@@ -81,7 +81,7 @@ import { Prop, Ref } from "vue-property-decorator";
 
 import { Vec2 } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
-import VDottedBox from "@/components/VDottedBox.vue";
+import VDottedBox from "@/components/utils/VDottedBox.vue";
 import { IMG_TAG_WIDTH } from "@/defines";
 @Options({
   components: {

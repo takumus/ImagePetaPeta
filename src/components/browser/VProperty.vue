@@ -59,8 +59,8 @@
 import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
-import VEditableLabel from "@/components/VEditableLabel.vue";
-import VPropertyThumbnail from "@/components/VPropertyThumbnail.vue";
+import VEditableLabel from "@/components/utils/VEditableLabel.vue";
+import VPropertyThumbnail from "@/components/browser/VPropertyThumbnail.vue";
 import { API, log } from "@/api";
 import { Vec2 } from "@/utils";
 @Options({

@@ -95,8 +95,8 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import VPanel from "@/components/VPanel.vue";
-import VCrop from "@/components/VCrop.vue";
+import VPanel from "@/components/board/VPanel.vue";
+import VCrop from "@/components/board/VCrop.vue";
 import { Board, BoardTransform, MenuType, MouseButton, PetaPanel } from "@/datas";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 import { ClickChecker, Vec2 } from "@/utils";

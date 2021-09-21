@@ -301,11 +301,11 @@ import { MenuItem } from "electron/main";
     sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
     return petaImages;
   }
-  async function getPetaImage(id: string) {
-    return new Promise((res: (data?: PetaImage) => void, rej: () => void) => {
+  function getPetaImage(id: string): Promise<PetaImage | null> {
+    return new Promise((res, rej) => {
       petaImagesDB.findOne({id}, (err, doc) => {
         if (err) {
-          res(undefined);
+          res(null);
           return;
         }
         res(doc);
@@ -342,19 +342,19 @@ import { MenuItem } from "electron/main";
       exists: false
     };
   }
-  async function saveFile(buffer: Buffer, filePath: string) {
-    return new Promise((res: (v: string) => void, rej: (v: string) => void) => {
+  function saveFile(buffer: Buffer, filePath: string): Promise<boolean> {
+    return new Promise((res, rej) => {
       fs.writeFile(filePath, buffer, (err) => {
         if (err) {
           rej(err.message);
           return;
         }
-        res("ok");
+        res(true);
       });
     });
   }
-  async function readFile(path: string) {
-    return new Promise((res: (v: Buffer) => void, rej: (v: string) => void) => {
+  function readFile(path: string): Promise<Buffer> {
+    return new Promise((res, rej) => {
       fs.readFile(path, (err, data) => {
         if (err) {
           rej(err.message);

@@ -111,7 +111,7 @@ import { API, log } from "@/api";
 import LoadingImage from "@/assets/sample.png";
 import RotateCursor from "@/assets/rotateCursor.png";
 import { IMG_TAG_WIDTH } from "@/defines";
-import VDottedBox from "@/components/VDottedBox.vue";
+import VDottedBox from "@/components/utils/VDottedBox.vue";
 import { fromMouseEvent } from "@/utils/vec2";
 enum ControlStatus {
   DRAGGING = "dragging",

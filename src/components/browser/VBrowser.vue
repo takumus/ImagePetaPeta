@@ -114,9 +114,9 @@ import { Options, Vue } from "vue-class-component";
 import { Categories, Category, createPetaPanel, PetaImage, PetaImages, PetaPanel, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
 import { Prop, Ref } from "vue-property-decorator";
 
-import VThumbnail from "@/components/VThumbnail.vue";
-import VProperty from "@/components/VProperty.vue";
-import VEditableLabel from "@/components/VEditableLabel.vue";
+import VThumbnail from "@/components/browser/VThumbnail.vue";
+import VProperty from "@/components/browser/VProperty.vue";
+import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import { Vec2 } from "@/utils";
 import { API, log } from "@/api";
 import GLOBAL from "@/globals";

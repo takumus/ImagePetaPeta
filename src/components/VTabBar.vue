@@ -118,7 +118,7 @@ import { log } from "@/api";
 import { Board, createBoard, MenuType, MouseButton, PetaImage } from "@/datas";
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
-import VEditableLabel from "@/components/VEditableLabel.vue";
+import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import Electron from "electron";
 import GLOBALS from "@/globals";
 import { Vec2 } from "@/utils";
