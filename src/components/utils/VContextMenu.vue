@@ -23,7 +23,7 @@
     min-width: 128px;
     padding: 8px 24px;
     // padding-left: 24px;
-    font-size: 0.9em;
+    font-size: 1em;
     cursor: pointer;
     &:hover {
       background-color: #555555;

@@ -82,10 +82,11 @@
         header {
           .search {
             border-radius: 8px;
-            border: solid 1px #333333;
+            border: solid 1.2px #333333;
             outline: none;
             padding: 4px;
             font-weight: bold;
+            font-size: 1.0em;
           }
         }
         ul {
