@@ -278,16 +278,7 @@ export default class VBrowser extends Vue {
     });
   }
   get filteredPetaImages() {
-    this.petaImagesArray.forEach((pi, i) => {
-      if (this.petaImagesArray.map((pi) => pi.id).join(",").split(pi.id).length != 2) {
-        API.send("dialog", "Error", []);
-        console.log(pi);
-      }
-    })
     if (this.selectUncategorized) {
-      // this.uncategorizedImages.forEach((ui) => {
-      //   console.log(ui.id);
-      // })
       return this.uncategorizedImages;
     }
     const categories = this.selectedCategories.split(" ");
