@@ -21,6 +21,11 @@
         </span>
         <span
           class="categories"
+        >
+          {{petaThumbnail.petaImage.id}}
+        </span>
+        <span
+          class="categories"
           v-if="petaThumbnail.petaImage.categories.length == 0"
         >
           Uncategorized

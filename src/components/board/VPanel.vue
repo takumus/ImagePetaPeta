@@ -235,10 +235,11 @@ export default class VPanel extends Vue {
     const mouse = this.getMouseFromEvent(fromMouseEvent(event));
     this.click.move(event);
     switch (this.controlStatus) {
-      case ControlStatus.DRAGGING:
+      case ControlStatus.DRAGGING: {
         this.petaPanel.position.x = mouse.x + this.dragOffset.x;
         this.petaPanel.position.y = mouse.y + this.dragOffset.y;
         break;
+      }
       case ControlStatus.SIZING: {
         const rMouse = mouse.clone().rotate(-this.petaPanel.rotation);
         const rPos = this.petaPanel.position.clone().rotate(-this.petaPanel.rotation);
@@ -354,11 +355,8 @@ export default class VPanel extends Vue {
   get ratio() {
     return (this.petaPanel.crop.height * this.petaPanel.petaImage.height) / (this.petaPanel.crop.width * this.petaPanel.petaImage.width);
   }
-  get normalWidth() {
-    return IMG_TAG_WIDTH;
-  }
   get normalHeight() {
-    return this.normalWidth * this.ratio;
+    return IMG_TAG_WIDTH * this.ratio;
   }
   get cropScale() {
     return 1 / this.petaPanel.crop.width;
@@ -379,28 +377,28 @@ export default class VPanel extends Vue {
     return this.petaPanel.height * this.transform.scale;
   }
   get _scaleX() {
-    return this.petaPanel.width / this.normalWidth * this.transform.scale;
+    return this.petaPanel.width / IMG_TAG_WIDTH * this.transform.scale;
   }
   get _scaleY() {
     return this.petaPanel.height / this.normalHeight * this.transform.scale;
   }
   get _offsetX() {
-    return `${-this.normalWidth / 2}px`;
+    return `${-IMG_TAG_WIDTH / 2}px`;
   }
   get _offsetY() {
     return `${-this.normalHeight / 2}px`;
   }
   get _normalizedWidth() {
-    return `${this.normalWidth}px`;
+    return `${IMG_TAG_WIDTH}px`;
   }
   get _normalizedHeight() {
     return `${this.normalHeight}px`;
   }
   get _cropPositionX() {
-    return -this.petaPanel.crop.position.x * this.normalWidth * this.cropScale + "px";
+    return -this.petaPanel.crop.position.x * IMG_TAG_WIDTH * this.cropScale + "px";
   }
   get _cropPositionY() {
-    return -this.petaPanel.crop.position.y * this.normalWidth * this.petaPanel.petaImage.height * this.cropScale + "px";
+    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel.petaImage.height * this.cropScale + "px";
   }
   get _cropScale() {
     return this.cropScale;

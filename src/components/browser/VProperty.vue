@@ -11,7 +11,7 @@
     <section class="buttons" v-show="!noImage">
       <button tabindex="-1" @click="clearSelection">Clear Selection</button>
     </section>
-    <p>Categories</p>
+    <p v-show="!noImage">Categories</p>
     <ul>
       <li v-for="category, i in _categories" :key="i">
         <VEditableLabel :label="category" :labelLook="`・${category}`" @change="(name) => changeCategory(category, name)" @focus="complementCategory" :growWidth="true" />
