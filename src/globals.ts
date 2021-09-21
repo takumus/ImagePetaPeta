@@ -6,6 +6,11 @@ const GLOBALS = {
     open: (items: ContextMenuItem[], position: Vec2): void => {
       //
     }
+  },
+  complement: {
+    open: (element: HTMLElement, items: string[]) => {
+      //
+    }
   }
 }
 // app.config.globalProperties.abc="aaa"

@@ -31,17 +31,19 @@
     </button>
   </article>
   <VTabBar
-    :boards="_boards"
+    :boards="sortedBoards"
     @remove="removeBoard"
     @add="addBoard"
     @select="selectBoard"
-    @sort="sortBoards"
     ref="vTabBar"
   />
   <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
   <VImageCache />
   <article class="context-menu">
     <VContextMenu ref="contextMenu"/>
+  </article>
+  <article class="complement">
+    <VComplement ref="complement"/>
   </article>
 </template>
 
@@ -97,9 +99,13 @@ body, html {
   left: 0px;
   text-align: right;
 }
-.context-menu {
+.complement {
   position: fixed;
   z-index: 5;
+}
+.context-menu {
+  position: fixed;
+  z-index: 6;
 }
 @import url("./styles/shared.scss");
 </style>
@@ -116,6 +122,7 @@ import VImageImporter from "@/components/utils/VImageImporter.vue";
 import VImageCache from "@/components/utils/VImageCache.vue";
 import VTabBar from "@/components/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
+import VComplement from "@/components/utils/VComplement.vue";
 import { Board, Categories, Category, createBoard, createCategory, createPetaPanel, ImportImageResult, MenuType, parseBoards, PetaImage, PetaImages, PetaPanel, UpdateMode } from "@/datas";
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2 } from "@/utils";
@@ -129,7 +136,8 @@ import { fromMouseEvent } from "./utils/vec2";
     VImageImporter,
     VImageCache,
     VTabBar,
-    VContextMenu
+    VContextMenu,
+    VComplement
   },
 })
 export default class App extends Vue {
@@ -253,9 +261,7 @@ export default class App extends Vue {
     });
   }
   updateBoard(board: Board, immidiately: boolean) {
-    if (this.boardUpdaters[board.id].order(board)) {
-      // log("board ordered", board.name);
-    }
+    this.boardUpdaters[board.id].order(board);
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
@@ -285,11 +291,7 @@ export default class App extends Vue {
     await this.getBoards();
     this.vTabBar.selectBoardByIndex(this.boards.length - 1);
   }
-  async sortBoards() {
-    // await API.send("updateBoards", this.boards, UpdateMode.UPDATE);
-    // log("sort boards");
-  }
-  get _boards() {
+  get sortedBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
   }
   @Watch("boards", { deep: true })

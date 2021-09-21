@@ -7,45 +7,51 @@
             <input
               type="text"
               v-model="selectedCategories"
+              @focus="complementCategory($event)"
             >
           </header>
           <ul>
             <li @click="selectCategory('')">
-              <VEditableLabel :label="`All(${petaImagesArray.length})`" :growWidth="true" :readonly="true"/>
+              <VEditableLabel :label="`・All(${petaImagesArray.length})`" :growWidth="true" :readonly="true"/>
             </li>
             <li @click="selectCategory('', true)" v-if="uncategorizedImages.length > 0">
-              <VEditableLabel :label="`Uncategorized(${uncategorizedImages.length})`" :growWidth="true" :readonly="true"/>
+              <VEditableLabel :label="`・Uncategorized(${uncategorizedImages.length})`" :growWidth="true" :readonly="true"/>
             </li>
             <li
               v-for="c in _categories"
               :key="c.name"
               @click="selectCategory(c.name)"
             >
-              <VEditableLabel :label="c.name" :labelLook="`${c.name}(${c.count})`" @change="(name) => changeCategory(c.name, name)" :growWidth="true" />
+              <VEditableLabel :label="c.name" :labelLook="`・${c.name}(${c.count})`" @change="(name) => changeCategory(c.name, name)" :growWidth="true" />
             </li>
           </ul>
         </section>
-        <section
-          class="images"
-          ref="images"
-        >
-          <div
-            class="thumbs-wrapper"
-            ref="thumbsWrapper"
-            :style="{height: scrollHeight + 8 + 'px'}"
+        <section class="images-wrapper">
+          <section
+            class="images"
+            ref="images"
           >
-            <VThumbnail
-              v-for="(data) in _petaThumbnails"
-              :key="data.petaImage.id"
-              :petaThumbnail="data"
-              @add="addPanel"
-              @select="selectImage"
-              @menu="petaImageMenu"
-            />
-          </div>
+            <div
+              class="thumbs-wrapper"
+              ref="thumbsWrapper"
+              :style="{height: scrollHeight + 8 + 'px'}"
+            >
+              <VThumbnail
+                v-for="(data) in _petaThumbnails"
+                :key="data.petaImage.id"
+                :petaThumbnail="data"
+                @add="addPanel"
+                @select="selectImage"
+                @menu="petaImageMenu"
+              />
+            </div>
+          </section>
         </section>
         <section class="property">
-          <VProperty :petaImages="selectedPetaImages"/>
+          <VProperty
+            :petaImages="selectedPetaImages"
+            @changeCategory="changePetaImageCategory"
+          />
         </section>
       </section>
     </div>
@@ -74,7 +80,7 @@
         ul {
           text-align: left;
           // padding: 0px;
-          padding-left: 8px;
+          padding-left: 0px;
           width: 100%;
           li {
             width: 100%;
@@ -99,10 +105,17 @@
           width: 100%;
         }
       }
+      .images-wrapper {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        padding: 8px;
+      }
       .property {
         width: 20%;
         min-width: 180px;
         color: #333333;
+        padding: 8px;
       }
     }
   }
@@ -120,6 +133,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import { Vec2 } from "@/utils";
 import { API, log } from "@/api";
 import GLOBAL from "@/globals";
+import GLOBALS from "@/globals";
 @Options({
   components: {
     VThumbnail,
@@ -187,30 +201,44 @@ export default class VBrowser extends Vue {
     // API.send("updatePetaImage", petaImage, true);
     petaImage._selected = !petaImage._selected;
   }
-  async changeCategory(category: string, name: string) {
-    name = name.replace(/\s+/g, "");
+  complementCategory(event: FocusEvent) {
+    GLOBALS.complement.open(event.target as HTMLInputElement, this._categories.map((c) => c.name));
+  }
+  async changeCategory(oldName: string, newName: string) {
+    newName = newName.replace(/\s+/g, "");
+    if (oldName == newName) return;
     let remove = false;
-    if (name == "") {
-      remove = await API.send("dialog", `Remove Category ${category}?`, ["Yes", "No"]) == 0;
+    if (newName == "") {
+      remove = await API.send("dialog", `Remove Category ${oldName}?`, ["Yes", "No"]) == 0;
     }
-    if (this._categories.find((c) => c.name == name)) {
+    if (this._categories.find((c) => c.name == newName)) {
       API.send("dialog", `Category ${name} already exists.`, []);
       return;
     }
     const changed: PetaImage[] = [];
     this.petaImagesArray.forEach((pi) => {
-      const index = pi.categories.indexOf(category);
+      const index = pi.categories.indexOf(oldName);
       if (index >= 0) {
         if (remove) {
           pi.categories.splice(index, 1);
         } else {
-          pi.categories[index] = name;
+          pi.categories[index] = newName;
         }
         changed.push(pi);
       }
     });
     API.send("updatePetaImages", changed, UpdateMode.UPDATE);
-    this.selectCategory(name);
+    this.selectCategory(newName);
+  }
+  changePetaImageCategory(oldName: string, newName: string) {
+    if (oldName == newName) return;
+    const categories = this.selectedCategories.split(" ");
+    const index = categories.indexOf(oldName);
+    if (index < 0) {
+      return;
+    }
+    categories[index] = newName;
+    this.selectedCategories = categories.join(" ");
   }
   clearSelectionAllImages() {
     this.petaImagesArray.forEach((pi) => {

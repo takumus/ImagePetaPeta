@@ -11,9 +11,10 @@
     <section class="buttons" v-show="!noImage">
       <button @click="clearSelection">Clear Selection</button>
     </section>
+    <p>Categories</p>
     <ul>
       <li v-for="category, i in _categories" :key="i">
-        <VEditableLabel :label="category" @change="(name) => changeCategory(category, name)" :growWidth="true" />
+        <VEditableLabel :label="category" :labelLook="`・${category}`" @change="(name) => changeCategory(category, name)" :growWidth="true" />
       </li>
     </ul>
   </div>
@@ -24,7 +25,6 @@
   width: 100%;
   height: 100%;
   color: #333333;
-  padding: 12px;
   position: relative;
   .previews {
     position: relative;
@@ -32,7 +32,6 @@
     height: 30%;
     overflow: hidden;
     border-radius: 8px;
-    margin: 8px;
     box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.5);
   }
   .buttons {
@@ -43,9 +42,15 @@
     li {
       list-style-type: none;
       background-color: #ffffff;
-      border: solid 2px;
+      // border: solid 2px;
       color: #333333;
-      padding: 8px;
+      padding: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #333333;
+      &:hover * {
+        text-decoration: underline;
+      }
     }
   }
   p {
@@ -112,10 +117,10 @@ export default class VProperty extends Vue {
           // 空欄じゃなければ更新
           pi.categories[index] = newName;
         }
+        this.$emit("changeCategory", oldName, newName);
       }
       pi.categories.sort();
     });
-    this.$emit("changeCategory", oldName, newName);
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
   }
   clearSelection() {
@@ -140,7 +145,7 @@ export default class VProperty extends Vue {
     return [...Object.keys(categories).filter((category) => categories[category] == this.petaImages.length), "..."];
   }
   get _petaThumbnails(): PetaThumbnail[] {
-    const maxWidth = this.previewWidth * 0.5;
+    const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
     const thumbnails = this.petaImages.map((p, i) => {
       let width = 0;
       let height = 0;
@@ -165,7 +170,7 @@ export default class VProperty extends Vue {
         this.petaImages.length > 1 ? (this.previewWidth - last.width) * (i / (this.petaImages.length - 1)) : this.previewWidth / 2 - thumb.width / 2,
         this.previewHeight / 2 - thumb.height / 2
       )
-    })
+    });
     return thumbnails;
   }
   get noImage() {

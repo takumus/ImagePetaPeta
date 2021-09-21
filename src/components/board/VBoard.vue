@@ -2,8 +2,8 @@
   <article class="board-root" ref="boardRoot">
     <section ref="panelsWrapper" class="panels-wrapper">
       <section ref="panelsBackground" class="panels-background">
-        <div class="line vertical" :style="{ transform: `translateX(${_zeroX})` }"></div>
-        <div class="line horizontal" :style="{ transform: `translateY(${_zeroY})` }"></div>
+        <div class="line vertical" :style="{ transform: `translateX(${centerX})` }"></div>
+        <div class="line horizontal" :style="{ transform: `translateY(${centerY})` }"></div>
       </section>
       <section class="panels" :style="{
         transform: `translate(${transform.position.x}px, ${transform.position.y}px)`
@@ -30,7 +30,7 @@
       />
     </section>
     <section class="info">
-      {{_zoom}}%
+      {{scalePercent}}%
     </section>
   </article>
 </template>
@@ -346,13 +346,13 @@ export default class VBoard extends Vue {
   get selectedPetaPanels() {
     return this.board.petaPanels.filter((pp) => pp._selected);
   }
-  get _zoom() {
+  get scalePercent() {
     return Math.floor(this.board.transform.scale * 100);
   }
-  get _zeroX() {
+  get centerX() {
     return Math.floor(this.transform.position.x) + "px";
   }
-  get _zeroY() {
+  get centerY() {
     return Math.floor(this.transform.position.y) + "px";
   }
   get transform(): BoardTransform {
