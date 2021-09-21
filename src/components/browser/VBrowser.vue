@@ -125,7 +125,7 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { Categories, Category, createPetaPanel, PetaImage, PetaImages, PetaPanel, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
+import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
 import { Prop, Ref } from "vue-property-decorator";
 
 import VThumbnail from "@/components/browser/VThumbnail.vue";
@@ -133,7 +133,6 @@ import VProperty from "@/components/browser/VProperty.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import { Vec2 } from "@/utils";
 import { API, log } from "@/api";
-import GLOBAL from "@/globals";
 import GLOBALS from "@/globals";
 @Options({
   components: {
@@ -183,7 +182,6 @@ export default class VBrowser extends Vue {
   selectCategory(category: string, uncategorized = false) {
     this.selectedCategories = category;
     this.selectUncategorized = uncategorized;
-    // this.clearSelectionAllImages();
   }
   addPanel(petaImage: PetaImage, worldPosition: Vec2, thumbnailPosition: Vec2) {
     petaImage._selected = false;
@@ -195,11 +193,8 @@ export default class VBrowser extends Vue {
       pi._selected = false;
     });
     petaImage._selected = false;
-    // const panel = createPetaPanel(petaImage, thumbnailPosition, this.imageWidth);
-    //   this.$emit("addPanel", panel, worldPosition);
   }
   selectImage(petaImage: PetaImage) {
-    // API.send("updatePetaImage", petaImage, true);
     petaImage._selected = !petaImage._selected;
   }
   complementCategory(event: FocusEvent) {
@@ -207,7 +202,9 @@ export default class VBrowser extends Vue {
   }
   async changeCategory(oldName: string, newName: string) {
     newName = newName.replace(/\s+/g, "");
-    if (oldName == newName) return;
+    if (oldName == newName) {
+      return;
+    }
     let remove = false;
     if (newName == "") {
       remove = await API.send("dialog", `Remove Category ${oldName}?`, ["Yes", "No"]) == 0;
@@ -248,7 +245,7 @@ export default class VBrowser extends Vue {
   }
   petaImageMenu(petaImage: PetaImage, position: Vec2) {
     petaImage._selected = true;
-    GLOBAL.contextMenu.open([
+    GLOBALS.contextMenu.open([
       {
         label: `Remove ${this.selectedPetaImages.length} Images`,
         click: async () => {
@@ -316,7 +313,6 @@ export default class VBrowser extends Vue {
     return [...categories];
   }
   get _petaThumbnails(): PetaThumbnail[] {
-    // log("update thumbnails");
     const hc = Math.floor(this.imagesWidth / this.defaultImageWidth);
     this.imageWidth = this.imagesWidth / hc;
     const yList: number[] = [];
