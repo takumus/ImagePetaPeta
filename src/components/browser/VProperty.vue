@@ -14,7 +14,7 @@
     <p>Categories</p>
     <ul>
       <li v-for="category, i in _categories" :key="i">
-        <VEditableLabel :label="category" :labelLook="`・${category}`" @change="(name) => changeCategory(category, name)" :growWidth="true" />
+        <VEditableLabel :label="category" :labelLook="`・${category}`" @change="(name) => changeCategory(category, name)" @focus="complementCategory" :growWidth="true" />
       </li>
     </ul>
   </div>
@@ -68,6 +68,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import VPropertyThumbnail from "@/components/browser/VPropertyThumbnail.vue";
 import { API, log } from "@/api";
 import { Vec2 } from "@/utils";
+import GLOBALS from "@/globals";
 @Options({
   components: {
     VEditableLabel,
@@ -80,6 +81,8 @@ import { Vec2 } from "@/utils";
 export default class VProperty extends Vue {
   @Prop()
   petaImages!: PetaImage[];
+  @Prop()
+  allCategories!: string[];
   @Ref("previews")
   previews!: HTMLElement;
   previewWidth = 0;
@@ -97,6 +100,7 @@ export default class VProperty extends Vue {
   }
   changeCategory(oldName: string, newName: string) {
     newName = newName.replace(/\s+/g, "");
+    let changed = false;
     this.petaImages.forEach((pi) => {
       const index = pi.categories.indexOf(oldName);
       if (index < 0) {
@@ -106,6 +110,7 @@ export default class VProperty extends Vue {
           if (newName != "") {
             // 空欄じゃなければ追加
             pi.categories.push(newName);
+            changed = true;
           }
         }
       } else {
@@ -117,16 +122,27 @@ export default class VProperty extends Vue {
           // 空欄じゃなければ更新
           pi.categories[index] = newName;
         }
+        changed = true;
         this.$emit("changeCategory", oldName, newName);
       }
       pi.categories.sort();
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
+    if (changed) {
+      API.send("dialog", "Clear Selection?", ["Yes", "No"]).then((index) => {
+        if (index == 0) {
+          this.clearSelection();
+        }
+      })
+    }
   }
   clearSelection() {
     this.petaImages.forEach((pi) => {
       pi._selected = false;
     })
+  }
+  complementCategory(event: FocusEvent) {
+    GLOBALS.complement.open(event.target as HTMLInputElement, this.allCategories);
   }
   get _categories(): string[] {
     if (this.noImage) {

@@ -8,6 +8,7 @@
       v-model="tempText"
       @blur="apply"
       @keyup.enter="apply"
+      @focus="focus($event)"
       ref="labelInput"
     >
     <span
@@ -66,7 +67,8 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
   components: {
   },
   emits: [
-    "change"
+    "change",
+    "focus"
   ]
 })
 export default class VEditableLabel extends Vue {
@@ -109,6 +111,9 @@ export default class VEditableLabel extends Vue {
     this.$emit("change", this.tempText);
     // もとに戻す
     this.tempText = this.label;
+  }
+  focus(event: FocusEvent) {
+    this.$emit("focus", event);
   }
   @Watch("tempText")
   changeTempText() {

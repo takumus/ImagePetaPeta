@@ -50,6 +50,7 @@
         <section class="property">
           <VProperty
             :petaImages="selectedPetaImages"
+            :allCategories="_categories.map(c => c.name)"
             @changeCategory="changePetaImageCategory"
           />
         </section>

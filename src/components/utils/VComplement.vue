@@ -73,7 +73,6 @@ export default class VComplement extends Vue {
       } else if (event.key == "Enter") {
         this.select(this.filteredItems[this.currentIndex]);
       }
-      this.normalizeIndex();
     });
   }
   normalizeIndex() {
@@ -92,12 +91,12 @@ export default class VComplement extends Vue {
     //
   }
   moveSelection() {
+    this.normalizeIndex();
     setTimeout(() => {
       if (this.input) this.input.setSelectionRange(this.input.value.length, this.input.value.length);
     },0);
   }
   open(input: HTMLElement, items: string[]): void {
-    console.log(input);
     this.input = input as HTMLInputElement;
     this.filteredItems = [];
     if (this.show) {
@@ -121,6 +120,7 @@ export default class VComplement extends Vue {
   }
   onInput() {
     if (!this.show || !this.input) return;
+    this.currentIndex = -1;
     const value = this.input.value.toLowerCase().trim();
     if (value == "") {
       this.filteredItems = [];
@@ -137,7 +137,7 @@ export default class VComplement extends Vue {
       }
       return ai - bi;
     });
-    this.normalizeIndex();
+    // this.normalizeIndex();
   }
   select(item?: string) {
     if (!this.show) return;
