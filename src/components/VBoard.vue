@@ -281,7 +281,7 @@ export default class VBoard extends Vue {
       }
     }], position);
   }
-  addPanel(petaPanel: PetaPanel, worldPosition: Vec2){
+  addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
     petaPanel.index = this.getMaxIndex() + 1;
     petaPanel.position.x -= this.transform.position.x;
     petaPanel.position.y -= this.transform.position.y;
@@ -289,8 +289,8 @@ export default class VBoard extends Vue {
     petaPanel.position.y *= 1 / this.transform.scale;
     petaPanel.width *= 1 / this.transform.scale;
     petaPanel.height = petaPanel.width * petaPanel.petaImage.height;
-    this.select(petaPanel, worldPosition);
     this.toFront(petaPanel);
+    this.select(petaPanel, worldPosition);
     if (worldPosition) {
       this.$nextTick(() => {
         const panelComponent = this.getVPanel(petaPanel);
@@ -307,14 +307,16 @@ export default class VBoard extends Vue {
   updateCrop() {
     this.croppingPetaPanel = null;
   }
-  select(petaPanel: PetaPanel, worldPosition: Vec2) {
+  select(petaPanel: PetaPanel, worldPosition?: Vec2) {
     this.clearSelectionAll();
     petaPanel._selected = true;
-    this.$nextTick(() => {
-      this.selectedPetaPanels.forEach((pp) => {
-        this.getVPanel(pp).startDrag(worldPosition)
-      })
-    });
+    if (worldPosition) {
+      this.$nextTick(() => {
+        this.selectedPetaPanels.forEach((pp) => {
+          this.getVPanel(pp).startDrag(worldPosition)
+        })
+      });
+    }
   }
   clearSelectionAll() {
     if (!this.shiftKeyPressed) {

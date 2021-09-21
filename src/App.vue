@@ -120,6 +120,7 @@ import { Board, Categories, Category, createBoard, createCategory, createPetaPan
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2 } from "@/utils";
 import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "./defines";
+import { fromMouseEvent } from "./utils/vec2";
 @Options({
   components: {
     VPanel,
@@ -195,12 +196,12 @@ export default class App extends Vue {
       if (!this.orderedAddPanelDragEvent) return;
       const panel = createPetaPanel(
         petaImage,
-        new Vec2(this.orderedAddPanelDragEvent.clientX, this.orderedAddPanelDragEvent.clientY),
+        fromMouseEvent(this.orderedAddPanelDragEvent),
         100,
         petaImage.height * 100
       );
       if (!this.browsing) {
-        this.addPanel(panel, new Vec2(0, 0));
+        this.addPanel(panel);//, fromMouseEvent(this.orderedAddPanelDragEvent));
       }
     });
     this.orderedAddPanelIds = [];
@@ -235,7 +236,7 @@ export default class App extends Vue {
     this.orderedAddPanelIds = ids;
     this.orderedAddPanelDragEvent = mouse;
   }
-  addPanel(petaPanel: PetaPanel, worldPosition: Vec2) {
+  addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
     if (!this.currentBoard) return;
     this.currentBoard.petaPanels.push(petaPanel);
     this.browsing = false;

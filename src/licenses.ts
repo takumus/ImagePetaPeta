@@ -57,7 +57,7 @@ export const LICENSES = [
   },
   {
     "name": "ImagePetaPeta@0.1.0",
-    "licenses": "# ImagePetaPeta\n\n## まずは\n```\nyarn\n```\n\n### デバッグ\n```\nyarn serve\n```\n\n### ビルド\n```\nyarn build\n```"
+    "licenses": "# ImagePetaPeta\n\n## ソース\nなぐり書きなので、いつかきれいにします。\n\n## まずは\n```\nyarn\n```\n\n### デバッグ\n```\nyarn serve\n```\n\n### ビルド\n```\nyarn build\n```"
   },
   {
     "name": "abbrev@1.1.1",
