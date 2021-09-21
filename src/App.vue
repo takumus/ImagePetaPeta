@@ -20,14 +20,16 @@
   </section>
   <article class="menu">
     <button
+      tabindex="-1"
       @click="importImages"
     >
-      ファイル読み込み
+      Import Images
     </button>
     <button
+      tabindex="-1"
       @click="openBrowser"
     >
-      {{ browsing ? "ブラウザを閉じる" : "ブラウザを開く" }}
+      {{ browsing ? "Close Browser" : "Open Browser" }}
     </button>
   </article>
   <VTabBar
@@ -98,6 +100,7 @@ body, html {
   bottom: 0px;
   left: 0px;
   text-align: right;
+  padding: 8px;
 }
 .complement {
   position: fixed;
@@ -172,6 +175,12 @@ export default class App extends Vue {
       log("update a PetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
+    window.addEventListener("keydown", (event) => {
+      if (event.key == "Escape") {
+        event.preventDefault();
+        this.browsing = false;
+      }
+    })
     await this.getAll();
     this.initSampleDatas();
   }

@@ -137,7 +137,6 @@ export default class VComplement extends Vue {
       }
       return ai - bi;
     });
-    // this.normalizeIndex();
   }
   select(item?: string) {
     if (!this.show) return;

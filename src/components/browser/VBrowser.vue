@@ -5,6 +5,7 @@
         <section class="categories">
           <header>
             <input
+              class="search"
               type="text"
               v-model="selectedCategories"
               @focus="complementCategory($event)"
@@ -78,6 +79,15 @@
       .categories {
         padding: 8px;
         text-align: center;
+        header {
+          .search {
+            border-radius: 8px;
+            border: solid 1px #333333;
+            outline: none;
+            padding: 4px;
+            font-weight: bold;
+          }
+        }
         ul {
           text-align: left;
           // padding: 0px;

@@ -9,7 +9,7 @@
     </section>
     <p>{{petaImages.length}} Images Selected.</p>
     <section class="buttons" v-show="!noImage">
-      <button @click="clearSelection">Clear Selection</button>
+      <button tabindex="-1" @click="clearSelection">Clear Selection</button>
     </section>
     <p>Categories</p>
     <ul>

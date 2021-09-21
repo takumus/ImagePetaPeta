@@ -13,7 +13,7 @@
       </div>
       <pre class="log">{{log}}</pre>
       <div class="confirms">
-        <button @click="ok" v-if="this.hasErrors">OK</button>
+        <button tabindex="-1" @click="ok" v-if="this.hasErrors">OK</button>
       </div>
     </div>
   </article>
