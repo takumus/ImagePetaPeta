@@ -33,9 +33,11 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
-import { PetaThumbnail } from "@/datas";
 import { Prop, Ref, Watch } from "vue-property-decorator";
+// Others
+import { PetaThumbnail } from "@/datas";
 import { ImageLoader } from "@/imageLoader";
 @Options({
   components: {

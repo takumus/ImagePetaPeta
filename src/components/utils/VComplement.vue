@@ -36,10 +36,11 @@
 </style>
 
 <script lang="ts">
-import { Vec2 } from "@/utils";
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
-import { v4 as uuid } from "uuid";
+// Others
+import { Vec2 } from "@/utils";
 import GLOBALS from "@/globals";
 @Options({
   components: {

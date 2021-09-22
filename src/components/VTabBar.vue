@@ -114,15 +114,16 @@
 </style>
 
 <script lang="ts">
-import { log } from "@/api";
-import { Board, createBoard, MenuType, MouseButton, PetaImage } from "@/datas";
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
+// Components
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
-import Electron from "electron";
+// Others
 import GLOBALS from "@/globals";
-import { Vec2 } from "@/utils";
-import { fromMouseEvent } from "@/utils/vec2";
+import { log } from "@/api";
+import { Board, MouseButton } from "@/datas";
+import { vec2FromMouseEvent } from "@/utils";
 @Options({
   components: {
     VEditableLabel
@@ -174,7 +175,7 @@ export default class VTabBar extends Vue {
       click: () => {
         this.removeBoard(board);
       }
-    }], fromMouseEvent(event));
+    }], vec2FromMouseEvent(event));
   }
   mousemove(event: MouseEvent) {
     if (!this.pressing) return;

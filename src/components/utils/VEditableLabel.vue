@@ -60,7 +60,7 @@
 </style>
 
 <script lang="ts">
-import { API, log } from "@/api";
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 @Options({

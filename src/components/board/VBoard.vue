@@ -94,15 +94,16 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
+import { Prop, Ref, Watch } from "vue-property-decorator";
+// Components
 import VPanel from "@/components/board/VPanel.vue";
 import VCrop from "@/components/board/VCrop.vue";
-import { Board, BoardTransform, MenuType, MouseButton, PetaPanel } from "@/datas";
-import { Prop, Ref, Watch } from "vue-property-decorator";
-import { ClickChecker, Vec2 } from "@/utils";
-import { API, log } from "@/api";
+// Others
+import { Board, BoardTransform, MouseButton, PetaPanel } from "@/datas";
+import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
 import GLOBALS from "@/globals";
-import { fromMouseEvent } from "@/utils/vec2";
 @Options({
   components: {
     VPanel,
@@ -188,7 +189,7 @@ export default class VBoard extends Vue {
           click: () => {
             this.resetTransform();
           }
-        }], fromMouseEvent(e));
+        }], vec2FromMouseEvent(e));
       }
     } else if (this.draggingBackground && e.button == MouseButton.LEFT) {
       this.dragging = false;
@@ -219,7 +220,7 @@ export default class VBoard extends Vue {
     }
   }
   wheel(event: WheelEvent) {
-    const mouse = fromMouseEvent(event);
+    const mouse = vec2FromMouseEvent(event);
     mouse.add(this.globalOffset.clone().mult(-1));
     if (event.ctrlKey || !this.isMac) {
       const currentZoom = this.board.transform.scale;

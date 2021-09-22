@@ -62,6 +62,7 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 @Options({

@@ -142,13 +142,15 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
-import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
 import { Prop, Ref } from "vue-property-decorator";
-
+// Components
 import VThumbnail from "@/components/browser/VThumbnail.vue";
 import VProperty from "@/components/browser/VProperty.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
+// Others
+import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
 import { Vec2 } from "@/utils";
 import { API, log } from "@/api";
 import GLOBALS from "@/globals";

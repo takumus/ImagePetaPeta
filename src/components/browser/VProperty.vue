@@ -61,11 +61,14 @@
 </style>
 
 <script lang="ts">
-import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
+// Components
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import VPropertyThumbnail from "@/components/browser/VPropertyThumbnail.vue";
+// Others
+import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
 import { API, log } from "@/api";
 import { Vec2 } from "@/utils";
 import GLOBALS from "@/globals";

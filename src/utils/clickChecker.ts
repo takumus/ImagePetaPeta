@@ -1,14 +1,14 @@
 import { CLICK_OFFSET } from "@/defines";
-import { fromMouseEvent, Vec2 } from "@/utils/vec2";
+import { vec2FromMouseEvent, Vec2 } from "@/utils";
 export class ClickChecker {
   clickPosition = new Vec2();
   click = false;
   down(event: MouseEvent) {
-    this.clickPosition = fromMouseEvent(event);
+    this.clickPosition = vec2FromMouseEvent(event);
     this.click = true;
   }
   move(event: MouseEvent) {
-    if (this.clickPosition.getDistance(fromMouseEvent(event)) > CLICK_OFFSET) {
+    if (this.clickPosition.getDistance(vec2FromMouseEvent(event)) > CLICK_OFFSET) {
       this.click = false;
     }
   }

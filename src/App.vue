@@ -113,9 +113,10 @@ body, html {
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
-
+// Components
 import VPanel from "@/components/board/VPanel.vue";
 import VBrowser from "@/components/browser/VBrowser.vue";
 import VBoard from "@/components/board/VBoard.vue";
@@ -124,11 +125,11 @@ import VImageCache from "@/components/utils/VImageCache.vue";
 import VTabBar from "@/components/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
-import { Board, createBoard, createCategory, createPetaPanel, ImportImageResult, MenuType, PetaImage, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
+// Others
+import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
 import { API, log } from "@/api";
-import { DelayUpdater, Vec2 } from "@/utils";
-import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "./defines";
-import { fromMouseEvent } from "./utils/vec2";
+import { DelayUpdater, Vec2, vec2FromMouseEvent } from "@/utils";
+import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/defines";
 @Options({
   components: {
     VPanel,
@@ -202,12 +203,12 @@ export default class App extends Vue {
       if (!this.orderedAddPanelDragEvent) return;
       const panel = createPetaPanel(
         petaImage,
-        fromMouseEvent(this.orderedAddPanelDragEvent),
+        vec2FromMouseEvent(this.orderedAddPanelDragEvent),
         100,
         petaImage.height * 100
       );
       if (!this.browsing) {
-        this.addPanel(panel);//, fromMouseEvent(this.orderedAddPanelDragEvent));
+        this.addPanel(panel);//, vec2FromMouseEvent(this.orderedAddPanelDragEvent));
       }
     });
     this.orderedAddPanelIds = [];

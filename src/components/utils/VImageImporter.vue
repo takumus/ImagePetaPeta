@@ -75,7 +75,9 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
+// Others
 import { getURLFromImgTag } from "@/utils";
 import { API, log } from "@/api";
 @Options({

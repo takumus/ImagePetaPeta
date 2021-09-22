@@ -75,13 +75,15 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
-import { MouseButton, PetaImage, PetaPanel, PetaThumbnail } from "@/datas";
 import { Prop, Ref } from "vue-property-decorator";
-
+// Components
+import VDottedBox from "@/components/utils/VDottedBox.vue";
+// Others
+import { MouseButton, PetaPanel } from "@/datas";
 import { Vec2 } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
-import VDottedBox from "@/components/utils/VDottedBox.vue";
 import { IMG_TAG_WIDTH } from "@/defines";
 @Options({
   components: {

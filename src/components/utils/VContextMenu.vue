@@ -39,10 +39,12 @@
 </style>
 
 <script lang="ts">
-import { ContextMenuItem } from "@/datas";
-import { Vec2 } from "@/utils";
+// Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
+// Others
+import { ContextMenuItem } from "@/datas";
+import { Vec2 } from "@/utils";
 import { v4 as uuid } from "uuid";
 import GLOBALS from "@/globals";
 @Options({

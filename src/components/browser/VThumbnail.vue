@@ -103,15 +103,14 @@
 </style>
 
 <script lang="ts">
+// Vue
 import { Options, Vue } from "vue-class-component";
-import { createPetaPanel, MouseButton, PetaImage, PetaPanel, PetaThumbnail, UpdateMode } from "@/datas";
 import { Prop, Ref, Watch } from "vue-property-decorator";
-import { ClickChecker, Vec2 } from "@/utils";
+// Others
+import { MouseButton,  PetaThumbnail, UpdateMode } from "@/datas";
+import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
 import { API } from "@/api";
-import LoadingImage from "@/assets/sample.png";
-import { fromMouseEvent } from "@/utils/vec2";
-// import { getImageData } from "@/utils";
 @Options({
   components: {
   },
@@ -155,7 +154,7 @@ export default class VThumbnail extends Vue {
         elementRect.x + elementRect.width / 2,
         elementRect.y + elementRect.height / 2
       );
-      this.$emit("add", this.petaThumbnail.petaImage, fromMouseEvent(event), position);
+      this.$emit("add", this.petaThumbnail.petaImage, vec2FromMouseEvent(event), position);
       this.pressing = false;
     }
   }
@@ -169,7 +168,7 @@ export default class VThumbnail extends Vue {
           this.$emit("select", this.petaThumbnail.petaImage);
           break;
         case MouseButton.RIGHT:
-          this.$emit("menu", this.petaThumbnail.petaImage, fromMouseEvent(event));
+          this.$emit("menu", this.petaThumbnail.petaImage, vec2FromMouseEvent(event));
           break;
       }
     }

@@ -44,9 +44,9 @@ export class Vec2 {
     return this;
   }
 }
-export function toVec2(position: {x: number, y: number}) {
+export function vec2FromObject(position: {x: number, y: number}) {
   return new Vec2(position.x, position.y);
 }
-export function fromMouseEvent(event: MouseEvent) {
+export function vec2FromMouseEvent(event: MouseEvent) {
   return new Vec2(event.clientX, event.clientY);
 }

@@ -1,4 +1,4 @@
-import { toVec2, Vec2 } from "@/utils";
+import { vec2FromObject, Vec2 } from "@/utils";
 import { v4 as uuid } from "uuid";
 export type PetaImageId = string;
 export interface PetaImage {
@@ -122,10 +122,10 @@ export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: num
 }
 export function parseBoards(boards: Board[], petaImages: PetaImages) {
   return boards.forEach((board) => {
-    board.transform.position = toVec2(board.transform.position);
+    board.transform.position = vec2FromObject(board.transform.position);
     board.petaPanels.forEach(pp => {
       pp._petaImage = petaImages[pp.petaImageId];
-      pp.position = toVec2(pp.position);
+      pp.position = vec2FromObject(pp.position);
     })
   });
 }

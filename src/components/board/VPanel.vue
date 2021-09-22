@@ -102,17 +102,18 @@
 </style>
 
 <script lang="ts">
+// VUe
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
-import { ClickChecker, Vec2 } from "@/utils";
+// Components
+import VDottedBox from "@/components/utils/VDottedBox.vue";
+// Others
+import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
-import { BoardTransform, MenuType, MouseButton, PetaImage, PetaPanel } from "@/datas";
-import { API, log } from "@/api";
+import { BoardTransform, MouseButton, PetaPanel } from "@/datas";
 import LoadingImage from "@/assets/sample.png";
 import RotateCursor from "@/assets/rotateCursor.png";
 import { IMG_TAG_WIDTH } from "@/defines";
-import VDottedBox from "@/components/utils/VDottedBox.vue";
-import { fromMouseEvent } from "@/utils/vec2";
 enum ControlStatus {
   DRAGGING = "dragging",
   ROTATING = "rotating",
@@ -193,7 +194,7 @@ export default class VPanel extends Vue {
     this.dragOffset.y = this.petaPanel.position.y - mouse.y;
   }
   startRotate(event: MouseEvent) {
-    const mouse = this.getMouseFromEvent(fromMouseEvent(event));
+    const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
     this.controlStatus = ControlStatus.ROTATING;
     const dx = mouse.x - (this.petaPanel.position.x);
     const dy = mouse.y - (this.petaPanel.position.y);
@@ -215,11 +216,11 @@ export default class VPanel extends Vue {
     }
   }
   private mousedown(event: MouseEvent) {
-    const worldPosition: Vec2 = fromMouseEvent(event);
+    const worldPosition: Vec2 = vec2FromMouseEvent(event);
     switch (event.button) {
       case MouseButton.LEFT: {
         this.startDrag(worldPosition);
-        this.$emit("select", this.petaPanel, fromMouseEvent(event));
+        this.$emit("select", this.petaPanel, vec2FromMouseEvent(event));
         if (!this.shiftKeyPressed) {
           this.$emit("toFront", this.petaPanel);
         }
@@ -232,7 +233,7 @@ export default class VPanel extends Vue {
     }
   }
   mousemove(event: MouseEvent) {
-    const mouse = this.getMouseFromEvent(fromMouseEvent(event));
+    const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
     this.click.move(event);
     switch (this.controlStatus) {
       case ControlStatus.DRAGGING: {
@@ -306,7 +307,7 @@ export default class VPanel extends Vue {
       }
       case MouseButton.RIGHT: {
         if (this.click.isClick) {
-          this.$emit("menu", this.petaPanel, fromMouseEvent(event));
+          this.$emit("menu", this.petaPanel, vec2FromMouseEvent(event));
         }
         break;
       }
@@ -325,7 +326,7 @@ export default class VPanel extends Vue {
     this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
   }
   beginChangeSize(vOrigin: SizingOrigin, hOrigin: SizingOrigin, event: MouseEvent) {
-    const mouse = this.getMouseFromEvent(fromMouseEvent(event));
+    const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
     const rMouse = mouse.clone().rotate(-this.petaPanel.rotation);
     this.sizeOffset.x = rMouse.x;
     this.sizeOffset.y = rMouse.y;
