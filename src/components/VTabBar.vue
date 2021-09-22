@@ -244,8 +244,11 @@ export default class VTabBar extends Vue {
     return true;// this.boards.length > 1;
   }
   @Watch("boards", { deep: true, immediate: true })
-  changeBoards(n: Board[], o: Board[]) {
-    if(n?.length != o?.length) {
+  changeBoards(n?: Board[], o?: Board[]) {
+    // idの並びと長さの変更のみ検知したい。これしか思いつかなかった。
+    const nIds = n?.map((b) => b.id).join(",");
+    const oIds = o?.map((b) => b.id).join(",");
+    if(nIds != oIds) {
       this.selectBoardByIndex(this.selectedIndex, true);
     }
   }

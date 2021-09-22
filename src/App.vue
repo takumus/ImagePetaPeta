@@ -187,7 +187,7 @@ export default class App extends Vue {
     await this.getBoards();
   }
   async getPetaImages() {
-    this.petaImages = await API.send("getPetaImages", [], "");
+    this.petaImages = await API.send("getPetaImages");
     this.boards.forEach((board) => {
       // boardのpetaPanelを回す
       for (let i = board.petaPanels.length - 1; i >= 0; i--) {

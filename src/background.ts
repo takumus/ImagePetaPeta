@@ -88,7 +88,7 @@ import { DEFAULT_BOARD_NAME } from "./defines";
       mainLog("return:", true);
       return images;
     },
-    getPetaImages: async (event, categories, order) => {
+    getPetaImages: async (event) => {
       mainLog("#Get Peta Images");
       return new Promise((res, rej) => {
         petaImagesDB.find({}).exec((err, data) => {
@@ -139,7 +139,7 @@ import { DEFAULT_BOARD_NAME } from "./defines";
     getBoards: async (event) => {
       mainLog("#Get Boards");
       return new Promise((res, rej) => {
-        boardsDB.find({}).exec((err, data) => {
+        boardsDB.find({}).exec(async (err, data) => {
           if (err) {
             mainLog("error:", err.message);
             rej(err.message);
@@ -148,12 +148,15 @@ import { DEFAULT_BOARD_NAME } from "./defines";
           if (data.length == 0) {
             mainLog("no boards");
             const board = createBoard(DEFAULT_BOARD_NAME);
-            updateBoard(board, UpdateMode.INSERT)
-            .then(() => {
-              data.push(board);
-              mainLog("return:", data.length);
-              res(data);
-            });
+            try {
+              await updateBoard(board, UpdateMode.INSERT);
+            } catch(err) {
+              mainLog("error:", err);
+              rej(err);
+            }
+            data.push(board);
+            mainLog("return:", data.length);
+            res(data);
           } else {
             mainLog("return:", data.length);
             res(data);

@@ -5,7 +5,7 @@ export interface Main {
   importImageFromURL: (url: string) => Promise<PetaImageId>;
   importImagesFromFilePaths: (filePaths: string[]) => Promise<PetaImageId[]>;
   // peta image
-  getPetaImages: (categories: string[], order: string) => Promise<PetaImages>;
+  getPetaImages: () => Promise<PetaImages>;
   getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
