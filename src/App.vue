@@ -13,7 +13,6 @@
   >
     <VBrowser
       :petaImages="petaImages"
-      :categories="categories"
       @addPanel="addPanel"
       :visible="browsing"
     />
@@ -126,7 +125,7 @@ import VImageCache from "@/components/utils/VImageCache.vue";
 import VTabBar from "@/components/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
-import { Board, Categories, Category, createBoard, createCategory, createPetaPanel, ImportImageResult, MenuType, parseBoards, PetaImage, PetaImages, PetaPanel, UpdateMode } from "@/datas";
+import { Board, createBoard, createCategory, createPetaPanel, ImportImageResult, MenuType, parseBoards, PetaImage, PetaImages, PetaPanel, UpdateMode } from "@/datas";
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2 } from "@/utils";
 import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "./defines";
@@ -151,7 +150,6 @@ export default class App extends Vue {
   @Ref("contextMenu")
   contextMenu!: VContextMenu;
   petaImages: PetaImages = {};
-  categories: Categories = {};
   boards: Board[] = [];
   currentBoard: Board | null = null;
   imageZIndex = 0;
@@ -182,17 +180,9 @@ export default class App extends Vue {
       }
     })
     await this.getAll();
-    this.initSampleDatas();
-  }
-  initSampleDatas() {
-    "色,構図,人体,顔,手".split(",").forEach((name) => {
-      const cat = createCategory(name);
-      this.categories[cat.id] = cat;
-    });
   }
   async getAll() {
     await this.getPetaImages();
-    await this.getCategories();
     await this.getBoards();
   }
   async getPetaImages() {
@@ -222,10 +212,6 @@ export default class App extends Vue {
       }
     });
     this.orderedAddPanelIds = [];
-  }
-  async getCategories() {
-    log("load all categories");
-    this.categories = await API.send("getCategories");
   }
   async getBoards() {
     log("load all boards");
@@ -304,8 +290,7 @@ export default class App extends Vue {
     return this.boards.sort((a, b) => a.index - b.index);
   }
   @Watch("boards", { deep: true })
-  changeBoard() {
-    // if (!this.currentBoard) return;
+  changeBoard(a: Board[], b: Board[]) {
     this.boards.forEach((board) => {
       this.updateBoard(board, false);
     });

@@ -45,136 +45,138 @@ import { MenuItem } from "electron/main";
   mainLog(DIR_ROOT);
   const mainAPIs: MainFunctions = {
     browseImages: async () => {
+      mainLog("#Browse Images");
       const file = await dialog.showOpenDialog(win, { properties: ['openFile', 'multiSelections'] });
       if (file.canceled) {
+        mainLog("canceled");
         throw "canceled";
       }
-      importImage(file.filePaths);
+      importImages(file.filePaths);
+      mainLog("return:", file.filePaths.length)
       return file.filePaths.length;
     },
     importImageFromURL: async (event, url) => {
       try {
         sendToRenderer("importImagesBegin", 1);
+        mainLog("#Import Image From URL");
         let data: Buffer;
         if (url.trim().indexOf("http") != 0) {
           // dataURIだったら
+          mainLog("data uri");
           data = dataURIToBuffer(url);
         } else {
           // 普通のurlだったら
+          mainLog("normal url:", url);
           data = (await axios.get(url, { responseType: 'arraybuffer' })).data;
         }
         const extName = "." + imageFormatToExtention((await sharp(data).metadata()).format);
-        if (!extName) throw new Error("invalid image file");
+        if (!extName) {
+          mainLog("invalid image file");
+          throw new Error("invalid image file");
+        }
         const now = new Date();
         const addResult = await addImage(data, now.toLocaleString(), extName, now, now);
         sendToRenderer("importImagesProgress", 1, url, addResult.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
         sendToRenderer("importImagesComplete", 1, 1);
+        mainLog("return: ", minimId(addResult.petaImage.id));
         return addResult.petaImage.id;
-      } catch (e) {
-        // console.log(e);
+      } catch (err) {
+        mainLog("error: ", err);
         sendToRenderer("importImagesProgress", 1, url, ImportImageResult.ERROR);
         sendToRenderer("importImagesComplete", 1, 0);
       }
       return "";
     },
     importImagesFromFilePaths: async (event, filePaths) =>{
-      return (await importImage(filePaths)).map((image) => image.id);
+      mainLog("#Import Images From File Paths");
+      const images = (await importImages(filePaths)).map((image) => image.id);
+      mainLog("return:", true);
+      return images;
     },
     getPetaImages: async (event, categories, order) => {
+      mainLog("#Get Peta Images");
       return new Promise((res, rej) => {
         petaImagesDB.find({}).exec((err, data) => {
           if (err) {
             rej(err.message);
+            mainLog("error:", err.message);
             return {};
           }
           const petaImages: PetaImages = {};
           data.forEach((pi) => {
             petaImages[pi.id] = pi;
           });
+          mainLog("return:", data.length);
           res(petaImages);
         });
       });
     },
     getPetaImageBinary: async (event, data, thumbnail) => {
+      mainLog("#Get Peta Image Binary");
+      mainLog("id:", minimId(data.id));
       return new Promise((res, rej) => {
         fs.readFile(getImagePath(data, thumbnail), (err, buffer) => {
           if (err) {
+            mainLog("error:", err, minimId(data.id));
             rej(err.message);
             return;
           }
+          mainLog("return:", buffer.byteLength, minimId(data.id));
           res(buffer);
         });
       });
     },
     updatePetaImages: async (event, datas, mode) => {
+      mainLog("#Update Peta Images");
       try {
         for (let i = 0; i < datas.length; i ++) {
           await updatePetaImage(datas[i], mode);
         }
       } catch (err) {
-        //
+        mainLog("error:", err);
       }
       if (mode != UpdateMode.UPDATE) {
         sendToRenderer("updatePetaImages");
       }
-      return true;
-    },
-    getCategories: async (event) => {
-      return new Promise((res, rej) => {
-        categoriesDB.find({}).exec((err, data) => {
-          if (err) {
-            rej(err.message);
-            return;
-          }
-          const categories: Categories = {};
-          data.forEach((c) => {
-            categories[c.id] = c;
-          })
-          res(categories);
-        });
-      });
-    },
-    updateCategories: async (event, categories, mode) => {
-      try {
-        for (let i = 0; i < categories.length; i ++) {
-          await updateCategory(categories[i], mode);
-        }
-      } catch (err) {
-        //
-      }
-      if (mode != UpdateMode.UPDATE) {
-        sendToRenderer("updateCategories");
-      }
+      mainLog("return:", true);
       return true;
     },
     getBoards: async (event) => {
+      mainLog("#Get Boards");
       return new Promise((res, rej) => {
         boardsDB.find({}).exec((err, data) => {
           if (err) {
+            mainLog("error:", err.message);
             rej(err.message);
             return;
           }
           if (data.length == 0) {
+            mainLog("no boards");
             const board = createBoard(DEFAULT_BOARD_NAME);
             updateBoard(board, UpdateMode.INSERT)
             .then(() => {
               data.push(boardToBoardDB(board));
+              mainLog("return:", data.length);
               res(data);
             });
           } else {
+            mainLog("return:", data.length);
             res(data);
           }
         });
       });
     },
     updateBoards: async (event, boards, mode) => {
+      mainLog("#Update Boards");
       try {
         for (let i = 0; i < boards.length; i ++) {
           await updateBoard(boards[i], mode);
         }
       } catch (err) {
+        mainLog("error:", err);
         return false;
       }
+      mainLog("return:", true);
       return true;
     },
     log: async (event, ...args: any) => {
@@ -182,6 +184,8 @@ import { MenuItem } from "electron/main";
       return true;
     },
     dialog: async (event, message, buttons) => {
+      mainLog("#Dialog");
+      mainLog("dialog:", message, buttons);
       const value = await dialog.showMessageBox(win, {
         title: "Petapeta",
         message: message,
@@ -191,15 +195,20 @@ import { MenuItem } from "electron/main";
     }
   }
   function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {
+    mainLog(" ##Update Peta Image");
+    mainLog(" mode:", mode);
+    mainLog(" image:", minimId(petaImage.id));
     petaImage._selected = false;
     return new Promise((res, rej) => {
       if (mode == UpdateMode.REMOVE) {
         petaImagesDB.remove({ id: petaImage.id }, {}, (err) => {
           if (err) {
+            mainLog(" failed to remove", err.message);
             rej(err.message);
           } else {
             fs.rm(getImagePath(petaImage), () => {
               fs.rm(getImagePath(petaImage, true), () => {
+                mainLog(" removed");
                 res(true);
               });
             });
@@ -209,8 +218,10 @@ import { MenuItem } from "electron/main";
         if (petaImage.addDate)
         petaImagesDB.update({ id: petaImage.id }, petaImage, { upsert: mode == UpdateMode.INSERT }, (err) => {
           if (err) {
+            mainLog(" failed to update:", err.message);
             rej(err.message);
           } else {
+            mainLog(" updated");
             res(true);
             sendToRenderer("updatePetaImage", petaImage);
           }
@@ -218,34 +229,18 @@ import { MenuItem } from "electron/main";
       }
     })
   }
-  function updateCategory(category: Category, mode: UpdateMode): Promise<boolean> {
-    return new Promise((res, rej) => {
-      if (mode == UpdateMode.REMOVE) {
-        categoriesDB.remove({ id: category.id }, {}, (err) => {
-          if (err) {
-            rej(err.message);
-          } else {
-            res(true);
-          }
-        });
-      } else {
-        categoriesDB.update({ id: category.id }, category, { upsert: mode == UpdateMode.INSERT }, (err) => {
-          if (err) {
-            rej(err.message);
-          } else {
-            res(true);
-          }
-        });
-      }
-    });
-  }
   function updateBoard(board: Board, mode: UpdateMode): Promise<boolean> {
+    mainLog(" ##Update Board");
+    mainLog(" mode:", mode);
+    mainLog(" board:", minimId(board.id));
     return new Promise((res, rej) => {
       if (mode == UpdateMode.REMOVE) {
         boardsDB.remove({ id: board.id }, {}, (err) => {
           if (err) {
+            mainLog(" failed to remove", err.message);
             rej(err.message);
           } else {
+            mainLog(" removed");
             res(true);
           }
         });
@@ -253,8 +248,10 @@ import { MenuItem } from "electron/main";
         const dbBoard: BoardDB = boardToBoardDB(board);
         boardsDB.update({ id: board.id }, dbBoard, { upsert: mode == UpdateMode.INSERT }, (err) => {
           if (err) {
+            mainLog(" failed to update:", err.message);
             rej(err.message);
           } else {
+            mainLog(" updated");
             res(true);
           }
         });
@@ -273,13 +270,16 @@ import { MenuItem } from "electron/main";
   Object.keys(mainAPIs).forEach((key) => {
     ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainAPIs as any)[key](e, ...args));
   });
-  async function importImage(filePaths: string[]) {
+  async function importImages(filePaths: string[]) {
     sendToRenderer("importImagesBegin", filePaths.length);
+    mainLog(" ##Import Images");
+    mainLog(" files:", filePaths.length);
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
     const addDate = new Date();
     for (let i = 0; i < filePaths.length; i++) {
       const filePath = filePaths[i];
+      mainLog(" import:", i + 1, "/", filePaths.length);
       let result = ImportImageResult.SUCCESS;
       try {
         const data = await readFile(filePath);
@@ -293,11 +293,14 @@ import { MenuItem } from "electron/main";
         }
         // success
         addedFileCount++;
+        mainLog(" imported", name, result);
       } catch (err) {
+        mainLog(" error:", err);
         result = ImportImageResult.ERROR;
       }
       sendToRenderer("importImagesProgress", (i + 1) / filePaths.length, filePath, result);
     }
+    mainLog(" return:", addedFileCount, "/", filePaths.length);
     sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
     return petaImages;
   }
@@ -365,6 +368,9 @@ import { MenuItem } from "electron/main";
     });
   }
 })();
+function minimId(id: string) {
+  return id.substr(0, 6);
+}
 function log(from: LogFrom, ...args: any[]) {
   console.log(`[${from}]`, ...args);
 }

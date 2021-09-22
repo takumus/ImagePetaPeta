@@ -1,27 +1,24 @@
 export class DelayUpdater<T> {
   private callback?: (data: T) => void;
-  private data?: T;
+  private data = "";
   private timerId = -1;
-  private prevDataJSON = "";
   private _ordered = false;
   constructor(private delay: number = 200) {
     //
   }
   initData(data: T) {
-    this.data = data;
-    this.prevDataJSON = JSON.stringify(data);
+    this.data = JSON.stringify(data);
   }
   forceUpdate() {
-    if (!this.callback || !this.data || !this._ordered) return;
+    if (!this.callback || !this._ordered) return;
     window.clearInterval(this.timerId);
     this._ordered = false;
-    const dataJSON = JSON.stringify(this.data);
-    if (dataJSON == this.prevDataJSON) return;
-    this.callback(this.data);
-    this.prevDataJSON = dataJSON;
+    this.callback(JSON.parse(this.data) as T);
   }
   order(data: T) {
-    this.data = data;
+    const newData = JSON.stringify(data);
+    if (this.data == newData) return;
+    this.data = newData;
     window.clearInterval(this.timerId);
     this._ordered = true;
     this.timerId = window.setTimeout(() => {

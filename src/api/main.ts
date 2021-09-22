@@ -8,9 +8,6 @@ export interface Main {
   getPetaImages: (categories: string[], order: string) => Promise<PetaImages>;
   getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
-  // category
-  getCategories: () => Promise<Categories>;
-  updateCategories: (categories: Category[], mode: UpdateMode) => Promise<boolean>;
   // boards
   getBoards: () => Promise<BoardDB[]>;
   updateBoards: (boards: Board[], mode: UpdateMode) => Promise<boolean>;
