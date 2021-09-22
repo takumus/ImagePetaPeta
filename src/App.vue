@@ -113,7 +113,6 @@ body, html {
 </style>
 
 <script lang="ts">
-import vue from "vue";
 import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
 

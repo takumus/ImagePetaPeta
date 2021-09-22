@@ -321,7 +321,14 @@ export default class VBrowser extends Vue {
         }
       });
     });
-    return [...categories];
+    categories.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      } else {
+        return 1;
+      }
+    })
+    return categories;
   }
   get _petaThumbnails(): PetaThumbnail[] {
     const hc = Math.floor(this.imagesWidth / this.defaultImageWidth);
