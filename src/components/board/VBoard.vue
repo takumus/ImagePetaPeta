@@ -141,6 +141,7 @@ export default class VBoard extends Vue {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("keydown", this.keydown);
     window.addEventListener("keyup", this.keyup);
+    window.addEventListener("mousedown", this.mousedownOutside);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
     });
@@ -156,12 +157,18 @@ export default class VBoard extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("keydown", this.keydown);
     window.removeEventListener("keyup", this.keyup);
+    window.removeEventListener("mousedown", this.mousedownOutside);
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
   }
   resize(rect: DOMRectReadOnly) {
     this.globalOffset.x = rect.width / 2;
     this.globalOffset.y = rect.height / 2;
+  }
+  mousedownOutside(e: MouseEvent) {
+    if (this.board.petaPanels.map((pp) => this.getVPanel(pp)?.$el).indexOf((e.target as HTMLElement).parentElement as any) < 0) {
+      this.clearSelectionAll();
+    }
   }
   mousedown(e: MouseEvent) {
     if (e.button == MouseButton.RIGHT) {
@@ -170,7 +177,7 @@ export default class VBoard extends Vue {
       this.dragging = true;
       this.draggingBackground = true;
       // clearSelection all
-      this.clearSelectionAll();
+      // this.clearSelectionAll();
     }
     this.click.down(e);
     if (!this.dragging) return;
@@ -293,11 +300,11 @@ export default class VBoard extends Vue {
     if (worldPosition) {
       this.$nextTick(() => {
         const panelComponent = this.getVPanel(petaPanel);
-        panelComponent.startDrag(worldPosition);
+        panelComponent?.startDrag(worldPosition);
       });
     }
   }
-  getVPanel(petaPanel: PetaPanel): VPanel {
+  getVPanel(petaPanel: PetaPanel): VPanel | null {
     return this.$refs[petaPanel.id] as VPanel;
   }
   editCrop(petaPanel: PetaPanel) {
@@ -312,7 +319,7 @@ export default class VBoard extends Vue {
     if (worldPosition) {
       this.$nextTick(() => {
         this.selectedPetaPanels.forEach((pp) => {
-          this.getVPanel(pp).startDrag(worldPosition)
+          this.getVPanel(pp)?.startDrag(worldPosition)
         })
       });
     }
@@ -339,7 +346,7 @@ export default class VBoard extends Vue {
   }
   load() {
     this.board.petaPanels.forEach((pp) => {
-      this.getVPanel(pp).loadFullSize();
+      this.getVPanel(pp)?.loadFullSize();
     });
   }
   get selectedPetaPanels() {
