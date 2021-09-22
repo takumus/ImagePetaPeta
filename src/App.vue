@@ -287,7 +287,7 @@ export default class App extends Vue {
     return this.boards.sort((a, b) => a.index - b.index);
   }
   @Watch("boards", { deep: true })
-  changeBoard(a: Board[], b: Board[]) {
+  changeBoard() {
     this.boards.forEach((board) => {
       this.updateBoard(board, false);
     });

@@ -358,7 +358,6 @@ export default class VBrowser extends Vue {
       });
       const position = new Vec2(mvi * this.imageWidth, yList[mvi]);
       const height = p.height * this.imageWidth;
-      const visible = (this.areaMinY < position.y && position.y < this.areaMaxY) || (this.areaMinY < position.y + height && position.y + height < this.areaMaxY);
       yList[mvi] += height;
       if (this.scrollHeight < yList[mvi]) {
         this.scrollHeight = yList[mvi];
@@ -368,7 +367,7 @@ export default class VBrowser extends Vue {
         position: position,
         width: this.imageWidth,
         height: height,
-        visible: visible
+        visible: (this.areaMinY < position.y && position.y < this.areaMaxY) || (this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
       }
     }).filter((p) => p.visible);
   }
