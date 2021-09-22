@@ -21,7 +21,7 @@ export interface PetaThumbnail {
   visible: boolean
 }
 export interface PetaPanel {
-  petaImage: PetaImage,
+  petaImageId: string,
   position: Vec2,
   rotation: number,
   width: number,
@@ -33,6 +33,7 @@ export interface PetaPanel {
   },
   id: string,
   index: number,
+  _petaImage?: PetaImage,
   _selected: boolean
 }
 export interface BoardTransform {
@@ -45,9 +46,6 @@ export interface Board {
   name: string,
   transform: BoardTransform,
   index: number
-}
-export interface BoardDB extends Omit<Board, "petaPanels"> {
-  petaPanels: (Omit<PetaPanel, "petaImage"> & { petaImageId: string })[]
 }
 export interface Category {
   name: string,
@@ -105,7 +103,7 @@ export function createCategory(name: string) {
 }
 export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
   const panel: PetaPanel = {
-    petaImage: petaImage,
+    petaImageId: petaImage.id,
     position: position,
     rotation: 0,
     width: width,
@@ -117,39 +115,24 @@ export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: num
     },
     id: uuid(),
     index: 0,
+    _petaImage: petaImage,
     _selected: false
   }
   return panel;
 }
-export function parseBoards(boardDBs: BoardDB[], petaImages: PetaImages) {
-  return boardDBs.map((bd) => {
-    const board: Board = {
-      petaPanels: bd.petaPanels.filter((ppd) => petaImages[ppd.petaImageId]).map((ppd): PetaPanel => {
-        const { petaImageId: any = undefined, ...petaPanel } = { ...ppd, petaImage: petaImages[ppd.petaImageId] };
-        petaPanel.position = toVec2(petaPanel.position);
-        petaPanel.crop.position = toVec2(petaPanel.crop.position);
-        return petaPanel;
-      }),
-      name: bd.name,
-      id: bd.id,
-      transform: {
-        scale: bd.transform.scale,
-        position: toVec2(bd.transform.position)
-      },
-      index: bd.index
-    }
-    return board;
+export function parseBoards(boards: Board[], petaImages: PetaImages) {
+  return boards.forEach((board) => {
+    board.transform.position = toVec2(board.transform.position);
+    board.petaPanels.forEach(pp => {
+      pp._petaImage = petaImages[pp.petaImageId];
+      pp.position = toVec2(pp.position);
+    })
   });
 }
-export function boardToBoardDB(board: Board): BoardDB {
-  return {
-    id: board.id,
-    name: board.name,
-    transform: board.transform,
-    petaPanels: board.petaPanels.map((pp) => {
-      const { petaImage: any = {}, ...boardPP } = { ...pp, petaImageId: pp.petaImage.id };
-      return boardPP;
-    }),
-    index: board.index
-  };
+export function toDBBoard(board: Board) {
+  const b = JSON.parse(JSON.stringify(board)) as Board;
+  b.petaPanels.forEach((pp) => {
+    pp._petaImage = undefined;
+  });
+  return b;
 }

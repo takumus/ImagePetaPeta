@@ -125,7 +125,7 @@ import VImageCache from "@/components/utils/VImageCache.vue";
 import VTabBar from "@/components/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
-import { Board, createBoard, createCategory, createPetaPanel, ImportImageResult, MenuType, parseBoards, PetaImage, PetaImages, PetaPanel, UpdateMode } from "@/datas";
+import { Board, createBoard, createCategory, createPetaPanel, ImportImageResult, MenuType, PetaImage, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2 } from "@/utils";
 import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "./defines";
@@ -170,7 +170,7 @@ export default class App extends Vue {
       this.getPetaImages();
     });
     API.on("updatePetaImage", (e, petaImage) => {
-      log("update a PetaImage", petaImage.id);
+      log("on updatePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
     window.addEventListener("keydown", (event) => {
@@ -179,6 +179,7 @@ export default class App extends Vue {
         this.browsing = false;
       }
     })
+    log("INIT RENDERER!");
     await this.getAll();
   }
   async getAll() {
@@ -186,13 +187,12 @@ export default class App extends Vue {
     await this.getBoards();
   }
   async getPetaImages() {
-    log("load all PetaImages");
     this.petaImages = await API.send("getPetaImages", [], "");
     this.boards.forEach((board) => {
       // boardのpetaPanelを回す
       for (let i = board.petaPanels.length - 1; i >= 0; i--) {
         // petaImageIDが存在しない場合、パネルを削除する。
-        if (!this.petaImages[board.petaPanels[i].petaImage.id]) {
+        if (!this.petaImages[board.petaPanels[i].petaImageId]) {
           board.petaPanels.splice(i, 1);
         }
       }
@@ -214,14 +214,13 @@ export default class App extends Vue {
     this.orderedAddPanelIds = [];
   }
   async getBoards() {
-    log("load all boards");
-    this.boards = parseBoards(await API.send("getBoards"), this.petaImages);
+    this.boards = await API.send("getBoards");
+    parseBoards(this.boards, this.petaImages);
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id].initData(board);
+        this.boardUpdaters[board.id].initData(toDBBoard(board));
         this.boardUpdaters[board.id].onUpdate((board) => {
-          log("board saved", board.name);
           API.send("updateBoards", [board], UpdateMode.UPDATE);
         });
       }
@@ -229,7 +228,7 @@ export default class App extends Vue {
   }
   importImages() {
     API.send("browseImages").catch((reason) => {
-      log(reason);
+      //
     });
   }
   openBrowser() {
@@ -246,7 +245,7 @@ export default class App extends Vue {
     this.vBoard.addPanel(petaPanel, worldPosition);
   }
   selectBoard(board: Board) {
-    log("board selected", board.name);
+    log("Board Selected", board.name);
     if (this.currentBoard) {
       this.updateBoard(this.currentBoard, true);
     }
@@ -256,7 +255,7 @@ export default class App extends Vue {
     });
   }
   updateBoard(board: Board, immidiately: boolean) {
-    this.boardUpdaters[board.id].order(board);
+    this.boardUpdaters[board.id].order(toDBBoard(board));
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
@@ -282,7 +281,7 @@ export default class App extends Vue {
       [board],
       UpdateMode.INSERT
     );
-    log("add board", board.name);
+    log("Board Added", board.name);
     await this.getBoards();
     this.vTabBar.selectBoardByIndex(this.boards.length - 1);
   }

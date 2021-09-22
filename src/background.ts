@@ -3,7 +3,7 @@ import { initWindow } from "@/window";
 import * as path from "path";
 import * as fs from "fs";
 import Nedb from "nedb";
-import { Board, BoardDB, boardToBoardDB, Categories, Category, createBoard, ImportImageResult, PetaImage, PetaImages, UpdateMode } from "@/datas";
+import { Board, Categories, Category, createBoard, ImportImageResult, PetaImage, PetaImages, UpdateMode } from "@/datas";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { imageFormatToExtention } from "@/utils";
@@ -38,7 +38,7 @@ import { MenuItem } from "electron/main";
     filename: path.resolve(DIR_ROOT, "categories.db"),
     autoload: true
   });
-  const boardsDB = new Nedb<BoardDB>({
+  const boardsDB = new Nedb<Board>({
     filename: path.resolve(DIR_ROOT, "boards.db"),
     autoload: true
   });
@@ -155,7 +155,7 @@ import { MenuItem } from "electron/main";
             const board = createBoard(DEFAULT_BOARD_NAME);
             updateBoard(board, UpdateMode.INSERT)
             .then(() => {
-              data.push(boardToBoardDB(board));
+              data.push(board);
               mainLog("return:", data.length);
               res(data);
             });
@@ -245,8 +245,7 @@ import { MenuItem } from "electron/main";
           }
         });
       } else {
-        const dbBoard: BoardDB = boardToBoardDB(board);
-        boardsDB.update({ id: board.id }, dbBoard, { upsert: mode == UpdateMode.INSERT }, (err) => {
+        boardsDB.update({ id: board.id }, board, { upsert: mode == UpdateMode.INSERT }, (err) => {
           if (err) {
             mainLog(" failed to update:", err.message);
             rej(err.message);
@@ -372,14 +371,14 @@ function minimId(id: string) {
   return id.substr(0, 6);
 }
 function log(from: LogFrom, ...args: any[]) {
-  console.log(`[${from}]`, ...args);
+  console.log(`[${from}](${new Date().toISOString().replace('T', " ").replace(/....Z/g, "")})`, ...args);
 }
 function mainLog(...args: any[]) {
   log(LogFrom.MAIN, ...args);
 }
 enum LogFrom {
-  MAIN = "main",
-  RENDERER = "renderer"
+  MAIN = "MAIN",
+  RENDERER = "REND"
 }
 interface AddImageResult {
   exists: boolean,

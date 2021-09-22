@@ -107,7 +107,7 @@ export default class VCrop extends Vue {
   imageWidth = 0;
   imageHeight = 0;
   async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel.petaImage, false);
+    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
@@ -194,12 +194,12 @@ export default class VCrop extends Vue {
   }
   resizeImage() {
     const rect = this.size.getBoundingClientRect();
-    if (this.petaPanel.petaImage.height / this.petaPanel.petaImage.width < rect.height / rect.width) {
+    if (this.petaPanel._petaImage!.height / this.petaPanel._petaImage!.width < rect.height / rect.width) {
       this.imageWidth = rect.width;
-      this.imageHeight = rect.width * this.petaPanel.petaImage.height;
+      this.imageHeight = rect.width * this.petaPanel._petaImage!.height;
     } else {
       this.imageHeight = rect.height;
-      this.imageWidth = rect.height / this.petaPanel.petaImage.height;
+      this.imageWidth = rect.height / this.petaPanel._petaImage!.height;
     }
   }
   get _cropX() {

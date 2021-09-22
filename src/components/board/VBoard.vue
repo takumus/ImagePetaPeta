@@ -288,7 +288,7 @@ export default class VBoard extends Vue {
     petaPanel.position.x *= 1 / this.transform.scale;
     petaPanel.position.y *= 1 / this.transform.scale;
     petaPanel.width *= 1 / this.transform.scale;
-    petaPanel.height = petaPanel.width * petaPanel.petaImage.height;
+    petaPanel.height = petaPanel.width * petaPanel._petaImage!.height;
     this.toFront(petaPanel);
     this.select(petaPanel, worldPosition);
     if (worldPosition) {

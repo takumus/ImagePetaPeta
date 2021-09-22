@@ -1,4 +1,4 @@
-import { PetaImage, Category, PetaImageId, PetaImages, Board, BoardDB, Categories, ContextMenuItem, MenuType, UpdateMode } from '@/datas';
+import { PetaImage, Category, PetaImageId, PetaImages, Board, Categories, ContextMenuItem, MenuType, UpdateMode } from '@/datas';
 import { IpcMainInvokeEvent } from 'electron';
 export interface Main {
   browseImages: () => Promise<number>;
@@ -9,7 +9,7 @@ export interface Main {
   getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
-  getBoards: () => Promise<BoardDB[]>;
+  getBoards: () => Promise<Board[]>;
   updateBoards: (boards: Board[], mode: UpdateMode) => Promise<boolean>;
   // log
   log: (...args: any[]) => Promise<boolean>;

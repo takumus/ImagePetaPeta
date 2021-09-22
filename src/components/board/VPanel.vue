@@ -164,7 +164,7 @@ export default class VPanel extends Vue {
   // vertical 縦
   // horizontal 横
   mounted() {
-    ImageLoader.getImageURL(this.petaPanel.petaImage, true).then((url) => {
+    ImageLoader.getImageURL(this.petaPanel._petaImage!, true).then((url) => {
       if (!this.loadedFullSize) {
         this.imageURL = url;
       }
@@ -322,7 +322,7 @@ export default class VPanel extends Vue {
     if (this.loadedFullSize) return;
     this.loadedFullSize = true;
     this.imageURL = LoadingImage;
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel.petaImage, false);
+    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
   }
   beginChangeSize(vOrigin: SizingOrigin, hOrigin: SizingOrigin, event: MouseEvent) {
     const mouse = this.getMouseFromEvent(fromMouseEvent(event));
@@ -353,7 +353,7 @@ export default class VPanel extends Vue {
     this.petaPanel.height = Math.abs(this.petaPanel.width * this.ratio) * sign;
   }
   get ratio() {
-    return (this.petaPanel.crop.height * this.petaPanel.petaImage.height) / (this.petaPanel.crop.width * this.petaPanel.petaImage.width);
+    return (this.petaPanel.crop.height * this.petaPanel._petaImage!.height) / (this.petaPanel.crop.width * this.petaPanel._petaImage!.width);
   }
   get normalHeight() {
     return IMG_TAG_WIDTH * this.ratio;
@@ -398,7 +398,7 @@ export default class VPanel extends Vue {
     return -this.petaPanel.crop.position.x * IMG_TAG_WIDTH * this.cropScale + "px";
   }
   get _cropPositionY() {
-    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel.petaImage.height * this.cropScale + "px";
+    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel._petaImage!.height * this.cropScale + "px";
   }
   get _cropScale() {
     return this.cropScale;
