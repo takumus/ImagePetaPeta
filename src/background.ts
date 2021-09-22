@@ -3,7 +3,7 @@ import { initWindow } from "@/window";
 import * as path from "path";
 import * as fs from "fs";
 import Nedb from "nedb";
-import { Board, Categories, Category, createBoard, ImportImageResult, PetaImage, PetaImages, UpdateMode } from "@/datas";
+import { Board, createBoard, ImportImageResult, PetaImage, PetaImages, UpdateMode } from "@/datas";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { imageFormatToExtention } from "@/utils";
@@ -11,8 +11,7 @@ import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
 import dataURIToBuffer from "data-uri-to-buffer";
-import { DEFAULT_BOARD_NAME, DEFAULT_CATEGORY } from "./defines";
-import { MenuItem } from "electron/main";
+import { DEFAULT_BOARD_NAME } from "./defines";
 (async () => {
   const win = await initWindow();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "petaDatas");
@@ -32,10 +31,6 @@ import { MenuItem } from "electron/main";
   }
   const petaImagesDB = new Nedb<PetaImage>({
     filename: path.resolve(DIR_ROOT, "images.db"),
-    autoload: true
-  });
-  const categoriesDB = new Nedb<Category>({
-    filename: path.resolve(DIR_ROOT, "categories.db"),
     autoload: true
   });
   const boardsDB = new Nedb<Board>({

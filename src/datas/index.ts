@@ -47,11 +47,6 @@ export interface Board {
   transform: BoardTransform,
   index: number
 }
-export interface Category {
-  name: string,
-  id: string
-}
-export type Categories = {[id: string]: Category};
 export enum ImportImageResult {
   SUCCESS = "success",
   EXISTS = "exists",
@@ -93,13 +88,6 @@ export function createBoard(name: string, index = 0) {
     index: index
   }
   return board;
-}
-export function createCategory(name: string) {
-  const category: Category = {
-    id: uuid(),
-    name: name
-  }
-  return category;
 }
 export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
   const panel: PetaPanel = {

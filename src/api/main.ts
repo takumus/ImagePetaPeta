@@ -1,4 +1,4 @@
-import { PetaImage, Category, PetaImageId, PetaImages, Board, Categories, ContextMenuItem, MenuType, UpdateMode } from '@/datas';
+import { PetaImage, PetaImageId, PetaImages, Board, UpdateMode } from '@/datas';
 import { IpcMainInvokeEvent } from 'electron';
 export interface Main {
   browseImages: () => Promise<number>;
