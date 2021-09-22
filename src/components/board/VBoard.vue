@@ -131,6 +131,7 @@ export default class VBoard extends Vue {
   petaPanelMenuListenerId = "";
   click = new ClickChecker();
   shiftKeyPressed = false;
+  resizer?: ResizeObserver;
   mounted() {
     this.panelsWrapper.addEventListener("mousedown", this.mousedown);
     this.panelsWrapper.addEventListener("dblclick", this.dblclick);
@@ -140,9 +141,11 @@ export default class VBoard extends Vue {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("keydown", this.keydown);
     window.addEventListener("keyup", this.keyup);
-    window.addEventListener("resize", this.resize);
+    this.resizer = new ResizeObserver((entries) => {
+      this.resize(entries[0].contentRect);
+    });
+    this.resizer.observe(this.panelsBackground);
     this.isMac = window.navigator.userAgent.indexOf("Macintosh") >= 0;
-    this.$nextTick(this.resize);
   }
   unmounted() {
     this.panelsWrapper.removeEventListener("mousedown", this.mousedown);
@@ -153,10 +156,10 @@ export default class VBoard extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("keydown", this.keydown);
     window.removeEventListener("keyup", this.keyup);
-    window.removeEventListener("resize", this.resize);
+    this.resizer?.unobserve(this.panelsBackground);
+    this.resizer?.disconnect();
   }
-  resize() {
-    const rect = this.panelsBackground.getBoundingClientRect();
+  resize(rect: DOMRectReadOnly) {
     this.globalOffset.x = rect.width / 2;
     this.globalOffset.y = rect.height / 2;
   }
