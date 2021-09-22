@@ -1,6 +1,6 @@
 <template>
   <ul v-show="this.show" class="complement-root" ref="complement" :style="{ top: position.y + 'px', left: position.x + 'px' }">
-    <li v-for="item, i in filteredItems" :key="item" @click="select(item)" class="item" :class="{ selected: i == currentIndex }">
+    <li v-for="item, i in filteredItems" :key="item" @mousedown="select(item)" class="item" :class="{ selected: i == currentIndex }">
       {{item}}
     </li>
   </ul>
@@ -54,6 +54,7 @@ export default class VComplement extends Vue {
   show = false;
   input?: HTMLInputElement;
   currentIndex = 0;
+  willHide = false;
   mounted() {
     GLOBALS.complement.open = this.open;
     window.addEventListener("mousedown", (event) => {
@@ -94,9 +95,12 @@ export default class VComplement extends Vue {
     this.normalizeIndex();
     setTimeout(() => {
       if (this.input) this.input.setSelectionRange(this.input.value.length, this.input.value.length);
-    },0);
+    }, 0);
   }
   open(input: HTMLElement, items: string[]): void {
+    if (input == this.input && this.show) {
+      return;
+    }
     this.input = input as HTMLInputElement;
     this.filteredItems = [];
     if (this.show) {
@@ -107,16 +111,22 @@ export default class VComplement extends Vue {
     this.position.y = rect.y + rect.height;
     this.items = items;
     this.show = true;
+    this.willHide = false;
     input.addEventListener("blur", this.blur);
     input.addEventListener("input", this.onInput);
     this.onInput();
   }
   blur() {
+    this.willHide = true;
+    // 遅延は不要
+    // setTimeout(() => {
+    if (!this.willHide) return;
     this.show = false;
     if (this.input) {
       this.input.removeEventListener("blur", this.blur);
       this.input.removeEventListener("input", this.onInput);
     }
+    // }, 100);
   }
   onInput() {
     if (!this.show || !this.input) return;
