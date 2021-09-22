@@ -15,7 +15,7 @@ import { DEFAULT_BOARD_NAME, DEFAULT_CATEGORY } from "./defines";
 import { MenuItem } from "electron/main";
 (async () => {
   const win = await initWindow();
-  const DIR_ROOT = path.resolve(app.getPath("desktop"), "petaDatas");
+  const DIR_ROOT = path.resolve(app.getPath("pictures"), "petaDatas");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
   // fs.rmdirSync(DIR_ROOT, {
