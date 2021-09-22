@@ -49,9 +49,9 @@ let addFullsizedImage:(url: string) => void = () => {
 function getPetaImageKey(petaImage: PetaImage, thumbnail: boolean) {
   return petaImage.fileName;
 }
-window.setInterval(() => {
-  // log(`\nfullSizedCache: ${fullSizedCache.length}\nthumbnailCache: ${thumbnailCache.length}`);
-}, 1000);
+// window.setInterval(() => {
+//   log(`\nfullSizedCache: ${fullSizedCache.length}\nthumbnailCache: ${thumbnailCache.length}`);
+// }, 1000);
 async function getImageURL(petaImage: PetaImage, thumbnail = false) {
   const key = getPetaImageKey(petaImage, thumbnail);
   if (thumbnail) {

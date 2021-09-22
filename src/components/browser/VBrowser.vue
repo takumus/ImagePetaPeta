@@ -183,21 +183,41 @@ export default class VBrowser extends Vue {
   areaMaxY = 0;
   areaMinY = 0;
   scrollHeight = 0;
+  scrollAreaHeight = 0;
   updateRectIntervalId = 0;
   sortMode = SortMode.ADD_DATE;
+  imagesResizer?: ResizeObserver;
+  scrollAreaResizer?: ResizeObserver;
   mounted() {
-    this.updateRectIntervalId = window.setInterval(this.updateRect, 100);
+    this.imagesResizer = new ResizeObserver((entries) => {
+      this.resizeImages(entries[0].contentRect);
+    });
+    this.scrollAreaResizer = new ResizeObserver((entries) => {
+      this.resizeScrollArea(entries[0].contentRect);
+    });
+    this.images.addEventListener("scroll", this.updateScrollArea);
+    this.imagesResizer.observe(this.thumbsWrapper);
+    this.scrollAreaResizer.observe(this.images);
   }
   unmounted() {
-    window.clearInterval(this.updateRectIntervalId);
+    this.images.removeEventListener("scroll", this.updateScrollArea);
+    this.imagesResizer?.unobserve(this.thumbsWrapper);
+    this.scrollAreaResizer?.unobserve(this.images);
+    this.imagesResizer?.disconnect();
+    this.scrollAreaResizer?.disconnect();
   }
-  updateRect() {
-    if (!this.visible) return;
-    this.imagesWidth = this.thumbsWrapper.getBoundingClientRect().width;
-    const areaHeight = this.images.getBoundingClientRect().height;
-    const offset = areaHeight;
+  updateScrollArea() {
+    const offset = this.scrollAreaHeight;
     this.areaMinY = this.images.scrollTop - offset;
-    this.areaMaxY = areaHeight + this.images.scrollTop + offset;
+    this.areaMaxY = this.scrollAreaHeight + this.images.scrollTop + offset;
+  }
+  resizeScrollArea(rect: DOMRectReadOnly) {
+    const areaHeight = rect.height;
+    this.scrollAreaHeight = areaHeight;
+    this.updateScrollArea();
+  }
+  resizeImages(rect: DOMRectReadOnly) {
+    this.imagesWidth = rect.width;
   }
   selectCategory(category: string, uncategorized = false) {
     this.selectedCategories = category;
