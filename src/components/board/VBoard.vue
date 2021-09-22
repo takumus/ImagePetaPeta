@@ -224,13 +224,13 @@ export default class VBoard extends Vue {
     mouse.add(this.globalOffset.clone().mult(-1));
     if (event.ctrlKey || !this.isMac) {
       const currentZoom = this.board.transform.scale;
-      const currentPositionX = -this.board.transform.position.x;
-      const currentPositionY = -this.board.transform.position.y;
       this.board.transform.scale *= 1 + -event.deltaY * (this.isMac ? 0.01 : 0.001);
-      if (this.board.transform.scale > this.scaleMax) this.board.transform.scale = this.scaleMax;
-      if (this.board.transform.scale < this.scaleMin) this.board.transform.scale = this.scaleMin;
-      this.board.transform.position.x = -((currentPositionX + mouse.x) * (this.board.transform.scale / currentZoom) - mouse.x);
-      this.board.transform.position.y = -((currentPositionY + mouse.y) * (this.board.transform.scale / currentZoom) - mouse.y);
+      if (this.board.transform.scale > this.scaleMax) {
+        this.board.transform.scale = this.scaleMax;
+      } else if (this.board.transform.scale < this.scaleMin) {
+        this.board.transform.scale = this.scaleMin;
+      }
+      this.board.transform.position.mult(-1).add(mouse).mult(this.board.transform.scale / currentZoom).sub(mouse).mult(-1);
     } else {
       this.board.transform.position.x += -event.deltaX;
       this.board.transform.position.y += -event.deltaY;
@@ -242,8 +242,7 @@ export default class VBoard extends Vue {
   }
   resetTransform() {
     this.board.transform.scale = 1;
-    this.board.transform.position.x = 0;
-    this.board.transform.position.y = 0;
+    this.board.transform.position.set(0, 0);
   }
   removeSelectedPanels() {
     this.board.petaPanels = this.board.petaPanels.filter((pp) => !pp._selected);
@@ -269,8 +268,7 @@ export default class VBoard extends Vue {
       click: () => {
         petaPanel.height = Math.abs(petaPanel.height);
         petaPanel.width = Math.abs(petaPanel.width);
-        petaPanel.crop.position.x = 0;
-        petaPanel.crop.position.y = 0;
+        petaPanel.crop.position.set(0, 0);
         petaPanel.crop.width = 1;
         petaPanel.crop.height = 1;
         petaPanel.rotation = 0;
@@ -284,10 +282,7 @@ export default class VBoard extends Vue {
   }
   addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
     petaPanel.index = this.getMaxIndex() + 1;
-    petaPanel.position.x -= this.transform.position.x;
-    petaPanel.position.y -= this.transform.position.y;
-    petaPanel.position.x *= 1 / this.transform.scale;
-    petaPanel.position.y *= 1 / this.transform.scale;
+    petaPanel.position.sub(this.transform.position).mult(1 / this.transform.scale);
     petaPanel.width *= 1 / this.transform.scale;
     petaPanel.height = petaPanel.width * petaPanel._petaImage!.height;
     this.toFront(petaPanel);

@@ -113,8 +113,7 @@ export default class VCrop extends Vue {
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
-    this.cropBegin.x = this.petaPanel.crop.position.x;
-    this.cropBegin.y = this.petaPanel.crop.position.y;
+    this.cropBegin.copyFrom(this.petaPanel.crop.position);
     this.cropEnd.x = this.cropBegin.x + this.petaPanel.crop.width;
     this.cropEnd.y = this.cropBegin.y + this.petaPanel.crop.height;
     this.$nextTick(() => {
@@ -146,24 +145,20 @@ export default class VCrop extends Vue {
     );
     if (this.preDragging) {
       if (this.dragBeginPosition.getDistance(mouse) > 0.01) {
-        this.cropBegin.x = mouse.x;
-        this.cropBegin.y = mouse.y;
-        this.cropEnd.x = mouse.x;
-        this.cropEnd.y = mouse.y;
+        this.cropBegin.copyFrom(mouse);
+        this.cropEnd.copyFrom(mouse);
         this.dragging = true;
         this.preDragging = false;
       }
     }
     if (!this.dragging) return;
-    this.cropEnd.x = mouse.x;
-    this.cropEnd.y = mouse.y;
+    this.cropEnd.copyFrom(mouse);
   }
   mouseup(e: MouseEvent) {
     if (this.dragging) {
       let width = this.cropWidth;
       let height = this.cropHeight;
-      this.petaPanel.crop.position.x = this.cropPosition.x;
-      this.petaPanel.crop.position.y = this.cropPosition.y;
+      this.petaPanel.crop.position.copyFrom(this.cropPosition);
       if (width * IMG_TAG_WIDTH < 5) {
         width = 5 / IMG_TAG_WIDTH;
       }

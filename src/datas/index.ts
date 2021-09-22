@@ -126,6 +126,7 @@ export function parseBoards(boards: Board[], petaImages: PetaImages) {
     board.petaPanels.forEach(pp => {
       pp._petaImage = petaImages[pp.petaImageId];
       pp.position = vec2FromObject(pp.position);
+      pp.crop.position = vec2FromObject(pp.crop.position);
     })
   });
 }

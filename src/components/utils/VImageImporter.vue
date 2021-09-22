@@ -79,7 +79,7 @@
 import { Options, Vue } from "vue-class-component";
 // Others
 import { getURLFromImgTag } from "@/utils";
-import { API, log } from "@/api";
+import { API } from "@/api";
 @Options({
   components: {
   },
@@ -97,10 +97,8 @@ export default class VImageImporter extends Vue {
     API.on("importImagesProgress", (e, progress, file, result) => {
       this.rawProgress = Math.floor(progress * 100);
       this.log = result + " -> " + file + "\n" + this.log;
-      log(`importing ${this.progress}% (${file})`);
     });
     API.on("importImagesBegin", (e, fileCount) => {
-      log(`begin import ${fileCount}`);
       this.progress = 0;
       this.rawProgress = 0;
       this.loading = true;
@@ -113,12 +111,10 @@ export default class VImageImporter extends Vue {
         this.hasErrors = true;
         this.log = `Error!\n${addedFileCount}/${fileCount} files added.` + "\n" + this.log;
       }
-      log(`complete import (${addedFileCount} / ${fileCount})`);
     });
     document.addEventListener('drop', async (event) => {
       event.preventDefault();
       event.stopPropagation();
-      log(event);
       if (event.dataTransfer) {
         const url = getURLFromImgTag(event.dataTransfer.getData('text/html'));
         let ids: string[] = [];

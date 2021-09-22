@@ -49,10 +49,10 @@ import { MenuItem } from "electron/main";
       const file = await dialog.showOpenDialog(win, { properties: ['openFile', 'multiSelections'] });
       if (file.canceled) {
         mainLog("canceled");
-        throw "canceled";
+        return 0;
       }
+      mainLog("return:", file.filePaths.length);
       importImages(file.filePaths);
-      mainLog("return:", file.filePaths.length)
       return file.filePaths.length;
     },
     importImageFromURL: async (event, url) => {
@@ -121,7 +121,7 @@ import { MenuItem } from "electron/main";
             rej(err.message);
             return;
           }
-          mainLog("return:", buffer.byteLength, minimId(data.id));
+          mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
           res(buffer);
         });
       });

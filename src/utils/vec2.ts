@@ -22,6 +22,11 @@ export class Vec2 {
     this.y *= n;
     return this;
   }
+  public div(n: number) {
+    this.x /= n;
+    this.y /= n;
+    return this;
+  }
   public normalize() {
     const l = this.getLength();
     this.x /= l;
@@ -36,12 +41,30 @@ export class Vec2 {
     this.y += vec2.y;
     return this;
   }
+  public sub(vec2: Vec2) {
+    this.x -= vec2.x;
+    this.y -= vec2.y;
+    return this;
+  }
+  public set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  public copyFrom(vec2: Vec2) {
+    this.x = vec2.x;
+    this.y = vec2.y;
+    return this;
+  }
   public rotate(rotation: number) {
     const r = Math.atan2(this.y, this.x);
     const L = this.getLength();
     this.x = Math.cos(r + rotation) * L;
     this.y = Math.sin(r + rotation) * L;
     return this;
+  }
+  public atan2() {
+    return Math.atan2(this.y, this.x);
   }
 }
 export function vec2FromObject(position: {x: number, y: number}) {

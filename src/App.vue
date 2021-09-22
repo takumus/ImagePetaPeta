@@ -208,7 +208,7 @@ export default class App extends Vue {
         petaImage.height * 100
       );
       if (!this.browsing) {
-        this.addPanel(panel);//, vec2FromMouseEvent(this.orderedAddPanelDragEvent));
+        this.addPanel(panel);
       }
     });
     this.orderedAddPanelIds = [];
@@ -227,9 +227,7 @@ export default class App extends Vue {
     })
   }
   importImages() {
-    API.send("browseImages").catch((reason) => {
-      //
-    });
+    API.send("browseImages");
   }
   openBrowser() {
     this.browsing = !this.browsing;

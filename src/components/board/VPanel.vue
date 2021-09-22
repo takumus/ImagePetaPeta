@@ -190,16 +190,12 @@ export default class VPanel extends Vue {
   startDrag(worldPosition: Vec2) {
     const mouse = this.getMouseFromEvent(worldPosition);
     this.controlStatus = ControlStatus.DRAGGING;
-    this.dragOffset.x = this.petaPanel.position.x - mouse.x;
-    this.dragOffset.y = this.petaPanel.position.y - mouse.y;
+    this.dragOffset.copyFrom(this.petaPanel.position.clone().sub(mouse));
   }
   startRotate(event: MouseEvent) {
     const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
     this.controlStatus = ControlStatus.ROTATING;
-    const dx = mouse.x - (this.petaPanel.position.x);
-    const dy = mouse.y - (this.petaPanel.position.y);
-    const radian = Math.atan2(dy, dx);
-    this.rotateOffset = radian;
+    this.rotateOffset = mouse.clone().sub(this.petaPanel.position).atan2();
     this.currentRotation = this.petaPanel.rotation;
   }
   keydown(e: KeyboardEvent) {
@@ -237,23 +233,20 @@ export default class VPanel extends Vue {
     this.click.move(event);
     switch (this.controlStatus) {
       case ControlStatus.DRAGGING: {
-        this.petaPanel.position.x = mouse.x + this.dragOffset.x;
-        this.petaPanel.position.y = mouse.y + this.dragOffset.y;
+        this.petaPanel.position.copyFrom(mouse.clone().add(this.dragOffset));
         break;
       }
       case ControlStatus.SIZING: {
         const rMouse = mouse.clone().rotate(-this.petaPanel.rotation);
         const rPos = this.petaPanel.position.clone().rotate(-this.petaPanel.rotation);
-        const dx = rMouse.x - this.sizeOffset.x;
-        const dy = rMouse.y - this.sizeOffset.y;
-        this.sizeOffset.x = rMouse.x;
-        this.sizeOffset.y = rMouse.y;
+        const d = rMouse.clone().sub(this.sizeOffset);
+        this.sizeOffset.copyFrom(rMouse);
         if (this.sizingHOrigin == SizingOrigin.LEFT || this.sizingHOrigin == SizingOrigin.RIGHT) {
-          rPos.x += dx / 2;
+          rPos.x += d.x / 2;
           if (this.sizingHOrigin == SizingOrigin.RIGHT) {
-            this.petaPanel.width += dx;
+            this.petaPanel.width += d.x;
           } else {
-            this.petaPanel.width -= dx;
+            this.petaPanel.width -= d.x;
           }
           const height = this.petaPanel.width * this.ratio * this.sizingBeginHSign * this.sizingBeginVSign;
           if (this.sizingVOrigin == SizingOrigin.BOTTOM){
@@ -266,11 +259,11 @@ export default class VPanel extends Vue {
             this.petaPanel.height = Math.abs(this.petaPanel.height) * this.sizingBeginVSign;
           }
         } else {
-          rPos.y += dy / 2;
+          rPos.y += d.y / 2;
           if (this.sizingVOrigin == SizingOrigin.BOTTOM) {
-            this.petaPanel.height += dy;
+            this.petaPanel.height += d.y;
           } else {
-            this.petaPanel.height -= dy;
+            this.petaPanel.height -= d.y;
           }
           this.petaPanel.width = this.petaPanel.height / this.ratio;
           if (this.sizingHOrigin == SizingOrigin.NONE) {
@@ -281,9 +274,7 @@ export default class VPanel extends Vue {
         break;
       }
       case ControlStatus.ROTATING: {
-        const dx = mouse.x - (this.petaPanel.position.x);
-        const dy = mouse.y - (this.petaPanel.position.y);
-        const rotation = Math.atan2(dy, dx);
+        const rotation = mouse.clone().sub(this.petaPanel.position).atan2();
         this.currentRotation += rotation - this.rotateOffset;
         this.rotateOffset = rotation;
         this.petaPanel.rotation = this.currentRotation;
@@ -328,8 +319,7 @@ export default class VPanel extends Vue {
   beginChangeSize(vOrigin: SizingOrigin, hOrigin: SizingOrigin, event: MouseEvent) {
     const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
     const rMouse = mouse.clone().rotate(-this.petaPanel.rotation);
-    this.sizeOffset.x = rMouse.x;
-    this.sizeOffset.y = rMouse.y;
+    this.sizeOffset.copyFrom(rMouse);
     this.controlStatus = ControlStatus.SIZING;
     this.sizingVOrigin = vOrigin;
     this.sizingHOrigin = hOrigin;
@@ -338,9 +328,7 @@ export default class VPanel extends Vue {
   }
   getMouseFromEvent(worldPosition: Vec2) {
     // 座標変換
-    const mouse = new Vec2(worldPosition.x - this.transform.position.x, worldPosition.y - this.transform.position.y);
-    mouse.mult(1 / this.transform.scale);
-    return mouse;
+    return worldPosition.clone().sub(this.transform.position).mult(1 / this.transform.scale);
   }
   getResizeCursor(index: number) {
     const rot = Math.floor(this.petaPanel.rotation / Math.PI * 180 + 45 / 2) % 360;
