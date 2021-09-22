@@ -90,16 +90,20 @@ export default class VProperty extends Vue {
   previews!: HTMLElement;
   previewWidth = 0;
   previewHeight = 0;
+  previewsResizer?: ResizeObserver;
   mounted() {
-    //
-    setInterval(() => {
-      const rect = this.previews.getBoundingClientRect();
-      this.previewWidth = rect.width;
-      this.previewHeight = rect.height;
-    }, 100);
+    this.previewsResizer = new ResizeObserver((entries) => {
+      this.resizePreviews(entries[0].contentRect);
+    });
+    this.previewsResizer.observe(this.previews);
   }
   unmounted() {
-    //
+    this.previewsResizer?.unobserve(this.previews);
+    this.previewsResizer?.disconnect();
+  }
+  resizePreviews(rect: DOMRectReadOnly) {
+    this.previewWidth = rect.width;
+    this.previewHeight = rect.height;
   }
   changeCategory(oldName: string, newName: string) {
     newName = newName.replace(/\s+/g, "");

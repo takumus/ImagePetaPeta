@@ -108,6 +108,7 @@ export default class VCrop extends Vue {
   cropEnd: Vec2 = new Vec2(1, 1);
   imageWidth = 0;
   imageHeight = 0;
+  imageResizer?: ResizeObserver;
   async mounted() {
     this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
     window.addEventListener("mousedown", this.mousedown);
@@ -116,16 +117,15 @@ export default class VCrop extends Vue {
     this.cropBegin.copyFrom(this.petaPanel.crop.position);
     this.cropEnd.x = this.cropBegin.x + this.petaPanel.crop.width;
     this.cropEnd.y = this.cropBegin.y + this.petaPanel.crop.height;
-    this.$nextTick(() => {
-      this.resizeImage();
-    });
-    window.addEventListener("resize", this.resizeImage);
+    this.imageResizer = new ResizeObserver((entries: ResizeObserverEntry[]) => this.resizeImage(entries[0].contentRect));
+    this.imageResizer.observe(this.size);
   }
   unmounted() {
     window.removeEventListener("mousedown", this.mousedown);
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
-    window.removeEventListener("resize", this.resizeImage);
+    this.imageResizer?.unobserve(this.size);
+    this.imageResizer?.disconnect();
   }
   mousedown(e: MouseEvent) {
     if (e.button != MouseButton.LEFT) return;
@@ -189,8 +189,7 @@ export default class VCrop extends Vue {
     if (value > 1) return 1;
     return value;
   }
-  resizeImage() {
-    const rect = this.size.getBoundingClientRect();
+  resizeImage(rect: DOMRectReadOnly) {
     if (this.petaPanel._petaImage!.height / this.petaPanel._petaImage!.width < rect.height / rect.width) {
       this.imageWidth = rect.width;
       this.imageHeight = rect.width * this.petaPanel._petaImage!.height;
