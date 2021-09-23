@@ -82,7 +82,7 @@ import { Prop, Ref } from "vue-property-decorator";
 import VDottedBox from "@/components/utils/VDottedBox.vue";
 // Others
 import { MouseButton, PetaPanel } from "@/datas";
-import { Vec2 } from "@/utils";
+import { ClickChecker, Vec2 } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
 import { IMG_TAG_WIDTH } from "@/defines";
 @Options({
@@ -102,13 +102,13 @@ export default class VCrop extends Vue {
   images!: HTMLDivElement;
   imageURL = "";
   dragging = false;
-  preDragging = false;
   dragBeginPosition: Vec2 = new Vec2();
   cropBegin: Vec2 = new Vec2(0, 0);
   cropEnd: Vec2 = new Vec2(1, 1);
   imageWidth = 0;
   imageHeight = 0;
   imageResizer?: ResizeObserver;
+  clicker: ClickChecker = new ClickChecker();
   async mounted() {
     this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
     window.addEventListener("mousedown", this.mousedown);
@@ -135,42 +135,44 @@ export default class VCrop extends Vue {
       (e.clientY - imgRect.y) / imgRect.height
     );
     this.dragBeginPosition = mouse;
-    this.preDragging = true;
+    this.dragging = true;
+    this.cropBegin.copyFrom(mouse);
+    this.cropEnd.copyFrom(mouse);
+    this.dragging = true;
+    this.clicker.down(e);
   }
   mousemove(e: MouseEvent) {
+    this.clicker.move(e);
+    if (!this.dragging) return;
     const imgRect = this.images.getBoundingClientRect();
     const mouse = new Vec2(
       (e.clientX - imgRect.x) / imgRect.width,
       (e.clientY - imgRect.y) / imgRect.height
     );
-    if (this.preDragging) {
-      if (this.dragBeginPosition.getDistance(mouse) > 0.01) {
-        this.cropBegin.copyFrom(mouse);
-        this.cropEnd.copyFrom(mouse);
-        this.dragging = true;
-        this.preDragging = false;
-      }
+    if (!this.clicker.isClick) {
+      this.cropEnd.copyFrom(mouse);
     }
-    if (!this.dragging) return;
-    this.cropEnd.copyFrom(mouse);
   }
   mouseup(e: MouseEvent) {
     if (this.dragging) {
-      let width = this.cropWidth;
-      let height = this.cropHeight;
-      this.petaPanel.crop.position.copyFrom(this.cropPosition);
-      if (width * IMG_TAG_WIDTH < 5) {
-        width = 5 / IMG_TAG_WIDTH;
+      if (this.clicker.isClick) {
+        //
+      } else {
+        let width = this.cropWidth;
+        let height = this.cropHeight;
+        this.petaPanel.crop.position.copyFrom(this.cropPosition);
+        if (width * IMG_TAG_WIDTH < 5) {
+          width = 5 / IMG_TAG_WIDTH;
+        }
+        if (height * IMG_TAG_WIDTH < 5) {
+          height = 5 / IMG_TAG_WIDTH;
+        }
+        this.petaPanel.crop.width = width;
+        this.petaPanel.crop.height = height;
       }
-      if (height * IMG_TAG_WIDTH < 5) {
-        height = 5 / IMG_TAG_WIDTH;
-      }
-      this.petaPanel.crop.width = width;
-      this.petaPanel.crop.height = height;
       this.$emit("update");
     }
     this.dragging = false;
-    this.preDragging = false;
   }
   get cropPosition() {
     return new Vec2(
