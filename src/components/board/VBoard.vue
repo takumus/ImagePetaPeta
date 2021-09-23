@@ -317,10 +317,8 @@ export default class VBoard extends Vue {
     this.clearSelectionAll();
     petaPanel._selected = true;
     if (worldPosition) {
-      this.$nextTick(() => {
-        this.selectedPetaPanels.forEach((pp) => {
-          this.getVPanel(pp)?.startDrag(worldPosition)
-        })
+      this.selectedPetaPanels.forEach((pp) => {
+        this.getVPanel(pp)?.startDrag(worldPosition)
       });
     }
   }

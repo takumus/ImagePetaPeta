@@ -12,9 +12,16 @@
       <button tabindex="-1" @click="clearSelection">Clear Selection</button>
     </section>
     <p v-show="!noImage">Categories</p>
-    <ul>
+    <ul class="categories">
       <li v-for="category, i in _categories" :key="i">
-        <VEditableLabel :label="category" :labelLook="`・${category}`" @change="(name) => changeCategory(category, name)" @focus="complementCategory" :growWidth="true" />
+        <VEditableLabel
+          :label="category"
+          :labelLook="`${category}`"
+          :growWidth="true"
+          @change="(name) => changeCategory(category, name)"
+          @focus="complementCategory"
+          @contextmenu="categoryMenu($event, category)"
+        />
       </li>
     </ul>
   </div>
@@ -37,7 +44,8 @@
   .buttons {
     text-align: center;
   }
-  ul {
+  .categories {
+    white-space: nowrap;
     padding: 0px;
     li {
       list-style-type: none;
@@ -50,6 +58,9 @@
       color: #333333;
       &:hover * {
         text-decoration: underline;
+      }
+      &::before {
+        content: "・";
       }
     }
   }
@@ -70,7 +81,7 @@ import VPropertyThumbnail from "@/components/browser/VPropertyThumbnail.vue";
 // Others
 import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
 import { API, log } from "@/api";
-import { Vec2 } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils";
 import GLOBALS from "@/globals";
 @Options({
   components: {
@@ -140,11 +151,11 @@ export default class VProperty extends Vue {
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
     if (changed) {
-      API.send("dialog", "Clear Selection?", ["Yes", "No"]).then((index) => {
-        if (index == 0) {
-          this.clearSelection();
-        }
-      })
+      // API.send("dialog", "Clear Selection?", ["Yes", "No"]).then((index) => {
+      //   if (index == 0) {
+      //     this.clearSelection();
+      //   }
+      // })
     }
   }
   clearSelection() {
@@ -154,6 +165,16 @@ export default class VProperty extends Vue {
   }
   complementCategory(event: FocusEvent) {
     GLOBALS.complement.open(event.target as HTMLInputElement, this.allCategories);
+  }
+  categoryMenu(event: MouseEvent, category: string) {
+    GLOBALS.contextMenu.open([
+      {
+        label: `Remove "${category}"`,
+        click: () => {
+          this.changeCategory(category, "");
+        }
+      }
+    ], vec2FromMouseEvent(event));
   }
   get _categories(): string[] {
     if (this.noImage) {

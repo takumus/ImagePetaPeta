@@ -53,9 +53,8 @@ export default class VComplement extends Vue {
   filteredItems: string[] = [];
   position = new Vec2(0, 0);
   show = false;
-  input?: HTMLInputElement;
+  target?: HTMLInputElement;
   currentIndex = 0;
-  willHide = false;
   mounted() {
     GLOBALS.complement.open = this.open;
     window.addEventListener("mousedown", (event) => {
@@ -65,7 +64,7 @@ export default class VComplement extends Vue {
       }
     });
     window.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (!this.show || !this.input) return;
+      if (!this.show || !this.target) return;
       if (event.key == "ArrowUp") {
         this.currentIndex--;
         this.moveSelection();
@@ -94,15 +93,21 @@ export default class VComplement extends Vue {
   }
   moveSelection() {
     this.normalizeIndex();
-    setTimeout(() => {
-      if (this.input) this.input.setSelectionRange(this.input.value.length, this.input.value.length);
-    }, 0);
+    this.$nextTick(() => {
+      if (this.target) {
+         const range = document.createRange();
+        range.selectNodeContents(this.target);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+    });
   }
   open(input: HTMLElement, items: string[]): void {
-    if (input == this.input && this.show) {
+    if (input == this.target && this.show) {
       return;
     }
-    this.input = input as HTMLInputElement;
+    this.target = input as HTMLInputElement;
     this.filteredItems = [];
     if (this.show) {
       this.select();
@@ -112,27 +117,23 @@ export default class VComplement extends Vue {
     this.position.y = rect.y + rect.height;
     this.items = items;
     this.show = true;
-    this.willHide = false;
     input.addEventListener("blur", this.blur);
-    input.addEventListener("input", this.onInput);
-    this.onInput();
+    input.addEventListener("input", this.input);
+    this.input();
   }
   blur() {
-    this.willHide = true;
-    // 遅延は不要
-    // setTimeout(() => {
-    if (!this.willHide) return;
     this.show = false;
-    if (this.input) {
-      this.input.removeEventListener("blur", this.blur);
-      this.input.removeEventListener("input", this.onInput);
+    if (this.target) {
+      this.target.removeEventListener("blur", this.blur);
+      this.target.removeEventListener("input", this.input);
     }
-    // }, 100);
   }
-  onInput() {
-    if (!this.show || !this.input) return;
+  input() {
+    if (!this.show || !this.target) {
+      return;
+    }
     this.currentIndex = -1;
-    const value = this.input.value.toLowerCase().trim();
+    const value = this.target.innerText.toLowerCase().trim();
     if (value == "") {
       this.filteredItems = [];
       return;
@@ -150,12 +151,9 @@ export default class VComplement extends Vue {
     });
   }
   select(item?: string) {
-    if (!this.show) return;
-    if (item) {
-      if (this.input) {
-        this.input.value = item;
-        this.input.dispatchEvent(new Event('input'));
-      }
+    if (this.show && item && this.target) {
+      this.target.innerText = item;
+      this.target.dispatchEvent(new Event('input'));
     }
   }
 }

@@ -1,30 +1,23 @@
 <template>
   <span class="editable-label-root" :style="{ width: growWidth ? '100%' : 'unset' }">
-    <input
-      :style="{ width: _labelWidth, height: _labelHeight }"
-      v-show="editing"
-      class="editable-label input"
-      type="text"
-      v-model="tempText"
-      @blur="apply"
-      @keyup.enter="apply"
-      @focus="focus($event)"
-      ref="labelInput"
-    >
     <span
-      :style="{ visibility: editing ? 'hidden' : 'visible', width: growWidth ? '100%' : 'unset' }"
       class="editable-label"
-      ref="labelSpan"
+      v-text="labelLook && !editing ? labelLook : tempText"
+      ref="label"
+      :style="{ width: _labelWidth, height: _labelHeight }"
+      :contenteditable="editing"
+      @blur="apply"
+      @keydown.enter="apply"
+      @focus="focus($event)"
       @dblclick="edit()"
+      @input="input"
     >
-      {{labelLook && !editing ? labelLook : tempText}}
     </span>
   </span>
 </template>
 
 <style lang="scss" scoped>
 .editable-label {
-  display: block;
   line-height: 1.0em;
   font-size: 1.0em;
   text-align: left;
@@ -34,7 +27,6 @@
   padding: 0px;
   margin: 0px;
   overflow: visible;
-  text-overflow: ellipsis;
   white-space: nowrap;
   border: none;
   background: none;
@@ -42,20 +34,20 @@
   cursor: pointer;
   min-width: 32px;
   height: 16px;
+  width: 100%;
   &.editing {
     cursor: inherit;
   }
-  &.input {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-  }
+}
+.editable-label::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
 }
 .editable-label-root {
   padding: 0px;
   margin: 0px;
   display: inline-block;
-  position: relative;
 }
 </style>
 
@@ -80,9 +72,7 @@ export default class VEditableLabel extends Vue {
   growWidth!: boolean;
   @Prop()
   readonly!: boolean;
-  @Ref("labelSpan")
-  labelSpan!: HTMLElement;
-  @Ref("labelInput")
+  @Ref("label")
   labelInput!: HTMLInputElement;
   tempText = "Hello";
   editing = false;
@@ -97,32 +87,31 @@ export default class VEditableLabel extends Vue {
   async edit() {
     if (this.readonly) return;
     this.editing = true;
-    this.changeTempText();
     this.$nextTick(() => {
       this.labelInput.focus();
-      this.labelInput.select();
+      const range = document.createRange();
+      range.selectNodeContents(this.labelInput);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
     });
   }
   apply() {
-    if (this.readonly) return;
-    if (!this.editing) return;
-    this.editing = false;
-    if (this.label == this.tempText) return;
-    this.$emit("change", this.tempText);
-    // もとに戻す
-    this.tempText = this.label;
+    setTimeout(() => {
+      if (this.readonly) return;
+      if (!this.editing) return;
+      this.editing = false;
+      if (this.label == this.tempText) return;
+      this.$emit("change", this.tempText);
+      // もとに戻す
+      this.tempText = this.label;
+    }, 1);
   }
   focus(event: FocusEvent) {
     this.$emit("focus", event);
   }
-  @Watch("tempText")
-  changeTempText() {
-    if (this.readonly) return;
-    this.$nextTick(() => {
-      const rect = this.labelSpan.getBoundingClientRect();
-      this.labelWidth = rect.width;
-      this.labelHeight = rect.height;
-    })
+  input(event: InputEvent) {
+    this.tempText = (event.target as HTMLElement).innerText;
   }
   @Watch("label")
   changeLabel() {

@@ -160,14 +160,11 @@ export default class VTabBar extends Vue {
     this.selectBoardByIndex(index);
     this.pressing = true;
     this.draggingBoard = this.board;
-    this.$nextTick(() => {
-      const rect = (event.target as HTMLElement).parentElement?.parentElement?.getBoundingClientRect();
-      if (!rect) return;
-      this.mousedownOffsetX = rect.x - event.clientX;
-      this.draggingTab.style.left = `${rect.x}px`;
-      // this.draggingTab.style.width = `${rect.width}px`;
-      this.beforeSortSelectedIndex = this.selectedIndex;
-    });
+    const rect = (event.target as HTMLElement).parentElement?.parentElement?.getBoundingClientRect();
+    if (!rect) return;
+    this.mousedownOffsetX = rect.x - event.clientX;
+    this.draggingTab.style.left = `${rect.x}px`;
+    this.beforeSortSelectedIndex = this.selectedIndex;
   }
   menu(event: MouseEvent, board: Board) {
     GLOBALS.contextMenu.open([{

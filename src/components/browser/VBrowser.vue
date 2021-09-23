@@ -13,17 +13,31 @@
           </header>
           <ul>
             <li @click="selectCategory('')">
-              <VEditableLabel :label="`・All(${petaImagesArray.length})`" :growWidth="true" :readonly="true"/>
+              <VEditableLabel
+                :label="`All(${petaImagesArray.length})`"
+                :growWidth="true"
+                :readonly="true"
+              />
             </li>
             <li @click="selectCategory('', true)" v-if="uncategorizedImages.length > 0">
-              <VEditableLabel :label="`・Uncategorized(${uncategorizedImages.length})`" :growWidth="true" :readonly="true"/>
+              <VEditableLabel
+                :label="`Uncategorized(${uncategorizedImages.length})`"
+                :growWidth="true"
+                :readonly="true"
+              />
             </li>
             <li
               v-for="c in _categories"
               :key="c.name"
               @click="selectCategory(c.name)"
             >
-              <VEditableLabel :label="c.name" :labelLook="`・${c.name}(${c.count})`" @change="(name) => changeCategory(c.name, name)" :growWidth="true" />
+              <VEditableLabel
+                :label="c.name"
+                :labelLook="`${c.name}(${c.count})`"
+                :growWidth="true"
+                @change="(name) => changeCategory(c.name, name)"
+                @contextmenu="categoryMenu($event, c.name)"
+              />
             </li>
           </ul>
         </section>
@@ -43,7 +57,7 @@
                 :petaThumbnail="data"
                 @add="addPanel"
                 @select="selectImage"
-                @menu="petaImageMenu"
+                @menu="petaImageMenu()"
               />
             </div>
           </section>
@@ -79,6 +93,7 @@
       .categories {
         padding: 8px;
         text-align: center;
+        white-space: nowrap;
         header {
           .search {
             border-radius: 8px;
@@ -103,6 +118,9 @@
             color: #333333;
             &:hover * {
               text-decoration: underline;
+            }
+            &::before {
+              content: "・";
             }
           }
         }
@@ -151,7 +169,7 @@ import VProperty from "@/components/browser/VProperty.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
-import { Vec2 } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils";
 import { API, log } from "@/api";
 import GLOBALS from "@/globals";
 @Options({
@@ -240,6 +258,16 @@ export default class VBrowser extends Vue {
   complementCategory(event: FocusEvent) {
     GLOBALS.complement.open(event.target as HTMLInputElement, this._categories.map((c) => c.name));
   }
+  categoryMenu(event: MouseEvent, category: string) {
+    GLOBALS.contextMenu.open([
+      {
+        label: `Remove "${category}"`,
+        click: () => {
+          this.changeCategory(category, "");
+        }
+      }
+    ], vec2FromMouseEvent(event));
+  }
   async changeCategory(oldName: string, newName: string) {
     newName = newName.replace(/\s+/g, "");
     if (oldName == newName) {
@@ -247,13 +275,13 @@ export default class VBrowser extends Vue {
     }
     let remove = false;
     if (newName == "") {
-      remove = await API.send("dialog", `Remove Category ${oldName}?`, ["Yes", "No"]) == 0;
+      remove = await API.send("dialog", `Remove "${oldName}"?`, ["Yes", "No"]) == 0;
       if (!remove) {
         return;
       }
     }
     if (this._categories.find((c) => c.name == newName)) {
-      API.send("dialog", `Category ${name} already exists.`, []);
+      API.send("dialog", `"${name}" already exists.`, []);
       return;
     }
     const changed: PetaImage[] = [];
