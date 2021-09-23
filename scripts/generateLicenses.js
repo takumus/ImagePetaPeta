@@ -1,6 +1,6 @@
 const fs = require("fs");
 const datas = JSON.parse(fs.readFileSync("./licenses.json"));
-const newDatas = Object.keys(datas).filter((name) => name.indexOf("ImagePetaPeta") < 0).map((name) => {
+const newDatas = Object.keys(datas).map((name) => {
   const data = datas[name];
   const licenses = fs.readFileSync(data.licenseFile).toString();
   delete data.path;

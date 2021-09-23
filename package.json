@@ -1,6 +1,6 @@
 {
-  "name": "ImagePetaPeta",
-  "productName": "ImagePetaPeta",
+  "name": "ImagePetaPeta-beta",
+  "productName": "ImagePetaPeta-beta",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "prebuild": "rimraf ./dist_electron && yarn generate-licenses",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "generate-licenses": "license-checker --production --json > ./licenses.json && node ./scripts/generateLicenses.js"
+    "generate-licenses": "license-checker --production --json --excludePrivatePackages > ./licenses.json && node ./scripts/generateLicenses.js"
   },
   "main": "background.js",
   "dependencies": {

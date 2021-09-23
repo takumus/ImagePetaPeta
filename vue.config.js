@@ -23,7 +23,7 @@ module.exports = {
     electronBuilder: {
       preload: 'src/preload.ts',
       builderOptions: {
-        appId: "io.takumus.imagepetapeta",
+        appId: "io.takumus.imagepetapeta-beta",
         productName: packageJSON.name,
         asar: true,
         win: {
