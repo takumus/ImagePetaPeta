@@ -112,7 +112,8 @@ import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
 import { BoardTransform, MouseButton, PetaPanel } from "@/datas";
 import LoadingImage from "@/assets/sample.png";
-import RotateCursor from "@/assets/rotateCursor.png";
+import RotateCursor1x from "@/assets/rotateCursor1x.png";
+import RotateCursor2x from "@/assets/rotateCursor2x.png";
 import { IMG_TAG_WIDTH } from "@/defines";
 enum ControlStatus {
   DRAGGING = "dragging",
@@ -159,7 +160,10 @@ export default class VPanel extends Vue {
   loadedFullSize = false;
   shiftKeyPressed = false;
   resizeCursors = [ "ns-resize", "nesw-resize", "ew-resize", "nwse-resize", "ns-resize", "nesw-resize", "ew-resize", "nwse-resize" ];
-  rotateCursor = `url('${RotateCursor}') 18 18, auto`;
+  rotateCursor = `-webkit-image-set(
+    url('${RotateCursor1x}') 1x,
+    url('${RotateCursor2x}') 2x
+  ) 16 16, auto`;
   hovered = false;
   click = new ClickChecker();
   // vertical 縦
