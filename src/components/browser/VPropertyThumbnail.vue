@@ -1,13 +1,13 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ top: _y, left: _x, width: _width, height: _height }"
+    :style="{ top: petaThumbnail.position.y + 'px', left: petaThumbnail.position.x + 'px', width: this.petaThumbnail.width + 'px', height: this.petaThumbnail.height + 'px' }"
   >
     <div class="wrapper">
       <img
         draggable="false"
         :src="imageURL"
-        v-if="_loaded"
+        v-if="loaded"
       >
     </div>
   </article>
@@ -56,19 +56,7 @@ export default class VPropertyThumbnail extends Vue {
   unmounted() {
     ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
   }
-  get _x() {
-    return this.petaThumbnail.position.x + "px";
-  }
-  get _y() {
-    return this.petaThumbnail.position.y + "px";
-  }
-  get _width() {
-    return this.petaThumbnail.width + "px";
-  }
-  get _height() {
-    return this.petaThumbnail.height + "px";
-  }
-  get _loaded() {
+  get loaded() {
     return this.imageURL != "";
   }
 }

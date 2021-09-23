@@ -2,32 +2,32 @@
   <div class="dottedbox-root" :style="{
     top: `${y}px`,
     left: `${x}px`,
-    width: `${_width}px`,
-    height: `${_height}px`
+    width: `${absWidth}px`,
+    height: `${absHeight}px`
   }">
     <div
-      v-if="!_svg"
+      v-if="!svg"
       class="border back"
     >
     </div>
     <div
-      v-if="!_svg"
+      v-if="!svg"
       class="border front"
     >
     </div>
     <svg 
-      v-if="_svg"
-      :width="_width"
-      :height="_height"
+      v-if="svg"
+      :width="absWidth"
+      :height="absHeight"
     >
       <polygon
-        :points="`0,0 ${_width},0 ${_width},${_height} 0,${_height} 0,0`"
+        :points="`0,0 ${absWidth},0 ${absWidth},${absHeight} 0,${absHeight} 0,0`"
         stroke="black"
         fill="none"
         stroke-width="2"
       />
       <polygon
-        :points="`${_dasharrayOffset},0 ${_width},0 ${_width},${_height} 0,${_height} 0,0`"
+        :points="`${_dasharrayOffset},0 ${absWidth},0 ${absWidth},${absHeight} 0,${absHeight} 0,0`"
         stroke="white"
         stroke-dasharray="5,5"
         fill="none"
@@ -89,16 +89,13 @@ export default class VDottedBox extends Vue {
   unmounted() {
     window.clearInterval(this.dasharrayAnimateId);
   }
-  get _dasharrayOffset() {
-    return this.dasharrayOffset;
-  }
-  get _width() {
+  get absWidth() {
     return Math.abs(this.width);
   }
-  get _height() {
+  get absHeight() {
     return Math.abs(this.height);
   }
-  get _svg() {
+  get svg() {
     return false;
   }
 }

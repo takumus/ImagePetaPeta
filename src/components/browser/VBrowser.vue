@@ -27,7 +27,7 @@
               />
             </li>
             <li
-              v-for="c in _categories"
+              v-for="c in categories"
               :key="c.name"
               @click="selectCategory(c.name)"
             >
@@ -52,7 +52,7 @@
               :style="{height: scrollHeight + 8 + 'px'}"
             >
               <VThumbnail
-                v-for="(data) in _petaThumbnails"
+                v-for="(data) in petaThumbnails"
                 :key="data.petaImage.id"
                 :petaThumbnail="data"
                 @add="addPanel"
@@ -65,7 +65,7 @@
         <section class="property">
           <VProperty
             :petaImages="selectedPetaImages"
-            :allCategories="_categories.map(c => c.name)"
+            :allCategories="categories.map(c => c.name)"
             @changeCategory="changePetaImageCategory"
           />
         </section>
@@ -256,7 +256,7 @@ export default class VBrowser extends Vue {
     petaImage._selected = !petaImage._selected;
   }
   complementCategory(event: FocusEvent) {
-    GLOBALS.complement.open(event.target as HTMLInputElement, this._categories.map((c) => c.name));
+    GLOBALS.complement.open(event.target as HTMLInputElement, this.categories.map((c) => c.name));
   }
   categoryMenu(event: MouseEvent, category: string) {
     GLOBALS.contextMenu.open([
@@ -280,7 +280,7 @@ export default class VBrowser extends Vue {
         return;
       }
     }
-    if (this._categories.find((c) => c.name == newName)) {
+    if (this.categories.find((c) => c.name == newName)) {
       API.send("dialog", `"${name}" already exists.`, []);
       return;
     }
@@ -363,7 +363,7 @@ export default class VBrowser extends Vue {
       }
     }
   }
-  get _categories() {
+  get categories() {
     const categories: {
       name: string,
       count: number
@@ -390,7 +390,7 @@ export default class VBrowser extends Vue {
     })
     return categories;
   }
-  get _petaThumbnails(): PetaThumbnail[] {
+  get petaThumbnails(): PetaThumbnail[] {
     const hc = Math.floor(this.imagesWidth / this.defaultImageWidth);
     this.imageWidth = this.imagesWidth / hc;
     const yList: number[] = [];

@@ -158,6 +158,7 @@ export default class App extends Vue {
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<Board>} = {};
   async mounted() {
+    log("INIT RENDERER!");
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
       this.getPetaImages();
     });
@@ -173,13 +174,6 @@ export default class App extends Vue {
       log("on updatePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
-    window.addEventListener("keydown", (event) => {
-      if (event.key == "Escape") {
-        event.preventDefault();
-        this.browsing = false;
-      }
-    });
-    log("INIT RENDERER!");
     await this.getAll();
   }
   async getAll() {

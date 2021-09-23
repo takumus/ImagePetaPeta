@@ -2,18 +2,18 @@
   <article class="panel-root"
     ref="container"
     :style="{
-      transform: `translate(${_position}) rotate(${_rotation}rad)`,
-      zIndex: _zIndex
+      transform: `translate(${_position}) rotate(${petaPanel.rotation}rad)`,
+      zIndex: petaPanel.index
     }"
   >
     <div
       ref="img"
       :style="{
-        width: _normalizedWidth,
-        height: _normalizedHeight,
-        transform: `scale(${_scaleX}, ${_scaleY})`,
-        top: `${_offsetY}`,
-        left: `${_offsetX}`
+        width: normalWidth + 'px',
+        height: normalHeight + 'px',
+        transform: `scale(${scaleX}, ${scaleY})`,
+        top: offsetY + 'px',
+        left: offsetX + 'px'
       }"
       class="image"
     >
@@ -21,18 +21,18 @@
         :src="imageURL"
         draggable="false"
         :style="{
-          left: _cropPositionX,
-          top: _cropPositionY,
-          transform: `scale(${_cropScale})`
+          left: cropPositionX,
+          top: cropPositionY,
+          transform: `scale(${cropScale})`
         }"
       >
     </div>
-    <div class="selection" v-if="_selected || hovered">
-      <VDottedBox :x="-_width / 2 + (_width < 0 ? _width : 0)" :y="-_height / 2 + (_height < 0 ? _height : 0)" :width="_width" :height="_height" />
+    <div class="selection" v-if="selected || hovered">
+      <VDottedBox :x="-width / 2 + (width < 0 ? width : 0)" :y="-height / 2 + (height < 0 ? height : 0)" :width="width" :height="height" />
     </div>
-    <div class="transformer" v-if="_selected">
+    <div class="transformer" v-if="selected">
       <div
-        v-for="rp in _rotatePoints"
+        v-for="rp in rotatePoints"
         :key="rp.id"
         class="rotate-point"
         :style="{ top: `${rp.y}px`, left: `${rp.x}px`, cursor: rotateCursor }"
@@ -40,10 +40,10 @@
       >
       </div>
       <div
-        v-for="cp in _controlPoint"
+        v-for="cp in controlPoints"
         :key="cp.id"
         class="control-point"
-        :style="{top: `${cp.y}px`, left: `${cp.x}px`, transform: `rotate(${-_rotation}rad)`, cursor: `${cp.cursor}`}"
+        :style="{top: `${cp.y}px`, left: `${cp.x}px`, transform: `rotate(${-petaPanel.rotation}rad)`, cursor: `${cp.cursor}`}"
         @mousedown="beginChangeSize(...cp.origin, $event)"
       >
         <div class="fill">
@@ -333,7 +333,7 @@ export default class VPanel extends Vue {
   getResizeCursor(index: number) {
     const rot = Math.floor(this.petaPanel.rotation / Math.PI * 180 + 45 / 2) % 360;
     const offset = Math.floor((rot + (rot < 0 ? 360 : 0)) / 45) + 8;
-    const direction = (this._height > 0 ? 1 : -1) * (this._width > 0 ? 1 : -1);
+    const direction = (this.height > 0 ? 1 : -1) * (this.width > 0 ? 1 : -1);
     return this.resizeCursors[(offset + index * direction) % 8];
   }
   @Watch("petaPanel.crop", { deep: true })
@@ -344,94 +344,82 @@ export default class VPanel extends Vue {
   get ratio() {
     return (this.petaPanel.crop.height * this.petaPanel._petaImage!.height) / (this.petaPanel.crop.width * this.petaPanel._petaImage!.width);
   }
+  get normalWidth() {
+    return IMG_TAG_WIDTH;
+  }
   get normalHeight() {
     return IMG_TAG_WIDTH * this.ratio;
   }
   get cropScale() {
     return 1 / this.petaPanel.crop.width;
   }
-  get _zIndex() {
-    return this.petaPanel.index;
-  }
   get _position() {
     return `${(this.petaPanel.position.x) * this.transform.scale}px, ${(this.petaPanel.position.y) * this.transform.scale}px`;
   }
-  get _rotation() {
-    return this.petaPanel.rotation;
-  }
-  get _width() {
+  get width() {
     return this.petaPanel.width * this.transform.scale;
   }
-  get _height() {
+  get height() {
     return this.petaPanel.height * this.transform.scale;
   }
-  get _scaleX() {
+  get scaleX() {
     return this.petaPanel.width / IMG_TAG_WIDTH * this.transform.scale;
   }
-  get _scaleY() {
+  get scaleY() {
     return this.petaPanel.height / this.normalHeight * this.transform.scale;
   }
-  get _offsetX() {
-    return `${-IMG_TAG_WIDTH / 2}px`;
+  get offsetX() {
+    return -this.normalWidth / 2;
   }
-  get _offsetY() {
-    return `${-this.normalHeight / 2}px`;
+  get offsetY() {
+    return -this.normalHeight / 2;
   }
-  get _normalizedWidth() {
-    return `${IMG_TAG_WIDTH}px`;
-  }
-  get _normalizedHeight() {
-    return `${this.normalHeight}px`;
-  }
-  get _cropPositionX() {
+  get cropPositionX() {
     return -this.petaPanel.crop.position.x * IMG_TAG_WIDTH * this.cropScale + "px";
   }
-  get _cropPositionY() {
+  get cropPositionY() {
     return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel._petaImage!.height * this.cropScale + "px";
   }
-  get _cropScale() {
-    return this.cropScale;
-  }
-  get _controlPoint() {
-    const points: {[key: string]: {origin: string[], x: number, y: number, cursor: string}} = {
+  get controlPoints() {
+    const points: { [key: string]: { origin: string[], x: number, y: number, cursor: string } } = {
       TOP_MID: {
         origin: [SizingOrigin.TOP, SizingOrigin.NONE],
-        x: 0, y: -this._height / 2,
+        x: 0, y: -this.height / 2,
         cursor: this.getResizeCursor(0)
       },
       TOP_RIGHT: {
         origin: [SizingOrigin.TOP, SizingOrigin.RIGHT],
-        x: this._width / 2, y: -this._height / 2,
+        x: this.width / 2, y: -this.height / 2,
         cursor: this.getResizeCursor(1)
       },
       MID_RIGHT: {
         origin: [SizingOrigin.NONE, SizingOrigin.RIGHT],
-        x: this._width / 2, y: 0,
+        x: this.width / 2, y: 0,
         cursor: this.getResizeCursor(2)
       },
       BOTTOM_RIGHT: {
         origin: [SizingOrigin.BOTTOM, SizingOrigin.RIGHT],
-        x: this._width / 2, y: this._height / 2,
+        x: this.width / 2, y: this.height / 2,
         cursor: this.getResizeCursor(3)
       },
       BOTTOM_MID: {
         origin: [SizingOrigin.BOTTOM, SizingOrigin.NONE],
-        x: 0, y: this._height / 2,
+        x: 0, y: this.height / 2,
         cursor: this.getResizeCursor(4)
       },
       BOTTOM_LEFT: {
         origin: [SizingOrigin.BOTTOM, SizingOrigin.LEFT],
-        x: -this._width / 2, y: this._height / 2,
+        x: -this.width / 2, y: this.height / 2,
         cursor: this.getResizeCursor(5)
       },
       MID_LEFT: {
         origin: [SizingOrigin.NONE, SizingOrigin.LEFT],
-        x: -this._width / 2, y: 0,
+        x: -this.width / 2, y: 0,
         cursor: this.getResizeCursor(6)
       },
       TOP_LEFT: {
         origin: [SizingOrigin.TOP, SizingOrigin.LEFT],
-        x: -this._width / 2, y: -this._height / 2,
+        x: -this.width / 2, y: -this.height / 2,
         cursor: this.getResizeCursor(7)
       }
     };
@@ -440,41 +428,41 @@ export default class VPanel extends Vue {
       ...points[k]
     }));
   }
-  get _rotatePoints() {
+  get rotatePoints() {
     const offset = 20;
     const xOffset = (this.petaPanel.width > 0 ? 1 : -1) * offset;
     const yOffset = (this.petaPanel.height > 0 ? 1 : -1) * offset;
-    const points: {[key: string]: {x: number, y: number, cursor: string}} = {
+    const points: { [key: string]: { x: number, y: number, cursor: string } } = {
       TOP_MID: {
-        x: 0, y: -this._height / 2 - yOffset,
+        x: 0, y: -this.height / 2 - yOffset,
         cursor: this.getResizeCursor(0)
       },
       TOP_RIGHT: {
-        x: this._width / 2 + xOffset, y: -this._height / 2  - yOffset,
+        x: this.width / 2 + xOffset, y: -this.height / 2  - yOffset,
         cursor: this.getResizeCursor(1)
       },
       MID_RIGHT: {
-        x: this._width / 2 + xOffset, y: 0,
+        x: this.width / 2 + xOffset, y: 0,
         cursor: this.getResizeCursor(2)
       },
       BOTTOM_RIGHT: {
-        x: this._width / 2 + xOffset, y: this._height / 2 + yOffset,
+        x: this.width / 2 + xOffset, y: this.height / 2 + yOffset,
         cursor: this.getResizeCursor(3)
       },
       BOTTOM_MID: {
-        x: 0, y: this._height / 2 + yOffset,
+        x: 0, y: this.height / 2 + yOffset,
         cursor: this.getResizeCursor(4)
       },
       BOTTOM_LEFT: {
-        x: -this._width / 2 - xOffset, y: this._height / 2 + yOffset,
+        x: -this.width / 2 - xOffset, y: this.height / 2 + yOffset,
         cursor: this.getResizeCursor(5)
       },
       MID_LEFT: {
-        x: -this._width / 2 - xOffset, y: 0,
+        x: -this.width / 2 - xOffset, y: 0,
         cursor: this.getResizeCursor(6)
       },
       TOP_LEFT: {
-        x: -this._width / 2 - xOffset, y: -this._height / 2 - yOffset,
+        x: -this.width / 2 - xOffset, y: -this.height / 2 - yOffset,
         cursor: this.getResizeCursor(7)
       }
     };
@@ -483,7 +471,7 @@ export default class VPanel extends Vue {
       ...points[k]
     }));
   }
-  get _selected() {
+  get selected() {
     return this.petaPanel._selected;
   }
 }

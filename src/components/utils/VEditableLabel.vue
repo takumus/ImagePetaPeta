@@ -4,7 +4,7 @@
       class="editable-label"
       v-text="labelLook && !editing ? labelLook : tempText"
       ref="label"
-      :style="{ width: _labelWidth, height: _labelHeight }"
+      :style="{ width: labelWidth + 'px', height: labelHeight + 'px' }"
       :contenteditable="editing"
       @blur="apply"
       @keydown.enter="apply"
@@ -117,12 +117,6 @@ export default class VEditableLabel extends Vue {
   @Watch("label")
   changeLabel() {
     this.tempText = this.label;
-  }
-  get _labelWidth() {
-    return this.labelWidth + "px";
-  }
-  get _labelHeight() {
-    return this.labelHeight + "px";
   }
 }
 </script>

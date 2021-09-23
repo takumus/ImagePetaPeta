@@ -1,14 +1,14 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ top: _y, left: _x, width: _width, height: _height }"
+    :style="{ top: petaThumbnail.position.y + 'px', left: petaThumbnail.position.x + 'px', width: petaThumbnail.width + 'px', height: petaThumbnail.height + 'px' }"
   >
     <div class="wrapper">
       <img
         draggable="false"
         :src="imageURL"
         @mousedown="mousedown($event)"
-        v-if="_loaded"
+        v-if="loaded"
         :class="{ 'selected-image': petaThumbnail.petaImage._selected }"
       >
       <div class="info">
@@ -173,30 +173,7 @@ export default class VThumbnail extends Vue {
       }
     }
   }
-  get _categories() {
-    return this.petaThumbnail.petaImage.categories.join(",");
-  }
-  set _categories(value: string) {
-    this.petaThumbnail.petaImage.categories.splice(0, this.petaThumbnail.petaImage.categories.length);
-    value.split(",").forEach((k) => {
-      k = k.trim();
-      this.petaThumbnail.petaImage.categories.push(k);
-    });
-    API.send("updatePetaImages", [this.petaThumbnail.petaImage], UpdateMode.UPDATE);
-  }
-  get _x() {
-    return this.petaThumbnail.position.x + "px";
-  }
-  get _y() {
-    return this.petaThumbnail.position.y + "px";
-  }
-  get _width() {
-    return this.petaThumbnail.width + "px";
-  }
-  get _height() {
-    return this.petaThumbnail.height + "px";
-  }
-  get _loaded() {
+  get loaded() {
     return this.imageURL != "";
   }
 }

@@ -4,7 +4,7 @@
       <div ref="size" class="size">
 
       </div>
-      <div ref="images" class="images" :style="{ width: _imageWidth, height: _imageHeight }">
+      <div ref="images" class="images" :style="{ width: imageWidth + 'px', height: imageHeight + 'px' }">
         <img
           :src="imageURL"
           draggable="false"
@@ -14,12 +14,12 @@
           :src="imageURL"
           draggable="false"
           :style="{
-            clipPath: `polygon(${_cropX}px ${_cropY}px, ${_cropX + _cropWidth}px ${_cropY}px, ${_cropX + _cropWidth}px ${_cropY + _cropHeight}px, ${_cropX}px ${_cropY + _cropHeight}px)`
+            clipPath: `polygon(${cropX}px ${cropY}px, ${cropX + renderCropWidth}px ${cropY}px, ${cropX + renderCropWidth}px ${cropY + renderCropHeight}px, ${cropX}px ${cropY + renderCropHeight}px)`
           }"
           class="front"
         >
         <div class="dottedbox">
-          <VDottedBox :x="_cropX" :y="_cropY" :width="_cropWidth" :height="_cropHeight" />
+          <VDottedBox :x="cropX" :y="cropY" :width="renderCropWidth" :height="renderCropHeight" />
         </div>
       </div>
     </div>
@@ -200,23 +200,17 @@ export default class VCrop extends Vue {
       this.imageWidth = rect.height / this.petaPanel._petaImage!.height;
     }
   }
-  get _cropX() {
+  get cropX() {
     return this.cropPosition.x * this.imageWidth;
   }
-  get _cropY() {
+  get cropY() {
     return this.cropPosition.y * this.imageHeight;
   }
-  get _cropWidth() {
+  get renderCropWidth() {
     return this.cropWidth * this.imageWidth;
   }
-  get _cropHeight() {
+  get renderCropHeight() {
     return this.cropHeight * this.imageHeight;
-  }
-  get _imageWidth() {
-    return this.imageWidth + "px";
-  }
-  get _imageHeight() {
-    return this.imageHeight + "px";
   }
 }
 </script>

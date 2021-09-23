@@ -14,7 +14,7 @@
         </span>
         <span
           class="remove"
-          v-if="_removable"
+          v-if="removable"
         >
           <span @click="removeBoard(b)">×</span>
         </span>
@@ -40,7 +40,7 @@
         </span>
         <span
           class="remove"
-          v-if="_removable"
+          v-if="removable"
         >
           ×
         </span>
@@ -241,7 +241,7 @@ export default class VTabBar extends Vue {
   get board() {
     return this.boards[this.selectedIndex];
   }
-  get _removable() {
+  get removable() {
     return true;// this.boards.length > 1;
   }
   @Watch("boards", { deep: true, immediate: true })

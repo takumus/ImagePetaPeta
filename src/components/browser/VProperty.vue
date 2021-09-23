@@ -2,7 +2,7 @@
   <div class="property-root">
     <section class="previews" ref="previews" v-show="!noImage">
       <VPropertyThumbnail
-        v-for="(data) in _petaThumbnails"
+        v-for="(data) in petaThumbnails"
         :key="data.petaImage.id"
         :petaThumbnail="data"
       />
@@ -13,7 +13,7 @@
     </section>
     <p v-show="!noImage">Categories</p>
     <ul class="categories">
-      <li v-for="category, i in _categories" :key="i">
+      <li v-for="category, i in categories" :key="i">
         <VEditableLabel
           :label="category"
           :labelLook="`${category}`"
@@ -176,7 +176,7 @@ export default class VProperty extends Vue {
       }
     ], vec2FromMouseEvent(event));
   }
-  get _categories(): string[] {
+  get categories(): string[] {
     if (this.noImage) {
       return [];
     }
@@ -192,7 +192,7 @@ export default class VProperty extends Vue {
     });
     return [...Object.keys(categories).filter((category) => categories[category] == this.petaImages.length), "..."];
   }
-  get _petaThumbnails(): PetaThumbnail[] {
+  get petaThumbnails(): PetaThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
     const thumbnails = this.petaImages.map((p, i) => {
       let width = 0;
