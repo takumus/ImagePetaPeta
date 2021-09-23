@@ -141,7 +141,7 @@ export default class VBoard extends Vue {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("keydown", this.keydown);
     window.addEventListener("keyup", this.keyup);
-    window.addEventListener("mousedown", this.mousedownOutside);
+    window.addEventListener("click", this.mousedownOutside);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
     });
@@ -157,7 +157,7 @@ export default class VBoard extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("keydown", this.keydown);
     window.removeEventListener("keyup", this.keyup);
-    window.removeEventListener("mousedown", this.mousedownOutside);
+    window.removeEventListener("click", this.mousedownOutside);
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
   }
@@ -166,18 +166,20 @@ export default class VBoard extends Vue {
     this.globalOffset.y = rect.height / 2;
   }
   mousedownOutside(e: MouseEvent) {
-    let parent = e.target as HTMLElement;
-    let inPanels = true;
-    while (parent != this.panelsWrapper) {
-      parent = parent.parentElement as HTMLElement;
-      if (!parent) {
-        inPanels = false;
-        break;
+    this.$nextTick(() => {
+      let parent = e.target as HTMLElement;
+      let inPanels = true;
+      while (parent != this.panelsWrapper) {
+        parent = parent.parentElement as HTMLElement;
+        if (!parent) {
+          inPanels = false;
+          break;
+        }
       }
-    }
-    if (!inPanels) {
-      this.clearSelectionAll(true);
-    }
+      if (!inPanels) {
+        this.clearSelectionAll(true);
+      }
+    });
   }
   mousedown(e: MouseEvent) {
     if (e.button == MouseButton.RIGHT) {
