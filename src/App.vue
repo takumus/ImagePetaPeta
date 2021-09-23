@@ -133,7 +133,7 @@ import VInfo from "@/components/utils/VInfo.vue";
 import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2, vec2FromMouseEvent } from "@/utils";
-import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/defines";
+import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, SAVE_DELAY } from "@/defines";
 @Options({
   components: {
     VPanel,
@@ -205,8 +205,8 @@ export default class App extends Vue {
       const panel = createPetaPanel(
         petaImage,
         vec2FromMouseEvent(this.orderedAddPanelDragEvent),
-        100,
-        petaImage.height * 100
+        DEFAULT_IMAGE_SIZE,
+        petaImage.height * DEFAULT_IMAGE_SIZE
       );
       if (!this.browsing) {
         this.addPanel(panel);
