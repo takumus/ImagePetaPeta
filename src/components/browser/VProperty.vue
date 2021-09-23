@@ -151,11 +151,11 @@ export default class VProperty extends Vue {
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
     if (changed) {
-      // API.send("dialog", "Clear Selection?", ["Yes", "No"]).then((index) => {
-      //   if (index == 0) {
-      //     this.clearSelection();
-      //   }
-      // })
+      API.send("dialog", "Clear Selection?", ["Yes", "No"]).then((index) => {
+        if (index == 0) {
+          this.clearSelection();
+        }
+      })
     }
   }
   clearSelection() {
