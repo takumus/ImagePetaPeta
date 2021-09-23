@@ -97,15 +97,16 @@ export default class VEditableLabel extends Vue {
     });
   }
   apply() {
+    // blur又はenterと当時にapplyすると、色々厄介だから少し待つ
     setTimeout(() => {
-      if (this.readonly) return;
       if (!this.editing) return;
       this.editing = false;
+      if (this.readonly) return;
       if (this.label == this.tempText) return;
       this.$emit("change", this.tempText);
       // もとに戻す
       this.tempText = this.label;
-    }, 1);
+    }, 10);
   }
   focus(event: FocusEvent) {
     this.$emit("focus", event);

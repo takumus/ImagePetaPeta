@@ -178,7 +178,7 @@ export default class App extends Vue {
         event.preventDefault();
         this.browsing = false;
       }
-    })
+    });
     log("INIT RENDERER!");
     await this.getAll();
   }
