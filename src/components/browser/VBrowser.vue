@@ -57,7 +57,7 @@
                 :petaThumbnail="data"
                 @add="addPanel"
                 @select="selectImage"
-                @menu="petaImageMenu()"
+                @menu="petaImageMenu"
               />
             </div>
           </section>
