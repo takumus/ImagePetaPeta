@@ -318,7 +318,7 @@ export default class VBrowser extends Vue {
       }
     }
     if (this.categories.find((c) => c.name == newName)) {
-      API.send("dialog", `"${name}" already exists.`, []);
+      API.send("dialog", `"${newName}" already exists.`, []);
       return;
     }
     const changed: PetaImage[] = [];
