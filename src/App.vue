@@ -263,7 +263,7 @@ export default class App extends Vue {
     this.info.show = true;
   }
   openSettings() {
-    //
+    API.send("dialog", "hello", "hello".split(""));
   }
   async removeBoard(board: Board) {
     if (await API.send("dialog", `Remove "${board.name}"?`, ["Yes", "No"]) != 0) {

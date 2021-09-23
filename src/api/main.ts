@@ -19,6 +19,10 @@ export interface Main {
   openURL: (url: string) => Promise<boolean>;
   // getAppInfo
   getAppInfo: () => Promise<AppInfo>;
+  // showDBFolder
+  showDBFolder: () => Promise<boolean>;
+  // showImageInFolder
+  showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>

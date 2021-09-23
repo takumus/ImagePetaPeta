@@ -3,7 +3,9 @@
     <div class="info">
       <p>{{ appInfo.name }} {{ appInfo.version }}</p>
       <button tabindex="-1" @click="gotoGithub">Github</button>
-      <button tabindex="-1" @click="gotoIssues">Issues/バグ報告</button>
+      <button tabindex="-1" @click="gotoIssues">Issues</button>
+      <p>Files</p>
+      <button tabindex="-1" @click="showDBFolder">DB Folder</button>
       <p>Licenses</p>
       <pre>
         {{ licenses }}
@@ -23,7 +25,7 @@
   left: 0px;
   background-color: rgba($color: #000000, $alpha: 0.7);
   .info {
-    width: 512px;
+    width: 600px;
     background-color: #ffffff;
     padding: 16px;
     border-radius: 8px;
@@ -43,6 +45,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       font-size: 0.7em;
+      background-color: #eeeeee;
     }
     p {
       white-space: nowrap;
@@ -84,6 +87,9 @@ export default class VInfo extends Vue {
   }
   gotoIssues() {
     API.send("openURL", "https://github.com/takumus/ImagePetaPeta/issues");
+  }
+  showDBFolder() {
+    API.send("showDBFolder");
   }
   ok() {
     this.show = false;

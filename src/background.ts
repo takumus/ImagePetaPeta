@@ -14,7 +14,7 @@ import dataURIToBuffer from "data-uri-to-buffer";
 import { DEFAULT_BOARD_NAME } from "./defines";
 (async () => {
   const win = await initWindow();
-  const DIR_ROOT = path.resolve(app.getPath("pictures"), "petaDatas");
+  const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
   // fs.rmdirSync(DIR_ROOT, {
@@ -37,6 +37,7 @@ import { DEFAULT_BOARD_NAME } from "./defines";
     filename: path.resolve(DIR_ROOT, "boards.db"),
     autoload: true
   });
+  const logFile = fs.createWriteStream(path.resolve(DIR_ROOT, "logs.log"), {flags: "a"});
   mainLog(DIR_ROOT);
   const mainAPIs: MainFunctions = {
     browseImages: async () => {
@@ -200,6 +201,14 @@ import { DEFAULT_BOARD_NAME } from "./defines";
         name: app.getName(),
         version: app.getVersion()
       };
+    },
+    showDBFolder: async (event) => {
+      shell.showItemInFolder(DIR_ROOT);
+      return true;
+    },
+    showImageInFolder: async (event, petaImage) => {
+      shell.showItemInFolder(getImagePath(petaImage, false));
+      return true;
     }
   }
   function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {
@@ -375,15 +384,17 @@ import { DEFAULT_BOARD_NAME } from "./defines";
       });
     });
   }
+  function log(from: LogFrom, ...args: any[]) {
+    const date = `[${from}](${new Date().toISOString().replace('T', " ").replace(/....Z/g, "")})`;
+    console.log(date, ...args);
+    logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n");
+  }
+  function mainLog(...args: any[]) {
+    log(LogFrom.MAIN, ...args);
+  }
 })();
 function minimId(id: string) {
   return id.substr(0, 6);
-}
-function log(from: LogFrom, ...args: any[]) {
-  console.log(`[${from}](${new Date().toISOString().replace('T', " ").replace(/....Z/g, "")})`, ...args);
-}
-function mainLog(...args: any[]) {
-  log(LogFrom.MAIN, ...args);
 }
 enum LogFrom {
   MAIN = "MAIN",
