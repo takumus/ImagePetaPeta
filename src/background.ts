@@ -197,6 +197,7 @@ import { DEFAULT_BOARD_NAME } from "./defines";
     mainLog(" mode:", mode);
     mainLog(" image:", minimId(petaImage.id));
     petaImage._selected = false;
+    petaImage.categories = Array.from(new Set(petaImage.categories));
     return new Promise((res, rej) => {
       if (mode == UpdateMode.REMOVE) {
         petaImagesDB.remove({ id: petaImage.id }, {}, (err) => {
