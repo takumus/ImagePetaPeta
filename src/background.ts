@@ -1,9 +1,9 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, Menu } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell } from "electron";
 import { initWindow } from "@/window";
 import * as path from "path";
 import * as fs from "fs";
 import Nedb from "nedb";
-import { Board, createBoard, ImportImageResult, PetaImage, PetaImages, UpdateMode } from "@/datas";
+import { AppInfo, Board, createBoard, ImportImageResult, PetaImage, PetaImages, UpdateMode } from "@/datas";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { imageFormatToExtention } from "@/utils";
@@ -190,6 +190,16 @@ import { DEFAULT_BOARD_NAME } from "./defines";
         buttons: buttons
       });
       return value.response;
+    },
+    openURL: async (event, url) => {
+      shell.openExternal(url);
+      return true;
+    },
+    getAppInfo: async (event) => {
+      return {
+        name: app.getName(),
+        version: app.getVersion()
+      };
     }
   }
   function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {

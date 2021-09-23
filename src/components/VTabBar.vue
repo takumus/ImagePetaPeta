@@ -46,6 +46,10 @@
         </span>
       </span>
     </span>
+    <span class="buttons">
+      <button tabindex="-1" @click="openSettings">Settings</button>
+      <button tabindex="-1" @click="openInfo">Info</button>
+    </span>
   </article>
 </template>
 
@@ -79,6 +83,9 @@
       min-width: 16px;
       border-right: none;
       flex-shrink: 0;
+      .wrapper .label {
+        padding: 12px;
+      }
     }
     &:hover .wrapper .remove {
       visibility: visible;
@@ -110,6 +117,17 @@
       }
     }
   }
+  .buttons {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    right: 0px;
+    text-align: right;
+    justify-content: flex-end;
+    button {
+      min-width: 0px;
+    }
+  }
 }
 </style>
 
@@ -132,7 +150,9 @@ import { vec2FromMouseEvent } from "@/utils";
     "remove",
     "add",
     "select",
-    "sort"
+    "sort",
+    "openInfo",
+    "openSettings"
   ]
 })
 export default class VTabBar extends Vue {
@@ -231,6 +251,12 @@ export default class VTabBar extends Vue {
     }
     log(board.name, "->", name);
     board.name = name;
+  }
+  openSettings() {
+    this.$emit("openSettings");
+  }
+  openInfo() {
+    this.$emit("openInfo");
   }
   async removeBoard(board: Board) {
     this.$emit("remove", board);

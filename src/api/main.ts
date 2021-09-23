@@ -1,4 +1,4 @@
-import { PetaImage, PetaImageId, PetaImages, Board, UpdateMode } from '@/datas';
+import { PetaImage, PetaImageId, PetaImages, Board, UpdateMode, AppInfo } from '@/datas';
 import { IpcMainInvokeEvent } from 'electron';
 export interface Main {
   browseImages: () => Promise<number>;
@@ -15,6 +15,10 @@ export interface Main {
   log: (...args: any[]) => Promise<boolean>;
   // dialog
   dialog: (message: string, buttons: string[]) => Promise<number>;
+  // openURL
+  openURL: (url: string) => Promise<boolean>;
+  // getAppInfo
+  getAppInfo: () => Promise<AppInfo>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>

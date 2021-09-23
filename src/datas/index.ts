@@ -76,6 +76,10 @@ export enum UpdateMode {
   UPDATE = "update",
   REMOVE = "remove"
 }
+export interface AppInfo {
+  name: string,
+  version: string
+}
 export function createBoard(name: string, index = 0) {
   const board: Board = {
     petaPanels: [],

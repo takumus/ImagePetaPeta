@@ -36,10 +36,13 @@
     @remove="removeBoard"
     @add="addBoard"
     @select="selectBoard"
+    @openInfo="openInfo"
+    @openSettings="openSettings"
     ref="vTabBar"
   />
   <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
   <VImageCache />
+  <VInfo ref="info"/>
   <article class="context-menu">
     <VContextMenu ref="contextMenu"/>
   </article>
@@ -125,6 +128,7 @@ import VImageCache from "@/components/utils/VImageCache.vue";
 import VTabBar from "@/components/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
+import VInfo from "@/components/utils/VInfo.vue";
 // Others
 import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
 import { API, log } from "@/api";
@@ -139,7 +143,8 @@ import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/defines";
     VImageCache,
     VTabBar,
     VContextMenu,
-    VComplement
+    VComplement,
+    VInfo
   },
 })
 export default class App extends Vue {
@@ -149,6 +154,8 @@ export default class App extends Vue {
   vTabBar!: VTabBar;
   @Ref("contextMenu")
   contextMenu!: VContextMenu;
+  @Ref("info")
+  info!: VInfo;
   petaImages: PetaImages = {};
   boards: Board[] = [];
   currentBoard: Board | null = null;
@@ -251,6 +258,12 @@ export default class App extends Vue {
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
+  }
+  openInfo() {
+    this.info.show = true;
+  }
+  openSettings() {
+    //
   }
   async removeBoard(board: Board) {
     if (await API.send("dialog", `Remove "${board.name}"?`, ["Yes", "No"]) != 0) {

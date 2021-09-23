@@ -21,8 +21,8 @@
         :src="imageURL"
         draggable="false"
         :style="{
-          left: cropPositionX,
-          top: cropPositionY,
+          left: cropPositionX + 'px',
+          top: cropPositionY + 'px',
           transform: `scale(${cropScale})`
         }"
       >
@@ -379,10 +379,10 @@ export default class VPanel extends Vue {
     return -this.normalHeight / 2;
   }
   get cropPositionX() {
-    return -this.petaPanel.crop.position.x * IMG_TAG_WIDTH * this.cropScale + "px";
+    return -this.petaPanel.crop.position.x * IMG_TAG_WIDTH * this.cropScale;
   }
   get cropPositionY() {
-    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel._petaImage!.height * this.cropScale + "px";
+    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel._petaImage!.height * this.cropScale;
   }
   get controlPoints() {
     const points: { [key: string]: { origin: string[], x: number, y: number, cursor: string } } = {
