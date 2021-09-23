@@ -12,16 +12,12 @@
             >
           </header>
           <ul>
-            <li @click="selectCategory('')">
+            <li
+              @click="selectCategory('')"
+              :class="{ selected: selectedAll }"
+            >
               <VEditableLabel
                 :label="`All(${petaImagesArray.length})`"
-                :growWidth="true"
-                :readonly="true"
-              />
-            </li>
-            <li @click="selectCategory('', true)" v-if="uncategorizedImages.length > 0">
-              <VEditableLabel
-                :label="`Uncategorized(${uncategorizedImages.length})`"
                 :growWidth="true"
                 :readonly="true"
               />
@@ -29,12 +25,14 @@
             <li
               v-for="c in categories"
               :key="c.name"
+              :class="{ selected: c.selected }"
               @click="selectCategory(c.name)"
             >
               <VEditableLabel
                 :label="c.name"
                 :labelLook="`${c.name}(${c.count})`"
                 :growWidth="true"
+                :readonly="c.readonly"
                 @change="(name) => changeCategory(c.name, name)"
                 @contextmenu="categoryMenu($event, c.name)"
               />
@@ -121,6 +119,11 @@
             }
             &::before {
               content: "・";
+              width: 16px;
+              display: inline-block;
+            }
+            &.selected::before {
+              content: "✔";
             }
           }
         }
@@ -172,6 +175,7 @@ import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, Update
 import { Vec2, vec2FromMouseEvent } from "@/utils";
 import { API, log } from "@/api";
 import GLOBALS from "@/globals";
+import { UNCATEGORIZED_CATEGORY_NAME } from "@/defines";
 @Options({
   components: {
     VThumbnail,
@@ -193,7 +197,6 @@ export default class VBrowser extends Vue {
   @Ref("thumbsWrapper")
   thumbsWrapper!: HTMLDivElement;
   selectedCategories = "";
-  selectUncategorized = false;
   selectedData!: PetaImage;
   imagesWidth = 0;
   defaultImageWidth = 128;
@@ -206,6 +209,7 @@ export default class VBrowser extends Vue {
   sortMode = SortMode.ADD_DATE;
   imagesResizer?: ResizeObserver;
   scrollAreaResizer?: ResizeObserver;
+  shiftKeyPressed = false;
   mounted() {
     this.imagesResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0].contentRect);
@@ -214,15 +218,33 @@ export default class VBrowser extends Vue {
       this.resizeScrollArea(entries[0].contentRect);
     });
     this.images.addEventListener("scroll", this.updateScrollArea);
+    window.addEventListener("keydown", this.keydown);
+    window.addEventListener("keyup", this.keyup);
     this.imagesResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.images);
   }
   unmounted() {
     this.images.removeEventListener("scroll", this.updateScrollArea);
+    window.removeEventListener("keydown", this.keydown);
+    window.removeEventListener("keyup", this.keyup);
     this.imagesResizer?.unobserve(this.thumbsWrapper);
     this.scrollAreaResizer?.unobserve(this.images);
     this.imagesResizer?.disconnect();
     this.scrollAreaResizer?.disconnect();
+  }
+  keydown(e: KeyboardEvent) {
+    switch(e.key) {
+      case "Shift":
+        this.shiftKeyPressed = true;
+        break;
+    }
+  }
+  keyup(e: KeyboardEvent) {
+    switch(e.key) {
+      case "Shift":
+        this.shiftKeyPressed = false;
+        break;
+    }
   }
   updateScrollArea() {
     const offset = this.scrollAreaHeight;
@@ -237,9 +259,24 @@ export default class VBrowser extends Vue {
   resizeImages(rect: DOMRectReadOnly) {
     this.imagesWidth = rect.width;
   }
-  selectCategory(category: string, uncategorized = false) {
-    this.selectedCategories = category;
-    this.selectUncategorized = uncategorized;
+  selectCategory(category: string) {
+    const categories = [...this.selectedCategoriesArray];
+    const index = categories.indexOf(category);
+    if (index < 0) {
+      if (!this.shiftKeyPressed) {
+        categories.length = 0;
+      }
+      categories.push(category);
+      this.selectedCategories = categories.join(" ");
+    } else {
+      if (!this.shiftKeyPressed) {
+        categories.length = 0;
+        categories.push(category);
+      } else {
+        categories.splice(index, 1);
+      }
+      this.selectedCategories = categories.join(" ");
+    }
   }
   addPanel(petaImage: PetaImage, worldPosition: Vec2, thumbnailPosition: Vec2) {
     petaImage._selected = false;
@@ -301,7 +338,7 @@ export default class VBrowser extends Vue {
   }
   changePetaImageCategory(oldName: string, newName: string) {
     if (oldName == newName) return;
-    const categories = this.selectedCategories.split(" ");
+    const categories = [...this.selectedCategoriesArray];
     const index = categories.indexOf(oldName);
     if (index < 0) {
       return;
@@ -326,7 +363,10 @@ export default class VBrowser extends Vue {
         }
       }
     ], position);
-  } 
+  }
+  get selectedCategoriesArray() {
+    return this.selectedCategories.split(" ").filter((category) => category != "");
+  }
   get petaImagesArray() {
     return Object.values(this.petaImages).sort(this.sort);
   }
@@ -339,13 +379,12 @@ export default class VBrowser extends Vue {
     });
   }
   get filteredPetaImages() {
-    if (this.selectUncategorized) {
+    if (this.selectedCategoriesArray.indexOf(UNCATEGORIZED_CATEGORY_NAME) >= 0) {
       return this.uncategorizedImages;
     }
-    const categories = this.selectedCategories.split(" ");
     return this.petaImagesArray.filter((d) => {
       let result = true;
-      categories.filter(k => k != "").forEach((k) => {
+      this.selectedCategoriesArray.forEach((k) => {
         if (!d.categories.includes(k)) {
           result = false;
         }
@@ -363,18 +402,17 @@ export default class VBrowser extends Vue {
       }
     }
   }
-  get categories() {
-    const categories: {
-      name: string,
-      count: number
-    }[] = [];
+  get categories():Category[] {
+    const categories: Category[] = [];
     this.petaImagesArray.forEach((pi) => {
       pi.categories.forEach((category) => {
         const c = categories.find((c) => category == c.name);
         if (!c) {
           categories.push({
             name: category,
-            count: 1
+            count: 1,
+            selected: this.selectedCategoriesArray.indexOf(category) >= 0,
+            readonly: false
           });
         } else {
           c.count++;
@@ -387,8 +425,16 @@ export default class VBrowser extends Vue {
       } else {
         return 1;
       }
-    })
-    return categories;
+    });
+    return [{
+      name: UNCATEGORIZED_CATEGORY_NAME,
+      count: this.uncategorizedImages.length,
+      selected: this.selectedCategoriesArray.indexOf(UNCATEGORIZED_CATEGORY_NAME) >= 0,
+      readonly: true
+    }, ...categories];
+  }
+  get selectedAll() {
+    return this.selectedCategoriesArray.length == 0;
   }
   get petaThumbnails(): PetaThumbnail[] {
     const hc = Math.floor(this.imagesWidth / this.defaultImageWidth);
@@ -422,5 +468,11 @@ export default class VBrowser extends Vue {
       }
     }).filter((p) => p.visible);
   }
+}
+interface Category {
+  name: string,
+  count: number,
+  selected: boolean,
+  readonly: boolean
 }
 </script>
