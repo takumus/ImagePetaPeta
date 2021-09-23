@@ -248,6 +248,9 @@ export default class VBrowser extends Vue {
     let remove = false;
     if (newName == "") {
       remove = await API.send("dialog", `Remove Category ${oldName}?`, ["Yes", "No"]) == 0;
+      if (!remove) {
+        return;
+      }
     }
     if (this._categories.find((c) => c.name == newName)) {
       API.send("dialog", `Category ${name} already exists.`, []);
