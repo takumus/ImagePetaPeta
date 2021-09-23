@@ -166,8 +166,17 @@ export default class VBoard extends Vue {
     this.globalOffset.y = rect.height / 2;
   }
   mousedownOutside(e: MouseEvent) {
-    if (this.board.petaPanels.map((pp) => this.getVPanel(pp)?.$el).indexOf((e.target as HTMLElement).parentElement as any) < 0) {
-      this.clearSelectionAll();
+    let parent = e.target as HTMLElement;
+    let inPanels = true;
+    while (parent != this.panelsWrapper) {
+      parent = parent.parentElement as HTMLElement;
+      if (!parent) {
+        inPanels = false;
+        break;
+      }
+    }
+    if (!inPanels) {
+      this.clearSelectionAll(true);
     }
   }
   mousedown(e: MouseEvent) {
@@ -176,8 +185,7 @@ export default class VBoard extends Vue {
     } else if (e.target == this.panelsBackground && e.button == MouseButton.LEFT) {
       this.dragging = true;
       this.draggingBackground = true;
-      // clearSelection all
-      // this.clearSelectionAll();
+      this.clearSelectionAll();
     }
     this.click.down(e);
     if (!this.dragging) return;
@@ -322,8 +330,8 @@ export default class VBoard extends Vue {
       });
     }
   }
-  clearSelectionAll() {
-    if (!this.shiftKeyPressed) {
+  clearSelectionAll(force = false) {
+    if (!this.shiftKeyPressed || force) {
       this.board.petaPanels.forEach((p) => {
         p._selected = false;
       });
