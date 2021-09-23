@@ -228,6 +228,10 @@ export default class VTabBar extends Vue {
     }
   }
   changeBoardName(board: Board, name: string) {
+    name = name.trim();
+    if (name == "") {
+      name = board.name;
+    }
     log(board.name, "->", name);
     board.name = name;
   }
