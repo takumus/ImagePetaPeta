@@ -125,11 +125,15 @@ export default class VProperty extends Vue {
         if (newName == "") {
           // 空欄の場合削除
           pi.categories.splice(index, 1);
+          changed = true;
         } else {
           // 空欄じゃなければ更新
-          pi.categories[index] = newName;
+          if (pi.categories.indexOf(newName) < 0) {
+            // 新規の名前が無ければ追加
+            pi.categories[index] = newName;
+            changed = true;
+          }
         }
-        changed = true;
         this.$emit("changeCategory", oldName, newName);
       }
       pi.categories.sort();
