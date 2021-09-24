@@ -2,6 +2,7 @@
   <span class="editable-label-root" :style="{ width: growWidth ? '100%' : 'unset' }">
     <span
       class="editable-label"
+      :class="{ editing: editing }"
       v-text="labelLook && !editing ? labelLook : tempText"
       ref="label"
       :style="{ width: labelWidth + 'px', height: labelHeight + 'px' }"
@@ -9,7 +10,8 @@
       @blur="apply"
       @keydown.enter="apply"
       @focus="focus($event)"
-      @dblclick="edit()"
+      @dblclick="edit(true)"
+      @click="edit()"
       @input="input"
     >
     </span>
@@ -35,9 +37,11 @@
   min-width: 32px;
   height: 16px;
   width: 100%;
-  &.editing {
-    cursor: inherit;
-  }
+  // &.editing::before {
+  //   content: "_";
+  //   width: 16px;
+  //   display: inline-block;
+  // }
 }
 .editable-label::after {
   content: "";
@@ -72,6 +76,8 @@ export default class VEditableLabel extends Vue {
   growWidth!: boolean;
   @Prop()
   readonly!: boolean;
+  @Prop()
+  clickToEdit!: boolean;
   @Ref("label")
   labelInput!: HTMLInputElement;
   tempText = "Hello";
@@ -84,7 +90,8 @@ export default class VEditableLabel extends Vue {
   unmounted() {
     //
   }
-  async edit() {
+  async edit(dblclick = false) {
+    if (!this.clickToEdit && !dblclick) return;
     if (this.readonly) return;
     this.editing = true;
     this.$nextTick(() => {

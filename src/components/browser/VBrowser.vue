@@ -289,6 +289,7 @@ export default class VBrowser extends Vue {
   }
   addPanel(petaImage: PetaImage, worldPosition: Vec2, thumbnailPosition: Vec2) {
     petaImage._selected = false;
+    // 複数同時追加用↓
     // const images = [petaImage, ...this.selectedPetaImages].reverse();
     const images = [petaImage];
     petaImage._selected = true;

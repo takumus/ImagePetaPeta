@@ -23,6 +23,16 @@
           @contextmenu="categoryMenu($event, category)"
         />
       </li>
+      <li class="add">
+        <VEditableLabel
+          :label="'category-name'"
+          :labelLook="`Click to add category`"
+          :growWidth="true"
+          :clickToEdit="true"
+          @change="(name) => changeCategory('', name)"
+          @focus="complementCategory"
+        />
+      </li>
     </ul>
   </div>
 </template>
@@ -60,7 +70,12 @@
         text-decoration: underline;
       }
       &::before {
+        width: 16px;
+        display: inline-block;
         content: "・";
+      }
+      &.add::before {
+        content: "＋";
       }
     }
   }
@@ -191,7 +206,7 @@ export default class VProperty extends Vue {
         }
       });
     });
-    return [...Object.keys(categories).filter((category) => categories[category] == this.petaImages.length), "..."];
+    return [...Object.keys(categories).filter((category) => categories[category] == this.petaImages.length)];
   }
   get petaThumbnails(): PetaThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
