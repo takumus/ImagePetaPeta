@@ -241,7 +241,7 @@ import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "./defines";
     mainLog(" mode:", mode);
     mainLog(" image:", minimId(petaImage.id));
     petaImage._selected = false;
-    petaImage.categories = Array.from(new Set(petaImage.categories));
+    petaImage.tags = Array.from(new Set(petaImage.tags));
     return new Promise((res, rej) => {
       if (mode == UpdateMode.REMOVE) {
         petaImagesDB.remove({ id: petaImage.id }, {}, (err) => {
@@ -377,7 +377,7 @@ import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "./defines";
       width: 1,
       height: output.height / output.width,
       id: id,
-      categories: [],
+      tags: [],
       _selected: false
     }
     await saveFile(data, getImagePathFromFilename(fileName, false));

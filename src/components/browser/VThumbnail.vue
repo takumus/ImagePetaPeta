@@ -13,17 +13,17 @@
       >
       <div class="info">
         <span
-          class="categories"
-          v-for="k in petaThumbnail.petaImage.categories"
+          class="tags"
+          v-for="k in petaThumbnail.petaImage.tags"
           :key="k"
         >
           {{k}}
         </span>
         <span
-          class="categories"
-          v-if="petaThumbnail.petaImage.categories.length == 0"
+          class="tags"
+          v-if="petaThumbnail.petaImage.tags.length == 0"
         >
-          Uncategorized
+          Untagged
         </span>
       </div>
       <div class="selected" v-show="petaThumbnail.petaImage._selected">
@@ -91,7 +91,7 @@
     pointer-events: none;
     word-break: break-word;
     padding: 8px;
-    .categories {
+    .tags {
       background-color: rgba($color: (#000000), $alpha: 0.5);
       padding: 2px;
       border-radius: 4px;

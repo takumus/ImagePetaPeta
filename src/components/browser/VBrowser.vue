@@ -2,18 +2,18 @@
   <article class="browser-root">
     <div class="wrapper">
       <section class="bottom">
-        <section class="categories">
+        <section class="tags">
           <header>
             <input
               class="search"
               type="text"
-              v-model="selectedCategories"
-              @focus="complementCategory($event)"
+              v-model="selectedTags"
+              @focus="complementTag($event)"
             >
           </header>
           <ul>
             <li
-              @click="selectCategory('')"
+              @click="selectTag('')"
               :class="{ selected: selectedAll }"
             >
               <VEditableLabel
@@ -23,18 +23,18 @@
               />
             </li>
             <li
-              v-for="c in categories"
+              v-for="c in tags"
               :key="c.name"
               :class="{ selected: c.selected }"
-              @click="selectCategory(c.name)"
+              @click="selectTag(c.name)"
             >
               <VEditableLabel
                 :label="c.name"
                 :labelLook="`${c.name}(${c.count})`"
                 :growWidth="true"
                 :readonly="c.readonly"
-                @change="(name) => changeCategory(c.name, name)"
-                @contextmenu="categoryMenu($event, c.name)"
+                @change="(name) => changeTag(c.name, name)"
+                @contextmenu="tagMenu($event, c.name)"
               />
             </li>
           </ul>
@@ -63,8 +63,8 @@
         <section class="property">
           <VProperty
             :petaImages="selectedPetaImages"
-            :allCategories="categoriesForComplement"
-            @changeCategory="changePetaImageCategory"
+            :allTags="tagsForComplement"
+            @changeTag="changePetaImageTag"
           />
         </section>
       </section>
@@ -88,7 +88,7 @@
       width: 100%;
       height: 100%;
       display: flex;
-      .categories {
+      .tags {
         padding: 8px;
         text-align: center;
         white-space: nowrap;
@@ -175,7 +175,7 @@ import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, Update
 import { Vec2, vec2FromMouseEvent } from "@/utils";
 import { API, log } from "@/api";
 import GLOBALS from "@/globals";
-import { UNCATEGORIZED_CATEGORY_NAME } from "@/defines";
+import { UNTAGGED_TAG_NAME } from "@/defines";
 @Options({
   components: {
     VThumbnail,
@@ -196,7 +196,7 @@ export default class VBrowser extends Vue {
   images!: HTMLDivElement;
   @Ref("thumbsWrapper")
   thumbsWrapper!: HTMLDivElement;
-  selectedCategories = "";
+  selectedTags = "";
   selectedData!: PetaImage;
   imagesWidth = 0;
   defaultImageWidth = 128;
@@ -268,23 +268,23 @@ export default class VBrowser extends Vue {
   resizeImages(rect: DOMRectReadOnly) {
     this.imagesWidth = rect.width;
   }
-  selectCategory(category: string) {
-    const categories = [...this.selectedCategoriesArray];
-    const index = categories.indexOf(category);
+  selectTag(tag: string) {
+    const tags = [...this.selectedTagsArray];
+    const index = tags.indexOf(tag);
     if (index < 0) {
       if (!this.shiftKeyPressed) {
-        categories.length = 0;
+        tags.length = 0;
       }
-      categories.push(category);
-      this.selectedCategories = categories.join(" ");
+      tags.push(tag);
+      this.selectedTags = tags.join(" ");
     } else {
       if (!this.shiftKeyPressed) {
-        categories.length = 0;
-        categories.push(category);
+        tags.length = 0;
+        tags.push(tag);
       } else {
-        categories.splice(index, 1);
+        tags.splice(index, 1);
       }
-      this.selectedCategories = categories.join(" ");
+      this.selectedTags = tags.join(" ");
     }
   }
   addPanel(petaImage: PetaImage, worldPosition: Vec2, thumbnailPosition: Vec2) {
@@ -305,20 +305,20 @@ export default class VBrowser extends Vue {
   selectImage(petaImage: PetaImage) {
     petaImage._selected = !petaImage._selected;
   }
-  complementCategory(event: FocusEvent) {
-    GLOBALS.complement.open(event.target as HTMLInputElement, this.categories.map((c) => c.name));
+  complementTag(event: FocusEvent) {
+    GLOBALS.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
   }
-  categoryMenu(event: MouseEvent, category: string) {
+  tagMenu(event: MouseEvent, tag: string) {
     GLOBALS.contextMenu.open([
       {
-        label: `Remove "${category}"`,
+        label: `Remove "${tag}"`,
         click: () => {
-          this.changeCategory(category, "");
+          this.changeTag(tag, "");
         }
       }
     ], vec2FromMouseEvent(event));
   }
-  async changeCategory(oldName: string, newName: string) {
+  async changeTag(oldName: string, newName: string) {
     newName = newName.replace(/\s+/g, "");
     if (oldName == newName) {
       return;
@@ -330,34 +330,34 @@ export default class VBrowser extends Vue {
         return;
       }
     }
-    if (this.categories.find((c) => c.name == newName)) {
+    if (this.tags.find((c) => c.name == newName)) {
       API.send("dialog", `"${newName}" already exists.`, []);
       return;
     }
     const changed: PetaImage[] = [];
     this.petaImagesArray.forEach((pi) => {
-      const index = pi.categories.indexOf(oldName);
+      const index = pi.tags.indexOf(oldName);
       if (index >= 0) {
         if (remove) {
-          pi.categories.splice(index, 1);
+          pi.tags.splice(index, 1);
         } else {
-          pi.categories[index] = newName;
+          pi.tags[index] = newName;
         }
         changed.push(pi);
       }
     });
     API.send("updatePetaImages", changed, UpdateMode.UPDATE);
-    this.selectCategory(newName);
+    this.selectTag(newName);
   }
-  changePetaImageCategory(oldName: string, newName: string) {
+  changePetaImageTag(oldName: string, newName: string) {
     if (oldName == newName) return;
-    const categories = [...this.selectedCategoriesArray];
-    const index = categories.indexOf(oldName);
+    const tags = [...this.selectedTagsArray];
+    const index = tags.indexOf(oldName);
     if (index < 0) {
       return;
     }
-    categories[index] = newName;
-    this.selectedCategories = categories.join(" ");
+    tags[index] = newName;
+    this.selectedTags = tags.join(" ");
   }
   clearSelectionAllImages() {
     this.petaImagesArray.forEach((pi) => {
@@ -377,8 +377,8 @@ export default class VBrowser extends Vue {
       }
     ], position);
   }
-  get selectedCategoriesArray() {
-    return this.selectedCategories.split(" ").filter((category) => category != "");
+  get selectedTagsArray() {
+    return this.selectedTags.split(" ").filter((tag) => tag != "");
   }
   get petaImagesArray() {
     return Object.values(this.petaImages).sort(this.sort);
@@ -388,17 +388,17 @@ export default class VBrowser extends Vue {
   }
   get uncategorizedImages() {
     return this.petaImagesArray.filter((d) => {
-      return d.categories.length == 0;
+      return d.tags.length == 0;
     });
   }
   get filteredPetaImages() {
-    if (this.selectedCategoriesArray.indexOf(UNCATEGORIZED_CATEGORY_NAME) >= 0) {
+    if (this.selectedTagsArray.indexOf(UNTAGGED_TAG_NAME) >= 0) {
       return this.uncategorizedImages;
     }
     return this.petaImagesArray.filter((d) => {
       let result = true;
-      this.selectedCategoriesArray.forEach((k) => {
-        if (!d.categories.includes(k)) {
+      this.selectedTagsArray.forEach((k) => {
+        if (!d.tags.includes(k)) {
           result = false;
         }
       });
@@ -415,16 +415,16 @@ export default class VBrowser extends Vue {
       }
     }
   }
-  get categories():Category[] {
-    const categories: Category[] = [];
+  get tags():Tag[] {
+    const tags: Tag[] = [];
     this.petaImagesArray.forEach((pi) => {
-      pi.categories.forEach((category) => {
-        const c = categories.find((c) => category == c.name);
+      pi.tags.forEach((tag) => {
+        const c = tags.find((c) => tag == c.name);
         if (!c) {
-          categories.push({
-            name: category,
+          tags.push({
+            name: tag,
             count: 1,
-            selected: this.selectedCategoriesArray.indexOf(category) >= 0,
+            selected: this.selectedTagsArray.indexOf(tag) >= 0,
             readonly: false
           });
         } else {
@@ -432,7 +432,7 @@ export default class VBrowser extends Vue {
         }
       });
     });
-    categories.sort((a, b) => {
+    tags.sort((a, b) => {
       if (a.name < b.name) {
         return -1;
       } else {
@@ -440,17 +440,17 @@ export default class VBrowser extends Vue {
       }
     });
     return [{
-      name: UNCATEGORIZED_CATEGORY_NAME,
+      name: UNTAGGED_TAG_NAME,
       count: this.uncategorizedImages.length,
-      selected: this.selectedCategoriesArray.indexOf(UNCATEGORIZED_CATEGORY_NAME) >= 0,
+      selected: this.selectedTagsArray.indexOf(UNTAGGED_TAG_NAME) >= 0,
       readonly: true
-    }, ...categories];
+    }, ...tags];
   }
-  get categoriesForComplement() {
-    return this.categories.filter((c) => c.name != UNCATEGORIZED_CATEGORY_NAME).map(c => c.name);
+  get tagsForComplement() {
+    return this.tags.filter((c) => c.name != UNTAGGED_TAG_NAME).map(c => c.name);
   }
   get selectedAll() {
-    return this.selectedCategoriesArray.length == 0;
+    return this.selectedTagsArray.length == 0;
   }
   get petaThumbnails(): PetaThumbnail[] {
     const hc = Math.floor(this.imagesWidth / this.defaultImageWidth);
@@ -485,7 +485,7 @@ export default class VBrowser extends Vue {
     }).filter((p) => p.visible);
   }
 }
-interface Category {
+interface Tag {
   name: string,
   count: number,
   selected: boolean,

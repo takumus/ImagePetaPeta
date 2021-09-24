@@ -6,7 +6,7 @@ export interface PetaImage {
   name: string,
   fileDate: number,
   addDate: number,
-  categories: string[],
+  tags: string[],
   width: number,
   height: number,
   id: PetaImageId,

@@ -11,26 +11,26 @@
     <section class="buttons" v-show="!noImage">
       <button tabindex="-1" @click="clearSelection">Clear Selection</button>
     </section>
-    <p v-show="!noImage">Categories</p>
-    <ul class="categories">
-      <li v-for="category, i in categories" :key="i">
+    <p v-show="!noImage">Tags</p>
+    <ul class="tags">
+      <li v-for="tag, i in tags" :key="i">
         <VEditableLabel
-          :label="category"
-          :labelLook="`${category}`"
+          :label="tag"
+          :labelLook="`${tag}`"
           :growWidth="true"
-          @change="(name) => changeCategory(category, name)"
-          @focus="complementCategory"
-          @contextmenu="categoryMenu($event, category)"
+          @change="(name) => changeTag(tag, name)"
+          @focus="complementTag"
+          @contextmenu="tagMenu($event, tag)"
         />
       </li>
       <li class="add">
         <VEditableLabel
-          :label="'category-name'"
-          :labelLook="`Click to add category`"
+          :label="'tag-name'"
+          :labelLook="`Click to add tag`"
           :growWidth="true"
           :clickToEdit="true"
-          @change="(name) => changeCategory('', name)"
-          @focus="complementCategory"
+          @change="(name) => changeTag('', name)"
+          @focus="complementTag"
         />
       </li>
     </ul>
@@ -54,7 +54,7 @@
   .buttons {
     text-align: center;
   }
-  .categories {
+  .tags {
     white-space: nowrap;
     padding: 0px;
     li {
@@ -105,14 +105,14 @@ import { MAX_PREVIEW_COUNT } from "@/defines";
     VPropertyThumbnail
   },
   emits: [
-    "changeCategory"
+    "changeTag"
   ]
 })
 export default class VProperty extends Vue {
   @Prop()
   petaImages!: PetaImage[];
   @Prop()
-  allCategories!: string[];
+  allTags!: string[];
   @Ref("previews")
   previews!: HTMLElement;
   previewWidth = 0;
@@ -132,18 +132,18 @@ export default class VProperty extends Vue {
     this.previewWidth = rect.width;
     this.previewHeight = rect.height;
   }
-  changeCategory(oldName: string, newName: string) {
+  changeTag(oldName: string, newName: string) {
     newName = newName.replace(/\s+/g, "");
     let changed = false;
     this.petaImages.forEach((pi) => {
-      const index = pi.categories.indexOf(oldName);
+      const index = pi.tags.indexOf(oldName);
       if (index < 0) {
         // 新規追加の場合
-        if (pi.categories.indexOf(newName) < 0) {
+        if (pi.tags.indexOf(newName) < 0) {
           // 新規の名前が無ければ追加
           if (newName != "") {
             // 空欄じゃなければ追加
-            pi.categories.push(newName);
+            pi.tags.push(newName);
             changed = true;
           }
         }
@@ -151,19 +151,19 @@ export default class VProperty extends Vue {
         // 更新の場合
         if (newName == "") {
           // 空欄の場合削除
-          pi.categories.splice(index, 1);
+          pi.tags.splice(index, 1);
           changed = true;
         } else {
           // 空欄じゃなければ更新
-          if (pi.categories.indexOf(newName) < 0) {
+          if (pi.tags.indexOf(newName) < 0) {
             // 新規の名前が無ければ追加
-            pi.categories[index] = newName;
+            pi.tags[index] = newName;
             changed = true;
           }
         }
-        this.$emit("changeCategory", oldName, newName);
+        this.$emit("changeTag", oldName, newName);
       }
-      pi.categories.sort();
+      pi.tags.sort();
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
     if (changed) {
@@ -179,34 +179,34 @@ export default class VProperty extends Vue {
       pi._selected = false;
     })
   }
-  complementCategory(event: FocusEvent) {
-    GLOBALS.complement.open(event.target as HTMLInputElement, this.allCategories);
+  complementTag(event: FocusEvent) {
+    GLOBALS.complement.open(event.target as HTMLInputElement, this.allTags);
   }
-  categoryMenu(event: MouseEvent, category: string) {
+  tagMenu(event: MouseEvent, tag: string) {
     GLOBALS.contextMenu.open([
       {
-        label: `Remove "${category}"`,
+        label: `Remove "${tag}"`,
         click: () => {
-          this.changeCategory(category, "");
+          this.changeTag(tag, "");
         }
       }
     ], vec2FromMouseEvent(event));
   }
-  get categories(): string[] {
+  get tags(): string[] {
     if (this.noImage) {
       return [];
     }
-    const categories: {[category: string]: number} = {};
+    const tags: {[tag: string]: number} = {};
     this.petaImages.forEach((pi) => {
-      pi.categories.forEach((category) => {
-        if (!categories[category]) {
-          categories[category] = 1;
+      pi.tags.forEach((tag) => {
+        if (!tags[tag]) {
+          tags[tag] = 1;
         } else {
-          categories[category]++;
+          tags[tag]++;
         }
       });
     });
-    return [...Object.keys(categories).filter((category) => categories[category] == this.petaImages.length)];
+    return [...Object.keys(tags).filter((tag) => tags[tag] == this.petaImages.length)];
   }
   get petaThumbnails(): PetaThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
