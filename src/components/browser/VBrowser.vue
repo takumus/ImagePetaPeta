@@ -289,14 +289,17 @@ export default class VBrowser extends Vue {
   }
   addPanel(petaImage: PetaImage, worldPosition: Vec2, thumbnailPosition: Vec2) {
     petaImage._selected = false;
-    const images = [petaImage, ...this.selectedPetaImages].reverse();
+    // const images = [petaImage, ...this.selectedPetaImages].reverse();
+    const images = [petaImage];
     petaImage._selected = true;
     images.forEach((pi, i) => {
       const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.imageWidth);
       this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(40, 0).mult(-(images.length - 1) + i)));
       pi._selected = false;
     });
-    petaImage._selected = false;
+    this.selectedPetaImages.forEach((pi) => {
+      pi._selected = false;
+    })
   }
   selectImage(petaImage: PetaImage) {
     petaImage._selected = !petaImage._selected;
