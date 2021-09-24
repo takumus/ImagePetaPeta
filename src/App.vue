@@ -7,16 +7,11 @@
       @openBrowser="openBrowser"
     />
   </section>
-  <section
-    class="browser-component"
-    v-show="browsing"
-  >
-    <VBrowser
-      :petaImages="petaImages"
-      @addPanel="addPanel"
-      :visible="browsing"
-    />
-  </section>
+  <VBrowser
+    :petaImages="petaImages"
+    @addPanel="addPanel"
+    :visible="browsing"
+  />
   <article class="menu">
     <button
       tabindex="-1"
@@ -55,12 +50,6 @@
 *, *:before, *:after {
   box-sizing: border-box;
 }
-#app {
-  width: 100%;
-  height: 100%;
-  margin: 0px;
-  padding: 0px;
-}
 .board-component {
   position: absolute;
   z-index: 1;
@@ -68,16 +57,6 @@
   left: 0px;
   width: 100%;
   height: 100%;
-}
-.browser-component {
-  position: absolute;
-  z-index: 3;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  padding: 100px;
-  background-color: rgba($color: #000000, $alpha: 0.7);
 }
 body, html {
   overflow: hidden;

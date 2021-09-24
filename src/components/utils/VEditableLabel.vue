@@ -1,5 +1,5 @@
 <template>
-  <span class="editable-label-root" :style="{ width: growWidth ? '100%' : 'unset' }">
+  <article class="editable-label-root" :style="{ width: growWidth ? '100%' : 'unset' }">
     <span
       class="editable-label"
       :class="{ editing: editing }"
@@ -15,43 +15,35 @@
       @input="input"
     >
     </span>
-  </span>
+  </article>
 </template>
 
 <style lang="scss" scoped>
-.editable-label {
-  line-height: 1.0em;
-  font-size: 1.0em;
-  text-align: left;
-  color: #333333;
-  // padding: 12px;
-  // flex-shrink: 1;
-  padding: 0px;
-  margin: 0px;
-  overflow: visible;
-  white-space: nowrap;
-  border: none;
-  background: none;
-  // outline: none;
-  cursor: pointer;
-  min-width: 32px;
-  height: 16px;
-  width: 100%;
-  // &.editing::before {
-  //   content: "_";
-  //   width: 16px;
-  //   display: inline-block;
-  // }
-}
-.editable-label::after {
-  content: "";
-  display: inline-block;
-  width: 16px;
-}
 .editable-label-root {
   padding: 0px;
   margin: 0px;
   display: inline-block;
+  .editable-label {
+    line-height: 1.0em;
+    font-size: 1.0em;
+    text-align: left;
+    color: #333333;
+    padding: 0px;
+    margin: 0px;
+    overflow: visible;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    cursor: pointer;
+    min-width: 32px;
+    height: 16px;
+    width: 100%;
+    &::after {
+      content: "";
+      display: inline-block;
+      width: 16px;
+    }
+  }
 }
 </style>
 

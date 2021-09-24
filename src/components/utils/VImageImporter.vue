@@ -1,8 +1,8 @@
 <template>
-  <article class="importer-root" v-if="loading">
-    <div class="progress">
+  <VModal :visible="loading" :center="true">
+    <article class="image-importer-root">
       <p>読込中...{{Math.floor(_progress)}}%</p>
-      <div class="bar">
+      <section class="bar">
         <div
           class="fill"
           :style="{
@@ -10,65 +10,45 @@
           }"
         >
         </div>
-      </div>
+      </section>
       <pre class="log">{{log}}</pre>
-      <div class="confirms">
+      <section class="confirms">
         <button tabindex="-1" @click="ok" v-if="this.hasErrors">OK</button>
-      </div>
-    </div>
-  </article>
+      </section>
+    </article>
+  </VModal>
 </template>
 
 <style lang="scss" scoped>
-.importer-root {
-  z-index: 3;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-  background-color: rgba($color: #000000, $alpha: 0.7);
-  .progress {
-    width: 512px;
-    background-color: #ffffff;
-    padding: 16px;
-    border-radius: 8px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.image-importer-root {
+  text-align: center;
+  .log {
+    text-align: left;
     overflow: hidden;
-    .log {
-      text-align: left;
-      overflow: hidden;
-      word-break: break-all;
-      white-space: pre-wrap ;
-      color: #333333;
-      height: 64px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      font-size: 0.7em;
-    }
-    p {
-      white-space: nowrap;
-      color: #333333;
-    }
-    .bar {
-      background-color: #333333;
-      width: 100%;
-      height: 16px;
-      overflow: hidden;
+    word-break: break-all;
+    white-space: pre-wrap ;
+    color: #333333;
+    height: 64px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 0.7em;
+  }
+  p {
+    white-space: nowrap;
+    color: #333333;
+  }
+  .bar {
+    background-color: #333333;
+    width: 100%;
+    height: 16px;
+    overflow: hidden;
+    border-radius: 8px;
+    padding: 2px;
+    .fill {
+      width: 50%;
+      height: 100%;
       border-radius: 8px;
-      padding: 2px;
-      .fill {
-        width: 50%;
-        height: 100%;
-        border-radius: 8px;
-        background-color: #ffffff;
-      }
-    }
-    .confirms {
-      text-align: center;
+      background-color: #ffffff;
     }
   }
 }
@@ -77,11 +57,14 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
+// Components
+import VModal from "@/components/VModal.vue";
 // Others
 import { getURLFromImgTag } from "@/utils";
 import { API } from "@/api";
 @Options({
   components: {
+    VModal
   },
   emits: [
     "addPanelByDragAndDrop"

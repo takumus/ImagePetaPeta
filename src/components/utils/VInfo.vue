@@ -1,6 +1,6 @@
 <template>
-  <article class="info-root" v-if="show">
-    <div class="info">
+  <VModal :visible="show" :center="true">
+    <article class="info-root">
       <p>{{ appInfo.name }} {{ appInfo.version }}</p>
       <button tabindex="-1" @click="gotoGithub">Github</button>
       <button tabindex="-1" @click="gotoIssues">Issues</button>
@@ -11,46 +11,28 @@
         {{ licenses }}
       </pre>
       <button tabindex="-1" @click="ok">Close</button>
-    </div>
-  </article>
+    </article>
+  </VModal>
 </template>
 
 <style lang="scss" scoped>
 .info-root {
-  z-index: 4;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-  background-color: rgba($color: #000000, $alpha: 0.7);
-  .info {
-    width: 600px;
-    background-color: #ffffff;
-    padding: 16px;
-    border-radius: 8px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  text-align: center;
+  pre {
+    text-align: left;
     overflow: hidden;
-    text-align: center;
-    pre {
-      text-align: left;
-      overflow: hidden;
-      word-break: break-all;
-      white-space: pre-wrap ;
-      color: #333333;
-      height: 128px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      font-size: 0.7em;
-      background-color: #eeeeee;
-    }
-    p {
-      white-space: nowrap;
-      color: #333333;
-    }
+    word-break: break-all;
+    white-space: pre-wrap ;
+    color: #333333;
+    height: 128px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 0.7em;
+    background-color: #eeeeee;
+  }
+  p {
+    white-space: nowrap;
+    color: #333333;
   }
 }
 </style>
@@ -59,12 +41,15 @@
 // Vue
 import { Options, Vue } from "vue-class-component";
 // import { Prop, Ref } from "vue-property-decorator";
+// Components
+import VModal from "@/components/VModal.vue";
 // Others
 import { LICENSES } from "@/licenses";
 import { API } from "@/api";
 import { AppInfo } from "@/datas";
 @Options({
   components: {
+    VModal
   },
 })
 export default class VInfo extends Vue {

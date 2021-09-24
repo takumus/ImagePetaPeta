@@ -1,6 +1,15 @@
 <template>
-  <article class="browser-root">
-    <div class="wrapper">
+  <VModal
+    :visible="visible"
+    :parentStyle="{
+      padding: '100px'
+    }"
+    :childStyle="{
+      width: '100%',
+      height: '100%'
+    }"
+  >
+    <article class="browser-root">
       <section class="bottom">
         <section class="tags">
           <header>
@@ -68,95 +77,88 @@
           />
         </section>
       </section>
-    </div>
-  </article>
+    </article>
+  </VModal>
 </template>
 
 <style lang="scss" scoped>
 .browser-root {
   width: 100%;
   height: 100%;
-  .wrapper {
+  display: flex;
+  flex-direction: column;
+  .bottom {
     width: 100%;
     height: 100%;
-    background-color: #ffffff;
-    border-radius: 8px;
     display: flex;
-    flex-direction: column;
-    padding: 16px;
-    .bottom {
+    &>.tags {
+      padding: 8px;
+      text-align: center;
+      white-space: nowrap;
+      header {
+        .search {
+          border-radius: 8px;
+          border: solid 1.2px #333333;
+          outline: none;
+          padding: 4px;
+          font-weight: bold;
+          font-size: 1.0em;
+        }
+      }
+      ul {
+        text-align: left;
+        // padding: 0px;
+        padding-left: 0px;
+        width: 100%;
+        li {
+          width: 100%;
+          padding: 4px;
+          list-style-type: none;
+          font-weight: bold;
+          cursor: pointer;
+          color: #333333;
+          &:hover * {
+            text-decoration: underline;
+          }
+          &::before {
+            content: "・";
+            width: 16px;
+            display: inline-block;
+          }
+          &.selected::before {
+            content: "✔";
+          }
+        }
+      }
+    }
+    .images {
       width: 100%;
       height: 100%;
-      display: flex;
-      .tags {
-        padding: 8px;
-        text-align: center;
-        white-space: nowrap;
-        header {
-          .search {
-            border-radius: 8px;
-            border: solid 1.2px #333333;
-            outline: none;
-            padding: 4px;
-            font-weight: bold;
-            font-size: 1.0em;
-          }
-        }
-        ul {
-          text-align: left;
-          // padding: 0px;
-          padding-left: 0px;
-          width: 100%;
-          li {
-            width: 100%;
-            padding: 4px;
-            list-style-type: none;
-            font-weight: bold;
-            cursor: pointer;
-            color: #333333;
-            &:hover * {
-              text-decoration: underline;
-            }
-            &::before {
-              content: "・";
-              width: 16px;
-              display: inline-block;
-            }
-            &.selected::before {
-              content: "✔";
-            }
-          }
-        }
-      }
-      .images {
+      position: relative;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      .thumbs-wrapper {
         width: 100%;
-        height: 100%;
-        position: relative;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        .thumbs-wrapper {
-          width: 100%;
-        }
-        &::-webkit-scrollbar {
-          width: 16px;
-        }
-        &::-webkit-scrollbar-thumb {
-          background-color: #cccccc;
-          border-radius: 8px;
-        }
       }
-      .images-wrapper {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        padding: 8px;
+      &::-webkit-scrollbar {
+        width: 16px;
       }
-      .property {
-        width: 20%;
-        min-width: 180px;
-        color: #333333;
-        padding: 8px;
+      &::-webkit-scrollbar-thumb {
+        background-color: #cccccc;
+        border-radius: 8px;
       }
+    }
+    .images-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      padding: 8px;
+    }
+    .property {
+      width: 20%;
+      min-width: 180px;
+      color: #333333;
+      padding: 8px;
     }
   }
 }
@@ -167,6 +169,7 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Components
+import VModal from "@/components/VModal.vue";
 import VThumbnail from "@/components/browser/VThumbnail.vue";
 import VProperty from "@/components/browser/VProperty.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
@@ -180,7 +183,8 @@ import { UNTAGGED_TAG_NAME } from "@/defines";
   components: {
     VThumbnail,
     VProperty,
-    VEditableLabel
+    VEditableLabel,
+    VModal
   },
   emits: [
     "select",

@@ -1,10 +1,10 @@
 <template>
-  <div
+  <article
     class="image-cache"
     ref="imageCache"
   >
-  <img v-for="url in cacheURLs" :key="url" :src="url">
-  </div>
+    <img v-for="url in cacheURLs" :key="url" :src="url">
+  </article>
 </template>
 
 <style lang="scss" scoped>

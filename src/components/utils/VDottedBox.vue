@@ -1,5 +1,5 @@
 <template>
-  <div class="dottedbox-root" :style="{
+  <article class="dottedbox-root" :style="{
     top: `${y}px`,
     left: `${x}px`,
     width: `${absWidth}px`,
@@ -34,7 +34,7 @@
         stroke-width="2"
       />
     </svg>
-  </div>
+  </article>
 </template>
 
 <style lang="scss" scoped>

@@ -1,5 +1,5 @@
 <template>
-  <div class="property-root">
+  <article class="property-root">
     <section class="previews" ref="previews" v-show="!noImage">
       <VPropertyThumbnail
         v-for="(data) in petaThumbnails"
@@ -11,30 +11,32 @@
     <section class="buttons" v-show="!noImage">
       <button tabindex="-1" @click="clearSelection">Clear Selection</button>
     </section>
-    <p v-show="!noImage">Tags</p>
-    <ul class="tags">
-      <li v-for="tag, i in tags" :key="i">
-        <VEditableLabel
-          :label="tag"
-          :labelLook="`${tag}`"
-          :growWidth="true"
-          @change="(name) => changeTag(tag, name)"
-          @focus="complementTag"
-          @contextmenu="tagMenu($event, tag)"
-        />
-      </li>
-      <li class="add">
-        <VEditableLabel
-          :label="'tag-name'"
-          :labelLook="`Click to add tag`"
-          :growWidth="true"
-          :clickToEdit="true"
-          @change="(name) => changeTag('', name)"
-          @focus="complementTag"
-        />
-      </li>
-    </ul>
-  </div>
+    <section v-show="!noImage">
+      <p>Tags</p>
+      <ul class="tags">
+        <li v-for="tag, i in tags" :key="i">
+          <VEditableLabel
+            :label="tag"
+            :labelLook="`${tag}`"
+            :growWidth="true"
+            @change="(name) => changeTag(tag, name)"
+            @focus="complementTag"
+            @contextmenu="tagMenu($event, tag)"
+          />
+        </li>
+        <li class="add">
+          <VEditableLabel
+            :label="'tag-name'"
+            :labelLook="`Click to add tag`"
+            :growWidth="true"
+            :clickToEdit="true"
+            @change="(name) => changeTag('', name)"
+            @focus="complementTag"
+          />
+        </li>
+      </ul>
+    </section>
+  </article>
 </template>
 
 <style lang="scss" scoped>
