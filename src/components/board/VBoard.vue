@@ -110,7 +110,6 @@ import GLOBALS from "@/globals";
     VCrop
   },
   emits: [
-    "openBrowser"
   ]
 })
 export default class VBoard extends Vue {
