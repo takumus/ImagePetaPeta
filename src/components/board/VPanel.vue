@@ -203,7 +203,7 @@ export default class VPanel extends Vue {
     this.currentRotation = this.petaPanel.rotation;
   }
   keydown(e: KeyboardEvent) {
-    if (e.key == "Shift") {
+    if (e.key.toLowerCase() == "shift") {
       this.shiftKeyPressed = true;
       if (this.controlStatus == ControlStatus.ROTATING) {
         this.fitRotation();
@@ -211,7 +211,7 @@ export default class VPanel extends Vue {
     }
   }
   keyup(e: KeyboardEvent) {
-    if (e.key == "Shift") {
+    if (e.key.toLowerCase() == "shift") {
       this.shiftKeyPressed = false;
     }
   }

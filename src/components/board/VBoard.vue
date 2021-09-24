@@ -222,19 +222,19 @@ export default class VBoard extends Vue {
     this.click.move(e);
   }
   keydown(e: KeyboardEvent) {
-    switch(e.key) {
-      case "Backspace":
-      case "Delete":
+    switch(e.key.toLowerCase()) {
+      case "backspace":
+      case "delete":
         this.removeSelectedPanels();
         break;
-      case "Shift":
+      case "shift":
         this.shiftKeyPressed = true;
         break;
     }
   }
   keyup(e: KeyboardEvent) {
-    switch(e.key) {
-      case "Shift":
+    switch(e.key.toLowerCase()) {
+      case "shift":
         this.shiftKeyPressed = false;
         break;
     }
