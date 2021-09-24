@@ -11,7 +11,7 @@
     :zIndex="3"
   >
     <article class="browser-root">
-      <section class="bottom">
+      <section class="top">
         <section class="tags">
           <header>
             <input
@@ -78,6 +78,9 @@
           />
         </section>
       </section>
+      <section class="bottom">
+        <button @click="close">Close</button>
+      </section>
     </article>
   </VModal>
 </template>
@@ -89,10 +92,13 @@
   display: flex;
   flex-direction: column;
   .bottom {
-    width: 100%;
-    height: 100%;
+    text-align: center;
+  }
+  .top {
     display: flex;
-    &>.tags {
+    flex: 1;
+    overflow: hidden;
+    &.tags {
       padding: 8px;
       text-align: center;
       white-space: nowrap;
@@ -195,7 +201,6 @@ import { UNTAGGED_TAG_NAME } from "@/defines";
 export default class VBrowser extends Vue {
   @Prop()
   petaImages: PetaImages = {};
-  @Prop()
   visible = false;
   @Ref("images")
   images!: HTMLDivElement;
@@ -227,6 +232,9 @@ export default class VBrowser extends Vue {
     window.addEventListener("keyup", this.keyup);
     this.imagesResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.images);
+
+    GLOBALS.browser.open = this.open;
+    GLOBALS.browser.close = this.close;
   }
   unmounted() {
     this.images.removeEventListener("scroll", this.updateScrollArea);
@@ -305,7 +313,8 @@ export default class VBrowser extends Vue {
     });
     this.selectedPetaImages.forEach((pi) => {
       pi._selected = false;
-    })
+    });
+    this.close();
   }
   selectImage(petaImage: PetaImage) {
     petaImage._selected = !petaImage._selected;
@@ -381,6 +390,13 @@ export default class VBrowser extends Vue {
         }
       }
     ], position);
+  }
+  open() {
+    this.visible = true;
+    console.log(1);
+  }
+  close() {
+    this.visible = false;
   }
   get selectedTagsArray() {
     return this.selectedTags.split(" ").filter((tag) => tag != "");

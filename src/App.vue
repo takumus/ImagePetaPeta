@@ -4,39 +4,25 @@
       v-if="currentBoard"
       :board="currentBoard"
       ref="vBoard"
-      @openBrowser="openBrowser"
     />
   </section>
   <VBrowser
     :petaImages="petaImages"
     @addPanel="addPanel"
-    :visible="browsing"
   />
   <VTabBar
     :boards="sortedBoards"
     @remove="removeBoard"
     @add="addBoard"
     @select="selectBoard"
-    @openInfo="openInfo"
-    @openSettings="openSettings"
     ref="vTabBar"
   />
   <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
   <VImageCache />
   <VInfo ref="info"/>
   <article class="menu">
-    <button
-      tabindex="-1"
-      @click="importImages"
-    >
-      Import Images
-    </button>
-    <button
-      tabindex="-1"
-      @click="openBrowser"
-    >
-      {{ browsing ? "Close Browser" : "Open Browser" }}
-    </button>
+    <button tabindex="-1" @click="$globals.settings.open">Settings</button>
+    <button tabindex="-1" @click="$globals.info.open">Info</button>
   </article>
   <article class="context-menu">
     <VContextMenu ref="contextMenu"/>
@@ -113,6 +99,7 @@ import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, Pet
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2, vec2FromMouseEvent } from "@/utils";
 import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
+import GLOBALS from "./globals";
 @Options({
   components: {
     VPanel,
@@ -213,17 +200,12 @@ export default class App extends Vue {
       }
     })
   }
-  importImages() {
-    API.send("browseImages");
-  }
-  openBrowser() {
-    this.browsing = !this.browsing;
-  }
   addPanelByDragAndDrop(ids: string[], mouse: DragEvent) {
     this.orderedAddPanelIds = ids;
     this.orderedAddPanelDragEvent = mouse;
   }
   addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
+    console.log(petaPanel);
     if (!this.currentBoard) return;
     this.currentBoard.petaPanels.push(petaPanel);
     this.browsing = false;
@@ -244,12 +226,6 @@ export default class App extends Vue {
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
-  }
-  openInfo() {
-    this.info.show = true;
-  }
-  openSettings() {
-    API.send("dialog", "hello", "hello".split(""));
   }
   async removeBoard(board: Board) {
     if (await API.send("dialog", `Remove "${board.name}"?`, ["Yes", "No"]) != 0) {

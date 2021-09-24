@@ -47,8 +47,18 @@
       </span>
     </span>
     <span class="buttons">
-      <button tabindex="-1" @click="openSettings">Settings</button>
-      <button tabindex="-1" @click="openInfo">Info</button>
+      <button
+        tabindex="-1"
+        @click="$globals.importImages"
+      >
+        Import Images
+      </button>
+      <button
+        tabindex="-1"
+        @click="$globals.browser.open()"
+      >
+        Open Browser
+      </button>
     </span>
   </article>
 </template>
@@ -151,8 +161,6 @@ import { vec2FromMouseEvent } from "@/utils";
     "add",
     "select",
     "sort",
-    "openInfo",
-    "openSettings"
   ]
 })
 export default class VTabBar extends Vue {
@@ -251,12 +259,6 @@ export default class VTabBar extends Vue {
     }
     log(board.name, "->", name);
     board.name = name;
-  }
-  openSettings() {
-    this.$emit("openSettings");
-  }
-  openInfo() {
-    this.$emit("openInfo");
   }
   async removeBoard(board: Board) {
     this.$emit("remove", board);

@@ -202,7 +202,7 @@ export default class VBoard extends Vue {
         GLOBALS.contextMenu.open([{
           label: "Open Browser",
           click: () => {
-            this.$emit("openBrowser");
+            GLOBALS.browser.open();
           }
         }, { separate: true }, {
           label: "Reset Position",

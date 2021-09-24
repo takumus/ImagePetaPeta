@@ -1,5 +1,5 @@
 <template>
-  <VModal :visible="show" :center="true" :zIndex="3">
+  <VModal :visible="visible" :center="true" :zIndex="3">
     <article class="info-root">
       <p>{{ appInfo.name }} {{ appInfo.version }}</p>
       <button tabindex="-1" @click="gotoGithub">Github</button>
@@ -10,7 +10,7 @@
       <pre>
         {{ licenses }}
       </pre>
-      <button tabindex="-1" @click="ok">Close</button>
+      <button tabindex="-1" @click="close">Close</button>
     </article>
   </VModal>
 </template>
@@ -47,6 +47,7 @@ import VModal from "@/components/VModal.vue";
 import { LICENSES } from "@/licenses";
 import { API } from "@/api";
 import { AppInfo } from "@/datas";
+import GLOBALS from "@/globals";
 @Options({
   components: {
     VModal
@@ -55,13 +56,15 @@ import { AppInfo } from "@/datas";
 export default class VInfo extends Vue {
   rawProgress = 100;
   info = 100;
-  show = false;
+  visible = false;
   version = "0.1.0";
   appInfo: AppInfo = {
     name: "",
     version: ""
   }
   async mounted() {
+    GLOBALS.info.open = this.open;
+    GLOBALS.info.close = this.close;
     this.appInfo = await API.send("getAppInfo");
   }
   get licenses() {
@@ -76,8 +79,11 @@ export default class VInfo extends Vue {
   showDBFolder() {
     API.send("showDBFolder");
   }
-  ok() {
-    this.show = false;
+  open() {
+    this.visible = true;
+  }
+  close() {
+    this.visible = false;
   }
 }
 </script>
