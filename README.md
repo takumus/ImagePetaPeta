@@ -1,20 +1,20 @@
 # ImagePetaPeta
-# インストール
-### ダウンロード
+## インストール
+#### ダウンロード
 <https://github.com/takumus/ImagePetaPeta/releases/tag/0.2.1-beta>
-### インストール
+#### インストール
 このような警告が出ますが、赤い枠のボタンを押せばインストールできます。
 ![1](./README/1.png)
 ![2](./README/2.png)
 
-# 開発者向け
+## 開発者向け
 
-### デバッグ
+#### デバッグ
 ```
 yarn serve
 ```
 
-### ビルド
+#### ビルド
 ```
 yarn build
 ```
