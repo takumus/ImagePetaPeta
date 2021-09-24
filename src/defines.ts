@@ -6,3 +6,4 @@ export const UNCATEGORIZED_CATEGORY_NAME = "Uncategorized";
 export const DEFAULT_IMAGE_SIZE = 200;
 export const PACKAGE_JSON_URL = "https://raw.githubusercontent.com/takumus/ImagePetaPeta/main/package.json";
 export const DOWNLOAD_URL = "https://github.com/takumus/ImagePetaPeta/releases/tag/";
+export const MAX_PREVIEW_COUNT = 20;

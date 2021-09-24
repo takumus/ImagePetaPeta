@@ -83,6 +83,7 @@ import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
 import { API, log } from "@/api";
 import { Vec2, vec2FromMouseEvent } from "@/utils";
 import GLOBALS from "@/globals";
+import { MAX_PREVIEW_COUNT } from "@/defines";
 @Options({
   components: {
     VEditableLabel,
@@ -194,7 +195,10 @@ export default class VProperty extends Vue {
   }
   get petaThumbnails(): PetaThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
-    const thumbnails = this.petaImages.map((p, i) => {
+    const petaImages = [...this.petaImages];
+    // プレビュー数の最大を抑える。
+    petaImages.splice(0, petaImages.length - MAX_PREVIEW_COUNT);
+    const thumbnails = petaImages.map((p, i) => {
       let width = 0;
       let height = 0;
       if (p.height / p.width < this.previewHeight / maxWidth) {
@@ -215,7 +219,7 @@ export default class VProperty extends Vue {
     const last = thumbnails[thumbnails.length - 1];
     thumbnails.forEach((thumb, i) => {
       thumb.position = new Vec2(
-        this.petaImages.length > 1 ? (this.previewWidth - last.width) * (i / (this.petaImages.length - 1)) : this.previewWidth / 2 - thumb.width / 2,
+        petaImages.length > 1 ? (this.previewWidth - last.width) * (i / (petaImages.length - 1)) : this.previewWidth / 2 - thumb.width / 2,
         this.previewHeight / 2 - thumb.height / 2
       )
     });
