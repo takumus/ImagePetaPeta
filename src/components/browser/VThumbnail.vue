@@ -110,7 +110,8 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import { MouseButton,  PetaThumbnail, UpdateMode } from "@/datas";
 import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
 import { ImageLoader } from "@/imageLoader";
-import { API } from "@/api";
+import { LOW_MEMORY_MODE } from "@/defines";
+// import { API } from "@/api";
 @Options({
   components: {
   },
@@ -125,11 +126,15 @@ export default class VThumbnail extends Vue {
   async mounted() {
     this.imageURL = await ImageLoader.getImageURL(this.petaThumbnail.petaImage, true);
     if (!(this.$el as HTMLElement).parentElement) {
-      ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+      if (LOW_MEMORY_MODE) {
+        ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+      }
     }
   }
   unmounted() {
-    ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+    if (LOW_MEMORY_MODE) {
+      ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+    }
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
   }
