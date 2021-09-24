@@ -8,7 +8,7 @@
 お金持ちになって法人登記したら考えます！
 ![1](./README/1.png)
 ![2](./README/2.png)
-## バグを見つけたら
+## バグ発見！または要望！
 <https://github.com/takumus/ImagePetaPeta/issues>  
 こちらより**New Issue**で投稿してください。  
 githubアカウントが無い場合は<https://github.com/takumus>のメールアドレスまで！
