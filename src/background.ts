@@ -11,7 +11,7 @@ import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
 import dataURIToBuffer from "data-uri-to-buffer";
-import { DEFAULT_BOARD_NAME } from "./defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "./defines";
 (async () => {
   const win = await initWindow();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -38,7 +38,6 @@ import { DEFAULT_BOARD_NAME } from "./defines";
     autoload: true
   });
   const logFile = fs.createWriteStream(path.resolve(DIR_ROOT, "logs.log"), {flags: "a"});
-  mainLog(DIR_ROOT);
   const mainAPIs: MainFunctions = {
     browseImages: async () => {
       mainLog("#Browse Images");
@@ -193,22 +192,48 @@ import { DEFAULT_BOARD_NAME } from "./defines";
       return value.response;
     },
     openURL: async (event, url) => {
+      mainLog("#Open URL");
+      mainLog("url:", url);
       shell.openExternal(url);
       return true;
     },
     getAppInfo: async (event) => {
-      return {
+      mainLog("#Get App Info");
+      const info = {
         name: app.getName(),
         version: app.getVersion()
       };
+      mainLog("return:", info);
+      return info;
     },
     showDBFolder: async (event) => {
+      mainLog("#Show DB Folder");
       shell.showItemInFolder(DIR_ROOT);
       return true;
     },
     showImageInFolder: async (event, petaImage) => {
+      mainLog("#Show Image In Folder");
       shell.showItemInFolder(getImagePath(petaImage, false));
       return true;
+    },
+    checkUpdate: async (event) => {
+      mainLog("#Check Update");
+      mainLog("url:", PACKAGE_JSON_URL);
+      mainLog("currentVersion:", app.getVersion());
+      try {
+        const packageJSON = (await axios.get(PACKAGE_JSON_URL, { responseType: "json" })).data;
+        mainLog("latestVersion:", packageJSON.version);
+        return {
+          current: app.getVersion(),
+          latest: packageJSON.version
+        }
+      } catch(e) {
+        mainLog("error:", e);
+      }
+      return {
+        current: app.getVersion(),
+        latest: "0.0.0"
+      }
     }
   }
   function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {

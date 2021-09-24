@@ -23,6 +23,8 @@ export interface Main {
   showDBFolder: () => Promise<boolean>;
   // showImageInFolder
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
+  // checkUpdate
+  checkUpdate: () => Promise<{ current: string, latest: string }>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>

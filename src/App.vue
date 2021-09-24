@@ -133,7 +133,7 @@ import VInfo from "@/components/utils/VInfo.vue";
 import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2, vec2FromMouseEvent } from "@/utils";
-import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, SAVE_DELAY } from "@/defines";
+import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
 @Options({
   components: {
     VPanel,
@@ -180,6 +180,13 @@ export default class App extends Vue {
     API.on("updatePetaImage", (e, petaImage) => {
       log("on updatePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
+    });
+    API.send("checkUpdate").then(async (result) => {
+      if (result.current.localeCompare(result.latest, "numeric") < 0) {
+        if (await API.send("dialog", `Update Available "${result.current}" -> "${result.latest}".\nDownload New Version?`, ["Yes", "No"]) == 0) {
+          API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
+        }
+      }
     });
     await this.getAll();
   }
