@@ -233,10 +233,19 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer?.disconnect();
   }
   keydown(e: KeyboardEvent) {
-    switch(e.key) {
-      case "Shift":
+    switch(e.key.toLowerCase()) {
+      case "shift":{
         this.shiftKeyPressed = true;
         break;
+      }
+      case "a": {
+        if (e.ctrlKey || e.metaKey) {
+          this.filteredPetaImages.forEach((pi) => {
+            pi._selected = true;
+          });
+        }
+        break;
+      }
     }
   }
   keyup(e: KeyboardEvent) {
