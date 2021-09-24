@@ -63,7 +63,7 @@
         <section class="property">
           <VProperty
             :petaImages="selectedPetaImages"
-            :allCategories="categories.map(c => c.name)"
+            :allCategories="categoriesForComplement"
             @changeCategory="changePetaImageCategory"
           />
         </section>
@@ -445,6 +445,9 @@ export default class VBrowser extends Vue {
       selected: this.selectedCategoriesArray.indexOf(UNCATEGORIZED_CATEGORY_NAME) >= 0,
       readonly: true
     }, ...categories];
+  }
+  get categoriesForComplement() {
+    return this.categories.filter((c) => c.name != UNCATEGORIZED_CATEGORY_NAME).map(c => c.name);
   }
   get selectedAll() {
     return this.selectedCategoriesArray.length == 0;
