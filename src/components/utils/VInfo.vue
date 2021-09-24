@@ -1,5 +1,5 @@
 <template>
-  <VModal :visible="show" :center="true">
+  <VModal :visible="show" :center="true" :zIndex="3">
     <article class="info-root">
       <p>{{ appInfo.name }} {{ appInfo.version }}</p>
       <button tabindex="-1" @click="gotoGithub">Github</button>

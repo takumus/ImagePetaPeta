@@ -12,6 +12,18 @@
     @addPanel="addPanel"
     :visible="browsing"
   />
+  <VTabBar
+    :boards="sortedBoards"
+    @remove="removeBoard"
+    @add="addBoard"
+    @select="selectBoard"
+    @openInfo="openInfo"
+    @openSettings="openSettings"
+    ref="vTabBar"
+  />
+  <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
+  <VImageCache />
+  <VInfo ref="info"/>
   <article class="menu">
     <button
       tabindex="-1"
@@ -26,18 +38,6 @@
       {{ browsing ? "Close Browser" : "Open Browser" }}
     </button>
   </article>
-  <VTabBar
-    :boards="sortedBoards"
-    @remove="removeBoard"
-    @add="addBoard"
-    @select="selectBoard"
-    @openInfo="openInfo"
-    @openSettings="openSettings"
-    ref="vTabBar"
-  />
-  <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
-  <VImageCache />
-  <VInfo ref="info"/>
   <article class="context-menu">
     <VContextMenu ref="contextMenu"/>
   </article>

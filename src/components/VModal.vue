@@ -2,7 +2,10 @@
   <article
     class="modal-root"
     v-show="visible"
-    :style="parentStyle ? parentStyle : {}"
+    :style=" {
+      ...(parentStyle ? parentStyle : {}),
+      zIndex: zIndex
+    }"
   >
     <div
       class="modal"
@@ -54,6 +57,8 @@ export default class VModal extends Vue {
   childStyle = {};
   @Prop()
   center = false;
+  @Prop({required: true})
+  zIndex = 0;
   centerStyle = {
     position: "absolute",
     top: "50%",

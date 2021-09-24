@@ -1,5 +1,5 @@
 <template>
-  <VModal :visible="loading" :center="true">
+  <VModal :visible="loading" :center="true" :zIndex="4">
     <article class="image-importer-root">
       <p>読込中...{{Math.floor(_progress)}}%</p>
       <section class="bar">
