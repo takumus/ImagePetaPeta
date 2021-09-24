@@ -98,7 +98,7 @@
     display: flex;
     flex: 1;
     overflow: hidden;
-    &.tags {
+    .tags {
       padding: 8px;
       text-align: center;
       white-space: nowrap;
