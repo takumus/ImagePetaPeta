@@ -199,12 +199,12 @@ export default class VBoard extends Vue {
       this.dragging = false;
       if (this.click.isClick && e.target == this.panelsBackground) {
         GLOBALS.contextMenu.open([{
-          label: "Open Browser",
+          label: this.$t("boards.menu.openBrowser"),
           click: () => {
             GLOBALS.browser.open();
           }
         }, { separate: true }, {
-          label: "Reset Position",
+          label: this.$t("boards.menu.resetPosition"),
           click: () => {
             this.resetTransform();
           }
@@ -268,22 +268,22 @@ export default class VBoard extends Vue {
   }
   petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
     GLOBALS.contextMenu.open([{
-      label: "Crop",
+      label: this.$t("boards.panelMenu.crop"),
       click: () => {
         this.editCrop(petaPanel);
       }
     }, { separate: true }, {
-      label: "Flip Horizontal",
+      label: this.$t("boards.panelMenu.flipHorizontal"),
       click: () => {
         petaPanel.width = -petaPanel.width;
       }
     }, {
-      label: "Flip Vertical",
+      label: this.$t("boards.panelMenu.flipVertical"),
       click: () => {
         petaPanel.height = -petaPanel.height;
       }
     }, { separate: true }, {
-      label: "Reset",
+      label: this.$t("boards.panelMenu.reset"),
       click: () => {
         petaPanel.height = Math.abs(petaPanel.height);
         petaPanel.width = Math.abs(petaPanel.width);
@@ -293,7 +293,7 @@ export default class VBoard extends Vue {
         petaPanel.rotation = 0;
       }
     }, { separate: true }, {
-      label: "Remove",
+      label: this.$t("boards.panelMenu.remove"),
       click: () => {
         this.removeSelectedPanels();
       }

@@ -21,8 +21,8 @@
   <VImageCache />
   <VInfo ref="info"/>
   <article class="menu">
-    <button tabindex="-1" @click="$globals.settings.open">Settings</button>
-    <button tabindex="-1" @click="$globals.info.open">Info</button>
+    <button tabindex="-1" @click="$globals.settings.open">{{$t("home.settingsButton")}}</button>
+    <button tabindex="-1" @click="$globals.info.open">{{$t("home.infoButton")}}</button>
   </article>
   <article class="context-menu">
     <VContextMenu ref="contextMenu"/>
@@ -149,7 +149,7 @@ export default class App extends Vue {
     });
     API.send("checkUpdate").then(async (result) => {
       if (result.current.localeCompare(result.latest, "numeric") < 0) {
-        if (await API.send("dialog", `Update Available "${result.current}" -> "${result.latest}".\nDownload New Version?`, ["Yes", "No"]) == 0) {
+        if (await API.send("dialog", this.$t("utils.update", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
           API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
         }
       }
@@ -228,7 +228,7 @@ export default class App extends Vue {
     }
   }
   async removeBoard(board: Board) {
-    if (await API.send("dialog", `Remove "${board.name}"?`, ["Yes", "No"]) != 0) {
+    if (await API.send("dialog", this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
       return;
     }
     this.boardUpdaters[board.id].forceUpdate();

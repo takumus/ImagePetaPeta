@@ -2,15 +2,15 @@
   <VModal :visible="visible" :center="true" :zIndex="3">
     <article class="info-root">
       <p>{{ appInfo.name }} {{ appInfo.version }}</p>
-      <button tabindex="-1" @click="gotoGithub">Github</button>
-      <button tabindex="-1" @click="gotoIssues">Issues</button>
-      <p>Files</p>
-      <button tabindex="-1" @click="showDBFolder">DB Folder</button>
-      <p>Licenses</p>
+      <button tabindex="-1" @click="gotoGithub">{{$t("info.githubButton")}}</button>
+      <button tabindex="-1" @click="gotoIssues">{{$t("info.issuesButton")}}</button>
+      <p></p>
+      <button tabindex="-1" @click="showDBFolder">{{$t("info.dbFolderButton")}}</button>
+      <p>{{$t("info.licenses")}}</p>
       <pre>
         {{ licenses }}
       </pre>
-      <button tabindex="-1" @click="close">Close</button>
+      <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>
 </template>

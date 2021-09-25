@@ -51,13 +51,13 @@
         tabindex="-1"
         @click="$globals.importImages"
       >
-        Import Images
+        {{$t("home.importImagesButton")}}
       </button>
       <button
         tabindex="-1"
         @click="$globals.browser.open()"
       >
-        Open Browser
+        {{$t("home.openBrowserButton")}}
       </button>
     </span>
   </article>
@@ -196,7 +196,7 @@ export default class VTabBar extends Vue {
   }
   menu(event: MouseEvent, board: Board) {
     GLOBALS.contextMenu.open([{
-      label: `Remove "${board.name}"`,
+      label: this.$t("tab.menu.remove", [board.name]),
       click: () => {
         this.removeBoard(board);
       }

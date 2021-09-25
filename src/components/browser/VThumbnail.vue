@@ -23,7 +23,7 @@
           class="tags"
           v-if="petaThumbnail.petaImage.tags.length == 0"
         >
-          Untagged
+          {{$t("browser.untagged")}}
         </span>
       </div>
       <div class="selected" v-show="petaThumbnail.petaImage._selected">

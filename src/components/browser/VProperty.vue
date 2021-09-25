@@ -7,12 +7,12 @@
         :petaThumbnail="data"
       />
     </section>
-    <p>{{petaImages.length}} Images Selected.</p>
+    <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
     <section class="buttons" v-show="!noImage">
-      <button tabindex="-1" @click="clearSelection">Clear Selection</button>
+      <button tabindex="-1" @click="clearSelection">{{$t("browser.property.clearSelectionButton")}}</button>
     </section>
     <section v-show="!noImage">
-      <p>Tags</p>
+      <p>{{$t("browser.property.tags")}}</p>
       <ul class="tags">
         <li v-for="tag, i in tags" :key="i">
           <VEditableLabel
@@ -27,7 +27,7 @@
         <li class="add">
           <VEditableLabel
             :label="'tag-name'"
-            :labelLook="`Click to add tag`"
+            :labelLook="$t('browser.property.clickToAddTag')"
             :growWidth="true"
             :clickToEdit="true"
             @change="(name) => changeTag('', name)"
@@ -169,7 +169,7 @@ export default class VProperty extends Vue {
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
     if (changed) {
-      API.send("dialog", "Clear Selection?", ["Yes", "No"]).then((index) => {
+      API.send("dialog", this.$t("browser.property.clearSelectionDialog"), [this.$t("shared.yes"), this.$t("shared.no")]).then((index) => {
         if (index == 0) {
           this.clearSelection();
         }
@@ -187,7 +187,7 @@ export default class VProperty extends Vue {
   tagMenu(event: MouseEvent, tag: string) {
     GLOBALS.contextMenu.open([
       {
-        label: `Remove "${tag}"`,
+        label: this.$t("browser.property.tagMenu.remove", [tag]),
         click: () => {
           this.changeTag(tag, "");
         }

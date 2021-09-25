@@ -27,7 +27,7 @@
               :class="{ selected: selectedAll }"
             >
               <VEditableLabel
-                :label="`All(${petaImagesArray.length})`"
+                :label="`${$t('browser.all')}(${petaImagesArray.length})`"
                 :growWidth="true"
                 :readonly="true"
               />
@@ -79,7 +79,7 @@
         </section>
       </section>
       <section class="bottom">
-        <button @click="close">Close</button>
+        <button @click="close">{{$t("shared.closeButton")}}</button>
       </section>
     </article>
   </VModal>
@@ -325,7 +325,7 @@ export default class VBrowser extends Vue {
   tagMenu(event: MouseEvent, tag: string) {
     GLOBALS.contextMenu.open([
       {
-        label: `Remove "${tag}"`,
+        label: this.$t("browser.tagMenu.remove", [tag]),
         click: () => {
           this.changeTag(tag, "");
         }
@@ -339,13 +339,13 @@ export default class VBrowser extends Vue {
     }
     let remove = false;
     if (newName == "") {
-      remove = await API.send("dialog", `Remove "${oldName}"?`, ["Yes", "No"]) == 0;
+      remove = await API.send("dialog", this.$t("browser.removeTagDialog", [oldName]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0;
       if (!remove) {
         return;
       }
     }
     if (this.tags.find((c) => c.name == newName)) {
-      API.send("dialog", `"${newName}" already exists.`, []);
+      API.send("dialog", this.$t("browser.tagAlreadyExistsDialog", [newName]), []);
       return;
     }
     const changed: PetaImage[] = [];
@@ -382,9 +382,9 @@ export default class VBrowser extends Vue {
     petaImage._selected = true;
     GLOBALS.contextMenu.open([
       {
-        label: `Remove ${this.selectedPetaImages.length} Images`,
+        label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
-          if (await API.send("dialog", `Remove ${this.selectedPetaImages.length} Images?`, ["Yes", "No"]) == 0) {
+          if (await API.send("dialog", this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
             API.send("updatePetaImages", this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }
@@ -444,6 +444,7 @@ export default class VBrowser extends Vue {
         if (!c) {
           tags.push({
             name: tag,
+            id: tag,
             count: 1,
             selected: this.selectedTagsArray.indexOf(tag) >= 0,
             readonly: false
@@ -461,6 +462,7 @@ export default class VBrowser extends Vue {
       }
     });
     return [{
+      id: UNTAGGED_TAG_NAME,
       name: UNTAGGED_TAG_NAME,
       count: this.uncategorizedImages.length,
       selected: this.selectedTagsArray.indexOf(UNTAGGED_TAG_NAME) >= 0,
@@ -508,6 +510,7 @@ export default class VBrowser extends Vue {
 }
 interface Tag {
   name: string,
+  id: string,
   count: number,
   selected: boolean,
   readonly: boolean

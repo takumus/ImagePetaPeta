@@ -1,7 +1,7 @@
 import ja from "./ja-default";
-import en from "./en";
+// import en from "./en";
 const languages = {
   ja,
-  en
+  // en
 }
 export default languages;
