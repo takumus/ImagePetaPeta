@@ -1,6 +1,6 @@
 {
   "name": "ImagePetaPeta-beta",
-  "version": "0.3.0-beta",
+  "version": "0.4.0-beta",
   "private": true,
   "scripts": {
     "serve": "yarn generate-licenses && vue-cli-service electron:serve",
