@@ -393,7 +393,6 @@ export default class VBrowser extends Vue {
   }
   open() {
     this.visible = true;
-    console.log(1);
   }
   close() {
     this.visible = false;

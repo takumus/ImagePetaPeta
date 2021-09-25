@@ -205,7 +205,6 @@ export default class App extends Vue {
     this.orderedAddPanelDragEvent = mouse;
   }
   addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
-    console.log(petaPanel);
     if (!this.currentBoard) return;
     this.currentBoard.petaPanels.push(petaPanel);
     this.browsing = false;
