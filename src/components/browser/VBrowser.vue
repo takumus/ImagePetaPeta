@@ -60,11 +60,11 @@
               :style="{height: scrollHeight + 8 + 'px'}"
             >
               <VThumbnail
-                v-for="(data) in petaThumbnails"
+                v-for="(data) in visiblePetaThumbnails"
                 :key="data.petaImage.id"
                 :petaThumbnail="data"
                 @add="addPanel"
-                @select="selectImage"
+                @select="selectThumbnail"
                 @menu="petaImageMenu"
               />
             </div>
@@ -220,6 +220,8 @@ export default class VBrowser extends Vue {
   imagesResizer?: ResizeObserver;
   scrollAreaResizer?: ResizeObserver;
   shiftKeyPressed = false;
+  ctrlKeyPressed = false;
+  firstSelectedPetaThumbnail: PetaThumbnail | null = null;
   mounted() {
     this.imagesResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0].contentRect);
@@ -247,8 +249,12 @@ export default class VBrowser extends Vue {
   }
   keydown(e: KeyboardEvent) {
     switch(e.key.toLowerCase()) {
-      case "shift":{
+      case "shift": {
         this.shiftKeyPressed = true;
+        break;
+      }
+      case "control": {
+        this.ctrlKeyPressed = true;
         break;
       }
       case "a": {
@@ -262,10 +268,15 @@ export default class VBrowser extends Vue {
     }
   }
   keyup(e: KeyboardEvent) {
-    switch(e.key) {
-      case "Shift":
+    switch(e.key.toLowerCase()) {
+      case "shift": {
         this.shiftKeyPressed = false;
         break;
+      }
+      case "control": {
+        this.ctrlKeyPressed = false;
+        break;
+      }
     }
   }
   updateScrollArea() {
@@ -300,12 +311,12 @@ export default class VBrowser extends Vue {
       this.selectedTags = tags.join(" ");
     }
   }
-  addPanel(petaImage: PetaImage, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    petaImage._selected = false;
+  addPanel(thumb: PetaThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
+    thumb.petaImage._selected = false;
     // 複数同時追加用↓
     // const images = [petaImage, ...this.selectedPetaImages].reverse();
-    const images = [petaImage];
-    petaImage._selected = true;
+    const images = [thumb.petaImage];
+    thumb.petaImage._selected = true;
     images.forEach((pi, i) => {
       const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.imageWidth);
       this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(40, 0).mult(-(images.length - 1) + i)));
@@ -316,8 +327,47 @@ export default class VBrowser extends Vue {
     });
     this.close();
   }
-  selectImage(petaImage: PetaImage) {
-    petaImage._selected = !petaImage._selected;
+  selectThumbnail(thumb: PetaThumbnail) {
+    if (this.selectedPetaImages.length < 1 || (!this.ctrlKeyPressed && !this.shiftKeyPressed)) {
+      // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
+      this.firstSelectedPetaThumbnail = thumb;
+    }
+    // 全選択解除するが、選択サムネイルは状態を保持する。
+    const prevSelection = thumb.petaImage._selected;
+    if (!this.ctrlKeyPressed) {
+      // コントロールキーが押されていなければ選択をリセット
+      this.clearSelectionAllImages();
+    }
+    thumb.petaImage._selected = prevSelection;
+    // 選択サムネイルを反転
+    thumb.petaImage._selected = !thumb.petaImage._selected;
+    if (this.firstSelectedPetaThumbnail && this.shiftKeyPressed) {
+      // 最初の選択と、シフトキーが押されていれば、範囲選択。
+      const topLeft = new Vec2(
+        Math.min(this.firstSelectedPetaThumbnail.position.x, thumb.position.x),
+        Math.min(this.firstSelectedPetaThumbnail.position.y, thumb.position.y)
+      );
+      const size = new Vec2(
+        Math.max(this.firstSelectedPetaThumbnail.position.x + this.firstSelectedPetaThumbnail.width, thumb.position.x + thumb.width),
+        Math.max( this.firstSelectedPetaThumbnail.position.y + this.firstSelectedPetaThumbnail.height, thumb.position.y + thumb.height)
+      ).clone().sub(topLeft);
+      this.petaThumbnails.forEach((pt) => {
+        let widthDiff = pt.width / 2 + size.x / 2 - Math.abs((pt.position.x + pt.width / 2) - (topLeft.x + size.x / 2));
+        let heightDiff = pt.height / 2 + size.y / 2 - Math.abs((pt.position.y + pt.height / 2) - (topLeft.y + size.y / 2));
+        if (widthDiff > pt.width) {
+          widthDiff = pt.width;
+        }
+        if (heightDiff > pt.height) {
+          heightDiff = pt.height;
+        }
+        const hitArea = widthDiff * heightDiff;
+        const ptArea = pt.width * pt.height;
+        if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > 0.4) {
+          console.log(hitArea / ptArea);
+          pt.petaImage._selected = true;
+        }
+      });
+    }
   }
   complementTag(event: FocusEvent) {
     GLOBALS.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
@@ -376,10 +426,10 @@ export default class VBrowser extends Vue {
   clearSelectionAllImages() {
     this.petaImagesArray.forEach((pi) => {
       pi._selected = false;
-    })
+    });
   }
-  petaImageMenu(petaImage: PetaImage, position: Vec2) {
-    petaImage._selected = true;
+  petaImageMenu(thumb: PetaThumbnail, position: Vec2) {
+    thumb.petaImage._selected = true;
     GLOBALS.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
@@ -504,7 +554,10 @@ export default class VBrowser extends Vue {
         height: height,
         visible: (this.areaMinY < position.y && position.y < this.areaMaxY) || (this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
       }
-    }).filter((p) => p.visible);
+    });
+  }
+  get visiblePetaThumbnails(): PetaThumbnail[] {
+    return this.petaThumbnails.filter((p) => p.visible);
   }
 }
 interface Tag {

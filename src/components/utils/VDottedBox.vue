@@ -27,7 +27,7 @@
         stroke-width="2"
       />
       <polygon
-        :points="`${_dasharrayOffset},0 ${absWidth},0 ${absWidth},${absHeight} 0,${absHeight} 0,0`"
+        :points="`${dasharrayOffset},0 ${absWidth},0 ${absWidth},${absHeight} 0,${absHeight} 0,0`"
         stroke="white"
         stroke-dasharray="5,5"
         fill="none"

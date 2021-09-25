@@ -1,7 +1,7 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ top: petaThumbnail.position.y + 'px', left: petaThumbnail.position.x + 'px', width: petaThumbnail.width + 'px', height: petaThumbnail.height + 'px' }"
+    :style="{ transform: `translate(${petaThumbnail.position.x + 'px'}, ${petaThumbnail.position.y + 'px'})`, width: petaThumbnail.width + 'px', height: petaThumbnail.height + 'px' }"
   >
     <div class="wrapper">
       <img
@@ -159,7 +159,7 @@ export default class VThumbnail extends Vue {
         elementRect.x + elementRect.width / 2,
         elementRect.y + elementRect.height / 2
       );
-      this.$emit("add", this.petaThumbnail.petaImage, vec2FromMouseEvent(event), position);
+      this.$emit("add", this.petaThumbnail, vec2FromMouseEvent(event), position);
       this.pressing = false;
     }
   }
@@ -170,10 +170,10 @@ export default class VThumbnail extends Vue {
     if (this.click.isClick) {
       switch(event.button) {
         case MouseButton.LEFT:
-          this.$emit("select", this.petaThumbnail.petaImage);
+          this.$emit("select", this.petaThumbnail);
           break;
         case MouseButton.RIGHT:
-          this.$emit("menu", this.petaThumbnail.petaImage, vec2FromMouseEvent(event));
+          this.$emit("menu", this.petaThumbnail, vec2FromMouseEvent(event));
           break;
       }
     }
