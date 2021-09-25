@@ -13,7 +13,8 @@
           :key="panel.id"
           :petaPanel="panel"
           :transform="transform"
-          @select="select"
+          @press="pressPetaPanel"
+          @click="clickPetaPanel"
           @toFront="toFront"
           @menu="petaPanelMenu"
           :ref="panel.id"
@@ -305,7 +306,7 @@ export default class VBoard extends Vue {
     petaPanel.width *= 1 / this.transform.scale;
     petaPanel.height = petaPanel.width * petaPanel._petaImage!.height;
     this.toFront(petaPanel);
-    this.select(petaPanel, worldPosition);
+    this.pressPetaPanel(petaPanel, worldPosition);
     if (worldPosition) {
       this.$nextTick(() => {
         const panelComponent = this.getVPanel(petaPanel);
@@ -322,13 +323,30 @@ export default class VBoard extends Vue {
   updateCrop() {
     this.croppingPetaPanel = null;
   }
-  select(petaPanel: PetaPanel, worldPosition?: Vec2) {
-    this.clearSelectionAll();
+  pressPetaPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
+    if (!this.shiftKeyPressed && (this.selectedPetaPanels.length <= 1 || !petaPanel._selected)) {
+      // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
+      // 最前にして選択リセット
+      this.toFront(petaPanel);
+      this.clearSelectionAll();
+    }
+    if (this.selectedPetaPanels.length <= 1) {
+      // 選択が１つ以下の場合選択範囲リセット
+      this.clearSelectionAll();
+    }
     petaPanel._selected = true;
     if (worldPosition) {
       this.selectedPetaPanels.forEach((pp) => {
         this.getVPanel(pp)?.startDrag(worldPosition)
       });
+    }
+  }
+  clickPetaPanel(petaPanel: PetaPanel) {
+    this.clearSelectionAll();
+    petaPanel._selected = true;
+    if (!this.shiftKeyPressed) {
+      // シフトなしの場合最前へ。
+      this.toFront(petaPanel);
     }
   }
   clearSelectionAll(force = false) {

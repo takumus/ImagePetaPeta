@@ -133,6 +133,8 @@ enum SizingOrigin {
     VDottedBox
   },
   emits: [
+    "press",
+    "click",
     "select",
     "toFront",
     "menu"
@@ -217,17 +219,17 @@ export default class VPanel extends Vue {
   }
   private mousedown(event: MouseEvent) {
     const worldPosition: Vec2 = vec2FromMouseEvent(event);
+    this.click.down(event);
     switch (event.button) {
       case MouseButton.LEFT: {
         this.startDrag(worldPosition);
-        this.$emit("select", this.petaPanel, vec2FromMouseEvent(event));
-        if (!this.shiftKeyPressed) {
-          this.$emit("toFront", this.petaPanel);
-        }
+        this.$emit("press", this.petaPanel, vec2FromMouseEvent(event));
+        // if (!this.shiftKeyPressed) {
+        //   this.$emit("toFront", this.petaPanel);
+        // }
         break;
       }
       case MouseButton.RIGHT: {
-        this.click.down(event);
         break;
       }
     }
@@ -298,6 +300,9 @@ export default class VPanel extends Vue {
       case MouseButton.LEFT: {
         this.loadFullSize();
         this.controlStatus = ControlStatus.NONE;
+        if (this.click.isClick) {
+          this.$emit("click", this.petaPanel);
+        }
         break;
       }
       case MouseButton.RIGHT: {
