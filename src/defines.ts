@@ -8,3 +8,4 @@ export const PACKAGE_JSON_URL = "https://raw.githubusercontent.com/takumus/Image
 export const DOWNLOAD_URL = "https://github.com/takumus/ImagePetaPeta/releases/tag/";
 export const MAX_PREVIEW_COUNT = 20;
 export const LOW_MEMORY_MODE = false;
+export const THUMBNAILS_SELECTION_PERCENT = 0.4;

@@ -184,7 +184,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
 import { Vec2, vec2FromMouseEvent } from "@/utils";
 import { API, log } from "@/api";
-import { UNTAGGED_TAG_NAME } from "@/defines";
+import { THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
 @Options({
   components: {
     VThumbnail,
@@ -363,8 +363,7 @@ export default class VBrowser extends Vue {
         }
         const hitArea = widthDiff * heightDiff;
         const ptArea = pt.width * pt.height;
-        if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > 0.4) {
-          console.log(hitArea / ptArea);
+        if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea >  THUMBNAILS_SELECTION_PERCENT) {
           pt.petaImage._selected = true;
         }
       });
