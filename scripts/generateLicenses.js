@@ -1,10 +1,15 @@
 const fs = require("fs");
 const datas = JSON.parse(fs.readFileSync("./licenses.json"));
+console.log("generating licenses!");
 const newDatas = Object.keys(datas).map((name) => {
   const data = datas[name];
-  const licenses = fs.readFileSync(data.licenseFile).toString();
-  delete data.path;
-  delete data.licenseFile;
+  let licenses = data.licenses;
+  try {
+    licenses = fs.readFileSync(data.licenseFile).toString();
+  } catch {
+    console.error("failed to load licenses:", name);
+    console.log(data);
+  }
   return {
     name: name,
     licenses: licenses
