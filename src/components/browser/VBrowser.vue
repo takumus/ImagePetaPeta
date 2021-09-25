@@ -312,6 +312,9 @@ export default class VBrowser extends Vue {
     }
   }
   addPanel(thumb: PetaThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
+    if (this.shiftKeyPressed || this.ctrlKeyPressed) {
+      return;
+    }
     thumb.petaImage._selected = false;
     // 複数同時追加用↓
     // const images = [petaImage, ...this.selectedPetaImages].reverse();
