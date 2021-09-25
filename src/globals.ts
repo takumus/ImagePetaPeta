@@ -41,5 +41,10 @@ const GLOBALS = {
     API.send("browseImages");
   }
 }
+declare module '@vue/runtime-core' {
+  export interface ComponentCustomProperties {
+    $globals: typeof GLOBALS;
+  }
+}
 // app.config.globalProperties.abc="aaa"
 export default GLOBALS;

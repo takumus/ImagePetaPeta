@@ -130,7 +130,6 @@ export default class VBoard extends Vue {
   globalOffset: Vec2 = new Vec2();
   petaPanelMenuListenerId = "";
   click = new ClickChecker();
-  shiftKeyPressed = false;
   resizer?: ResizeObserver;
   mounted() {
     this.panelsWrapper.addEventListener("mousedown", this.mousedown);
@@ -139,8 +138,6 @@ export default class VBoard extends Vue {
     this.panelsBackground.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mouseup", this.mouseup);
     window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("keydown", this.keydown);
-    window.addEventListener("keyup", this.keyup);
     window.addEventListener("click", this.mousedownOutside);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
@@ -155,8 +152,6 @@ export default class VBoard extends Vue {
     this.panelsBackground.removeEventListener("mousedown", this.mousedown);
     window.removeEventListener("mouseup", this.mouseup);
     window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("keydown", this.keydown);
-    window.removeEventListener("keyup", this.keyup);
     window.removeEventListener("click", this.mousedownOutside);
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
@@ -220,24 +215,6 @@ export default class VBoard extends Vue {
     this.board.transform.position.x = (e.clientX + this.dragOffset.x);
     this.board.transform.position.y = (e.clientY + this.dragOffset.y);
     this.click.move(e);
-  }
-  keydown(e: KeyboardEvent) {
-    switch(e.key.toLowerCase()) {
-      case "backspace":
-      case "delete":
-        this.removeSelectedPanels();
-        break;
-      case "shift":
-        this.shiftKeyPressed = true;
-        break;
-    }
-  }
-  keyup(e: KeyboardEvent) {
-    switch(e.key.toLowerCase()) {
-      case "shift":
-        this.shiftKeyPressed = false;
-        break;
-    }
   }
   wheel(event: WheelEvent) {
     const mouse = vec2FromMouseEvent(event);
@@ -324,7 +301,7 @@ export default class VBoard extends Vue {
     this.croppingPetaPanel = null;
   }
   pressPetaPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
-    if (!this.shiftKeyPressed && (this.selectedPetaPanels.length <= 1 || !petaPanel._selected)) {
+    if (!this.$keyboards.shift.value && (this.selectedPetaPanels.length <= 1 || !petaPanel._selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
       this.toFront(petaPanel);
@@ -344,13 +321,13 @@ export default class VBoard extends Vue {
   clickPetaPanel(petaPanel: PetaPanel) {
     this.clearSelectionAll();
     petaPanel._selected = true;
-    if (!this.shiftKeyPressed) {
+    if (!this.$keyboards.shift.value) {
       // シフトなしの場合最前へ。
       this.toFront(petaPanel);
     }
   }
   clearSelectionAll(force = false) {
-    if (!this.shiftKeyPressed || force) {
+    if (!this.$keyboards.shift.value || force) {
       this.board.petaPanels.forEach((p) => {
         p._selected = false;
       });
@@ -392,6 +369,12 @@ export default class VBoard extends Vue {
       position: this.board.transform.position.clone().add(this.globalOffset)
     }
     return transform;
+  }
+  @Watch("$keyboards.delete.value")
+  keyDelete(value: boolean) {
+    if (value) {
+      this.removeSelectedPanels();
+    }
   }
 }
 </script>

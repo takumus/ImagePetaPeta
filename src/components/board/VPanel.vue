@@ -160,7 +160,6 @@ export default class VPanel extends Vue {
   currentRotation = 0;
   imageURL = "";
   loadedFullSize = false;
-  shiftKeyPressed = false;
   resizeCursors = [ "ns-resize", "nesw-resize", "ew-resize", "nwse-resize", "ns-resize", "nesw-resize", "ew-resize", "nwse-resize" ];
   rotateCursor = `-webkit-image-set(
     url('${RotateCursor1x}') 1x,
@@ -181,8 +180,6 @@ export default class VPanel extends Vue {
     this.img.addEventListener("mouseleave", this.mouseleave);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
-    window.addEventListener("keydown", this.keydown);
-    window.addEventListener("keyup", this.keyup);
   }
   unmounted() {
     this.img.removeEventListener("mousedown", this.mousedown);
@@ -190,8 +187,6 @@ export default class VPanel extends Vue {
     this.img.removeEventListener("mouseleave", this.mouseleave);
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
-    window.removeEventListener("keydown", this.keydown);
-    window.removeEventListener("keyup", this.keyup);
   }
   startDrag(worldPosition: Vec2) {
     const mouse = this.getMouseFromEvent(worldPosition);
@@ -204,19 +199,6 @@ export default class VPanel extends Vue {
     this.rotateOffset = mouse.clone().sub(this.petaPanel.position).atan2();
     this.currentRotation = this.petaPanel.rotation;
   }
-  keydown(e: KeyboardEvent) {
-    if (e.key.toLowerCase() == "shift") {
-      this.shiftKeyPressed = true;
-      if (this.controlStatus == ControlStatus.ROTATING) {
-        this.fitRotation();
-      }
-    }
-  }
-  keyup(e: KeyboardEvent) {
-    if (e.key.toLowerCase() == "shift") {
-      this.shiftKeyPressed = false;
-    }
-  }
   private mousedown(event: MouseEvent) {
     const worldPosition: Vec2 = vec2FromMouseEvent(event);
     this.click.down(event);
@@ -224,9 +206,6 @@ export default class VPanel extends Vue {
       case MouseButton.LEFT: {
         this.startDrag(worldPosition);
         this.$emit("press", this.petaPanel, vec2FromMouseEvent(event));
-        // if (!this.shiftKeyPressed) {
-        //   this.$emit("toFront", this.petaPanel);
-        // }
         break;
       }
       case MouseButton.RIGHT: {
@@ -284,7 +263,7 @@ export default class VPanel extends Vue {
         this.currentRotation += rotation - this.rotateOffset;
         this.rotateOffset = rotation;
         this.petaPanel.rotation = this.currentRotation;
-        if (this.shiftKeyPressed) {
+        if (this.$keyboards.shift.value) {
           this.fitRotation();
         }
         break;
