@@ -184,7 +184,6 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
 import { Vec2, vec2FromMouseEvent } from "@/utils";
 import { API, log } from "@/api";
-import GLOBALS from "@/globals";
 import { UNTAGGED_TAG_NAME } from "@/defines";
 @Options({
   components: {
@@ -235,8 +234,7 @@ export default class VBrowser extends Vue {
     this.imagesResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.images);
 
-    GLOBALS.browser.open = this.open;
-    GLOBALS.browser.close = this.close;
+    this.$globals.browser = this;
   }
   unmounted() {
     this.images.removeEventListener("scroll", this.updateScrollArea);
@@ -373,10 +371,10 @@ export default class VBrowser extends Vue {
     }
   }
   complementTag(event: FocusEvent) {
-    GLOBALS.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
+    this.$globals.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
   }
   tagMenu(event: MouseEvent, tag: string) {
-    GLOBALS.contextMenu.open([
+    this.$globals.contextMenu.open([
       {
         label: this.$t("browser.tagMenu.remove", [tag]),
         click: () => {
@@ -433,7 +431,7 @@ export default class VBrowser extends Vue {
   }
   petaImageMenu(thumb: PetaThumbnail, position: Vec2) {
     thumb.petaImage._selected = true;
-    GLOBALS.contextMenu.open([
+    this.$globals.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {

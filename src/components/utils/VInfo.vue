@@ -47,7 +47,6 @@ import VModal from "@/components/VModal.vue";
 import { LICENSES } from "@/licenses";
 import { API } from "@/api";
 import { AppInfo } from "@/datas";
-import GLOBALS from "@/globals";
 @Options({
   components: {
     VModal
@@ -63,8 +62,7 @@ export default class VInfo extends Vue {
     version: ""
   }
   async mounted() {
-    GLOBALS.info.open = this.open;
-    GLOBALS.info.close = this.close;
+    this.$globals.info = this;
     this.appInfo = await API.send("getAppInfo");
   }
   get licenses() {

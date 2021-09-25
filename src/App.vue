@@ -99,7 +99,6 @@ import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, Pet
 import { API, log } from "@/api";
 import { DelayUpdater, Vec2, vec2FromMouseEvent } from "@/utils";
 import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
-import GLOBALS from "./globals";
 @Options({
   components: {
     VPanel,
@@ -132,6 +131,9 @@ export default class App extends Vue {
   boardUpdaters: {[key: string]: DelayUpdater<Board>} = {};
   async mounted() {
     log("INIT RENDERER!");
+    this.$globals.importImages = () => {
+      API.send("browseImages");
+    }
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
       this.getPetaImages();
     });
@@ -213,6 +215,7 @@ export default class App extends Vue {
   selectBoard(board: Board) {
     log("Board Selected", board.name);
     if (this.currentBoard) {
+      this.$globals
       this.updateBoard(this.currentBoard, true);
     }
     this.currentBoard = board;

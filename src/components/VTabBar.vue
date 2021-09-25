@@ -148,7 +148,6 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
-import GLOBALS from "@/globals";
 import { log } from "@/api";
 import { Board, MouseButton } from "@/datas";
 import { vec2FromMouseEvent } from "@/utils";
@@ -195,7 +194,7 @@ export default class VTabBar extends Vue {
     this.beforeSortSelectedIndex = this.selectedIndex;
   }
   menu(event: MouseEvent, board: Board) {
-    GLOBALS.contextMenu.open([{
+    this.$globals.contextMenu.open([{
       label: this.$t("tab.menu.remove", [board.name]),
       click: () => {
         this.removeBoard(board);

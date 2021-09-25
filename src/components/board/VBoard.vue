@@ -194,10 +194,10 @@ export default class VBoard extends Vue {
     if (e.button == MouseButton.RIGHT) {
       this.dragging = false;
       if (this.click.isClick && e.target == this.panelsBackground) {
-        GLOBALS.contextMenu.open([{
+        this.$globals.contextMenu.open([{
           label: this.$t("boards.menu.openBrowser"),
           click: () => {
-            GLOBALS.browser.open();
+            this.$globals.browser.open();
           }
         }, { separate: true }, {
           label: this.$t("boards.menu.resetPosition"),
@@ -245,7 +245,7 @@ export default class VBoard extends Vue {
     this.board.petaPanels = this.board.petaPanels.filter((pp) => !pp._selected);
   }
   petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
-    GLOBALS.contextMenu.open([{
+    this.$globals.contextMenu.open([{
       label: this.$t("boards.panelMenu.crop"),
       click: () => {
         this.editCrop(petaPanel);

@@ -41,7 +41,6 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Others
 import { Vec2 } from "@/utils";
-import GLOBALS from "@/globals";
 @Options({
   components: {
   }
@@ -56,7 +55,7 @@ export default class VComplement extends Vue {
   target?: HTMLInputElement;
   currentIndex = 0;
   mounted() {
-    GLOBALS.complement.open = this.open;
+    this.$globals.complement = this;
     window.addEventListener("mousedown", (event) => {
       if ((event.target as HTMLElement).parentElement != this.complement) {
         this.select();

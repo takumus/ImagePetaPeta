@@ -46,7 +46,6 @@ import { Prop, Ref } from "vue-property-decorator";
 import { ContextMenuItem } from "@/datas";
 import { Vec2 } from "@/utils";
 import { v4 as uuid } from "uuid";
-import GLOBALS from "@/globals";
 @Options({
   components: {
   }
@@ -58,7 +57,7 @@ export default class VContextMenu extends Vue {
   position = new Vec2(0, 0);
   show = false;
   mounted() {
-    GLOBALS.contextMenu.open = this.open;
+    this.$globals.contextMenu = this;
     window.addEventListener("mousedown", (event) => {
       if ((event.target as HTMLElement).parentElement != this.contextMenu) {
         this.select();
