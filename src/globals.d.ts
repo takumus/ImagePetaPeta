@@ -10,7 +10,8 @@ interface GLOBALS {
   }
   browser: {
     open: () => void;
-    close: () => void
+    close: () => void;
+    visible: boolean;
   }
   info: {
     open: () => void

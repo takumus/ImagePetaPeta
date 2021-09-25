@@ -20,12 +20,12 @@
   <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
   <VImageCache />
   <VInfo ref="info"/>
+  <VContextMenu ref="contextMenu"/>
+  <VComplement ref="complement"/>
   <article class="menu">
     <button tabindex="-1" @click="$globals.settings.open">{{$t("home.settingsButton")}}</button>
     <button tabindex="-1" @click="$globals.info.open">{{$t("home.infoButton")}}</button>
   </article>
-  <VContextMenu ref="contextMenu"/>
-  <VComplement ref="complement"/>
 </template>
 
 <style lang="scss">
@@ -113,7 +113,6 @@ export default class App extends Vue {
   boards: Board[] = [];
   currentBoard: Board | null = null;
   imageZIndex = 0;
-  browsing = false;
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<Board>} = {};
@@ -144,9 +143,6 @@ export default class App extends Vue {
         }
       }
     });
-    await this.getAll();
-  }
-  async getAll() {
     await this.getPetaImages();
     await this.getBoards();
   }
@@ -171,7 +167,7 @@ export default class App extends Vue {
         DEFAULT_IMAGE_SIZE,
         petaImage.height * DEFAULT_IMAGE_SIZE
       );
-      if (!this.browsing) {
+      if (!this.$globals.browser.visible) {
         this.addPanel(panel);
       }
     });
@@ -197,7 +193,6 @@ export default class App extends Vue {
   addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
     if (!this.currentBoard) return;
     this.currentBoard.petaPanels.push(petaPanel);
-    this.browsing = false;
     this.vBoard.addPanel(petaPanel, worldPosition);
   }
   selectBoard(board: Board) {
