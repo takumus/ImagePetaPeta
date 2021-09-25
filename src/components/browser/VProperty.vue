@@ -99,7 +99,6 @@ import VPropertyThumbnail from "@/components/browser/VPropertyThumbnail.vue";
 import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
 import { API, log } from "@/api";
 import { Vec2, vec2FromMouseEvent } from "@/utils";
-import GLOBALS from "@/globals";
 import { MAX_PREVIEW_COUNT } from "@/defines";
 @Options({
   components: {

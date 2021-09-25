@@ -104,7 +104,6 @@ import VCrop from "@/components/board/VCrop.vue";
 // Others
 import { Board, BoardTransform, MouseButton, PetaPanel } from "@/datas";
 import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
-import GLOBALS from "@/globals";
 @Options({
   components: {
     VPanel,
