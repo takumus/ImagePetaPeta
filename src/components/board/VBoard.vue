@@ -337,7 +337,7 @@ export default class VBoard extends Vue {
     petaPanel._selected = true;
     if (worldPosition) {
       this.selectedPetaPanels.forEach((pp) => {
-        this.getVPanel(pp)?.startDrag(worldPosition)
+        this.getVPanel(pp)?.startDrag(worldPosition);
       });
     }
   }
