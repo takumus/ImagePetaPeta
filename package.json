@@ -1,16 +1,15 @@
 {
   "name": "ImagePetaPeta-beta",
-  "productName": "ImagePetaPeta-beta",
   "version": "0.3.0-beta",
   "private": true,
   "scripts": {
-    "lint": "vue-cli-service lint",
-    "build": "vue-cli-service electron:build",
     "serve": "yarn generate-licenses && vue-cli-service electron:serve",
-    "prebuild": "rimraf ./dist_electron && yarn generate-licenses",
+    "build": "vue-cli-service electron:build",
+    "lint": "vue-cli-service lint",
+    "generate-licenses": "license-checker --production --json --excludePrivatePackages > ./licenses.json && node ./scripts/generateLicenses.js",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "generate-licenses": "license-checker --production --json --excludePrivatePackages > ./licenses.json && node ./scripts/generateLicenses.js",
+    "prebuild": "rimraf ./dist_electron && yarn generate-licenses",
     "release": "node ./scripts/release.js"
   },
   "main": "background.js",
@@ -30,7 +29,8 @@
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
     "vue-i18n": "^9.2.0-beta.6",
-    "vue-property-decorator": "^9.1.2"
+    "vue-property-decorator": "^9.1.2",
+    "vuex": "^4.0.0-0"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",
@@ -39,6 +39,7 @@
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
@@ -52,6 +53,7 @@
     "typescript": "~4.1.5",
     "vue-cli-plugin-electron-builder": "~2.1.1"
   },
+  "productName": "ImagePetaPeta-beta",
   "volta": {
     "node": "16.7.0"
   }

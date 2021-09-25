@@ -1624,7 +1624,7 @@
   optionalDependencies:
     fork-ts-checker-webpack-plugin-v5 "npm:fork-ts-checker-webpack-plugin@^5.0.11"
 
-"@vue/cli-plugin-vuex@^4.5.13":
+"@vue/cli-plugin-vuex@^4.5.13", "@vue/cli-plugin-vuex@~4.5.0":
   version "4.5.13"
   resolved "https://registry.yarnpkg.com/@vue/cli-plugin-vuex/-/cli-plugin-vuex-4.5.13.tgz#98646d8bc1e69cf6c6a6cba2fed3eace0356c360"
   integrity sha512-I1S9wZC7iI0Wn8kw8Zh+A2Qkf6s1M6vTGBkx8boXjuzfwEEyEHRxadsVCecZc8Mkpydo0nykj+MyYF96TKFuVA==
@@ -1777,7 +1777,7 @@
   optionalDependencies:
     prettier "^1.18.2"
 
-"@vue/devtools-api@^6.0.0-beta.13":
+"@vue/devtools-api@^6.0.0-beta.11", "@vue/devtools-api@^6.0.0-beta.13":
   version "6.0.0-beta.18"
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.18.tgz#84c0aff9289a57294cb97490811f69e8a0a67f8a"
   integrity sha512-56vRhO7nXWWFYTx520BQSDlQH5VYpwy62hFDEqi2yHHEBpEqseOP5WYQusq7BEW3DXSY9E9cfPVR5CFtJbKuMg==
@@ -10715,6 +10715,13 @@ vue@^3.0.0:
     "@vue/compiler-dom" "3.2.8"
     "@vue/runtime-dom" "3.2.8"
     "@vue/shared" "3.2.8"
+
+vuex@^4.0.0-0:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-4.0.2.tgz#f896dbd5bf2a0e963f00c67e9b610de749ccacc9"
+  integrity sha512-M6r8uxELjZIK8kTKDGgZTYX/ahzblnzC4isU1tpmEuOIIKmV+TRdc+H4s8ds2NuZ7wpUTdGRzJRtoj+lI+pc0Q==
+  dependencies:
+    "@vue/devtools-api" "^6.0.0-beta.11"
 
 watchpack-chokidar2@^2.0.1:
   version "2.0.1"

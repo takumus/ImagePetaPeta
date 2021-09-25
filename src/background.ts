@@ -300,10 +300,10 @@ import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "./defines";
       }
     });
   }
-  function getImagePathFromFilename(fileName: string, thumbnail: boolean = false) {
+  function getImagePathFromFilename(fileName: string, thumbnail = false) {
     return path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
   }
-  function getImagePath(petaImage: PetaImage, thumbnail: boolean = false) {
+  function getImagePath(petaImage: PetaImage, thumbnail = false) {
     return getImagePathFromFilename(petaImage.fileName, thumbnail);
   }
   function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {

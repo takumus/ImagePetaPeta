@@ -12,6 +12,7 @@
 <style lang="scss" scoped>
 .context-menu-root {
   position: fixed;
+  z-index: 5;
   background-color: #333333;
   padding: 0px;
   margin: 0px;

@@ -24,12 +24,8 @@
     <button tabindex="-1" @click="$globals.settings.open">{{$t("home.settingsButton")}}</button>
     <button tabindex="-1" @click="$globals.info.open">{{$t("home.infoButton")}}</button>
   </article>
-  <article class="context-menu">
-    <VContextMenu ref="contextMenu"/>
-  </article>
-  <article class="complement">
-    <VComplement ref="complement"/>
-  </article>
+  <VContextMenu ref="contextMenu"/>
+  <VComplement ref="complement"/>
 </template>
 
 <style lang="scss">
@@ -68,14 +64,6 @@ body, html {
   left: 0px;
   text-align: right;
   padding: 8px;
-}
-.complement {
-  position: fixed;
-  z-index: 5;
-}
-.context-menu {
-  position: fixed;
-  z-index: 6;
 }
 @import url("./styles/shared.scss");
 </style>
@@ -146,7 +134,7 @@ export default class App extends Vue {
       this.getPetaImages();
     });
     API.on("updatePetaImage", (e, petaImage) => {
-      log("on updatePetaImage", petaImage.id);
+      // log("on updatePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
     API.send("checkUpdate").then(async (result) => {
