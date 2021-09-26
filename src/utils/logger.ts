@@ -6,7 +6,7 @@ export default class Logger {
     this.logFile = createWriteStream(path, { flags: "a" });
   }
   log(from: LogFrom, ...args: any[]) {
-    const date = `[${from}](${new Date().toISOString().replace('T', " ").replace(/....Z/g, "")})`;
+    const date = `[${from}](${new Date().toLocaleString().replace(/....Z/g, "")})`;
     console.log(date, ...args);
     this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n");
   }
