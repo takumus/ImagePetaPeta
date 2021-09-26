@@ -26,7 +26,6 @@
   <article class="menu">
     <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
     <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
-    {{$keyboards.ctrl}}
   </article>
 </template>
 
@@ -123,6 +122,7 @@ export default class App extends Vue {
   boardUpdaters: {[key: string]: DelayUpdater<Board>} = {};
   async mounted() {
     log("INIT RENDERER!");
+    await this.getSettings();
     this.$globalComponents.importImages = () => {
       API.send("browseImages");
     }
@@ -216,6 +216,12 @@ export default class App extends Vue {
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
+  }
+  async getSettings() {
+    const settings = await API.send("getSettings");
+    Object.keys(settings).forEach((key) => {
+      (this.$settings as any)[key] = (settings as any)[key];
+    });
   }
   async removeBoard(board: Board) {
     if (await API.send("dialog", this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {

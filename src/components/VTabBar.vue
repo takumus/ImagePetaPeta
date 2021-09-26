@@ -72,6 +72,7 @@
   text-align: left;
   width: 100%;
   background-color: #eeeeee;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   line-height: 1.0em;
   font-size: 1.0em;
   display: flex;

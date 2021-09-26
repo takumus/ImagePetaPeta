@@ -83,7 +83,9 @@ const ja = {
     licenses: "ライセンス情報"
   },
   settings: {
-    settings: "設定"
+    settings: "設定",
+    lowMemoryMode: "省メモリモード",
+    lowMemoryModeDescriptions: "メモリの使用量は少なくなりますが、ブラウザのパフォーマンスは落ちます。"
   }
 };
 export default ja;

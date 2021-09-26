@@ -1,8 +1,6 @@
 import { app, ipcMain, dialog, IpcMainInvokeEvent, shell } from "electron";
 import * as path from "path";
-import * as fs from "fs";
 import * as asyncFile from "@/utils/asyncFile";
-import Nedb from "nedb";
 import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
@@ -16,16 +14,18 @@ import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
-import { LogFrom } from "./datas/logFrom";
-import { AddImageResult } from "./datas/addImageResult";
+import { LogFrom } from "@/datas/logFrom";
+import { AddImageResult } from "@/datas/addImageResult";
 import DB from "@/utils/db";
 import Logger from "@/utils/logger";
+import { Settings } from "@/datas/settings";
+import { defaultSettings } from "@/utils/settings";
+import Config from "@/utils/config";
 (async () => {
   const window = await initWindow();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
-  const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   await asyncFile.mkdir(DIR_ROOT).catch((err) => {
     //
   });
@@ -35,8 +35,22 @@ import Logger from "@/utils/logger";
   await asyncFile.mkdir(DIR_THUMBNAILS).catch((err) => {
     //
   });
+  const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
   const boardsDB = new DB<Board>(path.resolve(DIR_ROOT, "boards.db"));
+  const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
+  logger.mainLog("#Load Settings");
+  settingsConfig.load().then(() => {
+    logger.mainLog("settings loaded");
+  }).catch((e) => {
+    logger.mainLog("settings load error:", e);
+    settingsConfig.data = defaultSettings;
+    settingsConfig.save().then(() => {
+      logger.mainLog("recreate settings");
+    }).catch((e) => {
+      logger.mainLog("cannot recreate settings");
+    })
+  });
   const mainFunctions: MainFunctions = {
     browseImages: async () => {
       logger.mainLog("#Browse Images");
@@ -224,6 +238,27 @@ import Logger from "@/utils/logger";
         current: "0.0.0",
         latest: "0.0.0"
       };
+    },
+    updateSettings: async (event, settings) => {
+      try {
+        logger.mainLog("#Update Settings");
+        settingsConfig.data = settings;
+        await settingsConfig.save();
+        logger.mainLog("return:", true);
+        return true;
+      } catch(e) {
+        logger.mainLog(e);
+      }
+      return false;
+    },
+    getSettings: async (event) => {
+      try {
+        logger.mainLog("#Get Settings");
+        return settingsConfig.data;
+      } catch(e) {
+        logger.mainLog(e);
+      }
+      return defaultSettings;
     }
   }
   Object.keys(mainFunctions).forEach((key) => {

@@ -1,9 +1,9 @@
 <template>
-  <article class="board-root" ref="boardRoot">
+  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: $settings.backgroundFillColor }">
     <section ref="panelsWrapper" class="panels-wrapper">
       <section ref="panelsBackground" class="panels-background">
-        <div class="line vertical" :style="{ transform: `translateX(${centerX})` }"></div>
-        <div class="line horizontal" :style="{ transform: `translateY(${centerY})` }"></div>
+        <div class="line vertical" :style="{ transform: `translateX(${centerX})`, backgroundColor: $settings.backgroundLineColor }"></div>
+        <div class="line horizontal" :style="{ transform: `translateY(${centerY})`, backgroundColor: $settings.backgroundLineColor }"></div>
       </section>
       <section class="panels" :style="{
         transform: `translate(${transform.position.x}px, ${transform.position.y}px)`

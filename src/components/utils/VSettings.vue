@@ -2,6 +2,16 @@
   <VModal :visible="visible" :center="true" :zIndex="3">
     <article class="settings-root">
       <p>{{$t("settings.settings")}}</p>
+      <input
+        type="color"
+        :value="$settings.backgroundFillColor"
+        @input="$settings.backgroundFillColor = $event.target.value"
+      >
+      <input
+        type="color"
+        :value="$settings.backgroundLineColor"
+        @input="$settings.backgroundLineColor = $event.target.value"
+      >
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>
@@ -20,14 +30,16 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VModal from "@/components/VModal.vue";
+import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/api";
 @Options({
   components: {
-    VModal
+    VModal,
+    VEditableLabel
   },
 })
 export default class VSettings extends Vue {
@@ -40,6 +52,10 @@ export default class VSettings extends Vue {
   }
   close() {
     this.visible = false;
+  }
+  @Watch("$settings", { deep: true })
+  updateBackgroundColor() {
+    API.send("updateSettings", this.$settings);
   }
 }
 </script>

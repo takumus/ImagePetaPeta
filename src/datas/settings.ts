@@ -2,5 +2,6 @@ export interface Settings {
   windowWidth: number,
   windowHeight: number,
   dbDirectory: string,
-  backgroundColor: string
+  backgroundFillColor: string,
+  backgroundLineColor: string
 }

@@ -3,6 +3,7 @@ import { PetaImage, PetaImages } from '@/datas/petaImage';
 import { UpdateMode } from '@/datas/updateMode';
 import { AppInfo } from '@/datas/appInfo';
 import { IpcMainInvokeEvent } from 'electron';
+import { Settings } from '@/datas/settings';
 export interface Main {
   browseImages: () => Promise<number>;
   importImageFromURL: (url: string) => Promise<string>;
@@ -28,6 +29,9 @@ export interface Main {
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
   // checkUpdate
   checkUpdate: () => Promise<{ current: string, latest: string }>;
+  // updateSettings
+  updateSettings: (settings: Settings) => Promise<boolean>;
+  getSettings: () => Promise<Settings>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>
