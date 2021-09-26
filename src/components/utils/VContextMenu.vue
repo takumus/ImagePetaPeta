@@ -58,7 +58,7 @@ export default class VContextMenu extends Vue {
   position = new Vec2(0, 0);
   show = false;
   mounted() {
-    this.$globals.contextMenu = this;
+    this.$globalComponents.contextMenu = this;
     window.addEventListener("mousedown", (event) => {
       if ((event.target as HTMLElement).parentElement != this.contextMenu) {
         this.select();

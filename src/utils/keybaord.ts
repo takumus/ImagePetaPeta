@@ -1,41 +1,42 @@
 import { ref } from "vue";
-export const Keyboards = {
-  shift: ref(false),
-  ctrl: ref(false),
-  cmd: ref(false),
-  delete: ref(false),
-  current: ref("")
-};
+import { reactive } from "vue";
+export const Keyboards = reactive({
+  shift: false,
+  ctrl: false,
+  cmd: false,
+  delete: false,
+  current: ""
+});
 export function initKeyboards() {
   window.addEventListener("keydown", (e) => {
     switch(e.key.toLowerCase()) {
       case "shift":
-        Keyboards.shift.value = true;
+        Keyboards.shift = true;
         break;
       case "control":
-        Keyboards.ctrl.value = true;
+        Keyboards.ctrl = true;
         break;
       case "backspace":
       case "delete":
-        Keyboards.delete.value = true;
+        Keyboards.delete = true;
         break;
     }
-    Keyboards.current.value = e.key.toLowerCase();
+    Keyboards.current = e.key.toLowerCase();
   });
   window.addEventListener("keyup", (e) => {
     switch(e.key.toLowerCase()) {
       case "shift":
-        Keyboards.shift.value = false;
+        Keyboards.shift = false;
         break;
       case "control":
-        Keyboards.ctrl.value = false;
+        Keyboards.ctrl = false;
         break;
       case "backspace":
       case "delete":
-        Keyboards.delete.value = false;
+        Keyboards.delete = false;
         break;
     }
-    if (Keyboards.current.value == e.key.toLowerCase()) Keyboards.current.value = "";
+    if (Keyboards.current == e.key.toLowerCase()) Keyboards.current = "";
   });
 }
 declare module '@vue/runtime-core' {

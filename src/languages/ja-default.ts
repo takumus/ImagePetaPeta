@@ -81,6 +81,9 @@ const ja = {
     issuesButton: "バグ/要望",
     dbFolderButton: "データベースフォルダ",
     licenses: "ライセンス情報"
+  },
+  settings: {
+    settings: "設定"
   }
 };
 export default ja;

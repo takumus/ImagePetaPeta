@@ -183,10 +183,10 @@ export default class VProperty extends Vue {
     })
   }
   complementTag(event: FocusEvent) {
-    this.$globals.complement.open(event.target as HTMLInputElement, this.allTags);
+    this.$globalComponents.complement.open(event.target as HTMLInputElement, this.allTags);
   }
   tagMenu(event: MouseEvent, tag: string) {
-    this.$globals.contextMenu.open([
+    this.$globalComponents.contextMenu.open([
       {
         label: this.$t("browser.property.tagMenu.remove", [tag]),
         click: () => {

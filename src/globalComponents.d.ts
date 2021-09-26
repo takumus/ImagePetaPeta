@@ -25,6 +25,6 @@ interface GLOBALS {
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
-    $globals: GLOBALS;
+    $globalComponents: GLOBALS;
   }
 }

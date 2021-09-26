@@ -49,13 +49,13 @@
     <span class="buttons">
       <button
         tabindex="-1"
-        @click="$globals.importImages"
+        @click="$globalComponents.importImages"
       >
         {{$t("home.importImagesButton")}}
       </button>
       <button
         tabindex="-1"
-        @click="$globals.browser.open()"
+        @click="$globalComponents.browser.open()"
       >
         {{$t("home.openBrowserButton")}}
       </button>
@@ -195,7 +195,7 @@ export default class VTabBar extends Vue {
     this.beforeSortSelectedIndex = this.selectedIndex;
   }
   menu(event: MouseEvent, board: Board) {
-    this.$globals.contextMenu.open([{
+    this.$globalComponents.contextMenu.open([{
       label: this.$t("tab.menu.remove", [board.name]),
       click: () => {
         this.removeBoard(board);

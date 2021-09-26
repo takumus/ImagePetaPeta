@@ -20,11 +20,13 @@
   <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
   <VImageCache />
   <VInfo ref="info"/>
-  <VContextMenu ref="contextMenu"/>
-  <VComplement ref="complement"/>
+  <VSettings />
+  <VContextMenu />
+  <VComplement />
   <article class="menu">
-    <button tabindex="-1" @click="$globals.settings.open">{{$t("home.settingsButton")}}</button>
-    <button tabindex="-1" @click="$globals.info.open">{{$t("home.infoButton")}}</button>
+    <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
+    <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
+    {{$keyboards.ctrl}}
   </article>
 </template>
 
@@ -82,6 +84,7 @@ import VTabBar from "@/components/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
 import VInfo from "@/components/utils/VInfo.vue";
+import VSettings from "@/components/utils/VSettings.vue";
 // Others
 import { API, log } from "@/api";
 import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
@@ -102,7 +105,8 @@ import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
     VTabBar,
     VContextMenu,
     VComplement,
-    VInfo
+    VInfo,
+    VSettings
   },
 })
 export default class App extends Vue {
@@ -110,10 +114,6 @@ export default class App extends Vue {
   vBoard!: VBoard;
   @Ref("vTabBar")
   vTabBar!: VTabBar;
-  @Ref("contextMenu")
-  contextMenu!: VContextMenu;
-  @Ref("info")
-  info!: VInfo;
   petaImages: PetaImages = {};
   boards: Board[] = [];
   currentBoard: Board | null = null;
@@ -123,7 +123,7 @@ export default class App extends Vue {
   boardUpdaters: {[key: string]: DelayUpdater<Board>} = {};
   async mounted() {
     log("INIT RENDERER!");
-    this.$globals.importImages = () => {
+    this.$globalComponents.importImages = () => {
       API.send("browseImages");
     }
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
@@ -172,7 +172,7 @@ export default class App extends Vue {
         DEFAULT_IMAGE_SIZE,
         petaImage.height * DEFAULT_IMAGE_SIZE
       );
-      if (!this.$globals.browser.visible) {
+      if (!this.$globalComponents.browser.visible) {
         this.addPanel(panel);
       }
     });
@@ -203,7 +203,7 @@ export default class App extends Vue {
   selectBoard(board: Board) {
     log("Board Selected", board.name);
     if (this.currentBoard) {
-      this.$globals
+      this.$globalComponents
       this.updateBoard(this.currentBoard, true);
     }
     this.currentBoard = board;

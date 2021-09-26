@@ -62,7 +62,7 @@ export default class VInfo extends Vue {
     version: ""
   }
   async mounted() {
-    this.$globals.info = this;
+    this.$globalComponents.info = this;
     this.appInfo = await API.send("getAppInfo");
   }
   get licenses() {

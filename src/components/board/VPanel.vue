@@ -267,7 +267,7 @@ export default class VPanel extends Vue {
         this.currentRotation += rotation - this.rotateOffset;
         this.rotateOffset = rotation;
         this.petaPanel.rotation = this.currentRotation;
-        if (this.$keyboards.shift.value) {
+        if (this.$keyboards.shift) {
           this.fitRotation();
         }
         break;

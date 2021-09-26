@@ -196,10 +196,10 @@ export default class VBoard extends Vue {
     if (e.button == MouseButton.RIGHT) {
       this.dragging = false;
       if (this.click.isClick && e.target == this.panelsBackground) {
-        this.$globals.contextMenu.open([{
+        this.$globalComponents.contextMenu.open([{
           label: this.$t("boards.menu.openBrowser"),
           click: () => {
-            this.$globals.browser.open();
+            this.$globalComponents.browser.open();
           }
         }, { separate: true }, {
           label: this.$t("boards.menu.resetPosition"),
@@ -247,7 +247,7 @@ export default class VBoard extends Vue {
     this.board.petaPanels = this.board.petaPanels.filter((pp) => !pp._selected);
   }
   petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
-    this.$globals.contextMenu.open([{
+    this.$globalComponents.contextMenu.open([{
       label: this.$t("boards.panelMenu.crop"),
       click: () => {
         this.editCrop(petaPanel);
@@ -303,7 +303,7 @@ export default class VBoard extends Vue {
     this.croppingPetaPanel = null;
   }
   pressPetaPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
-    if (!this.$keyboards.shift.value && (this.selectedPetaPanels.length <= 1 || !petaPanel._selected)) {
+    if (!this.$keyboards.shift && (this.selectedPetaPanels.length <= 1 || !petaPanel._selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
       this.toFront(petaPanel);
@@ -323,13 +323,13 @@ export default class VBoard extends Vue {
   clickPetaPanel(petaPanel: PetaPanel) {
     this.clearSelectionAll();
     petaPanel._selected = true;
-    if (!this.$keyboards.shift.value) {
+    if (!this.$keyboards.shift) {
       // シフトなしの場合最前へ。
       this.toFront(petaPanel);
     }
   }
   clearSelectionAll(force = false) {
-    if (!this.$keyboards.shift.value || force) {
+    if (!this.$keyboards.shift || force) {
       this.board.petaPanels.forEach((p) => {
         p._selected = false;
       });
@@ -372,7 +372,7 @@ export default class VBoard extends Vue {
     }
     return transform;
   }
-  @Watch("$keyboards.delete.value")
+  @Watch("$keyboards.delete")
   keyDelete(value: boolean) {
     if (value) {
       this.removeSelectedPanels();

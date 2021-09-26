@@ -238,7 +238,7 @@ export default class VBrowser extends Vue {
     this.imagesResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.images);
 
-    this.$globals.browser = this;
+    this.$globalComponents.browser = this;
   }
   unmounted() {
     this.images.removeEventListener("scroll", this.updateScrollArea);
@@ -374,10 +374,10 @@ export default class VBrowser extends Vue {
     }
   }
   complementTag(event: FocusEvent) {
-    this.$globals.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
+    this.$globalComponents.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
   }
   tagMenu(event: MouseEvent, tag: string) {
-    this.$globals.contextMenu.open([
+    this.$globalComponents.contextMenu.open([
       {
         label: this.$t("browser.tagMenu.remove", [tag]),
         click: () => {
@@ -434,7 +434,7 @@ export default class VBrowser extends Vue {
   }
   petaImageMenu(thumb: PetaThumbnail, position: Vec2) {
     thumb.petaImage._selected = true;
-    this.$globals.contextMenu.open([
+    this.$globalComponents.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
