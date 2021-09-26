@@ -1,6 +1,4 @@
-'use strict'
-
-import { app, protocol, BrowserWindow, contextBridge, ipcRenderer, ipcMain, dialog, IpcMainInvokeEvent } from "electron"
+import { app, protocol, BrowserWindow } from "electron"
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib"
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer"
 import * as path from "path";

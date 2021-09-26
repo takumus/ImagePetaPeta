@@ -18,11 +18,13 @@ import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { LogFrom } from "./datas/logFrom";
 import { AddImageResult } from "./datas/addImageResult";
+import Logger from "@/utils/logger";
 (async () => {
-  const win = await initWindow();
+  const window = await initWindow();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
+  const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   await asyncFile.mkdir(DIR_ROOT).catch((err) => {
     //
   });
@@ -40,87 +42,86 @@ import { AddImageResult } from "./datas/addImageResult";
     filename: path.resolve(DIR_ROOT, "boards.db"),
     autoload: true
   });
-  const logFile = fs.createWriteStream(path.resolve(DIR_ROOT, "logs.log"), {flags: "a"});
-  const mainAPIs: MainFunctions = {
+  const mainFunctions: MainFunctions = {
     browseImages: async () => {
-      mainLog("#Browse Images");
-      const file = await dialog.showOpenDialog(win, { properties: ['openFile', 'multiSelections'] });
+      logger.mainLog("#Browse Images");
+      const file = await dialog.showOpenDialog(window, { properties: ['openFile', 'multiSelections'] });
       if (file.canceled) {
-        mainLog("canceled");
+        logger.mainLog("canceled");
         return 0;
       }
-      mainLog("return:", file.filePaths.length);
+      logger.mainLog("return:", file.filePaths.length);
       importImages(file.filePaths);
       return file.filePaths.length;
     },
     importImageFromURL: async (event, url) => {
       try {
         sendToRenderer("importImagesBegin", 1);
-        mainLog("#Import Image From URL");
+        logger.mainLog("#Import Image From URL");
         let data: Buffer;
         if (url.trim().indexOf("http") != 0) {
           // dataURIだったら
-          mainLog("data uri");
+          logger.mainLog("data uri");
           data = dataURIToBuffer(url);
         } else {
           // 普通のurlだったら
-          mainLog("normal url:", url);
+          logger.mainLog("normal url:", url);
           data = (await axios.get(url, { responseType: 'arraybuffer' })).data;
         }
         const extName = "." + imageFormatToExtention((await sharp(data).metadata()).format);
         if (!extName) {
-          mainLog("invalid image file");
+          logger.mainLog("invalid image file");
           throw new Error("invalid image file");
         }
         const now = new Date();
         const addResult = await addImage(data, now.toLocaleString(), extName, now, now);
         sendToRenderer("importImagesProgress", 1, url, addResult.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
         sendToRenderer("importImagesComplete", 1, 1);
-        mainLog("return: ", minimId(addResult.petaImage.id));
+        logger.mainLog("return: ", minimId(addResult.petaImage.id));
         return addResult.petaImage.id;
       } catch (err) {
-        mainLog("error: ", err);
+        logger.mainLog("error: ", err);
         sendToRenderer("importImagesProgress", 1, url, ImportImageResult.ERROR);
         sendToRenderer("importImagesComplete", 1, 0);
       }
       return "";
     },
     importImagesFromFilePaths: async (event, filePaths) =>{
-      mainLog("#Import Images From File Paths");
+      logger.mainLog("#Import Images From File Paths");
       const images = (await importImages(filePaths)).map((image) => image.id);
-      mainLog("return:", true);
+      logger.mainLog("return:", true);
       return images;
     },
     getPetaImages: async (event) => {
-      mainLog("#Get Peta Images");
+      logger.mainLog("#Get Peta Images");
       return new Promise((res, rej) => {
         petaImagesDB.find({}).exec((err, data) => {
           if (err) {
             rej(err.message);
-            mainLog("error:", err.message);
+            logger.mainLog("error:", err.message);
             return {};
           }
           const petaImages: PetaImages = {};
           data.forEach((pi) => {
             petaImages[pi.id] = pi;
           });
-          mainLog("return:", data.length);
+          logger.mainLog("return:", data.length);
           res(petaImages);
         });
       });
     },
     getPetaImageBinary: async (event, data, thumbnail) => {
-      mainLog("#Get Peta Image Binary");
-      mainLog("id:", minimId(data.id));
+      logger.mainLog("#Get Peta Image Binary");
+      logger.mainLog("id:", minimId(data.id));
       return new Promise((res, rej) => {
         const buffer = asyncFile.readFile(getImagePath(data, thumbnail))
         .then((buffer) => {
-          mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
+          logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
           res(buffer);
         })
         .catch((err) => {
           if (err) {
-            mainLog("error:", err, minimId(data.id));
+            logger.mainLog("error:", err, minimId(data.id));
             rej(err.message);
             return;
           }
@@ -128,69 +129,69 @@ import { AddImageResult } from "./datas/addImageResult";
       });
     },
     updatePetaImages: async (event, datas, mode) => {
-      mainLog("#Update Peta Images");
+      logger.mainLog("#Update Peta Images");
       try {
         for (let i = 0; i < datas.length; i ++) {
           await updatePetaImage(datas[i], mode);
         }
       } catch (err) {
-        mainLog("error:", err);
+        logger.mainLog("error:", err);
       }
       if (mode != UpdateMode.UPDATE) {
         sendToRenderer("updatePetaImages");
       }
-      mainLog("return:", true);
+      logger.mainLog("return:", true);
       return true;
     },
     getBoards: async (event) => {
-      mainLog("#Get Boards");
+      logger.mainLog("#Get Boards");
       return new Promise((res, rej) => {
         boardsDB.find({}).exec(async (err, data) => {
           if (err) {
-            mainLog("error:", err.message);
+            logger.mainLog("error:", err.message);
             rej(err.message);
             return;
           }
           if (data.length == 0) {
-            mainLog("no boards");
+            logger.mainLog("no boards");
             const board = createBoard(DEFAULT_BOARD_NAME);
             try {
               await updateBoard(board, UpdateMode.INSERT);
             } catch(err) {
-              mainLog("error:", err);
+              logger.mainLog("error:", err);
               rej(err);
             }
             data.push(board);
-            mainLog("return:", data.length);
+            logger.mainLog("return:", data.length);
             res(data);
           } else {
-            mainLog("return:", data.length);
+            logger.mainLog("return:", data.length);
             res(data);
           }
         });
       });
     },
     updateBoards: async (event, boards, mode) => {
-      mainLog("#Update Boards");
+      logger.mainLog("#Update Boards");
       try {
         for (let i = 0; i < boards.length; i ++) {
           await updateBoard(boards[i], mode);
         }
       } catch (err) {
-        mainLog("error:", err);
+        logger.mainLog("error:", err);
         return false;
       }
-      mainLog("return:", true);
+      logger.mainLog("return:", true);
       return true;
     },
     log: async (event, ...args: any) => {
-      log(LogFrom.RENDERER, ...args);
+      logger.log(LogFrom.RENDERER, ...args);
       return true;
     },
     dialog: async (event, message, buttons) => {
-      mainLog("#Dialog");
-      mainLog("dialog:", message, buttons);
-      const value = await dialog.showMessageBox(win, {
+      logger.mainLog("#Dialog");
+      logger.mainLog("dialog:", message, buttons);
+      const value = await dialog.showMessageBox(window, {
         title: "Petapeta",
         message: message,
         buttons: buttons
@@ -198,43 +199,43 @@ import { AddImageResult } from "./datas/addImageResult";
       return value.response;
     },
     openURL: async (event, url) => {
-      mainLog("#Open URL");
-      mainLog("url:", url);
+      logger.mainLog("#Open URL");
+      logger.mainLog("url:", url);
       shell.openExternal(url);
       return true;
     },
     getAppInfo: async (event) => {
-      mainLog("#Get App Info");
+      logger.mainLog("#Get App Info");
       const info = {
         name: app.getName(),
         version: app.getVersion()
       };
-      mainLog("return:", info);
+      logger.mainLog("return:", info);
       return info;
     },
     showDBFolder: async (event) => {
-      mainLog("#Show DB Folder");
+      logger.mainLog("#Show DB Folder");
       shell.showItemInFolder(DIR_ROOT);
       return true;
     },
     showImageInFolder: async (event, petaImage) => {
-      mainLog("#Show Image In Folder");
+      logger.mainLog("#Show Image In Folder");
       shell.showItemInFolder(getImagePath(petaImage, false));
       return true;
     },
     checkUpdate: async (event) => {
-      mainLog("#Check Update");
-      mainLog("url:", PACKAGE_JSON_URL);
-      mainLog("currentVersion:", app.getVersion());
+      logger.mainLog("#Check Update");
+      logger.mainLog("url:", PACKAGE_JSON_URL);
+      logger.mainLog("currentVersion:", app.getVersion());
       try {
         const packageJSON = (await axios.get(PACKAGE_JSON_URL, { responseType: "json" })).data;
-        mainLog("latestVersion:", packageJSON.version);
+        logger.mainLog("latestVersion:", packageJSON.version);
         return {
           current: app.getVersion(),
           latest: packageJSON.version
         }
       } catch(e) {
-        mainLog("error:", e);
+        logger.mainLog("error:", e);
       }
       return {
         current: app.getVersion(),
@@ -242,31 +243,31 @@ import { AddImageResult } from "./datas/addImageResult";
       }
     }
   }
-  Object.keys(mainAPIs).forEach((key) => {
-    ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainAPIs as any)[key](e, ...args));
+  Object.keys(mainFunctions).forEach((key) => {
+    ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
   });
   function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {
-    mainLog(" ##Update Peta Image");
-    mainLog(" mode:", mode);
-    mainLog(" image:", minimId(petaImage.id));
+    logger.mainLog(" ##Update Peta Image");
+    logger.mainLog(" mode:", mode);
+    logger.mainLog(" image:", minimId(petaImage.id));
     petaImage._selected = false;
     petaImage.tags = Array.from(new Set(petaImage.tags));
     return new Promise((res, rej) => {
       if (mode == UpdateMode.REMOVE) {
         petaImagesDB.remove({ id: petaImage.id }, {}, (err) => {
           if (err) {
-            mainLog(" failed to remove", err.message);
+            logger.mainLog(" failed to remove", err.message);
             rej(err.message);
           } else {
             asyncFile.rm(getImagePath(petaImage)).then(() => {
-              mainLog(" removed fullsize");
+              logger.mainLog(" removed fullsize");
             }).catch((err) => {
-              mainLog(" failed to removed fullsize");
+              logger.mainLog(" failed to removed fullsize");
             });
             asyncFile.rm(getImagePath(petaImage, true)).then(() => {
-              mainLog(" removed thumbnail");
+              logger.mainLog(" removed thumbnail");
             }).catch((err) => {
-              mainLog(" failed to removed thumbnail");
+              logger.mainLog(" failed to removed thumbnail");
             });
           }
         });
@@ -274,10 +275,10 @@ import { AddImageResult } from "./datas/addImageResult";
         if (petaImage.addDate)
         petaImagesDB.update({ id: petaImage.id }, petaImage, { upsert: mode == UpdateMode.INSERT }, (err) => {
           if (err) {
-            mainLog(" failed to update:", err.message);
+            logger.mainLog(" failed to update:", err.message);
             rej(err.message);
           } else {
-            mainLog(" updated");
+            logger.mainLog(" updated");
             res(true);
             sendToRenderer("updatePetaImage", petaImage);
           }
@@ -286,27 +287,27 @@ import { AddImageResult } from "./datas/addImageResult";
     })
   }
   function updateBoard(board: Board, mode: UpdateMode): Promise<boolean> {
-    mainLog(" ##Update Board");
-    mainLog(" mode:", mode);
-    mainLog(" board:", minimId(board.id));
+    logger.mainLog(" ##Update Board");
+    logger.mainLog(" mode:", mode);
+    logger.mainLog(" board:", minimId(board.id));
     return new Promise((res, rej) => {
       if (mode == UpdateMode.REMOVE) {
         boardsDB.remove({ id: board.id }, {}, (err) => {
           if (err) {
-            mainLog(" failed to remove", err.message);
+            logger.mainLog(" failed to remove", err.message);
             rej(err.message);
           } else {
-            mainLog(" removed");
+            logger.mainLog(" removed");
             res(true);
           }
         });
       } else {
         boardsDB.update({ id: board.id }, board, { upsert: mode == UpdateMode.INSERT }, (err) => {
           if (err) {
-            mainLog(" failed to update:", err.message);
+            logger.mainLog(" failed to update:", err.message);
             rej(err.message);
           } else {
-            mainLog(" updated");
+            logger.mainLog(" updated");
             res(true);
           }
         });
@@ -320,18 +321,18 @@ import { AddImageResult } from "./datas/addImageResult";
     return getImagePathFromFilename(petaImage.fileName, thumbnail);
   }
   function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
-    win.webContents.send(key, ...args);
+    window.webContents.send(key, ...args);
   }
   async function importImages(filePaths: string[]) {
     sendToRenderer("importImagesBegin", filePaths.length);
-    mainLog(" ##Import Images");
-    mainLog(" files:", filePaths.length);
+    logger.mainLog(" ##Import Images");
+    logger.mainLog(" files:", filePaths.length);
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
     const addDate = new Date();
     for (let i = 0; i < filePaths.length; i++) {
       const filePath = filePaths[i];
-      mainLog(" import:", i + 1, "/", filePaths.length);
+      logger.mainLog(" import:", i + 1, "/", filePaths.length);
       let result = ImportImageResult.SUCCESS;
       try {
         const data = await asyncFile.readFile(filePath);
@@ -345,14 +346,14 @@ import { AddImageResult } from "./datas/addImageResult";
         }
         // success
         addedFileCount++;
-        mainLog(" imported", name, result);
+        logger.mainLog(" imported", name, result);
       } catch (err) {
-        mainLog(" error:", err);
+        logger.mainLog(" error:", err);
         result = ImportImageResult.ERROR;
       }
       sendToRenderer("importImagesProgress", (i + 1) / filePaths.length, filePath, result);
     }
-    mainLog(" return:", addedFileCount, "/", filePaths.length);
+    logger.mainLog(" return:", addedFileCount, "/", filePaths.length);
     sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
     return petaImages;
   }
@@ -396,14 +397,6 @@ import { AddImageResult } from "./datas/addImageResult";
       petaImage: petaImage,
       exists: false
     };
-  }
-  function log(from: LogFrom, ...args: any[]) {
-    const date = `[${from}](${new Date().toISOString().replace('T', " ").replace(/....Z/g, "")})`;
-    console.log(date, ...args);
-    logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n");
-  }
-  function mainLog(...args: any[]) {
-    log(LogFrom.MAIN, ...args);
   }
   function minimId(id: string) {
     return id.substr(0, 6);
