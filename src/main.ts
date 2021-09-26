@@ -4,9 +4,8 @@ import languages from "@/languages";
 import App from "@/App.vue"
 import GlboalKeyboard from "@/globals/globalKeyboard";
 import GlobalSettings from "@/globals/globalSettings";
-import store from './store';
 
-const app = createApp(App).use(store);
+const app = createApp(App);
 const i18n = createI18n({
   locale: 'ja',
   messages: languages,
