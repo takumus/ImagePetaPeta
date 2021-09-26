@@ -9,7 +9,7 @@ import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
 import { initWindow } from "@/window";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { addBoardProperties, Board, createBoard } from "@/datas/board";
+import { addPetaBoardProperties, PetaBoard, createPetaBoard } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { Renderer } from "@/api/renderer";
@@ -38,7 +38,7 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
   });
   const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
-  const boardsDB = new DB<Board>(path.resolve(DIR_ROOT, "boards.db"));
+  const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
   const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
   logger.mainLog("#Load Settings");
   settingsConfig.load().then(() => {
@@ -149,21 +149,21 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
       logger.mainLog("return:", true);
       return true;
     },
-    getBoards: async (event) => {
+    getPetaBoards: async (event) => {
       try {
-        logger.mainLog("#Get Boards");
+        logger.mainLog("#Get PetaBoards");
         const data = await boardsDB.find({});
         data.forEach((board) => {
           // バージョンアップ時のプロパティ更新
-          addBoardProperties(board);
+          addPetaBoardProperties(board);
           board.petaPanels.forEach((petaPanel) => {
             addPetaPanelProperties(petaPanel);
           })
         })
         if (data.length == 0) {
           logger.mainLog("no boards");
-          const board = createBoard(DEFAULT_BOARD_NAME);
-          await updateBoard(board, UpdateMode.INSERT);
+          const board = createPetaBoard(DEFAULT_BOARD_NAME);
+          await updatePetaBoard(board, UpdateMode.INSERT);
           data.push(board);
           logger.mainLog("return:", data.length);
           return data;
@@ -176,11 +176,11 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
       }
       return [];
     },
-    updateBoards: async (event, boards, mode) => {
+    updatePetaBoards: async (event, boards, mode) => {
       try {
-        logger.mainLog("#Update Boards");
+        logger.mainLog("#Update PetaBoards");
         for (let i = 0; i < boards.length; i ++) {
-          await updateBoard(boards[i], mode);
+          await updatePetaBoard(boards[i], mode);
         }
         logger.mainLog("return:", true);
         return true;
@@ -291,8 +291,8 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
     sendToRenderer("updatePetaImage", petaImage);
     return true;
   }
-  async function updateBoard(board: Board, mode: UpdateMode) {
-    logger.mainLog(" ##Update Board");
+  async function updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
+    logger.mainLog(" ##Update PetaBoard");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" board:", minimId(board.id));
     if (mode == UpdateMode.REMOVE) {

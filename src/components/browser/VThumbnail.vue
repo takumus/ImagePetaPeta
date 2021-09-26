@@ -1,7 +1,7 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ transform: `translate(${petaThumbnail.position.x + 'px'}, ${petaThumbnail.position.y + 'px'})`, width: petaThumbnail.width + 'px', height: petaThumbnail.height + 'px' }"
+    :style="{ transform: `translate(${browserThumbnail.position.x + 'px'}, ${browserThumbnail.position.y + 'px'})`, width: browserThumbnail.width + 'px', height: browserThumbnail.height + 'px' }"
   >
     <div class="wrapper">
       <img
@@ -9,24 +9,24 @@
         :src="imageURL"
         @mousedown="mousedown($event)"
         v-if="loaded"
-        :class="{ 'selected-image': petaThumbnail.petaImage._selected }"
+        :class="{ 'selected-image': browserThumbnail.petaImage._selected }"
       >
       <div class="info">
         <span
           class="tags"
-          v-for="k in petaThumbnail.petaImage.tags"
+          v-for="k in browserThumbnail.petaImage.tags"
           :key="k"
         >
           {{k}}
         </span>
         <span
           class="tags"
-          v-if="petaThumbnail.petaImage.tags.length == 0"
+          v-if="browserThumbnail.petaImage.tags.length == 0"
         >
           {{$t("browser.untagged")}}
         </span>
       </div>
-      <div class="selected" v-show="petaThumbnail.petaImage._selected">
+      <div class="selected" v-show="browserThumbnail.petaImage._selected">
         <div class="checkbox">
           ✔
         </div>
@@ -109,7 +109,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { ImageLoader } from "@/imageLoader";
-import { PetaThumbnail } from "@/datas/petaThumbnail";
+import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 // import { API } from "@/api";
@@ -120,21 +120,21 @@ import { ClickChecker } from "@/utils/clickChecker";
 })
 export default class VThumbnail extends Vue {
   @Prop()
-  petaThumbnail!: PetaThumbnail;
+  browserThumbnail!: BrowserThumbnail;
   imageURL = "";
   pressing = false;
   click: ClickChecker = new ClickChecker();
   async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.petaThumbnail.petaImage, true);
+    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, true);
     if (!(this.$el as HTMLElement).parentElement) {
       if (this.$settings.lowMemoryMode) {
-        ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+        ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
       }
     }
   }
   unmounted() {
     if (this.$settings.lowMemoryMode) {
-      ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
     }
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
@@ -160,7 +160,7 @@ export default class VThumbnail extends Vue {
         elementRect.x + elementRect.width / 2,
         elementRect.y + elementRect.height / 2
       );
-      this.$emit("add", this.petaThumbnail, vec2FromMouseEvent(event), position);
+      this.$emit("add", this.browserThumbnail, vec2FromMouseEvent(event), position);
       this.pressing = false;
     }
   }
@@ -171,10 +171,10 @@ export default class VThumbnail extends Vue {
     if (this.click.isClick) {
       switch(event.button) {
         case MouseButton.LEFT:
-          this.$emit("select", this.petaThumbnail);
+          this.$emit("select", this.browserThumbnail);
           break;
         case MouseButton.RIGHT:
-          this.$emit("menu", this.petaThumbnail, vec2FromMouseEvent(event));
+          this.$emit("menu", this.browserThumbnail, vec2FromMouseEvent(event));
           break;
       }
     }

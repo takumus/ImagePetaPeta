@@ -106,7 +106,7 @@ import VPanel from "@/components/board/VPanel.vue";
 import VCrop from "@/components/board/VCrop.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { Board, BoardTransform } from "@/datas/board";
+import { PetaBoard, PetaBoardTransform } from "@/datas/petaBoard";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
@@ -120,7 +120,7 @@ import { ClickChecker } from "@/utils/clickChecker";
 })
 export default class VBoard extends Vue {
   @Prop()
-  board!: Board;
+  board!: PetaBoard;
   @Ref("panelsWrapper")
   panelsWrapper!: HTMLElement;
   @Ref("panelsBackground")
@@ -368,8 +368,8 @@ export default class VBoard extends Vue {
   get centerY() {
     return Math.floor(this.transform.position.y) + "px";
   }
-  get transform(): BoardTransform {
-    const transform: BoardTransform = {
+  get transform(): PetaBoardTransform {
+    const transform: PetaBoardTransform = {
       scale: this.board.transform.scale,
       position: this.board.transform.position.clone().add(this.globalOffset)
     }

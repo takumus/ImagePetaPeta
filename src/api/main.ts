@@ -1,4 +1,4 @@
-import { Board } from '@/datas/board';
+import { PetaBoard } from '@/datas/petaBoard';
 import { PetaImage, PetaImages } from '@/datas/petaImage';
 import { UpdateMode } from '@/datas/updateMode';
 import { AppInfo } from '@/datas/appInfo';
@@ -13,8 +13,8 @@ export interface Main {
   getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer | null>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
-  getBoards: () => Promise<Board[]>;
-  updateBoards: (boards: Board[], mode: UpdateMode) => Promise<boolean>;
+  getPetaBoards: () => Promise<PetaBoard[]>;
+  updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   // log
   log: (...args: any[]) => Promise<boolean>;
   // dialog

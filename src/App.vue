@@ -1,9 +1,9 @@
 <template>
   <section class="board-component">
     <VBoard
-      v-if="currentBoard"
-      :board="currentBoard"
-      ref="vBoard"
+      v-if="currentPetaBoard"
+      :board="currentPetaBoard"
+      ref="vPetaBoard"
     />
   </section>
   <VBrowser
@@ -11,10 +11,10 @@
     @addPanel="addPanel"
   />
   <VTabBar
-    :boards="sortedBoards"
-    @remove="removeBoard"
-    @add="addBoard"
-    @select="selectBoard"
+    :boards="sortedPetaBoards"
+    @remove="removePetaBoard"
+    @add="addPetaBoard"
+    @select="selectPetaBoard"
     ref="vTabBar"
   />
   <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
@@ -88,7 +88,7 @@ import VSettings from "@/components/utils/VSettings.vue";
 import { API, log } from "@/api";
 import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
 import { PetaImages } from "@/datas/petaImage";
-import { Board, createBoard, dbBoardsToBoards, boardsToDBBoards } from "@/datas/board";
+import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
 import { UpdateMode } from "@/datas/updateMode";
@@ -109,17 +109,17 @@ import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
   },
 })
 export default class App extends Vue {
-  @Ref("vBoard")
-  vBoard!: VBoard;
+  @Ref("vPetaBoard")
+  vPetaBoard!: VBoard;
   @Ref("vTabBar")
   vTabBar!: VTabBar;
   petaImages: PetaImages = {};
-  boards: Board[] = [];
-  currentBoard: Board | null = null;
+  boards: PetaBoard[] = [];
+  currentPetaBoard: PetaBoard | null = null;
   imageZIndex = 0;
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent?: DragEvent;
-  boardUpdaters: {[key: string]: DelayUpdater<Board>} = {};
+  boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   async mounted() {
     log("INIT RENDERER!");
     await this.getSettings();
@@ -149,7 +149,7 @@ export default class App extends Vue {
       }
     });
     await this.getPetaImages();
-    await this.getBoards();
+    await this.getPetaBoards();
   }
   async getPetaImages() {
     this.petaImages = await API.send("getPetaImages");
@@ -178,15 +178,15 @@ export default class App extends Vue {
     });
     this.orderedAddPanelIds = [];
   }
-  async getBoards() {
-    this.boards = await API.send("getBoards");
-    dbBoardsToBoards(this.boards, this.petaImages);
+  async getPetaBoards() {
+    this.boards = await API.send("getPetaBoards");
+    dbPetaBoardsToPetaBoards(this.boards, this.petaImages);
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id].initData(boardsToDBBoards(board));
+        this.boardUpdaters[board.id].initData(petaBoardsToDBPetaBoards(board));
         this.boardUpdaters[board.id].onUpdate((board) => {
-          API.send("updateBoards", [board], UpdateMode.UPDATE);
+          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
         });
       }
     })
@@ -196,23 +196,23 @@ export default class App extends Vue {
     this.orderedAddPanelDragEvent = mouse;
   }
   addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
-    if (!this.currentBoard) return;
-    this.currentBoard.petaPanels.push(petaPanel);
-    this.vBoard.addPanel(petaPanel, worldPosition);
+    if (!this.currentPetaBoard) return;
+    this.currentPetaBoard.petaPanels.push(petaPanel);
+    this.vPetaBoard.addPanel(petaPanel, worldPosition);
   }
-  selectBoard(board: Board) {
-    log("Board Selected", board.name);
-    if (this.currentBoard) {
+  selectPetaBoard(board: PetaBoard) {
+    log("PetaBoard Selected", board.name);
+    if (this.currentPetaBoard) {
       this.$globalComponents
-      this.updateBoard(this.currentBoard, true);
+      this.updatePetaBoard(this.currentPetaBoard, true);
     }
-    this.currentBoard = board;
+    this.currentPetaBoard = board;
     this.$nextTick(() => {
-      this.vBoard.load();
+      this.vPetaBoard.load();
     });
   }
-  updateBoard(board: Board, immidiately: boolean) {
-    this.boardUpdaters[board.id].order(boardsToDBBoards(board));
+  updatePetaBoard(board: PetaBoard, immidiately: boolean) {
+    this.boardUpdaters[board.id].order(petaBoardsToDBPetaBoards(board));
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
@@ -223,38 +223,38 @@ export default class App extends Vue {
       (this.$settings as any)[key] = (settings as any)[key];
     });
   }
-  async removeBoard(board: Board) {
+  async removePetaBoard(board: PetaBoard) {
     if (await API.send("dialog", this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
       return;
     }
     this.boardUpdaters[board.id].forceUpdate();
-    await API.send("updateBoards", [board], UpdateMode.REMOVE);
-    await this.getBoards();
+    await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
+    await this.getPetaBoards();
   }
-  async addBoard() {
+  async addPetaBoard() {
     const basename = DEFAULT_BOARD_NAME;
     const names = this.boards.map((b) => b.name);
     let name = basename;
     for (let i = 2; names.includes(name); i++) {
       name = basename + (i > 0 ? `(${i})` : "");
     }
-    const board = createBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1);
+    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1);
     await API.send(
-      "updateBoards",
+      "updatePetaBoards",
       [board],
       UpdateMode.INSERT
     );
-    log("Board Added", board.name);
-    await this.getBoards();
-    this.vTabBar.selectBoardByIndex(this.boards.length - 1);
+    log("PetaBoard Added", board.name);
+    await this.getPetaBoards();
+    this.vTabBar.selectPetaBoardByIndex(this.boards.length - 1);
   }
-  get sortedBoards() {
+  get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
   }
   @Watch("boards", { deep: true })
-  changeBoard() {
+  changePetaBoard() {
     this.boards.forEach((board) => {
-      this.updateBoard(board, false);
+      this.updatePetaBoard(board, false);
     });
   }
 }

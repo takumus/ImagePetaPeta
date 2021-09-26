@@ -115,7 +115,7 @@ import RotateCursor1x from "@/assets/rotateCursor1x.png";
 import RotateCursor2x from "@/assets/rotateCursor2x.png";
 import { IMG_TAG_WIDTH } from "@/defines";
 import { PetaPanel } from "@/datas/petaPanel";
-import { BoardTransform } from "@/datas/board";
+import { PetaBoardTransform } from "@/datas/petaBoard";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 ClickChecker
@@ -152,7 +152,7 @@ export default class VPanel extends Vue {
   @Prop()
   petaPanel!: PetaPanel;
   @Prop()
-  transform!: BoardTransform;
+  transform!: PetaBoardTransform;
   controlStatus = ControlStatus.NONE;
   dragOffset = new Vec2();
   sizeOffset = new Vec2();

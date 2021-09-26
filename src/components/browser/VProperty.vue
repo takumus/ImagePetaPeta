@@ -2,9 +2,9 @@
   <article class="property-root">
     <section class="previews" ref="previews" v-show="!noImage">
       <VPropertyThumbnail
-        v-for="(data) in petaThumbnails"
+        v-for="(data) in browserThumbnails"
         :key="data.petaImage.id"
-        :petaThumbnail="data"
+        :browserThumbnail="data"
       />
     </section>
     <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
@@ -101,7 +101,7 @@ import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/defines";
 import { PetaImage } from "@/datas/petaImage";
 import { UpdateMode } from "@/datas/updateMode";
-import { PetaThumbnail } from "@/datas/petaThumbnail";
+import { BrowserThumbnail } from "@/datas/browserThumbnail";
 @Options({
   components: {
     VEditableLabel,
@@ -211,7 +211,7 @@ export default class VProperty extends Vue {
     });
     return [...Object.keys(tags).filter((tag) => tags[tag] == this.petaImages.length)];
   }
-  get petaThumbnails(): PetaThumbnail[] {
+  get browserThumbnails(): BrowserThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
     const petaImages = [...this.petaImages];
     // プレビュー数の最大を抑える。

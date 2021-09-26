@@ -1,7 +1,7 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ top: petaThumbnail.position.y + 'px', left: petaThumbnail.position.x + 'px', width: this.petaThumbnail.width + 'px', height: this.petaThumbnail.height + 'px' }"
+    :style="{ top: browserThumbnail.position.y + 'px', left: browserThumbnail.position.x + 'px', width: this.browserThumbnail.width + 'px', height: this.browserThumbnail.height + 'px' }"
   >
     <div class="wrapper">
       <img
@@ -38,23 +38,23 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { ImageLoader } from "@/imageLoader";
-import { PetaThumbnail } from "@/datas/petaThumbnail";
+import { BrowserThumbnail } from "@/datas/browserThumbnail";
 @Options({
   components: {
   }
 })
 export default class VPropertyThumbnail extends Vue {
   @Prop()
-  petaThumbnail!: PetaThumbnail;
+  browserThumbnail!: BrowserThumbnail;
   imageURL = "";
   async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.petaThumbnail.petaImage, true);
+    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, true);
     if (!(this.$el as HTMLElement).parentElement) {
-      ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
     }
   }
   unmounted() {
-    ImageLoader.removeImageURL(this.petaThumbnail.petaImage, true);
+    ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
   }
   get loaded() {
     return this.imageURL != "";

@@ -4,23 +4,23 @@ import { vec2FromObject, Vec2 } from "@/utils/vec2";
 import { PetaImages } from "./petaImage";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
 
-export interface Board {
+export interface PetaBoard {
   petaPanels: PetaPanel[],
   id: string,
   name: string,
-  transform: BoardTransform,
+  transform: PetaBoardTransform,
   index: number,
   background: {
     fillColor: string,
     lineColor: string
   }
 }
-export interface BoardTransform {
+export interface PetaBoardTransform {
   scale: number,
   position: Vec2
 }
-export function createBoard(name: string, index = 0) {
-  const board: Board = {
+export function createPetaBoard(name: string, index = 0) {
+  const board: PetaBoard = {
     petaPanels: [],
     id: uuid(),
     name: name,
@@ -36,7 +36,7 @@ export function createBoard(name: string, index = 0) {
   }
   return board;
 }
-export function addBoardProperties(board: Board) {
+export function addPetaBoardProperties(board: PetaBoard) {
   // バージョンアップで旧ファイルとの整合性を取る
   if (!board.background) {
     // v0.5.0の追加パラメータ
@@ -46,7 +46,7 @@ export function addBoardProperties(board: Board) {
     }
   }
 }
-export function dbBoardsToBoards(boards: Board[], petaImages: PetaImages) {
+export function dbPetaBoardsToPetaBoards(boards: PetaBoard[], petaImages: PetaImages) {
   return boards.forEach((board) => {
     board.transform.position = vec2FromObject(board.transform.position);
     board.petaPanels.forEach(pp => {
@@ -56,8 +56,8 @@ export function dbBoardsToBoards(boards: Board[], petaImages: PetaImages) {
     })
   });
 }
-export function boardsToDBBoards(board: Board) {
-  const b = JSON.parse(JSON.stringify(board)) as Board;
+export function petaBoardsToDBPetaBoards(board: PetaBoard) {
+  const b = JSON.parse(JSON.stringify(board)) as PetaBoard;
   b.petaPanels.forEach((pp) => {
     pp._petaImage = undefined;
   });

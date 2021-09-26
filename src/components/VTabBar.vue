@@ -10,19 +10,19 @@
     >
       <span class="wrapper">
         <span class="label" @mousedown="mousedown($event, index, $target)" @contextmenu="menu($event, b)">
-          <VEditableLabel @change="(v) => changeBoardName(b, v)" :label="b.name"/>
+          <VEditableLabel @change="(v) => changePetaBoardName(b, v)" :label="b.name"/>
         </span>
         <span
           class="remove"
           v-if="removable"
         >
-          <span @click="removeBoard(b)">×</span>
+          <span @click="removePetaBoard(b)">×</span>
         </span>
       </span>
     </span>
     <span
       class="button add"
-      @click="addBoard()"
+      @click="addPetaBoard()"
     >
       <span class="wrapper">
         <span class="label">+</span>
@@ -151,7 +151,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { log } from "@/api";
 import { vec2FromMouseEvent } from "@/utils/vec2";
-import { Board } from "@/datas/board";
+import { PetaBoard } from "@/datas/petaBoard";
 import { MouseButton } from "@/datas/mouseButton";
 @Options({
   components: {
@@ -166,7 +166,7 @@ import { MouseButton } from "@/datas/mouseButton";
 })
 export default class VTabBar extends Vue {
   @Prop()
-  boards!: Board[];
+  boards!: PetaBoard[];
   @Ref("draggingTab")
   draggingTab!: HTMLElement;
   dragging = false;
@@ -175,7 +175,7 @@ export default class VTabBar extends Vue {
   editName = false;
   selectedIndex = 0;
   beforeSortSelectedIndex = 0;
-  draggingBoard!: Board;
+  draggingPetaBoard!: PetaBoard;
   mounted() {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
@@ -186,20 +186,20 @@ export default class VTabBar extends Vue {
   }
   mousedown(event: MouseEvent, index: number) {
     if (event.button != MouseButton.LEFT) return;
-    this.selectBoardByIndex(index);
+    this.selectPetaBoardByIndex(index);
     this.pressing = true;
-    this.draggingBoard = this.board;
+    this.draggingPetaBoard = this.board;
     const rect = (event.target as HTMLElement).parentElement?.parentElement?.getBoundingClientRect();
     if (!rect) return;
     this.mousedownOffsetX = rect.x - event.clientX;
     this.draggingTab.style.left = `${rect.x}px`;
     this.beforeSortSelectedIndex = this.selectedIndex;
   }
-  menu(event: MouseEvent, board: Board) {
+  menu(event: MouseEvent, board: PetaBoard) {
     this.$globalComponents.contextMenu.open([{
       label: this.$t("tab.menu.remove", [board.name]),
       click: () => {
-        this.removeBoard(board);
+        this.removePetaBoard(board);
       }
     }], vec2FromMouseEvent(event));
   }
@@ -208,11 +208,11 @@ export default class VTabBar extends Vue {
     if (this.dragging) {
       this.draggingTab.style.left = `${this.mousedownOffsetX + event.clientX}px`;
       // ソート前の選択中ボードのインデックス
-      const selectedBoard = this.board;
+      const selectedPetaBoard = this.board;
       let newIndex = 0;
       this.boards
       .map((b) => {
-        const elem: HTMLElement = b == this.draggingBoard ? this.draggingTab : (this.$refs[`tab-${b.id}`] as HTMLElement);
+        const elem: HTMLElement = b == this.draggingPetaBoard ? this.draggingTab : (this.$refs[`tab-${b.id}`] as HTMLElement);
         return {
           rect: elem.getBoundingClientRect(),
           board: b
@@ -222,7 +222,7 @@ export default class VTabBar extends Vue {
       .forEach((b, index) => {
         b.board.index = index;
         // 選択中ボードのインデックス復元。
-        if (b.board == selectedBoard) {
+        if (b.board == selectedPetaBoard) {
           newIndex = index;
         }
       });
@@ -238,22 +238,22 @@ export default class VTabBar extends Vue {
       this.$emit("sort");
     }
   }
-  selectBoardByIndex(index: number, force = false) {
+  selectPetaBoardByIndex(index: number, force = false) {
     if (this.boards.length == 0) return;
-    const prevBoard = this.boards[this.selectedIndex];
+    const prevPetaBoard = this.boards[this.selectedIndex];
     this.selectedIndex = index;
     if (this.selectedIndex >= this.boards.length) {
       this.selectedIndex = this.boards.length - 1;
     } else if (index < 0) {
       this.selectedIndex = 0;
     }
-    const currentBoard = this.boards[this.selectedIndex];
-    if (currentBoard != prevBoard || force) {
-      if (!currentBoard) return;
-      this.$emit("select", currentBoard);
+    const currentPetaBoard = this.boards[this.selectedIndex];
+    if (currentPetaBoard != prevPetaBoard || force) {
+      if (!currentPetaBoard) return;
+      this.$emit("select", currentPetaBoard);
     }
   }
-  changeBoardName(board: Board, name: string) {
+  changePetaBoardName(board: PetaBoard, name: string) {
     name = name.trim();
     if (name == "") {
       name = board.name;
@@ -261,10 +261,10 @@ export default class VTabBar extends Vue {
     log(board.name, "->", name);
     board.name = name;
   }
-  async removeBoard(board: Board) {
+  async removePetaBoard(board: PetaBoard) {
     this.$emit("remove", board);
   }
-  async addBoard() {
+  async addPetaBoard() {
     this.$emit("add");
   }
   get board() {
@@ -274,12 +274,12 @@ export default class VTabBar extends Vue {
     return true;// this.boards.length > 1;
   }
   @Watch("boards", { deep: true, immediate: true })
-  changeBoards(n?: Board[], o?: Board[]) {
+  changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
     // idの並びと長さの変更のみ検知したい。これしか思いつかなかった。
     const nIds = n?.map((b) => b.id).join(",");
     const oIds = o?.map((b) => b.id).join(",");
     if(nIds != oIds) {
-      this.selectBoardByIndex(this.selectedIndex, true);
+      this.selectPetaBoardByIndex(this.selectedIndex, true);
     }
   }
 }
