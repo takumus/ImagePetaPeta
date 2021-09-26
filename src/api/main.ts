@@ -9,7 +9,7 @@ export interface Main {
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
   // peta image
   getPetaImages: () => Promise<PetaImages>;
-  getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer>;
+  getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer | null>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
   getBoards: () => Promise<Board[]>;

@@ -1,5 +1,6 @@
 import { API, log } from "@/api";
 import { PetaImage } from "@/datas/petaImage";
+import SampleImage from "@/assets/sample.png";
 interface ImageCache {
   key: string
   url: string
@@ -66,6 +67,9 @@ async function getImageURL(petaImage: PetaImage, thumbnail = false) {
     }
   }
   const buffer = await API.send("getPetaImageBinary", petaImage, thumbnail);
+  if (!buffer) {
+    return SampleImage;
+  }
   let cache: ImageCache;
   if (thumbnail) {
     cache = thumbnailCache.add(key, buffer);

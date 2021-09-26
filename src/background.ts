@@ -18,6 +18,7 @@ import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { LogFrom } from "./datas/logFrom";
 import { AddImageResult } from "./datas/addImageResult";
+import DB from "@/utils/db";
 import Logger from "@/utils/logger";
 (async () => {
   const window = await initWindow();
@@ -34,14 +35,8 @@ import Logger from "@/utils/logger";
   await asyncFile.mkdir(DIR_THUMBNAILS).catch((err) => {
     //
   });
-  const petaImagesDB = new Nedb<PetaImage>({
-    filename: path.resolve(DIR_ROOT, "images.db"),
-    autoload: true
-  });
-  const boardsDB = new Nedb<Board>({
-    filename: path.resolve(DIR_ROOT, "boards.db"),
-    autoload: true
-  });
+  const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
+  const boardsDB = new DB<Board>(path.resolve(DIR_ROOT, "boards.db"));
   const mainFunctions: MainFunctions = {
     browseImages: async () => {
       logger.mainLog("#Browse Images");
@@ -87,46 +82,42 @@ import Logger from "@/utils/logger";
       return "";
     },
     importImagesFromFilePaths: async (event, filePaths) =>{
-      logger.mainLog("#Import Images From File Paths");
-      const images = (await importImages(filePaths)).map((image) => image.id);
-      logger.mainLog("return:", true);
-      return images;
+      try {
+        logger.mainLog("#Import Images From File Paths");
+        const images = (await importImages(filePaths)).map((image) => image.id);
+        logger.mainLog("return:", true);
+        return images;
+      } catch(e) {
+        logger.mainLog("error:", e);
+      }
+      return [];
     },
     getPetaImages: async (event) => {
-      logger.mainLog("#Get Peta Images");
-      return new Promise((res, rej) => {
-        petaImagesDB.find({}).exec((err, data) => {
-          if (err) {
-            rej(err.message);
-            logger.mainLog("error:", err.message);
-            return {};
-          }
-          const petaImages: PetaImages = {};
-          data.forEach((pi) => {
-            petaImages[pi.id] = pi;
-          });
-          logger.mainLog("return:", data.length);
-          res(petaImages);
+      try {
+        logger.mainLog("#Get Peta Images");
+        const data = await petaImagesDB.find({});
+        const petaImages: PetaImages = {};
+        data.forEach((pi) => {
+          petaImages[pi.id] = pi;
         });
-      });
+        logger.mainLog("return:", data.length);
+        return petaImages;
+      } catch(e) {
+        logger.mainLog("error:", e);
+      }
+      return {};
     },
     getPetaImageBinary: async (event, data, thumbnail) => {
-      logger.mainLog("#Get Peta Image Binary");
-      logger.mainLog("id:", minimId(data.id));
-      return new Promise((res, rej) => {
-        const buffer = asyncFile.readFile(getImagePath(data, thumbnail))
-        .then((buffer) => {
-          logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
-          res(buffer);
-        })
-        .catch((err) => {
-          if (err) {
-            logger.mainLog("error:", err, minimId(data.id));
-            rej(err.message);
-            return;
-          }
-        });
-      });
+      try {
+        logger.mainLog("#Get Peta Image Binary");
+        logger.mainLog("id:", minimId(data.id));
+        const buffer = await asyncFile.readFile(getImagePath(data, thumbnail));
+        logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
+        return buffer;
+      } catch(e) {
+        logger.mainLog("error:", e);
+      }
+      return null;
     },
     updatePetaImages: async (event, datas, mode) => {
       logger.mainLog("#Update Peta Images");
@@ -144,45 +135,37 @@ import Logger from "@/utils/logger";
       return true;
     },
     getBoards: async (event) => {
-      logger.mainLog("#Get Boards");
-      return new Promise((res, rej) => {
-        boardsDB.find({}).exec(async (err, data) => {
-          if (err) {
-            logger.mainLog("error:", err.message);
-            rej(err.message);
-            return;
-          }
-          if (data.length == 0) {
-            logger.mainLog("no boards");
-            const board = createBoard(DEFAULT_BOARD_NAME);
-            try {
-              await updateBoard(board, UpdateMode.INSERT);
-            } catch(err) {
-              logger.mainLog("error:", err);
-              rej(err);
-            }
-            data.push(board);
-            logger.mainLog("return:", data.length);
-            res(data);
-          } else {
-            logger.mainLog("return:", data.length);
-            res(data);
-          }
-        });
-      });
+      try {
+        logger.mainLog("#Get Boards");
+        const data = await boardsDB.find({});
+        if (data.length == 0) {
+          logger.mainLog("no boards");
+          const board = createBoard(DEFAULT_BOARD_NAME);
+          await updateBoard(board, UpdateMode.INSERT);
+          data.push(board);
+          logger.mainLog("return:", data.length);
+          return data;
+        } else {
+          logger.mainLog("return:", data.length);
+          return data;
+        }
+      } catch(e) {
+        logger.mainLog("error:", e);
+      }
+      return [];
     },
     updateBoards: async (event, boards, mode) => {
-      logger.mainLog("#Update Boards");
       try {
+        logger.mainLog("#Update Boards");
         for (let i = 0; i < boards.length; i ++) {
           await updateBoard(boards[i], mode);
         }
-      } catch (err) {
-        logger.mainLog("error:", err);
-        return false;
+        logger.mainLog("return:", true);
+        return true;
+      } catch(e) {
+        logger.mainLog("error:", e);
       }
-      logger.mainLog("return:", true);
-      return true;
+      return false;
     },
     log: async (event, ...args: any) => {
       logger.log(LogFrom.RENDERER, ...args);
@@ -224,10 +207,10 @@ import Logger from "@/utils/logger";
       return true;
     },
     checkUpdate: async (event) => {
-      logger.mainLog("#Check Update");
-      logger.mainLog("url:", PACKAGE_JSON_URL);
-      logger.mainLog("currentVersion:", app.getVersion());
       try {
+        logger.mainLog("#Check Update");
+        logger.mainLog("url:", PACKAGE_JSON_URL);
+        logger.mainLog("currentVersion:", app.getVersion());
         const packageJSON = (await axios.get(PACKAGE_JSON_URL, { responseType: "json" })).data;
         logger.mainLog("latestVersion:", packageJSON.version);
         return {
@@ -238,81 +221,44 @@ import Logger from "@/utils/logger";
         logger.mainLog("error:", e);
       }
       return {
-        current: app.getVersion(),
+        current: "0.0.0",
         latest: "0.0.0"
-      }
+      };
     }
   }
   Object.keys(mainFunctions).forEach((key) => {
     ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
   });
-  function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {
+  async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     logger.mainLog(" ##Update Peta Image");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" image:", minimId(petaImage.id));
     petaImage._selected = false;
     petaImage.tags = Array.from(new Set(petaImage.tags));
-    return new Promise((res, rej) => {
-      if (mode == UpdateMode.REMOVE) {
-        petaImagesDB.remove({ id: petaImage.id }, {}, (err) => {
-          if (err) {
-            logger.mainLog(" failed to remove", err.message);
-            rej(err.message);
-          } else {
-            asyncFile.rm(getImagePath(petaImage)).then(() => {
-              logger.mainLog(" removed fullsize");
-            }).catch((err) => {
-              logger.mainLog(" failed to removed fullsize");
-            });
-            asyncFile.rm(getImagePath(petaImage, true)).then(() => {
-              logger.mainLog(" removed thumbnail");
-            }).catch((err) => {
-              logger.mainLog(" failed to removed thumbnail");
-            });
-          }
-        });
-      } else {
-        if (petaImage.addDate)
-        petaImagesDB.update({ id: petaImage.id }, petaImage, { upsert: mode == UpdateMode.INSERT }, (err) => {
-          if (err) {
-            logger.mainLog(" failed to update:", err.message);
-            rej(err.message);
-          } else {
-            logger.mainLog(" updated");
-            res(true);
-            sendToRenderer("updatePetaImage", petaImage);
-          }
-        });
-      }
-    })
+    if (mode == UpdateMode.REMOVE) {
+      await petaImagesDB.remove({ id: petaImage.id });
+      await asyncFile.rm(getImagePath(petaImage));
+      await asyncFile.rm(getImagePath(petaImage, true));
+      logger.mainLog(" removed");
+      return true;
+    }
+    await petaImagesDB.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
+    logger.mainLog(" updated");
+    sendToRenderer("updatePetaImage", petaImage);
+    return true;
   }
-  function updateBoard(board: Board, mode: UpdateMode): Promise<boolean> {
+  async function updateBoard(board: Board, mode: UpdateMode) {
     logger.mainLog(" ##Update Board");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" board:", minimId(board.id));
-    return new Promise((res, rej) => {
-      if (mode == UpdateMode.REMOVE) {
-        boardsDB.remove({ id: board.id }, {}, (err) => {
-          if (err) {
-            logger.mainLog(" failed to remove", err.message);
-            rej(err.message);
-          } else {
-            logger.mainLog(" removed");
-            res(true);
-          }
-        });
-      } else {
-        boardsDB.update({ id: board.id }, board, { upsert: mode == UpdateMode.INSERT }, (err) => {
-          if (err) {
-            logger.mainLog(" failed to update:", err.message);
-            rej(err.message);
-          } else {
-            logger.mainLog(" updated");
-            res(true);
-          }
-        });
-      }
-    });
+    if (mode == UpdateMode.REMOVE) {
+      await boardsDB.remove({ id: board.id });
+      logger.mainLog(" removed");
+      return true;
+    }
+    await boardsDB.update({ id: board.id }, board, mode == UpdateMode.INSERT);
+    logger.mainLog(" updated");
+    return true;
   }
   function getImagePathFromFilename(fileName: string, thumbnail = false) {
     return path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
@@ -357,16 +303,8 @@ import Logger from "@/utils/logger";
     sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
     return petaImages;
   }
-  function getPetaImage(id: string): Promise<PetaImage | null> {
-    return new Promise((res, rej) => {
-      petaImagesDB.findOne({id}, (err, doc) => {
-        if (err) {
-          res(null);
-          return;
-        }
-        res(doc);
-      });
-    });
+  async function getPetaImage(id: string) {
+    return (await petaImagesDB.find({ id }))[0];
   }
   async function addImage(data: Buffer, name: string, extName: string, fileDate: Date, addDate: Date): Promise<AddImageResult> {
     const id = crypto.createHash('sha256').update(data).digest('hex');
@@ -392,7 +330,7 @@ import Logger from "@/utils/logger";
       _selected: false
     }
     await asyncFile.writeFile(getImagePathFromFilename(fileName, false), data);
-    petaImagesDB.update({ id: petaImage.id }, petaImage, { upsert: true });
+    await petaImagesDB.update({ id: petaImage.id }, petaImage, true);
     return {
       petaImage: petaImage,
       exists: false
