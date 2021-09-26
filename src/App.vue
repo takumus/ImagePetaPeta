@@ -35,6 +35,12 @@
 *, *:before, *:after {
   box-sizing: border-box;
 }
+.root {
+  color: #333333;
+  &.dark {
+    color: #ffffff;
+  }
+}
 button {
   display: inline-block;
   border-radius: 128px;
@@ -66,12 +72,6 @@ button {
       background-color: #444444;
     }
     box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
-  }
-}
-.root {
-  color: #333333;
-  &.dark {
-    color: #ffffff;
   }
 }
 .board-component {
