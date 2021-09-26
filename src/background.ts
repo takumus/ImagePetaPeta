@@ -21,6 +21,7 @@ import Logger from "@/utils/logger";
 import { Settings } from "@/datas/settings";
 import { defaultSettings } from "@/datas/settings";
 import Config from "@/utils/config";
+import { addPetaPanelProperties } from "./datas/petaPanel";
 (async () => {
   const window = await initWindow();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -155,6 +156,9 @@ import Config from "@/utils/config";
         data.forEach((board) => {
           // バージョンアップ時のプロパティ更新
           addBoardProperties(board);
+          board.petaPanels.forEach((petaPanel) => {
+            addPetaPanelProperties(petaPanel);
+          })
         })
         if (data.length == 0) {
           logger.mainLog("no boards");

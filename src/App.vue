@@ -88,7 +88,7 @@ import VSettings from "@/components/utils/VSettings.vue";
 import { API, log } from "@/api";
 import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
 import { PetaImages } from "@/datas/petaImage";
-import { Board, createBoard, parseBoards, toDBBoard } from "@/datas/board";
+import { Board, createBoard, dbBoardsToBoards, boardsToDBBoards } from "@/datas/board";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
 import { UpdateMode } from "@/datas/updateMode";
@@ -180,11 +180,11 @@ export default class App extends Vue {
   }
   async getBoards() {
     this.boards = await API.send("getBoards");
-    parseBoards(this.boards, this.petaImages);
+    dbBoardsToBoards(this.boards, this.petaImages);
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id].initData(toDBBoard(board));
+        this.boardUpdaters[board.id].initData(boardsToDBBoards(board));
         this.boardUpdaters[board.id].onUpdate((board) => {
           API.send("updateBoards", [board], UpdateMode.UPDATE);
         });
@@ -212,7 +212,7 @@ export default class App extends Vue {
     });
   }
   updateBoard(board: Board, immidiately: boolean) {
-    this.boardUpdaters[board.id].order(toDBBoard(board));
+    this.boardUpdaters[board.id].order(boardsToDBBoards(board));
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }

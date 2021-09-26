@@ -18,6 +18,9 @@ export interface PetaPanel {
   _petaImage?: PetaImage,
   _selected: boolean
 }
+export function addPetaPanelProperties(p: PetaPanel) {
+  // バージョンアップで旧ファイルとの整合性を取る
+}
 export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
   const panel: PetaPanel = {
     petaImageId: petaImage.id,
