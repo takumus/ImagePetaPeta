@@ -1,37 +1,37 @@
 import { app, ipcMain, dialog, IpcMainInvokeEvent, shell } from "electron";
-import { initWindow } from "@/window";
 import * as path from "path";
 import * as fs from "fs";
+import * as asyncFile from "@/utils/asyncFile";
 import Nedb from "nedb";
+import axios from "axios";
+import sharp from "sharp";
+import crypto from "crypto";
+import dataURIToBuffer from "data-uri-to-buffer";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
+import { initWindow } from "@/window";
+import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { Board, createBoard } from "@/datas/board";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
-import axios from "axios";
-import sharp from "sharp";
-import crypto from "crypto";
-import dataURIToBuffer from "data-uri-to-buffer";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "./defines";
-import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
+import { LogFrom } from "./datas/logFrom";
+import { AddImageResult } from "./datas/addImageResult";
 (async () => {
   const win = await initWindow();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
-  // fs.rmdirSync(DIR_ROOT, {
-  //   recursive: true
-  // })
-  if (!fs.existsSync(DIR_ROOT)) {
-    fs.mkdirSync(DIR_ROOT);
-  }
-  if (!fs.existsSync(DIR_IMAGES)) {
-    fs.mkdirSync(DIR_IMAGES);
-  }
-  if (!fs.existsSync(DIR_THUMBNAILS)) {
-    fs.mkdirSync(DIR_THUMBNAILS);
-  }
+  await asyncFile.mkdir(DIR_ROOT).catch((err) => {
+    //
+  });
+  await asyncFile.mkdir(DIR_IMAGES).catch((err) => {
+    //
+  });
+  await asyncFile.mkdir(DIR_THUMBNAILS).catch((err) => {
+    //
+  });
   const petaImagesDB = new Nedb<PetaImage>({
     filename: path.resolve(DIR_ROOT, "images.db"),
     autoload: true
@@ -113,14 +113,17 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
       mainLog("#Get Peta Image Binary");
       mainLog("id:", minimId(data.id));
       return new Promise((res, rej) => {
-        fs.readFile(getImagePath(data, thumbnail), (err, buffer) => {
+        const buffer = asyncFile.readFile(getImagePath(data, thumbnail))
+        .then((buffer) => {
+          mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
+          res(buffer);
+        })
+        .catch((err) => {
           if (err) {
             mainLog("error:", err, minimId(data.id));
             rej(err.message);
             return;
           }
-          mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
-          res(buffer);
         });
       });
     },
@@ -239,6 +242,9 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
       }
     }
   }
+  Object.keys(mainAPIs).forEach((key) => {
+    ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainAPIs as any)[key](e, ...args));
+  });
   function updatePetaImage(petaImage: PetaImage, mode: UpdateMode): Promise<boolean> {
     mainLog(" ##Update Peta Image");
     mainLog(" mode:", mode);
@@ -252,11 +258,15 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
             mainLog(" failed to remove", err.message);
             rej(err.message);
           } else {
-            fs.rm(getImagePath(petaImage), () => {
-              fs.rm(getImagePath(petaImage, true), () => {
-                mainLog(" removed");
-                res(true);
-              });
+            asyncFile.rm(getImagePath(petaImage)).then(() => {
+              mainLog(" removed fullsize");
+            }).catch((err) => {
+              mainLog(" failed to removed fullsize");
+            });
+            asyncFile.rm(getImagePath(petaImage, true)).then(() => {
+              mainLog(" removed thumbnail");
+            }).catch((err) => {
+              mainLog(" failed to removed thumbnail");
             });
           }
         });
@@ -312,9 +322,6 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
   function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
     win.webContents.send(key, ...args);
   }
-  Object.keys(mainAPIs).forEach((key) => {
-    ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainAPIs as any)[key](e, ...args));
-  });
   async function importImages(filePaths: string[]) {
     sendToRenderer("importImagesBegin", filePaths.length);
     mainLog(" ##Import Images");
@@ -327,10 +334,10 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
       mainLog(" import:", i + 1, "/", filePaths.length);
       let result = ImportImageResult.SUCCESS;
       try {
-        const data = await readFile(filePath);
+        const data = await asyncFile.readFile(filePath);
         const name = path.basename(filePath);
         const extName = path.extname(filePath);
-        const fileDate = fs.statSync(filePath).mtime;
+        const fileDate = (await asyncFile.stat(filePath)).mtime;
         const addResult = await addImage(data, name, extName, fileDate, addDate);
         petaImages.push(addResult.petaImage);
         if (addResult.exists) {
@@ -383,34 +390,12 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
       tags: [],
       _selected: false
     }
-    await saveFile(data, getImagePathFromFilename(fileName, false));
+    await asyncFile.writeFile(getImagePathFromFilename(fileName, false), data);
     petaImagesDB.update({ id: petaImage.id }, petaImage, { upsert: true });
     return {
       petaImage: petaImage,
       exists: false
     };
-  }
-  function saveFile(buffer: Buffer, filePath: string): Promise<boolean> {
-    return new Promise((res, rej) => {
-      fs.writeFile(filePath, buffer, (err) => {
-        if (err) {
-          rej(err.message);
-          return;
-        }
-        res(true);
-      });
-    });
-  }
-  function readFile(path: string): Promise<Buffer> {
-    return new Promise((res, rej) => {
-      fs.readFile(path, (err, data) => {
-        if (err) {
-          rej(err.message);
-          return;
-        }
-        res(data);
-      });
-    });
   }
   function log(from: LogFrom, ...args: any[]) {
     const date = `[${from}](${new Date().toISOString().replace('T', " ").replace(/....Z/g, "")})`;
@@ -420,15 +405,7 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
   function mainLog(...args: any[]) {
     log(LogFrom.MAIN, ...args);
   }
+  function minimId(id: string) {
+    return id.substr(0, 6);
+  }
 })();
-function minimId(id: string) {
-  return id.substr(0, 6);
-}
-enum LogFrom {
-  MAIN = "MAIN",
-  RENDERER = "REND"
-}
-interface AddImageResult {
-  exists: boolean,
-  petaImage: PetaImage
-}
