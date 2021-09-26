@@ -76,6 +76,7 @@
   line-height: 1.0em;
   font-size: 1.0em;
   display: flex;
+  color: #333333;
   .button {
     display: block;
     margin: 0px;
@@ -117,12 +118,10 @@
         padding-right: 0px;
         flex-shrink: 1;
         overflow: hidden;
-        color: #333333;
       }
       .remove {
         visibility: hidden;
         text-align: right;
-        color: #333333;
         padding: 12px;
         flex-shrink: 0;
       }

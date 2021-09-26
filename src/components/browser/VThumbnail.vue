@@ -93,6 +93,7 @@
     padding: 8px;
     .tags {
       background-color: rgba($color: (#000000), $alpha: 0.5);
+      color: #ffffff;
       padding: 2px;
       border-radius: 4px;
       margin-right: 4px;

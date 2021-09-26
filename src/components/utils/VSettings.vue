@@ -16,12 +16,9 @@
 <style lang="scss" scoped>
 .settings-root {
   text-align: center;
-  label {
-    color: #333333;
-  }
+  color: #333333;
   p {
     white-space: nowrap;
-    color: #333333;
   }
 }
 </style>

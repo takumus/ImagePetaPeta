@@ -43,13 +43,11 @@
 }
 body, html {
   overflow: hidden;
-  color: #ffffff;
   width: 100%;
   height: 100%;
   user-select: none;
   margin: 0px;
   padding: 0px;
-  background-color: #ffffff;
   font-size: 16px;
   font-family: "Helvetica Neue",
     Arial,

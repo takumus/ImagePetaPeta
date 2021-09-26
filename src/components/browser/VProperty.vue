@@ -63,11 +63,9 @@
       list-style-type: none;
       background-color: #ffffff;
       // border: solid 2px;
-      color: #333333;
       padding: 4px;
       font-weight: bold;
       cursor: pointer;
-      color: #333333;
       &:hover * {
         text-decoration: underline;
       }

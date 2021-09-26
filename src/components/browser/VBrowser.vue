@@ -91,6 +91,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  color: #333333;
   .bottom {
     text-align: center;
   }
@@ -123,7 +124,6 @@
           list-style-type: none;
           font-weight: bold;
           cursor: pointer;
-          color: #333333;
           &:hover * {
             text-decoration: underline;
           }
@@ -164,7 +164,6 @@
     .property {
       width: 20%;
       min-width: 180px;
-      color: #333333;
       padding: 8px;
     }
   }

@@ -17,9 +17,9 @@
   padding: 0px;
   margin: 0px;
   box-shadow: 2px 2px 5px rgba($color: #000000, $alpha: 0.5);
+  color: #ffffff;
   .item {
     white-space: nowrap;
-    color: #ffffff;
     list-style-type: none;
     min-width: 128px;
     padding: 8px 24px;
