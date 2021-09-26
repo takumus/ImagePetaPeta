@@ -8,6 +8,12 @@
         @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
       >{{$t("settings.lowMemoryMode")}}</label>
       <p></p>
+      <label><input
+        type="checkbox"
+        :checked="$settings.darkMode"
+        @change="$settings.darkMode = Boolean($event.target.checked)"
+      >{{$t("settings.darkMode")}}</label>
+      <p></p>
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>
@@ -16,7 +22,7 @@
 <style lang="scss" scoped>
 .settings-root {
   text-align: center;
-  color: #333333;
+  // color: #333333;
   p {
     white-space: nowrap;
   }

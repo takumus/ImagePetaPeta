@@ -35,6 +35,9 @@
     padding: 16px;
     border-radius: 8px;
     overflow: hidden;
+    .dark & {
+      background-color: #333333;
+    }
   }
 }
 </style>

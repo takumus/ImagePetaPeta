@@ -23,11 +23,11 @@
   padding: 0px;
   margin: 0px;
   display: inline-block;
+  // color: #333333;
   .editable-label {
     line-height: 1.0em;
     font-size: 1.0em;
     text-align: left;
-    color: #333333;
     padding: 0px;
     margin: 0px;
     overflow: visible;

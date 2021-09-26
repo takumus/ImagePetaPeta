@@ -91,7 +91,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  color: #333333;
+  // color: #333333;
   .bottom {
     text-align: center;
   }

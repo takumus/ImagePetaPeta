@@ -1,8 +1,10 @@
 export interface Settings {
   dbDirectory: string,
-  lowMemoryMode: boolean
+  lowMemoryMode: boolean,
+  darkMode: boolean
 }
 export const defaultSettings: Settings = {
   dbDirectory: "",
-  lowMemoryMode: false
+  lowMemoryMode: false,
+  darkMode: false
 }

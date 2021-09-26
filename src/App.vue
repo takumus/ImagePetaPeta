@@ -1,37 +1,78 @@
 <template>
-  <section class="board-component">
-    <VBoard
-      v-if="currentPetaBoard"
-      :board="currentPetaBoard"
-      ref="vPetaBoard"
+  <article class="root" :class="{ dark: $settings.darkMode }">
+    <section class="board-component">
+      <VBoard
+        v-if="currentPetaBoard"
+        :board="currentPetaBoard"
+        ref="vPetaBoard"
+      />
+    </section>
+    <VBrowser
+      :petaImages="petaImages"
+      @addPanel="addPanel"
     />
-  </section>
-  <VBrowser
-    :petaImages="petaImages"
-    @addPanel="addPanel"
-  />
-  <VTabBar
-    :boards="sortedPetaBoards"
-    @remove="removePetaBoard"
-    @add="addPetaBoard"
-    @select="selectPetaBoard"
-    ref="vTabBar"
-  />
-  <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
-  <VImageCache />
-  <VInfo ref="info"/>
-  <VSettings />
-  <VContextMenu />
-  <VComplement />
-  <article class="menu">
-    <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
-    <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
+    <VTabBar
+      :boards="sortedPetaBoards"
+      @remove="removePetaBoard"
+      @add="addPetaBoard"
+      @select="selectPetaBoard"
+      ref="vTabBar"
+    />
+    <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
+    <VImageCache />
+    <VInfo ref="info"/>
+    <VSettings />
+    <VContextMenu />
+    <VComplement />
+    <section class="menu">
+      <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
+      <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
+    </section>
   </article>
 </template>
 
 <style lang="scss">
 *, *:before, *:after {
   box-sizing: border-box;
+}
+button {
+  display: inline-block;
+  border-radius: 128px;
+  border: none;
+  background-color: #ffffff;
+  .dark & {
+    background-color: #666666;
+    color: #ffffff;
+  }
+  padding: 8px 16px;
+  min-width: 120px;
+  height: 32px;
+  line-height: 1.0em;
+  font-size: 1.0em;
+  cursor: pointer;
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+  margin: 4px;
+  outline: none;
+  &:hover {
+    background-color: #ffffff;
+    .dark & {
+      background-color: #555555;
+    }
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+  }
+  &:active {
+    background-color: #eeeeee;
+    .dark & {
+      background-color: #444444;
+    }
+    box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+.root {
+  color: #333333;
+  &.dark {
+    color: #ffffff;
+  }
 }
 .board-component {
   position: absolute;
@@ -64,7 +105,6 @@ body, html {
   text-align: right;
   padding: 8px;
 }
-@import url("./styles/shared.scss");
 </style>
 
 <script lang="ts">

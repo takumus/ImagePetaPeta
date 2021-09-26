@@ -18,7 +18,7 @@
 <style lang="scss" scoped>
 .info-root {
   text-align: center;
-  color: #333333;
+  // color: #333333;
   pre {
     text-align: left;
     overflow: hidden;
@@ -28,7 +28,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     font-size: 0.7em;
-    background-color: #eeeeee;
   }
   p {
     white-space: nowrap;

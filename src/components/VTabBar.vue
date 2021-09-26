@@ -76,7 +76,10 @@
   line-height: 1.0em;
   font-size: 1.0em;
   display: flex;
-  color: #333333;
+  .dark & {
+    background-color: #333333;
+  }
+  // color: #333333;
   .button {
     display: block;
     margin: 0px;
@@ -84,7 +87,9 @@
     border-left: solid 1px #cccccc;
     margin-right: -1px;
     flex-shrink: 1;
-    background-color: #eeeeee;
+    .dark & {
+      border-color: #222222;
+    }
     cursor: pointer;
     overflow: hidden;
     &.drag {
@@ -104,6 +109,9 @@
     }
     &.selected {
       background-color: #ffffff;
+      .dark & {
+        background-color: #222222;
+      }
       flex-shrink: 0;
       .wrapper {
         .remove {

@@ -43,7 +43,7 @@
 .property-root {
   width: 100%;
   height: 100%;
-  color: #333333;
+  // color: #333333;
   position: relative;
   .previews {
     position: relative;
@@ -61,8 +61,6 @@
     padding: 0px;
     li {
       list-style-type: none;
-      background-color: #ffffff;
-      // border: solid 2px;
       padding: 4px;
       font-weight: bold;
       cursor: pointer;

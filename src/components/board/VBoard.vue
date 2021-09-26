@@ -1,5 +1,5 @@
 <template>
-  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: board.background.fillColor }">
+  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: board.background.fillColor, dark: $settings.darkMode }">
     <section ref="panelsWrapper" class="panels-wrapper">
       <section ref="panelsBackground" class="panels-background">
         <div class="line vertical" :style="{ transform: `translateX(${centerX})`, backgroundColor: board.background.lineColor }"></div>
@@ -33,7 +33,7 @@
     <section class="info">
       <input type="color" v-model="board.background.fillColor">
       <input type="color" v-model="board.background.lineColor">
-      {{scalePercent}}%
+      <span class="zoom">{{scalePercent}}%</span>
     </section>
   </article>
 </template>
@@ -42,6 +42,7 @@
 .board-root {
   width: 100%;
   height: 100%;
+  // color: #333333;
   .panels-wrapper {
     position: absolute;
     top: 0px;
@@ -64,7 +65,6 @@
       width: 100%;
       height: 100%;
       .line {
-        background-color: #eeeeee;
         position: absolute;
         &.vertical {
           width: 1.5px;
@@ -91,8 +91,27 @@
     z-index: 2;
     bottom: 0px;
     right: 0px;
-    color: #333333;
     padding: 8px;
+    .zoom {
+      display: inline-block;
+      vertical-align: top;
+      padding: 4px;
+      border-radius: 8px;
+      background-color: #ffffff;
+      .dark & {
+        background-color: #333333;
+      }
+    }
+    input {
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 8px;
+      border-radius: 8px;
+      height: 26px;
+      .dark & {
+        background-color: #333333;
+      }
+    }
   }
 }
 </style>
