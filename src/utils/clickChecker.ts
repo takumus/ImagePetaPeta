@@ -1,5 +1,5 @@
 import { CLICK_OFFSET } from "@/defines";
-import { vec2FromMouseEvent, Vec2 } from "@/utils";
+import { vec2FromMouseEvent, Vec2 } from "@/utils/vec2";
 export class ClickChecker {
   clickPosition = new Vec2();
   click = false;

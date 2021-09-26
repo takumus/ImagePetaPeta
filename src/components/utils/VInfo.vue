@@ -46,7 +46,7 @@ import VModal from "@/components/VModal.vue";
 // Others
 import { LICENSES } from "@/licenses";
 import { API } from "@/api";
-import { AppInfo } from "@/datas";
+import { AppInfo } from "@/datas/appInfo";
 @Options({
   components: {
     VModal

@@ -102,8 +102,11 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VPanel from "@/components/board/VPanel.vue";
 import VCrop from "@/components/board/VCrop.vue";
 // Others
-import { Board, BoardTransform, MouseButton, PetaPanel } from "@/datas";
-import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
+import { Board, BoardTransform } from "@/datas/board";
+import { PetaPanel } from "@/datas/petaPanel";
+import { MouseButton } from "@/datas/mouseButton";
+import { ClickChecker } from "@/utils/clickChecker";
 @Options({
   components: {
     VPanel,

@@ -96,10 +96,12 @@ import { Prop, Ref } from "vue-property-decorator";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 import VPropertyThumbnail from "@/components/browser/VPropertyThumbnail.vue";
 // Others
-import { PetaImage, UpdateMode, PetaThumbnail } from "@/datas";
 import { API, log } from "@/api";
-import { Vec2, vec2FromMouseEvent } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/defines";
+import { PetaImage } from "@/datas/petaImage";
+import { UpdateMode } from "@/datas/updateMode";
+import { PetaThumbnail } from "@/datas/petaThumbnail";
 @Options({
   components: {
     VEditableLabel,

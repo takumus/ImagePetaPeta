@@ -60,7 +60,7 @@ import { Options, Vue } from "vue-class-component";
 // Components
 import VModal from "@/components/VModal.vue";
 // Others
-import { getURLFromImgTag } from "@/utils";
+import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import { API } from "@/api";
 @Options({
   components: {

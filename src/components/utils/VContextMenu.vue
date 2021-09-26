@@ -44,9 +44,9 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Others
-import { ContextMenuItem } from "@/datas";
-import { Vec2 } from "@/utils";
+import { Vec2 } from "@/utils/vec2";
 import { v4 as uuid } from "uuid";
+import { ContextMenuItem } from "@/datas/contextMenuItem";
 @Options({
   components: {
   }

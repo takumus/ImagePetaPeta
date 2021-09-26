@@ -149,8 +149,9 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { log } from "@/api";
-import { Board, MouseButton } from "@/datas";
-import { vec2FromMouseEvent } from "@/utils";
+import { vec2FromMouseEvent } from "@/utils/vec2";
+import { Board } from "@/datas/board";
+import { MouseButton } from "@/datas/mouseButton";
 @Options({
   components: {
     VEditableLabel

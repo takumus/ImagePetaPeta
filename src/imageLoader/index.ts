@@ -1,5 +1,5 @@
-import { PetaImage } from "@/datas";
 import { API, log } from "@/api";
+import { PetaImage } from "@/datas/petaImage";
 interface ImageCache {
   key: string
   url: string

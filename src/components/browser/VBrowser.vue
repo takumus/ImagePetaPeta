@@ -181,10 +181,14 @@ import VThumbnail from "@/components/browser/VThumbnail.vue";
 import VProperty from "@/components/browser/VProperty.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
-import { createPetaPanel, PetaImage, PetaImages, PetaThumbnail, SortMode, UpdateMode } from "@/datas";
-import { Vec2, vec2FromMouseEvent } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { API, log } from "@/api";
 import { THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
+import { PetaImage, PetaImages } from "@/datas/petaImage";
+import { SortMode } from "@/datas/sortMode";
+import { PetaThumbnail } from "@/datas/petaThumbnail";
+import { createPetaPanel } from "@/datas/petaPanel";
+import { UpdateMode } from "@/datas/updateMode";
 @Options({
   components: {
     VThumbnail,

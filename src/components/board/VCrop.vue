@@ -81,10 +81,12 @@ import { Prop, Ref } from "vue-property-decorator";
 // Components
 import VDottedBox from "@/components/utils/VDottedBox.vue";
 // Others
-import { MouseButton, PetaPanel } from "@/datas";
-import { ClickChecker, Vec2 } from "@/utils";
+import { Vec2 } from "@/utils/vec2";
 import { ImageLoader } from "@/imageLoader";
 import { IMG_TAG_WIDTH } from "@/defines";
+import { PetaPanel } from "@/datas/petaPanel";
+import { MouseButton } from "@/datas/mouseButton";
+import { ClickChecker } from "@/utils/clickChecker";
 @Options({
   components: {
     VDottedBox

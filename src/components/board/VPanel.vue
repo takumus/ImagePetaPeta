@@ -108,13 +108,17 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VDottedBox from "@/components/utils/VDottedBox.vue";
 // Others
-import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { ImageLoader } from "@/imageLoader";
-import { BoardTransform, MouseButton, PetaPanel } from "@/datas";
 import LoadingImage from "@/assets/sample.png";
 import RotateCursor1x from "@/assets/rotateCursor1x.png";
 import RotateCursor2x from "@/assets/rotateCursor2x.png";
 import { IMG_TAG_WIDTH } from "@/defines";
+import { PetaPanel } from "@/datas/petaPanel";
+import { BoardTransform } from "@/datas/board";
+import { MouseButton } from "@/datas/mouseButton";
+import { ClickChecker } from "@/utils/clickChecker";
+ClickChecker
 enum ControlStatus {
   DRAGGING = "dragging",
   ROTATING = "rotating",

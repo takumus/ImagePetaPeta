@@ -1,9 +1,12 @@
-import { PetaImage, PetaImageId, PetaImages, Board, UpdateMode, AppInfo } from '@/datas';
+import { Board } from '@/datas/board';
+import { PetaImage, PetaImages } from '@/datas/petaImage';
+import { UpdateMode } from '@/datas/updateMode';
+import { AppInfo } from '@/datas/appInfo';
 import { IpcMainInvokeEvent } from 'electron';
 export interface Main {
   browseImages: () => Promise<number>;
-  importImageFromURL: (url: string) => Promise<PetaImageId>;
-  importImagesFromFilePaths: (filePaths: string[]) => Promise<PetaImageId[]>;
+  importImageFromURL: (url: string) => Promise<string>;
+  importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
   // peta image
   getPetaImages: () => Promise<PetaImages>;
   getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer>;

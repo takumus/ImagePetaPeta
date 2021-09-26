@@ -1,5 +1,5 @@
-import { ContextMenuItem } from "@/datas";
-import { Vec2 } from "@/utils";
+import { ContextMenuItem } from "@/datas/contextMenuItem";
+import { Vec2 } from "@/utils/vec2";
 // let app: App;
 interface GLOBALS {
   contextMenu: {

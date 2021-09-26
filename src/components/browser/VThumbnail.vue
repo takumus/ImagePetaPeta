@@ -107,10 +107,12 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
-import { MouseButton,  PetaThumbnail, UpdateMode } from "@/datas";
-import { ClickChecker, Vec2, vec2FromMouseEvent } from "@/utils";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { ImageLoader } from "@/imageLoader";
 import { LOW_MEMORY_MODE } from "@/defines";
+import { PetaThumbnail } from "@/datas/petaThumbnail";
+import { MouseButton } from "@/datas/mouseButton";
+import { ClickChecker } from "@/utils/clickChecker";
 // import { API } from "@/api";
 @Options({
   components: {

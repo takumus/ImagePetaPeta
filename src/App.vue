@@ -83,10 +83,15 @@ import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
 import VInfo from "@/components/utils/VInfo.vue";
 // Others
-import { Board, createBoard, createPetaPanel, ImportImageResult, PetaImages, PetaPanel, UpdateMode, parseBoards, toDBBoard } from "@/datas";
 import { API, log } from "@/api";
-import { DelayUpdater, Vec2, vec2FromMouseEvent } from "@/utils";
 import { DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
+import { PetaImages } from "@/datas/petaImage";
+import { Board, createBoard, parseBoards, toDBBoard } from "@/datas/board";
+import { ImportImageResult } from "@/datas/importImageResult";
+import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
+import { UpdateMode } from "@/datas/updateMode";
+import { DelayUpdater } from "@/utils/delayUpdater";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 @Options({
   components: {
     VPanel,

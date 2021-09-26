@@ -1,4 +1,5 @@
-import { ImportImageResult, MenuType, PetaImage } from "@/datas";
+import { ImportImageResult } from "@/datas/importImageResult";
+import { PetaImage } from "@/datas/petaImage";
 
 export interface Renderer {
   updatePetaImages: () => void;

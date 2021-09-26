@@ -37,8 +37,8 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
-import { PetaThumbnail } from "@/datas";
 import { ImageLoader } from "@/imageLoader";
+import { PetaThumbnail } from "@/datas/petaThumbnail";
 @Options({
   components: {
   }
