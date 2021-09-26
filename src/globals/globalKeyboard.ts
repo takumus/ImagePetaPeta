@@ -1,46 +1,46 @@
-import { ref } from "vue";
-import { reactive } from "vue";
-export const Keyboards = reactive({
+import { reactive, App } from "vue";
+const keyboards = reactive({
   shift: false,
   ctrl: false,
   cmd: false,
   delete: false,
   current: ""
 });
-export function initKeyboards() {
+export function initKeyboards(app: App) {
+  app.config.globalProperties.$keyboards = keyboards;
   window.addEventListener("keydown", (e) => {
     switch(e.key.toLowerCase()) {
       case "shift":
-        Keyboards.shift = true;
+        keyboards.shift = true;
         break;
       case "control":
-        Keyboards.ctrl = true;
+        keyboards.ctrl = true;
         break;
       case "backspace":
       case "delete":
-        Keyboards.delete = true;
+        keyboards.delete = true;
         break;
     }
-    Keyboards.current = e.key.toLowerCase();
+    keyboards.current = e.key.toLowerCase();
   });
   window.addEventListener("keyup", (e) => {
     switch(e.key.toLowerCase()) {
       case "shift":
-        Keyboards.shift = false;
+        keyboards.shift = false;
         break;
       case "control":
-        Keyboards.ctrl = false;
+        keyboards.ctrl = false;
         break;
       case "backspace":
       case "delete":
-        Keyboards.delete = false;
+        keyboards.delete = false;
         break;
     }
-    if (Keyboards.current == e.key.toLowerCase()) Keyboards.current = "";
+    if (keyboards.current == e.key.toLowerCase()) keyboards.current = "";
   });
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
-    $keyboards: typeof Keyboards;
+    $keyboards: typeof keyboards;
   }
 }

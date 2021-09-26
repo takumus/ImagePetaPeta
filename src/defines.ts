@@ -7,5 +7,6 @@ export const DEFAULT_IMAGE_SIZE = 200;
 export const PACKAGE_JSON_URL = "https://raw.githubusercontent.com/takumus/ImagePetaPeta/main/package.json";
 export const DOWNLOAD_URL = "https://github.com/takumus/ImagePetaPeta/releases/tag/";
 export const MAX_PREVIEW_COUNT = 20;
-export const LOW_MEMORY_MODE = false;
 export const THUMBNAILS_SELECTION_PERCENT = 0.4;
+export const BOARD_DEFAULT_BACKGROUND_FILL_COLOR = "#ffffff";
+export const BOARD_DEFAULT_BACKGROUND_LINE_COLOR = "#cccccc";

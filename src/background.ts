@@ -9,7 +9,7 @@ import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
 import { initWindow } from "@/window";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { Board, createBoard } from "@/datas/board";
+import { addBoardProperties, Board, createBoard } from "@/datas/board";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { Renderer } from "@/api/renderer";
@@ -19,7 +19,7 @@ import { AddImageResult } from "@/datas/addImageResult";
 import DB from "@/utils/db";
 import Logger from "@/utils/logger";
 import { Settings } from "@/datas/settings";
-import { defaultSettings } from "@/utils/settings";
+import { defaultSettings } from "@/datas/settings";
 import Config from "@/utils/config";
 (async () => {
   const window = await initWindow();
@@ -152,6 +152,10 @@ import Config from "@/utils/config";
       try {
         logger.mainLog("#Get Boards");
         const data = await boardsDB.find({});
+        data.forEach((board) => {
+          // バージョンアップ時のプロパティ更新
+          addBoardProperties(board);
+        })
         if (data.length == 0) {
           logger.mainLog("no boards");
           const board = createBoard(DEFAULT_BOARD_NAME);
@@ -244,7 +248,7 @@ import Config from "@/utils/config";
         logger.mainLog("#Update Settings");
         settingsConfig.data = settings;
         await settingsConfig.save();
-        logger.mainLog("return:", true);
+        logger.mainLog("return:", settingsConfig.data);
         return true;
       } catch(e) {
         logger.mainLog(e);
@@ -254,6 +258,7 @@ import Config from "@/utils/config";
     getSettings: async (event) => {
       try {
         logger.mainLog("#Get Settings");
+        logger.mainLog("return:", settingsConfig.data);
         return settingsConfig.data;
       } catch(e) {
         logger.mainLog(e);

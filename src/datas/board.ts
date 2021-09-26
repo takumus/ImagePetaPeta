@@ -2,13 +2,18 @@ import { v4 as uuid } from "uuid";
 import { PetaPanel } from "./petaPanel";
 import { vec2FromObject, Vec2 } from "@/utils/vec2";
 import { PetaImages } from "./petaImage";
+import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
 
 export interface Board {
   petaPanels: PetaPanel[],
   id: string,
   name: string,
   transform: BoardTransform,
-  index: number
+  index: number,
+  background: {
+    fillColor: string,
+    lineColor: string
+  }
 }
 export interface BoardTransform {
   scale: number,
@@ -33,9 +38,22 @@ export function createBoard(name: string, index = 0) {
       scale: 1,
       position: new Vec2(0, 0)
     },
+    background: {
+      fillColor: "#ffffff",
+      lineColor: "#cccccc"
+    },
     index: index
   }
   return board;
+}
+export function addBoardProperties(board: Board) {
+  // バージョンアップで旧ファイルとの整合性を取る
+  if (!board.background) {
+    board.background = {
+      fillColor: BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+      lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR
+    }
+  }
 }
 export function toDBBoard(board: Board) {
   const b = JSON.parse(JSON.stringify(board)) as Board;

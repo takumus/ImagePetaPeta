@@ -16,5 +16,5 @@ const newDatas = Object.keys(datas).map((name) => {
   }
 });
 fs.rmSync("./licenses.json");
-fs.writeFileSync("./src/licenses.ts", `export const LICENSES = ${JSON.stringify(newDatas, null, 2)}`);
+fs.writeFileSync("./src/assets/licenses.ts", `export const LICENSES = ${JSON.stringify(newDatas, null, 2)}`);
 console.log("generate licenses.ts");

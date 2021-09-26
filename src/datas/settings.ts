@@ -1,7 +1,8 @@
 export interface Settings {
-  windowWidth: number,
-  windowHeight: number,
   dbDirectory: string,
-  backgroundFillColor: string,
-  backgroundLineColor: string
+  lowMemoryMode: boolean
+}
+export const defaultSettings: Settings = {
+  dbDirectory: "",
+  lowMemoryMode: false
 }

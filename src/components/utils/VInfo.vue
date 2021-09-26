@@ -44,7 +44,7 @@ import { Options, Vue } from "vue-class-component";
 // Components
 import VModal from "@/components/VModal.vue";
 // Others
-import { LICENSES } from "@/licenses";
+import { LICENSES } from "@/assets/licenses";
 import { API } from "@/api";
 import { AppInfo } from "@/datas/appInfo";
 @Options({

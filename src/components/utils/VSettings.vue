@@ -2,16 +2,12 @@
   <VModal :visible="visible" :center="true" :zIndex="3">
     <article class="settings-root">
       <p>{{$t("settings.settings")}}</p>
-      <input
-        type="color"
-        :value="$settings.backgroundFillColor"
-        @input="$settings.backgroundFillColor = $event.target.value"
-      >
-      <input
-        type="color"
-        :value="$settings.backgroundLineColor"
-        @input="$settings.backgroundLineColor = $event.target.value"
-      >
+      <label><input
+        type="checkbox"
+        :checked="$settings.lowMemoryMode"
+        @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
+      >{{$t("settings.lowMemoryMode")}}</label>
+      <p></p>
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>
@@ -20,6 +16,9 @@
 <style lang="scss" scoped>
 .settings-root {
   text-align: center;
+  label {
+    color: #333333;
+  }
   p {
     white-space: nowrap;
     color: #333333;
@@ -54,7 +53,7 @@ export default class VSettings extends Vue {
     this.visible = false;
   }
   @Watch("$settings", { deep: true })
-  updateBackgroundColor() {
+  save() {
     API.send("updateSettings", this.$settings);
   }
 }

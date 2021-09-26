@@ -1,9 +1,9 @@
 <template>
-  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: $settings.backgroundFillColor }">
+  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: board.background.fillColor }">
     <section ref="panelsWrapper" class="panels-wrapper">
       <section ref="panelsBackground" class="panels-background">
-        <div class="line vertical" :style="{ transform: `translateX(${centerX})`, backgroundColor: $settings.backgroundLineColor }"></div>
-        <div class="line horizontal" :style="{ transform: `translateY(${centerY})`, backgroundColor: $settings.backgroundLineColor }"></div>
+        <div class="line vertical" :style="{ transform: `translateX(${centerX})`, backgroundColor: board.background.lineColor }"></div>
+        <div class="line horizontal" :style="{ transform: `translateY(${centerY})`, backgroundColor: board.background.lineColor }"></div>
       </section>
       <section class="panels" :style="{
         transform: `translate(${transform.position.x}px, ${transform.position.y}px)`
@@ -31,6 +31,8 @@
       />
     </section>
     <section class="info">
+      <input type="color" v-model="board.background.fillColor">
+      <input type="color" v-model="board.background.lineColor">
       {{scalePercent}}%
     </section>
   </article>
@@ -90,6 +92,7 @@
     bottom: 0px;
     right: 0px;
     color: #333333;
+    padding: 8px;
   }
 }
 </style>
