@@ -45,7 +45,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    // background-color: #eeeeee;
     overflow: hidden;
     border-radius: 8px;
     img {
@@ -56,6 +55,7 @@
       filter: brightness(0.7);
       border-radius: 9px;
       padding: 1px;
+      background-color: #ffffff;
       &.selected-image {
         filter: brightness(1.0);
       }
@@ -76,10 +76,10 @@
     width: 100%;
     height: 100%;
     background-color: rgba($color: #ffffff, $alpha: 0.4);
-    border: solid 4px #333333;
+    border: solid 4px #222222;
     .checkbox {
       border-radius: 8px 0px 0px 0px;
-      background-color: #333333;
+      background-color: #222222;
       color: #ffffff;
       position: absolute;
       padding: 0px 6px;

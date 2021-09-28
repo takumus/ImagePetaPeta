@@ -61,10 +61,10 @@
   .thumbs-wrapper {
     width: 100%;
   }
-  &::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 16px;
   }
-  &::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background-color: #cccccc;
     border-radius: 8px;
     min-height: 20%;
