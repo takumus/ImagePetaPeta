@@ -163,7 +163,7 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VModal from "@/components/VModal.vue";
 import VThumbnail from "@/components/browser/VThumbnail.vue";
@@ -211,8 +211,6 @@ export default class VBrowser extends Vue {
   sortMode = SortMode.ADD_DATE;
   imagesResizer?: ResizeObserver;
   scrollAreaResizer?: ResizeObserver;
-  shiftKeyPressed = false;
-  ctrlKeyPressed = false;
   firstSelectedBrowserThumbnail: BrowserThumbnail | null = null;
   mounted() {
     this.imagesResizer = new ResizeObserver((entries) => {
@@ -223,7 +221,6 @@ export default class VBrowser extends Vue {
     });
     this.images.addEventListener("scroll", this.updateScrollArea);
     window.addEventListener("keydown", this.keydown);
-    window.addEventListener("keyup", this.keyup);
     this.imagesResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.images);
 
@@ -232,7 +229,6 @@ export default class VBrowser extends Vue {
   unmounted() {
     this.images.removeEventListener("scroll", this.updateScrollArea);
     window.removeEventListener("keydown", this.keydown);
-    window.removeEventListener("keyup", this.keyup);
     this.imagesResizer?.unobserve(this.thumbsWrapper);
     this.scrollAreaResizer?.unobserve(this.images);
     this.imagesResizer?.disconnect();
@@ -240,32 +236,12 @@ export default class VBrowser extends Vue {
   }
   keydown(e: KeyboardEvent) {
     switch(e.key.toLowerCase()) {
-      case "shift": {
-        this.shiftKeyPressed = true;
-        break;
-      }
-      case "control": {
-        this.ctrlKeyPressed = true;
-        break;
-      }
       case "a": {
         if (e.ctrlKey || e.metaKey) {
           this.filteredPetaImages.forEach((pi) => {
             pi._selected = true;
           });
         }
-        break;
-      }
-    }
-  }
-  keyup(e: KeyboardEvent) {
-    switch(e.key.toLowerCase()) {
-      case "shift": {
-        this.shiftKeyPressed = false;
-        break;
-      }
-      case "control": {
-        this.ctrlKeyPressed = false;
         break;
       }
     }
@@ -287,13 +263,13 @@ export default class VBrowser extends Vue {
     const tags = [...this.selectedTagsArray];
     const index = tags.indexOf(tag);
     if (index < 0) {
-      if (!this.shiftKeyPressed) {
+      if (!this.$keyboards.shift) {
         tags.length = 0;
       }
       tags.push(tag);
       this.selectedTags = tags.join(" ");
     } else {
-      if (!this.shiftKeyPressed) {
+      if (!this.$keyboards.shift) {
         tags.length = 0;
         tags.push(tag);
       } else {
@@ -303,7 +279,7 @@ export default class VBrowser extends Vue {
     }
   }
   addPanel(thumb: BrowserThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    if ((this.shiftKeyPressed || this.ctrlKeyPressed) && this.selectedPetaImages.length > 1) {
+    if ((this.$keyboards.shift || this.$keyboards.ctrl) && this.selectedPetaImages.length > 1) {
       return;
     }
     thumb.petaImage._selected = false;
@@ -322,20 +298,20 @@ export default class VBrowser extends Vue {
     this.close();
   }
   selectThumbnail(thumb: BrowserThumbnail) {
-    if (this.selectedPetaImages.length < 1 || (!this.ctrlKeyPressed && !this.shiftKeyPressed)) {
+    if (this.selectedPetaImages.length < 1 || (!this.$keyboards.ctrl && !this.$keyboards.shift)) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedBrowserThumbnail = thumb;
     }
     // 全選択解除するが、選択サムネイルは状態を保持する。
     const prevSelection = thumb.petaImage._selected;
-    if (!this.ctrlKeyPressed) {
+    if (!this.$keyboards.ctrl) {
       // コントロールキーが押されていなければ選択をリセット
       this.clearSelectionAllImages();
     }
     thumb.petaImage._selected = prevSelection;
     // 選択サムネイルを反転
     thumb.petaImage._selected = !thumb.petaImage._selected;
-    if (this.firstSelectedBrowserThumbnail && this.shiftKeyPressed) {
+    if (this.firstSelectedBrowserThumbnail && this.$keyboards.shift) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
         Math.min(this.firstSelectedBrowserThumbnail.position.x, thumb.position.x),
@@ -439,6 +415,10 @@ export default class VBrowser extends Vue {
   }
   close() {
     this.visible = false;
+  }
+  @Watch("selectedTags")
+  changeSelectedTags() {
+    this.images.scrollTo(0, 0);
   }
   get selectedTagsArray() {
     return this.selectedTags.split(" ").filter((tag) => tag != "");
