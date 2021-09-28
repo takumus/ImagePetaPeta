@@ -422,7 +422,7 @@ export default class VBrowser extends Vue {
     });
   }
   petaImageMenu(thumb: BrowserThumbnail, position: Vec2) {
-    thumb.petaImage._selected = true;
+    this.selectThumbnail(thumb);
     this.$globalComponents.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
