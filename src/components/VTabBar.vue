@@ -71,15 +71,12 @@
   left: 0px;
   text-align: left;
   width: 100%;
-  background-color: #eeeeee;
+  background-color: var(--main-tab-bg-color);
+  color: var(--main-font-color);
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   line-height: 1.0em;
   font-size: 1.0em;
   display: flex;
-  .dark & {
-    background-color: #333333;
-  }
-  // color: #333333;
   .button {
     display: block;
     margin: 0px;
@@ -88,7 +85,7 @@
     margin-right: -1px;
     flex-shrink: 1;
     .dark & {
-      border-color: #222222;
+      border-color: var(--main-button-active-bg-color);
     }
     cursor: pointer;
     overflow: hidden;
@@ -108,10 +105,7 @@
       visibility: visible;
     }
     &.selected {
-      background-color: #ffffff;
-      .dark & {
-        background-color: #222222;
-      }
+      background-color: var(--main-tab-selected-color);
       flex-shrink: 0;
       .wrapper {
         .remove {

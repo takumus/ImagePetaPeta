@@ -25,7 +25,7 @@ const ja = {
       resetPosition: "位置をリセット"
     },
     panelMenu: {
-      crop: "切り取り",
+      crop: "トリミング",
       flipHorizontal: "左右反転",
       flipVertical: "上下反転",
       reset: "リセット",

@@ -36,20 +36,46 @@
   box-sizing: border-box;
 }
 .root {
-  color: #333333;
+  --main-bg-color: #ffffff;
+  --main-font-color: #333333;
+
+  --main-button-bg-color: #ffffff;
+  --main-button-hover-bg-color: #ffffff;
+  --main-button-active-bg-color: #eeeeee;
+
+  --main-tab-bg-color: #eeeeee;
+  --main-tab-selected-color: #ffffff;
   &.dark {
-    color: #ffffff;
+    --main-bg-color: #333333;
+    --main-font-color: #ffffff;
+
+    --main-button-bg-color: #444444;
+    --main-button-hover-bg-color: #555555;
+    --main-button-active-bg-color: #444444;
+
+    --main-tab-bg-color: #333333;
+    --main-tab-selected-color: #444444;
+  }
+  background-color: var(--main-bg-color);
+  color: var(--main-font-color);
+  .thumbs-wrapper {
+    width: 100%;
+  }
+  &::-webkit-scrollbar {
+    width: 16px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #cccccc;
+    border-radius: 8px;
+    min-height: 20%;
   }
 }
 button {
   display: inline-block;
   border-radius: 128px;
   border: none;
-  background-color: #ffffff;
-  .dark & {
-    background-color: #666666;
-    color: #ffffff;
-  }
+  background-color: var(--main-button-bg-color);
+  color: var(--main-font-color);
   padding: 8px 16px;
   min-width: 120px;
   height: 32px;
@@ -60,17 +86,11 @@ button {
   margin: 4px;
   outline: none;
   &:hover {
-    background-color: #ffffff;
-    .dark & {
-      background-color: #555555;
-    }
+    background-color: var(--main-button-hover-bg-color);
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
   }
   &:active {
-    background-color: #eeeeee;
-    .dark & {
-      background-color: #444444;
-    }
+    background-color: var(--main-button-active-bg-color);
     box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
   }
 }
@@ -276,7 +296,7 @@ export default class App extends Vue {
     for (let i = 2; names.includes(name); i++) {
       name = basename + (i > 0 ? `(${i})` : "");
     }
-    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1);
+    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$settings.darkMode);
     await API.send(
       "updatePetaBoards",
       [board],

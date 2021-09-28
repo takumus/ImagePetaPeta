@@ -162,7 +162,7 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
         })
         if (data.length == 0) {
           logger.mainLog("no boards");
-          const board = createPetaBoard(DEFAULT_BOARD_NAME);
+          const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, settingsConfig.data.darkMode);
           await updatePetaBoard(board, UpdateMode.INSERT);
           data.push(board);
           logger.mainLog("return:", data.length);

@@ -144,16 +144,6 @@
       position: relative;
       overflow-y: scroll;
       overflow-x: hidden;
-      .thumbs-wrapper {
-        width: 100%;
-      }
-      &::-webkit-scrollbar {
-        width: 16px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background-color: #cccccc;
-        border-radius: 8px;
-      }
     }
     .images-wrapper {
       width: 100%;

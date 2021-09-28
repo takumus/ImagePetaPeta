@@ -28,16 +28,14 @@
   top: 0px;
   left: 0px;
   background-color: rgba($color: #000000, $alpha: 0.7);
+  color: var(--main-font-color);
   overflow: hidden;
   .modal {
     width: 600px;
-    background-color: #ffffff;
+    background-color: var(--main-bg-color);
     padding: 16px;
     border-radius: 8px;
     overflow: hidden;
-    .dark & {
-      background-color: #333333;
-    }
   }
 }
 </style>

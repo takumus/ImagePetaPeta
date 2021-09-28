@@ -1,5 +1,5 @@
 <template>
-  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: board.background.fillColor, dark: $settings.darkMode }">
+  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: board.background.fillColor }">
     <section ref="panelsWrapper" class="panels-wrapper">
       <section ref="panelsBackground" class="panels-background">
         <div class="line vertical" :style="{ transform: `translateX(${centerX})`, backgroundColor: board.background.lineColor }"></div>
@@ -97,10 +97,7 @@
       vertical-align: top;
       padding: 4px;
       border-radius: 8px;
-      background-color: #ffffff;
-      .dark & {
-        background-color: #333333;
-      }
+      background-color: var(--main-bg-color);
     }
     input {
       display: inline-block;
@@ -108,9 +105,7 @@
       margin-right: 8px;
       border-radius: 8px;
       height: 26px;
-      .dark & {
-        background-color: #333333;
-      }
+      background-color: var(--main-bg-color);
     }
   }
 }
