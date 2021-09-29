@@ -46,19 +46,27 @@
 
   --main-tab-bg-color: #eeeeee;
   --main-tab-selected-color: #ffffff;
+  
   &.dark {
     --main-bg-color: #333333;
     --main-font-color: #ffffff;
 
     --main-button-bg-color: #444444;
-    --main-button-hover-bg-color: #555555;
-    --main-button-active-bg-color: #444444;
+    --main-button-hover-bg-color: #444444;
+    --main-button-active-bg-color: #555555;
 
     --main-tab-bg-color: #333333;
     --main-tab-selected-color: #444444;
   }
   background-color: var(--main-bg-color);
   color: var(--main-font-color);
+  font-size: 12px;
+  font-family: "Helvetica Neue",
+    Arial,
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    Meiryo,
+    sans-serif;
   .thumbs-wrapper {
     width: 100%;
   }
@@ -77,9 +85,10 @@ button {
   border: none;
   background-color: var(--main-button-bg-color);
   color: var(--main-font-color);
-  padding: 8px 16px;
-  min-width: 120px;
-  height: 32px;
+  padding: 4px 16px;
+  // height: auto;
+  // min-width: 120px;
+  height: 24px;
   line-height: 1.0em;
   font-size: 1.0em;
   cursor: pointer;
@@ -113,13 +122,6 @@ body, html {
   user-select: none;
   margin: 0px;
   padding: 0px;
-  font-size: 16px;
-  font-family: "Helvetica Neue",
-    Arial,
-    "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans",
-    Meiryo,
-    sans-serif;
 }
 .menu {
   position: fixed;
@@ -182,7 +184,7 @@ export default class App extends Vue {
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
-  windowIsFocused = false;
+  windowIsFocused = true;
   async mounted() {
     log("INIT RENDERER!");
     this.$globalComponents.importImages = () => {
@@ -211,9 +213,9 @@ export default class App extends Vue {
       }
     });
     API.on("windowFocused", (e, focused) => {
-      this.windowIsFocused = focused;
+      // this.windowIsFocused = focused;
     });
-    this.windowIsFocused = await API.send("getWindowIsFocused");
+    // this.windowIsFocused = await API.send("getWindowIsFocused");
     await this.getSettings();
     await this.getPetaImages();
     await this.getPetaBoards();

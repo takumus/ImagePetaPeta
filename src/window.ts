@@ -16,6 +16,7 @@ export async function initWindow(): Promise<BrowserWindow> {
       win = new BrowserWindow({
         width: 1920,
         height: 1080,
+        frame: false,
         webPreferences: {
           nodeIntegration: false,
           contextIsolation: true,

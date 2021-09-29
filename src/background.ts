@@ -274,6 +274,19 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
     },
     setZoomLevel: async (event, level) => {
       window.webContents.setZoomLevel(level);
+    },
+    windowMinimize: async (event) => {
+      window.minimize();
+    },
+    windowMaximize: async (event) => {
+      if (window.isMaximized()) {
+        window.unmaximize();
+        return;
+      }
+      window.maximize();
+    },
+    windowClose: async (event) => {
+      app.quit();
     }
   }
   Object.keys(mainFunctions).forEach((key) => {
