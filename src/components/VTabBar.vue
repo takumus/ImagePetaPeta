@@ -4,9 +4,9 @@
       <section class="draggable">
       </section>
       <section class="window-buttons">
-        <span @click="minimizeWindow" class="window-button">-</span>
-        <span @click="maximizeWindow" class="window-button">□</span>
-        <span @click="closeWindow" class="window-button close">×</span>
+        <span @click="minimizeWindow" class="window-button">&#xe921;</span>
+        <span @click="maximizeWindow" class="window-button">&#xe922;</span>
+        <span @click="closeWindow" class="window-button close">&#xe8bb;</span>
       </section>
     </section>
     <section class="tab">
@@ -86,7 +86,7 @@
   .titlebar {
     width: 100%;
     background-color: var(--main-tab-bg-color);
-    height: 16px;
+    height: 18px;
     text-align: right;
     display: flex;
     .draggable {
@@ -95,10 +95,12 @@
     }
     .window-buttons {
       .window-button {
+        font-size: 9px;
         display: inline-block;
-        padding: 0px 16px;
-        height: 16px;
-        cursor: pointer;
+        padding: 0px 24px;
+        padding-top: 4px;
+        height: 100%;
+        font-family: Segoe MDL2 Assets;
         &:hover {
           background-color: var(--main-tab-selected-color);
           &.close {
