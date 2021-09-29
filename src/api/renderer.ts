@@ -9,4 +9,5 @@ export interface Renderer {
   importImagesProgress: (progress: number, file: string, result: ImportImageResult) => void;
   importImagesComplete: (fileCount: number, addedFileCount: number) => void;
   notifyUpdate: (current: string, latest: string) => void;
+  windowFocused: (focused: boolean) => void;
 }

@@ -22,12 +22,11 @@
 <style lang="scss" scoped>
 .image-importer-root {
   text-align: center;
-  color: #333333;
   .log {
     text-align: left;
     overflow: hidden;
     word-break: break-all;
-    white-space: pre-wrap ;
+    white-space: pre-wrap;
     height: 64px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -37,7 +36,7 @@
     white-space: nowrap;
   }
   .bar {
-    background-color: #333333;
+    background-color: var(--main-font-color);
     width: 100%;
     height: 16px;
     overflow: hidden;
@@ -47,7 +46,7 @@
       width: 50%;
       height: 100%;
       border-radius: 8px;
-      background-color: #ffffff;
+      background-color: var(--main-bg-color);
     }
   }
 }

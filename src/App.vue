@@ -12,6 +12,7 @@
       @addPanel="addPanel"
     />
     <VTabBar
+      v-show="windowIsFocused"
       :boards="sortedPetaBoards"
       @remove="removePetaBoard"
       @add="addPetaBoard"
@@ -24,7 +25,7 @@
     <VSettings />
     <VContextMenu />
     <VComplement />
-    <section class="menu">
+    <section class="menu" v-show="windowIsFocused">
       <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
       <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
     </section>
@@ -85,6 +86,9 @@ button {
   box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
   margin: 4px;
   outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   &:hover {
     background-color: var(--main-button-hover-bg-color);
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
@@ -178,9 +182,9 @@ export default class App extends Vue {
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
+  windowIsFocused = false;
   async mounted() {
     log("INIT RENDERER!");
-    await this.getSettings();
     this.$globalComponents.importImages = () => {
       API.send("browseImages");
     }
@@ -206,6 +210,11 @@ export default class App extends Vue {
         }
       }
     });
+    API.on("windowFocused", (e, focused) => {
+      this.windowIsFocused = focused;
+    });
+    this.windowIsFocused = await API.send("getWindowIsFocused");
+    await this.getSettings();
     await this.getPetaImages();
     await this.getPetaBoards();
   }

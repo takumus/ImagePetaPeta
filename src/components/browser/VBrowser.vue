@@ -416,6 +416,16 @@ export default class VBrowser extends Vue {
   close() {
     this.visible = false;
   }
+  sort(a: PetaImage, b: PetaImage) {
+    switch(this.sortMode) {
+      case SortMode.ADD_DATE: {
+        if (a.addDate == b.addDate) {
+          return b.fileDate - a.fileDate;
+        }
+        return b.addDate - a.addDate;
+      }
+    }
+  }
   @Watch("selectedTags")
   changeSelectedTags() {
     this.images.scrollTo(0, 0);
@@ -448,17 +458,7 @@ export default class VBrowser extends Vue {
       return result;
     });
   }
-  sort(a: PetaImage, b: PetaImage) {
-    switch(this.sortMode) {
-      case SortMode.ADD_DATE: {
-        if (a.addDate == b.addDate) {
-          return b.fileDate - a.fileDate;
-        }
-        return b.addDate - a.addDate;
-      }
-    }
-  }
-  get tags():Tag[] {
+  get tags(): Tag[] {
     const tags: Tag[] = [];
     this.petaImagesArray.forEach((pi) => {
       pi.tags.forEach((tag) => {

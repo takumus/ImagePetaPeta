@@ -53,11 +53,11 @@
       height: 100%;
       cursor: pointer;
       filter: brightness(0.7);
-      border-radius: 9px;
-      padding: 1px;
-      background-color: #ffffff;
+      // background-color: #ffffff;
       &.selected-image {
         filter: brightness(1.0);
+        border-radius: 9px;
+        padding: 2px;
       }
     }
     &:hover {

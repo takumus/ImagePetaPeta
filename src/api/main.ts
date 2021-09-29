@@ -32,6 +32,10 @@ export interface Main {
   // updateSettings
   updateSettings: (settings: Settings) => Promise<boolean>;
   getSettings: () => Promise<Settings>;
+  // getWindowIsFocused
+  getWindowIsFocused: () => Promise<boolean>;
+  // zoomLevel
+  setZoomLevel: (level: number) => Promise<void>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>

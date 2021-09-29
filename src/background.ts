@@ -268,10 +268,22 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
         logger.mainLog(e);
       }
       return defaultSettings;
+    },
+    getWindowIsFocused: async (event) => {
+      return window.isFocused();
+    },
+    setZoomLevel: async (event, level) => {
+      window.webContents.setZoomLevel(level);
     }
   }
   Object.keys(mainFunctions).forEach((key) => {
     ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
+  });
+  window.addListener("blur", () => {
+    sendToRenderer("windowFocused", false);
+  });
+  window.addListener("focus", () => {
+    sendToRenderer("windowFocused", true);
   });
   async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     logger.mainLog(" ##Update Peta Image");
