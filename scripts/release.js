@@ -1,7 +1,7 @@
 const fs = require("fs");
 const process = require("child_process");
 const packageJSON = JSON.parse(fs.readFileSync("./package.json"));
-const readme = fs.readFileSync("README.md").toString().replace(/<https:\/\/github.com\/takumus\/ImagePetaPeta\/releases\/tag\/.*>/g, `https://github.com/takumus/ImagePetaPeta/releases/tag/${packageJSON.version}`);
+const readme = fs.readFileSync("README.md").toString().replace(/<https:\/\/github.com\/takumus\/ImagePetaPeta\/releases\/tag\/.*>/g, `<https://github.com/takumus/ImagePetaPeta/releases/tag/${packageJSON.version}>`);
 fs.writeFileSync("README.md", readme);
 console.log(process.execSync(`git add README.md`).toString());
 console.log(process.execSync(`git add package.json`).toString());
