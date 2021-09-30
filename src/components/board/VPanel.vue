@@ -139,7 +139,7 @@ export default class VPanel extends Vue {
   rotateCursor = `-webkit-image-set(
     url('${RotateCursor1x}') 1x,
     url('${RotateCursor2x}') 2x
-  ) 16 16, auto`;
+  ) 11 11, auto`;
   hovered = false;
   click = new ClickChecker();
   // vertical 縦
