@@ -97,7 +97,7 @@
       vertical-align: top;
       padding: 4px;
       border-radius: 8px;
-      background-color: var(--main-bg-color);
+      background-color: var(--bg-color);
     }
     input {
       display: inline-block;
@@ -105,7 +105,7 @@
       margin-right: 8px;
       border-radius: 8px;
       height: 26px;
-      background-color: var(--main-bg-color);
+      background-color: var(--bg-color);
     }
   }
 }

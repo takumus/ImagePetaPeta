@@ -38,35 +38,35 @@
   box-sizing: border-box;
 }
 .root {
-  --main-bg-color: #ffffff;
-  --main-font-color: #333333;
+  --bg-color: #ffffff;
+  --font-color: #333333;
 
-  --main-button-bg-color: #ffffff;
-  --main-button-hover-bg-color: #ffffff;
-  --main-button-active-bg-color: #eeeeee;
+  --button-bg-color: #ffffff;
+  --button-hover-bg-color: #ffffff;
+  --button-active-bg-color: #eeeeee;
 
-  --main-tab-bg-color: #eeeeee;
-  --main-tab-selected-color: #ffffff;
+  --tab-bg-color: #eeeeee;
+  --tab-selected-color: #ffffff;
 
   --window-buttons-hover: #cccccc;
   --window-buttons-close-hover: #ff0000;
   
   &.dark {
-    --main-bg-color: #333333;
-    --main-font-color: #ffffff;
+    --bg-color: #333333;
+    --font-color: #ffffff;
 
-    --main-button-bg-color: #444444;
-    --main-button-hover-bg-color: #444444;
-    --main-button-active-bg-color: #555555;
+    --button-bg-color: #444444;
+    --button-hover-bg-color: #444444;
+    --button-active-bg-color: #555555;
 
-    --main-tab-bg-color: #333333;
-    --main-tab-selected-color: #444444;
+    --tab-bg-color: #333333;
+    --tab-selected-color: #444444;
 
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;
   }
-  background-color: var(--main-bg-color);
-  color: var(--main-font-color);
+  background-color: var(--bg-color);
+  color: var(--font-color);
   font-size: 12px;
   font-family: "Helvetica Neue",
     Arial,
@@ -90,8 +90,8 @@ button {
   display: inline-block;
   border-radius: 128px;
   border: none;
-  background-color: var(--main-button-bg-color);
-  color: var(--main-font-color);
+  background-color: var(--button-bg-color);
+  color: var(--font-color);
   padding: 4px 16px;
   // height: auto;
   // min-width: 120px;
@@ -106,11 +106,11 @@ button {
   text-overflow: ellipsis;
   white-space: nowrap;
   &:hover {
-    background-color: var(--main-button-hover-bg-color);
+    background-color: var(--button-hover-bg-color);
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
   }
   &:active {
-    background-color: var(--main-button-active-bg-color);
+    background-color: var(--button-active-bg-color);
     box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
   }
 }

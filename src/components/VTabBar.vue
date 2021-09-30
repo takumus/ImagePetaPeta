@@ -85,7 +85,7 @@
   width: 100%;
   .titlebar {
     width: 100%;
-    background-color: var(--main-tab-bg-color);
+    background-color: var(--tab-bg-color);
     height: 18px;
     text-align: right;
     display: flex;
@@ -113,8 +113,8 @@
   }
   .tab {
     width: 100%;
-    background-color: var(--main-tab-bg-color);
-    color: var(--main-font-color);
+    background-color: var(--tab-bg-color);
+    color: var(--font-color);
     box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
     display: flex;
     .draggable {
@@ -135,7 +135,7 @@
       margin-right: -1px;
       flex-shrink: 1;
       .dark & {
-        border-color: var(--main-button-active-bg-color);
+        border-color: var(--button-active-bg-color);
       }
       cursor: pointer;
       overflow: hidden;
@@ -155,7 +155,7 @@
         visibility: visible;
       }
       &.selected {
-        background-color: var(--main-tab-selected-color);
+        background-color: var(--tab-selected-color);
         flex-shrink: 0;
         .wrapper {
           .remove {
