@@ -2,6 +2,7 @@
   <article class="tab-root">
     <section class="titlebar" v-if="customTitlebar">
       <section class="draggable">
+        {{title}}
       </section>
       <section class="window-buttons">
         <span @click="minimizeWindow" class="window-button">&#xe921;</span>
@@ -78,6 +79,7 @@
 
 <style lang="scss" scoped>
 .tab-root {
+  --tab-height: 16px;
   position: fixed;
   z-index: 2;
   top: 0px;
@@ -86,20 +88,24 @@
   .titlebar {
     width: 100%;
     background-color: var(--tab-bg-color);
-    height: 18px;
+    height: var(--tab-height);
     text-align: right;
     display: flex;
     .draggable {
       flex-grow: 1;
       -webkit-app-region: drag;
+      text-align: left;
+      display: inline-block;
+      padding-left: 2px;
+      line-height: var(--tab-height);
+      font-size: 0.8em;
     }
     .window-buttons {
       .window-button {
         font-size: 6px;
         display: inline-block;
         padding: 0px 16px;
-        padding-top: 5px;
-        height: 100%;
+        line-height: var(--tab-height);
         font-family: Segoe MDL2 Assets;
         &:hover {
           background-color: var(--window-buttons-hover);
@@ -130,18 +136,16 @@
     .button {
       display: block;
       margin: 0px;
-      border-right: solid 1px #cccccc;
-      border-left: solid 1px #cccccc;
+      border-right: solid 1px var(--tab-border-color);
+      // border-left: solid 1px;
       margin-right: -1px;
       flex-shrink: 1;
-      .dark & {
-        border-color: var(--button-active-bg-color);
-      }
       cursor: pointer;
       overflow: hidden;
       &.drag {
         position: absolute;
         pointer-events: none;
+        border-left: solid 1px var(--tab-border-color);
       }
       &.add {
         min-width: 16px;
@@ -157,6 +161,7 @@
       &.selected {
         background-color: var(--tab-selected-color);
         flex-shrink: 0;
+        border-left: solid 1px var(--tab-border-color);
         .wrapper {
           .remove {
             visibility: visible;
@@ -223,6 +228,8 @@ export default class VTabBar extends Vue {
   customTitlebar = false;
   @Prop()
   hide = false;
+  @Prop()
+  title = "";
   @Ref("draggingTab")
   draggingTab!: HTMLElement;
   dragging = false;

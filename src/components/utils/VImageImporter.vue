@@ -30,7 +30,7 @@
     height: 64px;
     overflow-y: auto;
     overflow-x: hidden;
-    font-size: 0.7em;
+    font-size: 0.8em;
   }
   p {
     white-space: nowrap;

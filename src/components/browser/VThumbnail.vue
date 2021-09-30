@@ -102,7 +102,7 @@
       padding: 2px;
       border-radius: 4px;
       margin-right: 4px;
-      font-size: 0.7em;
+      font-size: 0.8em;
     }
   }
 }

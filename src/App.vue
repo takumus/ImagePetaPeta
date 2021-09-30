@@ -15,6 +15,7 @@
       :hide="!windowIsFocused"
       :boards="sortedPetaBoards"
       :customTitlebar="customTitlebar"
+      :title="title"
       @remove="removePetaBoard"
       @add="addPetaBoard"
       @select="selectPetaBoard"
@@ -29,6 +30,9 @@
     <section class="menu" v-show="windowIsFocused">
       <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
       <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
+    </section>
+    <section class="border">
+
     </section>
   </article>
 </template>
@@ -47,6 +51,7 @@
 
   --tab-bg-color: #eeeeee;
   --tab-selected-color: #ffffff;
+  --tab-border-color: #cccccc;
 
   --window-buttons-hover: #cccccc;
   --window-buttons-close-hover: #ff0000;
@@ -61,6 +66,7 @@
 
     --tab-bg-color: #333333;
     --tab-selected-color: #444444;
+    --tab-border-color: #555555;
 
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;
@@ -84,6 +90,14 @@
     background-color: #cccccc;
     border-radius: 8px;
     min-height: 20%;
+  }
+  .border {
+    z-index: 10;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    // border: solid 1.5px var(--font-color);
+    pointer-events: none;
   }
 }
 button {
@@ -192,6 +206,7 @@ export default class App extends Vue {
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
   customTitlebar = false;
+  title = "";
   async mounted() {
     log("INIT RENDERER!");
     if (await API.send("getPlatform") == "win32") {
@@ -226,6 +241,8 @@ export default class App extends Vue {
       this.windowIsFocused = focused;
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
+    const info = await API.send("getAppInfo");
+    this.title = `${info.name} ${info.version}`;
     await this.getPetaImages();
     await this.getPetaBoards();
   }
