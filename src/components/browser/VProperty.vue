@@ -1,6 +1,10 @@
 <template>
   <article class="property-root">
-    <section class="previews" ref="previews" v-show="!noImage">
+    <section
+      class="previews"
+      ref="previews"
+      v-show="!noImage"
+    >
       <VPropertyThumbnail
         v-for="(data) in browserThumbnails"
         :key="data.petaImage.id"
@@ -8,8 +12,16 @@
       />
     </section>
     <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
-    <section class="buttons" v-show="!noImage">
-      <button tabindex="-1" @click="clearSelection">{{$t("browser.property.clearSelectionButton")}}</button>
+    <section
+      class="buttons"
+      v-show="!noImage"
+    >
+      <button
+        tabindex="-1"
+        @click="clearSelection"
+      >
+        {{$t("browser.property.clearSelectionButton")}}
+      </button>
     </section>
     <section v-show="!noImage">
       <p>{{$t("browser.property.tags")}}</p>
@@ -120,6 +132,13 @@ export default class VProperty extends Vue {
       pi.tags.sort();
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
+    // if (changed) {
+      // API.send("dialog", this.$t("browser.property.clearSelectionDialog"), [this.$t("shared.yes"), this.$t("shared.no")]).then((index) => {
+      //   if (index == 0) {
+      //     this.clearSelection();
+      //   }
+      // })
+    // }
   }
   clearSelection() {
     this.petaImages.forEach((pi) => {

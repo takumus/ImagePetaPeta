@@ -8,7 +8,7 @@
       width: '100%',
       height: '100%'
     }"
-    :zIndex="3"
+    :zIndex="zIndex"
   >
     <article class="browser-root">
       <section class="top">
@@ -118,6 +118,8 @@ import { UpdateMode } from "@/datas/updateMode";
 export default class VBrowser extends Vue {
   @Prop()
   petaImages: PetaImages = {};
+  @Prop()
+  zIndex = 0;
   visible = false;
   @Ref("thumbnails")
   thumbnails!: HTMLDivElement;

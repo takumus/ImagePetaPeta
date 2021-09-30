@@ -2,8 +2,13 @@
   <article
     class="image-cache"
     ref="imageCache"
+    :style="{ zIndex: zIndex }"
   >
-    <img v-for="url in cacheURLs" :key="url" :src="url">
+    <img
+      v-for="url in cacheURLs"
+      :key="url"
+      :src="url"
+    >
   </article>
 </template>
 
@@ -18,6 +23,8 @@ import { ImageLoader } from "@/imageLoader";
   }
 })
 export default class VImageCache extends Vue {
+  @Prop()
+  zIndex = 0;
   @Ref("imageCache")
   imageCache!: HTMLDivElement;
   cacheURLs: string[] = [];
@@ -33,7 +40,6 @@ export default class VImageCache extends Vue {
 .image-cache {
   position: fixed;
   pointer-events: none;
-  z-index: 12345;
   img {
     position: fixed;
     bottom: -9999px;

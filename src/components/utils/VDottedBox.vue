@@ -1,10 +1,13 @@
 <template>
-  <article class="dottedbox-root" :style="{
-    top: `${y}px`,
-    left: `${x}px`,
-    width: `${absWidth}px`,
-    height: `${absHeight}px`
-  }">
+  <article
+    class="dottedbox-root"
+    :style="{
+      top: `${y}px`,
+      left: `${x}px`,
+      width: `${absWidth}px`,
+      height: `${absHeight}px`
+    }"
+  >
     <div
       v-if="!svg"
       class="border back"

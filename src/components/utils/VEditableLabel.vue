@@ -1,5 +1,10 @@
 <template>
-  <article class="editable-label-root" :style="{ width: growWidth ? '100%' : 'unset' }">
+  <article
+    class="editable-label-root"
+    :style="{
+      width: growWidth ? '100%' : 'unset'
+    }"
+  >
     <span
       class="editable-label"
       :class="{ editing: editing }"

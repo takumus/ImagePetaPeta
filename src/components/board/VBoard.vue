@@ -1,13 +1,41 @@
 <template>
-  <article class="board-root" ref="boardRoot" :style="{ backgroundColor: board.background.fillColor }">
-    <section ref="panelsWrapper" class="panels-wrapper">
-      <section ref="panelsBackground" class="panels-background">
-        <div class="line vertical" :style="{ transform: `translateX(${centerX})`, backgroundColor: board.background.lineColor }"></div>
-        <div class="line horizontal" :style="{ transform: `translateY(${centerY})`, backgroundColor: board.background.lineColor }"></div>
+  <article
+    class="board-root"
+    ref="boardRoot"
+    :style="{
+      backgroundColor: board.background.fillColor,
+      zIndex: zIndex
+    }"
+  >
+    <section
+      ref="panelsWrapper"
+      class="panels-wrapper"
+    >
+      <section
+        ref="panelsBackground"
+        class="panels-background"
+      >
+        <div
+          class="line vertical"
+          :style="{
+            transform: `translateX(${centerX})`,
+            backgroundColor: board.background.lineColor
+          }"
+        ></div>
+        <div
+          class="line horizontal"
+          :style="{
+            transform: `translateY(${centerY})`,
+            backgroundColor: board.background.lineColor
+          }"
+        ></div>
       </section>
-      <section class="panels" :style="{
-        transform: `translate(${transform.position.x}px, ${transform.position.y}px)`
-      }">
+      <section
+        class="panels"
+        :style="{
+          transform: `translate(${transform.position.x}px, ${transform.position.y}px)`
+        }"
+      >
         <VPanel
           v-for="panel in board.petaPanels"
           :key="panel.id"
@@ -31,8 +59,16 @@
       />
     </section>
     <section class="info">
-      <input type="color" v-model="board.background.fillColor" tabindex="-1">
-      <input type="color" v-model="board.background.lineColor" tabindex="-1">
+      <input
+        type="color"
+        v-model="board.background.fillColor"
+        tabindex="-1"
+      >
+      <input
+        type="color"
+        v-model="board.background.lineColor"
+        tabindex="-1"
+      >
       <span class="zoom">{{scalePercent}}%</span>
     </section>
   </article>
@@ -62,6 +98,8 @@ import { ClickChecker } from "@/utils/clickChecker";
 export default class VBoard extends Vue {
   @Prop()
   board!: PetaBoard;
+  @Prop()
+  zIndex = 0;
   @Ref("panelsWrapper")
   panelsWrapper!: HTMLElement;
   @Ref("panelsBackground")
@@ -330,7 +368,6 @@ export default class VBoard extends Vue {
 <style lang="scss" scoped>
 .board-root {
   position: absolute;
-  z-index: 1;
   top: 0px;
   left: 0px;
   width: 100%;

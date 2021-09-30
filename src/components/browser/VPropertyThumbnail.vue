@@ -1,7 +1,12 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ top: browserThumbnail.position.y + 'px', left: browserThumbnail.position.x + 'px', width: this.browserThumbnail.width + 'px', height: this.browserThumbnail.height + 'px' }"
+    :style="{
+      top: browserThumbnail.position.y + 'px',
+      left: browserThumbnail.position.x + 'px',
+      width: this.browserThumbnail.width + 'px',
+      height: this.browserThumbnail.height + 'px'
+    }"
   >
     <div class="wrapper">
       <img

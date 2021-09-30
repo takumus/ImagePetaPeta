@@ -1,9 +1,23 @@
 <template>
-  <ul v-show="this.show" class="context-menu-root" ref="contextMenu" :style="{ top: position.y + 'px', left: position.x + 'px' }">
-    <li v-for="item in items" :key="item._id" @click="select(item)" :class="{
-      item: !item.separate,
-      separate: item.separate
-    }">
+  <ul
+    v-show="this.show"
+    class="context-menu-root"
+    ref="contextMenu"
+    :style="{
+      top: position.y + 'px',
+      left: position.x + 'px',
+      zIndex: zIndex
+    }"
+  >
+    <li
+      v-for="item in items"
+      :key="item._id"
+      @click="select(item)"
+      :class="{
+        item: !item.separate,
+        separate: item.separate
+      }"
+    >
       {{item.label}}
     </li>
   </ul>
@@ -22,6 +36,8 @@ import { ContextMenuItem } from "@/datas/contextMenuItem";
   }
 })
 export default class VContextMenu extends Vue {
+  @Prop()
+  zIndex = 0;
   @Ref("contextMenu")
   contextMenu!: HTMLElement;
   items: ContextMenuItem[] = [];
@@ -64,7 +80,6 @@ export default class VContextMenu extends Vue {
 <style lang="scss" scoped>
 .context-menu-root {
   position: fixed;
-  z-index: 5;
   background-color: #333333;
   padding: 0px;
   margin: 0px;

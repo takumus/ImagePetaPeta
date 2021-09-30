@@ -1,10 +1,20 @@
 <template>
   <article class="crop-root">
     <div class="wrapper">
-      <div ref="size" class="size">
+      <div
+        ref="size"
+        class="size"
+      >
 
       </div>
-      <div ref="images" class="images" :style="{ width: imageWidth + 'px', height: imageHeight + 'px' }">
+      <div
+        ref="images"
+        class="images"
+        :style="{
+          width: imageWidth + 'px',
+          height: imageHeight + 'px'
+        }"
+      >
         <img
           :src="imageURL"
           draggable="false"
@@ -19,7 +29,12 @@
           class="front"
         >
         <div class="dottedbox">
-          <VDottedBox :x="cropX" :y="cropY" :width="renderCropWidth" :height="renderCropHeight" />
+          <VDottedBox
+            :x="cropX"
+            :y="cropY"
+            :width="renderCropWidth"
+            :height="renderCropHeight"
+          />
         </div>
       </div>
     </div>

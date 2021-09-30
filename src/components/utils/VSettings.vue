@@ -1,24 +1,37 @@
 <template>
-  <VModal :visible="visible" :center="true" :zIndex="3">
+  <VModal
+    :visible="visible"
+    :center="true"
+    :zIndex="zIndex"
+  >
     <article class="settings-root">
       <p>{{$t("settings.settings")}}</p>
-      <label><input
-        type="checkbox"
-        :checked="$settings.lowMemoryMode"
-        @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
-      >{{$t("settings.lowMemoryMode")}}</label>
+      <label>
+        <input
+          type="checkbox"
+          :checked="$settings.lowMemoryMode"
+          @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
+        >
+        {{$t("settings.lowMemoryMode")}}
+      </label>
       <p></p>
-      <label><input
-        type="checkbox"
-        :checked="$settings.darkMode"
-        @change="$settings.darkMode = Boolean($event.target.checked)"
-      >{{$t("settings.darkMode")}}</label>
+      <label>
+        <input
+          type="checkbox"
+          :checked="$settings.darkMode"
+          @change="$settings.darkMode = Boolean($event.target.checked)"
+        >
+        {{$t("settings.darkMode")}}
+      </label>
       <p></p>
-      <label><input
-        type="checkbox"
-        :checked="$settings.alwaysOnTop"
-        @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
-      >{{$t("settings.alwaysOnTop")}}</label>
+      <label>
+        <input
+          type="checkbox"
+          :checked="$settings.alwaysOnTop"
+          @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+        >
+        {{$t("settings.alwaysOnTop")}}
+      </label>
       <p></p>
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
@@ -41,6 +54,8 @@ import { API } from "@/api";
   },
 })
 export default class VSettings extends Vue {
+  @Prop()
+  zIndex = 0;
   visible = false;
   async mounted() {
     this.$globalComponents.settings = this;

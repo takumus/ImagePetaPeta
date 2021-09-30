@@ -1,16 +1,36 @@
 <template>
-  <VModal :visible="visible" :center="true" :zIndex="3">
+  <VModal
+    :visible="visible"
+    :center="true"
+    :zIndex="zIndex"
+  >
     <article class="info-root">
-      <p>{{ appInfo.name }} {{ appInfo.version }}</p>
-      <button tabindex="-1" @click="gotoGithub">{{$t("info.githubButton")}}</button>
-      <button tabindex="-1" @click="gotoIssues">{{$t("info.issuesButton")}}</button>
+      <p>
+        {{ appInfo.name }} {{ appInfo.version }}
+      </p>
+      <button
+        tabindex="-1"
+        @click="gotoGithub">
+        {{$t("info.githubButton")}}
+      </button>
+      <button
+        tabindex="-1"
+        @click="gotoIssues">
+        {{$t("info.issuesButton")}}
+      </button>
       <p></p>
-      <button tabindex="-1" @click="showDBFolder">{{$t("info.dbFolderButton")}}</button>
+      <button
+        tabindex="-1"
+        @click="showDBFolder">
+        {{$t("info.dbFolderButton")}}
+      </button>
       <p>{{$t("info.licenses")}}</p>
       <pre>
         {{ licenses }}
       </pre>
-      <button @click="close">{{$t("shared.closeButton")}}</button>
+      <button @click="close">
+        {{$t("shared.closeButton")}}
+      </button>
     </article>
   </VModal>
 </template>
@@ -18,7 +38,7 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-// import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref } from "vue-property-decorator";
 // Components
 import VModal from "@/components/modal/VModal.vue";
 // Others
@@ -31,6 +51,8 @@ import { AppInfo } from "@/datas/appInfo";
   },
 })
 export default class VInfo extends Vue {
+  @Prop()
+  zIndex = 0;
   rawProgress = 100;
   info = 100;
   visible = false;

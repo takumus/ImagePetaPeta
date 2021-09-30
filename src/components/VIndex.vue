@@ -1,15 +1,23 @@
 <template>
-  <article class="root" :class="{ dark: $settings.darkMode }">
+  <article
+    class="root"
+    :class="{
+      dark: $settings.darkMode
+    }"
+  >
     <VBoard
+      :zIndex="1"
       v-if="currentPetaBoard"
       :board="currentPetaBoard"
       ref="vPetaBoard"
     />
     <VBrowser
+      :zIndex="2"
       :petaImages="petaImages"
       @addPanel="addPanel"
     />
     <VTabBar
+      :zIndex="4"
       :hide="!windowIsFocused"
       :boards="sortedPetaBoards"
       :customTitlebar="customTitlebar"
@@ -19,12 +27,25 @@
       @select="selectPetaBoard"
       ref="vTabBar"
     />
-    <VInfo />
-    <VSettings />
-    <VContextMenu />
-    <VComplement />
-    <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
-    <VImageCache />
+    <VInfo
+      :zIndex="3"
+    />
+    <VSettings
+      :zIndex="3"
+    />
+    <VContextMenu
+      :zIndex="5"
+    />
+    <VComplement
+      :zIndex="5"
+    />
+    <VImageImporter
+      :zIndex="6"
+      @addPanelByDragAndDrop="addPanelByDragAndDrop"
+    />
+    <VImageCache
+      :zIndex="7"
+    />
     <section class="menu" v-show="windowIsFocused">
       <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
       <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>

@@ -1,6 +1,23 @@
 <template>
-  <ul v-show="this.show" class="complement-root" ref="complement" :style="{ top: position.y + 'px', left: position.x + 'px' }">
-    <li v-for="item, i in filteredItems" :key="item" @mousedown="select(item)" class="item" :class="{ selected: i == currentIndex }">
+  <ul
+    v-show="this.show"
+    class="complement-root"
+    ref="complement"
+    :style="{
+      top: position.y + 'px',
+      left: position.x + 'px',
+      zIndex: zIndex
+    }"
+  >
+    <li
+      v-for="item, i in filteredItems"
+      :key="item"
+      @mousedown="select(item)"
+      class="item"
+      :class="{
+        selected: i == currentIndex
+      }"
+    >
       {{item}}
     </li>
   </ul>
@@ -17,6 +34,8 @@ import { Vec2 } from "@/utils/vec2";
   }
 })
 export default class VComplement extends Vue {
+  @Prop()
+  zIndex = 0;
   @Ref("complement")
   complement!: HTMLElement;
   items: string[] = [];
@@ -132,7 +151,6 @@ export default class VComplement extends Vue {
 <style lang="scss" scoped>
 .complement-root {
   position: fixed;
-  z-index: 5;
   background-color: #333333;
   padding: 0px;
   margin: 0px;

@@ -1,7 +1,13 @@
 <template>
-  <VModal :visible="loading" :center="true" :zIndex="4">
+  <VModal
+    :visible="loading"
+    :center="true"
+    :zIndex="zIndex"
+  >
     <article class="image-importer-root">
-      <p>読込中...{{Math.floor(_progress)}}%</p>
+      <p>
+        読込中...{{Math.floor(_progress)}}%
+      </p>
       <section class="bar">
         <div
           class="fill"
@@ -11,9 +17,16 @@
         >
         </div>
       </section>
-      <pre class="log">{{log}}</pre>
+      <pre class="log">
+        {{log}}
+      </pre>
       <section class="confirms">
-        <button tabindex="-1" @click="ok" v-if="this.hasErrors">OK</button>
+        <button
+          tabindex="-1"
+          @click="ok"
+          v-if="this.hasErrors">
+          OK
+        </button>
       </section>
     </article>
   </VModal>
@@ -22,6 +35,7 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
+import { Prop, Ref } from "vue-property-decorator";
 // Components
 import VModal from "@/components/modal/VModal.vue";
 // Others
@@ -36,6 +50,8 @@ import { API } from "@/api";
   ]
 })
 export default class VImageImporter extends Vue {
+  @Prop()
+  zIndex = 0;
   rawProgress = 100;
   progress = 100;
   loading = false;

@@ -1,5 +1,6 @@
 <template>
-  <article class="panel-root"
+  <article
+    class="panel-root"
     ref="container"
     :style="{
       transform: `translate(${_position}) rotate(${petaPanel.rotation}rad)`,
@@ -27,15 +28,27 @@
         }"
       >
     </div>
-    <div class="selection" v-if="selected || hovered">
-      <VDottedBox :x="-width / 2 + (width < 0 ? width : 0)" :y="-height / 2 + (height < 0 ? height : 0)" :width="width" :height="height" />
+    <div
+      class="selection"
+      v-if="selected || hovered"
+    >
+      <VDottedBox
+        :x="-width / 2 + (width < 0 ? width : 0)"
+        :y="-height / 2 + (height < 0 ? height : 0)"
+        :width="width"
+        :height="height"
+      />
     </div>
     <div class="transformer" v-if="selected">
       <div
         v-for="rp in rotatePoints"
         :key="rp.id"
         class="rotate-point"
-        :style="{ top: `${rp.y}px`, left: `${rp.x}px`, cursor: rotateCursor }"
+        :style="{
+          top: `${rp.y}px`,
+          left: `${rp.x}px`,
+          cursor: rotateCursor
+        }"
         @mousedown="startRotate($event)"
       >
       </div>
@@ -43,7 +56,12 @@
         v-for="cp in controlPoints"
         :key="cp.id"
         class="control-point"
-        :style="{top: `${cp.y}px`, left: `${cp.x}px`, transform: `rotate(${-petaPanel.rotation}rad)`, cursor: `${cp.cursor}`}"
+        :style="{
+          top: `${cp.y}px`,
+          left: `${cp.x}px`,
+          transform: `rotate(${-petaPanel.rotation}rad)`,
+          cursor: `${cp.cursor}`
+        }"
         @mousedown="beginChangeSize(...cp.origin, $event)"
       >
         <div class="fill">

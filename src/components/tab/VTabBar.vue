@@ -1,16 +1,40 @@
 <template>
-  <article class="tab-root">
-    <section class="titlebar" v-if="customTitlebar">
+  <article
+    class="tab-root"
+    :style="{
+      zIndex: zIndex
+    }"
+  >
+    <section
+      class="titlebar"
+      v-if="customTitlebar"
+    >
       <section class="draggable">
         {{title}}
       </section>
       <section class="window-buttons">
-        <span @click="minimizeWindow" class="window-button">&#xe921;</span>
-        <span @click="maximizeWindow" class="window-button">&#xe922;</span>
-        <span @click="closeWindow" class="window-button close">&#xe8bb;</span>
+        <span
+          @click="minimizeWindow"
+          class="window-button"
+        >
+          &#xe921;
+        </span>
+        <span
+          @click="maximizeWindow"
+          class="window-button">
+            &#xe922;
+          </span>
+        <span
+          @click="closeWindow"
+          class="window-button close">
+            &#xe8bb;
+          </span>
       </section>
     </section>
-    <section class="tab" v-show="!hide">
+    <section
+      class="tab"
+      v-show="!hide"
+    >
       <span
         class="button"
         :class="{ selected: b == board }"
@@ -20,8 +44,15 @@
         :ref="`tab-${b.id}`"
       >
         <span class="wrapper">
-          <span class="label" @mousedown="mousedown($event, index, $target)" @contextmenu="menu($event, b)">
-            <VEditableLabel @change="(v) => changePetaBoardName(b, v)" :label="b.name"/>
+          <span
+            class="label"
+            @mousedown="mousedown($event, index, $target)"
+            @contextmenu="menu($event, b)"
+          >
+            <VEditableLabel
+              @change="(v) => changePetaBoardName(b, v)"
+              :label="b.name"
+            />
           </span>
           <span
             class="remove"
@@ -108,6 +139,8 @@ export default class VTabBar extends Vue {
   hide = false;
   @Prop()
   title = "";
+  @Prop()
+  zIndex = 0;
   @Ref("draggingTab")
   draggingTab!: HTMLElement;
   dragging = false;
@@ -239,7 +272,6 @@ export default class VTabBar extends Vue {
 .tab-root {
   --tab-height: 16px;
   position: fixed;
-  z-index: 2;
   top: 0px;
   left: 0px;
   width: 100%;

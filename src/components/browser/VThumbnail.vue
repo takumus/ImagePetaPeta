@@ -1,7 +1,11 @@
 <template>
   <article
     class="thumbnail-root"
-    :style="{ transform: `translate(${browserThumbnail.position.x + 'px'}, ${browserThumbnail.position.y + 'px'})`, width: browserThumbnail.width + 'px', height: browserThumbnail.height + 'px' }"
+    :style="{
+      transform: `translate(${browserThumbnail.position.x + 'px'}, ${browserThumbnail.position.y + 'px'})`,
+      width: browserThumbnail.width + 'px',
+      height: browserThumbnail.height + 'px'
+    }"
   >
     <div class="wrapper">
       <img
@@ -9,7 +13,9 @@
         :src="imageURL"
         @mousedown="mousedown($event)"
         v-if="loaded"
-        :class="{ 'selected-image': browserThumbnail.petaImage._selected }"
+        :class="{
+          'selected-image': browserThumbnail.petaImage._selected
+        }"
       >
       <div class="info">
         <span
@@ -26,7 +32,10 @@
           {{$t("browser.untagged")}}
         </span>
       </div>
-      <div class="selected" v-show="browserThumbnail.petaImage._selected">
+      <div
+        class="selected"
+        v-show="browserThumbnail.petaImage._selected"
+      >
         <div class="checkbox">
           ✔
         </div>
