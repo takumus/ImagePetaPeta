@@ -1,6 +1,6 @@
 <template>
   <article class="tab-root">
-    <section class="titlebar">
+    <section class="titlebar" v-if="customTitlebar">
       <section class="draggable">
       </section>
       <section class="window-buttons">
@@ -9,7 +9,7 @@
         <span @click="closeWindow" class="window-button close">&#xe8bb;</span>
       </section>
     </section>
-    <section class="tab">
+    <section class="tab" v-show="!hide">
       <span
         class="button"
         :class="{ selected: b == board }"
@@ -95,17 +95,17 @@
     }
     .window-buttons {
       .window-button {
-        font-size: 9px;
+        font-size: 6px;
         display: inline-block;
-        padding: 0px 24px;
-        padding-top: 4px;
+        padding: 0px 16px;
+        padding-top: 5px;
         height: 100%;
         font-family: Segoe MDL2 Assets;
         &:hover {
-          background-color: var(--main-tab-selected-color);
+          background-color: var(--window-buttons-hover);
           &.close {
             color: #ffffff;
-            background-color: #ff0000;
+            background-color: var(--window-buttons-close-hover);
           }
         }
       }
@@ -219,6 +219,10 @@ import { MouseButton } from "@/datas/mouseButton";
 export default class VTabBar extends Vue {
   @Prop()
   boards!: PetaBoard[];
+  @Prop()
+  customTitlebar = false;
+  @Prop()
+  hide = false;
   @Ref("draggingTab")
   draggingTab!: HTMLElement;
   dragging = false;

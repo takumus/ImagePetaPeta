@@ -14,6 +14,12 @@
         @change="$settings.darkMode = Boolean($event.target.checked)"
       >{{$t("settings.darkMode")}}</label>
       <p></p>
+      <label><input
+        type="checkbox"
+        :checked="$settings.alwaysOnTop"
+        @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+      >{{$t("settings.alwaysOnTop")}}</label>
+      <p></p>
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>

@@ -12,8 +12,9 @@
       @addPanel="addPanel"
     />
     <VTabBar
-      v-show="windowIsFocused"
+      :hide="!windowIsFocused"
       :boards="sortedPetaBoards"
+      :customTitlebar="customTitlebar"
       @remove="removePetaBoard"
       @add="addPetaBoard"
       @select="selectPetaBoard"
@@ -46,6 +47,9 @@
 
   --main-tab-bg-color: #eeeeee;
   --main-tab-selected-color: #ffffff;
+
+  --window-buttons-hover: #cccccc;
+  --window-buttons-close-hover: #ff0000;
   
   &.dark {
     --main-bg-color: #333333;
@@ -57,6 +61,9 @@
 
     --main-tab-bg-color: #333333;
     --main-tab-selected-color: #444444;
+
+    --window-buttons-hover: #444444;
+    --window-buttons-close-hover: #ff0000;
   }
   background-color: var(--main-bg-color);
   color: var(--main-font-color);
@@ -180,13 +187,16 @@ export default class App extends Vue {
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
   currentPetaBoard: PetaBoard | null = null;
-  imageZIndex = 0;
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
+  customTitlebar = false;
   async mounted() {
     log("INIT RENDERER!");
+    if (await API.send("getPlatform") == "win32") {
+      this.customTitlebar = true;
+    }
     this.$globalComponents.importImages = () => {
       API.send("browseImages");
     }
@@ -213,10 +223,9 @@ export default class App extends Vue {
       }
     });
     API.on("windowFocused", (e, focused) => {
-      // this.windowIsFocused = focused;
+      this.windowIsFocused = focused;
     });
-    // this.windowIsFocused = await API.send("getWindowIsFocused");
-    await this.getSettings();
+    this.windowIsFocused = await API.send("getWindowIsFocused");
     await this.getPetaImages();
     await this.getPetaBoards();
   }
@@ -285,12 +294,6 @@ export default class App extends Vue {
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
-  }
-  async getSettings() {
-    const settings = await API.send("getSettings");
-    Object.keys(settings).forEach((key) => {
-      (this.$settings as any)[key] = (settings as any)[key];
-    });
   }
   async removePetaBoard(board: PetaBoard) {
     if (await API.send("dialog", this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
