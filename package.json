@@ -1,5 +1,6 @@
 {
   "name": "ImagePetaPeta-beta",
+  "productName": "ImagePetaPeta-beta",
   "version": "0.6.1-beta",
   "private": true,
   "scripts": {
@@ -53,7 +54,6 @@
     "typescript": "~4.1.5",
     "vue-cli-plugin-electron-builder": "~2.1.1"
   },
-  "productName": "ImagePetaPeta-beta",
   "volta": {
     "node": "16.7.0"
   }
