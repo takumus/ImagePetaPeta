@@ -120,13 +120,6 @@ export default class VProperty extends Vue {
       pi.tags.sort();
     });
     API.send("updatePetaImages", this.petaImages, UpdateMode.UPDATE);
-    if (changed) {
-      // API.send("dialog", this.$t("browser.property.clearSelectionDialog"), [this.$t("shared.yes"), this.$t("shared.no")]).then((index) => {
-      //   if (index == 0) {
-      //     this.clearSelection();
-      //   }
-      // })
-    }
   }
   clearSelection() {
     this.petaImages.forEach((pi) => {
