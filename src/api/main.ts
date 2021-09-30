@@ -36,6 +36,14 @@ export interface Main {
   getWindowIsFocused: () => Promise<boolean>;
   // zoomLevel
   setZoomLevel: (level: number) => Promise<void>;
+  // Window
+  windowMaximize: () => Promise<void>;
+  windowMinimize: () => Promise<void>;
+  windowClose: () => Promise<void>;
+  // platform
+  getPlatform: () => Promise<NodeJS.Platform>;
+  // alwaysOnTop
+  // setAlwaysOnTop: (value: boolean) => Promise<void>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>

@@ -36,7 +36,7 @@
     white-space: nowrap;
   }
   .bar {
-    background-color: var(--main-font-color);
+    background-color: var(--font-color);
     width: 100%;
     height: 16px;
     overflow: hidden;
@@ -46,7 +46,7 @@
       width: 50%;
       height: 100%;
       border-radius: 8px;
-      background-color: var(--main-bg-color);
+      background-color: var(--bg-color);
     }
   }
 }

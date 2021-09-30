@@ -12,8 +12,9 @@
       @addPanel="addPanel"
     />
     <VTabBar
-      v-show="windowIsFocused"
+      :hide="!windowIsFocused"
       :boards="sortedPetaBoards"
+      :customTitlebar="customTitlebar"
       @remove="removePetaBoard"
       @add="addPetaBoard"
       @select="selectPetaBoard"
@@ -37,28 +38,42 @@
   box-sizing: border-box;
 }
 .root {
-  --main-bg-color: #ffffff;
-  --main-font-color: #333333;
+  --bg-color: #ffffff;
+  --font-color: #333333;
 
-  --main-button-bg-color: #ffffff;
-  --main-button-hover-bg-color: #ffffff;
-  --main-button-active-bg-color: #eeeeee;
+  --button-bg-color: #ffffff;
+  --button-hover-bg-color: #ffffff;
+  --button-active-bg-color: #eeeeee;
 
-  --main-tab-bg-color: #eeeeee;
-  --main-tab-selected-color: #ffffff;
+  --tab-bg-color: #eeeeee;
+  --tab-selected-color: #ffffff;
+
+  --window-buttons-hover: #cccccc;
+  --window-buttons-close-hover: #ff0000;
+  
   &.dark {
-    --main-bg-color: #333333;
-    --main-font-color: #ffffff;
+    --bg-color: #333333;
+    --font-color: #ffffff;
 
-    --main-button-bg-color: #444444;
-    --main-button-hover-bg-color: #555555;
-    --main-button-active-bg-color: #444444;
+    --button-bg-color: #444444;
+    --button-hover-bg-color: #444444;
+    --button-active-bg-color: #555555;
 
-    --main-tab-bg-color: #333333;
-    --main-tab-selected-color: #444444;
+    --tab-bg-color: #333333;
+    --tab-selected-color: #444444;
+
+    --window-buttons-hover: #444444;
+    --window-buttons-close-hover: #ff0000;
   }
-  background-color: var(--main-bg-color);
-  color: var(--main-font-color);
+  background-color: var(--bg-color);
+  color: var(--font-color);
+  font-size: 12px;
+  font-family: "Helvetica Neue",
+    Arial,
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    Meiryo,
+    sans-serif;
   .thumbs-wrapper {
     width: 100%;
   }
@@ -75,11 +90,12 @@ button {
   display: inline-block;
   border-radius: 128px;
   border: none;
-  background-color: var(--main-button-bg-color);
-  color: var(--main-font-color);
-  padding: 8px 16px;
-  min-width: 120px;
-  height: 32px;
+  background-color: var(--button-bg-color);
+  color: var(--font-color);
+  padding: 4px 16px;
+  // height: auto;
+  // min-width: 120px;
+  height: 24px;
   line-height: 1.0em;
   font-size: 1.0em;
   cursor: pointer;
@@ -90,11 +106,11 @@ button {
   text-overflow: ellipsis;
   white-space: nowrap;
   &:hover {
-    background-color: var(--main-button-hover-bg-color);
+    background-color: var(--button-hover-bg-color);
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
   }
   &:active {
-    background-color: var(--main-button-active-bg-color);
+    background-color: var(--button-active-bg-color);
     box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
   }
 }
@@ -113,13 +129,6 @@ body, html {
   user-select: none;
   margin: 0px;
   padding: 0px;
-  font-size: 16px;
-  font-family: "Helvetica Neue",
-    Arial,
-    "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans",
-    Meiryo,
-    sans-serif;
 }
 .menu {
   position: fixed;
@@ -178,13 +187,16 @@ export default class App extends Vue {
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
   currentPetaBoard: PetaBoard | null = null;
-  imageZIndex = 0;
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
-  windowIsFocused = false;
+  windowIsFocused = true;
+  customTitlebar = false;
   async mounted() {
     log("INIT RENDERER!");
+    if (await API.send("getPlatform") == "win32") {
+      this.customTitlebar = true;
+    }
     this.$globalComponents.importImages = () => {
       API.send("browseImages");
     }
@@ -214,7 +226,6 @@ export default class App extends Vue {
       this.windowIsFocused = focused;
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
-    await this.getSettings();
     await this.getPetaImages();
     await this.getPetaBoards();
   }
@@ -283,12 +294,6 @@ export default class App extends Vue {
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
     }
-  }
-  async getSettings() {
-    const settings = await API.send("getSettings");
-    Object.keys(settings).forEach((key) => {
-      (this.$settings as any)[key] = (settings as any)[key];
-    });
   }
   async removePetaBoard(board: PetaBoard) {
     if (await API.send("dialog", this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {

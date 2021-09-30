@@ -86,7 +86,8 @@ const ja = {
     settings: "設定",
     lowMemoryMode: "省メモリモード",
     lowMemoryModeDescriptions: "メモリの使用量は少なくなりますが、ブラウザのパフォーマンスは落ちます。",
-    darkMode: "ダークモード"
+    darkMode: "ダークモード",
+    alwaysOnTop: "常に手前に表示"
   }
 };
 export default ja;

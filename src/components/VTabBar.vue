@@ -1,143 +1,194 @@
 <template>
-  <article class="tab">
-    <span
-      class="button"
-      :class="{ selected: b == board }"
-      :style="{ opacity: b == board && dragging ? 0 : 1 }"
-      v-for="(b, index) in boards"
-      :key="b.id"
-      :ref="`tab-${b.id}`"
-    >
-      <span class="wrapper">
-        <span class="label" @mousedown="mousedown($event, index, $target)" @contextmenu="menu($event, b)">
-          <VEditableLabel @change="(v) => changePetaBoardName(b, v)" :label="b.name"/>
-        </span>
-        <span
-          class="remove"
-          v-if="removable"
-        >
-          <span @click="removePetaBoard(b)">×</span>
-        </span>
-      </span>
-    </span>
-    <span
-      class="button add"
-      @click="addPetaBoard()"
-    >
-      <span class="wrapper">
-        <span class="label">+</span>
-      </span>
-    </span>
-    <span
-      class="button selected drag"
-      ref="draggingTab"
-      :style="{ display: dragging ? 'block' : 'none' }"
-      v-if="board"
-    >
-      <span class="wrapper">
-        <span class="label">
-          <VEditableLabel :label="board.name" />
-        </span>
-        <span
-          class="remove"
-          v-if="removable"
-        >
-          ×
-        </span>
-      </span>
-    </span>
-    <span class="buttons">
-      <button
-        tabindex="-1"
-        @click="$globalComponents.importImages"
+  <article class="tab-root">
+    <section class="titlebar" v-if="customTitlebar">
+      <section class="draggable">
+      </section>
+      <section class="window-buttons">
+        <span @click="minimizeWindow" class="window-button">&#xe921;</span>
+        <span @click="maximizeWindow" class="window-button">&#xe922;</span>
+        <span @click="closeWindow" class="window-button close">&#xe8bb;</span>
+      </section>
+    </section>
+    <section class="tab" v-show="!hide">
+      <span
+        class="button"
+        :class="{ selected: b == board }"
+        :style="{ opacity: b == board && dragging ? 0 : 1 }"
+        v-for="(b, index) in boards"
+        :key="b.id"
+        :ref="`tab-${b.id}`"
       >
-        {{$t("home.importImagesButton")}}
-      </button>
-      <button
-        tabindex="-1"
-        @click="$globalComponents.browser.open()"
+        <span class="wrapper">
+          <span class="label" @mousedown="mousedown($event, index, $target)" @contextmenu="menu($event, b)">
+            <VEditableLabel @change="(v) => changePetaBoardName(b, v)" :label="b.name"/>
+          </span>
+          <span
+            class="remove"
+            v-if="removable"
+          >
+            <span @click="removePetaBoard(b)">×</span>
+          </span>
+        </span>
+      </span>
+      <span
+        class="button add"
+        @click="addPetaBoard()"
       >
-        {{$t("home.openBrowserButton")}}
-      </button>
-    </span>
+        <span class="wrapper">
+          <span class="label">+</span>
+        </span>
+      </span>
+      <span class="draggable">
+      </span>
+      <span
+        class="button selected drag"
+        ref="draggingTab"
+        :style="{ display: dragging ? 'block' : 'none' }"
+        v-if="board"
+      >
+        <span class="wrapper">
+          <span class="label">
+            <VEditableLabel :label="board.name" />
+          </span>
+          <span
+            class="remove"
+            v-if="removable"
+          >
+            ×
+          </span>
+        </span>
+      </span>
+      <span class="buttons">
+        <button
+          tabindex="-1"
+          @click="$globalComponents.importImages"
+        >
+          {{$t("home.importImagesButton")}}
+        </button>
+        <button
+          tabindex="-1"
+          @click="$globalComponents.browser.open()"
+        >
+          {{$t("home.openBrowserButton")}}
+        </button>
+      </span>
+    </section>
   </article>
 </template>
 
 <style lang="scss" scoped>
-.tab {
+.tab-root {
   position: fixed;
   z-index: 2;
   top: 0px;
   left: 0px;
-  text-align: left;
   width: 100%;
-  background-color: var(--main-tab-bg-color);
-  color: var(--main-font-color);
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
-  line-height: 1.0em;
-  font-size: 1.0em;
-  display: flex;
-  .button {
-    display: block;
-    margin: 0px;
-    border-right: solid 1px #cccccc;
-    border-left: solid 1px #cccccc;
-    margin-right: -1px;
-    flex-shrink: 1;
-    .dark & {
-      border-color: var(--main-button-active-bg-color);
+  .titlebar {
+    width: 100%;
+    background-color: var(--tab-bg-color);
+    height: 18px;
+    text-align: right;
+    display: flex;
+    .draggable {
+      flex-grow: 1;
+      -webkit-app-region: drag;
     }
-    cursor: pointer;
-    overflow: hidden;
-    &.drag {
-      position: absolute;
-      pointer-events: none;
-    }
-    &.add {
-      min-width: 16px;
-      border-right: none;
-      flex-shrink: 0;
-      .wrapper .label {
-        padding: 12px;
-      }
-    }
-    &:hover .wrapper .remove {
-      visibility: visible;
-    }
-    &.selected {
-      background-color: var(--main-tab-selected-color);
-      flex-shrink: 0;
-      .wrapper {
-        .remove {
-          visibility: visible;
+    .window-buttons {
+      .window-button {
+        font-size: 6px;
+        display: inline-block;
+        padding: 0px 16px;
+        padding-top: 5px;
+        height: 100%;
+        font-family: Segoe MDL2 Assets;
+        &:hover {
+          background-color: var(--window-buttons-hover);
+          &.close {
+            color: #ffffff;
+            background-color: var(--window-buttons-close-hover);
+          }
         }
       }
     }
-    .wrapper {
-      display: flex;
-      .label {
-        padding: 12px;
-        padding-right: 0px;
-        flex-shrink: 1;
-        overflow: hidden;
-      }
-      .remove {
-        visibility: hidden;
-        text-align: right;
-        padding: 12px;
-        flex-shrink: 0;
+  }
+  .tab {
+    width: 100%;
+    background-color: var(--tab-bg-color);
+    color: var(--font-color);
+    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    display: flex;
+    .draggable {
+      -webkit-app-region: drag;
+      flex-grow: 1;
+    }
+    .buttons {
+      button {
+        padding: 0px 8px;
+        height: auto;
       }
     }
-  }
-  .buttons {
-    position: relative;
-    display: flex;
-    flex-grow: 1;
-    right: 0px;
-    text-align: right;
-    justify-content: flex-end;
-    button {
-      min-width: 0px;
+    .button {
+      display: block;
+      margin: 0px;
+      border-right: solid 1px #cccccc;
+      border-left: solid 1px #cccccc;
+      margin-right: -1px;
+      flex-shrink: 1;
+      .dark & {
+        border-color: var(--button-active-bg-color);
+      }
+      cursor: pointer;
+      overflow: hidden;
+      &.drag {
+        position: absolute;
+        pointer-events: none;
+      }
+      &.add {
+        min-width: 16px;
+        border-right: none;
+        flex-shrink: 0;
+        .wrapper .label {
+          padding: 8px;
+        }
+      }
+      &:hover .wrapper .remove {
+        visibility: visible;
+      }
+      &.selected {
+        background-color: var(--tab-selected-color);
+        flex-shrink: 0;
+        .wrapper {
+          .remove {
+            visibility: visible;
+          }
+        }
+      }
+      .wrapper {
+        display: flex;
+        .label {
+          padding: 8px;
+          padding-right: 0px;
+          flex-shrink: 1;
+          overflow: hidden;
+        }
+        .remove {
+          visibility: hidden;
+          text-align: right;
+          padding: 8px;
+          flex-shrink: 0;
+        }
+      }
+    }
+    .buttons {
+      position: relative;
+      display: flex;
+      flex-shrink: 1;
+      right: 0px;
+      text-align: right;
+      justify-content: flex-end;
+      button {
+        min-width: 0px;
+      }
     }
   }
 }
@@ -150,7 +201,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
-import { log } from "@/api";
+import { API, log } from "@/api";
 import { vec2FromMouseEvent } from "@/utils/vec2";
 import { PetaBoard } from "@/datas/petaBoard";
 import { MouseButton } from "@/datas/mouseButton";
@@ -168,6 +219,10 @@ import { MouseButton } from "@/datas/mouseButton";
 export default class VTabBar extends Vue {
   @Prop()
   boards!: PetaBoard[];
+  @Prop()
+  customTitlebar = false;
+  @Prop()
+  hide = false;
   @Ref("draggingTab")
   draggingTab!: HTMLElement;
   dragging = false;
@@ -261,6 +316,15 @@ export default class VTabBar extends Vue {
     }
     log(board.name, "->", name);
     board.name = name;
+  }
+  minimizeWindow() {
+    API.send("windowMinimize");
+  }
+  maximizeWindow() {
+    API.send("windowMaximize");
+  }
+  closeWindow() {
+    API.send("windowClose");
   }
   async removePetaBoard(board: PetaBoard) {
     this.$emit("remove", board);

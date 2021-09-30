@@ -31,8 +31,8 @@
       />
     </section>
     <section class="info">
-      <input type="color" v-model="board.background.fillColor">
-      <input type="color" v-model="board.background.lineColor">
+      <input type="color" v-model="board.background.fillColor" tabindex="-1">
+      <input type="color" v-model="board.background.lineColor" tabindex="-1">
       <span class="zoom">{{scalePercent}}%</span>
     </section>
   </article>
@@ -67,12 +67,12 @@
       .line {
         position: absolute;
         &.vertical {
-          width: 1.5px;
+          width: 1px;
           height: 100%;
         }
         &.horizontal {
           width: 100%;
-          height: 1.5px;
+          height: 1px;
         }
       }
     }
@@ -97,7 +97,7 @@
       vertical-align: top;
       padding: 4px;
       border-radius: 8px;
-      background-color: var(--main-bg-color);
+      background-color: var(--bg-color);
     }
     input {
       display: inline-block;
@@ -105,7 +105,7 @@
       margin-right: 8px;
       border-radius: 8px;
       height: 26px;
-      background-color: var(--main-bg-color);
+      background-color: var(--bg-color);
     }
   }
 }

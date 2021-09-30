@@ -23,7 +23,8 @@ import { defaultSettings } from "@/datas/settings";
 import Config from "@/utils/config";
 import { addPetaPanelProperties } from "./datas/petaPanel";
 (async () => {
-  const window = await initWindow();
+  const customTitlebar = process.platform == "win32";
+  const window = await initWindow(customTitlebar);
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
@@ -251,6 +252,7 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
       try {
         logger.mainLog("#Update Settings");
         settingsConfig.data = settings;
+        window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
         await settingsConfig.save();
         logger.mainLog("return:", settingsConfig.data);
         return true;
@@ -274,7 +276,27 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
     },
     setZoomLevel: async (event, level) => {
       window.webContents.setZoomLevel(level);
-    }
+    },
+    windowMinimize: async (event) => {
+      window.minimize();
+    },
+    windowMaximize: async (event) => {
+      if (window.isMaximized()) {
+        window.unmaximize();
+        return;
+      }
+      window.maximize();
+    },
+    windowClose: async (event) => {
+      app.quit();
+    },
+    getPlatform: async (event) => {
+      return process.platform;
+    },
+    // setAlwaysOnTop: async (event, value) => {
+    //   logger.mainLog("#Set Always On Top", value);
+    //   window.setAlwaysOnTop(value);
+    // }
   }
   Object.keys(mainFunctions).forEach((key) => {
     ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
@@ -285,6 +307,7 @@ import { addPetaPanelProperties } from "./datas/petaPanel";
   window.addListener("focus", () => {
     sendToRenderer("windowFocused", true);
   });
+  window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
   async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     logger.mainLog(" ##Update Peta Image");
     logger.mainLog(" mode:", mode);

@@ -49,10 +49,10 @@
             </li>
           </ul>
         </section>
-        <section class="images-wrapper">
+        <section class="thumbnails-wrapper">
           <section
-            class="images"
-            ref="images"
+            class="thumbnails"
+            ref="thumbnails"
           >
             <div
               class="thumbs-wrapper"
@@ -138,14 +138,14 @@
         }
       }
     }
-    .images {
+    .thumbnails {
       width: 100%;
       height: 100%;
       position: relative;
       overflow-y: scroll;
       overflow-x: hidden;
     }
-    .images-wrapper {
+    .thumbnails-wrapper {
       width: 100%;
       height: 100%;
       position: relative;
@@ -194,44 +194,42 @@ export default class VBrowser extends Vue {
   @Prop()
   petaImages: PetaImages = {};
   visible = false;
-  @Ref("images")
-  images!: HTMLDivElement;
+  @Ref("thumbnails")
+  thumbnails!: HTMLDivElement;
   @Ref("thumbsWrapper")
   thumbsWrapper!: HTMLDivElement;
   selectedTags = "";
-  selectedData!: PetaImage;
-  imagesWidth = 0;
-  defaultImageWidth = 128;
-  imageWidth = 0;
+  thumbnailsWidth = 0;
+  defaultThumbnailWidth = 128;
+  thumbnailWidth = 0;
   areaMaxY = 0;
   areaMinY = 0;
   scrollHeight = 0;
   scrollAreaHeight = 0;
-  updateRectIntervalId = 0;
   sortMode = SortMode.ADD_DATE;
-  imagesResizer?: ResizeObserver;
+  thumbnailsResizer?: ResizeObserver;
   scrollAreaResizer?: ResizeObserver;
   firstSelectedBrowserThumbnail: BrowserThumbnail | null = null;
   mounted() {
-    this.imagesResizer = new ResizeObserver((entries) => {
+    this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0].contentRect);
     });
     this.scrollAreaResizer = new ResizeObserver((entries) => {
       this.resizeScrollArea(entries[0].contentRect);
     });
-    this.images.addEventListener("scroll", this.updateScrollArea);
+    this.thumbnails.addEventListener("scroll", this.updateScrollArea);
     window.addEventListener("keydown", this.keydown);
-    this.imagesResizer.observe(this.thumbsWrapper);
-    this.scrollAreaResizer.observe(this.images);
+    this.thumbnailsResizer.observe(this.thumbsWrapper);
+    this.scrollAreaResizer.observe(this.thumbnails);
 
     this.$globalComponents.browser = this;
   }
   unmounted() {
-    this.images.removeEventListener("scroll", this.updateScrollArea);
+    this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
     window.removeEventListener("keydown", this.keydown);
-    this.imagesResizer?.unobserve(this.thumbsWrapper);
-    this.scrollAreaResizer?.unobserve(this.images);
-    this.imagesResizer?.disconnect();
+    this.thumbnailsResizer?.unobserve(this.thumbsWrapper);
+    this.scrollAreaResizer?.unobserve(this.thumbnails);
+    this.thumbnailsResizer?.disconnect();
     this.scrollAreaResizer?.disconnect();
   }
   keydown(e: KeyboardEvent) {
@@ -248,8 +246,8 @@ export default class VBrowser extends Vue {
   }
   updateScrollArea() {
     const offset = this.scrollAreaHeight;
-    this.areaMinY = this.images.scrollTop - offset;
-    this.areaMaxY = this.scrollAreaHeight + this.images.scrollTop + offset;
+    this.areaMinY = this.thumbnails.scrollTop - offset;
+    this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + offset;
   }
   resizeScrollArea(rect: DOMRectReadOnly) {
     const areaHeight = rect.height;
@@ -257,7 +255,7 @@ export default class VBrowser extends Vue {
     this.updateScrollArea();
   }
   resizeImages(rect: DOMRectReadOnly) {
-    this.imagesWidth = rect.width;
+    this.thumbnailsWidth = rect.width;
   }
   selectTag(tag: string) {
     const tags = [...this.selectedTagsArray];
@@ -284,12 +282,12 @@ export default class VBrowser extends Vue {
     }
     thumb.petaImage._selected = false;
     // 複数同時追加用↓
-    // const images = [petaImage, ...this.selectedPetaImages].reverse();
-    const images = [thumb.petaImage];
+    // const thumbnails = [petaImage, ...this.selectedPetaImages].reverse();
+    const thumbnails = [thumb.petaImage];
     thumb.petaImage._selected = true;
-    images.forEach((pi, i) => {
-      const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.imageWidth);
-      this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(40, 0).mult(-(images.length - 1) + i)));
+    thumbnails.forEach((pi, i) => {
+      const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.thumbnailWidth);
+      this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(40, 0).mult(-(thumbnails.length - 1) + i)));
       pi._selected = false;
     });
     this.selectedPetaImages.forEach((pi) => {
@@ -428,7 +426,7 @@ export default class VBrowser extends Vue {
   }
   @Watch("selectedTags")
   changeSelectedTags() {
-    this.images.scrollTo(0, 0);
+    this.thumbnails.scrollTo(0, 0);
   }
   get selectedTagsArray() {
     return this.selectedTags.split(" ").filter((tag) => tag != "");
@@ -498,8 +496,8 @@ export default class VBrowser extends Vue {
     return this.selectedTagsArray.length == 0;
   }
   get browserThumbnails(): BrowserThumbnail[] {
-    const hc = Math.floor(this.imagesWidth / this.defaultImageWidth);
-    this.imageWidth = this.imagesWidth / hc;
+    const hc = Math.floor(this.thumbnailsWidth / this.defaultThumbnailWidth);
+    this.thumbnailWidth = this.thumbnailsWidth / hc;
     const yList: number[] = [];
     this.scrollHeight = 0;
     for (let i = 0; i < hc; i++) {
@@ -514,8 +512,8 @@ export default class VBrowser extends Vue {
           mvi = vi;
         }
       });
-      const position = new Vec2(mvi * this.imageWidth, yList[mvi]);
-      const height = p.height * this.imageWidth;
+      const position = new Vec2(mvi * this.thumbnailWidth, yList[mvi]);
+      const height = p.height * this.thumbnailWidth;
       yList[mvi] += height;
       if (this.scrollHeight < yList[mvi]) {
         this.scrollHeight = yList[mvi];
@@ -523,7 +521,7 @@ export default class VBrowser extends Vue {
       return {
         petaImage: p,
         position: position,
-        width: this.imageWidth,
+        width: this.thumbnailWidth,
         height: height,
         visible: (this.areaMinY < position.y && position.y < this.areaMaxY) || (this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
       }

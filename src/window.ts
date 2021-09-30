@@ -3,7 +3,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib"
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer"
 import * as path from "path";
 
-export async function initWindow(): Promise<BrowserWindow> {
+export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow> {
   return new Promise((res, rej) => {
     if (!app.requestSingleInstanceLock()) app.quit();
     const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -16,6 +16,8 @@ export async function initWindow(): Promise<BrowserWindow> {
       win = new BrowserWindow({
         width: 1920,
         height: 1080,
+        frame: !customTitlebar,
+        // transparent: true,
         webPreferences: {
           nodeIntegration: false,
           contextIsolation: true,
