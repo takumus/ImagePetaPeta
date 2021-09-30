@@ -327,9 +327,12 @@ export default class VBoard extends Vue {
 
 <style lang="scss" scoped>
 .board-root {
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
   width: 100%;
   height: 100%;
-  // color: #333333;
   .panels-wrapper {
     position: absolute;
     top: 0px;

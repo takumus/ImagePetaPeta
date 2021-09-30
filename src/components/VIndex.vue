@@ -1,12 +1,10 @@
 <template>
   <article class="root" :class="{ dark: $settings.darkMode }">
-    <section class="board-component">
-      <VBoard
-        v-if="currentPetaBoard"
-        :board="currentPetaBoard"
-        ref="vPetaBoard"
-      />
-    </section>
+    <VBoard
+      v-if="currentPetaBoard"
+      :board="currentPetaBoard"
+      ref="vPetaBoard"
+    />
     <VBrowser
       :petaImages="petaImages"
       @addPanel="addPanel"
@@ -21,18 +19,17 @@
       @select="selectPetaBoard"
       ref="vTabBar"
     />
-    <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
-    <VImageCache />
-    <VInfo ref="info"/>
+    <VInfo />
     <VSettings />
     <VContextMenu />
     <VComplement />
+    <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop"/>
+    <VImageCache />
     <section class="menu" v-show="windowIsFocused">
       <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
       <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
     </section>
     <section class="border">
-
     </section>
   </article>
 </template>
@@ -322,14 +319,6 @@ button {
     background-color: var(--button-active-bg-color);
     box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
   }
-}
-.board-component {
-  position: absolute;
-  z-index: 1;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
 }
 body, html {
   overflow: hidden;
