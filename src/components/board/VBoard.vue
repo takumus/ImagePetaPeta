@@ -191,6 +191,8 @@ export default class VBoard extends Vue {
     this.board.petaPanels = this.board.petaPanels.filter((pp) => !pp._selected);
   }
   petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
+    this.clearSelectionAll();
+    petaPanel._selected = true;
     this.$globalComponents.contextMenu.open([{
       label: this.$t("boards.panelMenu.crop"),
       click: () => {

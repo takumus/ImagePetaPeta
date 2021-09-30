@@ -443,9 +443,11 @@ export default class VPanel extends Vue {
   }
   .selection {
     position: absolute;
+    z-index: 1;
   }
   .transformer {
     position: absolute;
+    z-index: 2;
     .rotate-point {
       position: absolute;
       width: 40px;
