@@ -37,30 +37,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.dottedbox-root {
-  position: absolute;
-  pointer-events: none;
-  .border {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-width: 1.5px;
-    &.back {
-      border-style: solid;
-      border-color: #ffffff;
-    }
-    &.front {
-      border-style: dashed;
-      border-color: #000000;
-    }
-  }
-  svg {
-    position: absolute;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -100,3 +76,27 @@ export default class VDottedBox extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.dottedbox-root {
+  position: absolute;
+  pointer-events: none;
+  .border {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-width: 1.5px;
+    &.back {
+      border-style: solid;
+      border-color: #ffffff;
+    }
+    &.front {
+      border-style: dashed;
+      border-color: #000000;
+    }
+  }
+  svg {
+    position: absolute;
+  }
+}
+</style>

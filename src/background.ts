@@ -21,7 +21,7 @@ import Logger from "@/utils/logger";
 import { Settings } from "@/datas/settings";
 import { defaultSettings } from "@/datas/settings";
 import Config from "@/utils/config";
-import { addPetaPanelProperties } from "./datas/petaPanel";
+import { addPetaPanelProperties } from "@/datas/petaPanel";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const window = await initWindow(customTitlebar);

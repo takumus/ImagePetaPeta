@@ -7,23 +7,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.image-cache {
-  position: fixed;
-  pointer-events: none;
-  z-index: 12345;
-  img {
-    position: fixed;
-    bottom: -9999px;
-    right: -9999px;
-    width: 10000px;
-    height: 10000px;
-    opacity: 0.1;
-    pointer-events: none;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -45,3 +28,20 @@ export default class VImageCache extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.image-cache {
+  position: fixed;
+  pointer-events: none;
+  z-index: 12345;
+  img {
+    position: fixed;
+    bottom: -9999px;
+    right: -9999px;
+    width: 10000px;
+    height: 10000px;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+}
+</style>

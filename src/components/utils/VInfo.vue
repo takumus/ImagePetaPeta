@@ -15,32 +15,12 @@
   </VModal>
 </template>
 
-<style lang="scss" scoped>
-.info-root {
-  text-align: center;
-  // color: #333333;
-  pre {
-    text-align: left;
-    overflow: hidden;
-    word-break: break-all;
-    white-space: pre-wrap;
-    height: 128px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    font-size: 0.8em;
-  }
-  p {
-    white-space: nowrap;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
 // import { Prop, Ref } from "vue-property-decorator";
 // Components
-import VModal from "@/components/VModal.vue";
+import VModal from "@/components/modal/VModal.vue";
 // Others
 import { LICENSES } from "@/assets/licenses";
 import { API } from "@/api";
@@ -83,3 +63,23 @@ export default class VInfo extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.info-root {
+  text-align: center;
+  // color: #333333;
+  pre {
+    text-align: left;
+    overflow: hidden;
+    word-break: break-all;
+    white-space: pre-wrap;
+    height: 128px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 0.8em;
+  }
+  p {
+    white-space: nowrap;
+  }
+}
+</style>

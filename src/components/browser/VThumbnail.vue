@@ -35,79 +35,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.thumbnail-root {
-  display: block;
-  position: absolute;
-  padding-right: 8px;
-  padding-top: 8px;
-  .wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    border-radius: 8px;
-    img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-      filter: brightness(0.7);
-      // background-color: #ffffff;
-      &.selected-image {
-        filter: brightness(1.0);
-        border-radius: 9px;
-        padding: 2px;
-      }
-    }
-    &:hover {
-      box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
-      img {
-        filter: brightness(1);
-      }
-    }
-  }
-  .selected {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    pointer-events: none;
-    border-radius: 8px;
-    width: 100%;
-    height: 100%;
-    background-color: rgba($color: #ffffff, $alpha: 0.4);
-    border: solid 4px #222222;
-    .checkbox {
-      border-radius: 8px 0px 0px 0px;
-      background-color: #222222;
-      color: #ffffff;
-      position: absolute;
-      padding: 0px 6px;
-      margin-right: -2px;
-      margin-bottom: -2px;
-      bottom: 0px;
-      right: 0px;
-    }
-  }
-  .info {
-    width: 100%;
-    position: absolute;
-    bottom: 0px;
-    pointer-events: none;
-    word-break: break-word;
-    padding: 8px;
-    .tags {
-      background-color: rgba($color: (#000000), $alpha: 0.5);
-      color: #ffffff;
-      padding: 2px;
-      border-radius: 4px;
-      margin-right: 4px;
-      font-size: 0.8em;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -190,3 +117,76 @@ export default class VThumbnail extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.thumbnail-root {
+  display: block;
+  position: absolute;
+  padding-right: 8px;
+  padding-top: 8px;
+  .wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      filter: brightness(0.7);
+      // background-color: #ffffff;
+      &.selected-image {
+        filter: brightness(1.0);
+        border-radius: 9px;
+        padding: 2px;
+      }
+    }
+    &:hover {
+      box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
+      img {
+        filter: brightness(1);
+      }
+    }
+  }
+  .selected {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    pointer-events: none;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: #ffffff, $alpha: 0.4);
+    border: solid 4px #222222;
+    .checkbox {
+      border-radius: 8px 0px 0px 0px;
+      background-color: #222222;
+      color: #ffffff;
+      position: absolute;
+      padding: 0px 6px;
+      margin-right: -2px;
+      margin-bottom: -2px;
+      bottom: 0px;
+      right: 0px;
+    }
+  }
+  .info {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    pointer-events: none;
+    word-break: break-word;
+    padding: 8px;
+    .tags {
+      background-color: rgba($color: (#000000), $alpha: 0.5);
+      color: #ffffff;
+      padding: 2px;
+      border-radius: 4px;
+      margin-right: 4px;
+      font-size: 0.8em;
+    }
+  }
+}
+</style>

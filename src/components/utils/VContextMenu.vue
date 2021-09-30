@@ -9,36 +9,6 @@
   </ul>
 </template>
 
-<style lang="scss" scoped>
-.context-menu-root {
-  position: fixed;
-  z-index: 5;
-  background-color: #333333;
-  padding: 0px;
-  margin: 0px;
-  box-shadow: 2px 2px 5px rgba($color: #000000, $alpha: 0.5);
-  color: #ffffff;
-  .item {
-    white-space: nowrap;
-    list-style-type: none;
-    min-width: 128px;
-    padding: 8px 24px;
-    // padding-left: 24px;
-    font-size: 1em;
-    cursor: pointer;
-    &:hover {
-      background-color: #555555;
-    }
-  }
-  .separate {
-    border-bottom: solid 1px #CCCCCC;
-    margin: 0px 8px;
-    height: 0px;
-    overflow: hidden;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -90,3 +60,33 @@ export default class VContextMenu extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.context-menu-root {
+  position: fixed;
+  z-index: 5;
+  background-color: #333333;
+  padding: 0px;
+  margin: 0px;
+  box-shadow: 2px 2px 5px rgba($color: #000000, $alpha: 0.5);
+  color: #ffffff;
+  .item {
+    white-space: nowrap;
+    list-style-type: none;
+    min-width: 128px;
+    padding: 8px 24px;
+    // padding-left: 24px;
+    font-size: 1em;
+    cursor: pointer;
+    &:hover {
+      background-color: #555555;
+    }
+  }
+  .separate {
+    border-bottom: solid 1px #CCCCCC;
+    margin: 0px 8px;
+    height: 0px;
+    overflow: hidden;
+  }
+}
+</style>

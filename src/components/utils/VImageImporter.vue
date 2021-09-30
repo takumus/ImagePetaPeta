@@ -19,44 +19,11 @@
   </VModal>
 </template>
 
-<style lang="scss" scoped>
-.image-importer-root {
-  text-align: center;
-  .log {
-    text-align: left;
-    overflow: hidden;
-    word-break: break-all;
-    white-space: pre-wrap;
-    height: 64px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    font-size: 0.8em;
-  }
-  p {
-    white-space: nowrap;
-  }
-  .bar {
-    background-color: var(--font-color);
-    width: 100%;
-    height: 16px;
-    overflow: hidden;
-    border-radius: 8px;
-    padding: 2px;
-    .fill {
-      width: 50%;
-      height: 100%;
-      border-radius: 8px;
-      background-color: var(--bg-color);
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
 // Components
-import VModal from "@/components/VModal.vue";
+import VModal from "@/components/modal/VModal.vue";
 // Others
 import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import { API } from "@/api";
@@ -142,3 +109,36 @@ export default class VImageImporter extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.image-importer-root {
+  text-align: center;
+  .log {
+    text-align: left;
+    overflow: hidden;
+    word-break: break-all;
+    white-space: pre-wrap;
+    height: 64px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 0.8em;
+  }
+  p {
+    white-space: nowrap;
+  }
+  .bar {
+    background-color: var(--font-color);
+    width: 100%;
+    height: 16px;
+    overflow: hidden;
+    border-radius: 8px;
+    padding: 2px;
+    .fill {
+      width: 50%;
+      height: 100%;
+      border-radius: 8px;
+      background-color: var(--bg-color);
+    }
+  }
+}
+</style>

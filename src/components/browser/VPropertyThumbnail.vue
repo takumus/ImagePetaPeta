@@ -13,24 +13,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.thumbnail-root {
-  display: block;
-  position: absolute;
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -60,3 +42,21 @@ export default class VPropertyThumbnail extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.thumbnail-root {
+  display: block;
+  position: absolute;
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+}
+</style>

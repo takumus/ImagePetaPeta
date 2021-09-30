@@ -37,123 +37,6 @@
   </article>
 </template>
 
-<style lang="scss">
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-.root {
-  --bg-color: #ffffff;
-  --font-color: #333333;
-
-  --button-bg-color: #ffffff;
-  --button-hover-bg-color: #ffffff;
-  --button-active-bg-color: #eeeeee;
-
-  --tab-bg-color: #eeeeee;
-  --tab-selected-color: #ffffff;
-  --tab-border-color: #cccccc;
-
-  --window-buttons-hover: #cccccc;
-  --window-buttons-close-hover: #ff0000;
-  
-  &.dark {
-    --bg-color: #333333;
-    --font-color: #ffffff;
-
-    --button-bg-color: #444444;
-    --button-hover-bg-color: #444444;
-    --button-active-bg-color: #555555;
-
-    --tab-bg-color: #333333;
-    --tab-selected-color: #444444;
-    --tab-border-color: #555555;
-
-    --window-buttons-hover: #444444;
-    --window-buttons-close-hover: #ff0000;
-  }
-  background-color: var(--bg-color);
-  color: var(--font-color);
-  font-size: 12px;
-  font-family: "Helvetica Neue",
-    Arial,
-    "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans",
-    Meiryo,
-    sans-serif;
-  .thumbs-wrapper {
-    width: 100%;
-  }
-  ::-webkit-scrollbar {
-    width: 16px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: #cccccc;
-    border-radius: 8px;
-    min-height: 20%;
-  }
-  .border {
-    z-index: 10;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    // border: solid 1.5px var(--font-color);
-    pointer-events: none;
-  }
-}
-button {
-  display: inline-block;
-  border-radius: 128px;
-  border: none;
-  background-color: var(--button-bg-color);
-  color: var(--font-color);
-  padding: 4px 16px;
-  // height: auto;
-  // min-width: 120px;
-  height: 24px;
-  line-height: 1.0em;
-  font-size: 1.0em;
-  cursor: pointer;
-  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
-  margin: 4px;
-  outline: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  &:hover {
-    background-color: var(--button-hover-bg-color);
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
-  }
-  &:active {
-    background-color: var(--button-active-bg-color);
-    box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
-  }
-}
-.board-component {
-  position: absolute;
-  z-index: 1;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-}
-body, html {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-  margin: 0px;
-  padding: 0px;
-}
-.menu {
-  position: fixed;
-  z-index: 4;
-  bottom: 0px;
-  left: 0px;
-  text-align: right;
-  padding: 8px;
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -164,7 +47,7 @@ import VBrowser from "@/components/browser/VBrowser.vue";
 import VBoard from "@/components/board/VBoard.vue";
 import VImageImporter from "@/components/utils/VImageImporter.vue";
 import VImageCache from "@/components/utils/VImageCache.vue";
-import VTabBar from "@/components/VTabBar.vue";
+import VTabBar from "@/components/tab/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
 import VInfo from "@/components/utils/VInfo.vue";
@@ -193,7 +76,7 @@ import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
     VSettings
   },
 })
-export default class App extends Vue {
+export default class Index extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: VBoard;
   @Ref("vTabBar")
@@ -348,3 +231,120 @@ export default class App extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+.root {
+  --bg-color: #ffffff;
+  --font-color: #333333;
+
+  --button-bg-color: #ffffff;
+  --button-hover-bg-color: #ffffff;
+  --button-active-bg-color: #eeeeee;
+
+  --tab-bg-color: #eeeeee;
+  --tab-selected-color: #ffffff;
+  --tab-border-color: #cccccc;
+
+  --window-buttons-hover: #cccccc;
+  --window-buttons-close-hover: #ff0000;
+  
+  &.dark {
+    --bg-color: #333333;
+    --font-color: #ffffff;
+
+    --button-bg-color: #444444;
+    --button-hover-bg-color: #444444;
+    --button-active-bg-color: #555555;
+
+    --tab-bg-color: #333333;
+    --tab-selected-color: #444444;
+    --tab-border-color: #555555;
+
+    --window-buttons-hover: #444444;
+    --window-buttons-close-hover: #ff0000;
+  }
+  background-color: var(--bg-color);
+  color: var(--font-color);
+  font-size: 12px;
+  font-family: "Helvetica Neue",
+    Arial,
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    Meiryo,
+    sans-serif;
+  .thumbs-wrapper {
+    width: 100%;
+  }
+  ::-webkit-scrollbar {
+    width: 16px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #cccccc;
+    border-radius: 8px;
+    min-height: 20%;
+  }
+  .border {
+    z-index: 10;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    // border: solid 1.5px var(--font-color);
+    pointer-events: none;
+  }
+}
+button {
+  display: inline-block;
+  border-radius: 128px;
+  border: none;
+  background-color: var(--button-bg-color);
+  color: var(--font-color);
+  padding: 4px 16px;
+  // height: auto;
+  // min-width: 120px;
+  height: 24px;
+  line-height: 1.0em;
+  font-size: 1.0em;
+  cursor: pointer;
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
+  margin: 4px;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &:hover {
+    background-color: var(--button-hover-bg-color);
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+  }
+  &:active {
+    background-color: var(--button-active-bg-color);
+    box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+.board-component {
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+body, html {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  margin: 0px;
+  padding: 0px;
+}
+.menu {
+  position: fixed;
+  z-index: 4;
+  bottom: 0px;
+  left: 0px;
+  text-align: right;
+  padding: 8px;
+}
+</style>

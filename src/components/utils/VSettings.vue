@@ -25,22 +25,12 @@
   </VModal>
 </template>
 
-<style lang="scss" scoped>
-.settings-root {
-  text-align: center;
-  // color: #333333;
-  p {
-    white-space: nowrap;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
-import VModal from "@/components/VModal.vue";
+import VModal from "@/components/modal/VModal.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/api";
@@ -67,3 +57,13 @@ export default class VSettings extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.settings-root {
+  text-align: center;
+  // color: #333333;
+  p {
+    white-space: nowrap;
+  }
+}
+</style>

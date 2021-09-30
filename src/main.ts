@@ -1,7 +1,7 @@
 import { createApp } from "vue"
 import { createI18n } from "vue-i18n";
 import languages from "@/languages";
-import App from "@/App.vue"
+import App from "@/components/VIndex.vue"
 import GlboalKeyboard from "@/globals/globalKeyboard";
 import GlobalSettings from "@/globals/globalSettings";
 

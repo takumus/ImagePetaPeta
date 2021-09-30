@@ -38,79 +38,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.board-root {
-  width: 100%;
-  height: 100%;
-  // color: #333333;
-  .panels-wrapper {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    .panels {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      z-index: 2;
-    }
-    .panels-background {
-      z-index: 1;
-      cursor: grab !important;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 100%;
-      .line {
-        position: absolute;
-        &.vertical {
-          width: 1px;
-          height: 100%;
-        }
-        &.horizontal {
-          width: 100%;
-          height: 1px;
-        }
-      }
-    }
-  }
-  .crop {
-    position: absolute;
-    z-index: 3;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background-color: rgba($color: #000000, $alpha: 0.7);
-  }
-  .info {
-    position: absolute;
-    z-index: 2;
-    bottom: 0px;
-    right: 0px;
-    padding: 8px;
-    .zoom {
-      display: inline-block;
-      vertical-align: top;
-      padding: 4px;
-      border-radius: 8px;
-      background-color: var(--bg-color);
-    }
-    input {
-      display: inline-block;
-      vertical-align: top;
-      margin-right: 8px;
-      border-radius: 8px;
-      height: 26px;
-      background-color: var(--bg-color);
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -397,3 +324,76 @@ export default class VBoard extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.board-root {
+  width: 100%;
+  height: 100%;
+  // color: #333333;
+  .panels-wrapper {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    .panels {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      z-index: 2;
+    }
+    .panels-background {
+      z-index: 1;
+      cursor: grab !important;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      .line {
+        position: absolute;
+        &.vertical {
+          width: 1px;
+          height: 100%;
+        }
+        &.horizontal {
+          width: 100%;
+          height: 1px;
+        }
+      }
+    }
+  }
+  .crop {
+    position: absolute;
+    z-index: 3;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: #000000, $alpha: 0.7);
+  }
+  .info {
+    position: absolute;
+    z-index: 2;
+    bottom: 0px;
+    right: 0px;
+    padding: 8px;
+    .zoom {
+      display: inline-block;
+      vertical-align: top;
+      padding: 4px;
+      border-radius: 8px;
+      background-color: var(--bg-color);
+    }
+    input {
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 8px;
+      border-radius: 8px;
+      height: 26px;
+      background-color: var(--bg-color);
+    }
+  }
+}
+</style>

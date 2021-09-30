@@ -77,128 +77,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.tab-root {
-  --tab-height: 16px;
-  position: fixed;
-  z-index: 2;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  .titlebar {
-    width: 100%;
-    background-color: var(--tab-bg-color);
-    height: var(--tab-height);
-    text-align: right;
-    display: flex;
-    .draggable {
-      flex-grow: 1;
-      -webkit-app-region: drag;
-      text-align: left;
-      display: inline-block;
-      padding-left: 2px;
-      line-height: var(--tab-height);
-      font-size: 0.8em;
-    }
-    .window-buttons {
-      .window-button {
-        font-size: 6px;
-        display: inline-block;
-        padding: 0px 16px;
-        line-height: var(--tab-height);
-        font-family: Segoe MDL2 Assets;
-        &:hover {
-          background-color: var(--window-buttons-hover);
-          &.close {
-            color: #ffffff;
-            background-color: var(--window-buttons-close-hover);
-          }
-        }
-      }
-    }
-  }
-  .tab {
-    width: 100%;
-    background-color: var(--tab-bg-color);
-    color: var(--font-color);
-    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
-    display: flex;
-    .draggable {
-      -webkit-app-region: drag;
-      flex-grow: 1;
-    }
-    .buttons {
-      button {
-        padding: 0px 8px;
-        height: auto;
-      }
-    }
-    .button {
-      display: block;
-      margin: 0px;
-      border-right: solid 1px var(--tab-border-color);
-      // border-left: solid 1px;
-      margin-right: -1px;
-      flex-shrink: 1;
-      cursor: pointer;
-      overflow: hidden;
-      &.drag {
-        position: absolute;
-        pointer-events: none;
-        border-left: solid 1px var(--tab-border-color);
-      }
-      &.add {
-        min-width: 16px;
-        border-right: none;
-        flex-shrink: 0;
-        .wrapper .label {
-          padding: 8px;
-        }
-      }
-      &:hover .wrapper .remove {
-        visibility: visible;
-      }
-      &.selected {
-        background-color: var(--tab-selected-color);
-        flex-shrink: 0;
-        border-left: solid 1px var(--tab-border-color);
-        .wrapper {
-          .remove {
-            visibility: visible;
-          }
-        }
-      }
-      .wrapper {
-        display: flex;
-        .label {
-          padding: 8px;
-          padding-right: 0px;
-          flex-shrink: 1;
-          overflow: hidden;
-        }
-        .remove {
-          visibility: hidden;
-          text-align: right;
-          padding: 8px;
-          flex-shrink: 0;
-        }
-      }
-    }
-    .buttons {
-      position: relative;
-      display: flex;
-      flex-shrink: 1;
-      right: 0px;
-      text-align: right;
-      justify-content: flex-end;
-      button {
-        min-width: 0px;
-      }
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -356,3 +234,125 @@ export default class VTabBar extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.tab-root {
+  --tab-height: 16px;
+  position: fixed;
+  z-index: 2;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  .titlebar {
+    width: 100%;
+    background-color: var(--tab-bg-color);
+    height: var(--tab-height);
+    text-align: right;
+    display: flex;
+    .draggable {
+      flex-grow: 1;
+      -webkit-app-region: drag;
+      text-align: left;
+      display: inline-block;
+      padding-left: 2px;
+      line-height: var(--tab-height);
+      font-size: 0.8em;
+    }
+    .window-buttons {
+      .window-button {
+        font-size: 6px;
+        display: inline-block;
+        padding: 0px 16px;
+        line-height: var(--tab-height);
+        font-family: Segoe MDL2 Assets;
+        &:hover {
+          background-color: var(--window-buttons-hover);
+          &.close {
+            color: #ffffff;
+            background-color: var(--window-buttons-close-hover);
+          }
+        }
+      }
+    }
+  }
+  .tab {
+    width: 100%;
+    background-color: var(--tab-bg-color);
+    color: var(--font-color);
+    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    display: flex;
+    .draggable {
+      -webkit-app-region: drag;
+      flex-grow: 1;
+    }
+    .buttons {
+      button {
+        padding: 0px 8px;
+        height: auto;
+      }
+    }
+    .button {
+      display: block;
+      margin: 0px;
+      border-right: solid 1px var(--tab-border-color);
+      // border-left: solid 1px;
+      margin-right: -1px;
+      flex-shrink: 1;
+      cursor: pointer;
+      overflow: hidden;
+      &.drag {
+        position: absolute;
+        pointer-events: none;
+        border-left: solid 1px var(--tab-border-color);
+      }
+      &.add {
+        min-width: 16px;
+        border-right: none;
+        flex-shrink: 0;
+        .wrapper .label {
+          padding: 8px;
+        }
+      }
+      &:hover .wrapper .remove {
+        visibility: visible;
+      }
+      &.selected {
+        background-color: var(--tab-selected-color);
+        flex-shrink: 0;
+        border-left: solid 1px var(--tab-border-color);
+        .wrapper {
+          .remove {
+            visibility: visible;
+          }
+        }
+      }
+      .wrapper {
+        display: flex;
+        .label {
+          padding: 8px;
+          padding-right: 0px;
+          flex-shrink: 1;
+          overflow: hidden;
+        }
+        .remove {
+          visibility: hidden;
+          text-align: right;
+          padding: 8px;
+          flex-shrink: 0;
+        }
+      }
+    }
+    .buttons {
+      position: relative;
+      display: flex;
+      flex-shrink: 1;
+      right: 0px;
+      text-align: right;
+      justify-content: flex-end;
+      button {
+        min-width: 0px;
+      }
+    }
+  }
+}
+</style>

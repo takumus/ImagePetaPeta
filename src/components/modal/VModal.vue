@@ -19,27 +19,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.modal-root {
-  z-index: 4;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-  background-color: rgba($color: #000000, $alpha: 0.7);
-  color: var(--font-color);
-  overflow: hidden;
-  .modal {
-    width: 600px;
-    background-color: var(--bg-color);
-    padding: 16px;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -71,3 +50,24 @@ export default class VModal extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.modal-root {
+  z-index: 4;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background-color: rgba($color: #000000, $alpha: 0.7);
+  color: var(--font-color);
+  overflow: hidden;
+  .modal {
+    width: 600px;
+    background-color: var(--bg-color);
+    padding: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+}
+</style>

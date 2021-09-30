@@ -85,87 +85,12 @@
   </VModal>
 </template>
 
-<style lang="scss" scoped>
-.browser-root {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  // color: #333333;
-  .bottom {
-    text-align: center;
-  }
-  .top {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    .tags {
-      padding: 8px;
-      text-align: center;
-      white-space: nowrap;
-      header {
-        .search {
-          border-radius: 8px;
-          border: solid 1.2px #333333;
-          outline: none;
-          padding: 4px;
-          font-weight: bold;
-          font-size: 1.0em;
-        }
-      }
-      ul {
-        text-align: left;
-        // padding: 0px;
-        padding-left: 0px;
-        width: 100%;
-        li {
-          width: 100%;
-          padding: 4px;
-          list-style-type: none;
-          font-weight: bold;
-          cursor: pointer;
-          &:hover * {
-            text-decoration: underline;
-          }
-          &::before {
-            content: "・";
-            width: 16px;
-            display: inline-block;
-          }
-          &.selected::before {
-            content: "✔";
-          }
-        }
-      }
-    }
-    .thumbnails {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow-y: scroll;
-      overflow-x: hidden;
-    }
-    .thumbnails-wrapper {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      padding: 8px;
-    }
-    .property {
-      width: 20%;
-      min-width: 180px;
-      padding: 8px;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
-import VModal from "@/components/VModal.vue";
+import VModal from "@/components/modal/VModal.vue";
 import VThumbnail from "@/components/browser/VThumbnail.vue";
 import VProperty from "@/components/browser/VProperty.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
@@ -539,3 +464,78 @@ interface Tag {
   readonly: boolean
 }
 </script>
+
+<style lang="scss" scoped>
+.browser-root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  // color: #333333;
+  .bottom {
+    text-align: center;
+  }
+  .top {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    .tags {
+      padding: 8px;
+      text-align: center;
+      white-space: nowrap;
+      header {
+        .search {
+          border-radius: 8px;
+          border: solid 1.2px #333333;
+          outline: none;
+          padding: 4px;
+          font-weight: bold;
+          font-size: 1.0em;
+        }
+      }
+      ul {
+        text-align: left;
+        // padding: 0px;
+        padding-left: 0px;
+        width: 100%;
+        li {
+          width: 100%;
+          padding: 4px;
+          list-style-type: none;
+          font-weight: bold;
+          cursor: pointer;
+          &:hover * {
+            text-decoration: underline;
+          }
+          &::before {
+            content: "・";
+            width: 16px;
+            display: inline-block;
+          }
+          &.selected::before {
+            content: "✔";
+          }
+        }
+      }
+    }
+    .thumbnails {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+    .thumbnails-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      padding: 8px;
+    }
+    .property {
+      width: 20%;
+      min-width: 180px;
+      padding: 8px;
+    }
+  }
+}
+</style>

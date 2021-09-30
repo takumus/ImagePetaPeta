@@ -54,53 +54,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.panel-root {
-  position: absolute;
-  .image {
-    transform-origin: center;
-    position: absolute;
-    display: block;
-    cursor: move;
-    overflow: hidden;
-    img {
-      width: 100%;
-      position: relative;
-      transform-origin: top left;
-      pointer-events: none;
-    }
-  }
-  .selection {
-    position: absolute;
-  }
-  .transformer {
-    position: absolute;
-    .rotate-point {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      margin: -20px -20px;
-      z-index: 1;
-    }
-    .control-point {
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      margin: -12px -12px;
-      padding: 6px;
-      z-index: 2;
-      .fill {
-        border: solid 1px;
-        background-color: #ffffff;
-        border-color: #000000;
-        width: 100%;
-        height: 100%;
-      }
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // VUe
 import { Options, Vue } from "vue-class-component";
@@ -471,3 +424,50 @@ export default class VPanel extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.panel-root {
+  position: absolute;
+  .image {
+    transform-origin: center;
+    position: absolute;
+    display: block;
+    cursor: move;
+    overflow: hidden;
+    img {
+      width: 100%;
+      position: relative;
+      transform-origin: top left;
+      pointer-events: none;
+    }
+  }
+  .selection {
+    position: absolute;
+  }
+  .transformer {
+    position: absolute;
+    .rotate-point {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      margin: -20px -20px;
+      z-index: 1;
+    }
+    .control-point {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      margin: -12px -12px;
+      padding: 6px;
+      z-index: 2;
+      .fill {
+        border: solid 1px;
+        background-color: #ffffff;
+        border-color: #000000;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+</style>

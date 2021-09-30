@@ -39,51 +39,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.property-root {
-  width: 100%;
-  height: 100%;
-  // color: #333333;
-  position: relative;
-  .previews {
-    position: relative;
-    width: 100%;
-    height: 30%;
-    overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.5);
-  }
-  .buttons {
-    text-align: center;
-  }
-  .tags {
-    white-space: nowrap;
-    padding: 0px;
-    li {
-      list-style-type: none;
-      padding: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      &:hover * {
-        text-decoration: underline;
-      }
-      &::before {
-        width: 16px;
-        display: inline-block;
-        content: "・";
-      }
-      &.add::before {
-        content: "＋";
-      }
-    }
-  }
-  p {
-    text-align: center;
-    font-size: 1.0em;
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -244,3 +199,48 @@ export default class VProperty extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.property-root {
+  width: 100%;
+  height: 100%;
+  // color: #333333;
+  position: relative;
+  .previews {
+    position: relative;
+    width: 100%;
+    height: 30%;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.5);
+  }
+  .buttons {
+    text-align: center;
+  }
+  .tags {
+    white-space: nowrap;
+    padding: 0px;
+    li {
+      list-style-type: none;
+      padding: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      &:hover * {
+        text-decoration: underline;
+      }
+      &::before {
+        width: 16px;
+        display: inline-block;
+        content: "・";
+      }
+      &.add::before {
+        content: "＋";
+      }
+    }
+  }
+  p {
+    text-align: center;
+    font-size: 1.0em;
+  }
+}
+</style>

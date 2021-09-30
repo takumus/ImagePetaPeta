@@ -18,35 +18,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.editable-label-root {
-  padding: 0px;
-  margin: 0px;
-  display: inline-block;
-  // color: #333333;
-  .editable-label {
-    line-height: 1.0em;
-    font-size: 1.0em;
-    text-align: left;
-    padding: 0px;
-    margin: 0px;
-    overflow: visible;
-    white-space: nowrap;
-    border: none;
-    background: none;
-    cursor: pointer;
-    min-width: 32px;
-    height: 16px;
-    width: 100%;
-    &::after {
-      content: "";
-      display: inline-block;
-      width: 16px;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -119,3 +90,32 @@ export default class VEditableLabel extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.editable-label-root {
+  padding: 0px;
+  margin: 0px;
+  display: inline-block;
+  // color: #333333;
+  .editable-label {
+    line-height: 1.0em;
+    font-size: 1.0em;
+    text-align: left;
+    padding: 0px;
+    margin: 0px;
+    overflow: visible;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    cursor: pointer;
+    min-width: 32px;
+    height: 16px;
+    width: 100%;
+    &::after {
+      content: "";
+      display: inline-block;
+      width: 16px;
+    }
+  }
+}
+</style>

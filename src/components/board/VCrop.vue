@@ -26,54 +26,6 @@
   </article>
 </template>
 
-<style lang="scss" scoped>
-.crop-root {
-  width: 100%;
-  height: 100%;
-  padding: 128px;
-  cursor: crosshair;
-  .wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    .images {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
-    }
-    img {
-      position: absolute;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      &.back {
-        filter: invert(100%) brightness(30%);
-      }
-      &.front {
-        pointer-events: none;
-      }
-    }
-    .dottedbox {
-      position: absolute;
-      z-index: 2;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    .size {
-      width: 100%;
-      height: 100%;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
@@ -216,3 +168,51 @@ export default class VCrop extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.crop-root {
+  width: 100%;
+  height: 100%;
+  padding: 128px;
+  cursor: crosshair;
+  .wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    .images {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
+    img {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      &.back {
+        filter: invert(100%) brightness(30%);
+      }
+      &.front {
+        pointer-events: none;
+      }
+    }
+    .dottedbox {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .size {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+</style>
