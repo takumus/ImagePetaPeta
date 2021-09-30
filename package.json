@@ -7,7 +7,7 @@
     "serve": "yarn generate-licenses && vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
     "lint": "vue-cli-service lint",
-    "generate-licenses": "license-checker --production --json --excludePrivatePackages > ./licenses.json && node ./scripts/generateLicenses.js",
+    "generate-licenses": "license-checker --production --json > ./licenses.json && node ./scripts/generateLicenses.js",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "prebuild": "rimraf ./dist_electron && yarn generate-licenses",
