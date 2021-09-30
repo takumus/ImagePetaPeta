@@ -66,7 +66,7 @@ export default class VModal extends Vue {
     width: 600px;
     background-color: var(--bg-color);
     padding: 16px;
-    border-radius: 8px;
+    border-radius: var(--rounded);
     overflow: hidden;
   }
 }

@@ -131,12 +131,12 @@ export default class VImageImporter extends Vue {
     width: 100%;
     height: 16px;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: var(--rounded);
     padding: 2px;
     .fill {
       width: 50%;
       height: 100%;
-      border-radius: 8px;
+      border-radius: var(--rounded);
       background-color: var(--bg-color);
     }
   }

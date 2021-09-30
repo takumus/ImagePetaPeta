@@ -386,14 +386,14 @@ export default class VBoard extends Vue {
       display: inline-block;
       vertical-align: top;
       padding: 4px;
-      border-radius: 8px;
+      border-radius: var(--rounded);
       background-color: var(--bg-color);
     }
     input {
       display: inline-block;
       vertical-align: top;
       margin-right: 8px;
-      border-radius: 8px;
+      border-radius: var(--rounded);
       height: 26px;
       background-color: var(--bg-color);
     }

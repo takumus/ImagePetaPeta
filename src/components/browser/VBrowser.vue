@@ -485,7 +485,7 @@ interface Tag {
       white-space: nowrap;
       header {
         .search {
-          border-radius: 8px;
+          border-radius: var(--rounded);
           border: solid 1.2px #333333;
           outline: none;
           padding: 4px;

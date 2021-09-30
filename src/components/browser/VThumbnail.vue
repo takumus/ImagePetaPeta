@@ -129,7 +129,7 @@ export default class VThumbnail extends Vue {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: var(--rounded);
     img {
       display: block;
       width: 100%;
@@ -139,7 +139,7 @@ export default class VThumbnail extends Vue {
       // background-color: #ffffff;
       &.selected-image {
         filter: brightness(1.0);
-        border-radius: 9px;
+        border-radius: var(--rounded);
         padding: 2px;
       }
     }
@@ -155,13 +155,13 @@ export default class VThumbnail extends Vue {
     bottom: 0px;
     right: 0px;
     pointer-events: none;
-    border-radius: 8px;
+    border-radius: var(--rounded);
     width: 100%;
     height: 100%;
     background-color: rgba($color: #ffffff, $alpha: 0.4);
     border: solid 4px #222222;
     .checkbox {
-      border-radius: 8px 0px 0px 0px;
+      border-radius: var(--rounded) 0px 0px 0px;
       background-color: #222222;
       color: #ffffff;
       position: absolute;
@@ -183,7 +183,7 @@ export default class VThumbnail extends Vue {
       background-color: rgba($color: (#000000), $alpha: 0.5);
       color: #ffffff;
       padding: 2px;
-      border-radius: 4px;
+      border-radius: var(--rounded);
       margin-right: 4px;
       font-size: 0.8em;
     }
