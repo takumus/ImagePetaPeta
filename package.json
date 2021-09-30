@@ -11,7 +11,7 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "prebuild": "rimraf ./dist_electron && yarn generate-licenses",
-    "release": "node ./scripts/release.js"
+    "release": "yarn generate-licenses && node ./scripts/release.js"
   },
   "main": "background.js",
   "dependencies": {
