@@ -291,9 +291,10 @@ export default class VTabBar extends Vue {
       font-size: 0.8em;
     }
     .window-buttons {
+      display: flex;
       .window-button {
         font-size: 6px;
-        display: inline-block;
+        display: block;
         padding: 0px 16px;
         line-height: var(--tab-height);
         font-family: Segoe MDL2 Assets;
