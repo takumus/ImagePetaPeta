@@ -482,9 +482,11 @@ interface Tag {
     flex: 1;
     overflow: hidden;
     .tags {
+      flex-direction: column;
       padding: 8px;
       text-align: center;
       white-space: nowrap;
+      display: flex;
       header {
         .search {
           border-radius: var(--rounded);
@@ -497,9 +499,13 @@ interface Tag {
       }
       ul {
         text-align: left;
-        // padding: 0px;
         padding-left: 0px;
         width: 100%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        flex: 1;
+        margin: 0px;
+        margin-top: 12px;
         li {
           width: 100%;
           padding: 4px;
