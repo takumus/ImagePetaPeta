@@ -299,7 +299,7 @@ body, html {
     width: 100%;
   }
   ::-webkit-scrollbar {
-    width: 16px;
+    width: 8px;
   }
   ::-webkit-scrollbar-thumb {
     background-color: #cccccc;
@@ -325,7 +325,8 @@ body, html {
     line-height: 1.0em;
     font-size: 1.0em;
     cursor: pointer;
-    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+    // box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+    border: solid 1.2px #cccccc;
     margin: 4px;
     outline: none;
     overflow: hidden;
@@ -333,11 +334,11 @@ body, html {
     white-space: nowrap;
     &:hover {
       background-color: var(--button-hover-bg-color);
-      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+      // box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
     }
     &:active {
       background-color: var(--button-active-bg-color);
-      box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.5);
+      // box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.5);
     }
   }
   .menu {
