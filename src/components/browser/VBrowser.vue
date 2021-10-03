@@ -209,8 +209,8 @@ export default class VBrowser extends Vue {
     }
     thumb.petaImage._selected = false;
     // 複数同時追加用↓
-    // const thumbnails = [petaImage, ...this.selectedPetaImages].reverse();
-    const thumbnails = [thumb.petaImage];
+    const thumbnails = [thumb.petaImage, ...this.selectedPetaImages].reverse();
+    // const thumbnails = [thumb.petaImage];
     thumb.petaImage._selected = true;
     thumbnails.forEach((pi, i) => {
       const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.thumbnailWidth);
@@ -222,7 +222,7 @@ export default class VBrowser extends Vue {
     });
     this.close();
   }
-  selectThumbnail(thumb: BrowserThumbnail) {
+  selectThumbnail(thumb: BrowserThumbnail, force = false) {
     if (this.selectedPetaImages.length < 1 || (!this.$keyboards.ctrl && !this.$keyboards.shift)) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedBrowserThumbnail = thumb;
@@ -235,7 +235,7 @@ export default class VBrowser extends Vue {
     }
     thumb.petaImage._selected = prevSelection;
     // 選択サムネイルを反転
-    thumb.petaImage._selected = !thumb.petaImage._selected;
+    thumb.petaImage._selected = !thumb.petaImage._selected || force;
     if (this.firstSelectedBrowserThumbnail && this.$keyboards.shift) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
@@ -323,7 +323,9 @@ export default class VBrowser extends Vue {
     });
   }
   petaImageMenu(thumb: BrowserThumbnail, position: Vec2) {
-    this.selectThumbnail(thumb);
+    if (!thumb.petaImage._selected) {
+      this.selectThumbnail(thumb, true);
+    }
     this.$globalComponents.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),

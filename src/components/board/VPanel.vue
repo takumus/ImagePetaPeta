@@ -21,6 +21,7 @@
       <img
         :src="imageURL"
         draggable="false"
+        @load="imageLoaded"
         :style="{
           left: cropPositionX + 'px',
           top: cropPositionY + 'px',
@@ -89,6 +90,7 @@ import { PetaPanel } from "@/datas/petaPanel";
 import { PetaBoardTransform } from "@/datas/petaBoard";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
+import { log } from "@/api";
 ClickChecker
 enum ControlStatus {
   DRAGGING = "dragging",
@@ -142,14 +144,16 @@ export default class VPanel extends Vue {
   ) 11 11, auto`;
   hovered = false;
   click = new ClickChecker();
+  imageLoadedPromiseResolve: (() => void) | null = null;
+  loadedThumbnail = false;
   // vertical 縦
   // horizontal 横
   mounted() {
-    ImageLoader.getImageURL(this.petaPanel._petaImage!, true).then((url) => {
-      if (!this.loadedFullSize) {
-        this.imageURL = url;
-      }
-    })
+    // ImageLoader.getImageURL(this.petaPanel._petaImage!, true).then((url) => {
+    //   if (!this.loadedFullSize) {
+    //     this.imageURL = url;
+    //   }
+    // });
     this.img.addEventListener("mousedown", this.mousedown);
     this.img.addEventListener("mouseenter", this.mouseenter);
     this.img.addEventListener("mouseleave", this.mouseleave);
@@ -255,7 +259,6 @@ export default class VPanel extends Vue {
   mouseup(event: MouseEvent) {
     switch(event.button) {
       case MouseButton.LEFT: {
-        this.loadFullSize();
         this.controlStatus = ControlStatus.NONE;
         if (this.click.isClick) {
           this.$emit("click", this.petaPanel);
@@ -276,11 +279,19 @@ export default class VPanel extends Vue {
   mouseleave() {
     this.hovered = false;
   }
-  async loadFullSize() {
-    if (this.loadedFullSize) return;
-    this.loadedFullSize = true;
-    this.imageURL = LoadingImage;
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
+  async load(thumb = false) {
+    this.loadedThumbnail = thumb;
+    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, thumb);
+    console.log(this.imageURL);
+    return new Promise<void>((res, rej) => {
+      this.imageLoadedPromiseResolve = res;
+    });
+  }
+  imageLoaded(e: Event) {
+    if (this.imageLoadedPromiseResolve) {
+      this.imageLoadedPromiseResolve();
+      this.imageLoadedPromiseResolve = null;
+    }
   }
   beginChangeSize(vOrigin: SizingOrigin, hOrigin: SizingOrigin, event: MouseEvent) {
     const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));

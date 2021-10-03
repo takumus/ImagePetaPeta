@@ -30,7 +30,9 @@ export default class VImageCache extends Vue {
   cacheURLs: string[] = [];
   async mounted() {
     ImageLoader.onAddFullsizedImage((url) => {
-      this.cacheURLs.push(url);
+      if (!this.$settings.lowMemoryMode) {
+        this.cacheURLs.push(url);
+      }
     });
   }
 }

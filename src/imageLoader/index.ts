@@ -12,16 +12,26 @@ class ImageCasher {
     if (url) return url;
     return undefined;
   }
-  add(key: string, buffer: Buffer) {
-    let cache = this.find(key);
-    if (cache) return cache;
-    const url = window.URL.createObjectURL(new Blob([buffer]));
-    cache = {
-      key,
-      url
-    };
-    this.cache.push(cache);
-    return cache;
+  add(key: string, buffer: Buffer): Promise<ImageCache> {
+    return new Promise((res, rej) => {
+      let cache = this.find(key);
+      if (cache) return cache;
+      // const fr = new FileReader()
+      // fr.addEventListener("load", (event) => {
+      //   cache = {
+      //     key,
+      //     url: fr.result as string
+      //   };
+      //   this.cache.push(cache);
+      //   res(cache);
+      // });
+      cache = {
+        key,
+        url: window.URL.createObjectURL(new Blob([buffer]))
+      };
+      this.cache.push(cache);
+      res(cache);
+    });
   }
   remove(key: string) {
     for (let i = 0; i < this.cache.length; i++) {
@@ -72,9 +82,9 @@ async function getImageURL(petaImage: PetaImage, thumbnail = false) {
   }
   let cache: ImageCache;
   if (thumbnail) {
-    cache = thumbnailCache.add(key, buffer);
+    cache = await thumbnailCache.add(key, buffer);
   } else {
-    cache = fullSizedCache.add(key, buffer);
+    cache = await fullSizedCache.add(key, buffer);
     addFullsizedImage(cache.url);
   }
   return cache.url;

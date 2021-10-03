@@ -87,6 +87,7 @@ import { PetaBoard, PetaBoardTransform } from "@/datas/petaBoard";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
+import { log } from "@/api";
 @Options({
   components: {
     VPanel,
@@ -174,6 +175,7 @@ export default class VBoard extends Vue {
     this.dragOffset.y = (this.board.transform.position.y - e.clientY);
   }
   mouseup(e: MouseEvent) {
+    this.loadFullsized();
     if (!this.dragging) return;
     if (e.button == MouseButton.RIGHT) {
       this.dragging = false;
@@ -220,6 +222,13 @@ export default class VBoard extends Vue {
   dblclick(event: MouseEvent) {
     if (event.target != this.panelsBackground) return;
     this.resetTransform();
+  }
+  async loadFullsized() {
+    const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => vp?.loadedThumbnail);
+    log(vPanels.length);
+    for (let i = 0; i < vPanels.length; i++) {
+      await vPanels[i]?.load(false);
+    }
   }
   resetTransform() {
     this.board.transform.scale = 1;
@@ -273,6 +282,7 @@ export default class VBoard extends Vue {
     if (worldPosition) {
       this.$nextTick(() => {
         const panelComponent = this.getVPanel(petaPanel);
+        panelComponent?.load(true);
         panelComponent?.startDrag(worldPosition);
       });
     }
@@ -332,10 +342,11 @@ export default class VBoard extends Vue {
   getMaxIndex() {
     return Math.max(...this.board.petaPanels.map((pp) => pp.index));
   }
-  load() {
-    this.board.petaPanels.forEach((pp) => {
-      this.getVPanel(pp)?.loadFullSize();
-    });
+  async load() {
+    for (let i = 0; i < this.board.petaPanels.length; i++) {
+      const pp = this.board.petaPanels[i];
+      await this.getVPanel(pp)?.load();
+    }
   }
   get selectedPetaPanels() {
     return this.board.petaPanels.filter((pp) => pp._selected);
