@@ -225,7 +225,6 @@ export default class VBoard extends Vue {
   }
   async loadFullsized() {
     const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => vp?.loadedThumbnail);
-    log(vPanels.length);
     for (let i = 0; i < vPanels.length; i++) {
       await vPanels[i]?.load(false);
     }
