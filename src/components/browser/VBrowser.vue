@@ -304,7 +304,7 @@ export default class VBrowser extends Vue {
         changed.push(pi);
       }
     });
-    API.send("updatePetaImages", changed, UpdateMode.UPDATE);
+    API.send("savePetaImages", changed, UpdateMode.UPDATE);
     this.selectTag(newName);
   }
   changePetaImageTag(oldName: string, newName: string) {
@@ -331,7 +331,7 @@ export default class VBrowser extends Vue {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
           if (await API.send("dialog", this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
-            API.send("updatePetaImages", this.selectedPetaImages, UpdateMode.REMOVE);
+            API.send("savePetaImages", this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }
       }

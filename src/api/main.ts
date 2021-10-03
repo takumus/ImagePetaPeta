@@ -11,10 +11,10 @@ export interface Main {
   // peta image
   getPetaImages: () => Promise<PetaImages>;
   getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer | null>;
-  updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
+  savePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
   getPetaBoards: () => Promise<PetaBoard[]>;
-  updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
+  savePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   // log
   log: (...args: any[]) => Promise<boolean>;
   // dialog

@@ -94,6 +94,7 @@ import { log } from "@/api";
     VCrop
   },
   emits: [
+    "change"
   ]
 })
 export default class VBoard extends Vue {
@@ -276,8 +277,9 @@ export default class VBoard extends Vue {
     petaPanel.position.sub(this.transform.position).mult(1 / this.transform.scale);
     petaPanel.width *= 1 / this.transform.scale;
     petaPanel.height = petaPanel.width * petaPanel._petaImage!.height;
+    petaPanel._selected = true;
     this.toFront(petaPanel);
-    this.pressPetaPanel(petaPanel, worldPosition);
+    // this.pressPetaPanel(petaPanel, worldPosition);
     if (worldPosition) {
       this.$nextTick(() => {
         const panelComponent = this.getVPanel(petaPanel);
@@ -371,6 +373,10 @@ export default class VBoard extends Vue {
     if (value) {
       this.removeSelectedPanels();
     }
+  }
+  @Watch("board", { deep: true })
+  changeBoard() {
+    this.$emit("change", this.board);
   }
 }
 </script>

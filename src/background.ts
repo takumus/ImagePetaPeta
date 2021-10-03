@@ -135,11 +135,11 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
       }
       return null;
     },
-    updatePetaImages: async (event, datas, mode) => {
+    savePetaImages: async (event, datas, mode) => {
       logger.mainLog("#Update Peta Images");
       try {
         for (let i = 0; i < datas.length; i ++) {
-          await updatePetaImage(datas[i], mode);
+          await savePetaImage(datas[i], mode);
         }
       } catch (err) {
         logger.mainLog("error:", err);
@@ -164,7 +164,7 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
         if (data.length == 0) {
           logger.mainLog("no boards");
           const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, settingsConfig.data.darkMode);
-          await updatePetaBoard(board, UpdateMode.INSERT);
+          await savePetaBoard(board, UpdateMode.INSERT);
           data.push(board);
           logger.mainLog("return:", data.length);
           return data;
@@ -177,11 +177,11 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
       }
       return [];
     },
-    updatePetaBoards: async (event, boards, mode) => {
+    savePetaBoards: async (event, boards, mode) => {
       try {
         logger.mainLog("#Update PetaBoards");
         for (let i = 0; i < boards.length; i ++) {
-          await updatePetaBoard(boards[i], mode);
+          await savePetaBoard(boards[i], mode);
         }
         logger.mainLog("return:", true);
         return true;
@@ -308,7 +308,7 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
     sendToRenderer("windowFocused", true);
   });
   window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
-  async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
+  async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     logger.mainLog(" ##Update Peta Image");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" image:", minimId(petaImage.id));
@@ -326,7 +326,7 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
     sendToRenderer("updatePetaImage", petaImage);
     return true;
   }
-  async function updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
+  async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
     logger.mainLog(" ##Update PetaBoard");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" board:", minimId(board.id));

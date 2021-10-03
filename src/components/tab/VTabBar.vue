@@ -256,12 +256,13 @@ export default class VTabBar extends Vue {
   get removable() {
     return true;// this.boards.length > 1;
   }
-  @Watch("boards", { deep: true, immediate: true })
+  @Watch("boards", { deep: false, immediate: true })
   changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
     // idの並びと長さの変更のみ検知したい。これしか思いつかなかった。
     const nIds = n?.map((b) => b.id).join(",");
     const oIds = o?.map((b) => b.id).join(",");
     if(nIds != oIds) {
+      log("sort")
       this.selectPetaBoardByIndex(this.selectedIndex, true);
     }
   }

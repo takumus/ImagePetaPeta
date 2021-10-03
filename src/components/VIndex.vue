@@ -10,6 +10,7 @@
       v-if="currentPetaBoard"
       :board="currentPetaBoard"
       ref="vPetaBoard"
+      @change="changePetaBoard"
     />
     <VBrowser
       :zIndex="2"
@@ -25,6 +26,7 @@
       @remove="removePetaBoard"
       @add="addPetaBoard"
       @select="selectPetaBoard"
+      @sort="changePetaBoards"
       ref="vTabBar"
     />
     <VInfo
@@ -128,7 +130,7 @@ export default class Index extends Vue {
       this.getPetaImages();
     });
     API.on("updatePetaImage", (e, petaImage) => {
-      // log("on updatePetaImage", petaImage.id);
+      // log("on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
     API.send("checkUpdate").then(async (result) => {
@@ -182,7 +184,7 @@ export default class Index extends Vue {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
         this.boardUpdaters[board.id].initData(petaBoardsToDBPetaBoards(board));
         this.boardUpdaters[board.id].onUpdate((board) => {
-          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
+          API.send("savePetaBoards", [board], UpdateMode.UPDATE);
         });
       }
     })
@@ -199,15 +201,14 @@ export default class Index extends Vue {
   selectPetaBoard(board: PetaBoard) {
     log("PetaBoard Selected", board.name);
     if (this.currentPetaBoard) {
-      this.$globalComponents
-      this.updatePetaBoard(this.currentPetaBoard, true);
+      // this.savePetaBoard(this.currentPetaBoard, true);
     }
     this.currentPetaBoard = board;
     this.$nextTick(() => {
       this.vPetaBoard.load();
     });
   }
-  updatePetaBoard(board: PetaBoard, immidiately: boolean) {
+  savePetaBoard(board: PetaBoard, immidiately: boolean) {
     this.boardUpdaters[board.id].order(petaBoardsToDBPetaBoards(board));
     if (immidiately) {
       this.boardUpdaters[board.id].forceUpdate();
@@ -218,7 +219,7 @@ export default class Index extends Vue {
       return;
     }
     this.boardUpdaters[board.id].forceUpdate();
-    await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
+    await API.send("savePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();
   }
   async addPetaBoard() {
@@ -230,7 +231,7 @@ export default class Index extends Vue {
     }
     const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$settings.darkMode);
     await API.send(
-      "updatePetaBoards",
+      "savePetaBoards",
       [board],
       UpdateMode.INSERT
     );
@@ -241,10 +242,12 @@ export default class Index extends Vue {
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
   }
-  @Watch("boards", { deep: true })
-  changePetaBoard() {
+  changePetaBoard(board: PetaBoard) {
+    this.savePetaBoard(board, false);
+  }
+  changePetaBoards() {
     this.boards.forEach((board) => {
-      this.updatePetaBoard(board, false);
+      this.savePetaBoard(board, true);
     });
   }
 }
