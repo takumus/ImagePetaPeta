@@ -29,9 +29,9 @@ export default class VImageCache extends Vue {
   imageCache!: HTMLDivElement;
   cacheURLs: string[] = [];
   async mounted() {
-    ImageLoader.onAddFullsizedImage((url) => {
+    ImageLoader.onUpdateFullsizedCache((c) => {
       if (!this.$settings.lowMemoryMode) {
-        this.cacheURLs.push(url);
+        this.cacheURLs = c.cache.map((c) => c.url);
       }
     });
   }
@@ -44,10 +44,10 @@ export default class VImageCache extends Vue {
   pointer-events: none;
   img {
     position: fixed;
-    bottom: -9999px;
-    right: -9999px;
-    width: 10000px;
-    height: 10000px;
+    bottom: -99999px;
+    right: -99999px;
+    width: 100000px;
+    height: 100000px;
     opacity: 0.1;
     pointer-events: none;
   }

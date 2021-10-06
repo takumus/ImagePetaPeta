@@ -232,7 +232,6 @@ export default class VTabBar extends Vue {
     if (name == "") {
       name = board.name;
     }
-    log(board.name, "->", name);
     board.name = name;
   }
   minimizeWindow() {
@@ -258,13 +257,7 @@ export default class VTabBar extends Vue {
   }
   @Watch("boards", { deep: false, immediate: true })
   changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
-    // idの並びと長さの変更のみ検知したい。これしか思いつかなかった。
-    const nIds = n?.map((b) => b.id).join(",");
-    const oIds = o?.map((b) => b.id).join(",");
-    if(nIds != oIds) {
-      log("sort")
-      this.selectPetaBoardByIndex(this.selectedIndex, true);
-    }
+    this.selectPetaBoardByIndex(this.selectedIndex, true);
   }
 }
 </script>

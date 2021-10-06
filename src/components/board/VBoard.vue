@@ -88,6 +88,7 @@ import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 import { log } from "@/api";
+import { ImageLoader } from "@/imageLoader";
 @Options({
   components: {
     VPanel,
@@ -344,6 +345,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((pp) => pp.index));
   }
   async load() {
+    ImageLoader.fullSizedCache.trim(0);
     for (let i = 0; i < this.board.petaPanels.length; i++) {
       const pp = this.board.petaPanels[i];
       await this.getVPanel(pp)?.load();
