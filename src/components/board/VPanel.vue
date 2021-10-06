@@ -50,7 +50,7 @@
           left: `${rp.x}px`,
           cursor: rotateCursor
         }"
-        @mousedown="startRotate($event)"
+        @mousedown.left="startRotate($event)"
       >
       </div>
       <div
@@ -63,7 +63,7 @@
           transform: `rotate(${-petaPanel.rotation}rad)`,
           cursor: `${cp.cursor}`
         }"
-        @mousedown="beginChangeSize(...cp.origin, $event)"
+        @mousedown.left="beginChangeSize(...cp.origin, $event)"
       >
         <div class="fill">
 

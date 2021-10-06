@@ -5,7 +5,7 @@ interface ImageCache {
   key: string
   url: string
 }
-class ImageCasher {
+class ImageCacher {
   cache: ImageCache[] = [];
   find(key: string) {
     const url = this.cache.find((c) => c.key == key);
@@ -52,9 +52,9 @@ class ImageCasher {
     });
   }
 }
-const fullSizedCache = new ImageCasher();
-const thumbnailCache = new ImageCasher();
-let addFullsizedImage:(url: string) => void = () => {
+const fullSizedCache = new ImageCacher();
+const thumbnailCache = new ImageCacher();
+let updateFullsizedCache:(cache: ImageCacher) => void = () => {
   //
 };
 function getPetaImageKey(petaImage: PetaImage, thumbnail: boolean) {
@@ -85,7 +85,7 @@ async function getImageURL(petaImage: PetaImage, thumbnail = false) {
     cache = await thumbnailCache.add(key, buffer);
   } else {
     cache = await fullSizedCache.add(key, buffer);
-    addFullsizedImage(cache.url);
+    updateFullsizedCache(fullSizedCache);
   }
   return cache.url;
 }
@@ -97,11 +97,13 @@ function removeImageURL(petaImage: PetaImage, thumbnail: boolean) {
     fullSizedCache.remove(key);
   }
 }
-function onAddFullsizedImage(callback: typeof addFullsizedImage) {
-  addFullsizedImage = callback;
+function onUpdateFullsizedCache(callback: typeof updateFullsizedCache) {
+  updateFullsizedCache = callback;
 }
 export const ImageLoader = {
   getImageURL,
   removeImageURL,
-  onAddFullsizedImage
+  onUpdateFullsizedCache,
+  fullSizedCache,
+  thumbnailCache
 }
