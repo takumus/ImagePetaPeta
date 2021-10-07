@@ -97,7 +97,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { API, log } from "@/api";
-import { THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
+import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { SortMode } from "@/datas/sortMode";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
@@ -203,14 +203,17 @@ export default class VBrowser extends Vue {
       this.selectedTags = tags.join(" ");
     }
   }
-  addPanel(thumb: BrowserThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
+  async addPanel(thumb: BrowserThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
     if ((this.$keyboards.shift || this.$keyboards.ctrl) && this.selectedPetaImages.length > 1) {
       return;
     }
-    thumb.petaImage._selected = false;
-    // 複数同時追加用↓
+    // 複数同時追加
     const thumbnails = [thumb.petaImage, ...this.selectedPetaImages].reverse();
-    // const thumbnails = [thumb.petaImage];
+    if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
+      if (await API.send("dialog", this.$t("browser.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+        return;
+      }
+    }
     thumb.petaImage._selected = true;
     thumbnails.forEach((pi, i) => {
       const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.thumbnailWidth);

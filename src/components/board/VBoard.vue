@@ -87,8 +87,9 @@ import { PetaBoard, PetaBoardTransform } from "@/datas/petaBoard";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
-import { log } from "@/api";
+import { API, log } from "@/api";
 import { ImageLoader } from "@/imageLoader";
+import { BOARD_MAX_PETAPANEL_COUNT } from "@/defines";
 @Options({
   components: {
     VPanel,
@@ -346,6 +347,11 @@ export default class VBoard extends Vue {
   }
   async load() {
     ImageLoader.fullSizedCache.trim(0);
+    if (this.board.petaPanels.length > BOARD_MAX_PETAPANEL_COUNT) {
+      if (await API.send("dialog", this.$t("boards.loadManyImageDialog", [this.board.petaPanels.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+        return;
+      }
+    }
     for (let i = 0; i < this.board.petaPanels.length; i++) {
       const pp = this.board.petaPanels[i];
       await this.getVPanel(pp)?.load();

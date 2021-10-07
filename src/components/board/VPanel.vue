@@ -14,7 +14,8 @@
         height: normalHeight + 'px',
         transform: `scale(${scaleX}, ${scaleY})`,
         top: offsetY + 'px',
-        left: offsetX + 'px'
+        left: offsetX + 'px',
+        backgroundColor: loadedFullSize ? 'transparent' : '#cccccc',
       }"
       class="image"
     >
@@ -280,9 +281,12 @@ export default class VPanel extends Vue {
     this.hovered = false;
   }
   async load(thumb = false) {
-    this.loadedThumbnail = thumb;
+    if (thumb) {
+      this.loadedThumbnail = true;
+    } else {
+      this.loadedFullSize = true;
+    }
     this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, thumb);
-    console.log(this.imageURL);
     return new Promise<void>((res, rej) => {
       this.imageLoadedPromiseResolve = res;
     });
