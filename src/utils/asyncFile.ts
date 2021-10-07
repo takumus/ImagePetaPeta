@@ -21,9 +21,9 @@ export function readFile(path: string): Promise<Buffer> {
     });
   });
 }
-export function mkdir(path: string): Promise<boolean> {
+export function mkdir(path: string, recursive = false): Promise<boolean> {
   return new Promise((res, rej) => {
-    fs.mkdir(path, (err) => {
+    fs.mkdir(path, { recursive }, (err) => {
       if (err) {
         rej(err);
         return;

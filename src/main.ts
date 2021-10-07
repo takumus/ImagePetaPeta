@@ -7,7 +7,7 @@ import GlobalSettings from "@/globals/globalSettings";
 
 const app = createApp(App);
 const i18n = createI18n({
-  locale: 'ja',
+  locale: "ja",
   messages: languages,
 });
 
@@ -16,4 +16,4 @@ app.use(GlboalKeyboard);
 app.use(GlobalSettings);
 app.config.globalProperties.$globalComponents = {};
 
-app.mount('#app');
+app.mount("#app");

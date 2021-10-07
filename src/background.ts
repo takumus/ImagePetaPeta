@@ -1,62 +1,47 @@
 import { app, ipcMain, dialog, IpcMainInvokeEvent, shell } from "electron";
 import * as path from "path";
-import * as asyncFile from "@/utils/asyncFile";
 import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
 import dataURIToBuffer from "data-uri-to-buffer";
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
-import { initWindow } from "@/window";
+import * as asyncFile from "@/utils/asyncFile";
+import DB from "@/utils/db";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
+import Logger from "@/utils/logger";
+import Config from "@/utils/config";
+import { initWindow } from "@/window";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { addPetaBoardProperties, PetaBoard, createPetaBoard } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
-import { Renderer } from "@/api/renderer";
-import { MainFunctions } from "@/api/main";
 import { LogFrom } from "@/datas/logFrom";
 import { AddImageResult } from "@/datas/addImageResult";
-import DB from "@/utils/db";
-import Logger from "@/utils/logger";
 import { Settings } from "@/datas/settings";
 import { defaultSettings } from "@/datas/settings";
-import Config from "@/utils/config";
 import { addPetaPanelProperties } from "@/datas/petaPanel";
+import { Renderer } from "@/api/renderer";
+import { MainFunctions } from "@/api/main";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const window = await initWindow(customTitlebar);
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
-  await asyncFile.mkdir(DIR_ROOT).catch((err) => {
-    //
-  });
-  await asyncFile.mkdir(DIR_IMAGES).catch((err) => {
-    //
-  });
-  await asyncFile.mkdir(DIR_THUMBNAILS).catch((err) => {
-    //
-  });
+  await asyncFile.mkdir(DIR_ROOT).catch((err) => {});
+  await asyncFile.mkdir(DIR_IMAGES).catch((err) => {});
+  await asyncFile.mkdir(DIR_THUMBNAILS).catch((err) => {});
   const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
   const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
   const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
-  logger.mainLog("#Load Settings");
-  settingsConfig.load().then(() => {
-    logger.mainLog("settings loaded");
-  }).catch((e) => {
-    logger.mainLog("settings load error:", e);
-    settingsConfig.data = defaultSettings;
-    settingsConfig.save().then(() => {
-      logger.mainLog("recreate settings");
-    }).catch((e) => {
-      logger.mainLog("cannot recreate settings");
-    })
-  });
+  await loadSettings();
   const mainFunctions: MainFunctions = {
     browseImages: async () => {
       logger.mainLog("#Browse Images");
-      const file = await dialog.showOpenDialog(window, { properties: ['openFile', 'multiSelections'] });
+      const file = await dialog.showOpenDialog(window, {
+        properties: ["openFile", "multiSelections"]
+      });
       if (file.canceled) {
         logger.mainLog("canceled");
         return 0;
@@ -77,7 +62,7 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
         } else {
           // 普通のurlだったら
           logger.mainLog("normal url:", url);
-          data = (await axios.get(url, { responseType: 'arraybuffer' })).data;
+          data = (await axios.get(url, { responseType: "arraybuffer" })).data;
         }
         const extName = "." + imageFormatToExtention((await sharp(data).metadata()).format);
         if (!extName) {
@@ -348,6 +333,19 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
   function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
     window.webContents.send(key, ...args);
   }
+  async function loadSettings() {
+    logger.mainLog("#Load Settings");
+    await settingsConfig.load().catch((e) => {
+      logger.mainLog("settings load error:", e);
+      settingsConfig.data = defaultSettings;
+      settingsConfig.save().then(() => {
+        logger.mainLog("recreate settings");
+      }).catch((e) => {
+        logger.mainLog("cannot recreate settings");
+      })
+    });
+    logger.mainLog("settings loaded");
+  }
   async function importImages(filePaths: string[]) {
     sendToRenderer("importImagesBegin", filePaths.length);
     logger.mainLog(" ##Import Images");
@@ -386,7 +384,7 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
     return (await petaImagesDB.find({ id }))[0];
   }
   async function addImage(data: Buffer, name: string, extName: string, fileDate: Date, addDate: Date): Promise<AddImageResult> {
-    const id = crypto.createHash('sha256').update(data).digest('hex');
+    const id = crypto.createHash("sha256").update(data).digest("hex");
     const exists = await getPetaImage(id);
     if (exists) return {
       petaImage: exists,
