@@ -79,8 +79,8 @@ export default class VCrop extends Vue {
   imageHeight = 0;
   imageResizer?: ResizeObserver;
   clicker: ClickChecker = new ClickChecker();
-  async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, ImageType.FULLSIZED);
+  mounted() {
+    this.imageURL = ImageLoader.getImageURL(this.petaPanel._petaImage!, ImageType.FULLSIZED);
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);

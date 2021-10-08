@@ -6,10 +6,8 @@ const cacheURLs: string[] = [];
 let updateFullsizedCache:(url: string[]) => void = () => {
   //
 };
-async function getImageURL(petaImage: PetaImage, type: ImageType) {
-  // const key = getPetaImageKey(petaImage);
+function getImageURL(petaImage: PetaImage, type: ImageType) {
   const url = `image-${type}://${petaImage.fileName}`;
-  // console.log(url, cacheURLs.indexOf(url));
   if (type == ImageType.FULLSIZED && cacheURLs.indexOf(url) < 0) {
     cacheURLs.push(url);
     updateFullsizedCache(cacheURLs);

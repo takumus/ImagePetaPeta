@@ -273,13 +273,13 @@ export default class VPanel extends Vue {
   mouseleave() {
     this.hovered = false;
   }
-  async load(type: ImageType) {
+  load(type: ImageType) {
     if (type == ImageType.THUMBNAIL) {
       this.loadedThumbnail = true;
     } else {
       this.loadedFullSize = true;
     }
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, type);
+    this.imageURL = ImageLoader.getImageURL(this.petaPanel._petaImage!, type);
     return new Promise<void>((res, rej) => {
       this.imageLoadedPromiseResolve = res;
     });

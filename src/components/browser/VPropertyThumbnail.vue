@@ -34,8 +34,8 @@ export default class VPropertyThumbnail extends Vue {
   @Prop()
   browserThumbnail!: BrowserThumbnail;
   imageURL = "";
-  async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+  mounted() {
+    this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
   }
   get loaded() {
     return this.imageURL != "";
