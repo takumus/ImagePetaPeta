@@ -347,7 +347,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((pp) => pp.index));
   }
   async load() {
-    ImageLoader.fullSizedCache.trim(0);
+    ImageLoader.clearCache();
     if (this.board.petaPanels.length > BOARD_MAX_PETAPANEL_COUNT) {
       if (await API.send("dialog", this.$t("boards.loadManyImageDialog", [this.board.petaPanels.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;

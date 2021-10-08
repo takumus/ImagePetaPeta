@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session } from "electron";
 import * as path from "path";
 import axios from "axios";
 import sharp from "sharp";
@@ -37,6 +37,16 @@ import { ImageType } from "./datas/imageType";
   const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
   const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
   await loadSettings();
+  session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
+    const filename = request.url.split("/").pop()!;
+    const returnPath = path.resolve(DIR_IMAGES, filename);
+    cb({ path: returnPath });
+  });
+  session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (request, cb) => {
+    const filename = request.url.split("/").pop()!;
+    const returnPath = path.resolve(DIR_THUMBNAILS, filename + ".webp");
+    cb({ path: returnPath });
+  });
   const mainFunctions: MainFunctions = {
     browseImages: async () => {
       logger.mainLog("#Browse Images");
