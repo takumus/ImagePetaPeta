@@ -204,11 +204,13 @@ export default class VBrowser extends Vue {
     }
   }
   async addPanel(thumb: BrowserThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    if ((this.$keyboards.shift || this.$keyboards.ctrl) && this.selectedPetaImages.length > 1) {
-      return;
+    if (!this.$keyboards.shift && !this.$keyboards.ctrl && !thumb.petaImage._selected) {
+      this.clearSelectionAllImages();
     }
     // 複数同時追加
-    const thumbnails = [thumb.petaImage, ...this.selectedPetaImages].reverse();
+    const thumbnails = thumb.petaImage._selected ? [] : [thumb.petaImage];
+    thumbnails.push(...this.selectedPetaImages)
+    thumbnails.reverse();
     if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
       if (await API.send("dialog", this.$t("browser.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
@@ -217,7 +219,7 @@ export default class VBrowser extends Vue {
     thumb.petaImage._selected = true;
     thumbnails.forEach((pi, i) => {
       const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.thumbnailWidth);
-      this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(40, 0).mult(-(thumbnails.length - 1) + i)));
+      this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(20, 20).mult(-(thumbnails.length - 1) + i)));
       pi._selected = false;
     });
     this.selectedPetaImages.forEach((pi) => {
