@@ -74,7 +74,7 @@ import VInfo from "@/components/utils/VInfo.vue";
 import VSettings from "@/components/utils/VSettings.vue";
 // Others
 import { API, log } from "@/api";
-import { BOARD_ADD_MULTIPLE_OFFSET, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
+import { BOARD_ADD_MULTIPLE_OFFSET, BOARD_MAX_PETAPANEL_ADD_COUNT, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
 import { PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
@@ -160,6 +160,11 @@ export default class Index extends Vue {
         }
       }
     });
+    if (this.orderedAddPanelIds.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
+      if (await API.send("dialog", this.$t("boards.addManyImageDialog", [this.orderedAddPanelIds.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+        return;
+      }
+    }
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];
       if (!petaImage) return;
