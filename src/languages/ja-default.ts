@@ -34,6 +34,9 @@ const ja = {
     loadManyImageDialog: (ctx: any) => {
       return `このボードには${ctx.list(0)}枚の大量の画像が存在します。\n場合によってはメモリ不足になりますが、読み込みますか？`
     },
+    addManyImageDialog: (ctx: any) => {
+      return `${ctx.list(0)}枚の画像をボードに追加しますか？`
+    },
   },
   browser: {
     tagMenu: {
@@ -54,9 +57,6 @@ const ja = {
     },
     tagAlreadyExistsDialog: (ctx: any) => {
       return `タグ"${ctx.list(0)}"はすでに存在します`
-    },
-    addManyImageDialog: (ctx: any) => {
-      return `${ctx.list(0)}枚の画像をボードに追加しますか？`
     },
     property: {
       clickToAddTag: "クリックでタグ追加",

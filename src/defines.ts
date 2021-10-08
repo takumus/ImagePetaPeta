@@ -1,3 +1,5 @@
+import { Vec2 } from "./utils/vec2";
+
 export const IMG_TAG_WIDTH = 10000;
 export const DEFAULT_BOARD_NAME = "noname";
 export const SAVE_DELAY = 500;
@@ -14,3 +16,4 @@ export const BOARD_DARK_BACKGROUND_FILL_COLOR = "#222222";
 export const BOARD_DARK_BACKGROUND_LINE_COLOR = "#444444";
 export const BOARD_MAX_PETAPANEL_COUNT = 100;
 export const BOARD_MAX_PETAPANEL_ADD_COUNT = 20;
+export const BOARD_ADD_MULTIPLE_OFFSET = new Vec2(20, 20);

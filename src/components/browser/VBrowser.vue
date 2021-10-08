@@ -97,7 +97,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { API, log } from "@/api";
-import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
+import { BOARD_ADD_MULTIPLE_OFFSET, BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { SortMode } from "@/datas/sortMode";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
@@ -212,14 +212,22 @@ export default class VBrowser extends Vue {
     thumbnails.push(...this.selectedPetaImages)
     thumbnails.reverse();
     if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
-      if (await API.send("dialog", this.$t("browser.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+      if (await API.send("dialog", this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
       }
     }
     thumb.petaImage._selected = true;
     thumbnails.forEach((pi, i) => {
-      const panel = createPetaPanel(pi, thumbnailPosition.clone(), this.thumbnailWidth);
-      this.$emit("addPanel", panel, worldPosition.clone().add(new Vec2(20, 20).mult(-(thumbnails.length - 1) + i)));
+      const panel = createPetaPanel(
+        pi,
+        thumbnailPosition.clone(),
+        this.thumbnailWidth
+      );
+      this.$emit(
+        "addPanel",
+        panel,
+        worldPosition.clone().add(BOARD_ADD_MULTIPLE_OFFSET.clone().mult(-(thumbnails.length - 1) + i))
+      );
       pi._selected = false;
     });
     this.selectedPetaImages.forEach((pi) => {
