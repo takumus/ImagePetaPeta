@@ -1,7 +1,7 @@
 {
   "name": "ImagePetaPeta-beta",
   "productName": "ImagePetaPeta-beta",
-  "version": "0.7.1-beta",
+  "version": "0.7.2-beta",
   "private": true,
   "scripts": {
     "serve": "yarn generate-licenses && vue-cli-service electron:serve",
@@ -11,7 +11,7 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "prebuild": "rimraf ./dist_electron && yarn generate-licenses",
-    "release": "yarn generate-licenses && node ./scripts/release.js"
+    "release": "yarn generate-licenses && node ./scripts/release.js && yarn build"
   },
   "main": "background.js",
   "dependencies": {
