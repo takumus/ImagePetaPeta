@@ -119,19 +119,19 @@ import { ImageType } from "./datas/imageType";
       }
       return {};
     },
-    getPetaImageBinary: async (event, data, type) => {
-      try {
-        logger.mainLog("#Get Peta Image Binary");
-        logger.mainLog("id:", minimId(data.id));
-        logger.mainLog("type:", type);
-        const buffer = await asyncFile.readFile(getImagePath(data, type));
-        logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
-        return buffer;
-      } catch(e) {
-        logger.mainLog("error:", e);
-      }
-      return null;
-    },
+    // getPetaImageBinary: async (event, data, type) => {
+    //   try {
+    //     logger.mainLog("#Get Peta Image Binary");
+    //     logger.mainLog("id:", minimId(data.id));
+    //     logger.mainLog("type:", type);
+    //     const buffer = await asyncFile.readFile(getImagePath(data, type));
+    //     logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
+    //     return buffer;
+    //   } catch(e) {
+    //     logger.mainLog("error:", e);
+    //   }
+    //   return null;
+    // },
     savePetaImages: async (event, datas, mode) => {
       logger.mainLog("#Update Peta Images");
       try {

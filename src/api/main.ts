@@ -11,7 +11,7 @@ export interface Main {
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
   // peta image
   getPetaImages: () => Promise<PetaImages>;
-  getPetaImageBinary: (data: PetaImage, type: ImageType) => Promise<Buffer | null>;
+  // getPetaImageBinary: (data: PetaImage, type: ImageType) => Promise<Buffer | null>;
   savePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
   getPetaBoards: () => Promise<PetaBoard[]>;
