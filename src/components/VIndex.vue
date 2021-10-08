@@ -175,6 +175,9 @@ export default class Index extends Vue {
       }
     });
     this.orderedAddPanelIds = [];
+    if (this.currentPetaBoard) {
+      this.vPetaBoard.load();
+    }
   }
   async getPetaBoards() {
     this.boards = await API.send("getPetaBoards");

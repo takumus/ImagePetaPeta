@@ -91,9 +91,9 @@ export default class VImageImporter extends Vue {
           }
           ids = await API.send("importImagesFromFilePaths", filePaths);
         }
-        if (ids.length == 1) {
-          this.$emit("addPanelByDragAndDrop", ids, event);
-        }
+        // if (ids.length == 1) {
+        this.$emit("addPanelByDragAndDrop", ids, event);
+        // }
       }
     });
     document.addEventListener('dragover', (e) => {
