@@ -54,6 +54,7 @@ import { IMG_TAG_WIDTH } from "@/defines";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
+import { ImageType } from "@/datas/imageType";
 @Options({
   components: {
     VDottedBox
@@ -79,7 +80,7 @@ export default class VCrop extends Vue {
   imageResizer?: ResizeObserver;
   clicker: ClickChecker = new ClickChecker();
   async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, false);
+    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, ImageType.FULLSIZED);
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);

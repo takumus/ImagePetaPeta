@@ -4,13 +4,14 @@ import { UpdateMode } from '@/datas/updateMode';
 import { AppInfo } from '@/datas/appInfo';
 import { IpcMainInvokeEvent } from 'electron';
 import { Settings } from '@/datas/settings';
+import { ImageType } from '@/datas/imageType';
 export interface Main {
   browseImages: () => Promise<number>;
   importImageFromURL: (url: string) => Promise<string>;
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
   // peta image
   getPetaImages: () => Promise<PetaImages>;
-  getPetaImageBinary: (data: PetaImage, thumbnail?: boolean) => Promise<Buffer | null>;
+  getPetaImageBinary: (data: PetaImage, type: ImageType) => Promise<Buffer | null>;
   savePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   // boards
   getPetaBoards: () => Promise<PetaBoard[]>;

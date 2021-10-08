@@ -25,6 +25,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { ImageLoader } from "@/imageLoader";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
+import { ImageType } from "@/datas/imageType";
 @Options({
   components: {
   }
@@ -34,13 +35,13 @@ export default class VPropertyThumbnail extends Vue {
   browserThumbnail!: BrowserThumbnail;
   imageURL = "";
   async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, true);
+    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
     if (!(this.$el as HTMLElement).parentElement) {
-      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
+      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
     }
   }
   unmounted() {
-    ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
+    ImageLoader.removeImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
   }
   get loaded() {
     return this.imageURL != "";

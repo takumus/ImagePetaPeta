@@ -90,6 +90,7 @@ import { ClickChecker } from "@/utils/clickChecker";
 import { API, log } from "@/api";
 import { ImageLoader } from "@/imageLoader";
 import { BOARD_MAX_PETAPANEL_COUNT } from "@/defines";
+import { ImageType } from "@/datas/imageType";
 @Options({
   components: {
     VPanel,
@@ -227,9 +228,9 @@ export default class VBoard extends Vue {
     this.resetTransform();
   }
   async loadFullsized() {
-    const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => vp?.loadedThumbnail);
+    const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => !vp?.loadedFullSize);
     for (let i = 0; i < vPanels.length; i++) {
-      await vPanels[i]?.load(false);
+      await vPanels[i]?.load(ImageType.FULLSIZED);
     }
   }
   resetTransform() {
@@ -285,7 +286,7 @@ export default class VBoard extends Vue {
     if (worldPosition) {
       this.$nextTick(() => {
         const panelComponent = this.getVPanel(petaPanel);
-        panelComponent?.load(true);
+        panelComponent?.load(ImageType.THUMBNAIL);
         panelComponent?.startDrag(worldPosition);
       });
     }
@@ -354,7 +355,7 @@ export default class VBoard extends Vue {
     }
     for (let i = 0; i < this.board.petaPanels.length; i++) {
       const pp = this.board.petaPanels[i];
-      await this.getVPanel(pp)?.load();
+      await this.getVPanel(pp)?.load(ImageType.FULLSIZED);
     }
   }
   get selectedPetaPanels() {

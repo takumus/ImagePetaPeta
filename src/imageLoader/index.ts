@@ -1,6 +1,7 @@
 import { API, log } from "@/api";
 import { PetaImage } from "@/datas/petaImage";
 import SampleImage from "@/assets/sample.png";
+import { ImageType } from "@/datas/imageType";
 interface ImageCache {
   key: string
   url: string
@@ -57,15 +58,15 @@ const thumbnailCache = new ImageCacher();
 let updateFullsizedCache:(cache: ImageCacher) => void = () => {
   //
 };
-function getPetaImageKey(petaImage: PetaImage, thumbnail: boolean) {
+function getPetaImageKey(petaImage: PetaImage) {
   return petaImage.fileName;
 }
 // window.setInterval(() => {
 //   log(`\nfullSizedCache: ${fullSizedCache.length}\nthumbnailCache: ${thumbnailCache.length}`);
 // }, 1000);
-async function getImageURL(petaImage: PetaImage, thumbnail = false) {
-  const key = getPetaImageKey(petaImage, thumbnail);
-  if (thumbnail) {
+async function getImageURL(petaImage: PetaImage, type: ImageType) {
+  const key = getPetaImageKey(petaImage);
+  if (type == ImageType.THUMBNAIL) {
     const cache = thumbnailCache.find(key);
     if (cache) {
       return cache.url;
@@ -76,12 +77,12 @@ async function getImageURL(petaImage: PetaImage, thumbnail = false) {
       return cache.url;
     }
   }
-  const buffer = await API.send("getPetaImageBinary", petaImage, thumbnail);
+  const buffer = await API.send("getPetaImageBinary", petaImage, type);
   if (!buffer) {
     return SampleImage;
   }
   let cache: ImageCache;
-  if (thumbnail) {
+  if (type == ImageType.THUMBNAIL) {
     cache = await thumbnailCache.add(key, buffer);
   } else {
     cache = await fullSizedCache.add(key, buffer);
@@ -89,9 +90,9 @@ async function getImageURL(petaImage: PetaImage, thumbnail = false) {
   }
   return cache.url;
 }
-function removeImageURL(petaImage: PetaImage, thumbnail: boolean) {
-  const key = getPetaImageKey(petaImage, thumbnail);
-  if (thumbnail) {
+function removeImageURL(petaImage: PetaImage, type: ImageType) {
+  const key = getPetaImageKey(petaImage);
+  if (type == ImageType.THUMBNAIL) {
     thumbnailCache.remove(key);
   } else {
     fullSizedCache.remove(key);

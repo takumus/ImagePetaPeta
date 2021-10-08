@@ -54,6 +54,7 @@ import { ImageLoader } from "@/imageLoader";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
+import { ImageType } from "@/datas/imageType";
 // import { API } from "@/api";
 @Options({
   components: {
@@ -67,16 +68,16 @@ export default class VThumbnail extends Vue {
   pressing = false;
   click: ClickChecker = new ClickChecker();
   async mounted() {
-    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, true);
+    this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
     if (!(this.$el as HTMLElement).parentElement) {
       if (this.$settings.lowMemoryMode) {
-        ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
+        ImageLoader.removeImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
       }
     }
   }
   unmounted() {
     if (this.$settings.lowMemoryMode) {
-      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, true);
+      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
     }
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);

@@ -92,6 +92,7 @@ import { PetaBoardTransform } from "@/datas/petaBoard";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 import { log } from "@/api";
+import { ImageType } from "@/datas/imageType";
 ClickChecker
 enum ControlStatus {
   DRAGGING = "dragging",
@@ -150,11 +151,6 @@ export default class VPanel extends Vue {
   // vertical 縦
   // horizontal 横
   mounted() {
-    // ImageLoader.getImageURL(this.petaPanel._petaImage!, true).then((url) => {
-    //   if (!this.loadedFullSize) {
-    //     this.imageURL = url;
-    //   }
-    // });
     this.img.addEventListener("mousedown", this.mousedown);
     this.img.addEventListener("mouseenter", this.mouseenter);
     this.img.addEventListener("mouseleave", this.mouseleave);
@@ -163,7 +159,7 @@ export default class VPanel extends Vue {
   }
   unmounted() {
     if (this.$settings.lowMemoryMode) {
-      ImageLoader.removeImageURL(this.petaPanel._petaImage!, false);
+      ImageLoader.removeImageURL(this.petaPanel._petaImage!, ImageType.FULLSIZED);
     }
     this.img.removeEventListener("mousedown", this.mousedown);
     this.img.removeEventListener("mouseenter", this.mouseenter);
@@ -280,13 +276,14 @@ export default class VPanel extends Vue {
   mouseleave() {
     this.hovered = false;
   }
-  async load(thumb = false) {
-    if (thumb) {
+  async load(type: ImageType) {
+    if (type == ImageType.THUMBNAIL) {
       this.loadedThumbnail = true;
     } else {
       this.loadedFullSize = true;
     }
-    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, thumb);
+    this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, type);
+    log(this.imageURL);
     return new Promise<void>((res, rej) => {
       this.imageLoadedPromiseResolve = res;
     });

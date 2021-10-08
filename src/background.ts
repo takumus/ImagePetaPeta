@@ -22,6 +22,7 @@ import { defaultSettings } from "@/datas/settings";
 import { addPetaPanelProperties } from "@/datas/petaPanel";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
+import { ImageType } from "./datas/imageType";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const window = await initWindow(customTitlebar);
@@ -108,11 +109,12 @@ import { MainFunctions } from "@/api/main";
       }
       return {};
     },
-    getPetaImageBinary: async (event, data, thumbnail) => {
+    getPetaImageBinary: async (event, data, type) => {
       try {
         logger.mainLog("#Get Peta Image Binary");
         logger.mainLog("id:", minimId(data.id));
-        const buffer = await asyncFile.readFile(getImagePath(data, thumbnail));
+        logger.mainLog("type:", type);
+        const buffer = await asyncFile.readFile(getImagePath(data, type));
         logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
         return buffer;
       } catch(e) {
@@ -211,7 +213,7 @@ import { MainFunctions } from "@/api/main";
     },
     showImageInFolder: async (event, petaImage) => {
       logger.mainLog("#Show Image In Folder");
-      shell.showItemInFolder(getImagePath(petaImage, false));
+      shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
       return true;
     },
     checkUpdate: async (event) => {
@@ -301,8 +303,8 @@ import { MainFunctions } from "@/api/main";
     petaImage.tags = Array.from(new Set(petaImage.tags));
     if (mode == UpdateMode.REMOVE) {
       await petaImagesDB.remove({ id: petaImage.id });
-      await asyncFile.rm(getImagePath(petaImage));
-      await asyncFile.rm(getImagePath(petaImage, true));
+      await asyncFile.rm(getImagePath(petaImage, ImageType.FULLSIZED));
+      await asyncFile.rm(getImagePath(petaImage, ImageType.THUMBNAIL));
       logger.mainLog(" removed");
       return true;
     }
@@ -324,10 +326,11 @@ import { MainFunctions } from "@/api/main";
     logger.mainLog(" updated");
     return true;
   }
-  function getImagePathFromFilename(fileName: string, thumbnail = false) {
+  function getImagePathFromFilename(fileName: string, type: ImageType) {
+    const thumbnail = type == ImageType.THUMBNAIL;
     return path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
   }
-  function getImagePath(petaImage: PetaImage, thumbnail = false) {
+  function getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
     return getImagePathFromFilename(petaImage.fileName, thumbnail);
   }
   function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
@@ -394,7 +397,7 @@ import { MainFunctions } from "@/api/main";
     const output = await sharp(data)
     .resize(128)
     .webp({ quality: 80 })
-    .toFile(getImagePathFromFilename(fileName, true));
+    .toFile(getImagePathFromFilename(fileName, ImageType.THUMBNAIL));
     const petaImage: PetaImage = {
       fileName: fileName,
       name: name,
@@ -406,7 +409,7 @@ import { MainFunctions } from "@/api/main";
       tags: [],
       _selected: false
     }
-    await asyncFile.writeFile(getImagePathFromFilename(fileName, false), data);
+    await asyncFile.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), data);
     await petaImagesDB.update({ id: petaImage.id }, petaImage, true);
     return {
       petaImage: petaImage,
