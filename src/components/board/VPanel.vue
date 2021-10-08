@@ -283,7 +283,6 @@ export default class VPanel extends Vue {
       this.loadedFullSize = true;
     }
     this.imageURL = await ImageLoader.getImageURL(this.petaPanel._petaImage!, type);
-    log(this.imageURL);
     return new Promise<void>((res, rej) => {
       this.imageLoadedPromiseResolve = res;
     });
