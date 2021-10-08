@@ -69,16 +69,8 @@ export default class VThumbnail extends Vue {
   click: ClickChecker = new ClickChecker();
   async mounted() {
     this.imageURL = await ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
-    if (!(this.$el as HTMLElement).parentElement) {
-      if (this.$settings.lowMemoryMode) {
-        ImageLoader.removeImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
-      }
-    }
   }
   unmounted() {
-    if (this.$settings.lowMemoryMode) {
-      ImageLoader.removeImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
-    }
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
   }

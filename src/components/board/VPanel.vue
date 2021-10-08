@@ -158,9 +158,6 @@ export default class VPanel extends Vue {
     window.addEventListener("mouseup", this.mouseup);
   }
   unmounted() {
-    if (this.$settings.lowMemoryMode) {
-      ImageLoader.removeImageURL(this.petaPanel._petaImage!, ImageType.FULLSIZED);
-    }
     this.img.removeEventListener("mousedown", this.mousedown);
     this.img.removeEventListener("mouseenter", this.mouseenter);
     this.img.removeEventListener("mouseleave", this.mouseleave);
