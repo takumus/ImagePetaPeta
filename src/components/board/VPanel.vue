@@ -15,7 +15,7 @@
         transform: `scale(${scaleX}, ${scaleY})`,
         top: offsetY + 'px',
         left: offsetX + 'px',
-        backgroundColor: loadedFullSizeed ? 'transparent' : '#cccccc',
+        backgroundColor: loadedFullSized ? 'transparent' : '#cccccc',
       }"
       class="image"
     >
