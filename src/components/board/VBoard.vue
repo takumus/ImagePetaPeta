@@ -134,6 +134,7 @@ export default class VBoard extends Vue {
   click = new ClickChecker();
   resizer?: ResizeObserver;
   viewSize = new Vec2();
+  readyToLoad = false;
   mounted() {
     this.panelsWrapper.addEventListener("mousedown", this.mousedown);
     this.panelsWrapper.addEventListener("dblclick", this.dblclick);
@@ -242,12 +243,6 @@ export default class VBoard extends Vue {
   dblclick(event: MouseEvent) {
     if (event.target != this.panelsBackground) return;
     this.resetTransform();
-  }
-  async loadFullsized() {
-    const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => !vp?.loadedFullSize);
-    for (let i = 0; i < vPanels.length; i++) {
-      await vPanels[i]?.load(ImageType.FULLSIZED);
-    }
   }
   resetTransform() {
     this.board.transform.scale = 1;
@@ -371,14 +366,22 @@ export default class VBoard extends Vue {
     return inside
   }
   async load() {
+    this.readyToLoad = false;
     if (this.board.petaPanels.length > BOARD_MAX_PETAPANEL_COUNT) {
       if (await API.send("dialog", this.$t("boards.loadManyImageDialog", [this.board.petaPanels.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
       }
     }
-    for (let i = 0; i < this.board.petaPanels.length; i++) {
-      const pp = this.board.petaPanels[i];
-      await this.getVPanel(pp)?.load(ImageType.FULLSIZED);
+    this.readyToLoad = true;
+    await this.loadFullsized();
+  }
+  async loadFullsized() {
+    if (!this.readyToLoad) {
+      return;
+    }
+    const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => !vp?.loadedFullSized);
+    for (let i = 0; i < vPanels.length; i++) {
+      await vPanels[i]?.load(ImageType.FULLSIZED);
     }
   }
   get selectedPetaPanels() {

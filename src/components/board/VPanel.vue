@@ -15,7 +15,7 @@
         transform: `scale(${scaleX}, ${scaleY})`,
         top: offsetY + 'px',
         left: offsetX + 'px',
-        backgroundColor: loadedFullSize ? 'transparent' : '#cccccc',
+        backgroundColor: loadedFullSizeed ? 'transparent' : '#cccccc',
       }"
       class="image"
     >
@@ -138,7 +138,7 @@ export default class VPanel extends Vue {
   rotateOffset = 0;
   currentRotation = 0;
   imageURL = "";
-  loadedFullSize = false;
+  loadedFullSized = false;
   resizeCursors = [ "ns-resize", "nesw-resize", "ew-resize", "nwse-resize", "ns-resize", "nesw-resize", "ew-resize", "nwse-resize" ];
   rotateCursor = `-webkit-image-set(
     url('${RotateCursor1x}') 1x,
@@ -147,7 +147,6 @@ export default class VPanel extends Vue {
   hovered = false;
   click = new ClickChecker();
   imageLoadedPromiseResolve: (() => void) | null = null;
-  loadedThumbnail = false;
   // vertical 縦
   // horizontal 横
   mounted() {
@@ -274,10 +273,8 @@ export default class VPanel extends Vue {
     this.hovered = false;
   }
   load(type: ImageType) {
-    if (type == ImageType.THUMBNAIL) {
-      this.loadedThumbnail = true;
-    } else {
-      this.loadedFullSize = true;
+    if (type == ImageType.FULLSIZED) {
+      this.loadedFullSized = true;
     }
     this.imageURL = ImageLoader.getImageURL(this.petaPanel._petaImage!, type);
     return new Promise<void>((res, rej) => {
