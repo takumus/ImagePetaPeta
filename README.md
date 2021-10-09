@@ -1,6 +1,6 @@
 # ImagePetaPeta
 ## ダウンロード
-<https://github.com/takumus/ImagePetaPeta/releases/tag/0.7.5-beta>
+<https://github.com/takumus/ImagePetaPeta/releases/tag/0.7.6-beta>
 ## インストール
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
 この警告は、私が**EVコードサイニング証明書**を取得すれば消えるのですが、  
