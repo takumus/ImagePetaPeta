@@ -54,12 +54,6 @@
               :label="b.name"
             />
           </span>
-          <span
-            class="remove"
-            v-if="removable"
-          >
-            <span @click="removePetaBoard(b)">×</span>
-          </span>
         </span>
       </span>
       <span
@@ -81,12 +75,6 @@
         <span class="wrapper">
           <span class="label">
             <VEditableLabel :label="board.name" />
-          </span>
-          <span
-            class="remove"
-            v-if="removable"
-          >
-            ×
           </span>
         </span>
       </span>
@@ -340,18 +328,10 @@ export default class VTabBar extends Vue {
           padding: 8px;
         }
       }
-      &:hover .wrapper .remove {
-        visibility: visible;
-      }
       &.selected {
         background-color: var(--tab-selected-color);
         flex-shrink: 0;
         border-left: solid 1px var(--tab-border-color);
-        .wrapper {
-          .remove {
-            visibility: visible;
-          }
-        }
       }
       .wrapper {
         display: flex;
@@ -360,12 +340,6 @@ export default class VTabBar extends Vue {
           padding-right: 0px;
           flex-shrink: 1;
           overflow: hidden;
-        }
-        .remove {
-          visibility: hidden;
-          text-align: right;
-          padding: 8px;
-          flex-shrink: 0;
         }
       }
     }
