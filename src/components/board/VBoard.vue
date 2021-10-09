@@ -46,6 +46,7 @@
           @toFront="toFront"
           @menu="petaPanelMenu"
           :ref="panel.id"
+          v-show="getPanelIsInside(panel)"
         />
       </section>
     </section>
@@ -71,7 +72,18 @@
       >
       <span class="zoom">{{scalePercent}}%</span>
     </section>
-  </article>
+    <article
+      class="image-cache"
+      ref="imageCache"
+      :style="{ zIndex: zIndex }"
+    >
+      <img
+        v-for="url in cacheURLs"
+        :key="url"
+        :src="url"
+      >
+    </article>
+    </article>
 </template>
 
 <script lang="ts">
@@ -91,6 +103,7 @@ import { API, log } from "@/api";
 import { ImageLoader } from "@/imageLoader";
 import { BOARD_MAX_PETAPANEL_COUNT } from "@/defines";
 import { ImageType } from "@/datas/imageType";
+import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 @Options({
   components: {
     VPanel,
@@ -120,6 +133,7 @@ export default class VBoard extends Vue {
   petaPanelMenuListenerId = "";
   click = new ClickChecker();
   resizer?: ResizeObserver;
+  viewSize = new Vec2();
   mounted() {
     this.panelsWrapper.addEventListener("mousedown", this.mousedown);
     this.panelsWrapper.addEventListener("dblclick", this.dblclick);
@@ -148,6 +162,8 @@ export default class VBoard extends Vue {
   resize(rect: DOMRectReadOnly) {
     this.globalOffset.x = rect.width / 2;
     this.globalOffset.y = rect.height / 2;
+    this.viewSize.x = rect.width;
+    this.viewSize.y = rect.height;
   }
   mousedownOutside(e: MouseEvent) {
     this.$nextTick(() => {
@@ -346,8 +362,15 @@ export default class VBoard extends Vue {
   getMaxIndex() {
     return Math.max(...this.board.petaPanels.map((pp) => pp.index));
   }
+  getPanelIsInside(panel: PetaPanel) {
+    const panelWorldPosition = panel.position.clone().mult(this.transform.scale).add(this.transform.position);
+    const panelWorldSize = new Vec2(panel.width, panel.height).getLength() / 2 * this.transform.scale;
+    const inside = 
+      Math.abs(panelWorldPosition.x - this.viewSize.x / 2) < panelWorldSize + this.viewSize.x / 2
+      && Math.abs(panelWorldPosition.y - this.viewSize.y / 2) < panelWorldSize + this.viewSize.y / 2;
+    return inside
+  }
   async load() {
-    ImageLoader.clearCache();
     if (this.board.petaPanels.length > BOARD_MAX_PETAPANEL_COUNT) {
       if (await API.send("dialog", this.$t("boards.loadManyImageDialog", [this.board.petaPanels.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
@@ -376,6 +399,11 @@ export default class VBoard extends Vue {
       position: this.board.transform.position.clone().add(this.globalOffset)
     }
     return transform;
+  }
+  get cacheURLs() {
+    const urls = Array.from(new Set(this.board.petaPanels.filter((p) => this.getPanelIsInside(p)).map((p) => ImageLoader.getImageURL(p._petaImage!, ImageType.FULLSIZED))));
+    console.log(urls);
+    return urls;
   }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {
@@ -460,6 +488,24 @@ export default class VBoard extends Vue {
       border-radius: var(--rounded);
       height: 26px;
       background-color: var(--bg-color);
+    }
+  }
+  .image-cache {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    img {
+      position: fixed;
+      bottom: -99990px;
+      right: -99990px;
+      width: 100000px;
+      height: 100000px;
+      opacity: 0.1;
+      pointer-events: none;
     }
   }
 }

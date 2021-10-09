@@ -45,9 +45,6 @@
       :zIndex="6"
       @addPanelByDragAndDrop="addPanelByDragAndDrop"
     />
-    <VImageCache
-      :zIndex="7"
-    />
     <section class="menu" v-show="windowIsFocused">
       <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
       <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
@@ -66,7 +63,6 @@ import VPanel from "@/components/board/VPanel.vue";
 import VBrowser from "@/components/browser/VBrowser.vue";
 import VBoard from "@/components/board/VBoard.vue";
 import VImageImporter from "@/components/utils/VImageImporter.vue";
-import VImageCache from "@/components/utils/VImageCache.vue";
 import VTabBar from "@/components/tab/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
@@ -88,7 +84,6 @@ import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
     VBrowser,
     VBoard,
     VImageImporter,
-    VImageCache,
     VTabBar,
     VContextMenu,
     VComplement,
