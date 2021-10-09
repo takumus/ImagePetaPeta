@@ -401,9 +401,11 @@ export default class VBoard extends Vue {
     return transform;
   }
   get cacheURLs() {
-    const urls = Array.from(new Set(this.board.petaPanels.filter((p) => this.getPanelIsInside(p)).map((p) => ImageLoader.getImageURL(p._petaImage!, ImageType.FULLSIZED))));
-    console.log(urls);
-    return urls;
+    return Array.from(new Set(
+      this.board.petaPanels
+        .filter((p) => this.getPanelIsInside(p))
+        .map((p) => ImageLoader.getImageURL(p._petaImage!, ImageType.FULLSIZED))
+    ));
   }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {
