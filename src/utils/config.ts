@@ -1,22 +1,22 @@
-import { readFile, writeFile } from "./asyncFile";
+import fs from "fs";
 
 export default class Config<T> {
   data: T;
   constructor(private path: string, private defaultData: T) {
     this.data = JSON.parse(JSON.stringify(defaultData));
   }
-  async load() {
+  load() {
     let buffer: Buffer | null = null;
     try {
-      buffer = await readFile(this.path);
+      buffer = fs.readFileSync(this.path);
     } catch (e) {
-      await this.save();
+      this.save();
     }
     if (buffer) {
       this.data = JSON.parse(buffer.toString());
     }
   }
-  async save() {
-    await writeFile(this.path, Buffer.from(JSON.stringify(this.data, null, 2)));
+  save() {
+    fs.writeFileSync(this.path, Buffer.from(JSON.stringify(this.data, null, 2)));
   }
 }

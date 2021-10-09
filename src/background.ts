@@ -3,6 +3,7 @@ import * as path from "path";
 import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
+import fs from "fs";
 import dataURIToBuffer from "data-uri-to-buffer";
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
 import * as asyncFile from "@/utils/asyncFile";
@@ -17,26 +18,34 @@ import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { LogFrom } from "@/datas/logFrom";
 import { AddImageResult } from "@/datas/addImageResult";
-import { Settings } from "@/datas/settings";
-import { defaultSettings } from "@/datas/settings";
+import { Settings, defaultSettings } from "@/datas/settings";
 import { addPetaPanelProperties } from "@/datas/petaPanel";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { ImageType } from "./datas/imageType";
 (async () => {
   const customTitlebar = process.platform == "win32";
-  const window = await initWindow(customTitlebar);
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
-  await asyncFile.mkdir(DIR_ROOT).catch((err) => {});
-  await asyncFile.mkdir(DIR_IMAGES).catch((err) => {});
-  await asyncFile.mkdir(DIR_THUMBNAILS).catch((err) => {});
+  try {
+    fs.mkdirSync(DIR_ROOT);
+  } catch(err) { }
+  try {
+    fs.mkdirSync(DIR_IMAGES);
+  } catch(err) { }
+  try {
+    fs.mkdirSync(DIR_THUMBNAILS);
+  } catch(err) { }
   const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
   const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
   const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
-  await loadSettings();
+  loadSettings();
+  if (!settingsConfig.data.enableHardwareAcceleration) {
+    app.disableHardwareAcceleration();
+  }
+  const window = await initWindow(customTitlebar);
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;
     const returnPath = path.resolve(DIR_IMAGES, filename);
@@ -248,6 +257,10 @@ import { ImageType } from "./datas/imageType";
     updateSettings: async (event, settings) => {
       try {
         logger.mainLog("#Update Settings");
+        if (settingsConfig.data.enableHardwareAcceleration != settings.enableHardwareAcceleration) {
+          logger.mainLog("change hardware accelaration:", settings.enableHardwareAcceleration);
+          // app.relaunch();
+        }
         settingsConfig.data = settings;
         window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
         await settingsConfig.save();
@@ -346,17 +359,20 @@ import { ImageType } from "./datas/imageType";
   function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
     window.webContents.send(key, ...args);
   }
-  async function loadSettings() {
+  function loadSettings() {
     logger.mainLog("#Load Settings");
-    await settingsConfig.load().catch((e) => {
+    try {
+      settingsConfig.load();
+    } catch(e) {
       logger.mainLog("settings load error:", e);
       settingsConfig.data = defaultSettings;
-      settingsConfig.save().then(() => {
+      try {
+        settingsConfig.save();
         logger.mainLog("recreate settings");
-      }).catch((e) => {
+      } catch(e) {
         logger.mainLog("cannot recreate settings");
-      })
-    });
+      }
+    };
     logger.mainLog("settings loaded");
   }
   async function importImages(filePaths: string[]) {

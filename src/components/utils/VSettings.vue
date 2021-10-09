@@ -6,33 +6,48 @@
   >
     <article class="settings-root">
       <p>{{$t("settings.settings")}}</p>
-      <label>
-        <input
-          type="checkbox"
-          :checked="$settings.lowMemoryMode"
-          @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
-        >
-        {{$t("settings.lowMemoryMode")}}
-      </label>
-      <p></p>
-      <label>
-        <input
-          type="checkbox"
-          :checked="$settings.darkMode"
-          @change="$settings.darkMode = Boolean($event.target.checked)"
-        >
-        {{$t("settings.darkMode")}}
-      </label>
-      <p></p>
-      <label>
-        <input
-          type="checkbox"
-          :checked="$settings.alwaysOnTop"
-          @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
-        >
-        {{$t("settings.alwaysOnTop")}}
-      </label>
-      <p></p>
+      <section>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.darkMode"
+            @change="$settings.darkMode = Boolean($event.target.checked)"
+          >
+          {{$t("settings.darkMode")}}
+        </label>
+      </section>
+      <section>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.alwaysOnTop"
+            @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+          >
+          {{$t("settings.alwaysOnTop")}}
+        </label>
+      </section>
+      <section>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.lowMemoryMode"
+            @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
+          >
+          {{$t("settings.lowMemoryMode")}}
+        </label>
+        <p>{{$t("settings.lowMemoryModeDescriptions")}}</p>
+      </section>
+      <section>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.enableHardwareAcceleration"
+            @change="$settings.enableHardwareAcceleration = Boolean($event.target.checked)"
+          >
+          {{$t("settings.enableHardwareAcceleration")}}
+        </label><br>
+        <p>{{$t("settings.enableHardwareAccelerationDescriptions")}}</p>
+      </section>
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>
@@ -77,8 +92,13 @@ export default class VSettings extends Vue {
 .settings-root {
   text-align: center;
   // color: #333333;
-  p {
-    white-space: nowrap;
+  section {
+    text-align: left;
+    p {
+      font-size: 0.8em;
+      margin-left: 16px;
+      white-space: pre;
+    }
   }
 }
 </style>
