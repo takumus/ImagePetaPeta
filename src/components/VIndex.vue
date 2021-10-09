@@ -146,15 +146,6 @@ export default class Index extends Vue {
   }
   async getPetaImages() {
     this.petaImages = await API.send("getPetaImages");
-    this.boards.forEach((board) => {
-      // boardのpetaPanelを回す
-      for (let i = board.petaPanels.length - 1; i >= 0; i--) {
-        // petaImageIDが存在しない場合、パネルを削除する。
-        if (!this.petaImages[board.petaPanels[i].petaImageId]) {
-          board.petaPanels.splice(i, 1);
-        }
-      }
-    });
     if (this.orderedAddPanelIds.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
       if (await API.send("dialog", this.$t("boards.addManyImageDialog", [this.orderedAddPanelIds.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
@@ -190,7 +181,7 @@ export default class Index extends Vue {
           API.send("savePetaBoards", [board], UpdateMode.UPDATE);
         });
       }
-    })
+    });
   }
   addPanelByDragAndDrop(ids: string[], mouse: DragEvent) {
     this.orderedAddPanelIds = ids;
@@ -279,6 +270,7 @@ body, html {
   --tab-border-color: #cccccc;
   --window-buttons-hover: #cccccc;
   --window-buttons-close-hover: #ff0000;
+  --petapanel-bg-color: #eeeeee;
   --rounded: 6px;
   &.dark {
     --bg-color: #333333;
@@ -291,6 +283,7 @@ body, html {
     --tab-border-color: #555555;
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;
+    --petapanel-bg-color: #555555;
   }
   background-color: var(--bg-color);
   color: var(--font-color);

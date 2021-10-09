@@ -322,12 +322,11 @@ import { ImageType } from "./datas/imageType";
     logger.mainLog(" ##Update Peta Image");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" image:", minimId(petaImage.id));
-    petaImage._selected = false;
     petaImage.tags = Array.from(new Set(petaImage.tags));
     if (mode == UpdateMode.REMOVE) {
       await petaImagesDB.remove({ id: petaImage.id });
-      await asyncFile.rm(getImagePath(petaImage, ImageType.FULLSIZED));
-      await asyncFile.rm(getImagePath(petaImage, ImageType.THUMBNAIL));
+      await asyncFile.rm(getImagePath(petaImage, ImageType.FULLSIZED)).catch((e) => {});
+      await asyncFile.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
       logger.mainLog(" removed");
       return true;
     }

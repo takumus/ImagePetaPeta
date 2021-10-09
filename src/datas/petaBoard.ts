@@ -51,6 +51,7 @@ export function dbPetaBoardsToPetaBoards(boards: PetaBoard[], petaImages: PetaIm
     board.transform.position = vec2FromObject(board.transform.position);
     board.petaPanels.forEach(pp => {
       pp._petaImage = petaImages[pp.petaImageId];
+      pp._selected = false;
       pp.position = vec2FromObject(pp.position);
       pp.crop.position = vec2FromObject(pp.crop.position);
     })
@@ -60,6 +61,7 @@ export function petaBoardsToDBPetaBoards(board: PetaBoard) {
   const b = JSON.parse(JSON.stringify(board)) as PetaBoard;
   b.petaPanels.forEach((pp) => {
     pp._petaImage = undefined;
+    pp._selected = undefined;
   });
   return b;
 }

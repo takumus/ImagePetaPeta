@@ -290,7 +290,11 @@ export default class VBoard extends Vue {
     petaPanel.index = this.getMaxIndex() + 1;
     petaPanel.position.sub(this.transform.position).mult(1 / this.transform.scale);
     petaPanel.width *= 1 / this.transform.scale;
-    petaPanel.height = petaPanel.width * petaPanel._petaImage!.height;
+    let height = 1;
+    if (petaPanel._petaImage) {
+      height = petaPanel._petaImage.height;
+    }
+    petaPanel.height = petaPanel.width * height;
     petaPanel._selected = true;
     this.toFront(petaPanel);
     // this.pressPetaPanel(petaPanel, worldPosition);
@@ -404,12 +408,12 @@ export default class VBoard extends Vue {
     return transform;
   }
   get cacheURLs() {
-    if (this.$settings.lowMemoryMode) {
+    if (this.$settings.lowMemoryMode || !this.readyToLoad) {
       return [];
     }
     return Array.from(new Set(
       this.board.petaPanels
-        .filter((p) => this.getPanelIsInside(p))
+        .filter((p) => this.getPanelIsInside(p) && p._petaImage)
         .map((p) => ImageLoader.getImageURL(p._petaImage!, ImageType.FULLSIZED))
     ));
   }

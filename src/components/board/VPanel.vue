@@ -14,15 +14,18 @@
         height: normalHeight + 'px',
         transform: `scale(${scaleX}, ${scaleY})`,
         top: offsetY + 'px',
-        left: offsetX + 'px',
-        backgroundColor: loadedFullSized ? 'transparent' : '#cccccc',
+        left: offsetX + 'px'
       }"
       class="image"
+      :class="{
+        loaded: loadedFullSized && !imageLoadError
+      }"
     >
       <img
         :src="imageURL"
         draggable="false"
         @load="imageLoaded"
+        @error="imageLoadError = readyToLoad"
         :style="{
           left: cropPositionX + 'px',
           top: cropPositionY + 'px',
@@ -71,6 +74,7 @@
         </div>
       </div>
     </div>
+    <p class="image-load-error" v-if="imageLoadError">{{$t("boards.imageLoadError")}}</p>
   </article>
 </template>
 
@@ -146,6 +150,7 @@ export default class VPanel extends Vue {
   ) 11 11, auto`;
   hovered = false;
   click = new ClickChecker();
+  imageLoadError = false;
   imageLoadedPromiseResolve: (() => void) | null = null;
   // vertical 縦
   // horizontal 横
@@ -273,10 +278,15 @@ export default class VPanel extends Vue {
     this.hovered = false;
   }
   load(type: ImageType) {
+    if (!this.petaPanel._petaImage) {
+      this.imageLoadError = true;
+      return;
+    }
+    this.imageLoadError = false;
     if (type == ImageType.FULLSIZED) {
       this.loadedFullSized = true;
     }
-    this.imageURL = ImageLoader.getImageURL(this.petaPanel._petaImage!, type);
+    this.imageURL = ImageLoader.getImageURL(this.petaPanel._petaImage, type);
     return new Promise<void>((res, rej) => {
       this.imageLoadedPromiseResolve = res;
     });
@@ -313,7 +323,10 @@ export default class VPanel extends Vue {
     this.petaPanel.height = Math.abs(this.petaPanel.width * this.ratio) * sign;
   }
   get ratio() {
-    return (this.petaPanel.crop.height * this.petaPanel._petaImage!.height) / (this.petaPanel.crop.width * this.petaPanel._petaImage!.width);
+    if (!this.petaPanel._petaImage) {
+      return 1;
+    }
+    return (this.petaPanel.crop.height * this.petaPanel._petaImage.height) / (this.petaPanel.crop.width * this.petaPanel._petaImage.width);
   }
   get normalWidth() {
     return IMG_TAG_WIDTH;
@@ -349,7 +362,11 @@ export default class VPanel extends Vue {
     return -this.petaPanel.crop.position.x * IMG_TAG_WIDTH * this.cropScale;
   }
   get cropPositionY() {
-    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * this.petaPanel._petaImage!.height * this.cropScale;
+    let height = 1;
+    if (this.petaPanel._petaImage) {
+      height = this.petaPanel._petaImage.height;
+    }
+    return -this.petaPanel.crop.position.y * IMG_TAG_WIDTH * height * this.cropScale;
   }
   get controlPoints() {
     const points: { [key: string]: { origin: string[], x: number, y: number, cursor: string } } = {
@@ -463,6 +480,10 @@ export default class VPanel extends Vue {
       transform-origin: top left;
       pointer-events: none;
     }
+    background-color: var(--petapanel-bg-color);
+    &.loaded {
+      background-color: transparent;
+    }
   }
   .selection {
     position: absolute;
@@ -493,6 +514,15 @@ export default class VPanel extends Vue {
         height: 100%;
       }
     }
+  }
+  .image-load-error {
+    z-index: 2;
+    position: absolute;
+    margin: 0px;
+    padding: 0px;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
   }
 }
 </style>

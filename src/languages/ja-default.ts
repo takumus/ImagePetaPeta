@@ -31,12 +31,13 @@ const ja = {
       reset: "リセット",
       remove: "削除"
     },
+    imageLoadError: "画像読み込みエラー",
     loadManyImageDialog: (ctx: any) => {
       return `このボードには${ctx.list(0)}枚の大量の画像が存在します。\n場合によってはメモリ不足になりますが、読み込みますか？`
     },
     addManyImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像をボードに追加しますか？`
-    },
+    }
   },
   browser: {
     tagMenu: {
