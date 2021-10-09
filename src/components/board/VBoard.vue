@@ -104,6 +104,8 @@ import { ImageLoader } from "@/imageLoader";
 import { BOARD_MAX_PETAPANEL_COUNT } from "@/defines";
 import { ImageType } from "@/datas/imageType";
 import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
+import * as PIXI from 'pixi.js'
+import { ILoaderAdd } from "pixi.js";
 @Options({
   components: {
     VPanel,
@@ -145,9 +147,50 @@ export default class VBoard extends Vue {
     window.addEventListener("click", this.mousedownOutside);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
+      app.renderer.resize(entries[0].contentRect.width, entries[0].contentRect.height);
+      app.view.style.width = entries[0].contentRect.width + "px";
+      app.view.style.height = entries[0].contentRect.height + "px";
     });
     this.resizer.observe(this.panelsBackground);
     this.isMac = window.navigator.userAgent.indexOf("Macintosh") >= 0;
+
+    const app = new PIXI.Application({
+      resolution: window.devicePixelRatio
+    });
+
+    // The application will create a canvas element for you that you
+    // can then insert into the DOM
+    this.panelsBackground.appendChild(app.view);
+    app.view.style.pointerEvents = "none";
+
+    // load the texture we need
+    this.board.petaPanels.forEach((pp, i) => {
+      app.loader.add('bunny' + i, ImageLoader.getImageURL(pp._petaImage!, ImageType.FULLSIZED));
+    });
+    app.loader.load((loader, resources) => {
+      // This creates a texture from a 'bunny.png' image
+      this.board.petaPanels.forEach((pp, i) => {
+        const bunny = new PIXI.Sprite(resources['bunny' + i].texture);
+
+        // Setup the position of the bunny
+        bunny.x = this.viewSize.x * (i / this.board.petaPanels.length);
+        bunny.y = this.viewSize.y * (i / this.board.petaPanels.length);
+
+        // Rotate around the center
+        bunny.anchor.x = 0;
+        bunny.anchor.y = 0;
+        bunny.scale.set(0.2, 0.2);
+
+        // Add the bunny to the scene we are building
+        app.stage.addChild(bunny);
+
+        // Listen for frame updates
+        app.ticker.add(() => {
+            // each frame we spin the bunny around a bit
+            bunny.rotation += 0.01;
+        });
+      })
+    });
   }
   unmounted() {
     this.panelsWrapper.removeEventListener("mousedown", this.mousedown);
