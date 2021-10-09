@@ -337,7 +337,7 @@ export default class VTabBar extends Vue {
         display: flex;
         .label {
           padding: 8px;
-          padding-right: 0px;
+          // padding-right: 0px;
           flex-shrink: 1;
           overflow: hidden;
         }

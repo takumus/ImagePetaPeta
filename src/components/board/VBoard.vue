@@ -404,6 +404,9 @@ export default class VBoard extends Vue {
     return transform;
   }
   get cacheURLs() {
+    if (this.$settings.lowMemoryMode) {
+      return [];
+    }
     return Array.from(new Set(
       this.board.petaPanels
         .filter((p) => this.getPanelIsInside(p))
