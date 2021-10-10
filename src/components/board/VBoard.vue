@@ -30,25 +30,6 @@
           }"
         ></div>
       </section>
-      <section
-        class="panels"
-        :style="{
-          transform: `translate(${transform.position.x}px, ${transform.position.y}px)`
-        }"
-      >
-        <VPanel
-          v-for="panel in board.petaPanels"
-          :key="panel.id"
-          :petaPanel="panel"
-          :transform="transform"
-          @press="pressPetaPanel"
-          @click="clickPetaPanel"
-          @toFront="toFront"
-          @menu="petaPanelMenu"
-          :ref="panel.id"
-          v-show="getPanelIsInside(panel)"
-        />
-      </section>
     </section>
     <section
       class="crop"
@@ -83,7 +64,7 @@
         :src="url"
       >
     </article>
-    </article>
+  </article>
 </template>
 
 <script lang="ts">
@@ -106,6 +87,8 @@ import { ImageType } from "@/datas/imageType";
 import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import * as PIXI from 'pixi.js'
 import { ILoaderAdd } from "pixi.js";
+import { PetaImage } from "@/datas/petaImage";
+import { PPanel } from "@/components/board/PPanel";
 @Options({
   components: {
     VPanel,
@@ -131,83 +114,56 @@ export default class VBoard extends Vue {
   scaleMax = 1000 / 100;
   isMac = false;
   draggingBackground = false;
-  globalOffset: Vec2 = new Vec2();
   petaPanelMenuListenerId = "";
   click = new ClickChecker();
   resizer?: ResizeObserver;
   viewSize = new Vec2();
   readyToLoad = false;
-  mounted() {
-    this.panelsWrapper.addEventListener("mousedown", this.mousedown);
-    this.panelsWrapper.addEventListener("dblclick", this.dblclick);
-    this.panelsWrapper.addEventListener("mousewheel", this.wheel as any);
-    this.panelsBackground.addEventListener("mousedown", this.mousedown);
+  pixi!: PIXI.Application;
+  panelsSprite = new PIXI.Sprite();
+  async mounted() {
+    this.pixi = new PIXI.Application({
+      resolution: window.devicePixelRatio,
+      antialias: true
+    });
+    this.pixi.view.addEventListener("mousedown", this.mousedown);
+    this.pixi.view.addEventListener("dblclick", this.dblclick);
+    this.pixi.view.addEventListener("mousewheel", this.wheel as any);
+    // this.panelsBackground.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mouseup", this.mouseup);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("click", this.mousedownOutside);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
-      app.renderer.resize(entries[0].contentRect.width, entries[0].contentRect.height);
-      app.view.style.width = entries[0].contentRect.width + "px";
-      app.view.style.height = entries[0].contentRect.height + "px";
     });
     this.resizer.observe(this.panelsBackground);
     this.isMac = window.navigator.userAgent.indexOf("Macintosh") >= 0;
-
-    const app = new PIXI.Application({
-      resolution: window.devicePixelRatio
-    });
-
-    // The application will create a canvas element for you that you
-    // can then insert into the DOM
-    this.panelsBackground.appendChild(app.view);
-    app.view.style.pointerEvents = "none";
-
-    // load the texture we need
-    this.board.petaPanels.forEach((pp, i) => {
-      app.loader.add('bunny' + i, ImageLoader.getImageURL(pp._petaImage!, ImageType.FULLSIZED));
-    });
-    app.loader.load((loader, resources) => {
-      // This creates a texture from a 'bunny.png' image
-      this.board.petaPanels.forEach((pp, i) => {
-        const bunny = new PIXI.Sprite(resources['bunny' + i].texture);
-
-        // Setup the position of the bunny
-        bunny.x = this.viewSize.x * (i / this.board.petaPanels.length);
-        bunny.y = this.viewSize.y * (i / this.board.petaPanels.length);
-
-        // Rotate around the center
-        bunny.anchor.x = 0;
-        bunny.anchor.y = 0;
-        bunny.scale.set(0.2, 0.2);
-
-        // Add the bunny to the scene we are building
-        app.stage.addChild(bunny);
-
-        // Listen for frame updates
-        app.ticker.add(() => {
-            // each frame we spin the bunny around a bit
-            bunny.rotation += 0.01;
-        });
-      })
-    });
+    // this.pixi.view.style.pointerEvents = "none";
+    this.pixi.stage.addChild(this.panelsSprite);
+    this.panelsBackground.appendChild(this.pixi.view);
+    this.update();
   }
   unmounted() {
-    this.panelsWrapper.removeEventListener("mousedown", this.mousedown);
-    this.panelsWrapper.removeEventListener("dblclick", this.dblclick);
-    this.panelsWrapper.removeEventListener("mousewheel", this.wheel as any);
-    this.panelsBackground.removeEventListener("mousedown", this.mousedown);
+    this.pixi.view.removeEventListener("mousedown", this.mousedown);
+    this.pixi.view.removeEventListener("dblclick", this.dblclick);
+    this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
+    // this.panelsBackground.removeEventListener("mousedown", this.mousedown);
     window.removeEventListener("mouseup", this.mouseup);
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("click", this.mousedownOutside);
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
+    this.panelsBackground.removeChild(this.pixi.view);
+    this.pixi.destroy();
   }
   resize(rect: DOMRectReadOnly) {
-    this.globalOffset.x = rect.width / 2;
-    this.globalOffset.y = rect.height / 2;
     this.viewSize.x = rect.width;
     this.viewSize.y = rect.height;
+    this.pixi.renderer.resize(rect.width, rect.height);
+    this.pixi.view.style.width = rect.width + "px";
+    this.pixi.view.style.height = rect.height + "px";
+    this.panelsSprite.x = this.viewSize.x / 2;
+    this.panelsSprite.y = this.viewSize.y / 2;
   }
   mousedownOutside(e: MouseEvent) {
     this.$nextTick(() => {
@@ -226,12 +182,9 @@ export default class VBoard extends Vue {
     });
   }
   mousedown(e: MouseEvent) {
+    console.log(e);
     if (e.button == MouseButton.RIGHT) {
       this.dragging = true;
-    } else if (e.target == this.panelsBackground && e.button == MouseButton.LEFT) {
-      this.dragging = true;
-      this.draggingBackground = true;
-      this.clearSelectionAll();
     }
     this.click.down(e);
     if (!this.dragging) return;
@@ -239,7 +192,7 @@ export default class VBoard extends Vue {
     this.dragOffset.y = (this.board.transform.position.y - e.clientY);
   }
   mouseup(e: MouseEvent) {
-    this.loadFullsized();
+    // this.loadFullsized();
     if (!this.dragging) return;
     if (e.button == MouseButton.RIGHT) {
       this.dragging = false;
@@ -265,10 +218,10 @@ export default class VBoard extends Vue {
     this.board.transform.position.x = (e.clientX + this.dragOffset.x);
     this.board.transform.position.y = (e.clientY + this.dragOffset.y);
     this.click.move(e);
+    this.update();
   }
   wheel(event: WheelEvent) {
     const mouse = vec2FromMouseEvent(event);
-    mouse.add(this.globalOffset.clone().mult(-1));
     if (event.ctrlKey || !this.isMac) {
       const currentZoom = this.board.transform.scale;
       this.board.transform.scale *= 1 + -event.deltaY * (this.isMac ? 0.01 : 0.001);
@@ -282,14 +235,20 @@ export default class VBoard extends Vue {
       this.board.transform.position.x += -event.deltaX;
       this.board.transform.position.y += -event.deltaY;
     }
+    this.update();
+  }
+  update() {
+    this.pixi.stage.x = this.board.transform.position.x;
+    this.pixi.stage.y = this.board.transform.position.y;
+    this.pixi.stage.scale.set(this.board.transform.scale);
   }
   dblclick(event: MouseEvent) {
-    if (event.target != this.panelsBackground) return;
     this.resetTransform();
   }
   resetTransform() {
     this.board.transform.scale = 1;
     this.board.transform.position.set(0, 0);
+    this.update();
   }
   removeSelectedPanels() {
     this.board.petaPanels = this.board.petaPanels.filter((pp) => !pp._selected);
@@ -413,12 +372,7 @@ export default class VBoard extends Vue {
     return inside
   }
   async load() {
-    this.readyToLoad = false;
-    if (this.board.petaPanels.length > BOARD_MAX_PETAPANEL_COUNT) {
-      if (await API.send("dialog", this.$t("boards.loadManyImageDialog", [this.board.petaPanels.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
-        return;
-      }
-    }
+    log("load");
     this.readyToLoad = true;
     await this.loadFullsized();
   }
@@ -426,9 +380,12 @@ export default class VBoard extends Vue {
     if (!this.readyToLoad) {
       return;
     }
-    const vPanels = this.board.petaPanels.map((pp) => this.getVPanel(pp)).filter((vp) => !vp?.loadedFullSized);
-    for (let i = 0; i < vPanels.length; i++) {
-      await vPanels[i]?.load(ImageType.FULLSIZED);
+    this.panelsSprite.children.length = 0;
+    for (let i = 0; i < this.board.petaPanels.length; i++) {
+      const petaPanel = this.board.petaPanels[i];
+      const bunny = new PPanel(petaPanel);
+      this.panelsSprite.addChild(bunny);
+      await bunny.loadTexture(ImageType.FULLSIZED);
     }
   }
   get selectedPetaPanels() {
@@ -446,7 +403,7 @@ export default class VBoard extends Vue {
   get transform(): PetaBoardTransform {
     const transform: PetaBoardTransform = {
       scale: this.board.transform.scale,
-      position: this.board.transform.position.clone().add(this.globalOffset)
+      position: this.board.transform.position.clone()
     }
     return transform;
   }
@@ -468,6 +425,7 @@ export default class VBoard extends Vue {
   }
   @Watch("board", { deep: true })
   changeBoard() {
+    this.update();
     this.$emit("change", this.board);
   }
 }
