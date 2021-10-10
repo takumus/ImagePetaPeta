@@ -53,17 +53,6 @@
       >
       <span class="zoom">{{scalePercent}}%</span>
     </section>
-    <article
-      class="image-cache"
-      ref="imageCache"
-      :style="{ zIndex: zIndex }"
-    >
-      <img
-        v-for="url in cacheURLs"
-        :key="url"
-        :src="url"
-      >
-    </article>
   </article>
 </template>
 
@@ -75,7 +64,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VPanel from "@/components/board/VPanel.vue";
 import VCrop from "@/components/board/VCrop.vue";
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
+import { Vec2, vec2FromMouseEvent, vec2FromObject } from "@/utils/vec2";
 import { PetaBoard, PetaBoardTransform } from "@/datas/petaBoard";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
@@ -85,7 +74,7 @@ import { ImageLoader } from "@/imageLoader";
 import { BOARD_MAX_PETAPANEL_COUNT } from "@/defines";
 import { ImageType } from "@/datas/imageType";
 import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
-import * as PIXI from 'pixi.js'
+import * as PIXI from "pixi.js";
 import { ILoaderAdd } from "pixi.js";
 import { PetaImage } from "@/datas/petaImage";
 import { PPanel } from "@/components/board/PPanel";
@@ -121,6 +110,7 @@ export default class VBoard extends Vue {
   readyToLoad = false;
   pixi!: PIXI.Application;
   panelsSprite = new PIXI.Sprite();
+  ppanels: {[key: string]: PPanel} = {};
   async mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -289,27 +279,24 @@ export default class VBoard extends Vue {
     }], position);
   }
   addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
-    petaPanel.index = this.getMaxIndex() + 1;
-    petaPanel.position.sub(this.transform.position).mult(1 / this.transform.scale);
-    petaPanel.width *= 1 / this.transform.scale;
-    let height = 1;
-    if (petaPanel._petaImage) {
-      height = petaPanel._petaImage.height;
-    }
-    petaPanel.height = petaPanel.width * height;
-    petaPanel._selected = true;
-    this.toFront(petaPanel);
-    // this.pressPetaPanel(petaPanel, worldPosition);
-    if (worldPosition) {
-      this.$nextTick(() => {
-        const panelComponent = this.getVPanel(petaPanel);
-        panelComponent?.load(ImageType.THUMBNAIL);
-        panelComponent?.startDrag(worldPosition);
-      });
-    }
-  }
-  getVPanel(petaPanel: PetaPanel): VPanel | null {
-    return this.$refs[petaPanel.id] as VPanel;
+    // petaPanel.index = this.getMaxIndex() + 1;
+    // petaPanel.position.sub(this.transform.position).mult(1 / this.transform.scale);
+    // petaPanel.width *= 1 / this.transform.scale;
+    // let height = 1;
+    // if (petaPanel._petaImage) {
+    //   height = petaPanel._petaImage.height;
+    // }
+    // petaPanel.height = petaPanel.width * height;
+    // petaPanel._selected = true;
+    // this.toFront(petaPanel);
+    // // this.pressPetaPanel(petaPanel, worldPosition);
+    // if (worldPosition) {
+    //   // this.$nextTick(() => {
+    //   //   const panelComponent = this.getVPanel(petaPanel);
+    //   //   panelComponent?.load(ImageType.THUMBNAIL);
+    //   //   panelComponent?.startDrag(worldPosition);
+    //   // });
+    // }
   }
   editCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
@@ -317,47 +304,36 @@ export default class VBoard extends Vue {
   updateCrop() {
     this.croppingPetaPanel = null;
   }
-  pressPetaPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
-    if (!this.$keyboards.shift && (this.selectedPetaPanels.length <= 1 || !petaPanel._selected)) {
-      // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
-      // 最前にして選択リセット
-      this.toFront(petaPanel);
-      this.clearSelectionAll();
-    }
-    if (this.selectedPetaPanels.length <= 1) {
-      // 選択が１つ以下の場合選択範囲リセット
-      this.clearSelectionAll();
-    }
-    petaPanel._selected = true;
-    if (worldPosition) {
-      this.selectedPetaPanels.forEach((pp) => {
-        this.getVPanel(pp)?.startDrag(worldPosition);
-      });
-    }
-  }
-  clickPetaPanel(petaPanel: PetaPanel) {
-    this.clearSelectionAll();
-    petaPanel._selected = true;
-    if (!this.$keyboards.shift) {
-      // シフトなしの場合最前へ。
-      this.toFront(petaPanel);
-    }
-  }
+  // clickPetaPanel(petaPanel: PetaPanel) {
+  //   this.clearSelectionAll();
+  //   petaPanel._selected = true;
+  //   if (!this.$keyboards.shift) {
+  //     // シフトなしの場合最前へ。
+  //     this.toFront(petaPanel);
+  //   }
+  // }
   clearSelectionAll(force = false) {
     if (!this.$keyboards.shift || force) {
-      this.board.petaPanels.forEach((p) => {
-        p._selected = false;
+      Object.values(this.ppanels).forEach((p) => {
+        p.selected = false;
+        console.log(p.selected);
       });
     }
   }
-  toFront(petaPanel: PetaPanel) {
+  toFront(ppanel: PPanel) {
     const maxIndex = this.getMaxIndex();
-    if (petaPanel.index == maxIndex) return;
-    petaPanel.index = maxIndex + 1;
-    [...this.board.petaPanels]
+    if (ppanel.petaPanel.index == maxIndex) return;
+    ppanel.petaPanel.index = maxIndex + 1;
+    this.board.petaPanels
     .sort((a, b) => a.index - b.index)
     .forEach((pp, i) => {
       pp.index = i;
+    });
+    this.sortIndex();
+  }
+  sortIndex() {
+    this.panelsSprite.children.sort((a, b) => {
+      return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
     });
   }
   getMaxIndex() {
@@ -381,15 +357,70 @@ export default class VBoard extends Vue {
       return;
     }
     this.panelsSprite.children.length = 0;
+    this.ppanels = {};
+    let loaded = 0;
     for (let i = 0; i < this.board.petaPanels.length; i++) {
       const petaPanel = this.board.petaPanels[i];
       const bunny = new PPanel(petaPanel);
+      this.ppanels[petaPanel.id] = bunny;
+      this.initPPanelEvent(bunny);
       this.panelsSprite.addChild(bunny);
-      await bunny.loadTexture(ImageType.FULLSIZED);
+      bunny.loadTexture(ImageType.FULLSIZED).then(() => {
+        loaded++;
+        log("loading", loaded, "/", this.board.petaPanels.length);
+      });
     }
   }
-  get selectedPetaPanels() {
-    return this.board.petaPanels.filter((pp) => pp._selected);
+  initPPanelEvent(ppanel: PPanel) {
+    ppanel.on("pointerdown", (e: PIXI.InteractionEvent) => {
+      this.pointerdownPPanel(ppanel, e);
+    });
+    ppanel.on("pointerup", (e: PIXI.InteractionEvent) => {
+      this.pointerupPPanel(ppanel, e);
+    });
+    ppanel.on("pointermove", (e: PIXI.InteractionEvent) => {
+      this.pointermovePPanel(ppanel, e);
+    });
+  }
+  pointerdownPPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
+    if (!this.$keyboards.shift && (this.selectedPPanels.length <= 1 || !ppanel.selected)) {
+      // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
+      // 最前にして選択リセット
+      this.toFront(ppanel);
+      this.clearSelectionAll();
+    }
+    if (this.selectedPPanels.length <= 1) {
+      // 選択が１つ以下の場合選択範囲リセット
+      this.clearSelectionAll();
+    }
+    ppanel.selected = true;
+    // if (worldPosition) {
+      // this.selectedPPanels.forEach((pp) => {
+        // this.getVPanel(pp)?.startDrag(worldPosition);
+      // });
+    // }
+    ppanel.dragging = true;
+    // console.log(e.data.global);
+    const pos = vec2FromObject(e.data.global);
+    ppanel.draggingOffset = vec2FromObject(ppanel.position).sub(this.panelsSprite.toLocal(pos));
+    console.log(pos);
+    console.log(ppanel.draggingOffset);
+  }
+  pointerupPPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
+    if (!ppanel.dragging) {
+      return;
+    }
+    ppanel.dragging = false;
+  }
+  pointermovePPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
+    if (!ppanel.dragging) {
+      return;
+    }
+    const pos = vec2FromObject(this.panelsSprite.toLocal(e.data.global));
+    ppanel.petaPanel.position = pos.add(ppanel.draggingOffset);
+  }
+  get selectedPPanels() {
+    return Object.values(this.ppanels).filter((pp) => pp.selected);
   }
   get scalePercent() {
     return Math.floor(this.board.transform.scale * 100);
@@ -406,16 +437,6 @@ export default class VBoard extends Vue {
       position: this.board.transform.position.clone()
     }
     return transform;
-  }
-  get cacheURLs() {
-    if (this.$settings.lowMemoryMode || !this.readyToLoad) {
-      return [];
-    }
-    return Array.from(new Set(
-      this.board.petaPanels
-        .filter((p) => this.getPanelIsInside(p) && p._petaImage)
-        .map((p) => ImageLoader.getImageURL(p._petaImage!, ImageType.FULLSIZED))
-    ));
   }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {
@@ -453,7 +474,6 @@ export default class VBoard extends Vue {
     }
     .panels-background {
       z-index: 1;
-      cursor: grab !important;
       position: absolute;
       top: 0px;
       left: 0px;
