@@ -110,37 +110,41 @@ export default class VBoard extends Vue {
   readyToLoad = false;
   pixi!: PIXI.Application;
   panelsSprite = new PIXI.Sprite();
+  panelsCenterWrapper = new PIXI.Sprite();
+  backgroundSprite = new PIXI.Graphics();
   ppanels: {[key: string]: PPanel} = {};
   async mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
       antialias: true
     });
-    this.pixi.view.addEventListener("mousedown", this.mousedown);
+    // this.pixi.view.addEventListener("mousedown", this.mousedown);
     this.pixi.view.addEventListener("dblclick", this.dblclick);
     this.pixi.view.addEventListener("mousewheel", this.wheel as any);
     // this.panelsBackground.addEventListener("mousedown", this.mousedown);
-    window.addEventListener("mouseup", this.mouseup);
-    window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("click", this.mousedownOutside);
+    // window.addEventListener("click", this.mousedownOutside);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
     });
     this.resizer.observe(this.panelsBackground);
     this.isMac = window.navigator.userAgent.indexOf("Macintosh") >= 0;
     // this.pixi.view.style.pointerEvents = "none";
+    this.pixi.stage.addChild(this.backgroundSprite);
     this.pixi.stage.addChild(this.panelsSprite);
+    this.panelsSprite.addChild(this.panelsCenterWrapper);
     this.panelsBackground.appendChild(this.pixi.view);
     this.update();
+    this.pixi.stage.interactive = true;
+    this.pixi.stage.on("pointerdown", this.mousedown);
+    this.pixi.stage.on("pointerup", this.mouseup);
+    this.pixi.stage.on("pointerupoutside", this.mouseup);
+    this.pixi.stage.on("pointermove", this.mousemove);
+    this.pixi.stage.on("pointermoveoutside", this.mousemove);
   }
   unmounted() {
-    this.pixi.view.removeEventListener("mousedown", this.mousedown);
     this.pixi.view.removeEventListener("dblclick", this.dblclick);
     this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
-    // this.panelsBackground.removeEventListener("mousedown", this.mousedown);
-    window.removeEventListener("mouseup", this.mouseup);
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("click", this.mousedownOutside);
+    // window.removeEventListener("click", this.mousedownOutside);
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
     this.panelsBackground.removeChild(this.pixi.view);
@@ -152,62 +156,57 @@ export default class VBoard extends Vue {
     this.pixi.renderer.resize(rect.width, rect.height);
     this.pixi.view.style.width = rect.width + "px";
     this.pixi.view.style.height = rect.height + "px";
-    this.panelsSprite.x = this.viewSize.x / 2;
-    this.panelsSprite.y = this.viewSize.y / 2;
+    this.panelsCenterWrapper.x = this.viewSize.x / 2;
+    this.panelsCenterWrapper.y = this.viewSize.y / 2;
+    this.backgroundSprite.beginFill(Number(this.board.background.fillColor.replace("#", "0x")));
+    this.backgroundSprite.drawRect(0, 0, this.viewSize.x, this.viewSize.y);
   }
-  mousedownOutside(e: MouseEvent) {
-    this.$nextTick(() => {
-      let parent = e.target as HTMLElement;
-      let inPanels = true;
-      while (parent != this.panelsWrapper) {
-        parent = parent.parentElement as HTMLElement;
-        if (!parent) {
-          inPanels = false;
-          break;
-        }
-      }
-      if (!inPanels) {
-        this.clearSelectionAll(true);
-      }
-    });
-  }
-  mousedown(e: MouseEvent) {
-    console.log(e);
-    if (e.button == MouseButton.RIGHT) {
+  mousedown(e: PIXI.InteractionEvent) {
+    if (e.data.button == MouseButton.RIGHT) {
       this.dragging = true;
-    }
-    this.click.down(e);
-    if (!this.dragging) return;
-    this.dragOffset.x = (this.board.transform.position.x - e.clientX);
-    this.dragOffset.y = (this.board.transform.position.y - e.clientY);
-  }
-  mouseup(e: MouseEvent) {
-    // this.loadFullsized();
-    if (!this.dragging) return;
-    if (e.button == MouseButton.RIGHT) {
-      this.dragging = false;
-      if (this.click.isClick && e.target == this.panelsBackground) {
-        this.$globalComponents.contextMenu.open([{
-          label: this.$t("boards.menu.openBrowser"),
-          click: () => {
-            this.$globalComponents.browser.open();
-          }
-        }, { separate: true }, {
-          label: this.$t("boards.menu.resetPosition"),
-          click: () => {
-            this.resetTransform();
-          }
-        }], vec2FromMouseEvent(e));
+      this.dragOffset.x = (this.board.transform.position.x - e.data.global.x);
+      this.dragOffset.y = (this.board.transform.position.y - e.data.global.y);
+    } else if (e.data.button == MouseButton.LEFT) {
+      if (Object.values(this.ppanels).find((c) => c == e.target)) {
+        const ppanel = e.target as PPanel;
+        this.pointerdownPPanel(ppanel, e);
+        return;
       }
-    } else if (this.draggingBackground && e.button == MouseButton.LEFT) {
-      this.dragging = false;
+      this.clearSelectionAll();
     }
   }
-  mousemove(e: MouseEvent) {
+  mouseup(e: PIXI.InteractionEvent) {
+    // this.loadFullsized();
+    if (e.data.button == MouseButton.RIGHT) {
+      this.dragging = false;
+      // if (this.click.isClick && e.target == this.panelsBackground) {
+      //   this.$globalComponents.contextMenu.open([{
+      //     label: this.$t("boards.menu.openBrowser"),
+      //     click: () => {
+      //       this.$globalComponents.browser.open();
+      //     }
+      //   }, { separate: true }, {
+      //     label: this.$t("boards.menu.resetPosition"),
+      //     click: () => {
+      //       this.resetTransform();
+      //     }
+      //   }], vec2FromMouseEvent(e));
+      // }
+    } else if (e.data.button == MouseButton.LEFT) {
+      Object.values(this.ppanels).forEach((pp) => {
+        pp.dragging = false;
+      });
+    }
+  }
+  mousemove(e: PIXI.InteractionEvent) {
+    Object.values(this.ppanels).filter((pp) => pp.dragging).forEach((pp) => {
+      const pos = vec2FromObject(this.panelsCenterWrapper.toLocal(e.data.global));
+      pp.petaPanel.position = pos.add(pp.draggingOffset);
+    });
     if (!this.dragging) return;
-    this.board.transform.position.x = (e.clientX + this.dragOffset.x);
-    this.board.transform.position.y = (e.clientY + this.dragOffset.y);
-    this.click.move(e);
+    this.board.transform.position.x = (e.data.global.x + this.dragOffset.x);
+    this.board.transform.position.y = (e.data.global.y + this.dragOffset.y);
+    // this.click.move(e);
     this.update();
   }
   wheel(event: WheelEvent) {
@@ -228,9 +227,9 @@ export default class VBoard extends Vue {
     this.update();
   }
   update() {
-    this.pixi.stage.x = this.board.transform.position.x;
-    this.pixi.stage.y = this.board.transform.position.y;
-    this.pixi.stage.scale.set(this.board.transform.scale);
+    this.panelsSprite.x = this.board.transform.position.x;
+    this.panelsSprite.y = this.board.transform.position.y;
+    this.panelsSprite.scale.set(this.board.transform.scale);
   }
   dblclick(event: MouseEvent) {
     this.resetTransform();
@@ -304,19 +303,10 @@ export default class VBoard extends Vue {
   updateCrop() {
     this.croppingPetaPanel = null;
   }
-  // clickPetaPanel(petaPanel: PetaPanel) {
-  //   this.clearSelectionAll();
-  //   petaPanel._selected = true;
-  //   if (!this.$keyboards.shift) {
-  //     // シフトなしの場合最前へ。
-  //     this.toFront(petaPanel);
-  //   }
-  // }
   clearSelectionAll(force = false) {
     if (!this.$keyboards.shift || force) {
       Object.values(this.ppanels).forEach((p) => {
         p.selected = false;
-        console.log(p.selected);
       });
     }
   }
@@ -332,7 +322,7 @@ export default class VBoard extends Vue {
     this.sortIndex();
   }
   sortIndex() {
-    this.panelsSprite.children.sort((a, b) => {
+    this.panelsCenterWrapper.children.sort((a, b) => {
       return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
     });
   }
@@ -356,7 +346,7 @@ export default class VBoard extends Vue {
     if (!this.readyToLoad) {
       return;
     }
-    this.panelsSprite.children.length = 0;
+    this.panelsCenterWrapper.children.length = 0;
     this.ppanels = {};
     let loaded = 0;
     for (let i = 0; i < this.board.petaPanels.length; i++) {
@@ -364,7 +354,7 @@ export default class VBoard extends Vue {
       const bunny = new PPanel(petaPanel);
       this.ppanels[petaPanel.id] = bunny;
       this.initPPanelEvent(bunny);
-      this.panelsSprite.addChild(bunny);
+      this.panelsCenterWrapper.addChild(bunny);
       bunny.loadTexture(ImageType.FULLSIZED).then(() => {
         loaded++;
         log("loading", loaded, "/", this.board.petaPanels.length);
@@ -372,15 +362,7 @@ export default class VBoard extends Vue {
     }
   }
   initPPanelEvent(ppanel: PPanel) {
-    ppanel.on("pointerdown", (e: PIXI.InteractionEvent) => {
-      this.pointerdownPPanel(ppanel, e);
-    });
-    ppanel.on("pointerup", (e: PIXI.InteractionEvent) => {
-      this.pointerupPPanel(ppanel, e);
-    });
-    ppanel.on("pointermove", (e: PIXI.InteractionEvent) => {
-      this.pointermovePPanel(ppanel, e);
-    });
+    //
   }
   pointerdownPPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
     if (!this.$keyboards.shift && (this.selectedPPanels.length <= 1 || !ppanel.selected)) {
@@ -394,30 +376,17 @@ export default class VBoard extends Vue {
       this.clearSelectionAll();
     }
     ppanel.selected = true;
-    // if (worldPosition) {
-      // this.selectedPPanels.forEach((pp) => {
-        // this.getVPanel(pp)?.startDrag(worldPosition);
-      // });
-    // }
-    ppanel.dragging = true;
-    // console.log(e.data.global);
-    const pos = vec2FromObject(e.data.global);
-    ppanel.draggingOffset = vec2FromObject(ppanel.position).sub(this.panelsSprite.toLocal(pos));
-    console.log(pos);
-    console.log(ppanel.draggingOffset);
+    Object.values(this.ppanels).filter((pp) => pp.selected).forEach((pp) => {
+      const pos = vec2FromObject(e.data.global);
+      pp.draggingOffset = vec2FromObject(pp.position).sub(this.panelsCenterWrapper.toLocal(pos));
+      pp.dragging = true;
+    });
   }
   pointerupPPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
     if (!ppanel.dragging) {
       return;
     }
     ppanel.dragging = false;
-  }
-  pointermovePPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
-    if (!ppanel.dragging) {
-      return;
-    }
-    const pos = vec2FromObject(this.panelsSprite.toLocal(e.data.global));
-    ppanel.petaPanel.position = pos.add(ppanel.draggingOffset);
   }
   get selectedPPanels() {
     return Object.values(this.ppanels).filter((pp) => pp.selected);

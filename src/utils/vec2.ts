@@ -67,9 +67,6 @@ export class Vec2 {
   public atan2() {
     return Math.atan2(this.y, this.x);
   }
-  public toPIXI() {
-    return new PIXI.Point(this.x, this.y);
-  }
 }
 export function vec2FromObject(position: {x: number, y: number}) {
   return new Vec2(position.x, position.y);
