@@ -1,3 +1,4 @@
+import * as PIXI from "pixi.js";
 export class Vec2 {
   constructor(public x: number = 0, public y: number = 0) {
     
@@ -51,7 +52,7 @@ export class Vec2 {
     this.y = y;
     return this;
   }
-  public copyFrom(vec2: Vec2) {
+  public copyFrom(vec2: {x: number, y: number}) {
     this.x = vec2.x;
     this.y = vec2.y;
     return this;
@@ -65,6 +66,9 @@ export class Vec2 {
   }
   public atan2() {
     return Math.atan2(this.y, this.x);
+  }
+  public toPIXI() {
+    return new PIXI.Point(this.x, this.y);
   }
 }
 export function vec2FromObject(position: {x: number, y: number}) {
