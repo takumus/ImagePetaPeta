@@ -1,4 +1,4 @@
-type ArgType = Vec2 | {
+export type XYObject = Vec2 | {
   x: number,
   y: number
 }
@@ -6,8 +6,8 @@ export class Vec2 {
   public x = 0;
   public y = 0;
   constructor(x?: number, y?: number);
-  constructor(p?: ArgType);
-  constructor(a: number | ArgType = 0, b = 0) {
+  constructor(p?: XYObject);
+  constructor(a: number | XYObject = 0, b = 0) {
     if (typeof a === "object") {
       this.x = a.x;
       this.y = a.y;
@@ -17,8 +17,8 @@ export class Vec2 {
     }
   }
   set(x?: number, y?: number): Vec2;
-  set(p?: ArgType): Vec2;
-  set(a: number | ArgType = 0, b = 0) {
+  set(p?: XYObject): Vec2;
+  set(a: number | XYObject = 0, b = 0) {
     if (typeof a === "object") {
       this.x = a.x;
       this.y = a.y;
@@ -31,12 +31,12 @@ export class Vec2 {
   public getLength() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
-  public getDistance(v: ArgType) {
+  public getDistance(v: XYObject) {
     const dx = v.x - this.x;
     const dy = v.y - this.y;
     return Math.sqrt(dx * dx + dy * dy);
   }
-  public getDiff(v: ArgType) {
+  public getDiff(v: XYObject) {
     return new Vec2(v.x - this.x, v.y - this.y);
   }
   public mult(n: number) {
@@ -56,12 +56,12 @@ export class Vec2 {
   public clone() {
     return new Vec2(this);
   }
-  public add(vec2: ArgType) {
+  public add(vec2: XYObject) {
     this.x += vec2.x;
     this.y += vec2.y;
     return this;
   }
-  public sub(vec2: ArgType) {
+  public sub(vec2: XYObject) {
     this.x -= vec2.x;
     this.y -= vec2.y;
     return this;
@@ -76,11 +76,11 @@ export class Vec2 {
   public atan2() {
     return Math.atan2(this.y, this.x);
   }
-  public copyTo(vec2: ArgType) {
+  public copyTo(vec2: XYObject) {
     vec2.x = this.x;
     vec2.y = this.y;
   }
-  public copyFrom(vec2: ArgType) {
+  public copyFrom(vec2: XYObject) {
     this.x = vec2.x;
     this.y = vec2.y;
     return this;

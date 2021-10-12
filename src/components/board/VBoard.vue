@@ -116,7 +116,7 @@ export default class VBoard extends Vue {
   rootContainer = new PIXI.Container();
   panelsCenterWrapper = new PIXI.Container();
   backgroundSprite = new PIXI.Graphics();
-  ppanels: {[key: string]: PPanel} = {};
+  pPanels: {[key: string]: PPanel} = {};
   debugGraphics = new PIXI.Graphics();
   corners: PIXI.Sprite[] = [];
   transformingPPanels: PPanel[] = [];
@@ -201,8 +201,8 @@ export default class VBoard extends Vue {
     this.sizing = true;
     this.sizingCornerIndex = index;
     this.beginSizingPosition = new Vec2(e.data.global);
-    this.beginSizingPetaPanels = this.selectedPPanels.map((pp) => {
-      const p = JSON.parse(JSON.stringify(pp.petaPanel));
+    this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
+      const p = JSON.parse(JSON.stringify(pPanel.petaPanel));
       delete p._petaImage;
       return p;
     });
@@ -210,8 +210,8 @@ export default class VBoard extends Vue {
     this.beginSizingDistance = this.tcp.getDistance(this.corners[this.sizingCornerIndex]);
   }
   beginRotating(index: number, e: PIXI.InteractionEvent) {
-    this.beginSizingPetaPanels = this.selectedPPanels.map((pp) => {
-      const p = JSON.parse(JSON.stringify(pp.petaPanel));
+    this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
+      const p = JSON.parse(JSON.stringify(pPanel.petaPanel));
       delete p._petaImage;
       return p;
     });
@@ -231,15 +231,16 @@ export default class VBoard extends Vue {
     return center.div(this.beginRotatingCorners.length);
   }
   mousedown(e: PIXI.InteractionEvent) {
+    this.click.down(e.data.global);
     if (e.data.button == MouseButton.RIGHT) {
       this.dragging = true;
       this.dragOffset
       .copyFrom(this.board.transform.position)
       .sub(e.data.global);
     } else if (e.data.button == MouseButton.LEFT) {
-      if (Object.values(this.ppanels).find((c) => c == e.target)) {
-        const ppanel = e.target as PPanel;
-        this.pointerdownPPanel(ppanel, e);
+      const pPanel = this.getPPanelFromObject(e.target);
+      if (pPanel) {
+        this.pointerdownPPanel(pPanel, e);
         return;
       }
       if (e.target.name == "transformer") {
@@ -249,11 +250,36 @@ export default class VBoard extends Vue {
       }
     }
   }
+  getPPanelFromObject(object: PIXI.DisplayObject) {
+    if (this.pPanelsArray.find((c) => c == object)) {
+      return object as PPanel;
+    }
+    return null;
+  }
   mouseup(e: PIXI.InteractionEvent) {
     // this.loadFullsized();
     this.sizing = false;
     this.rotating = false;
     if (e.data.button == MouseButton.RIGHT) {
+      log(this.click.isClick);
+      if (this.click.isClick) {
+        const pPanel = this.getPPanelFromObject(e.target);
+        if (pPanel) {
+          this.petaPanelMenu(pPanel.petaPanel, new Vec2(e.data.global));
+        } else {
+          this.$globalComponents.contextMenu.open([{
+            label: this.$t("boards.menu.openBrowser"),
+            click: () => {
+              this.$globalComponents.browser.open();
+            }
+          }, { separate: true }, {
+            label: this.$t("boards.menu.resetPosition"),
+            click: () => {
+              this.resetTransform();
+            }
+          }], new Vec2(e.data.global));
+        }
+      }
       this.dragging = false;
       // if (this.click.isClick && e.target == this.panelsBackground) {
       //   this.$globalComponents.contextMenu.open([{
@@ -269,17 +295,18 @@ export default class VBoard extends Vue {
       //   }], vec2FromMouseEvent(e));
       // }
     } else if (e.data.button == MouseButton.LEFT) {
-      Object.values(this.ppanels).forEach((pp) => {
-        pp.dragging = false;
+      this.pPanelsArray.forEach((pPanel) => {
+        pPanel.dragging = false;
       });
     }
   }
   mousemove(e: PIXI.InteractionEvent) {
+    this.click.move(e.data.global);
     if (this.sizing) {
       const scale = this.tcp.getDistance(this.rootContainer.toLocal(e.data.global)) / this.beginSizingDistance;
-      this.selectedPPanels.forEach((pp, i) => {
-        pp.petaPanel.width = this.beginSizingPetaPanels[i].width * scale;
-        pp.petaPanel.height = this.beginSizingPetaPanels[i].height * scale;
+      this.selectedPPanels.forEach((pPanel, i) => {
+        pPanel.petaPanel.width = this.beginSizingPetaPanels[i].width * scale;
+        pPanel.petaPanel.height = this.beginSizingPetaPanels[i].height * scale;
         const position = this.tcp.getDiff(
           this.rootContainer.toLocal(
             this.panelsCenterWrapper.toGlobal(
@@ -287,22 +314,24 @@ export default class VBoard extends Vue {
             )
           )
         );
-        pp.petaPanel.position = this.panelsCenterWrapper.toLocal(
-          this.rootContainer.toGlobal(
-            position
-            .clone()
-            .normalize()
-            .mult(position.getLength())
-            .mult(scale)
-            .add(this.tcp)
+        pPanel.petaPanel.position = new Vec2(
+          this.panelsCenterWrapper.toLocal(
+            this.rootContainer.toGlobal(
+              position
+              .clone()
+              .normalize()
+              .mult(position.getLength())
+              .mult(scale)
+              .add(this.tcp)
+            )
           )
         );
       })
     } else if (this.rotating) {
       const center = this.getRotatingCenter();
       this.rotatingRotation = center.getDiff(this.rootContainer.toLocal(e.data.global)).atan2();
-      this.selectedPPanels.forEach((pp, i) => {
-        pp.petaPanel.rotation = this.beginSizingPetaPanels[i].rotation + this.rotatingRotation - this.beginRotatingRotation;
+      this.selectedPPanels.forEach((pPanel, i) => {
+        pPanel.petaPanel.rotation = this.beginSizingPetaPanels[i].rotation + this.rotatingRotation - this.beginRotatingRotation;
         const diff = center.getDiff(
           this.rootContainer.toLocal(
             this.panelsCenterWrapper.toGlobal(
@@ -310,22 +339,25 @@ export default class VBoard extends Vue {
             )
           )
         );
-        const r = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
-        const globalPos2 = this.rootContainer.toGlobal(
-          new Vec2(
-            Math.cos(r),
-            Math.sin(r)
-          ).mult(diff.getLength()).add(center)
+        const rad = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
+        pPanel.petaPanel.position.set(
+          this.panelsCenterWrapper.toLocal(
+            this.rootContainer.toGlobal(
+              new Vec2(
+                Math.cos(rad),
+                Math.sin(rad)
+              ).mult(diff.getLength()).add(center)
+            )
+          )
         );
-        pp.petaPanel.position.copyFrom(this.panelsCenterWrapper.toLocal(globalPos2));
       });
     }
-    Object.values(this.ppanels).filter((pp) => pp.dragging).forEach((pp) => {
-      pp.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(e.data.global)).add(pp.draggingOffset);
+    this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
+      pPanel.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(e.data.global)).add(pPanel.draggingOffset);
     });
     if (!this.dragging) return;
     this.board.transform.position
-    .copyFrom(e.data.global)
+    .set(e.data.global)
     .add(this.dragOffset);
     // this.click.move(e);
     // this.update();
@@ -355,8 +387,8 @@ export default class VBoard extends Vue {
   update() {
     this.board.transform.position.copyTo(this.rootContainer);
     this.rootContainer.scale.set(this.board.transform.scale);
-    Object.values(this.ppanels).forEach((pp) => {
-      pp.update();
+    this.pPanelsArray.forEach((pPanel) => {
+      pPanel.update();
     });
     if (this.rotating) {
       const center = this.getRotatingCenter();
@@ -380,9 +412,9 @@ export default class VBoard extends Vue {
         let minY = Number.MAX_SAFE_INTEGER;
         let maxX = Number.MIN_SAFE_INTEGER;
         let maxY = Number.MIN_SAFE_INTEGER;
-        this.selectedPPanels.forEach((pp) => {
-          pp.getCorners().forEach((c, i) => {
-            c.add(pp.petaPanel.position);
+        this.selectedPPanels.forEach((pPanel) => {
+          pPanel.getCorners().forEach((c, i) => {
+            c.add(pPanel.petaPanel.position);
             c.add(this.viewSize.clone().div(2));
             minX = Math.min(minX, c.x);
             minY = Math.min(minY, c.y);
@@ -401,7 +433,7 @@ export default class VBoard extends Vue {
       }
     }
     this.debugGraphics.clear();
-    this.debugGraphics.lineStyle(2, 0x00ff00);
+    this.debugGraphics.lineStyle(2 / this.board.transform.scale, 0x00ff00);
     this.debugGraphics.moveTo(this.corners[0].x, this.corners[0].y);
     for (let i = 1; i < this.corners.length + 1; i++) {
       const c = this.corners[i % this.corners.length];
@@ -417,11 +449,17 @@ export default class VBoard extends Vue {
     // this.update();
   }
   removeSelectedPanels() {
-    this.board.petaPanels = this.board.petaPanels.filter((pp) => !pp._selected);
+    this.pPanelsArray.filter((pPanel) => pPanel.selected).forEach((pPanel) => {
+      this.removePPanel(pPanel);
+    })
+    this.board.petaPanels = this.pPanelsArray.map((pPanel) => pPanel.petaPanel);
+  }
+  removePPanel(pPanel: PPanel) {
+    this.panelsCenterWrapper.removeChild(pPanel);
+    pPanel.destroy();
+    delete this.pPanels[pPanel.petaPanel.id];
   }
   petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
-    this.clearSelectionAll();
-    petaPanel._selected = true;
     this.$globalComponents.contextMenu.open([{
       label: this.$t("boards.panelMenu.crop"),
       click: () => {
@@ -454,25 +492,15 @@ export default class VBoard extends Vue {
       }
     }], position);
   }
-  addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
-    // petaPanel.index = this.getMaxIndex() + 1;
-    // petaPanel.position.sub(this.transform.position).mult(1 / this.transform.scale);
-    // petaPanel.width *= 1 / this.transform.scale;
-    // let height = 1;
-    // if (petaPanel._petaImage) {
-    //   height = petaPanel._petaImage.height;
-    // }
-    // petaPanel.height = petaPanel.width * height;
-    // petaPanel._selected = true;
-    // this.toFront(petaPanel);
-    // // this.pressPetaPanel(petaPanel, worldPosition);
-    // if (worldPosition) {
-    //   // this.$nextTick(() => {
-    //   //   const panelComponent = this.getVPanel(petaPanel);
-    //   //   panelComponent?.load(ImageType.THUMBNAIL);
-    //   //   panelComponent?.startDrag(worldPosition);
-    //   // });
-    // }
+  async addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
+    log(petaPanel, worldPosition);
+    this.loadFullsized(petaPanel);
+    const pPanel = this.pPanels[petaPanel.id];
+    petaPanel.width *= 1 / this.board.transform.scale;
+    petaPanel.height *= 1 / this.board.transform.scale;
+    pPanel.dragging = true;
+    pPanel.selected = true;
+    this.toFront(pPanel);
   }
   editCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
@@ -482,19 +510,19 @@ export default class VBoard extends Vue {
   }
   clearSelectionAll(force = false) {
     if (!this.$keyboards.shift || force) {
-      Object.values(this.ppanels).forEach((p) => {
+      this.pPanelsArray.forEach((p) => {
         p.selected = false;
       });
     }
   }
-  toFront(ppanel: PPanel) {
+  toFront(pPanel: PPanel) {
     const maxIndex = this.getMaxIndex();
-    if (ppanel.petaPanel.index == maxIndex) return;
-    ppanel.petaPanel.index = maxIndex + 1;
+    if (pPanel.petaPanel.index == maxIndex) return;
+    pPanel.petaPanel.index = maxIndex + 1;
     this.board.petaPanels
     .sort((a, b) => a.index - b.index)
-    .forEach((pp, i) => {
-      pp.index = i;
+    .forEach((petaPanel, i) => {
+      petaPanel.index = i;
     });
     this.sortIndex();
   }
@@ -504,39 +532,25 @@ export default class VBoard extends Vue {
     });
   }
   getMaxIndex() {
-    return Math.max(...this.board.petaPanels.map((pp) => pp.index));
-  }
-  getPanelIsInside(panel: PetaPanel) {
-    const panelWorldPosition = panel.position.clone().mult(this.transform.scale).add(this.transform.position);
-    const panelWorldSize = new Vec2(panel.width, panel.height).getLength() / 2 * this.transform.scale;
-    const inside = 
-      Math.abs(panelWorldPosition.x - this.viewSize.x / 2) < panelWorldSize + this.viewSize.x / 2
-      && Math.abs(panelWorldPosition.y - this.viewSize.y / 2) < panelWorldSize + this.viewSize.y / 2;
-    return inside
+    return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
     log("load");
     // this.clearCache();
+    this.pPanelsArray.forEach((pPanel) => {
+      this.removePPanel(pPanel);
+    });
+    this.pPanels = {};
+    await this.loadAllFullsized();
+  }
+  async loadAllFullsized() {
     if (this.board.petaPanels.length > 0) {
       this.pixi.ticker.stop();
     }
-    await this.loadFullsized();
-  }
-  async loadFullsized() {
-    Object.values(this.ppanels).forEach((pp) => {
-      this.panelsCenterWrapper.removeChild(pp);
-      pp.destroy();
-    });
-    this.ppanels = {};
     let loaded = 0;
     for (let i = 0; i < this.board.petaPanels.length; i++) {
-      const petaPanel = this.board.petaPanels[i];
-      const ppanel = new PPanel(petaPanel);
-      this.ppanels[petaPanel.id] = ppanel;
-      this.panelsCenterWrapper.addChild(ppanel);
-      ppanel.loadTexture(ImageType.FULLSIZED).then(() => {
+      this.loadFullsized(this.board.petaPanels[i]).then((result) => {
         loaded++;
-        // log("loading", loaded, "/", this.board.petaPanels.length);
         if (loaded == this.board.petaPanels.length) {
           this.pixi.ticker.start();
           log("loaded", loaded);
@@ -544,52 +558,53 @@ export default class VBoard extends Vue {
       });
     }
   }
+  async loadFullsized(petaPanel: PetaPanel) {
+    if (this.pPanels[petaPanel.id]) {
+      return false;
+    }
+    const pPanel = new PPanel(petaPanel);
+    this.pPanels[petaPanel.id] = pPanel;
+    this.panelsCenterWrapper.addChild(pPanel);
+    try {
+      await pPanel.loadTexture(ImageType.FULLSIZED);
+    } catch(err) {
+      return false;
+    }
+    return true;
+  }
   clearCache() {
     PIXI.utils.destroyTextureCache();
     PIXI.utils.clearTextureCache();
   }
-  pointerdownPPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
-    if (!this.$keyboards.shift && (this.selectedPPanels.length <= 1 || !ppanel.selected)) {
+  pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
+    if (!this.$keyboards.shift && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
-      this.toFront(ppanel);
+      this.toFront(pPanel);
       this.clearSelectionAll();
     }
     if (this.selectedPPanels.length <= 1) {
       // 選択が１つ以下の場合選択範囲リセット
       this.clearSelectionAll();
     }
-    ppanel.selected = true;
-    Object.values(this.ppanels).filter((pp) => pp.selected).forEach((pp) => {
+    pPanel.selected = true;
+    this.selectedPPanels.forEach((pPanel) => {
       const pos = new Vec2(e.data.global);
-      pp.draggingOffset = new Vec2(pp.position).sub(this.panelsCenterWrapper.toLocal(pos));
-      pp.dragging = true;
+      pPanel.draggingOffset = new Vec2(pPanel.position).sub(this.panelsCenterWrapper.toLocal(pos));
+      pPanel.dragging = true;
     });
   }
-  pointerupPPanel(ppanel: PPanel, e: PIXI.InteractionEvent) {
-    if (!ppanel.dragging) {
+  pointerupPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
+    if (!pPanel.dragging) {
       return;
     }
-    ppanel.dragging = false;
+    pPanel.dragging = false;
+  }
+  get pPanelsArray() {
+    return Object.values(this.pPanels);
   }
   get selectedPPanels() {
-    return Object.values(this.ppanels).filter((pp) => pp.selected);
-  }
-  get scalePercent() {
-    return Math.floor(this.board.transform.scale * 100);
-  }
-  get centerX() {
-    return Math.floor(this.transform.position.x) + "px";
-  }
-  get centerY() {
-    return Math.floor(this.transform.position.y) + "px";
-  }
-  get transform(): PetaBoardTransform {
-    const transform: PetaBoardTransform = {
-      scale: this.board.transform.scale,
-      position: this.board.transform.position.clone()
-    }
-    return transform;
+    return this.pPanelsArray.filter((pPanel) => pPanel.selected);
   }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {

@@ -171,7 +171,7 @@ export default class VPanel extends Vue {
   startDrag(worldPosition: Vec2) {
     const mouse = this.getMouseFromEvent(worldPosition);
     this.controlStatus = ControlStatus.DRAGGING;
-    this.dragOffset.copyFrom(this.petaPanel.position.clone().sub(mouse));
+    this.dragOffset.set(this.petaPanel.position.clone().sub(mouse));
   }
   startRotate(event: MouseEvent) {
     const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
@@ -198,14 +198,14 @@ export default class VPanel extends Vue {
     this.click.move(event);
     switch (this.controlStatus) {
       case ControlStatus.DRAGGING: {
-        this.petaPanel.position.copyFrom(mouse.clone().add(this.dragOffset));
+        this.petaPanel.position.set(mouse.clone().add(this.dragOffset));
         break;
       }
       case ControlStatus.SIZING: {
         const rMouse = mouse.clone().rotate(-this.petaPanel.rotation);
         const rPos = this.petaPanel.position.clone().rotate(-this.petaPanel.rotation);
         const d = rMouse.clone().sub(this.sizeOffset);
-        this.sizeOffset.copyFrom(rMouse);
+        this.sizeOffset.set(rMouse);
         if (this.sizingHOrigin == SizingOrigin.LEFT || this.sizingHOrigin == SizingOrigin.RIGHT) {
           rPos.x += d.x / 2;
           if (this.sizingHOrigin == SizingOrigin.RIGHT) {
@@ -300,7 +300,7 @@ export default class VPanel extends Vue {
   beginChangeSize(vOrigin: SizingOrigin, hOrigin: SizingOrigin, event: MouseEvent) {
     const mouse = this.getMouseFromEvent(vec2FromMouseEvent(event));
     const rMouse = mouse.clone().rotate(-this.petaPanel.rotation);
-    this.sizeOffset.copyFrom(rMouse);
+    this.sizeOffset.set(rMouse);
     this.controlStatus = ControlStatus.SIZING;
     this.sizingVOrigin = vOrigin;
     this.sizingHOrigin = hOrigin;
