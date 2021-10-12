@@ -80,11 +80,6 @@ export class Vec2 {
     vec2.x = this.x;
     vec2.y = this.y;
   }
-  public copyFrom(vec2: XYObject) {
-    this.x = vec2.x;
-    this.y = vec2.y;
-    return this;
-  }
   public toJSON() {
     return {
       x: this.x,

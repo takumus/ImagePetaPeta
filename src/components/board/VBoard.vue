@@ -15,20 +15,6 @@
         ref="panelsBackground"
         class="panels-background"
       >
-        <div
-          class="line vertical"
-          :style="{
-            transform: `translateX(${centerX})`,
-            backgroundColor: board.background.lineColor
-          }"
-        ></div>
-        <div
-          class="line horizontal"
-          :style="{
-            transform: `translateY(${centerY})`,
-            backgroundColor: board.background.lineColor
-          }"
-        ></div>
       </section>
     </section>
     <section
@@ -51,7 +37,7 @@
         v-model="board.background.lineColor"
         tabindex="-1"
       >
-      <span class="zoom">{{scalePercent}}%</span>
+      <!-- <span class="zoom">{{scalePercent}}%</span> -->
     </section>
   </article>
 </template>
@@ -235,7 +221,7 @@ export default class VBoard extends Vue {
     if (e.data.button == MouseButton.RIGHT) {
       this.dragging = true;
       this.dragOffset
-      .copyFrom(this.board.transform.position)
+      .set(this.board.transform.position)
       .sub(e.data.global);
     } else if (e.data.button == MouseButton.LEFT) {
       const pPanel = this.getPPanelFromObject(e.target);
@@ -261,7 +247,6 @@ export default class VBoard extends Vue {
     this.sizing = false;
     this.rotating = false;
     if (e.data.button == MouseButton.RIGHT) {
-      log(this.click.isClick);
       if (this.click.isClick) {
         const pPanel = this.getPPanelFromObject(e.target);
         if (pPanel) {
@@ -493,7 +478,6 @@ export default class VBoard extends Vue {
     }], position);
   }
   async addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
-    log(petaPanel, worldPosition);
     this.loadFullsized(petaPanel);
     const pPanel = this.pPanels[petaPanel.id];
     petaPanel.width *= 1 / this.board.transform.scale;
@@ -517,7 +501,6 @@ export default class VBoard extends Vue {
   }
   toFront(pPanel: PPanel) {
     const maxIndex = this.getMaxIndex();
-    if (pPanel.petaPanel.index == maxIndex) return;
     pPanel.petaPanel.index = maxIndex + 1;
     this.board.petaPanels
     .sort((a, b) => a.index - b.index)
@@ -541,6 +524,7 @@ export default class VBoard extends Vue {
       this.removePPanel(pPanel);
     });
     this.pPanels = {};
+    this.pixi.ticker.start();
     await this.loadAllFullsized();
   }
   async loadAllFullsized() {
@@ -549,8 +533,12 @@ export default class VBoard extends Vue {
     }
     let loaded = 0;
     for (let i = 0; i < this.board.petaPanels.length; i++) {
-      this.loadFullsized(this.board.petaPanels[i]).then((result) => {
+      await this.loadFullsized(this.board.petaPanels[i]).then((result) => {
         loaded++;
+        log("loaded", loaded);
+        if (loaded % 10 == 0) {
+          this.pixi.ticker.update();
+        }
         if (loaded == this.board.petaPanels.length) {
           this.pixi.ticker.start();
           log("loaded", loaded);
