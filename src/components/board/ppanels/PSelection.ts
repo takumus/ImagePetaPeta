@@ -25,7 +25,7 @@ export class PSelection extends PIXI.Container {
   }
   update() {
     if (!this.texture) return;
-    if (this.corners.length < 4) return;
+    if (this.corners.length < 5) return;
     this.texture.tilePosition.x += 0.2 * this.renderScale;
     this.texture.tileScale.set(0.5 * this.renderScale);
     this.graphics.clear();
@@ -38,9 +38,9 @@ export class PSelection extends PIXI.Container {
     this.corners.reduce((p, c) => p.clone().add(c), new Vec2())
     .div(this.corners.length)
     .setTo(this.texture);
-    const diff = new Vec2(this.corners[0]).getDiff(this.corners[1]);
+    const diff = new Vec2(this.corners[0]).getDiff(this.corners[2]);
     this.texture.width = diff.getLength() * 1.2;
-    this.texture.height = new Vec2(this.corners[1]).getDistance(this.corners[2]) * 1.2;
+    this.texture.height = new Vec2(this.corners[2]).getDistance(this.corners[4]) * 1.2;
     this.texture.rotation = diff.atan2();
   }
 }

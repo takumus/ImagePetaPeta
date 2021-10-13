@@ -35,6 +35,10 @@ export class PTransformer extends PIXI.Container {
     this.corners.push(new PControlPoint());
     this.corners.push(new PControlPoint());
     this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
     this.addChild(this.pSelection);
     this.corners.forEach((c, i) => {
       c.size.on("pointerdown", (e) => {
@@ -180,8 +184,8 @@ export class PTransformer extends PIXI.Container {
       if (this.selectedPPanels.length == 1) {
         this.selectedPPanels[0].getCorners().forEach((c, i) => {
           const p = this.toLocal(this.selectedPPanels[0].toGlobal(c));
-          this.corners[i].x = p.x;
-          this.corners[i].y = p.y;
+          this.corners[i * 2].x = p.x;
+          this.corners[i * 2].y = p.y;
         });
       } else {
         let minX = Infinity;
@@ -199,12 +203,18 @@ export class PTransformer extends PIXI.Container {
         });
         this.corners[0].x = minX;
         this.corners[0].y = minY;
-        this.corners[1].x = maxX;
-        this.corners[1].y = minY;
         this.corners[2].x = maxX;
-        this.corners[2].y = maxY;
-        this.corners[3].x = minX;
-        this.corners[3].y = maxY;
+        this.corners[2].y = minY;
+        this.corners[4].x = maxX;
+        this.corners[4].y = maxY;
+        this.corners[6].x = minX;
+        this.corners[6].y = maxY;
+      }
+      for (let i = 0; i < this.corners.length / 2; i++) {
+        const c = this.corners[i * 2 + 1];
+        const pc = this.corners[i * 2];
+        const nc = this.corners[(i * 2 + 2) % this.corners.length];
+        new Vec2(pc).add(nc).div(2).setTo(c);
       }
     }
     if (this.selectedPPanels.length > 0) {
