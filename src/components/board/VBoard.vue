@@ -74,7 +74,6 @@ export default class VBoard extends Vue {
   scaleMin = 10 / 100;
   scaleMax = 1000 / 100;
   isMac = false;
-  petaPanelMenuListenerId = "";
   click = new ClickChecker();
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;

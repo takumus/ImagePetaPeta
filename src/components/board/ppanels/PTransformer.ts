@@ -5,6 +5,7 @@ import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from '@/datas/mouseButton';
 import { ClickChecker } from '@/utils/clickChecker';
 import { PSelection } from "@/components/board/ppanels/PSelection";
+import { PControlPoint } from "@/components/board/ppanels/PControlPoint";
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",
@@ -13,7 +14,7 @@ enum ControlStatus {
   NONE = "none"
 }
 export class PTransformer extends PIXI.Container {
-  corners: PIXI.Sprite[] = [];
+  corners: PControlPoint[] = [];
   dragOffset = new Vec2();
   controlStatus = ControlStatus.NONE;
   beginRotatingRotation = 0;
@@ -30,35 +31,26 @@ export class PTransformer extends PIXI.Container {
   pSelection: PSelection = new PSelection();
   constructor() {
     super();
-    this.corners.push(new PIXI.Sprite());
-    this.corners.push(new PIXI.Sprite());
-    this.corners.push(new PIXI.Sprite());
-    this.corners.push(new PIXI.Sprite());
+    this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
+    this.corners.push(new PControlPoint());
     this.addChild(this.pSelection);
     this.corners.forEach((c, i) => {
-      const s = new PIXI.Graphics();
-      s.beginFill(0xff0000);
-      s.drawCircle(0, 0, 10);
-      s.interactive = true;
-      s.on("pointerdown", (e) => {
+      c.size.on("pointerdown", (e) => {
         this.beginSizing(i, e);
       });
-      s.name = "transformer";
-
-      const r = new PIXI.Graphics();
-      r.beginFill(0x0000ff);
-      r.drawCircle(0, 0, 20);
-      r.interactive = true;
-      r.on("pointerdown", (e) => {
+      c.rotate.on("pointerdown", (e) => {
         this.beginRotating(i, e);
       });
-      r.name = "transformer";
-      c.addChild(r, s);
     });
     this.addChild(...this.corners);
   }
   setScale(scale: number) {
     this.pSelection.setScale(scale);
+    this.corners.forEach((c) => {
+      c.setScale(scale);
+    })
   }
   beginSizing(index: number, e: PIXI.InteractionEvent) {
     console.log("sizing");
@@ -216,7 +208,6 @@ export class PTransformer extends PIXI.Container {
       }
     }
     if (this.selectedPPanels.length > 0) {
-      // this.pSelection.setScale(1 / this.board.transform.scale);
       this.pSelection.setCorners(this.corners.map((c) => new Vec2(c)));
       this.pSelection.visible = true;
     } else {
