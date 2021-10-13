@@ -64,9 +64,7 @@ export class PPanel extends PIXI.Sprite {
       new Vec2(this.petaPanel.width / 2, -this.petaPanel.height / 2),
       new Vec2(this.petaPanel.width / 2, this.petaPanel.height / 2),
       new Vec2(-this.petaPanel.width / 2, this.petaPanel.height / 2)
-    ].map((v) => {
-      return v.rotate(this.petaPanel.rotation)
-    });
+    ];
   }
   public destroy() {
     this.image.destroy();

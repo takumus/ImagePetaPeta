@@ -59,7 +59,6 @@
 import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
 // Components
-import VPanel from "@/components/board/VPanel.vue";
 import VBrowser from "@/components/browser/VBrowser.vue";
 import VBoard from "@/components/board/VBoard.vue";
 import VImageImporter from "@/components/utils/VImageImporter.vue";
@@ -80,7 +79,6 @@ import { DelayUpdater } from "@/utils/delayUpdater";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 @Options({
   components: {
-    VPanel,
     VBrowser,
     VBoard,
     VImageImporter,

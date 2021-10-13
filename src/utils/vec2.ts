@@ -76,7 +76,7 @@ export class Vec2 {
   public atan2() {
     return Math.atan2(this.y, this.x);
   }
-  public copyTo(vec2: XYObject) {
+  public setTo(vec2: XYObject) {
     vec2.x = this.x;
     vec2.y = this.y;
   }
