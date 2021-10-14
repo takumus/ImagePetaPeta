@@ -233,9 +233,6 @@ export default class VBoard extends Vue {
     this.pPanelsArray.forEach((pPanel) => {
       pPanel.update();
     });
-    this.selectedPPanels.forEach((pPanel) => {
-      pPanel.setScale(1 / this.board.transform.scale);
-    })
     this.pTransformer.setScale(1 / this.board.transform.scale);
     this.pTransformer.update();
   }
@@ -299,8 +296,13 @@ export default class VBoard extends Vue {
   editCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
   }
-  updateCrop() {
+  updateCrop(petaPanel: PetaPanel) {
+    if (!petaPanel._petaImage) {
+      return;
+    }
     this.croppingPetaPanel = null;
+    const sign = 1;
+    petaPanel.height = Math.abs(petaPanel.width * ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width))) * sign;
   }
   clearSelectionAll(force = false) {
     if (!this.$keyboards.shift || force) {

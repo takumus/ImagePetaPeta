@@ -9,15 +9,24 @@ export class PPanel extends PIXI.Sprite {
   public dragging = false;
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
-  public selectedOutline = new PIXI.Graphics();
+  private masker = new PIXI.Graphics();
   private loader = new PIXI.Loader();
-  private _scale = 1;
+  private prevWidth = 0;
+  private prevHeight = 0;
+  private prevSelected = false;
+  private prevCropWidth = 0;
+  private prevCropHeight = 0;
+  private prevCropX = 0;
+  private prevCropY = 0;
+  private prevPositionX = 0;
+  private prevPositionY = 0;
+  private prevRotation = 0;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
-    this.image.anchor.set(0.5, 0.5);
-    this.addChild(this.image);
-    this.addChild(this.selectedOutline);
+    // this.image.anchor.set(0.5, 0.5);
+    this.image.mask = this.masker;
+    this.addChild(this.image, this.masker);
     this.interactive = true;
     this.update();
   }
@@ -48,19 +57,50 @@ export class PPanel extends PIXI.Sprite {
     });
   }
   public update() {
-    this.image.width = this.petaPanel.width;
-    this.image.height = this.petaPanel.height;
+    if (!this.petaPanel._petaImage) {
+      return;
+    }
+    if (!(
+      this.prevWidth != this.petaPanel.width
+      || this.prevHeight != this.petaPanel.height
+      || this.prevSelected != this.selected
+      || this.prevCropWidth != this.petaPanel.crop.width
+      || this.prevCropHeight != this.petaPanel.crop.height
+      || this.prevCropX != this.petaPanel.crop.position.x
+      || this.prevCropY != this.petaPanel.crop.position.y
+      || this.prevPositionX != this.petaPanel.position.x
+      || this.prevPositionY != this.petaPanel.position.y
+      || this.prevRotation != this.petaPanel.rotation
+    )) {
+      return;
+    }
+    this.prevWidth = this.petaPanel.width;
+    this.prevHeight = this.petaPanel.height;
+    this.prevSelected = this.selected;
+    this.prevCropWidth = this.petaPanel.crop.width;
+    this.prevCropHeight = this.petaPanel.crop.height;
+    this.prevCropX = this.petaPanel.crop.position.x;
+    this.prevCropY = this.petaPanel.crop.position.y;
+    this.prevPositionX = this.petaPanel.position.x;
+    this.prevPositionY = this.petaPanel.position.y;
+    this.prevRotation = this.petaPanel.rotation;
+    
+    this.image.width = this.petaPanel.width * (1 / this.petaPanel.crop.width);
+    this.image.height = this.petaPanel.width * this.petaPanel._petaImage.height * (1 / this.petaPanel.crop.width);
+    this.image.x = -this.petaPanel.width / 2 - this.petaPanel.crop.position.x * this.image.width;
+    this.image.y = -this.petaPanel.height / 2 - this.petaPanel.crop.position.y * this.image.height;
+    this.masker.clear();
+    this.masker.beginFill(0xff0000);
+    this.masker.drawRect(
+      -this.petaPanel.width / 2,
+      -this.petaPanel.height / 2,
+      this.petaPanel.width,
+      this.petaPanel.height
+    );
+
     this.x = this.petaPanel.position.x;
     this.y = this.petaPanel.position.y;
     this.rotation = this.petaPanel.rotation;
-    this.selectedOutline.clear();
-    if (this.selected) {
-      this.selectedOutline.lineStyle(1 * this._scale, 0x000000);
-      this.selectedOutline.drawRect(-this.image.width/2, -this.image.height/2, this.image.width, this.image.height);
-    }
-  }
-  public setScale(scale: number) {
-    this._scale = scale;
   }
   public getCorners(): Vec2[] {
     return [

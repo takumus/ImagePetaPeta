@@ -142,7 +142,7 @@ export default class VCrop extends Vue {
         this.petaPanel.crop.width = width;
         this.petaPanel.crop.height = height;
       }
-      this.$emit("update");
+      this.$emit("update", this.petaPanel);
     }
     this.dragging = false;
   }

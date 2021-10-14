@@ -28,7 +28,9 @@ export class PTransformer extends PIXI.Container {
   beginSizingDistance = 0;
   pPanels: {[key: string]: PPanel} = {};
   click = new ClickChecker();
-  pSelection: PSelection = new PSelection();
+  pMultipleSelection: PSelection = new PSelection();
+  singleSelection = new PIXI.Graphics();
+  _scale = 1;
   constructor() {
     super();
     this.corners.push(new PControlPoint());
@@ -39,7 +41,8 @@ export class PTransformer extends PIXI.Container {
     this.corners.push(new PControlPoint());
     this.corners.push(new PControlPoint());
     this.corners.push(new PControlPoint());
-    this.addChild(this.pSelection);
+    this.addChild(this.singleSelection);
+    this.addChild(this.pMultipleSelection);
     this.corners.forEach((c, i) => {
       c.size.on("pointerdown", (e) => {
         this.beginSizing(i, e);
@@ -51,13 +54,13 @@ export class PTransformer extends PIXI.Container {
     this.addChild(...this.corners);
   }
   setScale(scale: number) {
-    this.pSelection.setScale(scale);
+    this.pMultipleSelection.setScale(scale);
     this.corners.forEach((c) => {
       c.setScale(scale);
-    })
+    });
+    this._scale = scale;
   }
   beginSizing(index: number, e: PIXI.InteractionEvent) {
-    console.log("sizing");
     this.controlStatus = ControlStatus.PANEL_SIZE;
     this.sizingCornerIndex = index;
     this.beginSizingPosition = new Vec2(e.data.global);
@@ -168,9 +171,6 @@ export class PTransformer extends PIXI.Container {
     });
   }
   update() {
-    this.pPanelsArray.forEach((pPanel) => {
-      pPanel.update();
-    });
     if (this.controlStatus == ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.corners.forEach((c, i) => {
@@ -218,11 +218,22 @@ export class PTransformer extends PIXI.Container {
       }
     }
     if (this.selectedPPanels.length > 0) {
-      this.pSelection.setCorners(this.corners.map((c) => new Vec2(c)));
-      this.pSelection.visible = true;
+      this.pMultipleSelection.setCorners(this.corners.map((c) => new Vec2(c)));
+      this.pMultipleSelection.visible = true;
     } else {
-      this.pSelection.visible = false;
+      this.pMultipleSelection.visible = false;
     }
-    this.pSelection.update();
+    this.pMultipleSelection.update();
+    this.singleSelection.clear();
+    this.singleSelection.lineStyle(1 * this._scale, 0x000000);
+    this.selectedPPanels.forEach((pPanel) => {
+      const corners = pPanel.getCorners();
+      const p = this.toLocal(pPanel.toGlobal(corners[0]));
+      this.singleSelection.moveTo(p.x, p.y);
+      for (let i = 1; i< corners.length + 1; i++) {
+        const p = this.toLocal(pPanel.toGlobal(corners[i % corners.length]));
+        this.singleSelection.lineTo(p.x, p.y);
+      }
+    });
   }
 }
