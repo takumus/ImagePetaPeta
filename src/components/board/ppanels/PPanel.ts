@@ -11,6 +11,7 @@ export class PPanel extends PIXI.Sprite {
   public image = new PIXI.Sprite();
   public selectedOutline = new PIXI.Graphics();
   private loader = new PIXI.Loader();
+  private _scale = 1;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -54,9 +55,12 @@ export class PPanel extends PIXI.Sprite {
     this.rotation = this.petaPanel.rotation;
     this.selectedOutline.clear();
     if (this.selected) {
-      this.selectedOutline.lineStyle({ width: 1, color: 0xff0000 });
+      this.selectedOutline.lineStyle(1 * this._scale, 0x000000);
       this.selectedOutline.drawRect(-this.image.width/2, -this.image.height/2, this.image.width, this.image.height);
     }
+  }
+  public setScale(scale: number) {
+    this._scale = scale;
   }
   public getCorners(): Vec2[] {
     return [

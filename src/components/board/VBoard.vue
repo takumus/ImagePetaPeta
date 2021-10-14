@@ -233,6 +233,9 @@ export default class VBoard extends Vue {
     this.pPanelsArray.forEach((pPanel) => {
       pPanel.update();
     });
+    this.selectedPPanels.forEach((pPanel) => {
+      pPanel.setScale(1 / this.board.transform.scale);
+    })
     this.pTransformer.setScale(1 / this.board.transform.scale);
     this.pTransformer.update();
   }
