@@ -86,6 +86,9 @@ export class Vec2 {
       y: this.y
     }
   }
+  public toArray(): [number, number] {
+    return [this.x, this.y];
+  }
 }
 export function vec2FromMouseEvent(event: MouseEvent) {
   return new Vec2(event.clientX, event.clientY);
