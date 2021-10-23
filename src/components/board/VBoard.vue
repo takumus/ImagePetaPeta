@@ -81,6 +81,7 @@ export default class VBoard extends Vue {
   rootContainer = new PIXI.Container();
   panelsCenterWrapper = new PIXI.Container();
   backgroundSprite = new PIXI.Graphics();
+  crossLine = new PIXI.Graphics();
   pPanels: {[key: string]: PPanel} = {};
   pTransformer = new PTransformer();
   dragging = false;
@@ -93,6 +94,7 @@ export default class VBoard extends Vue {
     bottomRight: new Vec2()
   }
   selectionGraphics = new PIXI.Graphics();
+  stageRect = new Vec2();
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -110,6 +112,7 @@ export default class VBoard extends Vue {
     this.pixi.stage.on("pointermove", (e) => this.pTransformer.mousemove(e));
     this.pixi.stage.on("pointermoveoutside", (e) => this.pTransformer.mousemove(e));
     this.pixi.stage.addChild(this.backgroundSprite);
+    this.pixi.stage.addChild(this.crossLine);
     this.pixi.stage.addChild(this.rootContainer);
     this.rootContainer.addChild(this.panelsCenterWrapper);
     this.rootContainer.addChild(this.pTransformer);
@@ -134,14 +137,14 @@ export default class VBoard extends Vue {
     this.pixi.destroy();
   }
   resize(rect: DOMRectReadOnly) {
+    this.stageRect.x = rect.width;
+    this.stageRect.y = rect.height;
     this.pixi.renderer.resize(rect.width, rect.height);
     this.pixi.view.style.width = rect.width + "px";
     this.pixi.view.style.height = rect.height + "px";
     this.panelsCenterWrapper.x = rect.width / 2;
     this.panelsCenterWrapper.y = rect.height / 2;
-    this.backgroundSprite.clear();
-    this.backgroundSprite.beginFill(Number(this.board.background.fillColor.replace("#", "0x")));
-    this.backgroundSprite.drawRect(0, 0, rect.width, rect.height);
+    this.updateRect();
   }
   mousedown(e: PIXI.InteractionEvent) {
     this.click.down(e.data.global);
@@ -248,8 +251,35 @@ export default class VBoard extends Vue {
       this.board.transform.position.y += -event.deltaY;
     }
   }
+  updateRect() {
+    this.crossLine.clear();
+    this.crossLine.lineStyle(1, Number(this.board.background.lineColor.replace("#", "0x")), 1, undefined, true);
+    this.crossLine.moveTo(-this.stageRect.x, 0);
+    this.crossLine.lineTo(this.stageRect.x, 0);
+    this.crossLine.moveTo(0, -this.stageRect.y);
+    this.crossLine.lineTo(0, this.stageRect.y);
+    this.backgroundSprite.clear();
+    this.backgroundSprite.beginFill(Number(this.board.background.fillColor.replace("#", "0x")));
+    this.backgroundSprite.drawRect(0, 0, this.stageRect.x, this.stageRect.y);
+  }
   update() {
     this.board.transform.position.setTo(this.rootContainer);
+    this.board.transform.position.clone()
+    .add(
+      new Vec2(this.panelsCenterWrapper)
+      .mult(this.board.transform.scale)
+    )
+    .setTo(this.crossLine);
+    if (this.crossLine.x < 0) {
+      this.crossLine.x = 0;
+    } else if (this.crossLine.x > this.stageRect.x) {
+      this.crossLine.x = this.stageRect.x;
+    }
+    if (this.crossLine.y < 0) {
+      this.crossLine.y = 0;
+    } else if (this.crossLine.y > this.stageRect.y) {
+      this.crossLine.y = this.stageRect.y;
+    }
     this.rootContainer.scale.set(this.board.transform.scale);
     this.pPanelsArray.forEach((pPanel) => {
       pPanel.update();
@@ -477,6 +507,7 @@ export default class VBoard extends Vue {
   @Watch("board", { deep: true })
   changeBoard() {
     this.update();
+    this.updateRect();
     this.$emit("change", this.board);
   }
 }
