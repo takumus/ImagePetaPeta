@@ -1,23 +1,25 @@
 //
 // https://github.com/wise9/enchant.js/blob/master/dev/src/Entity.js
+
+import { Vec2 } from "./vec2";
+
 //
 type Pos = [number, number];
 interface Rect {
-  leftTop: Pos,
-  rightTop: Pos,
-  leftBottom: Pos,
-  rightBottom: Pos
+  leftTop: Vec2,
+  rightTop: Vec2,
+  leftBottom: Vec2,
+  rightBottom: Vec2,
 }
 export function hitTest (rect1: Rect, rect2: Rect) {
-  // if (this._dirty) {
-  //     this._updateCoordinate();
-  // } if (other._dirty) {
-  //     other._updateCoordinate();
-  // }
-  const lt1 = rect1.leftTop, rt1 = rect1.rightTop,
-    lb1 = rect1.leftBottom, rb1 = rect1.rightBottom,
-    lt2 = rect2.leftTop, rt2 = rect2.rightTop,
-    lb2 = rect2.leftBottom, rb2 = rect2.rightBottom,
+  const lt1 = rect1.leftTop.toArray(),
+    rt1 = rect1.rightTop.toArray(),
+    lb1 = rect1.leftBottom.toArray(),
+    rb1 = rect1.rightBottom.toArray(),
+    lt2 = rect2.leftTop.toArray(), 
+    rt2 = rect2.rightTop.toArray(),
+    lb2 = rect2.leftBottom.toArray(), 
+    rb2 = rect2.rightBottom.toArray(),
     ltx1 = lt1[0], lty1 = lt1[1], rtx1 = rt1[0], rty1 = rt1[1],
     lbx1 = lb1[0], lby1 = lb1[1], rbx1 = rb1[0], rby1 = rb1[1],
     ltx2 = lt2[0], lty2 = lt2[1], rtx2 = rt2[0], rty2 = rt2[1],
@@ -89,7 +91,7 @@ export function hitTest (rect1: Rect, rect2: Rect) {
           c1 = (vx * dy1 - vy * dx1) / c;
           c2 = (vx * dy2 - vy * dx2) / c;
           if (0 < c1 && c1 < 1 && 0 < c2 && c2 < 1) {
-              return true;
+            return true;
           }
         }
       }

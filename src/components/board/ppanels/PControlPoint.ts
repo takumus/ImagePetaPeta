@@ -22,7 +22,7 @@ export class PControlPoint extends PIXI.Container {
   }
   setScale(scale: number) {
     this.size.clear();
-    this.size.lineStyle(1 * scale, 0x000000);
+    this.size.lineStyle(1 * scale, 0x000000, 1, undefined, true);
     this.size.beginFill(0xffffff);
     this.size.drawRect(0, 0, 10 * scale, 10 * scale);
     this.size.pivot.x = 10 * scale / 2;

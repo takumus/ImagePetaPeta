@@ -29,8 +29,7 @@ export class PTransformer extends PIXI.Container {
   pPanels: {[key: string]: PPanel} = {};
   click = new ClickChecker();
   pMultipleSelection: PSelection = new PSelection();
-  singleSelection = new PIXI.Graphics();
-  _scale = 1;
+  _scale = 0;
   constructor() {
     super();
     this.corners.push(new PControlPoint());
@@ -41,7 +40,6 @@ export class PTransformer extends PIXI.Container {
     this.corners.push(new PControlPoint());
     this.corners.push(new PControlPoint());
     this.corners.push(new PControlPoint());
-    this.addChild(this.singleSelection);
     this.addChild(this.pMultipleSelection);
     this.corners.forEach((c, i) => {
       c.size.on("pointerdown", (e) => {
@@ -54,11 +52,14 @@ export class PTransformer extends PIXI.Container {
     this.addChild(...this.corners);
   }
   setScale(scale: number) {
+    if (scale == this._scale) {
+      return;
+    }
+    this._scale = scale;
     this.pMultipleSelection.setScale(scale);
     this.corners.forEach((c) => {
       c.setScale(scale);
     });
-    this._scale = scale;
   }
   beginSizing(index: number, e: PIXI.InteractionEvent) {
     this.controlStatus = ControlStatus.PANEL_SIZE;
@@ -224,16 +225,5 @@ export class PTransformer extends PIXI.Container {
       this.pMultipleSelection.visible = false;
     }
     this.pMultipleSelection.update();
-    this.singleSelection.clear();
-    this.singleSelection.lineStyle(1 * this._scale, 0x000000);
-    this.selectedPPanels.forEach((pPanel) => {
-      const corners = pPanel.getCorners();
-      const p = this.toLocal(pPanel.toGlobal(corners[0]));
-      this.singleSelection.moveTo(p.x, p.y);
-      for (let i = 1; i< corners.length + 1; i++) {
-        const p = this.toLocal(pPanel.toGlobal(corners[i % corners.length]));
-        this.singleSelection.lineTo(p.x, p.y);
-      }
-    });
   }
 }

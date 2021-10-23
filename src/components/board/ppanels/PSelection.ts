@@ -5,6 +5,7 @@ export class PSelection extends PIXI.Container {
   texture?: PIXI.TilingSprite;
   graphics: PIXI.Graphics = new PIXI.Graphics();
   corners: Vec2[] = [];
+  dirty = false;
   renderScale = 1;
   constructor() {
     super();
@@ -18,23 +19,26 @@ export class PSelection extends PIXI.Container {
     this.addChild(this.graphics);
   }
   setCorners(corners: Vec2[]) {
+    if (this.corners.join(",") != corners.join(",")) {
+      this.dirty = true;
+    }
     this.corners = corners;
   }
   setScale(scale: number) {
+    if (this.renderScale != scale) {
+      this.dirty = true;
+    }
     this.renderScale = scale;
   }
   update() {
     if (!this.texture) return;
-    if (this.corners.length < 5) return;
     this.texture.tilePosition.x += 0.2 * this.renderScale;
     this.texture.tileScale.set(0.5 * this.renderScale);
+    if (!this.dirty) return;
+    if (this.corners.length < 5) return;
     this.graphics.clear();
-    this.graphics.lineStyle(1 * this.renderScale, 0x00ff00);
-    this.graphics.moveTo(this.corners[0].x, this.corners[0].y);
-    for (let i = 1; i < this.corners.length + 1; i++) {
-      const c = this.corners[i % this.corners.length];
-      this.graphics.lineTo(c.x, c.y);
-    }
+    this.graphics.lineStyle(1, 0x00ff00, 1, undefined, true);
+    this.graphics.drawPolygon(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
     this.corners.reduce((p, c) => p.clone().add(c), new Vec2())
     .div(this.corners.length)
     .setTo(this.texture);
@@ -42,5 +46,6 @@ export class PSelection extends PIXI.Container {
     this.texture.width = diff.getLength() * 1.2;
     this.texture.height = new Vec2(this.corners[2]).getDistance(this.corners[4]) * 1.2;
     this.texture.rotation = diff.atan2();
+    this.dirty = false;
   }
 }

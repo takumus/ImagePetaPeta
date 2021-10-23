@@ -258,7 +258,6 @@ export default class VBoard extends Vue {
     this.pTransformer.update();
     this.selectionGraphics.clear();
     if (this.selecting) {
-      this.selectionGraphics.lineStyle(2, 0xff0000);
       const selection = {
         leftTop: new Vec2(
           Math.min(this.selection.topLeft.x, this.selection.bottomRight.x),
@@ -277,6 +276,8 @@ export default class VBoard extends Vue {
           Math.max(this.selection.topLeft.y, this.selection.bottomRight.y)
         ),
       }
+      this.selectionGraphics.lineStyle(1 / this.board.transform.scale, 0x000000, 1, undefined, true);
+      this.selectionGraphics.beginFill(0xffffff, 0.5);
       this.selectionGraphics.drawRect(
         selection.leftTop.x,
         selection.leftTop.y,
@@ -287,17 +288,15 @@ export default class VBoard extends Vue {
         const pPanelCorners = pPanel.getCorners().map((c) => {
           return new Vec2(this.rootContainer.toLocal(pPanel.toGlobal(c)));
         })
-        pPanel.selected = hitTest({
-          leftTop: selection.leftTop.toArray(),
-          rightTop: selection.rightTop.toArray(),
-          rightBottom: selection.rightBottom.toArray(),
-          leftBottom: selection.leftBottom.toArray()
-        }, {
-          leftTop: pPanelCorners[0].toArray(),
-          rightTop: pPanelCorners[1].toArray(),
-          rightBottom: pPanelCorners[2].toArray(),
-          leftBottom: pPanelCorners[3].toArray()
-        });
+        pPanel.selected = hitTest(
+          selection,
+          {
+            leftTop: pPanelCorners[0],
+            rightTop: pPanelCorners[1],
+            rightBottom: pPanelCorners[2],
+            leftBottom: pPanelCorners[3]
+          }
+        );
       });
     }
   }

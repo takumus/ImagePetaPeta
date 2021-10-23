@@ -10,6 +10,7 @@ export class PPanel extends PIXI.Sprite {
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
   private masker = new PIXI.Graphics();
+  private selection = new PIXI.Graphics();
   private loader = new PIXI.Loader();
   private prevWidth = 0;
   private prevHeight = 0;
@@ -26,7 +27,7 @@ export class PPanel extends PIXI.Sprite {
     this.anchor.set(0.5, 0.5);
     // this.image.anchor.set(0.5, 0.5);
     this.image.mask = this.masker;
-    this.addChild(this.image, this.masker);
+    this.addChild(this.image, this.masker, this.selection);
     this.interactive = true;
     this.update();
   }
@@ -97,7 +98,12 @@ export class PPanel extends PIXI.Sprite {
       this.petaPanel.width,
       this.petaPanel.height
     );
-
+    const corners = this.getCorners();
+    this.selection.clear();
+    if (this.selected) {
+      this.selection.lineStyle(1, 0x000000, 1, undefined, true);
+      this.selection.drawPolygon(corners.map((p) => new PIXI.Point(p.x, p.y)));
+    }
     this.x = this.petaPanel.position.x;
     this.y = this.petaPanel.position.y;
     this.rotation = this.petaPanel.rotation;
