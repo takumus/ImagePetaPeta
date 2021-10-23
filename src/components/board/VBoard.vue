@@ -348,11 +348,14 @@ export default class VBoard extends Vue {
       }
     }], position);
   }
-  async addPanel(petaPanel: PetaPanel, worldPosition?: Vec2){
+  async addPanel(petaPanel: PetaPanel, offsetIndex: number){
     this.loadFullsized(petaPanel);
+    const offset = new Vec2(20, 20).mult(offsetIndex);
     const pPanel = this.pPanels[petaPanel.id];
     petaPanel.width *= 1 / this.board.transform.scale;
     petaPanel.height *= 1 / this.board.transform.scale;
+    petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
+    pPanel.draggingOffset = offset.mult(1 / this.board.transform.scale);
     pPanel.dragging = true;
     pPanel.selected = true;
     this.toFront(pPanel);

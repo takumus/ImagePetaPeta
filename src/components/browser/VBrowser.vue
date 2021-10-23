@@ -220,13 +220,13 @@ export default class VBrowser extends Vue {
     thumbnails.forEach((pi, i) => {
       const panel = createPetaPanel(
         pi,
-        thumbnailPosition.clone(),
+        worldPosition.clone(),
         this.thumbnailWidth
       );
       this.$emit(
         "addPanel",
         panel,
-        worldPosition.clone().add(BOARD_ADD_MULTIPLE_OFFSET.clone().mult(-(thumbnails.length - 1) + i))
+        i
       );
       pi._selected = false;
     });

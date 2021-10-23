@@ -149,6 +149,7 @@ export default class Index extends Vue {
         return;
       }
     }
+    let offsetIndex = 0;
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];
       if (!petaImage) return;
@@ -160,7 +161,7 @@ export default class Index extends Vue {
         petaImage.height * DEFAULT_IMAGE_SIZE
       );
       if (!this.$globalComponents.browser.visible) {
-        this.addPanel(panel);
+        this.addPanel(panel, offsetIndex++);
       }
     });
     this.orderedAddPanelIds = [];
@@ -185,10 +186,10 @@ export default class Index extends Vue {
     this.orderedAddPanelIds = ids;
     this.orderedAddPanelDragEvent = mouse;
   }
-  addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
+  addPanel(petaPanel: PetaPanel, offsetIndex: number) {
     if (!this.currentPetaBoard) return;
     this.currentPetaBoard.petaPanels.push(petaPanel);
-    this.vPetaBoard.addPanel(petaPanel, worldPosition);
+    this.vPetaBoard.addPanel(petaPanel, offsetIndex);
   }
   selectPetaBoard(board: PetaBoard) {
     log("PetaBoard Selected", board.name);
