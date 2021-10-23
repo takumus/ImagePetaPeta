@@ -260,6 +260,7 @@ body, html {
 }
 .root {
   --bg-color: #ffffff;
+  --border-color: #999999;
   --font-color: #333333;
   --button-bg-color: #ffffff;
   --button-hover-bg-color: #ffffff;
@@ -273,6 +274,7 @@ body, html {
   --rounded: 6px;
   &.dark {
     --bg-color: #333333;
+    --border-color: #cccccc;
     --font-color: #ffffff;
     --button-bg-color: #444444;
     --button-hover-bg-color: #444444;
@@ -324,7 +326,7 @@ body, html {
     font-size: 1.0em;
     cursor: pointer;
     // box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
-    border: solid 1.2px #cccccc;
+    border: solid 1px var(--border-color);
     margin: 4px;
     outline: none;
     overflow: hidden;

@@ -32,7 +32,7 @@
         v-model="board.background.lineColor"
         tabindex="-1"
       >
-      <!-- <span class="zoom">{{scalePercent}}%</span> -->
+      <span class="zoom">{{scalePercent}}%</span>
     </section>
   </article>
 </template>
@@ -119,9 +119,7 @@ export default class VBoard extends Vue {
     this.rootContainer.addChild(this.selectionGraphics);
     this.panelsBackground.appendChild(this.pixi.view);
     this.pixi.stage.interactive = true;
-    this.pixi.ticker.add(() => {
-      this.update();
-    });
+    this.pixi.ticker.add(this.update);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
     });
@@ -134,6 +132,7 @@ export default class VBoard extends Vue {
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
     this.panelsBackground.removeChild(this.pixi.view);
+    this.pixi.ticker.remove(this.update);
     this.pixi.destroy();
   }
   resize(rect: DOMRectReadOnly) {
@@ -485,6 +484,9 @@ export default class VBoard extends Vue {
   get selectedPPanels() {
     return this.pPanelsArray.filter((pPanel) => pPanel.selected);
   }
+  get scalePercent() {
+    return Math.floor(this.board.transform.scale * 100);
+  }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {
     if (value) {
@@ -561,12 +563,14 @@ export default class VBoard extends Vue {
       padding: 4px;
       border-radius: var(--rounded);
       background-color: var(--bg-color);
+      border: solid 1px var(--border-color);
     }
     input {
       display: inline-block;
       vertical-align: top;
       margin-right: 8px;
       border-radius: var(--rounded);
+      border: solid 1px var(--border-color);
       height: 26px;
       background-color: var(--bg-color);
     }
