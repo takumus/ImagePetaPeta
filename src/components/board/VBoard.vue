@@ -196,19 +196,6 @@ export default class VBoard extends Vue {
         }
       }
       this.dragging = false;
-      // if (this.click.isClick && e.target == this.panelsBackground) {
-      //   this.$globalComponents.contextMenu.open([{
-      //     label: this.$t("boards.menu.openBrowser"),
-      //     click: () => {
-      //       this.$globalComponents.browser.open();
-      //     }
-      //   }, { separate: true }, {
-      //     label: this.$t("boards.menu.resetPosition"),
-      //     click: () => {
-      //       this.resetTransform();
-      //     }
-      //   }], vec2FromMouseEvent(e));
-      // }
     } else if (e.data.button == MouseButton.LEFT) {
       this.pPanelsArray.forEach((pPanel) => {
         pPanel.dragging = false;
