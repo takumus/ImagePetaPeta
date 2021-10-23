@@ -557,21 +557,25 @@ export default class VBoard extends Vue {
     bottom: 0px;
     right: 0px;
     padding: 8px;
+    height: 40px;
+    display: flex;
     .zoom {
-      display: inline-block;
-      vertical-align: top;
+      display: block;
       padding: 4px;
       border-radius: var(--rounded);
       background-color: var(--bg-color);
       border: solid 1px var(--border-color);
+      height: 100%;
+      width: 50px;
+      text-align: center;
     }
     input {
-      display: inline-block;
-      vertical-align: top;
+      display: block;
       margin-right: 8px;
       border-radius: var(--rounded);
       border: solid 1px var(--border-color);
-      height: 26px;
+      height: 100%;
+      width: 50px;
       background-color: var(--bg-color);
     }
   }
