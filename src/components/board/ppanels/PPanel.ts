@@ -85,35 +85,44 @@ export class PPanel extends PIXI.Sprite {
     this.prevPositionX = this.petaPanel.position.x;
     this.prevPositionY = this.petaPanel.position.y;
     this.prevRotation = this.petaPanel.rotation;
+
+    if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
+      this.image.mask = this.masker;
+      this.masker.visible = true;
+    } else {
+      this.image.mask = null;
+      this.masker.visible = false;
+    }
     
     this.image.width = this.petaPanel.width * (1 / this.petaPanel.crop.width);
     this.image.height = this.petaPanel.width * this.petaPanel._petaImage.height * (1 / this.petaPanel.crop.width);
     this.image.x = -this.petaPanel.width / 2 - this.petaPanel.crop.position.x * this.image.width;
     this.image.y = -this.petaPanel.height / 2 - this.petaPanel.crop.position.y * this.image.height;
-    this.masker.clear();
-    this.masker.beginFill(0xff0000);
-    this.masker.drawRect(
-      -this.petaPanel.width / 2,
-      -this.petaPanel.height / 2,
-      this.petaPanel.width,
-      this.petaPanel.height
-    );
-    const corners = this.getCorners();
+    if (this.image.mask) {
+      this.masker.clear();
+      this.masker.beginFill(0xff0000);
+      this.masker.drawRect(
+        -this.petaPanel.width / 2,
+        -this.petaPanel.height / 2,
+        this.petaPanel.width,
+        this.petaPanel.height
+      );
+    }
     this.selection.clear();
     if (this.selected) {
       this.selection.lineStyle(1, 0x000000, 1, undefined, true);
-      this.selection.drawPolygon(corners.map((p) => new PIXI.Point(p.x, p.y)));
+      this.selection.drawPolygon(this.getCorners().map((p) => new PIXI.Point(p.x, p.y)));
     }
     this.x = this.petaPanel.position.x;
     this.y = this.petaPanel.position.y;
     this.rotation = this.petaPanel.rotation;
   }
-  public getCorners(): Vec2[] {
+  public getCorners(offset = 0): Vec2[] {
     return [
-      new Vec2(-this.petaPanel.width / 2, -this.petaPanel.height / 2),
-      new Vec2(this.petaPanel.width / 2, -this.petaPanel.height / 2),
-      new Vec2(this.petaPanel.width / 2, this.petaPanel.height / 2),
-      new Vec2(-this.petaPanel.width / 2, this.petaPanel.height / 2)
+      new Vec2(-this.petaPanel.width / 2 - offset, -this.petaPanel.height / 2 - offset),
+      new Vec2(this.petaPanel.width / 2 + offset, -this.petaPanel.height / 2 - offset),
+      new Vec2(this.petaPanel.width / 2 + offset, this.petaPanel.height / 2 + offset),
+      new Vec2(-this.petaPanel.width / 2 - offset, this.petaPanel.height / 2 + offset)
     ];
   }
   public destroy() {

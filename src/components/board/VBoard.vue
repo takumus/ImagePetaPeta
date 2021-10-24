@@ -95,6 +95,7 @@ export default class VBoard extends Vue {
   }
   selectionGraphics = new PIXI.Graphics();
   stageRect = new Vec2();
+  mousePosition = new Vec2();
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -119,7 +120,7 @@ export default class VBoard extends Vue {
     this.rootContainer.addChild(this.selectionGraphics);
     this.panelsBackground.appendChild(this.pixi.view);
     this.pixi.stage.interactive = true;
-    this.pixi.ticker.add(this.update);
+    this.pixi.ticker.add(this.animate);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
     });
@@ -132,7 +133,7 @@ export default class VBoard extends Vue {
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
     this.panelsBackground.removeChild(this.pixi.view);
-    this.pixi.ticker.remove(this.update);
+    this.pixi.ticker.remove(this.animate);
     this.pixi.destroy();
   }
   resize(rect: DOMRectReadOnly) {
@@ -203,18 +204,8 @@ export default class VBoard extends Vue {
     }
   }
   mousemove(e: PIXI.InteractionEvent) {
-    this.click.move(e.data.global);
-    this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
-      pPanel.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(e.data.global)).add(pPanel.draggingOffset);
-    });
-    if (this.dragging) {
-      this.board.transform.position
-      .set(e.data.global)
-      .add(this.dragOffset);
-    }
-    if (this.selecting) {
-      this.selection.bottomRight = new Vec2(this.rootContainer.toLocal(e.data.global));
-    }
+    this.mousePosition = new Vec2(e.data.global);
+    this.click.move(this.mousePosition);
   }
   wheel(event: WheelEvent) {
     const mouse = vec2FromMouseEvent(event);
@@ -248,7 +239,21 @@ export default class VBoard extends Vue {
     this.backgroundSprite.beginFill(Number(this.board.background.fillColor.replace("#", "0x")));
     this.backgroundSprite.drawRect(0, 0, this.stageRect.x, this.stageRect.y);
   }
-  update() {
+  animate() {
+    this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
+      pPanel.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(this.mousePosition)).add(pPanel.draggingOffset);
+    });
+    if (this.dragging) {
+      this.board.transform.position
+      .set(this.mousePosition)
+      .add(this.dragOffset);
+    }
+    if (this.selecting) {
+      this.selection.bottomRight = new Vec2(this.rootContainer.toLocal(this.mousePosition));
+    }
+    this.pPanelsArray.forEach((pPanel) => {
+      pPanel.update();
+    });
     this.board.transform.position.setTo(this.rootContainer);
     this.board.transform.position.clone()
     .add(
@@ -267,9 +272,6 @@ export default class VBoard extends Vue {
       this.crossLine.y = this.stageRect.y;
     }
     this.rootContainer.scale.set(this.board.transform.scale);
-    this.pPanelsArray.forEach((pPanel) => {
-      pPanel.update();
-    });
     this.pTransformer.setScale(1 / this.board.transform.scale);
     this.pTransformer.update();
     this.selectionGraphics.clear();
@@ -493,10 +495,26 @@ export default class VBoard extends Vue {
       this.removeSelectedPanels();
     }
   }
-  @Watch("board", { deep: true })
+  @Watch("board.petaPanels", { deep: true })
   changeBoard() {
-    this.update();
+    this.$emit("change", this.board);
+  }
+  @Watch("board.transform", { deep: true })
+  changeBoardTransform() {
     this.updateRect();
+    this.$emit("change", this.board);
+  }
+  @Watch("board.background", { deep: true })
+  changeBoardBackground() {
+    this.updateRect();
+    this.$emit("change", this.board);
+  }
+  @Watch("board.name")
+  changeBoardName() {
+    this.$emit("change", this.board);
+  }
+  @Watch("board.index")
+  changeBoardIndex() {
     this.$emit("change", this.board);
   }
 }
