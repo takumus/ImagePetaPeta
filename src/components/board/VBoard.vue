@@ -261,15 +261,16 @@ export default class VBoard extends Vue {
       .mult(this.board.transform.scale)
     )
     .setTo(this.crossLine);
-    if (this.crossLine.x < 0) {
-      this.crossLine.x = 0;
-    } else if (this.crossLine.x > this.stageRect.x) {
-      this.crossLine.x = this.stageRect.x;
+    const offset = 0;
+    if (this.crossLine.x < offset) {
+      this.crossLine.x = offset;
+    } else if (this.crossLine.x > this.stageRect.x - offset) {
+      this.crossLine.x = this.stageRect.x - offset;
     }
-    if (this.crossLine.y < 0) {
-      this.crossLine.y = 0;
-    } else if (this.crossLine.y > this.stageRect.y) {
-      this.crossLine.y = this.stageRect.y;
+    if (this.crossLine.y < offset) {
+      this.crossLine.y = offset;
+    } else if (this.crossLine.y > this.stageRect.y - offset) {
+      this.crossLine.y = this.stageRect.y - offset;
     }
     this.rootContainer.scale.set(this.board.transform.scale);
     this.pTransformer.setScale(1 / this.board.transform.scale);

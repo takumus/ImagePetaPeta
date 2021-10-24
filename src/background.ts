@@ -115,7 +115,7 @@ import { ImageType } from "./datas/imageType";
     },
     getPetaImages: async (event) => {
       try {
-        logger.mainLog("#Get Peta Images");
+        logger.mainLog("#Get PetaImages");
         const data = await petaImagesDB.find({});
         const petaImages: PetaImages = {};
         data.forEach((pi) => {
@@ -307,7 +307,7 @@ import { ImageType } from "./datas/imageType";
   });
   window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
   async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    logger.mainLog(" ##Update Peta Image");
+    logger.mainLog(" ##Save PetaImage");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" image:", minimId(petaImage.id));
     petaImage.tags = Array.from(new Set(petaImage.tags));
@@ -325,7 +325,7 @@ import { ImageType } from "./datas/imageType";
     return true;
   }
   async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    logger.mainLog(" ##Update PetaBoard");
+    logger.mainLog(" ##Save PetaBoard");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" board:", minimId(board.id));
     if (mode == UpdateMode.REMOVE) {
