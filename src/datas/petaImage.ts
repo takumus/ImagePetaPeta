@@ -7,6 +7,6 @@ export interface PetaImage {
   width: number,
   height: number,
   id: string,
-  _selected: boolean
+  _selected?: boolean
 }
 export type PetaImages = {[id: string]: PetaImage};

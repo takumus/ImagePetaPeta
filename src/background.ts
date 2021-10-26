@@ -115,11 +115,12 @@ import { ImageType } from "./datas/imageType";
     },
     getPetaImages: async (event) => {
       try {
-        logger.mainLog("#Get Peta Images");
+        logger.mainLog("#Get PetaImages");
         const data = await petaImagesDB.find({});
         const petaImages: PetaImages = {};
         data.forEach((pi) => {
           petaImages[pi.id] = pi;
+          pi._selected = false;
         });
         logger.mainLog("return:", data.length);
         return petaImages;
@@ -128,21 +129,8 @@ import { ImageType } from "./datas/imageType";
       }
       return {};
     },
-    // getPetaImageBinary: async (event, data, type) => {
-    //   try {
-    //     logger.mainLog("#Get Peta Image Binary");
-    //     logger.mainLog("id:", minimId(data.id));
-    //     logger.mainLog("type:", type);
-    //     const buffer = await asyncFile.readFile(getImagePath(data, type));
-    //     logger.mainLog("return:", buffer.byteLength + "bytes", minimId(data.id));
-    //     return buffer;
-    //   } catch(e) {
-    //     logger.mainLog("error:", e);
-    //   }
-    //   return null;
-    // },
     savePetaImages: async (event, datas, mode) => {
-      logger.mainLog("#Update Peta Images");
+      logger.mainLog("#Save PetaImages");
       try {
         for (let i = 0; i < datas.length; i ++) {
           await savePetaImage(datas[i], mode);
@@ -185,7 +173,7 @@ import { ImageType } from "./datas/imageType";
     },
     savePetaBoards: async (event, boards, mode) => {
       try {
-        logger.mainLog("#Update PetaBoards");
+        logger.mainLog("#Save PetaBoards");
         for (let i = 0; i < boards.length; i ++) {
           await savePetaBoard(boards[i], mode);
         }
@@ -319,7 +307,7 @@ import { ImageType } from "./datas/imageType";
   });
   window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
   async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    logger.mainLog(" ##Update Peta Image");
+    logger.mainLog(" ##Save PetaImage");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" image:", minimId(petaImage.id));
     petaImage.tags = Array.from(new Set(petaImage.tags));
@@ -330,13 +318,14 @@ import { ImageType } from "./datas/imageType";
       logger.mainLog(" removed");
       return true;
     }
+    petaImage._selected = undefined;
     await petaImagesDB.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
     logger.mainLog(" updated");
     sendToRenderer("updatePetaImage", petaImage);
     return true;
   }
   async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    logger.mainLog(" ##Update PetaBoard");
+    logger.mainLog(" ##Save PetaBoard");
     logger.mainLog(" mode:", mode);
     logger.mainLog(" board:", minimId(board.id));
     if (mode == UpdateMode.REMOVE) {

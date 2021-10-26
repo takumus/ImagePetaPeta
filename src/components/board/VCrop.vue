@@ -86,7 +86,7 @@ export default class VCrop extends Vue {
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
-    this.cropBegin.copyFrom(this.petaPanel.crop.position);
+    this.cropBegin.set(this.petaPanel.crop.position);
     this.cropEnd.x = this.cropBegin.x + this.petaPanel.crop.width;
     this.cropEnd.y = this.cropBegin.y + this.petaPanel.crop.height;
     this.imageResizer = new ResizeObserver((entries: ResizeObserverEntry[]) => this.resizeImage(entries[0].contentRect));
@@ -108,13 +108,13 @@ export default class VCrop extends Vue {
     );
     this.dragBeginPosition = mouse;
     this.dragging = true;
-    this.cropBegin.copyFrom(mouse);
-    this.cropEnd.copyFrom(mouse);
+    this.cropBegin.set(mouse);
+    this.cropEnd.set(mouse);
     this.dragging = true;
-    this.clicker.down(e);
+    this.clicker.down(new Vec2(e.clientX, e.clientY));
   }
   mousemove(e: MouseEvent) {
-    this.clicker.move(e);
+    this.clicker.move(new Vec2(e.clientX, e.clientY));
     if (!this.dragging) return;
     const imgRect = this.images.getBoundingClientRect();
     const mouse = new Vec2(
@@ -122,7 +122,7 @@ export default class VCrop extends Vue {
       (e.clientY - imgRect.y) / imgRect.height
     );
     if (!this.clicker.isClick) {
-      this.cropEnd.copyFrom(mouse);
+      this.cropEnd.set(mouse);
     }
   }
   mouseup(e: MouseEvent) {
@@ -132,7 +132,7 @@ export default class VCrop extends Vue {
       } else {
         let width = this.cropWidth;
         let height = this.cropHeight;
-        this.petaPanel.crop.position.copyFrom(this.cropPosition);
+        this.petaPanel.crop.position.set(this.cropPosition);
         if (width * IMG_TAG_WIDTH < 5) {
           width = 5 / IMG_TAG_WIDTH;
         }
@@ -142,7 +142,7 @@ export default class VCrop extends Vue {
         this.petaPanel.crop.width = width;
         this.petaPanel.crop.height = height;
       }
-      this.$emit("update");
+      this.$emit("update", this.petaPanel);
     }
     this.dragging = false;
   }

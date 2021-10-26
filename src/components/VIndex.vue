@@ -59,7 +59,6 @@
 import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
 // Components
-import VPanel from "@/components/board/VPanel.vue";
 import VBrowser from "@/components/browser/VBrowser.vue";
 import VBoard from "@/components/board/VBoard.vue";
 import VImageImporter from "@/components/utils/VImageImporter.vue";
@@ -80,7 +79,6 @@ import { DelayUpdater } from "@/utils/delayUpdater";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 @Options({
   components: {
-    VPanel,
     VBrowser,
     VBoard,
     VImageImporter,
@@ -151,6 +149,7 @@ export default class Index extends Vue {
         return;
       }
     }
+    let offsetIndex = 0;
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];
       if (!petaImage) return;
@@ -162,7 +161,7 @@ export default class Index extends Vue {
         petaImage.height * DEFAULT_IMAGE_SIZE
       );
       if (!this.$globalComponents.browser.visible) {
-        this.addPanel(panel);
+        this.addPanel(panel, offsetIndex++);
       }
     });
     this.orderedAddPanelIds = [];
@@ -187,10 +186,10 @@ export default class Index extends Vue {
     this.orderedAddPanelIds = ids;
     this.orderedAddPanelDragEvent = mouse;
   }
-  addPanel(petaPanel: PetaPanel, worldPosition?: Vec2) {
+  addPanel(petaPanel: PetaPanel, offsetIndex: number) {
     if (!this.currentPetaBoard) return;
     this.currentPetaBoard.petaPanels.push(petaPanel);
-    this.vPetaBoard.addPanel(petaPanel, worldPosition);
+    this.vPetaBoard.addPanel(petaPanel, offsetIndex);
   }
   selectPetaBoard(board: PetaBoard) {
     log("PetaBoard Selected", board.name);
@@ -261,6 +260,7 @@ body, html {
 }
 .root {
   --bg-color: #ffffff;
+  --border-color: #999999;
   --font-color: #333333;
   --button-bg-color: #ffffff;
   --button-hover-bg-color: #ffffff;
@@ -274,6 +274,7 @@ body, html {
   --rounded: 6px;
   &.dark {
     --bg-color: #333333;
+    --border-color: #cccccc;
     --font-color: #ffffff;
     --button-bg-color: #444444;
     --button-hover-bg-color: #444444;
@@ -325,7 +326,7 @@ body, html {
     font-size: 1.0em;
     cursor: pointer;
     // box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
-    border: solid 1.2px #cccccc;
+    border: solid 1px var(--border-color);
     margin: 4px;
     outline: none;
     overflow: hidden;

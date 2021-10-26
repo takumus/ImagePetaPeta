@@ -75,7 +75,7 @@ export default class VThumbnail extends Vue {
     window.removeEventListener("mouseup", this.mouseup);
   }
   mousedown(event: MouseEvent) {
-    this.click.down(event);
+    this.click.down(new Vec2(event.clientX, event.clientY));
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
     switch (event.button) {
@@ -87,7 +87,7 @@ export default class VThumbnail extends Vue {
   }
   mousemove(event: MouseEvent) {
     if (!this.pressing) return;
-    this.click.move(event);
+    this.click.move(new Vec2(event.clientX, event.clientY));
     if (!this.click.isClick) {
       const img = (event as Event).target as HTMLElement;
       const elementRect = img.getBoundingClientRect();
