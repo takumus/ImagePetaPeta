@@ -79,6 +79,7 @@ export default class VBoard extends Vue {
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;
   rootContainer = new PIXI.Container();
+  centerWrapper = new PIXI.Container();
   panelsCenterWrapper = new PIXI.Container();
   backgroundSprite = new PIXI.Graphics();
   crossLine = new PIXI.Graphics();
@@ -114,7 +115,8 @@ export default class VBoard extends Vue {
     this.pixi.stage.on("pointermoveoutside", (e) => this.pTransformer.mousemove(e));
     this.pixi.stage.addChild(this.backgroundSprite);
     this.pixi.stage.addChild(this.crossLine);
-    this.pixi.stage.addChild(this.rootContainer);
+    this.pixi.stage.addChild(this.centerWrapper);
+    this.centerWrapper.addChild(this.rootContainer);
     this.rootContainer.addChild(this.panelsCenterWrapper);
     this.rootContainer.addChild(this.pTransformer);
     this.rootContainer.addChild(this.selectionGraphics);
@@ -142,8 +144,10 @@ export default class VBoard extends Vue {
     this.pixi.renderer.resize(rect.width, rect.height);
     this.pixi.view.style.width = rect.width + "px";
     this.pixi.view.style.height = rect.height + "px";
-    this.panelsCenterWrapper.x = rect.width / 2;
-    this.panelsCenterWrapper.y = rect.height / 2;
+    // this.panelsCenterWrapper.x = rect.width / 2;
+    // this.panelsCenterWrapper.y = rect.height / 2 ;
+    this.centerWrapper.x = rect.width / 2;
+    this.centerWrapper.y = rect.height / 2;
     this.updateRect();
   }
   mousedown(e: PIXI.InteractionEvent) {
@@ -208,7 +212,7 @@ export default class VBoard extends Vue {
     this.click.move(this.mousePosition);
   }
   wheel(event: WheelEvent) {
-    const mouse = vec2FromMouseEvent(event);
+    const mouse = vec2FromMouseEvent(event).sub(this.stageRect.clone().div(2));
     if (event.ctrlKey || !this.isMac) {
       const currentZoom = this.board.transform.scale;
       this.board.transform.scale *= 1 + -event.deltaY * (this.isMac ? 0.01 : 0.001);
@@ -255,12 +259,7 @@ export default class VBoard extends Vue {
       pPanel.update();
     });
     this.board.transform.position.setTo(this.rootContainer);
-    this.board.transform.position.clone()
-    .add(
-      new Vec2(this.panelsCenterWrapper)
-      .mult(this.board.transform.scale)
-    )
-    .setTo(this.crossLine);
+    new Vec2(this.panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(this.crossLine);
     const offset = 0;
     if (this.crossLine.x < offset) {
       this.crossLine.x = offset;
@@ -416,7 +415,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
-    log("load");
+    // log("load");
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
