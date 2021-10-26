@@ -104,6 +104,9 @@ export default class Index extends Vue {
   customTitlebar = false;
   title = "";
   async mounted() {
+    window.onerror = (e) => {
+      log("window error:", e);
+    }
     log("INIT RENDERER!");
     if (await API.send("getPlatform") == "win32") {
       this.customTitlebar = true;
