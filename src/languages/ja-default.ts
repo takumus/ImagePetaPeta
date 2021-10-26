@@ -96,7 +96,7 @@ const ja = {
     darkMode: "ダークモード",
     alwaysOnTop: "常に手前に表示",
     enableHardwareAcceleration: "GPUレンダリング",
-    enableHardwareAccelerationDescriptions: "GPUを使って高速にレンダリング出来ますが、大量の画像を読み込んだ場合に表示が崩れる事があります。\n変更後はアプリの再起動が必要です！",
+    enableHardwareAccelerationDescriptions: "GPUを使って高速にレンダリング出来ます。無効にした場合、大幅にパフォーマンスが落ちます。",
   }
 };
 export default ja;
