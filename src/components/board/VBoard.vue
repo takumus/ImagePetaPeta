@@ -358,6 +358,7 @@ export default class VBoard extends Vue {
         pPanel.petaPanel.crop.width = 1;
         pPanel.petaPanel.crop.height = 1;
         pPanel.petaPanel.rotation = 0;
+        this.updateCrop(pPanel.petaPanel);
       }
     }, { separate: true }, {
       label: this.$t("boards.panelMenu.remove"),

@@ -85,7 +85,18 @@ export class PPanel extends PIXI.Sprite {
     this.prevPositionX = this.petaPanel.position.x;
     this.prevPositionY = this.petaPanel.position.y;
     this.prevRotation = this.petaPanel.rotation;
-
+    const panelWidth = this.absPanelWidth();
+    const panelHeight = this.absPanelHeight();
+    const flippedX = this.petaPanel.width < 0;
+    const flippedY = this.petaPanel.height < 0;
+    this.image.scale.set(
+      flippedX ? -1 : 1,
+      flippedY ? -1 : 1
+    );
+    this.image.anchor.set(
+      flippedX ? 1 : 0,
+      flippedY ? 1 : 0
+    );
     if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
       this.image.mask = this.masker;
       this.masker.visible = true;
@@ -93,19 +104,20 @@ export class PPanel extends PIXI.Sprite {
       this.image.mask = null;
       this.masker.visible = false;
     }
-    
-    this.image.width = this.petaPanel.width * (1 / this.petaPanel.crop.width);
-    this.image.height = this.petaPanel.width * this.petaPanel._petaImage.height * (1 / this.petaPanel.crop.width);
-    this.image.x = -this.petaPanel.width / 2 - this.petaPanel.crop.position.x * this.image.width;
-    this.image.y = -this.petaPanel.height / 2 - this.petaPanel.crop.position.y * this.image.height;
+    const imageWidth = panelWidth * (1 / this.petaPanel.crop.width);
+    const imageHeight = panelWidth * this.petaPanel._petaImage.height * (1 / this.petaPanel.crop.width);
+    this.image.width = imageWidth;
+    this.image.height = imageHeight;
+    this.image.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
+    this.image.y = -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
     if (this.image.mask) {
       this.masker.clear();
       this.masker.beginFill(0xff0000);
       this.masker.drawRect(
-        -this.petaPanel.width / 2,
-        -this.petaPanel.height / 2,
-        this.petaPanel.width,
-        this.petaPanel.height
+        -panelWidth / 2,
+        -panelHeight / 2,
+        panelWidth,
+        panelHeight
       );
     }
     this.selection.clear();
@@ -118,16 +130,24 @@ export class PPanel extends PIXI.Sprite {
     this.rotation = this.petaPanel.rotation;
   }
   public getCorners(offset = 0): Vec2[] {
+    const w = this.absPanelWidth();
+    const h = this.absPanelHeight();
     return [
-      new Vec2(-this.petaPanel.width / 2 - offset, -this.petaPanel.height / 2 - offset),
-      new Vec2(this.petaPanel.width / 2 + offset, -this.petaPanel.height / 2 - offset),
-      new Vec2(this.petaPanel.width / 2 + offset, this.petaPanel.height / 2 + offset),
-      new Vec2(-this.petaPanel.width / 2 - offset, this.petaPanel.height / 2 + offset)
+      new Vec2(-w / 2 - offset, -h / 2 - offset),
+      new Vec2(w / 2 + offset, -h / 2 - offset),
+      new Vec2(w / 2 + offset, h / 2 + offset),
+      new Vec2(-w / 2 - offset, h / 2 + offset)
     ];
   }
   public destroy() {
     this.image.destroy();
     this.loader.destroy();
     super.destroy();
+  }
+  private absPanelWidth() {
+    return Math.abs(this.petaPanel.width);
+  }
+  private absPanelHeight() {
+    return Math.abs(this.petaPanel.height);
   }
 }
