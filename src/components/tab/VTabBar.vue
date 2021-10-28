@@ -252,7 +252,7 @@ export default class VTabBar extends Vue {
 
 <style lang="scss" scoped>
 .tab-root {
-  --tab-height: 16px;
+  --tab-height: 24px;
   position: fixed;
   top: 0px;
   left: 0px;
@@ -268,7 +268,7 @@ export default class VTabBar extends Vue {
       -webkit-app-region: drag;
       text-align: left;
       display: inline-block;
-      padding-left: 2px;
+      padding-left: 6px;
       line-height: var(--tab-height);
       font-size: 0.8em;
     }
