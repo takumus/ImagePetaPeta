@@ -9,6 +9,7 @@
       :zIndex="1"
       v-if="currentPetaBoard"
       :board="currentPetaBoard"
+      :windowIsFocused="windowIsFocused"
       ref="vPetaBoard"
       @change="changePetaBoard"
     />

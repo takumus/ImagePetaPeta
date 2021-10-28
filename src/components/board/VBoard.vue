@@ -21,7 +21,7 @@
         @update="updateCrop"
       />
     </section>
-    <section class="info">
+    <section class="info" v-show="windowIsFocused">
       <input
         type="color"
         v-model="board.background.fillColor"
@@ -68,6 +68,8 @@ export default class VBoard extends Vue {
   board!: PetaBoard;
   @Prop()
   zIndex = 0;
+  @Prop()
+  windowIsFocused = false;
   @Ref("panelsBackground")
   panelsBackground!: HTMLElement;
   croppingPetaPanel?: PetaPanel | null = null;
