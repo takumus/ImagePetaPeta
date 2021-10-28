@@ -35,7 +35,7 @@ export class PPanel extends PIXI.Sprite {
     const url = this.petaPanel._petaImage ? ImageLoader.getImageURL(this.petaPanel._petaImage, type): "";
     return new Promise((res, rej) => {
       if (!this.petaPanel._petaImage) {
-        rej();
+        rej("_petaImage is undefined");
         return;
       }
       const texture = PIXI.utils.TextureCache[url];
@@ -48,7 +48,7 @@ export class PPanel extends PIXI.Sprite {
       this.loader.add(url);
       this.loader.load((loader, resources) => {
         if (!this.petaPanel._petaImage) {
-          rej();
+          rej("cannot load texture");
           return;
         }
         this.image.texture = resources[ImageLoader.getImageURL(this.petaPanel._petaImage, type)].texture!;

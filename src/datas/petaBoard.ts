@@ -53,7 +53,8 @@ export function dbPetaBoardsToPetaBoards(boards: PetaBoard[], petaImages: PetaIm
       pp._petaImage = petaImages[pp.petaImageId];
       pp.position = new Vec2(pp.position);
       pp.crop.position = new Vec2(pp.crop.position);
-    })
+    });
+    board.petaPanels = board.petaPanels.filter((pp) => pp._petaImage);
   });
 }
 export function petaBoardsToDBPetaBoards(board: PetaBoard) {

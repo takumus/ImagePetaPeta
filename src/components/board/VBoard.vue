@@ -434,13 +434,12 @@ export default class VBoard extends Vue {
     for (let i = 0; i < this.board.petaPanels.length; i++) {
       await this.loadFullsized(this.board.petaPanels[i]).then((result) => {
         loaded++;
-        log("loaded", loaded);
+        log("loaded:", loaded, "/", this.board.petaPanels.length);
         if (loaded % 10 == 0) {
           this.pixi.ticker.update();
         }
         if (loaded == this.board.petaPanels.length) {
           this.pixi.ticker.start();
-          log("loaded", loaded);
         }
       });
     }
@@ -455,6 +454,7 @@ export default class VBoard extends Vue {
     try {
       await pPanel.loadTexture(ImageType.FULLSIZED);
     } catch(err) {
+      console.log(err);
       return false;
     }
     return true;
