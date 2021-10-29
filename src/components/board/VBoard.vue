@@ -125,6 +125,7 @@ export default class VBoard extends Vue {
     this.panelsBackground.appendChild(this.pixi.view);
     this.pixi.stage.interactive = true;
     this.pixi.ticker.add(this.animate);
+    this.setSickerEnabled(false);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0].contentRect);
     });
@@ -232,6 +233,9 @@ export default class VBoard extends Vue {
     } else {
       this.board.transform.position.x += -event.deltaX;
       this.board.transform.position.y += -event.deltaY;
+    }
+    if (!this.pixi.ticker.started) {
+      this.pixi.ticker.update();
     }
   }
   updateRect() {
@@ -430,7 +434,7 @@ export default class VBoard extends Vue {
   }
   async loadAllFullsized() {
     if (this.board.petaPanels.length > 0) {
-      this.pixi.ticker.stop();
+      this.setSickerEnabled(false);
     }
     let loaded = 0;
     for (let i = 0; i < this.board.petaPanels.length; i++) {
@@ -441,7 +445,9 @@ export default class VBoard extends Vue {
           this.pixi.ticker.update();
         }
         if (loaded == this.board.petaPanels.length) {
-          this.pixi.ticker.start();
+          if (this.windowIsFocused) {
+            this.setSickerEnabled(true);
+          }
         }
       });
     }
@@ -483,6 +489,17 @@ export default class VBoard extends Vue {
       pPanel.dragging = true;
     });
   }
+  setSickerEnabled(value: boolean) {
+    if (value) {
+      if (!this.pixi.ticker.started) {
+        this.pixi.ticker.start();
+      }
+    } else {
+      if (this.pixi.ticker.started) {
+        this.pixi.ticker.stop();
+      }
+    }
+  }
   get pPanelsArray() {
     return Object.values(this.pPanels);
   }
@@ -519,6 +536,11 @@ export default class VBoard extends Vue {
   @Watch("board.index")
   changeBoardIndex() {
     this.$emit("change", this.board);
+  }
+  @Watch("windowIsFocused")
+  changeWindowIsFocused() {
+    this.setSickerEnabled(this.windowIsFocused);
+    log("ticker:", this.windowIsFocused);
   }
 }
 </script>
