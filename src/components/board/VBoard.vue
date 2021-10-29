@@ -21,18 +21,31 @@
         @update="updateCrop"
       />
     </section>
-    <section class="info" v-show="windowIsFocused">
+    <section class="info">
       <input
         type="color"
         v-model="board.background.fillColor"
         tabindex="-1"
+        v-show="windowIsFocused"
       >
       <input
         type="color"
         v-model="board.background.lineColor"
         tabindex="-1"
+        v-show="windowIsFocused"
       >
-      <span class="zoom">{{scalePercent}}%</span>
+      <span
+        class="zoom"
+        v-show="windowIsFocused"
+      >
+        {{scalePercent}}%
+      </span>
+      <span
+        class="zoom"
+        v-show="$settings.showFPS"
+      >
+        {{fps}}fps
+      </span>
     </section>
   </article>
 </template>
@@ -99,6 +112,8 @@ export default class VBoard extends Vue {
   selectionGraphics = new PIXI.Graphics();
   stageRect = new Vec2();
   mousePosition = new Vec2();
+  frame = 0;
+  fps = 0;
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -131,6 +146,10 @@ export default class VBoard extends Vue {
     });
     this.resizer.observe(this.panelsBackground);
     this.isMac = window.navigator.userAgent.indexOf("Macintosh") >= 0;
+    setInterval(() => {
+      this.fps = this.frame;
+      this.frame = 0;
+    }, 1000);
   }
   unmounted() {
     this.pixi.view.removeEventListener("dblclick", this.resetTransform);
@@ -250,6 +269,7 @@ export default class VBoard extends Vue {
     this.backgroundSprite.drawRect(0, 0, this.stageRect.x, this.stageRect.y);
   }
   animate() {
+    this.frame++;
     this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
       pPanel.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(this.mousePosition)).add(pPanel.draggingOffset);
     });
@@ -611,10 +631,11 @@ export default class VBoard extends Vue {
       height: 100%;
       width: 50px;
       text-align: center;
+      margin-left: 8px;
     }
     input {
       display: block;
-      margin-right: 8px;
+      margin-left: 8px;
       border-radius: var(--rounded);
       border: solid 1px var(--border-color);
       height: 100%;

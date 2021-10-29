@@ -49,6 +49,17 @@
         </label><br>
         <p>{{$t("settings.enableHardwareAccelerationDescriptions")}}</p>
       </section>
+      <section>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.showFPS"
+            @change="$settings.showFPS = Boolean($event.target.checked)"
+          >
+          {{$t("settings.showFPS")}}
+        </label><br>
+        <p>{{$t("settings.showFPSDescriptions")}}</p>
+      </section>
       <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>

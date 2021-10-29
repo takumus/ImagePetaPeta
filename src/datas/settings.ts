@@ -3,12 +3,14 @@ export interface Settings {
   lowMemoryMode: boolean,
   darkMode: boolean,
   alwaysOnTop: boolean,
-  enableHardwareAcceleration: boolean
+  enableHardwareAcceleration: boolean,
+  showFPS: boolean
 }
 export const defaultSettings: Settings = {
   dbDirectory: "",
   lowMemoryMode: false,
   darkMode: false,
   alwaysOnTop: false,
-  enableHardwareAcceleration: false
+  enableHardwareAcceleration: true,
+  showFPS: false
 }
