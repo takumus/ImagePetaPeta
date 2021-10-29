@@ -42,9 +42,9 @@ import { ImageType } from "./datas/imageType";
   const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
   const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
   loadSettings();
-  if (!settingsConfig.data.enableHardwareAcceleration) {
-    app.disableHardwareAcceleration();
-  }
+  // if (!settingsConfig.data.enableHardwareAcceleration) {
+  //   app.disableHardwareAcceleration();
+  // }
   const window = await initWindow(customTitlebar);
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;

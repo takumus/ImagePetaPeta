@@ -41,10 +41,11 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.enableHardwareAcceleration"
+            :checked="true"
             @change="$settings.enableHardwareAcceleration = Boolean($event.target.checked)"
+            disabled
           >
-          {{$t("settings.enableHardwareAcceleration")}}
+          <s>{{$t("settings.enableHardwareAcceleration")}}</s>
         </label><br>
         <p>{{$t("settings.enableHardwareAccelerationDescriptions")}}</p>
       </section>
