@@ -84,7 +84,7 @@ export default class VDottedBox extends Vue {
 .dottedbox-root {
   position: absolute;
   pointer-events: none;
-  .border {
+  >.border {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -98,7 +98,7 @@ export default class VDottedBox extends Vue {
       border-color: #000000;
     }
   }
-  svg {
+  >svg {
     position: absolute;
   }
 }

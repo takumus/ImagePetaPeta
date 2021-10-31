@@ -299,9 +299,6 @@ body, html {
     "Hiragino Sans",
     Meiryo,
     sans-serif;
-  .thumbs-wrapper {
-    width: 100%;
-  }
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -310,7 +307,7 @@ body, html {
     border-radius: var(--rounded);
     min-height: 20%;
   }
-  .border {
+  >.border {
     z-index: 10;
     position: fixed;
     width: 100%;
@@ -345,7 +342,7 @@ body, html {
       // box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.5);
     }
   }
-  .menu {
+  >.menu {
     position: fixed;
     z-index: 4;
     bottom: 0px;

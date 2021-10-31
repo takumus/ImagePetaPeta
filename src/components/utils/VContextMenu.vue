@@ -85,7 +85,7 @@ export default class VContextMenu extends Vue {
   margin: 0px;
   box-shadow: 2px 2px 5px rgba($color: #000000, $alpha: 0.5);
   color: #ffffff;
-  .item {
+  >.item {
     white-space: nowrap;
     list-style-type: none;
     min-width: 128px;
@@ -97,7 +97,7 @@ export default class VContextMenu extends Vue {
       background-color: #555555;
     }
   }
-  .separate {
+  >.separate {
     border-bottom: solid 1px #CCCCCC;
     margin: 0px 8px;
     height: 0px;

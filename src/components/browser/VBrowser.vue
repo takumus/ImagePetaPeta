@@ -9,6 +9,7 @@
       height: '100%'
     }"
     :zIndex="zIndex"
+    @close="close"
   >
     <article class="browser-root">
       <section class="top">
@@ -78,9 +79,9 @@
           />
         </section>
       </section>
-      <section class="bottom">
+      <!-- <section class="bottom">
         <button @click="close">{{$t("shared.closeButton")}}</button>
-      </section>
+      </section> -->
     </article>
   </VModal>
 </template>
@@ -489,21 +490,21 @@ interface Tag {
   display: flex;
   flex-direction: column;
   // color: #333333;
-  .bottom {
+  >.bottom {
     text-align: center;
   }
-  .top {
+  >.top {
     display: flex;
     flex: 1;
     overflow: hidden;
-    .tags {
+    >.tags {
       flex-direction: column;
       padding: 8px;
       text-align: center;
       white-space: nowrap;
       display: flex;
-      header {
-        .search {
+      >header {
+        >.search {
           border-radius: var(--rounded);
           border: solid 1.2px #333333;
           outline: none;
@@ -512,7 +513,7 @@ interface Tag {
           font-size: 1.0em;
         }
       }
-      ul {
+      >ul {
         text-align: left;
         padding-left: 0px;
         width: 100%;
@@ -521,7 +522,7 @@ interface Tag {
         flex: 1;
         margin: 0px;
         margin-top: 12px;
-        li {
+        >li {
           width: 100%;
           padding: 4px;
           list-style-type: none;
@@ -541,20 +542,20 @@ interface Tag {
         }
       }
     }
-    .thumbnails {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow-y: scroll;
-      overflow-x: hidden;
-    }
-    .thumbnails-wrapper {
+    >.thumbnails-wrapper {
       width: 100%;
       height: 100%;
       position: relative;
       padding: 8px;
+      >.thumbnails {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow-y: scroll;
+        overflow-x: hidden;
+      }
     }
-    .property {
+    >.property {
       width: 20%;
       min-width: 180px;
       padding: 8px;

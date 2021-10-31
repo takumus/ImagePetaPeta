@@ -23,9 +23,9 @@
         {{$t("browser.property.clearSelectionButton")}}
       </button>
     </section>
-    <section v-show="!noImage">
+    <section v-show="!noImage" class="tags">
       <p>{{$t("browser.property.tags")}}</p>
-      <ul class="tags">
+      <ul>
         <li v-for="tag, i in tags" :key="i">
           <VEditableLabel
             :label="tag"
@@ -218,7 +218,7 @@ export default class VProperty extends Vue {
   height: 100%;
   // color: #333333;
   position: relative;
-  .previews {
+  >.previews {
     position: relative;
     width: 100%;
     height: 30%;
@@ -226,13 +226,13 @@ export default class VProperty extends Vue {
     border-radius: var(--rounded);
     box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.5);
   }
-  .buttons {
+  >.buttons {
     text-align: center;
   }
-  .tags {
+  >.tags ul {
     white-space: nowrap;
     padding: 0px;
-    li {
+    >li {
       list-style-type: none;
       padding: 4px;
       font-weight: bold;

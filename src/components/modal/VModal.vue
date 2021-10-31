@@ -14,7 +14,12 @@
         ...(center ? centerStyle : {})
       } : (center ? centerStyle : {})"
     >
-      <slot></slot>
+      <div class="title">
+        <span class="close" @click="close">&#xe8bb;</span>
+      </div>
+      <div class="content">
+        <slot></slot>
+      </div>
     </div>
   </article>
 </template>
@@ -48,6 +53,9 @@ export default class VModal extends Vue {
   async mounted() {
     // this.appInfo = await API.send("getAppInfo");
   }
+  close() {
+    this.$emit("close");
+  }
 }
 </script>
 
@@ -61,12 +69,25 @@ export default class VModal extends Vue {
   background-color: rgba($color: #000000, $alpha: 0.7);
   color: var(--font-color);
   overflow: hidden;
-  .modal {
+  >.modal {
     width: 600px;
     background-color: var(--bg-color);
     padding: 16px;
     border-radius: var(--rounded);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    >.title {
+      text-align: right;
+      >.close {
+        font-family: Segoe MDL2 Assets;
+        cursor: pointer;
+      }
+    }
+    >.content {
+      flex: 1;
+      overflow: hidden;
+    }
   }
 }
 </style>

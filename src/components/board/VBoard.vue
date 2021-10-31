@@ -572,40 +572,15 @@ export default class VBoard extends Vue {
   left: 0px;
   width: 100%;
   height: 100%;
-  .panels-wrapper {
+  >.panels-wrapper {
     position: absolute;
     top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
     z-index: 1;
-    .panels {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      z-index: 2;
-    }
-    .panels-background {
-      z-index: 1;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 100%;
-      .line {
-        position: absolute;
-        &.vertical {
-          width: 1px;
-          height: 100%;
-        }
-        &.horizontal {
-          width: 100%;
-          height: 1px;
-        }
-      }
-    }
   }
-  .crop {
+  >.crop {
     position: absolute;
     z-index: 3;
     top: 0px;
@@ -614,7 +589,7 @@ export default class VBoard extends Vue {
     height: 100%;
     background-color: rgba($color: #000000, $alpha: 0.7);
   }
-  .info {
+  >.info {
     position: absolute;
     z-index: 2;
     bottom: 0px;
@@ -622,7 +597,7 @@ export default class VBoard extends Vue {
     padding: 8px;
     height: 40px;
     display: flex;
-    .zoom {
+    >.zoom {
       display: block;
       padding: 4px;
       border-radius: var(--rounded);
@@ -633,7 +608,7 @@ export default class VBoard extends Vue {
       text-align: center;
       margin-left: 8px;
     }
-    input {
+    >input {
       display: block;
       margin-left: 8px;
       border-radius: var(--rounded);
@@ -641,24 +616,6 @@ export default class VBoard extends Vue {
       height: 100%;
       width: 50px;
       background-color: var(--bg-color);
-    }
-  }
-  .image-cache {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    img {
-      position: fixed;
-      bottom: -99990px;
-      right: -99990px;
-      width: 100000px;
-      height: 100000px;
-      opacity: 0.1;
-      pointer-events: none;
     }
   }
 }

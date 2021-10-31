@@ -126,13 +126,13 @@ export default class VThumbnail extends Vue {
   position: absolute;
   padding-right: 8px;
   padding-top: 8px;
-  .wrapper {
+  >.wrapper {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
-    img {
+    >img {
       display: block;
       width: 100%;
       height: 100%;
@@ -147,47 +147,47 @@ export default class VThumbnail extends Vue {
     }
     &:hover {
       box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
-      img {
+      >img {
         filter: brightness(1);
       }
     }
-  }
-  .selected {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    pointer-events: none;
-    border-radius: var(--rounded);
-    width: 100%;
-    height: 100%;
-    background-color: rgba($color: #ffffff, $alpha: 0.4);
-    border: solid 4px #222222;
-    .checkbox {
-      border-radius: var(--rounded) 0px 0px 0px;
-      background-color: #222222;
-      color: #ffffff;
+    >.info {
+      width: 100%;
       position: absolute;
-      padding: 0px 6px;
-      margin-right: -2px;
-      margin-bottom: -2px;
+      bottom: 0px;
+      pointer-events: none;
+      word-break: break-word;
+      padding: 8px;
+      >.tags {
+        background-color: rgba($color: (#000000), $alpha: 0.5);
+        color: #ffffff;
+        padding: 2px;
+        border-radius: var(--rounded);
+        margin-right: 4px;
+        font-size: 0.8em;
+      }
+    }
+    >.selected {
+      position: absolute;
       bottom: 0px;
       right: 0px;
-    }
-  }
-  .info {
-    width: 100%;
-    position: absolute;
-    bottom: 0px;
-    pointer-events: none;
-    word-break: break-word;
-    padding: 8px;
-    .tags {
-      background-color: rgba($color: (#000000), $alpha: 0.5);
-      color: #ffffff;
-      padding: 2px;
+      pointer-events: none;
       border-radius: var(--rounded);
-      margin-right: 4px;
-      font-size: 0.8em;
+      width: 100%;
+      height: 100%;
+      background-color: rgba($color: #ffffff, $alpha: 0.4);
+      border: solid 4px #222222;
+      >.checkbox {
+        border-radius: var(--rounded) 0px 0px 0px;
+        background-color: #222222;
+        color: #ffffff;
+        position: absolute;
+        padding: 0px 6px;
+        margin-right: -2px;
+        margin-bottom: -2px;
+        bottom: 0px;
+        right: 0px;
+      }
     }
   }
 }

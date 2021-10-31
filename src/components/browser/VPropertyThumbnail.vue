@@ -47,12 +47,12 @@ export default class VPropertyThumbnail extends Vue {
 .thumbnail-root {
   display: block;
   position: absolute;
-  img {
+  >img {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .wrapper {
+  >.wrapper {
     position: relative;
     width: 100%;
     height: 100%;

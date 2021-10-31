@@ -3,6 +3,7 @@
     :visible="visible"
     :center="true"
     :zIndex="zIndex"
+    @close="close"
   >
     <article class="settings-root">
       <p>{{$t("settings.settings")}}</p>
@@ -60,7 +61,6 @@
         </label><br>
         <p>{{$t("settings.showFPSDescriptions")}}</p>
       </section>
-      <button @click="close">{{$t("shared.closeButton")}}</button>
     </article>
   </VModal>
 </template>
@@ -104,9 +104,9 @@ export default class VSettings extends Vue {
 .settings-root {
   text-align: center;
   // color: #333333;
-  section {
+  >section {
     text-align: left;
-    p {
+    >p {
       font-size: 0.8em;
       margin-left: 16px;
       white-space: pre;

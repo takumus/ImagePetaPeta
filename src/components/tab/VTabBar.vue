@@ -257,13 +257,13 @@ export default class VTabBar extends Vue {
   top: 0px;
   left: 0px;
   width: 100%;
-  .titlebar {
+  >.titlebar {
     width: 100%;
     background-color: var(--tab-bg-color);
     height: var(--tab-height);
     text-align: right;
     display: flex;
-    .draggable {
+    >.draggable {
       flex-grow: 1;
       -webkit-app-region: drag;
       text-align: left;
@@ -272,9 +272,9 @@ export default class VTabBar extends Vue {
       line-height: var(--tab-height);
       font-size: 0.8em;
     }
-    .window-buttons {
+    >.window-buttons {
       display: flex;
-      .window-button {
+      >.window-button {
         font-size: 6px;
         display: block;
         padding: 0px 16px;
@@ -290,23 +290,23 @@ export default class VTabBar extends Vue {
       }
     }
   }
-  .tab {
+  >.tab {
     width: 100%;
     background-color: var(--tab-bg-color);
     color: var(--font-color);
     box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
     display: flex;
-    .draggable {
+    >.draggable {
       -webkit-app-region: drag;
       flex-grow: 1;
     }
-    .buttons {
-      button {
+    >.buttons {
+      >button {
         padding: 0px 8px;
         height: auto;
       }
     }
-    .button {
+    >.button {
       display: block;
       margin: 0px;
       border-right: solid 1px var(--tab-border-color);
@@ -333,9 +333,9 @@ export default class VTabBar extends Vue {
         flex-shrink: 0;
         border-left: solid 1px var(--tab-border-color);
       }
-      .wrapper {
+      >.wrapper {
         display: flex;
-        .label {
+        >.label {
           padding: 8px;
           // padding-right: 0px;
           flex-shrink: 1;
@@ -343,14 +343,14 @@ export default class VTabBar extends Vue {
         }
       }
     }
-    .buttons {
+    >.buttons {
       position: relative;
       display: flex;
       flex-shrink: 1;
       right: 0px;
       text-align: right;
       justify-content: flex-end;
-      button {
+      >button {
         min-width: 0px;
       }
     }

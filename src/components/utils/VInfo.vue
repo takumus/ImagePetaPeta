@@ -3,6 +3,7 @@
     :visible="visible"
     :center="true"
     :zIndex="zIndex"
+    @close="close"
   >
     <article class="info-root">
       <p>
@@ -28,9 +29,6 @@
       <pre>
         {{ licenses }}
       </pre>
-      <button @click="close">
-        {{$t("shared.closeButton")}}
-      </button>
     </article>
   </VModal>
 </template>
@@ -90,7 +88,7 @@ export default class VInfo extends Vue {
 .info-root {
   text-align: center;
   // color: #333333;
-  pre {
+  >pre {
     text-align: left;
     overflow: hidden;
     word-break: break-all;
@@ -100,7 +98,7 @@ export default class VInfo extends Vue {
     overflow-x: hidden;
     font-size: 0.8em;
   }
-  p {
+  >p {
     white-space: nowrap;
   }
 }
