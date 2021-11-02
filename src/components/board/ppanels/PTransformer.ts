@@ -226,4 +226,8 @@ export class PTransformer extends PIXI.Container {
     }
     this.pMultipleSelection.update();
   }
+  // fitRotation() {
+  //   const rot = Math.floor(this.currentRotation / Math.PI * 180 + 90 / 2) % 360;
+  //   this.petaPanel.rotation = Math.floor((rot + (rot < 0 ? 360 : 0)) / 90) * (Math.PI / 2);
+  // }
 }

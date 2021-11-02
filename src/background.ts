@@ -18,7 +18,7 @@ import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { LogFrom } from "@/datas/logFrom";
 import { AddImageResult } from "@/datas/addImageResult";
-import { Settings, defaultSettings } from "@/datas/settings";
+import { Settings, defaultSettings, upgradeSettings } from "@/datas/settings";
 import { addPetaPanelProperties } from "@/datas/petaPanel";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
@@ -361,6 +361,7 @@ import { ImageType } from "./datas/imageType";
         logger.mainLog("cannot recreate settings");
       }
     };
+    settingsConfig.data = upgradeSettings(settingsConfig.data);
     logger.mainLog("settings loaded");
   }
   async function importImages(filePaths: string[]) {

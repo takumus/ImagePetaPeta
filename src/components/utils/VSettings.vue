@@ -29,14 +29,34 @@
       </section>
       <section>
         <label>
+          {{$t("settings.zoomSensitivity")}}:
+        </label>
+        <input
+          type="number"
+          :value="$settings.zoomSensitivity"
+          @change="$settings.zoomSensitivity = Number($event.target.value)"
+        >
+      </section>
+      <section>
+        <label>
+          {{$t("settings.moveSensitivity")}}:
+        </label>
+        <input
+          type="number"
+          :value="$settings.moveSensitivity"
+          @change="$settings.moveSensitivity = Number($event.target.value)"
+        >
+      </section>
+      <section>
+        <label>
           <input
             type="checkbox"
-            :checked="$settings.lowMemoryMode"
+            :checked="false"
             @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
+            disabled
           >
-          {{$t("settings.lowMemoryMode")}}
+          <s>{{$t("settings.lowMemoryMode")}}</s>
         </label>
-        <p>{{$t("settings.lowMemoryModeDescriptions")}}</p>
       </section>
       <section>
         <label>
@@ -47,8 +67,7 @@
             disabled
           >
           <s>{{$t("settings.enableHardwareAcceleration")}}</s>
-        </label><br>
-        <p>{{$t("settings.enableHardwareAccelerationDescriptions")}}</p>
+        </label>
       </section>
       <section>
         <label>

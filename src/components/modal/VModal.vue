@@ -15,7 +15,7 @@
       } : (center ? centerStyle : {})"
     >
       <div class="title">
-        <span class="close" @click="close">&#xe8bb;</span>
+        <span class="close" @click="close">{{$systemInfo.platform == "win32" ? "&#xe8bb;" : "×"}}</span>
       </div>
       <div class="content">
         <slot></slot>
@@ -80,7 +80,13 @@ export default class VModal extends Vue {
     >.title {
       text-align: right;
       >.close {
-        font-family: Segoe MDL2 Assets;
+        font-family: Segoe MDL2 Assets,
+          "Helvetica Neue",
+          Arial,
+          "Hiragino Kaku Gothic ProN",
+          "Hiragino Sans",
+          Meiryo,
+          sans-serif;
         cursor: pointer;
       }
     }

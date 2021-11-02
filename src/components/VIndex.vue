@@ -102,16 +102,12 @@ export default class Index extends Vue {
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
-  customTitlebar = false;
   title = "";
   async mounted() {
     window.onerror = (e) => {
       log("window error:", e);
     }
     log("INIT RENDERER!");
-    if (await API.send("getPlatform") == "win32") {
-      this.customTitlebar = true;
-    }
     this.$globalComponents.importImages = () => {
       API.send("browseImages");
     }
@@ -238,6 +234,9 @@ export default class Index extends Vue {
   }
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
+  }
+  get customTitlebar() {
+    return this.$systemInfo.platform == "win32";
   }
   changePetaBoard(board: PetaBoard) {
     this.savePetaBoard(board, false);

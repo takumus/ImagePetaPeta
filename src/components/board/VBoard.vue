@@ -89,7 +89,6 @@ export default class VBoard extends Vue {
   dragOffset = new Vec2();
   scaleMin = 10 / 100;
   scaleMax = 1000 / 100;
-  isMac = false;
   click = new ClickChecker();
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;
@@ -145,7 +144,6 @@ export default class VBoard extends Vue {
       this.resize(entries[0].contentRect);
     });
     this.resizer.observe(this.panelsBackground);
-    this.isMac = window.navigator.userAgent.indexOf("Macintosh") >= 0;
     setInterval(() => {
       this.fps = this.frame;
       this.frame = 0;
@@ -235,9 +233,9 @@ export default class VBoard extends Vue {
   }
   wheel(event: WheelEvent) {
     const mouse = vec2FromMouseEvent(event).sub(this.stageRect.clone().div(2));
-    if (event.ctrlKey || !this.isMac) {
+    if (event.ctrlKey || this.isWin) {
       const currentZoom = this.board.transform.scale;
-      this.board.transform.scale *= 1 + -event.deltaY * (this.isMac ? 0.01 : 0.001);
+      this.board.transform.scale *= 1 + -event.deltaY * (this.isWin ? 0.00001 : 0.0001) * this.$settings.zoomSensitivity;
       if (this.board.transform.scale > this.scaleMax) {
         this.board.transform.scale = this.scaleMax;
       } else if (this.board.transform.scale < this.scaleMin) {
@@ -250,8 +248,8 @@ export default class VBoard extends Vue {
       .sub(mouse)
       .mult(-1);
     } else {
-      this.board.transform.position.x += -event.deltaX;
-      this.board.transform.position.y += -event.deltaY;
+      this.board.transform.position.x += -event.deltaX * this.$settings.moveSensitivity * 0.01;
+      this.board.transform.position.y += -event.deltaY * this.$settings.moveSensitivity * 0.01;
     }
     if (!this.pixi.ticker.started) {
       this.pixi.ticker.update();
@@ -519,6 +517,9 @@ export default class VBoard extends Vue {
         this.pixi.ticker.stop();
       }
     }
+  }
+  get isWin() {
+    return this.$systemInfo.platform == "win32";
   }
   get pPanelsArray() {
     return Object.values(this.pPanels);

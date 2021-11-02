@@ -98,7 +98,9 @@ const ja = {
     enableHardwareAcceleration: "GPUレンダリング",
     enableHardwareAccelerationDescriptions: "GPUを使って高速にレンダリング出来ます。無効にした場合、大幅にパフォーマンスが落ちます。\n変更後は再起動が必要です。",
     showFPS: "フレームレートを表示",
-    showFPSDescriptions: "右下に表示されます。大体60fps出ていれば問題ありません。\n著しく低い場合はご連絡ください。"
+    showFPSDescriptions: "右下に表示されます。大体60fps出ていれば問題ありません。\n著しく低い場合はご連絡ください。",
+    zoomSensitivity: "ズーム感度",
+    moveSensitivity: "移動感度(Macのみ)"
   }
 };
 export default ja;
