@@ -4,7 +4,6 @@
 import { Vec2 } from "./vec2";
 
 //
-type Pos = [number, number];
 interface Rect {
   leftTop: Vec2,
   rightTop: Vec2,
@@ -12,38 +11,34 @@ interface Rect {
   rightBottom: Vec2,
 }
 export function hitTest (rect1: Rect, rect2: Rect) {
-  const lt1 = rect1.leftTop.toArray(),
-    rt1 = rect1.rightTop.toArray(),
-    lb1 = rect1.leftBottom.toArray(),
-    rb1 = rect1.rightBottom.toArray(),
-    lt2 = rect2.leftTop.toArray(), 
-    rt2 = rect2.rightTop.toArray(),
-    lb2 = rect2.leftBottom.toArray(), 
-    rb2 = rect2.rightBottom.toArray(),
-    ltx1 = lt1[0], lty1 = lt1[1], rtx1 = rt1[0], rty1 = rt1[1],
-    lbx1 = lb1[0], lby1 = lb1[1], rbx1 = rb1[0], rby1 = rb1[1],
-    ltx2 = lt2[0], lty2 = lt2[1], rtx2 = rt2[0], rty2 = rt2[1],
-    lbx2 = lb2[0], lby2 = lb2[1], rbx2 = rb2[0], rby2 = rb2[1],
-    t1 = [ rtx1 - ltx1, rty1 - lty1 ],
-    r1 = [ rbx1 - rtx1, rby1 - rty1 ],
-    b1 = [ lbx1 - rbx1, lby1 - rby1 ],
-    l1 = [ ltx1 - lbx1, lty1 - lby1 ],
-    t2 = [ rtx2 - ltx2, rty2 - lty2 ],
-    r2 = [ rbx2 - rtx2, rby2 - rty2 ],
-    b2 = [ lbx2 - rbx2, lby2 - rby2 ],
-    l2 = [ ltx2 - lbx2, lty2 - lby2 ],
-    cx1 = (ltx1 + rtx1 + lbx1 + rbx1) >> 2,
-    cy1 = (lty1 + rty1 + lby1 + rby1) >> 2,
-    cx2 = (ltx2 + rtx2 + lbx2 + rbx2) >> 2,
-    cy2 = (lty2 + rty2 + lby2 + rby2) >> 2;
+  const lt1 = rect1.leftTop,
+    rt1 = rect1.rightTop,
+    lb1 = rect1.leftBottom,
+    rb1 = rect1.rightBottom,
+    lt2 = rect2.leftTop, 
+    rt2 = rect2.rightTop,
+    lb2 = rect2.leftBottom, 
+    rb2 = rect2.rightBottom,
+    t1 = [ rt1.x - lt1.x, rt1.y - lt1.y ],
+    r1 = [ rb1.x - rt1.x, rb1.y - rt1.y ],
+    b1 = [ lb1.x - rb1.x, lb1.y - rb1.y ],
+    l1 = [ lt1.x - lb1.x, lt1.y - lb1.y ],
+    t2 = [ rt2.x - lt2.x, rt2.y - lt2.y ],
+    r2 = [ rb2.x - rt2.x, rb2.y - rt2.y ],
+    b2 = [ lb2.x - rb2.x, lb2.y - rb2.y ],
+    l2 = [ lt2.x - lb2.x, lt2.y - lb2.y ],
+    cx1 = (lt1.x + rt1.x + lb1.x + rb1.x) >> 2,
+    cy1 = (lt1.y + rt1.y + lb1.y + rb1.y) >> 2,
+    cx2 = (lt2.x + rt2.x + lb2.x + rb2.x) >> 2,
+    cy2 = (lt2.y + rt2.y + lb2.y + rb2.y) >> 2;
   let i: number,
     j: number,
-    poss1: Pos[],
-    poss2: Pos[],
+    poss1: Vec2[],
+    poss2: Vec2[],
     dirs1: number[][],
     dirs2: number[][],
-    pos1: Pos,
-    pos2: Pos,
+    pos1: Vec2,
+    pos2: Vec2,
     dir1: number[],
     dir2: number[],
     px1: number,
@@ -59,15 +54,15 @@ export function hitTest (rect1: Rect, rect2: Rect) {
     c: number,
     c1: number,
     c2: number;
-  if (t1[0] * (cy2 - lty1) - t1[1] * (cx2 - ltx1) > 0 &&
-    r1[0] * (cy2 - rty1) - r1[1] * (cx2 - rtx1) > 0 &&
-    b1[0] * (cy2 - rby1) - b1[1] * (cx2 - rbx1) > 0 &&
-    l1[0] * (cy2 - lby1) - l1[1] * (cx2 - lbx1) > 0) {
+  if (t1[0] * (cy2 - lt1.y) - t1[1] * (cx2 - lt1.x) > 0 &&
+    r1[0] * (cy2 - rt1.y) - r1[1] * (cx2 - rt1.x) > 0 &&
+    b1[0] * (cy2 - rb1.y) - b1[1] * (cx2 - rb1.x) > 0 &&
+    l1[0] * (cy2 - lb1.y) - l1[1] * (cx2 - lb1.x) > 0) {
     return true;
-  } else if (t2[0] * (cy1 - lty2) - t2[1] * (cx1 - ltx2) > 0 &&
-    r2[0] * (cy1 - rty2) - r2[1] * (cx1 - rtx2) > 0 &&
-    b2[0] * (cy1 - rby2) - b2[1] * (cx1 - rbx2) > 0 &&
-    l2[0] * (cy1 - lby2) - l2[1] * (cx1 - lbx2) > 0) {
+  } else if (t2[0] * (cy1 - lt2.y) - t2[1] * (cx1 - lt2.x) > 0 &&
+    r2[0] * (cy1 - rt2.y) - r2[1] * (cx1 - rt2.x) > 0 &&
+    b2[0] * (cy1 - rb2.y) - b2[1] * (cx1 - rb2.x) > 0 &&
+    l2[0] * (cy1 - lb2.y) - l2[1] * (cx1 - lb2.x) > 0) {
     return true;
   } else {
     poss1 = [ lt1, rt1, rb1, lb1 ];
@@ -76,12 +71,12 @@ export function hitTest (rect1: Rect, rect2: Rect) {
     dirs2 = [ t2, r2, b2, l2 ];
     for (i = 0; i < 4; i++) {
       pos1 = poss1[i];
-      px1 = pos1[0]; py1 = pos1[1];
+      px1 = pos1.x; py1 = pos1.y;
       dir1 = dirs1[i];
       dx1 = dir1[0]; dy1 = dir1[1];
       for (j = 0; j < 4; j++) {
         pos2 = poss2[j];
-        px2 = pos2[0]; py2 = pos2[1];
+        px2 = pos2.x; py2 = pos2.y;
         dir2 = dirs2[j];
         dx2 = dir2[0]; dy2 = dir2[1];
         c = dx1 * dy2 - dy1 * dx2;
