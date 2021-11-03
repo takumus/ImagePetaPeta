@@ -96,6 +96,8 @@ export default class VBoard extends Vue {
   centerWrapper = new PIXI.Container();
   panelsCenterWrapper = new PIXI.Container();
   backgroundSprite = new PIXI.Graphics();
+  backgroundFilter = new PIXI.filters.ColorMatrixFilter();
+  selectingBackground = new PIXI.Graphics();
   crossLine = new PIXI.Graphics();
   pPanels: {[key: string]: PPanel} = {};
   pTransformer = new PTransformer();
@@ -137,6 +139,7 @@ export default class VBoard extends Vue {
     this.rootContainer.addChild(this.pTransformer);
     this.rootContainer.addChild(this.selectionGraphics);
     this.panelsBackground.appendChild(this.pixi.view);
+    this.backgroundSprite.filters = [this.backgroundFilter];
     this.pixi.stage.interactive = true;
     this.pixi.ticker.add(this.animate);
     this.setSickerEnabled(false);
@@ -319,7 +322,7 @@ export default class VBoard extends Vue {
         ),
       }
       this.selectionGraphics.lineStyle(1 / this.board.transform.scale, 0x000000, 1, undefined, true);
-      this.selectionGraphics.beginFill(0xffffff, 0.5);
+      this.selectionGraphics.beginFill(0xffffff, 0.1);
       this.selectionGraphics.drawRect(
         selection.leftTop.x,
         selection.leftTop.y,
@@ -339,6 +342,16 @@ export default class VBoard extends Vue {
             leftBottom: pPanelCorners[3]
           }
         );
+      });
+    }
+    this.pPanelsArray.forEach((pp) => {
+      pp.unselected = false;
+    });
+    this.setBackgroundBrightness(1);
+    if (this.selectedPPanels.length > 0) {
+      this.setBackgroundBrightness(0.3);
+      this.unselectedPPanels.forEach((pp) => {
+        pp.unselected = true;
       });
     }
   }
@@ -518,6 +531,9 @@ export default class VBoard extends Vue {
       }
     }
   }
+  setBackgroundBrightness(value: number) {
+    this.backgroundFilter.brightness(value, false);
+  }
   get isWin() {
     return this.$systemInfo.platform == "win32";
   }
@@ -526,6 +542,9 @@ export default class VBoard extends Vue {
   }
   get selectedPPanels() {
     return this.pPanelsArray.filter((pPanel) => pPanel.selected);
+  }
+  get unselectedPPanels() {
+    return this.pPanelsArray.filter((pPanel) => !pPanel.selected);
   }
   get scalePercent() {
     return Math.floor(this.board.transform.scale * 100);

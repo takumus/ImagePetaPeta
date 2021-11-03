@@ -6,6 +6,7 @@ import { Vec2 } from '@/utils/vec2';
 import * as PIXI from 'pixi.js';
 export class PPanel extends PIXI.Sprite {
   public selected = false;
+  public unselected = false;
   public dragging = false;
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
@@ -22,6 +23,7 @@ export class PPanel extends PIXI.Sprite {
   private prevPositionX = 0;
   private prevPositionY = 0;
   private prevRotation = 0;
+  private prevUnselected = false;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -72,6 +74,7 @@ export class PPanel extends PIXI.Sprite {
       || this.prevPositionX != this.petaPanel.position.x
       || this.prevPositionY != this.petaPanel.position.y
       || this.prevRotation != this.petaPanel.rotation
+      || this.prevUnselected != this.unselected
     )) {
       return;
     }
@@ -85,6 +88,7 @@ export class PPanel extends PIXI.Sprite {
     this.prevPositionX = this.petaPanel.position.x;
     this.prevPositionY = this.petaPanel.position.y;
     this.prevRotation = this.petaPanel.rotation;
+    this.prevUnselected = this.unselected;
     const panelWidth = this.absPanelWidth();
     const panelHeight = this.absPanelHeight();
     const flippedX = this.petaPanel.width < 0;
@@ -121,9 +125,14 @@ export class PPanel extends PIXI.Sprite {
       );
     }
     this.selection.clear();
-    if (this.selected) {
-      this.selection.lineStyle(1, 0x000000, 1, undefined, true);
-      this.selection.drawPolygon(this.getCorners().map((p) => new PIXI.Point(p.x, p.y)));
+    if (this.selected || this.unselected) {
+      this.selection.beginFill(this.unselected ? 0x000000 : 0xffffff, 0.5);
+      this.selection.drawRect(
+        -panelWidth / 2,
+        -panelHeight / 2,
+        panelWidth,
+        panelHeight
+      );
     }
     this.x = this.petaPanel.position.x;
     this.y = this.petaPanel.position.y;
