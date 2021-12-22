@@ -282,9 +282,6 @@ export default class VBoard extends Vue {
     if (this.selecting) {
       this.selection.bottomRight = new Vec2(this.rootContainer.toLocal(this.mousePosition));
     }
-    this.pPanelsArray.forEach((pPanel) => {
-      pPanel.update();
-    });
     this.board.transform.position.setTo(this.rootContainer);
     new Vec2(this.panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(this.crossLine);
     const offset = 0;
@@ -300,7 +297,6 @@ export default class VBoard extends Vue {
     }
     this.rootContainer.scale.set(this.board.transform.scale);
     this.pTransformer.setScale(1 / this.board.transform.scale);
-    this.pTransformer.update();
     this.selectionGraphics.clear();
     if (this.selecting) {
       const selection = {
@@ -354,6 +350,10 @@ export default class VBoard extends Vue {
         pp.unselected = true;
       });
     }
+    this.pPanelsArray.forEach((pPanel) => {
+      pPanel.update();
+    });
+    this.pTransformer.update();
   }
   resetTransform() {
     this.board.transform.scale = 1;
@@ -453,14 +453,13 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
-    // log("load");
+    log("load");
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
     });
     this.pPanels = {};
     this.pTransformer.pPanels = this.pPanels;
-    this.pixi.ticker.start();
     await this.loadAllFullsized();
   }
   async loadAllFullsized() {
@@ -476,6 +475,7 @@ export default class VBoard extends Vue {
           this.pixi.ticker.update();
         }
         if (loaded == this.board.petaPanels.length) {
+          this.pixi.ticker.update();
           if (this.windowIsFocused) {
             this.setSickerEnabled(true);
           }

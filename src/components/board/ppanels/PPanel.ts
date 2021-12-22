@@ -125,8 +125,8 @@ export class PPanel extends PIXI.Sprite {
       );
     }
     this.selection.clear();
-    if (this.selected || this.unselected) {
-      this.selection.beginFill(this.unselected ? 0x000000 : 0xffffff, 0.5);
+    if (this.unselected) {
+      this.selection.beginFill(0x000000, 0.5);
       this.selection.drawRect(
         -panelWidth / 2,
         -panelHeight / 2,
