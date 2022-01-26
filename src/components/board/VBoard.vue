@@ -405,6 +405,9 @@ export default class VBoard extends Vue {
     }], position);
   }
   async addPanel(petaPanel: PetaPanel, offsetIndex: number){
+    if (offsetIndex == 0) {
+      this.clearSelectionAll();
+    }
     this.loadFullsized(petaPanel);
     const offset = new Vec2(20, 20).mult(offsetIndex);
     const pPanel = this.pPanels[petaPanel.id];
@@ -453,7 +456,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
-    log("load");
+    log("load", this.board.name);
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
@@ -461,6 +464,7 @@ export default class VBoard extends Vue {
     this.pPanels = {};
     this.pTransformer.pPanels = this.pPanels;
     await this.loadAllFullsized();
+    this.pixi.ticker.update();
   }
   async loadAllFullsized() {
     if (this.board.petaPanels.length > 0) {
@@ -474,8 +478,7 @@ export default class VBoard extends Vue {
         if (loaded % 10 == 0) {
           this.pixi.ticker.update();
         }
-        if (loaded >= this.board.petaPanels.length) {
-          this.pixi.ticker.update();
+        if (loaded == this.board.petaPanels.length) {
           if (this.windowIsFocused) {
             this.setSickerEnabled(true);
           }

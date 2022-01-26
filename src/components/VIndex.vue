@@ -192,10 +192,10 @@ export default class Index extends Vue {
     this.vPetaBoard.addPanel(petaPanel, offsetIndex);
   }
   selectPetaBoard(board: PetaBoard) {
-    log("PetaBoard Selected", board.name);
-    if (this.currentPetaBoard) {
-      // this.savePetaBoard(this.currentPetaBoard, true);
+    if (this.currentPetaBoard?.id == board.id) {
+      return;
     }
+    log("PetaBoard Selected", board.name);
     this.currentPetaBoard = board;
     this.$nextTick(() => {
       this.vPetaBoard.load();
