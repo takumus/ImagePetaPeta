@@ -474,7 +474,7 @@ export default class VBoard extends Vue {
         if (loaded % 10 == 0) {
           this.pixi.ticker.update();
         }
-        if (loaded == this.board.petaPanels.length) {
+        if (loaded >= this.board.petaPanels.length) {
           this.pixi.ticker.update();
           if (this.windowIsFocused) {
             this.setSickerEnabled(true);
