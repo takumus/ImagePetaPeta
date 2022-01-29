@@ -252,7 +252,7 @@ export default class VBoard extends Vue {
     const mouse = vec2FromMouseEvent(event).sub(this.stageRect.clone().div(2));
     if (event.ctrlKey || this.isWin) {
       const currentZoom = this.board.transform.scale;
-      this.board.transform.scale *= 1 + -event.deltaY * (this.isWin ? 0.00001 : 0.0001) * this.$settings.zoomSensitivity;
+      this.board.transform.scale *= 1 + -event.deltaY * (this.isWin ? 0.1 : 1) * this.$settings.zoomSensitivity * 0.0001;
       if (this.board.transform.scale > this.scaleMax) {
         this.board.transform.scale = this.scaleMax;
       } else if (this.board.transform.scale < this.scaleMin) {
@@ -491,12 +491,6 @@ export default class VBoard extends Vue {
         if (loaded % 10 == 0) {
           this.orderPIXIRender();
         }
-        if (loaded == this.board.petaPanels.length) {
-          if (this.windowIsFocused) {
-            this.orderPIXIRender();
-            // this.setSickerEnabled(true);
-          }
-        }
       });
     }
   }
@@ -599,7 +593,7 @@ export default class VBoard extends Vue {
   @Watch("windowIsFocused")
   changeWindowIsFocused() {
     // this.setSickerEnabled(this.windowIsFocused);
-    log("ticker:", this.windowIsFocused);
+    // log("ticker:", this.windowIsFocused);
   }
 }
 </script>

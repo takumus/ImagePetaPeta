@@ -114,11 +114,6 @@ export default class Index extends Vue {
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
       this.getPetaImages();
     });
-    API.on("importImagesProgress", (e, progress, file, result) => {
-      if (result == ImportImageResult.SUCCESS) {
-        this.getPetaImages();
-      }
-    });
     API.on("updatePetaImages", (e) => {
       this.getPetaImages();
     });
@@ -304,7 +299,7 @@ body, html {
   ::-webkit-scrollbar-thumb {
     background-color: #cccccc;
     border-radius: var(--rounded);
-    min-height: 20%;
+    min-height: 64px;
   }
   >.border {
     z-index: 10;
