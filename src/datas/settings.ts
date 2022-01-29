@@ -15,8 +15,8 @@ export const defaultSettings: Settings = {
   alwaysOnTop: false,
   enableHardwareAcceleration: true,
   showFPS: false,
-  zoomSensitivity: 1,
-  moveSensitivity: 1
+  zoomSensitivity: 100,
+  moveSensitivity: 100
 }
 export function upgradeSettings(settings: Settings) {
   // バージョンアップで旧ファイルとの整合性を取る
