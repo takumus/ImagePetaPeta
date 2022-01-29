@@ -48,7 +48,10 @@ export class PPanel extends PIXI.Sprite {
         return;
       }
       this.loader.add(url);
-      this.loader.load((loader, resources) => {
+      this.loader.onError.add((error) => {
+        rej("cannot load texture");
+      });
+      this.loader.load((_, resources) => {
         if (!this.petaPanel._petaImage) {
           rej("cannot load texture");
           return;

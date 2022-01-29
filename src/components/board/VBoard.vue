@@ -504,7 +504,7 @@ export default class VBoard extends Vue {
     try {
       await pPanel.loadTexture(ImageType.FULLSIZED);
     } catch(err) {
-      console.log(err);
+      log("load error:", err);
       return false;
     }
     return true;
