@@ -32,7 +32,7 @@ export class PSelection extends PIXI.Container {
   }
   update() {
     if (!this.texture) return;
-    this.texture.tilePosition.x += 0.2 * this.renderScale;
+    // this.texture.tilePosition.x += 2 * this.renderScale * PIXI.Ticker.shared.maxFPS;
     this.texture.tileScale.set(0.5 * this.renderScale);
     if (!this.dirty) return;
     if (this.corners.length < 5) return;
