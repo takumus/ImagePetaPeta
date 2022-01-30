@@ -483,16 +483,19 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   async loadAllFullsized() {
-    let loaded = 0;
     for (let i = 0; i < this.board.petaPanels.length; i++) {
-      await this.loadFullsized(this.board.petaPanels[i]).then((result) => {
-        loaded++;
-        log("loaded:", loaded, "/", this.board.petaPanels.length);
-        if (loaded % 10 == 0) {
-          this.orderPIXIRender();
+      const petaPanel = this.board.petaPanels[i];
+      const progress =  `${i + 1}/${this.board.petaPanels.length}`;
+      await this.loadFullsized(petaPanel).then((result) => {
+        if (result) {
+          log(`loaded(${petaPanel._petaImage?.fileName}):`, progress);
         }
+      }).catch((err) => {
+        log(`loderr(${petaPanel._petaImage?.fileName}):`, progress, err);
       });
+      this.orderPIXIRender();
     }
+    log("load complete");
   }
   async loadFullsized(petaPanel: PetaPanel) {
     if (this.pPanels[petaPanel.id]) {
@@ -501,12 +504,7 @@ export default class VBoard extends Vue {
     const pPanel = new PPanel(petaPanel);
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
-    try {
-      await pPanel.loadTexture(ImageType.FULLSIZED);
-    } catch(err) {
-      log("load error:", err);
-      return false;
-    }
+    await pPanel.loadTexture(ImageType.FULLSIZED);
     return true;
   }
   clearCache() {

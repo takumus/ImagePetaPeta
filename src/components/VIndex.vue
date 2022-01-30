@@ -5,6 +5,18 @@
       dark: $settings.darkMode
     }"
   >
+    <VTabBar
+      :zIndex="4"
+      :hide="!windowIsFocused"
+      :boards="sortedPetaBoards"
+      :customTitlebar="customTitlebar"
+      :title="title"
+      @remove="removePetaBoard"
+      @add="addPetaBoard"
+      @select="selectPetaBoard"
+      @sort="changePetaBoards"
+      ref="vTabBar"
+    />
     <VBoard
       :zIndex="1"
       v-if="currentPetaBoard"
@@ -17,18 +29,6 @@
       :zIndex="2"
       :petaImages="petaImages"
       @addPanel="addPanel"
-    />
-    <VTabBar
-      :zIndex="4"
-      :hide="!windowIsFocused"
-      :boards="sortedPetaBoards"
-      :customTitlebar="customTitlebar"
-      :title="title"
-      @remove="removePetaBoard"
-      @add="addPetaBoard"
-      @select="selectPetaBoard"
-      @sort="changePetaBoards"
-      ref="vTabBar"
     />
     <VInfo
       :zIndex="3"
