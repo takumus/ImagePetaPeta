@@ -22,6 +22,8 @@ export interface Main {
   dialog: (message: string, buttons: string[]) => Promise<number>;
   // openURL
   openURL: (url: string) => Promise<boolean>;
+  // openImageFile
+  openImageFile: (petaImage: PetaImage) => Promise<void>;
   // getAppInfo
   getAppInfo: () => Promise<AppInfo>;
   // showDBFolder

@@ -204,6 +204,9 @@ import { ImageType } from "./datas/imageType";
       shell.openExternal(url);
       return true;
     },
+    openImageFile: async (event, petaImage) => {
+      shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
+    },
     getAppInfo: async (event) => {
       logger.mainLog("#Get App Info");
       const info = {

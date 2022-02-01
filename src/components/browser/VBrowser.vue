@@ -348,6 +348,12 @@ export default class VBrowser extends Vue {
             API.send("savePetaImages", this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }
+      },
+      {
+        label: this.$t("browser.petaImageMenu.openImageFile"),
+        click: async () => {
+          await API.send("openImageFile", thumb.petaImage);
+        }
       }
     ], position);
   }
