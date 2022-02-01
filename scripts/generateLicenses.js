@@ -1,6 +1,9 @@
 const fs = require("fs");
 const customLicenses = require("./customLicenses");
-const datas = {...customLicenses, ...JSON.parse(fs.readFileSync("./licenses.json"))};
+const datas = {
+  ...JSON.parse(fs.readFileSync("./licenses.json")),
+  ...customLicenses
+};
 console.log("generating licenses!");
 const newDatas = Object.keys(datas).map((name) => {
   const data = datas[name];
