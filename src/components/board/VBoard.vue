@@ -268,7 +268,7 @@ export default class VBoard extends Vue {
       this.board.transform.position.add(
         new Vec2(event.deltaX, event.deltaY)
         .mult(this.$settings.moveSensitivity)
-        .mult(0.01)
+        .mult(-0.01)
       );
       // this.board.transform.position.x += -event.deltaX * this.$settings.moveSensitivity * 0.01;
       // this.board.transform.position.y += -event.deltaY * this.$settings.moveSensitivity * 0.01;
