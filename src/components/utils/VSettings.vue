@@ -26,6 +26,7 @@
           >
           {{$t("settings.alwaysOnTop")}}
         </label>
+        <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
       </section>
       <section>
         <label>
@@ -36,6 +37,7 @@
           :value="$settings.zoomSensitivity"
           @change="$settings.zoomSensitivity = Number($event.target.value)"
         >
+        <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
       </section>
       <section>
         <label>
@@ -46,8 +48,9 @@
           :value="$settings.moveSensitivity"
           @change="$settings.moveSensitivity = Number($event.target.value)"
         >
+        <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
       </section>
-      <section>
+      <!-- <section>
         <label>
           <input
             type="checkbox"
@@ -68,7 +71,7 @@
           >
           <s>{{$t("settings.enableHardwareAcceleration")}}</s>
         </label>
-      </section>
+      </section> -->
       <section>
         <label>
           <input

@@ -95,12 +95,15 @@ const ja = {
     lowMemoryModeDescriptions: "このバージョンでは、省メモリモードの設定は意味がありません。",
     darkMode: "ダークモード",
     alwaysOnTop: "常に手前に表示",
+    alwaysOnTopDescriptions: "このアプリの画面を常に最前面に固定します。",
     enableHardwareAcceleration: "GPUレンダリング",
     enableHardwareAccelerationDescriptions: "GPUを使って高速にレンダリング出来ます。無効にした場合、大幅にパフォーマンスが落ちます。\n変更後は再起動が必要です。",
     showFPS: "フレームレートを表示",
-    showFPSDescriptions: "右下に表示されます。大体60fps出ていれば問題ありません。\n著しく低い場合はご連絡ください。",
+    showFPSDescriptions: "開発者向けの機能です。",
     zoomSensitivity: "ズーム感度",
-    moveSensitivity: "移動感度(Macのみ)"
+    zoomSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
+    moveSensitivity: "移動感度(Macのみ)",
+    moveSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
   }
 };
 export default ja;

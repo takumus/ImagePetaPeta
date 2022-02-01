@@ -66,7 +66,7 @@ export default class VModal extends Vue {
   height: 100%;
   top: 0px;
   left: 0px;
-  background-color: rgba($color: #000000, $alpha: 0.7);
+  background-color: var(--modal-bg-color);
   color: var(--font-color);
   overflow: hidden;
   >.modal {

@@ -250,9 +250,9 @@ export default class VBoard extends Vue {
   }
   wheel(event: WheelEvent) {
     const mouse = vec2FromMouseEvent(event).sub(this.stageRect.clone().div(2));
-    if (event.ctrlKey || this.isWin) {
+    if (event.ctrlKey || this.$systemInfo.platform == "win32") {
       const currentZoom = this.board.transform.scale;
-      this.board.transform.scale *= 1 + -event.deltaY * (this.isWin ? 0.1 : 1) * this.$settings.zoomSensitivity * 0.0001;
+      this.board.transform.scale *= 1 + -event.deltaY * this.$settings.zoomSensitivity * 0.00001;
       if (this.board.transform.scale > this.scaleMax) {
         this.board.transform.scale = this.scaleMax;
       } else if (this.board.transform.scale < this.scaleMin) {
@@ -270,8 +270,6 @@ export default class VBoard extends Vue {
         .mult(this.$settings.moveSensitivity)
         .mult(-0.01)
       );
-      // this.board.transform.position.x += -event.deltaX * this.$settings.moveSensitivity * 0.01;
-      // this.board.transform.position.y += -event.deltaY * this.$settings.moveSensitivity * 0.01;
     }
     this.orderPIXIRender();
   }
@@ -548,9 +546,6 @@ export default class VBoard extends Vue {
       this.renderOrdered = false;
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
-  }
-  get isWin() {
-    return this.$systemInfo.platform == "win32";
   }
   get pPanelsArray() {
     return Object.values(this.pPanels);

@@ -258,6 +258,7 @@ body, html {
 }
 .root {
   --bg-color: #ffffff;
+  --modal-bg-color: #00000070;
   --border-color: #999999;
   --font-color: #333333;
   --button-bg-color: #ffffff;
@@ -272,6 +273,7 @@ body, html {
   --rounded: 6px;
   &.dark {
     --bg-color: #333333;
+    --modal-bg-color: #ffffff50;
     --border-color: #cccccc;
     --font-color: #ffffff;
     --button-bg-color: #444444;
