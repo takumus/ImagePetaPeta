@@ -95,6 +95,8 @@ const ja = {
     lowMemoryMode: "省メモリモード",
     lowMemoryModeDescriptions: "このバージョンでは、省メモリモードの設定は意味がありません。",
     darkMode: "ダークモード",
+    autoDarkMode: "ダークモードの自動検出",
+    autoDarkModeDescriptions: "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
     alwaysOnTop: "常に手前に表示",
     alwaysOnTopDescriptions: "このアプリの画面を常に最前面に固定します。",
     enableHardwareAcceleration: "GPUレンダリング",

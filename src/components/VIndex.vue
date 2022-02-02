@@ -2,7 +2,7 @@
   <article
     class="root"
     :class="{
-      dark: $settings.darkMode
+      dark: darkMode
     }"
   >
     <VTabBar
@@ -102,6 +102,7 @@ export default class Index extends Vue {
   orderedAddPanelDragEvent?: DragEvent;
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
+  systemDarkMode = false;
   title = "";
   async mounted() {
     window.onerror = (e) => {
@@ -134,6 +135,7 @@ export default class Index extends Vue {
     this.windowIsFocused = await API.send("getWindowIsFocused");
     const info = await API.send("getAppInfo");
     this.title = `${info.name} ${info.version}`;
+    this.getSystemDarkMode();
     await this.getPetaImages();
     await this.getPetaBoards();
   }
@@ -232,6 +234,18 @@ export default class Index extends Vue {
   }
   get customTitlebar() {
     return this.$systemInfo.platform == "win32";
+  }
+  get darkMode() {
+    if (this.$settings.autoDarkMode) {
+      return this.systemDarkMode;
+    }
+    return this.$settings.darkMode;
+  }
+  getSystemDarkMode() {
+    this.systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTimeout(() => {
+      this.getSystemDarkMode();
+    }, 1000);
   }
   changePetaBoard(board: PetaBoard) {
     this.savePetaBoard(board, false);

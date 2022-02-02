@@ -12,10 +12,22 @@
           <input
             type="checkbox"
             :checked="$settings.darkMode"
+            :disabled="$settings.autoDarkMode"
             @change="$settings.darkMode = Boolean($event.target.checked)"
           >
           {{$t("settings.darkMode")}}
         </label>
+      </section>
+      <section>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.autoDarkMode"
+            @change="$settings.autoDarkMode = Boolean($event.target.checked)"
+          >
+          {{$t("settings.autoDarkMode")}}
+        </label>
+        <p>{{$t("settings.autoDarkModeDescriptions")}}</p>
       </section>
       <section>
         <label>
