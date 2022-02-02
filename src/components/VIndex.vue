@@ -257,12 +257,13 @@ body, html {
   padding: 0px;
 }
 .root {
+  --rounded: 6px;
   --bg-color: #ffffff;
   --modal-bg-color: #00000070;
   --border-color: #999999;
   --font-color: #333333;
   --button-bg-color: #ffffff;
-  --button-hover-bg-color: #ffffff;
+  --button-hover-bg-color: #eeeeee;
   --button-active-bg-color: #eeeeee;
   --tab-bg-color: #eeeeee;
   --tab-selected-color: #ffffff;
@@ -270,14 +271,13 @@ body, html {
   --window-buttons-hover: #cccccc;
   --window-buttons-close-hover: #ff0000;
   --petapanel-bg-color: #eeeeee;
-  --rounded: 6px;
   &.dark {
     --bg-color: #333333;
     --modal-bg-color: #ffffff50;
     --border-color: #cccccc;
     --font-color: #ffffff;
     --button-bg-color: #444444;
-    --button-hover-bg-color: #444444;
+    --button-hover-bg-color: #555555;
     --button-active-bg-color: #555555;
     --tab-bg-color: #333333;
     --tab-selected-color: #444444;

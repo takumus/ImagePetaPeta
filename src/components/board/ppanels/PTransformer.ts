@@ -30,6 +30,7 @@ export class PTransformer extends PIXI.Container {
   click = new ClickChecker();
   pMultipleSelection: PSelection = new PSelection();
   _scale = 0;
+  fit = false;
   constructor() {
     super();
     this.corners.push(new PControlPoint());
@@ -145,6 +146,12 @@ export class PTransformer extends PIXI.Container {
     } else if (this.controlStatus == ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.rotatingRotation = center.getDiff(this.toLocal(e.data.global)).atan2();
+      if (this.fit) {
+        const diff = center.getDiff(this.beginTransformCorners[3]);
+        const r = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
+        const rot = Math.floor(r / Math.PI * 180 + 90 / 2) % 360;
+        this.rotatingRotation = Math.floor((rot + (rot < 0 ? 360 : 0)) / 90) * (Math.PI / 2) - diff.atan2() + this.beginRotatingRotation;
+      }
       this.selectedPPanels.forEach((pPanel, i) => {
         pPanel.petaPanel.rotation = this.beginSizingPetaPanels[i].rotation + this.rotatingRotation - this.beginRotatingRotation;
         const diff = center.getDiff(
@@ -161,7 +168,9 @@ export class PTransformer extends PIXI.Container {
               new Vec2(
                 Math.cos(rad),
                 Math.sin(rad)
-              ).mult(diff.getLength()).add(center)
+              )
+              .mult(diff.getLength())
+              .add(center)
             )
           )
         );
@@ -215,7 +224,10 @@ export class PTransformer extends PIXI.Container {
         const c = this.corners[i * 2 + 1];
         const pc = this.corners[i * 2];
         const nc = this.corners[(i * 2 + 2) % this.corners.length];
-        new Vec2(pc).add(nc).div(2).setTo(c);
+        new Vec2(pc)
+        .add(nc)
+        .div(2)
+        .setTo(c);
       }
     }
     if (this.selectedPPanels.length > 0) {
@@ -226,8 +238,4 @@ export class PTransformer extends PIXI.Container {
     }
     this.pMultipleSelection.update();
   }
-  // fitRotation() {
-  //   const rot = Math.floor(this.currentRotation / Math.PI * 180 + 90 / 2) % 360;
-  //   this.petaPanel.rotation = Math.floor((rot + (rot < 0 ? 360 : 0)) / 90) * (Math.PI / 2);
-  // }
 }

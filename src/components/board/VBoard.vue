@@ -360,7 +360,7 @@ export default class VBoard extends Vue {
     });
     this.setBackgroundBrightness(1);
     if (this.selectedPPanels.length > 0) {
-      this.setBackgroundBrightness(0.3);
+      this.setBackgroundBrightness(0.7);
       this.unselectedPPanels.forEach((pp) => {
         pp.unselected = true;
       });
@@ -564,6 +564,10 @@ export default class VBoard extends Vue {
     if (value) {
       this.removeSelectedPanels();
     }
+  }
+  @Watch("$keyboards.shift")
+  keyShift(value: boolean) {
+    this.pTransformer.fit = value;
   }
   @Watch("board.petaPanels", { deep: true })
   changeBoard() {
