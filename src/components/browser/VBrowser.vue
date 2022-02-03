@@ -8,6 +8,7 @@
       width: '100%',
       height: '100%'
     }"
+    :visibleCloseButton="true"
     @close="close"
   >
     <article class="browser-root">

@@ -2,6 +2,7 @@
   <VModal
     :visible="visible"
     :center="true"
+    :visibleCloseButton="true"
     @close="close"
   >
     <article class="settings-root">

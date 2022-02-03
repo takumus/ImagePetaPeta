@@ -2,10 +2,11 @@
   <VModal
     :visible="loading"
     :center="true"
+    :visibleCloseButton="false"
   >
     <article class="image-importer-root">
       <p>
-        {{$t("imageImporter.importing")}}{{Math.floor(_progress)}}%
+        {{$t("imageImporter.importing")}}{{Math.floor(progress)}}%
       </p>
       <!-- <section class="bar">
         <div
@@ -16,7 +17,7 @@
         >
         </div>
       </section> -->
-      <VProgressBar :progress="_progress"></VProgressBar>
+      <VProgressBar :progress="progress"></VProgressBar>
       <pre class="log">{{log}}</pre>
       <section class="confirms">
         <button
@@ -117,9 +118,6 @@ export default class VImageImporter extends Vue {
   ok() {
     this.hasErrors = false;
     this.loading = false;
-  }
-  get _progress() {
-    return this.progress;
   }
 }
 </script>

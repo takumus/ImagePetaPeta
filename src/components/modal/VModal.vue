@@ -17,7 +17,7 @@
         ...(center ? centerStyle : {})
       } : (center ? centerStyle : {})"
     >
-      <div class="title">
+      <div class="title" v-if="visibleCloseButton">
         <span class="close" @click="close">{{$systemInfo.platform == "win32" ? "&#xe8bb;" : "×"}}</span>
       </div>
       <div class="content">
@@ -46,6 +46,8 @@ export default class VModal extends Vue {
   childStyle = {};
   @Prop()
   center = false;
+  @Prop()
+  visibleCloseButton = true;
   zIndex = 0;
   noBackground = false;
   centerStyle = {
