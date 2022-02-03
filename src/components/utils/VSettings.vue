@@ -62,28 +62,6 @@
         >
         <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
       </section>
-      <!-- <section>
-        <label>
-          <input
-            type="checkbox"
-            :checked="false"
-            @change="$settings.lowMemoryMode = Boolean($event.target.checked)"
-            disabled
-          >
-          <s>{{$t("settings.lowMemoryMode")}}</s>
-        </label>
-      </section>
-      <section>
-        <label>
-          <input
-            type="checkbox"
-            :checked="true"
-            @change="$settings.enableHardwareAcceleration = Boolean($event.target.checked)"
-            disabled
-          >
-          <s>{{$t("settings.enableHardwareAcceleration")}}</s>
-        </label>
-      </section> -->
       <section>
         <label>
           <input
