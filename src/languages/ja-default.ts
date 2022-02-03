@@ -38,7 +38,7 @@ const ja = {
     addManyImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像をボードに追加しますか？`
     },
-    loading: "読込中"
+    loading: "読込中..."
   },
   browser: {
     tagMenu: {

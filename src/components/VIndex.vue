@@ -315,7 +315,7 @@ body, html {
   ::-webkit-scrollbar-thumb {
     background-color: #cccccc;
     border-radius: var(--rounded);
-    min-height: 64px;
+    min-height: 16px;
   }
   >.border {
     z-index: 10;

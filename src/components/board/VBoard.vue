@@ -47,6 +47,13 @@
         {{fps}}fps
       </span>
     </section>
+    <VBoardLoading
+      :zIndex="1"
+      :loading="loading"
+      :log="loadingLog"
+      :progress="loadingProgress"
+      ref="loadingModal"
+    ></VBoardLoading>
   </article>
 </template>
 
@@ -56,6 +63,7 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VCrop from "@/components/board/VCrop.vue";
+import VBoardLoading from "@/components/board/VBoardLoading.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { PetaBoard, PetaBoardTransform } from "@/datas/petaBoard";
@@ -70,7 +78,8 @@ import { PTransformer } from "@/components/board/ppanels/PTransformer";
 import { hitTest } from "@/utils/hitTest";
 @Options({
   components: {
-    VCrop
+    VCrop,
+    VBoardLoading
   },
   emits: [
     "change"
@@ -85,6 +94,11 @@ export default class VBoard extends Vue {
   windowIsFocused = false;
   @Ref("panelsBackground")
   panelsBackground!: HTMLElement;
+  @Ref("loadingModal")
+  loadingModal!: VBoardLoading;
+  loading = false;
+  loadingLog = "";
+  loadingProgress = 0;
   croppingPetaPanel?: PetaPanel | null = null;
   dragOffset = new Vec2();
   scaleMin = 10 / 100;
@@ -476,6 +490,7 @@ export default class VBoard extends Vue {
   }
   async load() {
     log("load", this.board.name);
+    this.loading = true;
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
@@ -484,6 +499,9 @@ export default class VBoard extends Vue {
     this.pTransformer.pPanels = this.pPanels;
     await this.loadAllFullsized();
     this.orderPIXIRender();
+    this.loading = false;
+    this.loadingProgress = 0;
+    this.loadingLog = "";
   }
   async loadAllFullsized() {
     for (let i = 0; i < this.board.petaPanels.length; i++) {
@@ -492,10 +510,13 @@ export default class VBoard extends Vue {
       await this.loadFullsized(petaPanel).then((result) => {
         if (result) {
           log(`loaded(${petaPanel._petaImage?.fileName}):`, progress);
+          this.loadingLog = `loaded(${petaPanel._petaImage?.fileName}):${progress}\n` + this.loadingLog;
         }
       }).catch((err) => {
         log(`loderr(${petaPanel._petaImage?.fileName}):`, progress, err);
+        this.loadingLog = `loaderr(${petaPanel._petaImage?.fileName}):${progress}\n` + this.loadingLog;
       });
+      this.loadingProgress = ((i + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();
     }
     log("load complete");
