@@ -18,4 +18,4 @@ export const BOARD_MAX_PETAPANEL_COUNT = 100;
 export const BOARD_MAX_PETAPANEL_ADD_COUNT = 20;
 export const BOARD_ADD_MULTIPLE_OFFSET = new Vec2(20, 20);
 export const BOARD_ZOOM_MIN = 1 / 100;     // 1%
-export const BOARD_ZOOM_MAX = 10000 / 100; // 10000%
+export const BOARD_ZOOM_MAX = 5000 / 100; // 5000%
