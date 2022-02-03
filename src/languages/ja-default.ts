@@ -37,7 +37,8 @@ const ja = {
     },
     addManyImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像をボードに追加しますか？`
-    }
+    },
+    loading: "読込中"
   },
   browser: {
     tagMenu: {
@@ -107,6 +108,9 @@ const ja = {
     zoomSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
     moveSensitivity: "移動感度(Macのみ)",
     moveSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
+  },
+  imageImporter: {
+    importing: "画像ファイルを読込中..."
   }
 };
 export default ja;

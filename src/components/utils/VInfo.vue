@@ -26,9 +26,7 @@
         {{$t("info.dbFolderButton")}}
       </button>
       <p>{{$t("info.licenses")}}</p>
-      <pre>
-        {{ licenses }}
-      </pre>
+      <pre>{{ licenses }}</pre>
     </article>
   </VModal>
 </template>

@@ -6,9 +6,9 @@
   >
     <article class="image-importer-root">
       <p>
-        読込中...{{Math.floor(_progress)}}%
+        {{$t("imageImporter.importing")}}{{Math.floor(_progress)}}%
       </p>
-      <section class="bar">
+      <!-- <section class="bar">
         <div
           class="fill"
           :style="{
@@ -16,10 +16,9 @@
           }"
         >
         </div>
-      </section>
-      <pre class="log">
-        {{log}}
-      </pre>
+      </section> -->
+      <VProgressBar :progress="_progress"></VProgressBar>
+      <pre class="log">{{log}}</pre>
       <section class="confirms">
         <button
           tabindex="-1"
@@ -38,12 +37,14 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Components
 import VModal from "@/components/modal/VModal.vue";
+import VProgressBar from "@/components/utils/VProgressBar.vue";
 // Others
 import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import { API } from "@/api";
 @Options({
   components: {
-    VModal
+    VModal,
+    VProgressBar
   },
   emits: [
     "addPanelByDragAndDrop"
@@ -141,20 +142,6 @@ export default class VImageImporter extends Vue {
   }
   p {
     white-space: nowrap;
-  }
-  .bar {
-    background-color: var(--font-color);
-    width: 100%;
-    height: 16px;
-    overflow: hidden;
-    border-radius: var(--rounded);
-    padding: 2px;
-    .fill {
-      width: 50%;
-      height: 100%;
-      border-radius: var(--rounded);
-      background-color: var(--bg-color);
-    }
   }
 }
 </style>
