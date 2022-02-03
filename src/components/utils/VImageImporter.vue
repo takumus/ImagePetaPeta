@@ -51,19 +51,22 @@ import { API } from "@/api";
   ]
 })
 export default class VImageImporter extends Vue {
-  rawProgress = 100;
   progress = 100;
   loading = false;
   hasErrors = false;
   log = "";
   mounted() {
     API.on("importImagesProgress", (e, progress, file, result) => {
-      this.rawProgress = Math.floor(progress * 100);
+      this.progress = Math.floor(progress * 100);
       this.log = result + " -> " + file + "\n" + this.log;
+      if (this.progress == 100 && !this.hasErrors) {
+        setTimeout(() => {
+          this.loading = false;
+        }, 500);
+      }
     });
     API.on("importImagesBegin", (e, fileCount) => {
       this.progress = 0;
-      this.rawProgress = 0;
       this.loading = true;
       this.hasErrors = false;
       this.log = "";
@@ -99,21 +102,6 @@ export default class VImageImporter extends Vue {
       e.preventDefault();
       e.stopPropagation();
     });
-    this.smoothProgress();
-  }
-  smoothProgress() {
-    if (this.loading) {
-      this.progress += (this.rawProgress - this.progress) * 0.2;
-      if (this.progress > 99.9) {
-        this.progress = 100;
-        if (!this.hasErrors) {
-          setTimeout(() => {
-            this.loading = false;
-          }, 100);
-        }
-      }
-    }
-    requestAnimationFrame(this.smoothProgress);
   }
   ok() {
     this.hasErrors = false;
