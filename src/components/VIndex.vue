@@ -123,7 +123,7 @@ export default class Index extends Vue {
       // this.petaImages[petaImage.id] = petaImage;
     });
     API.send("checkUpdate").then(async (result) => {
-      if (result.current.localeCompare(result.latest, "numeric") != 0) {
+      if (result.current != result.latest, "numeric") {
         if (await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
           API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
         }
