@@ -1,6 +1,9 @@
 <template>
   <article
     class="modal-root"
+    :class="{
+      'no-background': noBackground
+    }"
     v-show="visible"
     :style=" {
       ...(parentStyle ? parentStyle : {}),
@@ -27,8 +30,9 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
+import { v4 as uuid } from "uuid";
 @Options({
   components: {
   },
@@ -42,19 +46,33 @@ export default class VModal extends Vue {
   childStyle = {};
   @Prop()
   center = false;
-  @Prop({required: true})
   zIndex = 0;
+  noBackground = false;
   centerStyle = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)"
   }
+  modalId = uuid();
   async mounted() {
     // this.appInfo = await API.send("getAppInfo");
   }
   close() {
     this.$emit("close");
+  }
+  @Watch("$globalComponents.currentModalId")
+  changeModal() {
+    this.noBackground = this.modalId != this.$globalComponents.currentModalId[this.$globalComponents.currentModalId.length - 1];
+  }
+  @Watch("visible")
+  changeVisible() {
+    this.$globalComponents.currentModalId = this.$globalComponents.currentModalId.filter((id) => id != this.modalId);
+    if (this.visible) {
+      this.$globalComponents.currentModalId.push(this.modalId);
+      this.zIndex = this.$globalComponents.currentModalZIndex + 3;
+      this.$globalComponents.currentModalZIndex ++;
+    }
   }
 }
 </script>
@@ -69,6 +87,9 @@ export default class VModal extends Vue {
   background-color: var(--modal-bg-color);
   color: var(--font-color);
   overflow: hidden;
+  &.no-background {
+    background-color: transparent;
+  }
   >.modal {
     width: 600px;
     background-color: var(--bg-color);

@@ -5,8 +5,16 @@
       dark: darkMode
     }"
   >
+    <VBoard
+      :zIndex="1"
+      v-if="currentPetaBoard"
+      :board="currentPetaBoard"
+      :windowIsFocused="windowIsFocused"
+      ref="vPetaBoard"
+      @change="changePetaBoard"
+    />
     <VTabBar
-      :zIndex="4"
+      :zIndex="3"
       :hide="!windowIsFocused"
       :boards="sortedPetaBoards"
       :customTitlebar="customTitlebar"
@@ -17,38 +25,42 @@
       @sort="changePetaBoards"
       ref="vTabBar"
     />
-    <VBoard
-      :zIndex="1"
-      v-if="currentPetaBoard"
-      :board="currentPetaBoard"
-      :windowIsFocused="windowIsFocused"
-      ref="vPetaBoard"
-      @change="changePetaBoard"
-    />
-    <VBrowser
-      :zIndex="2"
-      :petaImages="petaImages"
-      @addPanel="addPanel"
-    />
-    <VInfo
-      :zIndex="3"
-    />
-    <VSettings
-      :zIndex="3"
-    />
+    <section
+      class="modals"
+      v-show="this.$globalComponents.currentModalId.length > 0"
+    >
+      <VBrowser
+        :petaImages="petaImages"
+        @addPanel="addPanel"
+      />
+      <VInfo />
+      <VSettings />
+      <VImageImporter
+        @addPanelByDragAndDrop="addPanelByDragAndDrop"
+      />
+    </section>
     <VContextMenu
-      :zIndex="5"
+      :zIndex="4"
     />
     <VComplement
       :zIndex="5"
     />
-    <VImageImporter
-      :zIndex="6"
-      @addPanelByDragAndDrop="addPanelByDragAndDrop"
-    />
-    <section class="menu" v-show="windowIsFocused">
-      <button tabindex="-1" @click="$globalComponents.settings.open">{{$t("home.settingsButton")}}</button>
-      <button tabindex="-1" @click="$globalComponents.info.open">{{$t("home.infoButton")}}</button>
+    <section
+      class="menu"
+      v-show="windowIsFocused"
+    >
+      <button
+        tabindex="-1"
+        @click="$globalComponents.settings.open"
+      >
+      {{$t("home.settingsButton")}}
+      </button>
+      <button
+        tabindex="-1"
+        @click="$globalComponents.info.open"
+      >
+      {{$t("home.infoButton")}}
+      </button>
     </section>
     <section class="border">
     </section>
@@ -123,7 +135,7 @@ export default class Index extends Vue {
       // this.petaImages[petaImage.id] = petaImage;
     });
     API.send("checkUpdate").then(async (result) => {
-      if (result.current != result.latest, "numeric") {
+      if (result.current != result.latest) {
         if (await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
           API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
         }
@@ -359,6 +371,14 @@ body, html {
     left: 0px;
     text-align: right;
     padding: 8px;
+  }
+  >.modals {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
   }
 }
 </style>

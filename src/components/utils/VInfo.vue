@@ -2,7 +2,6 @@
   <VModal
     :visible="visible"
     :center="true"
-    :zIndex="zIndex"
     @close="close"
   >
     <article class="info-root">
@@ -47,8 +46,6 @@ import { AppInfo } from "@/datas/appInfo";
   },
 })
 export default class VInfo extends Vue {
-  @Prop()
-  zIndex = 0;
   rawProgress = 100;
   info = 100;
   visible = false;

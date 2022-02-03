@@ -2,7 +2,6 @@
   <VModal
     :visible="visible"
     :center="true"
-    :zIndex="zIndex"
     @close="close"
   >
     <article class="settings-root">
@@ -115,8 +114,6 @@ import { API } from "@/api";
   },
 })
 export default class VSettings extends Vue {
-  @Prop()
-  zIndex = 0;
   visible = false;
   async mounted() {
     this.$globalComponents.settings = this;

@@ -21,7 +21,9 @@ interface GLOBALS {
     open: () => void
     close: () => void
   },
-  importImages: () => void
+  importImages: () => void,
+  currentModalId: string[],
+  currentModalZIndex: number
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {

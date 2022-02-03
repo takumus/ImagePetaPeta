@@ -2,7 +2,6 @@
   <VModal
     :visible="loading"
     :center="true"
-    :zIndex="zIndex"
   >
     <article class="image-importer-root">
       <p>
@@ -51,8 +50,6 @@ import { API } from "@/api";
   ]
 })
 export default class VImageImporter extends Vue {
-  @Prop()
-  zIndex = 0;
   rawProgress = 100;
   progress = 100;
   loading = false;

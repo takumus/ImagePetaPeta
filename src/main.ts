@@ -2,7 +2,7 @@ import { createApp } from "vue"
 import { createI18n } from "vue-i18n";
 import languages from "@/languages";
 import App from "@/components/VIndex.vue"
-import { App as _App } from "vue";
+import { App as _App, reactive } from "vue";
 import GlboalKeyboard from "@/globals/globalKeyboard";
 import GlobalSettings from "@/globals/globalSettings";
 import GlobalSystemInfo from "@/globals/globalSystemInfo";
@@ -16,6 +16,9 @@ import GlobalSystemInfo from "@/globals/globalSystemInfo";
   app.use(GlboalKeyboard);
   await GlobalSettings.install(app);
   await GlobalSystemInfo.install(app);
-  app.config.globalProperties.$globalComponents = {};
+  app.config.globalProperties.$globalComponents = reactive({
+    currentModalId: [],
+    currentModalZIndex: 0
+  });
   app.mount("#app");
 })();
