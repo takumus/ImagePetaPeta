@@ -76,6 +76,7 @@ import * as PIXI from "pixi.js";
 import { PPanel } from "@/components/board/ppanels/PPanel";
 import { PTransformer } from "@/components/board/ppanels/PTransformer";
 import { hitTest } from "@/utils/hitTest";
+import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/defines";
 @Options({
   components: {
     VCrop,
@@ -101,8 +102,6 @@ export default class VBoard extends Vue {
   loadingProgress = 0;
   croppingPetaPanel?: PetaPanel | null = null;
   dragOffset = new Vec2();
-  scaleMin = 10 / 100;
-  scaleMax = 1000 / 100;
   click = new ClickChecker();
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;
@@ -122,10 +121,7 @@ export default class VBoard extends Vue {
   renderOrdered = false;
   selecting = false;
   requestAnimationFrameHandle = 0;
-  selection: {
-    topLeft: Vec2,
-    bottomRight: Vec2
-  } = {
+  selection = {
     topLeft: new Vec2(),
     bottomRight: new Vec2()
   }
@@ -267,10 +263,10 @@ export default class VBoard extends Vue {
     if (event.ctrlKey || this.$systemInfo.platform == "win32") {
       const currentZoom = this.board.transform.scale;
       this.board.transform.scale *= 1 + -event.deltaY * this.$settings.zoomSensitivity * 0.00001;
-      if (this.board.transform.scale > this.scaleMax) {
-        this.board.transform.scale = this.scaleMax;
-      } else if (this.board.transform.scale < this.scaleMin) {
-        this.board.transform.scale = this.scaleMin;
+      if (this.board.transform.scale > BOARD_ZOOM_MAX) {
+        this.board.transform.scale = BOARD_ZOOM_MAX;
+      } else if (this.board.transform.scale < BOARD_ZOOM_MIN) {
+        this.board.transform.scale = BOARD_ZOOM_MIN;
       }
       this.board.transform.position
       .mult(-1)

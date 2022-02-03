@@ -17,3 +17,5 @@ export const BOARD_DARK_BACKGROUND_LINE_COLOR = "#444444";
 export const BOARD_MAX_PETAPANEL_COUNT = 100;
 export const BOARD_MAX_PETAPANEL_ADD_COUNT = 20;
 export const BOARD_ADD_MULTIPLE_OFFSET = new Vec2(20, 20);
+export const BOARD_ZOOM_MIN = 1 / 100;     // 1%
+export const BOARD_ZOOM_MAX = 10000 / 100; // 10000%
