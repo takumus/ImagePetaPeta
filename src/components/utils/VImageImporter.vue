@@ -59,11 +59,6 @@ export default class VImageImporter extends Vue {
     API.on("importImagesProgress", (e, progress, file, result) => {
       this.progress = Math.floor(progress * 100);
       this.log = result + " -> " + file + "\n" + this.log;
-      if (this.progress == 100 && !this.hasErrors) {
-        setTimeout(() => {
-          this.loading = false;
-        }, 500);
-      }
     });
     API.on("importImagesBegin", (e, fileCount) => {
       this.progress = 0;
@@ -72,10 +67,13 @@ export default class VImageImporter extends Vue {
       this.log = "";
     });
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
-      // this.loading = false;
       if (fileCount != addedFileCount) {
         this.hasErrors = true;
         this.log = `Error!\n${addedFileCount}/${fileCount} files added.` + "\n" + this.log;
+      } else {
+        setTimeout(() => {
+          this.loading = false;
+        }, 500);
       }
     });
     document.addEventListener('drop', async (event) => {
