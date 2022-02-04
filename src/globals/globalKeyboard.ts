@@ -15,6 +15,7 @@ const Plugin = {
         case "shift":
           keyboards.shift = true;
           break;
+        case "meta":
         case "control":
           keyboards.ctrl = true;
           break;
@@ -33,6 +34,7 @@ const Plugin = {
         case "shift":
           keyboards.shift = false;
           break;
+        case "meta":
         case "control":
           keyboards.ctrl = false;
           break;
