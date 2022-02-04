@@ -93,6 +93,49 @@
         </button>
       </span>
     </section>
+    <section class="tab-bottom" v-show="!hide">
+      <article v-if="board" class="board-parameters">
+        <!-- ズーム率 -->
+        <span
+          class="box"
+          @click="board.transform.scale = 1"
+        >
+          {{Math.floor(board.transform.scale * 100)}}%
+        </span>
+        <!-- 塗り色 -->
+        <span
+          class="box"
+          :style="{
+            backgroundColor: board.background.fillColor
+          }"
+          @click="$refs['inputFillColor'].click()"
+        >
+          &nbsp;
+        </span>
+        <input
+          type="color"
+          v-model="board.background.fillColor"
+          tabindex="-1"
+          ref="inputFillColor"
+        >
+        <!-- 線色 -->
+        <span
+          class="box"
+          :style="{
+            backgroundColor: board.background.lineColor
+          }"
+          @click="$refs['inputLineColor'].click()"
+        >
+          &nbsp;
+        </span>
+        <input
+          type="color"
+          v-model="board.background.lineColor"
+          tabindex="-1"
+          ref="inputLineColor"
+        >
+      </article>
+    </section>
   </article>
 </template>
 
@@ -290,31 +333,69 @@ export default class VTabBar extends Vue {
       }
     }
   }
+  >.tab-bottom {
+    width: 100%;
+    background-color: var(--tab-selected-color);
+    height: var(--tab-height);
+    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    >.board-parameters {
+      height: 100%;
+      padding: 4px;
+      padding-left: 6px;
+      // display: flex;
+      // flex-direction: row;
+      text-align: center;
+      >input {
+        display: inline-block;
+        width: 0px;
+        height: 0px;
+        overflow: hidden;
+        position: relative;
+        margin: 0px;
+        padding: 0px;
+        border: none;
+      }
+      >.box {
+        display: inline-block;
+        border-radius: var(--rounded);
+        background-color: var(--bg-color);
+        border: solid 1px var(--border-color);
+        height: 100%;
+        width: 50px;
+        text-align: center;
+        margin-right: 4px;
+        cursor: pointer;
+      }
+    }
+  }
   >.tab {
     width: 100%;
     background-color: var(--tab-bg-color);
     color: var(--font-color);
-    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
     display: flex;
+    padding-left: 4px;
     >.draggable {
       -webkit-app-region: drag;
       flex-grow: 1;
     }
     >.buttons {
       >button {
-        padding: 0px 8px;
+        padding: 0px 6px;
         height: auto;
+        margin-left: 0px;
+        margin-right: 4px;
       }
     }
     >.button {
       display: block;
       margin: 0px;
-      border-right: solid 1px var(--tab-border-color);
+      // border-right: solid 1px var(--tab-border-color);
       // border-left: solid 1px;
       margin-right: -1px;
       flex-shrink: 1;
       cursor: pointer;
       overflow: hidden;
+      position: relative;
       &.drag {
         position: absolute;
         pointer-events: none;
@@ -331,7 +412,26 @@ export default class VTabBar extends Vue {
       &.selected {
         background-color: var(--tab-selected-color);
         flex-shrink: 0;
-        border-left: solid 1px var(--tab-border-color);
+        border: none;
+        border-radius: var(--rounded) var(--rounded) 0px 0px;
+        // &::before,
+        // &::after {
+        //   position: absolute;
+        //   bottom: 0px;
+        //   width: 16px;
+        //   height: 16px;
+        //   content: "";
+        //   background: #ff0000;
+        //   // background-color: #00ff00;
+        //   z-index: 2;
+        //   border-radius: 16px;
+        // }
+        // &::before {
+        //   left: -16px;
+        // }
+        // &::after {
+        //   right: -16px;
+        // }
       }
       >.wrapper {
         display: flex;
@@ -343,6 +443,7 @@ export default class VTabBar extends Vue {
         }
       }
     }
+
     >.buttons {
       position: relative;
       display: flex;

@@ -22,7 +22,7 @@
       />
     </section>
     <section class="info">
-      <input
+      <!-- <input
         type="color"
         v-model="board.background.fillColor"
         tabindex="-1"
@@ -39,7 +39,7 @@
         v-show="windowIsFocused"
       >
         {{scalePercent}}%
-      </span>
+      </span> -->
       <span
         class="zoom"
         v-show="$settings.showFPS"
