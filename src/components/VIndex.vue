@@ -142,7 +142,7 @@ export default class Index extends Vue {
       }
     });
     API.on("windowFocused", (e, focused) => {
-      this.windowIsFocused = focused;
+      this.windowIsFocused = true;
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
     const info = await API.send("getAppInfo");
@@ -156,11 +156,6 @@ export default class Index extends Vue {
   }
   async getPetaImages() {
     this.petaImages = await API.send("getPetaImages");
-    if (this.orderedAddPanelIds.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
-      if (await API.send("dialog", this.$t("boards.addManyImageDialog", [this.orderedAddPanelIds.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
-        return;
-      }
-    }
     let offsetIndex = 0;
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];

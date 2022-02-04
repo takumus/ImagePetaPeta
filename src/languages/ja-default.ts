@@ -13,8 +13,8 @@ const ja = {
   home: {
     infoButton: "情報",
     settingsButton: "設定",
-    importImagesButton: "画像を読み込む",
-    openBrowserButton: "ブラウザを開く"
+    importImagesButton: "インポート",
+    openBrowserButton: "ブラウザ"
   },
   boards: {
     removeDialog: (ctx: any) => {

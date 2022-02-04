@@ -17,36 +17,36 @@
           @click="minimizeWindow"
           class="window-button"
         >
-          &#xe921;
+          <span class="icon">&#xe921;</span>
         </span>
         <span
           @click="maximizeWindow"
           class="window-button">
-            &#xe922;
+            <span class="icon">&#xe922;</span>
           </span>
         <span
           @click="closeWindow"
           class="window-button close">
-            &#xe8bb;
+            <span class="icon">&#xe8bb;</span>
           </span>
       </section>
     </section>
     <section
-      class="tab"
+      class="tabs"
       v-show="!hide"
     >
       <span
-        class="button"
+        class="tab"
         :class="{ selected: b == board }"
         :style="{ opacity: b == board && dragging ? 0 : 1 }"
         v-for="(b, index) in boards"
+        @mousedown="mousedown($event, index, $target)"
         :key="b.id"
         :ref="`tab-${b.id}`"
       >
         <span class="wrapper">
           <span
             class="label"
-            @mousedown="mousedown($event, index, $target)"
             @contextmenu="menu($event, b)"
           >
             <VEditableLabel
@@ -57,7 +57,7 @@
         </span>
       </span>
       <span
-        class="button add"
+        class="tab add"
         @click="addPetaBoard()"
       >
         <span class="wrapper">
@@ -67,7 +67,7 @@
       <span class="draggable">
       </span>
       <span
-        class="button selected drag"
+        class="tab selected drag"
         ref="draggingTab"
         :style="{ display: dragging ? 'block' : 'none' }"
         v-if="board"
@@ -77,20 +77,6 @@
             <VEditableLabel :label="board.name" />
           </span>
         </span>
-      </span>
-      <span class="buttons">
-        <button
-          tabindex="-1"
-          @click="$globalComponents.importImages"
-        >
-          {{$t("home.importImagesButton")}}
-        </button>
-        <button
-          tabindex="-1"
-          @click="$globalComponents.browser.open()"
-        >
-          {{$t("home.openBrowserButton")}}
-        </button>
       </span>
     </section>
     <section class="tab-bottom" v-show="!hide">
@@ -134,6 +120,20 @@
           tabindex="-1"
           ref="inputLineColor"
         >
+      </article>
+      <article class="shared-buttons">
+        <button
+          tabindex="-1"
+          @click="$globalComponents.importImages"
+        >
+          {{$t("home.importImagesButton")}}
+        </button>
+        <button
+          tabindex="-1"
+          @click="$globalComponents.browser.open()"
+        >
+          {{$t("home.openBrowserButton")}}
+        </button>
       </article>
     </section>
   </article>
@@ -189,15 +189,16 @@ export default class VTabBar extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
   }
-  mousedown(event: MouseEvent, index: number) {
+  mousedown(event: MouseEvent, index: number, target: HTMLElement) {
     if (event.button != MouseButton.LEFT) return;
     this.selectPetaBoardByIndex(index);
     this.pressing = true;
     this.draggingPetaBoard = this.board;
-    const rect = (event.target as HTMLElement).parentElement?.parentElement?.getBoundingClientRect();
+    const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect();
     if (!rect) return;
     this.mousedownOffsetX = rect.x - event.clientX;
     this.draggingTab.style.left = `${rect.x}px`;
+    this.draggingTab.style.height = `${rect.height}px`;
     this.beforeSortSelectedIndex = this.selectedIndex;
   }
   menu(event: MouseEvent, board: PetaBoard) {
@@ -318,11 +319,14 @@ export default class VTabBar extends Vue {
     >.window-buttons {
       display: flex;
       >.window-button {
-        font-size: 6px;
-        display: block;
+        display: flex;
         padding: 0px 16px;
-        line-height: var(--tab-height);
-        font-family: Segoe MDL2 Assets;
+        align-items: center;
+        >.icon {
+          display: inline-block;
+          font-size: 6px;
+          font-family: Segoe MDL2 Assets;
+        }
         &:hover {
           background-color: var(--window-buttons-hover);
           &.close {
@@ -337,9 +341,35 @@ export default class VTabBar extends Vue {
     width: 100%;
     background-color: var(--tab-selected-color);
     height: var(--tab-height);
-    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.2);
-    >.board-parameters {
+    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
+    position: relative;
+    >.shared-buttons {
+      position: absolute;
+      top: 0px;
+      left: 0px;
       height: 100%;
+      width: 100%;
+      padding: 4px;
+      padding-left: 6px;
+      display: flex;
+      flex-shrink: 1;
+      right: 0px;
+      text-align: right;
+      justify-content: flex-end;
+      >button {
+        min-width: 0px;
+        padding: 0px 6px;
+        height: auto;
+        margin: 0px;
+        margin-right: 4px;
+      }
+    }
+    >.board-parameters {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      height: 100%;
+      width: 100%;
       padding: 4px;
       padding-left: 6px;
       // display: flex;
@@ -368,25 +398,18 @@ export default class VTabBar extends Vue {
       }
     }
   }
-  >.tab {
+  >.tabs {
     width: 100%;
     background-color: var(--tab-bg-color);
     color: var(--font-color);
+    height: var(--tab-height);
     display: flex;
     padding-left: 4px;
     >.draggable {
       -webkit-app-region: drag;
       flex-grow: 1;
     }
-    >.buttons {
-      >button {
-        padding: 0px 6px;
-        height: auto;
-        margin-left: 0px;
-        margin-right: 4px;
-      }
-    }
-    >.button {
+    >.tab {
       display: block;
       margin: 0px;
       // border-right: solid 1px var(--tab-border-color);
@@ -406,7 +429,7 @@ export default class VTabBar extends Vue {
         border-right: none;
         flex-shrink: 0;
         .wrapper .label {
-          padding: 8px;
+          padding: 0px 8px;
         }
       }
       &.selected {
@@ -414,45 +437,16 @@ export default class VTabBar extends Vue {
         flex-shrink: 0;
         border: none;
         border-radius: var(--rounded) var(--rounded) 0px 0px;
-        // &::before,
-        // &::after {
-        //   position: absolute;
-        //   bottom: 0px;
-        //   width: 16px;
-        //   height: 16px;
-        //   content: "";
-        //   background: #ff0000;
-        //   // background-color: #00ff00;
-        //   z-index: 2;
-        //   border-radius: 16px;
-        // }
-        // &::before {
-        //   left: -16px;
-        // }
-        // &::after {
-        //   right: -16px;
-        // }
       }
       >.wrapper {
         display: flex;
+        align-items: center;
+        height: 100%;
         >.label {
-          padding: 8px;
-          // padding-right: 0px;
+          padding: 0px 8px;
           flex-shrink: 1;
           overflow: hidden;
         }
-      }
-    }
-
-    >.buttons {
-      position: relative;
-      display: flex;
-      flex-shrink: 1;
-      right: 0px;
-      text-align: right;
-      justify-content: flex-end;
-      >button {
-        min-width: 0px;
       }
     }
   }
