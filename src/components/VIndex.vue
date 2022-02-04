@@ -309,8 +309,8 @@ body, html {
     --button-hover-bg-color: #555555;
     --button-active-bg-color: #555555;
     --tab-bg-color: #333333;
-    --tab-selected-color: #444444;
-    --tab-border-color: #555555;
+    --tab-selected-color: #222222;
+    --tab-border-color: #444444;
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;
     --petapanel-bg-color: #555555;
