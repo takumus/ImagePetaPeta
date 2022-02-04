@@ -63,9 +63,12 @@ export default class VModal extends Vue {
   close() {
     this.$emit("close");
   }
+  isActive() {
+    return this.modalId == this.$globalComponents.currentModalId[this.$globalComponents.currentModalId.length - 1];
+  }
   @Watch("$globalComponents.currentModalId")
   changeModal() {
-    this.noBackground = this.modalId != this.$globalComponents.currentModalId[this.$globalComponents.currentModalId.length - 1];
+    this.noBackground = !this.isActive();
   }
   @Watch("visible")
   changeVisible() {
@@ -74,6 +77,14 @@ export default class VModal extends Vue {
       this.$globalComponents.currentModalId.push(this.modalId);
       this.zIndex = this.$globalComponents.currentModalZIndex + 3;
       this.$globalComponents.currentModalZIndex ++;
+    }
+  }
+  @Watch("$keyboards.escape")
+  pressEscape() {
+    if (this.$keyboards.escape) {
+      if (this.isActive()) {
+        this.close();
+      }
     }
   }
 }

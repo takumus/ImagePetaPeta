@@ -4,6 +4,7 @@ const keyboards = reactive({
   ctrl: false,
   cmd: false,
   delete: false,
+  escape: false,
   current: ""
 });
 const Plugin = {
@@ -21,6 +22,9 @@ const Plugin = {
         case "delete":
           keyboards.delete = true;
           break;
+        case "escape":
+          keyboards.escape = true;
+          break;
       }
       keyboards.current = e.key.toLowerCase();
     });
@@ -35,6 +39,9 @@ const Plugin = {
         case "backspace":
         case "delete":
           keyboards.delete = false;
+          break;
+        case "escape":
+          keyboards.escape = false;
           break;
       }
       if (keyboards.current == e.key.toLowerCase()) keyboards.current = "";
