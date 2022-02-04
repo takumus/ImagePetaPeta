@@ -17,6 +17,7 @@ export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow
         width: 1920,
         height: 1080,
         frame: !customTitlebar,
+        show: false,
         // transparent: true,
         webPreferences: {
           nodeIntegration: false,
@@ -29,10 +30,12 @@ export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow
 
       if (process.env.WEBPACK_DEV_SERVER_URL) {
         await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-        if (!process.env.IS_TEST) win.webContents.openDevTools({ mode: "detach" });
+        if (!process.env.IS_TEST) {
+          win.webContents.openDevTools({ mode: "detach" });
+        }
       } else {
         createProtocol("app")
-        win.loadURL("app://./index.html")
+        await win.loadURL("app://./index.html");
       }
     }
     app.on("window-all-closed", () => {

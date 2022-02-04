@@ -150,6 +150,9 @@ export default class Index extends Vue {
     this.getSystemDarkMode();
     await this.getPetaImages();
     await this.getPetaBoards();
+    this.$nextTick(() => {
+      API.send("showMainWindow");
+    })
   }
   async getPetaImages() {
     this.petaImages = await API.send("getPetaImages");

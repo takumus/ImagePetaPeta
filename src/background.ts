@@ -57,6 +57,9 @@ import { ImageType } from "./datas/imageType";
     cb({ path: returnPath });
   });
   const mainFunctions: MainFunctions = {
+    showMainWindow: async () => {
+      window.show();
+    },
     browseImages: async () => {
       logger.mainLog("#Browse Images");
       const file = await dialog.showOpenDialog(window, {

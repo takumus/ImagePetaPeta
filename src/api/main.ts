@@ -6,6 +6,7 @@ import { IpcMainInvokeEvent } from 'electron';
 import { Settings } from '@/datas/settings';
 import { ImageType } from '@/datas/imageType';
 export interface Main {
+  showMainWindow: () => Promise<void>;
   browseImages: () => Promise<number>;
   importImageFromURL: (url: string) => Promise<string>;
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
