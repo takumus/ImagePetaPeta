@@ -9,8 +9,58 @@
       class="titlebar"
       v-if="customTitlebar"
     >
-      <section class="draggable">
-        {{title}}
+      <section class="titlebar-and-tab">
+        <section class="draggable">
+          <!-- {{title}} -->
+        </section>
+        <section
+          class="tabs"
+          v-show="!hide"
+        >
+          <span
+            class="tab"
+            :class="{ selected: b == board }"
+            :style="{ opacity: b == board && dragging ? 0 : 1 }"
+            v-for="(b, index) in boards"
+            @mousedown="mousedown($event, index, $target)"
+            :key="b.id"
+            :ref="`tab-${b.id}`"
+          >
+            <span class="wrapper">
+              <span
+                class="label"
+                @contextmenu="menu($event, b)"
+              >
+                <VEditableLabel
+                  @change="(v) => changePetaBoardName(b, v)"
+                  :label="b.name"
+                />
+              </span>
+            </span>
+          </span>
+          <span
+            class="tab add"
+            @click="addPetaBoard()"
+          >
+            <span class="wrapper">
+              <span class="label">+</span>
+            </span>
+          </span>
+          <span class="draggable">
+          </span>
+          <span
+            class="tab selected drag"
+            ref="draggingTab"
+            :style="{ display: dragging ? 'block' : 'none' }"
+            v-if="board"
+          >
+            <span class="wrapper">
+              <span class="label">
+                <VEditableLabel :label="board.name" />
+              </span>
+            </span>
+          </span>
+        </section>
       </section>
       <section class="window-buttons">
         <span
@@ -30,54 +80,6 @@
             <span class="icon">&#xe8bb;</span>
           </span>
       </section>
-    </section>
-    <section
-      class="tabs"
-      v-show="!hide"
-    >
-      <span
-        class="tab"
-        :class="{ selected: b == board }"
-        :style="{ opacity: b == board && dragging ? 0 : 1 }"
-        v-for="(b, index) in boards"
-        @mousedown="mousedown($event, index, $target)"
-        :key="b.id"
-        :ref="`tab-${b.id}`"
-      >
-        <span class="wrapper">
-          <span
-            class="label"
-            @contextmenu="menu($event, b)"
-          >
-            <VEditableLabel
-              @change="(v) => changePetaBoardName(b, v)"
-              :label="b.name"
-            />
-          </span>
-        </span>
-      </span>
-      <span
-        class="tab add"
-        @click="addPetaBoard()"
-      >
-        <span class="wrapper">
-          <span class="label">+</span>
-        </span>
-      </span>
-      <span class="draggable">
-      </span>
-      <span
-        class="tab selected drag"
-        ref="draggingTab"
-        :style="{ display: dragging ? 'block' : 'none' }"
-        v-if="board"
-      >
-        <span class="wrapper">
-          <span class="label">
-            <VEditableLabel :label="board.name" />
-          </span>
-        </span>
-      </span>
     </section>
     <section class="tab-bottom" v-show="!hide">
       <article v-if="board" class="board-parameters">
@@ -304,17 +306,75 @@ export default class VTabBar extends Vue {
   >.titlebar {
     width: 100%;
     background-color: var(--tab-bg-color);
-    height: var(--tab-height);
+    min-height: var(--tab-height);
     text-align: right;
     display: flex;
-    >.draggable {
+    >.titlebar-and-tab {
       flex-grow: 1;
-      -webkit-app-region: drag;
-      text-align: left;
-      display: inline-block;
-      padding-left: 6px;
-      line-height: var(--tab-height);
-      font-size: 0.8em;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      >.draggable {
+        flex-grow: 1;
+        -webkit-app-region: drag;
+        text-align: left;
+        display: inline-block;
+        padding-left: 6px;
+        font-size: 0.8em;
+        height: 10px;
+      }
+      >.tabs {
+        width: 100%;
+        background-color: var(--tab-bg-color);
+        color: var(--font-color);
+        height: var(--tab-height);
+        display: flex;
+        padding-left: 10px;
+        >.draggable {
+          -webkit-app-region: drag;
+          flex-grow: 1;
+        }
+        >.tab {
+          display: block;
+          margin: 0px;
+          // border-right: solid 1px var(--tab-border-color);
+          // border-left: solid 1px;
+          margin-right: -1px;
+          flex-shrink: 1;
+          cursor: pointer;
+          overflow: hidden;
+          position: relative;
+          &.drag {
+            position: absolute;
+            pointer-events: none;
+            border-left: solid 1px var(--tab-border-color);
+          }
+          &.add {
+            min-width: 16px;
+            border-right: none;
+            flex-shrink: 0;
+            .wrapper .label {
+              padding: 0px 8px;
+            }
+          }
+          &.selected {
+            background-color: var(--tab-selected-color);
+            flex-shrink: 0;
+            border: none;
+            border-radius: var(--rounded) var(--rounded) 0px 0px;
+          }
+          >.wrapper {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            >.label {
+              padding: 0px 8px;
+              flex-shrink: 1;
+              overflow: hidden;
+            }
+          }
+        }
+      }
     }
     >.window-buttons {
       display: flex;
@@ -395,58 +455,6 @@ export default class VTabBar extends Vue {
         text-align: center;
         margin-right: 4px;
         cursor: pointer;
-      }
-    }
-  }
-  >.tabs {
-    width: 100%;
-    background-color: var(--tab-bg-color);
-    color: var(--font-color);
-    height: var(--tab-height);
-    display: flex;
-    padding-left: 4px;
-    >.draggable {
-      -webkit-app-region: drag;
-      flex-grow: 1;
-    }
-    >.tab {
-      display: block;
-      margin: 0px;
-      // border-right: solid 1px var(--tab-border-color);
-      // border-left: solid 1px;
-      margin-right: -1px;
-      flex-shrink: 1;
-      cursor: pointer;
-      overflow: hidden;
-      position: relative;
-      &.drag {
-        position: absolute;
-        pointer-events: none;
-        border-left: solid 1px var(--tab-border-color);
-      }
-      &.add {
-        min-width: 16px;
-        border-right: none;
-        flex-shrink: 0;
-        .wrapper .label {
-          padding: 0px 8px;
-        }
-      }
-      &.selected {
-        background-color: var(--tab-selected-color);
-        flex-shrink: 0;
-        border: none;
-        border-radius: var(--rounded) var(--rounded) 0px 0px;
-      }
-      >.wrapper {
-        display: flex;
-        align-items: center;
-        height: 100%;
-        >.label {
-          padding: 0px 8px;
-          flex-shrink: 1;
-          overflow: hidden;
-        }
       }
     }
   }

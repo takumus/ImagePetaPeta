@@ -142,7 +142,7 @@ export default class Index extends Vue {
       }
     });
     API.on("windowFocused", (e, focused) => {
-      this.windowIsFocused = true;
+      this.windowIsFocused = focused;
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
     const info = await API.send("getAppInfo");
