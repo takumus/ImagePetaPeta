@@ -22,24 +22,6 @@
       />
     </section>
     <section class="info">
-      <!-- <input
-        type="color"
-        v-model="board.background.fillColor"
-        tabindex="-1"
-        v-show="windowIsFocused"
-      >
-      <input
-        type="color"
-        v-model="board.background.lineColor"
-        tabindex="-1"
-        v-show="windowIsFocused"
-      >
-      <span
-        class="zoom"
-        v-show="windowIsFocused"
-      >
-        {{scalePercent}}%
-      </span> -->
       <span
         class="zoom"
         v-show="$settings.showFPS"
@@ -91,8 +73,6 @@ export default class VBoard extends Vue {
   board!: PetaBoard;
   @Prop()
   zIndex = 0;
-  @Prop()
-  windowIsFocused = false;
   @Ref("panelsBackground")
   panelsBackground!: HTMLElement;
   @Ref("loadingModal")
@@ -608,11 +588,6 @@ export default class VBoard extends Vue {
   @Watch("board.index")
   changeBoardIndex() {
     this.$emit("change", this.board);
-  }
-  @Watch("windowIsFocused")
-  changeWindowIsFocused() {
-    // this.setSickerEnabled(this.windowIsFocused);
-    // log("ticker:", this.windowIsFocused);
   }
 }
 </script>

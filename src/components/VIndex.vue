@@ -9,13 +9,12 @@
       :zIndex="1"
       v-if="currentPetaBoard"
       :board="currentPetaBoard"
-      :windowIsFocused="windowIsFocused"
       ref="vPetaBoard"
       @change="changePetaBoard"
     />
     <VTabBar
       :zIndex="3"
-      :hide="!windowIsFocused"
+      :uiVisible="uiVisible"
       :boards="sortedPetaBoards"
       :customTitlebar="customTitlebar"
       :title="title"
@@ -45,25 +44,6 @@
     <VComplement
       :zIndex="5"
     />
-    <!-- <section
-      class="menu"
-      v-show="windowIsFocused"
-    >
-      <button
-        tabindex="-1"
-        @click="$globalComponents.settings.open"
-      >
-      {{$t("home.settingsButton")}}
-      </button>
-      <button
-        tabindex="-1"
-        @click="$globalComponents.info.open"
-      >
-      {{$t("home.infoButton")}}
-      </button>
-    </section> -->
-    <section class="border">
-    </section>
   </article>
 </template>
 
@@ -250,6 +230,9 @@ export default class Index extends Vue {
       return this.systemDarkMode;
     }
     return this.$settings.darkMode;
+  }
+  get uiVisible() {
+    return this.$settings.autoHideUI ? this.windowIsFocused : true;
   }
   getSystemDarkMode() {
     this.systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;

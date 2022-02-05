@@ -15,7 +15,7 @@
         </section>
         <section
           class="tabs"
-          v-show="!hide"
+          v-show="uiVisible"
         >
           <span
             class="tab"
@@ -81,7 +81,7 @@
           </span>
       </section>
     </section>
-    <section class="tab-bottom" v-show="!hide">
+    <section class="tab-bottom" v-show="uiVisible">
       <article v-if="board" class="board-parameters">
         <!-- ズーム率 -->
         <button
@@ -183,7 +183,7 @@ export default class VTabBar extends Vue {
   @Prop()
   customTitlebar = false;
   @Prop()
-  hide = false;
+  uiVisible = true;
   @Prop()
   title = "";
   @Prop()

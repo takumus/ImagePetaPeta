@@ -7,7 +7,8 @@ export interface Settings {
   enableHardwareAcceleration: boolean,
   showFPS: boolean,
   zoomSensitivity: number,
-  moveSensitivity: number
+  moveSensitivity: number,
+  autoHideUI: boolean
 }
 export const defaultSettings: Settings = {
   dbDirectory: "",
@@ -18,7 +19,8 @@ export const defaultSettings: Settings = {
   enableHardwareAcceleration: true,
   showFPS: false,
   zoomSensitivity: 100,
-  moveSensitivity: 100
+  moveSensitivity: 100,
+  autoHideUI: false,
 }
 export function upgradeSettings(settings: Settings) {
   // バージョンアップで旧ファイルとの整合性を取る

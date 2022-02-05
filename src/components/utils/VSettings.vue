@@ -66,6 +66,17 @@
         <label>
           <input
             type="checkbox"
+            :checked="$settings.autoHideUI"
+            @change="$settings.autoHideUI = Boolean($event.target.checked)"
+          >
+          {{$t("settings.autoHideUI")}}
+        </label><br>
+        <p>{{$t("settings.autoHideUIDescriptions")}}</p>
+      </section>
+      <section>
+        <label>
+          <input
+            type="checkbox"
             :checked="$settings.showFPS"
             @change="$settings.showFPS = Boolean($event.target.checked)"
           >
