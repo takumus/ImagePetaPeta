@@ -406,9 +406,7 @@ export default class VTabBar extends Vue {
     >.shared-buttons {
       position: absolute;
       top: 0px;
-      left: 0px;
       height: 100%;
-      width: 100%;
       padding: 4px;
       padding-left: 6px;
       display: flex;
