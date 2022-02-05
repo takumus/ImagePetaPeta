@@ -45,7 +45,7 @@
     <VComplement
       :zIndex="5"
     />
-    <section
+    <!-- <section
       class="menu"
       v-show="windowIsFocused"
     >
@@ -61,7 +61,7 @@
       >
       {{$t("home.infoButton")}}
       </button>
-    </section>
+    </section> -->
     <section class="border">
     </section>
   </article>
@@ -289,7 +289,7 @@ body, html {
   --button-bg-color: #ffffff;
   --button-hover-bg-color: #eeeeee;
   --button-active-bg-color: #eeeeee;
-  --tab-bg-color: #eeeeee;
+  --tab-bg-color: #e9e9e9;
   --tab-selected-color: #ffffff;
   --tab-border-color: #cccccc;
   --window-buttons-hover: #cccccc;
@@ -304,7 +304,7 @@ body, html {
     --button-hover-bg-color: #555555;
     --button-active-bg-color: #555555;
     --tab-bg-color: #333333;
-    --tab-selected-color: #222222;
+    --tab-selected-color: #141414;
     --tab-border-color: #444444;
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;

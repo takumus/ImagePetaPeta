@@ -84,14 +84,14 @@
     <section class="tab-bottom" v-show="!hide">
       <article v-if="board" class="board-parameters">
         <!-- ズーム率 -->
-        <span
-          class="box"
+        <button
+          tabindex="-1"
           @click="board.transform.scale = 1"
         >
           {{Math.floor(board.transform.scale * 100)}}%
-        </span>
+        </button>
         <!-- 塗り色 -->
-        <span
+        <button
           class="box"
           :style="{
             backgroundColor: board.background.fillColor
@@ -99,7 +99,7 @@
           @click="$refs['inputFillColor'].click()"
         >
           &nbsp;
-        </span>
+        </button>
         <input
           type="color"
           v-model="board.background.fillColor"
@@ -107,7 +107,7 @@
           ref="inputFillColor"
         >
         <!-- 線色 -->
-        <span
+        <button
           class="box"
           :style="{
             backgroundColor: board.background.lineColor
@@ -115,7 +115,7 @@
           @click="$refs['inputLineColor'].click()"
         >
           &nbsp;
-        </span>
+        </button>
         <input
           type="color"
           v-model="board.background.lineColor"
@@ -123,18 +123,32 @@
           ref="inputLineColor"
         >
       </article>
-      <article class="shared-buttons">
+      <article class="shared-buttons left">
+        <button
+          tabindex="-1"
+          @click="$globalComponents.browser.open()"
+        >
+          {{$t("home.openBrowserButton")}}
+        </button>
         <button
           tabindex="-1"
           @click="$globalComponents.importImages"
         >
           {{$t("home.importImagesButton")}}
         </button>
+      </article>
+      <article class="shared-buttons right">
         <button
           tabindex="-1"
-          @click="$globalComponents.browser.open()"
+          @click="$globalComponents.info.open"
         >
-          {{$t("home.openBrowserButton")}}
+        {{$t("home.infoButton")}}
+        </button>
+        <button
+          tabindex="-1"
+          @click="$globalComponents.settings.open"
+        >
+        {{$t("home.settingsButton")}}
         </button>
       </article>
     </section>
@@ -400,26 +414,36 @@ export default class VTabBar extends Vue {
   >.tab-bottom {
     width: 100%;
     background-color: var(--tab-selected-color);
-    height: var(--tab-height);
+    height: 30px;
     box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
     position: relative;
+    border-bottom: solid 1px var(--bg-color);
+    button {
+      min-width: 0px;
+      padding: 0px 6px;
+      height: 100%;
+      margin: 0px;
+    }
     >.shared-buttons {
       position: absolute;
       top: 0px;
       height: 100%;
       padding: 4px;
-      padding-left: 6px;
       display: flex;
       flex-shrink: 1;
-      right: 0px;
-      text-align: right;
+      text-align: left;
       justify-content: flex-end;
-      >button {
-        min-width: 0px;
-        padding: 0px 6px;
-        height: auto;
-        margin: 0px;
-        margin-right: 4px;
+      &.left {
+        left: 0px;
+        button {
+          margin-right: 4px;
+        }
+      }
+      &.right {
+        right: 0px;
+        button {
+          margin-left: 4px;
+        }
       }
     }
     >.board-parameters {
@@ -430,8 +454,6 @@ export default class VTabBar extends Vue {
       width: 100%;
       padding: 4px;
       padding-left: 6px;
-      // display: flex;
-      // flex-direction: row;
       text-align: center;
       >input {
         display: inline-block;
@@ -443,16 +465,9 @@ export default class VTabBar extends Vue {
         padding: 0px;
         border: none;
       }
-      >.box {
-        display: inline-block;
-        border-radius: var(--rounded);
-        background-color: var(--bg-color);
-        border: solid 1px var(--border-color);
-        height: 100%;
-        width: 50px;
-        text-align: center;
+      >button {
+        min-width: 50px;
         margin-right: 4px;
-        cursor: pointer;
       }
     }
   }

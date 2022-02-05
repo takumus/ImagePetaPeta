@@ -2,7 +2,7 @@
   <VModal
     :visible="visible"
     :parentStyle="{
-      padding: '100px'
+      padding: '74px'
     }"
     :childStyle="{
       width: '100%',
