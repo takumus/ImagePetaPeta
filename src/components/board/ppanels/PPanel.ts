@@ -13,17 +13,7 @@ export class PPanel extends PIXI.Sprite {
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private loader = new PIXI.Loader();
-  private prevWidth = 0;
-  private prevHeight = 0;
-  private prevSelected = false;
-  private prevCropWidth = 0;
-  private prevCropHeight = 0;
-  private prevCropX = 0;
-  private prevCropY = 0;
-  private prevPositionX = 0;
-  private prevPositionY = 0;
-  private prevRotation = 0;
-  private prevUnselected = false;
+  private isSame = valueChecker();
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -66,32 +56,21 @@ export class PPanel extends PIXI.Sprite {
     if (!this.petaPanel._petaImage) {
       return;
     }
-    if (!(
-      this.prevWidth != this.petaPanel.width
-      || this.prevHeight != this.petaPanel.height
-      || this.prevSelected != this.selected
-      || this.prevCropWidth != this.petaPanel.crop.width
-      || this.prevCropHeight != this.petaPanel.crop.height
-      || this.prevCropX != this.petaPanel.crop.position.x
-      || this.prevCropY != this.petaPanel.crop.position.y
-      || this.prevPositionX != this.petaPanel.position.x
-      || this.prevPositionY != this.petaPanel.position.y
-      || this.prevRotation != this.petaPanel.rotation
-      || this.prevUnselected != this.unselected
-    )) {
+    if (
+      this.isSame("petaPanel.width", this.petaPanel.width)
+      && this.isSame("petaPanel.height", this.petaPanel.height)
+      && this.isSame("petaPanel.crop.width", this.petaPanel.crop.width)
+      && this.isSame("petaPanel.crop.height", this.petaPanel.crop.height)
+      && this.isSame("petaPanel.crop.position.x", this.petaPanel.crop.position.x)
+      && this.isSame("petaPanel.crop.position.y", this.petaPanel.crop.position.y)
+      && this.isSame("petaPanel.position.x", this.petaPanel.position.x)
+      && this.isSame("petaPanel.position.y", this.petaPanel.position.y)
+      && this.isSame("petaPanel.rotation", this.petaPanel.rotation)
+      && this.isSame("unselected", this.unselected)
+      && this.isSame("selected", this.selected)
+    ) {
       return;
     }
-    this.prevWidth = this.petaPanel.width;
-    this.prevHeight = this.petaPanel.height;
-    this.prevSelected = this.selected;
-    this.prevCropWidth = this.petaPanel.crop.width;
-    this.prevCropHeight = this.petaPanel.crop.height;
-    this.prevCropX = this.petaPanel.crop.position.x;
-    this.prevCropY = this.petaPanel.crop.position.y;
-    this.prevPositionX = this.petaPanel.position.x;
-    this.prevPositionY = this.petaPanel.position.y;
-    this.prevRotation = this.petaPanel.rotation;
-    this.prevUnselected = this.unselected;
     const panelWidth = this.absPanelWidth();
     const panelHeight = this.absPanelHeight();
     const flippedX = this.petaPanel.width < 0;
@@ -115,8 +94,8 @@ export class PPanel extends PIXI.Sprite {
     const imageHeight = panelWidth * this.petaPanel._petaImage.height * (1 / this.petaPanel.crop.width);
     this.image.width = imageWidth;
     this.image.height = imageHeight;
-    this.image.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
-    this.image.y = -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
+    this.image.x = -panelWidth / 2 - (flippedX ? 1 - this.petaPanel.crop.position.x - this.petaPanel.crop.width : this.petaPanel.crop.position.x) * imageWidth;
+    this.image.y = -panelHeight / 2 - (flippedY ? 1 - this.petaPanel.crop.position.y - this.petaPanel.crop.height : this.petaPanel.crop.position.y) * imageHeight;
     if (this.image.mask) {
       this.masker.clear();
       this.masker.beginFill(0xff0000);
@@ -161,5 +140,15 @@ export class PPanel extends PIXI.Sprite {
   }
   private absPanelHeight() {
     return Math.abs(this.petaPanel.height);
+  }
+}
+function valueChecker() {
+  const values: {[key: string]: any} = {};
+  return function(key: string, value: any) {
+    if (values[key] != value) {
+      values[key] = value;
+      return false;
+    }
+    return true;
   }
 }
