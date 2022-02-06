@@ -7,7 +7,6 @@
   >
     <section
       class="titlebar"
-      v-if="customTitlebar"
     >
       <section class="titlebar-and-tab">
         <section class="draggable">
@@ -15,6 +14,9 @@
         </section>
         <section
           class="tabs"
+          :class="{
+            mac: isMac
+          }"
           v-show="uiVisible"
         >
           <span
@@ -62,7 +64,10 @@
           </span>
         </section>
       </section>
-      <section class="window-buttons">
+      <section
+        class="window-buttons"
+        v-if="customTitlebar"
+      >
         <span
           @click="minimizeWindow"
           class="window-button"
@@ -303,6 +308,9 @@ export default class VTabBar extends Vue {
   get removable() {
     return true;// this.boards.length > 1;
   }
+  get isMac() {
+    return this.$systemInfo.platform == "darwin";
+  }
   @Watch("boards", { deep: false, immediate: true })
   changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
     this.selectPetaBoardByIndex(this.selectedIndex, true);
@@ -344,6 +352,9 @@ export default class VTabBar extends Vue {
         height: var(--tab-height);
         display: flex;
         padding-left: 10px;
+        &.mac {
+          padding-left: 70px;
+        }
         >.draggable {
           -webkit-app-region: drag;
           flex-grow: 1;

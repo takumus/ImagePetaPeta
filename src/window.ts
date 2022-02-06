@@ -19,7 +19,8 @@ export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow
         height: WINDOW_DEFAULT_HEIGHT,
         minWidth: WINDOW_MIN_WIDTH,
         minHeight: WINDOW_MIN_HEIGHT,
-        frame: !customTitlebar,
+        frame: false,
+        titleBarStyle: "hiddenInset",
         show: false,
         // transparent: true,
         webPreferences: {
