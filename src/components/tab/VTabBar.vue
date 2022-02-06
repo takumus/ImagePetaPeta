@@ -97,7 +97,7 @@
         </button>
         <!-- 塗り色 -->
         <button
-          class="box"
+          class="color"
           :style="{
             backgroundColor: board.background.fillColor
           }"
@@ -113,7 +113,7 @@
         >
         <!-- 線色 -->
         <button
-          class="box"
+          class="color"
           :style="{
             backgroundColor: board.background.lineColor
           }"
@@ -477,6 +477,12 @@ export default class VTabBar extends Vue {
       >button {
         min-width: 50px;
         margin-right: 4px;
+        &.color {
+          border-radius: 100px;
+          width: auto;
+          min-width: 0px;
+          aspect-ratio: 1;
+        }
       }
     }
   }
