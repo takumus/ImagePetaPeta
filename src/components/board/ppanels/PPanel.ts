@@ -10,21 +10,27 @@ export class PPanel extends PIXI.Sprite {
   public dragging = false;
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
+  public noImage = false;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
+  private noImageGraphics = new PIXI.Graphics();
   private loader = new PIXI.Loader();
   private isSame = valueChecker();
+  private defaultHeight = 0;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
     // this.image.anchor.set(0.5, 0.5);
     this.image.mask = this.masker;
-    this.addChild(this.image, this.masker, this.selection);
+    this.addChild(this.image, this.masker, this.noImageGraphics, this.selection);
     this.interactive = true;
+    this.noImageGraphics.visible = false;
+    this.defaultHeight = petaPanel.height / petaPanel.width;
     this.update();
   }
   public loadTexture(type: ImageType): Promise<void> {
     const url = this.petaPanel._petaImage ? ImageLoader.getImageURL(this.petaPanel._petaImage, type): "";
+    this.noImage = true;
     return new Promise((res, rej) => {
       if (!this.petaPanel._petaImage) {
         rej("_petaImage is undefined");
@@ -33,6 +39,7 @@ export class PPanel extends PIXI.Sprite {
       const texture = PIXI.utils.TextureCache[url];
       if (texture) {
         this.image.texture = texture;
+        this.noImage = false;
         this.update();
         res();
         return;
@@ -47,15 +54,16 @@ export class PPanel extends PIXI.Sprite {
           return;
         }
         this.image.texture = resources[ImageLoader.getImageURL(this.petaPanel._petaImage, type)].texture!;
+        this.noImage = false;
         this.update();
         res();
       });
     });
   }
   public update() {
-    if (!this.petaPanel._petaImage) {
-      return;
-    }
+    // if (!this.petaPanel._petaImage) {
+    //   return;
+    // }
     if (
       this.isSame("petaPanel.width", this.petaPanel.width)
       && this.isSame("petaPanel.height", this.petaPanel.height)
@@ -91,7 +99,8 @@ export class PPanel extends PIXI.Sprite {
       this.masker.visible = false;
     }
     const imageWidth = panelWidth * (1 / this.petaPanel.crop.width);
-    const imageHeight = panelWidth * this.petaPanel._petaImage.height * (1 / this.petaPanel.crop.width);
+    const tempImageHeight = this.petaPanel._petaImage ? this.petaPanel._petaImage.height : this.defaultHeight;
+    const imageHeight = panelWidth * tempImageHeight * (1 / this.petaPanel.crop.width);
     this.image.width = imageWidth;
     this.image.height = imageHeight;
     this.image.x = -panelWidth / 2 - (flippedX ? 1 - this.petaPanel.crop.position.x - this.petaPanel.crop.width : this.petaPanel.crop.position.x) * imageWidth;
@@ -115,6 +124,22 @@ export class PPanel extends PIXI.Sprite {
         panelWidth,
         panelHeight
       );
+    }
+    this.noImageGraphics.visible = this.noImage;
+    if (this.noImage) {
+      this.noImageGraphics.clear();
+      this.noImageGraphics.beginFill(0xCCCCCC, 1);
+      this.noImageGraphics.drawRect(
+        -panelWidth / 2,
+        -panelHeight / 2,
+        panelWidth,
+        panelHeight
+      );
+      this.noImageGraphics.lineStyle(1, 0x333333, 1, undefined, true);
+      this.noImageGraphics.moveTo(-panelWidth / 2, -panelHeight / 2);
+      this.noImageGraphics.lineTo(-panelWidth / 2 + panelWidth, -panelHeight / 2 + panelHeight);
+      this.noImageGraphics.moveTo(-panelWidth / 2 + panelWidth, -panelHeight / 2);
+      this.noImageGraphics.lineTo(-panelWidth / 2, -panelHeight / 2 + panelHeight);
     }
     this.x = this.petaPanel.position.x;
     this.y = this.petaPanel.position.y;
