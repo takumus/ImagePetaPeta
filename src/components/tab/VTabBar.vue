@@ -66,7 +66,7 @@
       </section>
       <section
         class="window-buttons"
-        v-if="customTitlebar"
+        v-if="!isMac"
       >
         <span
           @click="minimizeWindow"
@@ -185,8 +185,6 @@ import { MouseButton } from "@/datas/mouseButton";
 export default class VTabBar extends Vue {
   @Prop()
   boards!: PetaBoard[];
-  @Prop()
-  customTitlebar = false;
   @Prop()
   uiVisible = true;
   @Prop()

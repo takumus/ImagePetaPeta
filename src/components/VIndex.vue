@@ -16,7 +16,6 @@
       :zIndex="3"
       :uiVisible="uiVisible"
       :boards="sortedPetaBoards"
-      :customTitlebar="customTitlebar"
       :title="title"
       @remove="removePetaBoard"
       @add="addPetaBoard"
@@ -221,9 +220,6 @@ export default class Index extends Vue {
   }
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
-  }
-  get customTitlebar() {
-    return this.$systemInfo.platform == "win32";
   }
   get darkMode() {
     if (this.$settings.autoDarkMode) {
