@@ -348,9 +348,9 @@ export default class VBoard extends Vue {
     this.pPanelsArray.forEach((pp) => {
       pp.unselected = false;
     });
-    this.setBackgroundBrightness(1);
+    // this.setBackgroundBrightness(1);
     if (this.selectedPPanels.length > 0) {
-      this.setBackgroundBrightness(0.7);
+      // this.setBackgroundBrightness(0.7);
       this.unselectedPPanels.forEach((pp) => {
         pp.unselected = true;
       });
