@@ -326,9 +326,11 @@ import { ImageType } from "./datas/imageType";
     petaImage.tags = Array.from(new Set(petaImage.tags));
     if (mode == UpdateMode.REMOVE) {
       await petaImagesDB.remove({ id: petaImage.id });
+      logger.mainLog(" removed db");
       await asyncFile.rm(getImagePath(petaImage, ImageType.FULLSIZED)).catch((e) => {});
+      logger.mainLog(" removed file");
       await asyncFile.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
-      logger.mainLog(" removed");
+      logger.mainLog(" removed thumbnail");
       return true;
     }
     petaImage._selected = undefined;
