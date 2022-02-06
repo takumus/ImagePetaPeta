@@ -1,7 +1,8 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, webFrame } from "electron";
 import { NAME } from "@/api";
 import { v4 as uuid } from "uuid";
 const listeners: {[key: string]: { key: string, cb: (...argv: any) => void }} = {};
+webFrame.setZoomLevel(1);
 contextBridge.exposeInMainWorld(
   NAME, {
     send: (key: string, ...args: any) => {

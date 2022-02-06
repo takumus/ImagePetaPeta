@@ -2,6 +2,7 @@ import { app, protocol, BrowserWindow } from "electron"
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib"
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer"
 import * as path from "path";
+import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "./defines";
 
 export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow> {
   return new Promise((res, rej) => {
@@ -14,8 +15,10 @@ export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow
     let win: BrowserWindow;
     async function createWindow() {
       win = new BrowserWindow({
-        width: 1920,
-        height: 1080,
+        width: WINDOW_DEFAULT_WIDTH,
+        height: WINDOW_DEFAULT_HEIGHT,
+        minWidth: WINDOW_MIN_WIDTH,
+        minHeight: WINDOW_MIN_HEIGHT,
         frame: !customTitlebar,
         show: false,
         // transparent: true,

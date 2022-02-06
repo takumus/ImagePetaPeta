@@ -46,6 +46,13 @@ import { ImageType } from "./datas/imageType";
   //   app.disableHardwareAcceleration();
   // }
   const window = await initWindow(customTitlebar);
+  window.setSize(settingsConfig.data.windowSize.width, settingsConfig.data.windowSize.height);
+  window.on("close", () => {
+    settingsConfig.data.windowSize.width = window.getSize()[0];
+    settingsConfig.data.windowSize.height = window.getSize()[1];
+    settingsConfig.save();
+    logger.mainLog("#Save Window Size", settingsConfig.data.windowSize);
+  })
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;
     const returnPath = path.resolve(DIR_IMAGES, filename);

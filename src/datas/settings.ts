@@ -1,3 +1,5 @@
+import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH } from "@/defines";
+
 export interface Settings {
   dbDirectory: string,
   lowMemoryMode: boolean,
@@ -8,7 +10,8 @@ export interface Settings {
   showFPS: boolean,
   zoomSensitivity: number,
   moveSensitivity: number,
-  autoHideUI: boolean
+  autoHideUI: boolean,
+  windowSize: { width: number, height: number }
 }
 export const defaultSettings: Settings = {
   dbDirectory: "",
@@ -21,14 +24,21 @@ export const defaultSettings: Settings = {
   zoomSensitivity: 100,
   moveSensitivity: 100,
   autoHideUI: false,
+  windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT }
 }
 export function upgradeSettings(settings: Settings) {
   // バージョンアップで旧ファイルとの整合性を取る
   if (settings.zoomSensitivity === undefined) {
-    settings.zoomSensitivity = 100;
+    settings.zoomSensitivity = defaultSettings.zoomSensitivity;
   }
   if (settings.moveSensitivity === undefined) {
-    settings.moveSensitivity = 100;
+    settings.moveSensitivity = defaultSettings.moveSensitivity;
+  }
+  if (settings.windowSize === undefined) {
+    settings.windowSize = {
+      width: defaultSettings.windowSize.width,
+      height: defaultSettings.windowSize.height
+    }
   }
   return settings;
 }

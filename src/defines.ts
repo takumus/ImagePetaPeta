@@ -19,3 +19,7 @@ export const BOARD_MAX_PETAPANEL_ADD_COUNT = 20;
 export const BOARD_ADD_MULTIPLE_OFFSET = new Vec2(20, 20);
 export const BOARD_ZOOM_MIN = 1 / 100;     // 1%
 export const BOARD_ZOOM_MAX = 5000 / 100; // 5000%
+export const WINDOW_DEFAULT_WIDTH = 1280;
+export const WINDOW_DEFAULT_HEIGHT = 720;
+export const WINDOW_MIN_WIDTH = 640;
+export const WINDOW_MIN_HEIGHT = 360;
