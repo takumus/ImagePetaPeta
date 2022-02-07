@@ -28,74 +28,66 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+// Vue
+import { Options, Vue } from "vue-class-component";
+import { Prop, Ref, Watch } from "vue-property-decorator";
+// Others
 import { v4 as uuid } from "uuid";
-export default defineComponent({
-  props: {
-    visible: {
-      default: false
-    },
-    parentStyle: {
-      default: {}
-    },
-    childStyle: {
-      default: {}
-    },
-    center: {
-      default: false
-    },
-    visibleCloseButton: {
-      default: true
-    },
-    a: {
-      default: 1
-    }
+@Options({
+  components: {
   },
-  data() {
-    return {
-      zIndex: 0,
-      noBackground: false,
-      centerStyle: {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)"
-      },
-      modalId: uuid()
-    }
-  },
-  methods: {
-    mounted() {
+})
+export default class VModal extends Vue {
+  @Prop()
+  visible = false;
+  @Prop()
+  parentStyle = {};
+  @Prop()
+  childStyle = {};
+  @Prop()
+  center = false;
+  @Prop()
+  visibleCloseButton = true;
+  zIndex = 0;
+  noBackground = false;
+  centerStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)"
+  }
+  modalId = uuid();
+  async mounted() {
     // this.appInfo = await API.send("getAppInfo");
-    },
-    close() {
-      this.$emit("close");
-    },
-    isActive() {
-      return this.modalId == this.$globalComponents.currentModalId[this.$globalComponents.currentModalId.length - 1];
+  }
+  close() {
+    this.$emit("close");
+  }
+  isActive() {
+    return this.modalId == this.$globalComponents.currentModalId[this.$globalComponents.currentModalId.length - 1];
+  }
+  @Watch("$globalComponents.currentModalId")
+  changeModal() {
+    this.noBackground = !this.isActive();
+  }
+  @Watch("visible")
+  changeVisible() {
+    this.$globalComponents.currentModalId = this.$globalComponents.currentModalId.filter((id) => id != this.modalId);
+    if (this.visible) {
+      this.$globalComponents.currentModalId.push(this.modalId);
+      this.zIndex = this.$globalComponents.currentModalZIndex + 3;
+      this.$globalComponents.currentModalZIndex ++;
     }
-  },
-  watch: {
-    "$globalComponents.currentModalId"() {
-      this.noBackground = !this.isActive();
-    },
-    "visible"() {
-      this.$globalComponents.currentModalId = this.$globalComponents.currentModalId.filter((id) => id != this.modalId);
-      if (this.visible) {
-        this.$globalComponents.currentModalId.push(this.modalId);
-        this.zIndex = this.$globalComponents.currentModalZIndex + 3;
-        this.$globalComponents.currentModalZIndex ++;
-      }
-    },
-    "$keyboards.escape"() {
-      if (this.$keyboards.escape) {
-        if (this.isActive()) {
-          this.close();
-        }
+  }
+  @Watch("$keyboards.escape")
+  pressEscape() {
+    if (this.$keyboards.escape) {
+      if (this.isActive()) {
+        this.close();
       }
     }
   }
-});
+}
 </script>
 
 <style lang="scss" scoped>
