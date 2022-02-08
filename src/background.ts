@@ -468,12 +468,6 @@ import { ImageType } from "./datas/imageType";
     };
   }
   function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
-    if (BROWSER_THUMBNAIL_SIZE.indexOf(size) < 0) {
-      size = BROWSER_THUMBNAIL_SIZE[1];
-    }
-    if (BROWSER_THUMBNAIL_QUALITY.indexOf(quality) < 0) {
-      quality = BROWSER_THUMBNAIL_QUALITY[1];
-    }
     return sharp(data)
     .resize(size)
     .webp({ quality: quality })
