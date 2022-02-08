@@ -98,6 +98,7 @@
         <!-- 塗り色 -->
         <button
           class="color"
+          tabindex="-1"
           :style="{
             backgroundColor: board.background.fillColor
           }"
@@ -114,6 +115,7 @@
         <!-- 線色 -->
         <button
           class="color"
+          tabindex="-1"
           :style="{
             backgroundColor: board.background.lineColor
           }"
