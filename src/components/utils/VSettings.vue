@@ -75,6 +75,51 @@
       </section>
       <section>
         <label>
+          {{$t("settings.thumbnailsSize")}}:
+        </label>
+        <select
+          :value="$settings.thumbnails.size"
+          @change="$settings.thumbnails.size = Number($event.target.value)"
+          :disabled="!regenerateThumbnailsCompleted"
+        >
+          <option
+            :value="size"
+            v-for="size in thumbnailsSize"
+            :key="size"
+          >
+            {{size}}
+          </option>
+        </select>px, 
+        <label>
+          {{$t("settings.thumbnailsQuality")}}:
+        </label>
+        <select
+          :value="$settings.thumbnails.quality"
+          @change="$settings.thumbnails.quality = Number($event.target.value)"
+          :disabled="!regenerateThumbnailsCompleted"
+        >
+          <option
+            :value="quality"
+            v-for="quality in thumbnailsQuality"
+            :key="quality"
+          >
+            {{quality}}
+          </option>
+        </select>
+        <button
+          @click="regenerateThumbnails"
+        >
+          {{$t("settings.thumbnailsRegenerateButton")}}
+        </button>
+        <label
+          v-show="!regenerateThumbnailsCompleted"
+        >
+          {{regenerateThumbnailsDone}}/{{regenerateThumbnailsCount}}
+        </label>
+        <p>{{$t("settings.thumbnailsDescriptions")}}</p>
+      </section>
+      <section>
+        <label>
           <input
             type="checkbox"
             :checked="$settings.showFPS"
@@ -97,6 +142,7 @@ import VModal from "@/components/modal/VModal.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/api";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/defines";
 @Options({
   components: {
     VModal,
@@ -105,8 +151,21 @@ import { API } from "@/api";
 })
 export default class VSettings extends Vue {
   visible = false;
+  regenerateThumbnailsCompleted = true;
+  regenerateThumbnailsDone = 0;
+  regenerateThumbnailsCount = 0;
   async mounted() {
     this.$globalComponents.settings = this;
+    API.on("regenerateThumbnailsProgress", (_, done, count) => {
+      this.regenerateThumbnailsDone = done;
+      this.regenerateThumbnailsCount = count;
+    });
+    API.on("regenerateThumbnailsBegin", (_) => {
+      this.regenerateThumbnailsCompleted = false;
+    });
+    API.on("regenerateThumbnailsComplete", (_) => {
+      this.regenerateThumbnailsCompleted = true;
+    });
   }
   open() {
     this.visible = true;
@@ -117,6 +176,15 @@ export default class VSettings extends Vue {
   @Watch("$settings", { deep: true })
   save() {
     API.send("updateSettings", this.$settings);
+  }
+  regenerateThumbnails() {
+    API.send("regenerateThumbnails");
+  }
+  get thumbnailsSize() {
+    return BROWSER_THUMBNAIL_SIZE;
+  }
+  get thumbnailsQuality() {
+    return BROWSER_THUMBNAIL_QUALITY;
   }
 }
 </script>

@@ -23,3 +23,5 @@ export const WINDOW_DEFAULT_WIDTH = 1280;
 export const WINDOW_DEFAULT_HEIGHT = 720;
 export const WINDOW_MIN_WIDTH = 640;
 export const WINDOW_MIN_HEIGHT = 360;
+export const BROWSER_THUMBNAIL_QUALITY = [60, 80, 100];
+export const BROWSER_THUMBNAIL_SIZE = [128, 256, 512, 1024];

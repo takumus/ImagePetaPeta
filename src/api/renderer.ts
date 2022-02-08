@@ -10,4 +10,7 @@ export interface Renderer {
   importImagesComplete: (fileCount: number, addedFileCount: number) => void;
   notifyUpdate: (current: string, latest: string) => void;
   windowFocused: (focused: boolean) => void;
+  regenerateThumbnailsProgress: (done: number, count: number) => void;
+  regenerateThumbnailsBegin: () => void;
+  regenerateThumbnailsComplete: () => void;
 }

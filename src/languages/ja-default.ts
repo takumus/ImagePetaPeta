@@ -105,7 +105,11 @@ const ja = {
     moveSensitivity: "移動感度(Macのみ)",
     moveSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
     autoHideUI: "非アクティブ時にUIを隠す",
-    autoHideUIDescriptions: "別アプリを操作している時に、タブバーやボタン等のUIを自動で隠します。"
+    autoHideUIDescriptions: "別アプリを操作している時に、タブバーやボタン等のUIを自動で隠します。",
+    thumbnailsSize: "サムネイルサイズ",
+    thumbnailsQuality: "サムネイル品質",
+    thumbnailsRegenerateButton: "サムネイル再生成",
+    thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。設定変更後は再生成ボタンを押してください。"
   },
   imageImporter: {
     importing: "画像ファイルを読込中..."

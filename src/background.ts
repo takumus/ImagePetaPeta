@@ -5,7 +5,7 @@ import sharp from "sharp";
 import crypto from "crypto";
 import fs from "fs";
 import dataURIToBuffer from "data-uri-to-buffer";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
 import * as asyncFile from "@/utils/asyncFile";
 import DB from "@/utils/db";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
@@ -304,6 +304,25 @@ import { ImageType } from "./datas/imageType";
     getPlatform: async (event) => {
       return process.platform;
     },
+    regenerateThumbnails: async (event) => {
+      logger.mainLog("#Regenerate Thumbnails");
+      logger.mainLog("preset:", settingsConfig.data.thumbnails);
+      sendToRenderer("regenerateThumbnailsBegin");
+      const images = await petaImagesDB.find({});
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const data = await asyncFile.readFile(path.resolve(DIR_IMAGES, image.fileName));
+        await generateThumbnail(
+          data,
+          getImagePathFromFilename(image.fileName, ImageType.THUMBNAIL),
+          settingsConfig.data.thumbnails.size,
+          settingsConfig.data.thumbnails.quality
+        );
+        logger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
+        sendToRenderer("regenerateThumbnailsProgress", i + 1, images.length);
+      }
+      sendToRenderer("regenerateThumbnailsComplete");
+    }
     // setAlwaysOnTop: async (event, value) => {
     //   logger.mainLog("#Set Always On Top", value);
     //   window.setAlwaysOnTop(value);
@@ -424,10 +443,12 @@ import { ImageType } from "./datas/imageType";
       exists: true
     };
     const fileName = `${id}${extName}`;
-    const output = await sharp(data)
-    .resize(128)
-    .webp({ quality: 80 })
-    .toFile(getImagePathFromFilename(fileName, ImageType.THUMBNAIL));
+    const output = await generateThumbnail(
+      data,
+      getImagePathFromFilename(fileName, ImageType.THUMBNAIL),
+      settingsConfig.data.thumbnails.size,
+      settingsConfig.data.thumbnails.quality
+    );
     const petaImage: PetaImage = {
       fileName: fileName,
       name: name,
@@ -446,7 +467,19 @@ import { ImageType } from "./datas/imageType";
       exists: false
     };
   }
+  function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
+    if (BROWSER_THUMBNAIL_SIZE.indexOf(size) < 0) {
+      size = BROWSER_THUMBNAIL_SIZE[1];
+    }
+    if (BROWSER_THUMBNAIL_QUALITY.indexOf(quality) < 0) {
+      quality = BROWSER_THUMBNAIL_QUALITY[1];
+    }
+    return sharp(data)
+    .resize(size)
+    .webp({ quality: quality })
+    .toFile(fileName);
+  }
   function minimId(id: string) {
-    return id.substr(0, 6);
+    return id.substring(0, 6);
   }
 })();

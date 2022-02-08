@@ -1,4 +1,4 @@
-import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH } from "@/defines";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH } from "@/defines";
 
 export interface Settings {
   dbDirectory: string,
@@ -12,6 +12,10 @@ export interface Settings {
   moveSensitivity: number,
   autoHideUI: boolean,
   windowSize: { width: number, height: number }
+  thumbnails: {
+    size: number,
+    quality: number
+  }
 }
 export const defaultSettings: Settings = {
   dbDirectory: "",
@@ -24,7 +28,11 @@ export const defaultSettings: Settings = {
   zoomSensitivity: 100,
   moveSensitivity: 100,
   autoHideUI: false,
-  windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT }
+  windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT },
+  thumbnails: {
+    size: BROWSER_THUMBNAIL_SIZE[1],
+    quality: BROWSER_THUMBNAIL_QUALITY[1]
+  }
 }
 export function upgradeSettings(settings: Settings) {
   // バージョンアップで旧ファイルとの整合性を取る
@@ -38,6 +46,12 @@ export function upgradeSettings(settings: Settings) {
     settings.windowSize = {
       width: defaultSettings.windowSize.width,
       height: defaultSettings.windowSize.height
+    }
+  }
+  if (settings.thumbnails === undefined) {
+    settings.thumbnails = {
+      size: defaultSettings.thumbnails.size,
+      quality: defaultSettings.thumbnails.quality
     }
   }
   return settings;
