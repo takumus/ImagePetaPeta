@@ -93,6 +93,10 @@ const ja = {
   },
   settings: {
     settings: "設定",
+    general: "基本",
+    control: "操作",
+    browser: "ブラウザ",
+    others: "その他",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions: "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
@@ -109,6 +113,7 @@ const ja = {
     thumbnailsSize: "サムネイルサイズ",
     thumbnailsQuality: "サムネイル品質",
     thumbnailsRegenerateButton: "サムネイル再生成",
+    thumbnailsRegenerateConfirm: "サムネイルの再生成には時間がかかりますが、よろしいですか?",
     thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。設定変更後は再生成ボタンを押してください。"
   },
   imageImporter: {

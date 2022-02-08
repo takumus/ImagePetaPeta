@@ -7,7 +7,22 @@
   >
     <article class="settings-root">
       <p>{{$t("settings.settings")}}</p>
-      <section>
+      <ul>
+        <li
+          v-for="tab in ['general', 'control', 'browser', 'others']"
+          :key="tab"
+          :class="{
+            selected: currentTab == tab
+          }"
+          @click="currentTab = tab"
+        >
+          {{$t("settings." + tab)}}
+        </li>
+      </ul>
+      <!--
+        General
+      -->
+      <section v-show="currentTab == 'general'">
         <label>
           <input
             type="checkbox"
@@ -17,8 +32,7 @@
           >
           {{$t("settings.darkMode")}}
         </label>
-      </section>
-      <section>
+        <br>
         <label>
           <input
             type="checkbox"
@@ -28,8 +42,6 @@
           {{$t("settings.autoDarkMode")}}
         </label>
         <p>{{$t("settings.autoDarkModeDescriptions")}}</p>
-      </section>
-      <section>
         <label>
           <input
             type="checkbox"
@@ -40,7 +52,10 @@
         </label>
         <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
       </section>
-      <section>
+      <!--
+        Control
+      -->
+      <section v-show="currentTab == 'control'">
         <label>
           {{$t("settings.zoomSensitivity")}}:
         </label>
@@ -50,8 +65,6 @@
           @change="$settings.zoomSensitivity = Number($event.target.value)"
         >
         <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
-      </section>
-      <section>
         <label>
           {{$t("settings.moveSensitivity")}}:
         </label>
@@ -62,18 +75,10 @@
         >
         <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
       </section>
-      <section>
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.autoHideUI"
-            @change="$settings.autoHideUI = Boolean($event.target.checked)"
-          >
-          {{$t("settings.autoHideUI")}}
-        </label><br>
-        <p>{{$t("settings.autoHideUIDescriptions")}}</p>
-      </section>
-      <section>
+      <!--
+        Browser
+      -->
+      <section v-show="currentTab == 'browser'">
         <label>
           {{$t("settings.thumbnailsSize")}}:
         </label>
@@ -118,7 +123,19 @@
         </label>
         <p>{{$t("settings.thumbnailsDescriptions")}}</p>
       </section>
-      <section>
+      <!--
+        Others
+      -->
+      <section v-show="currentTab == 'others'">
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.autoHideUI"
+            @change="$settings.autoHideUI = Boolean($event.target.checked)"
+          >
+          {{$t("settings.autoHideUI")}}
+        </label><br>
+        <p>{{$t("settings.autoHideUIDescriptions")}}</p>
         <label>
           <input
             type="checkbox"
@@ -154,6 +171,8 @@ export default class VSettings extends Vue {
   regenerateThumbnailsCompleted = true;
   regenerateThumbnailsDone = 0;
   regenerateThumbnailsCount = 0;
+  tabs = ["general", "control", "browser", "others"];
+  currentTab = "general";
   async mounted() {
     this.$globalComponents.settings = this;
     API.on("regenerateThumbnailsProgress", (_, done, count) => {
@@ -193,6 +212,18 @@ export default class VSettings extends Vue {
 .settings-root {
   text-align: center;
   // color: #333333;
+  >ul {
+    list-style-type: none;
+    padding: 0px;
+    >li {
+      margin: 0px 8px;
+      display: inline-block;
+      cursor: pointer;
+      &.selected {
+        text-decoration: underline;
+      }
+    }
+  }
   >section {
     text-align: left;
     >p {
