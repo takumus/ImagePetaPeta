@@ -69,6 +69,7 @@ import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
 import { UpdateMode } from "@/datas/updateMode";
 import { DelayUpdater } from "@/utils/delayUpdater";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
+import { isLatest } from "@/utils/versionCheck";
 @Options({
   components: {
     VBrowser,
@@ -114,7 +115,7 @@ export default class Index extends Vue {
       // this.petaImages[petaImage.id] = petaImage;
     });
     API.send("checkUpdate").then(async (result) => {
-      if (result.current != result.latest) {
+      if (!isLatest(result.current, result.latest)) {
         if (await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
           API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
         }
