@@ -30,7 +30,7 @@ export const defaultSettings: Settings = {
   autoHideUI: false,
   windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT },
   thumbnails: {
-    size: BROWSER_THUMBNAIL_SIZE[1],
+    size: BROWSER_THUMBNAIL_SIZE[0],
     quality: BROWSER_THUMBNAIL_QUALITY[1]
   }
 }
