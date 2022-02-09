@@ -23,6 +23,7 @@ import { addPetaPanelProperties } from "@/datas/petaPanel";
 import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { ImageType } from "./datas/imageType";
+import { defaultStates, States, upgradeStates } from "./datas/states";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -41,17 +42,16 @@ import { ImageType } from "./datas/imageType";
   const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
   const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
   const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
+  const statesConfig = new Config<States>(path.resolve(DIR_ROOT, "states.json"), defaultStates);
   loadSettings();
-  // if (!settingsConfig.data.enableHardwareAcceleration) {
-  //   app.disableHardwareAcceleration();
-  // }
+  loadStates();
   const window = await initWindow(customTitlebar);
-  window.setSize(settingsConfig.data.windowSize.width, settingsConfig.data.windowSize.height);
+  window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
   window.on("close", () => {
-    settingsConfig.data.windowSize.width = window.getSize()[0];
-    settingsConfig.data.windowSize.height = window.getSize()[1];
-    settingsConfig.save();
-    logger.mainLog("#Save Window Size", settingsConfig.data.windowSize);
+    statesConfig.data.windowSize.width = window.getSize()[0];
+    statesConfig.data.windowSize.height = window.getSize()[1];
+    statesConfig.save();
+    logger.mainLog("#Save Window Size", statesConfig.data.windowSize);
   })
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;
@@ -397,6 +397,23 @@ import { ImageType } from "./datas/imageType";
     };
     settingsConfig.data = upgradeSettings(settingsConfig.data);
     logger.mainLog("settings loaded");
+  }
+  function loadStates() {
+    logger.mainLog("#Load States");
+    try {
+      statesConfig.load();
+    } catch(e) {
+      logger.mainLog("states load error:", e);
+      statesConfig.data = defaultStates;
+      try {
+        statesConfig.save();
+        logger.mainLog("recreate states");
+      } catch(e) {
+        logger.mainLog("cannot recreate states");
+      }
+    };
+    statesConfig.data = upgradeStates(statesConfig.data);
+    logger.mainLog("states loaded");
   }
   async function importImages(filePaths: string[]) {
     sendToRenderer("importImagesBegin", filePaths.length);

@@ -77,6 +77,14 @@
             :allTags="tagsForComplement"
             @changeTag="changePetaImageTag"
           />
+          <input
+            type="range"
+            v-model="thumbnailsSize"
+            @change="$settings.browserThumbnailSize = Number($event.target.value)"
+            min="64"
+            max="256"
+            step="16"
+          >
         </section>
       </section>
       <!-- <section class="bottom">
@@ -126,7 +134,6 @@ export default class VBrowser extends Vue {
   thumbsWrapper!: HTMLDivElement;
   selectedTags = "";
   thumbnailsWidth = 0;
-  defaultThumbnailWidth = 128;
   thumbnailWidth = 0;
   areaMaxY = 0;
   areaMinY = 0;
@@ -136,6 +143,7 @@ export default class VBrowser extends Vue {
   thumbnailsResizer?: ResizeObserver;
   scrollAreaResizer?: ResizeObserver;
   firstSelectedBrowserThumbnail: BrowserThumbnail | null = null;
+  thumbnailsSize = 0;
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0].contentRect);
@@ -149,6 +157,7 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer.observe(this.thumbnails);
 
     this.$globalComponents.browser = this;
+    this.thumbnailsSize = this.$settings.browserThumbnailSize;
   }
   unmounted() {
     this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
@@ -171,7 +180,7 @@ export default class VBrowser extends Vue {
     }
   }
   updateScrollArea() {
-    const offset = this.scrollAreaHeight;
+    const offset = this.scrollAreaHeight * 0.2;
     this.areaMinY = this.thumbnails.scrollTop - offset;
     this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + offset;
   }
@@ -443,7 +452,7 @@ export default class VBrowser extends Vue {
     return this.selectedTagsArray.length == 0;
   }
   get browserThumbnails(): BrowserThumbnail[] {
-    const hc = Math.floor(this.thumbnailsWidth / this.defaultThumbnailWidth);
+    const hc = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
     this.thumbnailWidth = this.thumbnailsWidth / hc;
     const yList: number[] = [];
     this.scrollHeight = 0;
@@ -563,6 +572,8 @@ interface Tag {
       width: 20%;
       min-width: 180px;
       padding: 8px;
+      display: flex;
+      flex-direction: column;
     }
   }
 }
