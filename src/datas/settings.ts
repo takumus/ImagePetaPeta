@@ -1,4 +1,4 @@
-import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH } from "@/defines";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/defines";
 
 export const defaultSettings = {
   dbDirectory: "",
@@ -15,7 +15,8 @@ export const defaultSettings = {
     size: BROWSER_THUMBNAIL_SIZE[0],
     quality: BROWSER_THUMBNAIL_QUALITY[1]
   },
-  browserThumbnailSize: 128
+  browserThumbnailSize: 128,
+  loadThumbnailsInFullsized: false
 }
 export function upgradeSettings(settings: Settings) {
   // バージョンアップで旧ファイルとの整合性を取る
@@ -33,6 +34,9 @@ export function upgradeSettings(settings: Settings) {
   }
   if (settings.browserThumbnailSize === undefined) {
     settings.browserThumbnailSize = defaultSettings.browserThumbnailSize;
+  }
+  if (settings.loadThumbnailsInFullsized === undefined) {
+    settings.loadThumbnailsInFullsized = false;
   }
   return settings;
 }

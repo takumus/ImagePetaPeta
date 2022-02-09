@@ -6,6 +6,7 @@ import { App as _App, reactive } from "vue";
 import GlboalKeyboard from "@/globals/globalKeyboard";
 import GlobalSettings from "@/globals/globalSettings";
 import GlobalSystemInfo from "@/globals/globalSystemInfo";
+import GlobalDefines from "@/globals/globalDefines";
 (async () => {
   const app = createApp(App);
   const i18n = createI18n({
@@ -16,6 +17,7 @@ import GlobalSystemInfo from "@/globals/globalSystemInfo";
   app.use(GlboalKeyboard);
   await GlobalSettings.install(app);
   await GlobalSystemInfo.install(app);
+  await GlobalDefines.install(app);
   app.config.globalProperties.$globalComponents = reactive({
     currentModalId: [],
     currentModalZIndex: 0

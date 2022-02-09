@@ -101,7 +101,7 @@ const ja = {
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions: "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
     alwaysOnTop: "常に手前に表示",
-    alwaysOnTopDescriptions: "このアプリの画面を常に最前面に固定します。",
+    alwaysOnTopDescriptions: "このアプリのウインドウを常に最前面に固定します。",
     showFPS: "フレームレートを表示",
     showFPSDescriptions: "開発者向けの機能です。",
     zoomSensitivity: "ズーム感度",
@@ -114,7 +114,9 @@ const ja = {
     thumbnailsQuality: "サムネイル品質",
     thumbnailsRegenerateButton: "サムネイル再生成",
     thumbnailsRegenerateConfirm: "サムネイルの再生成には時間がかかりますが、よろしいですか?",
-    thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。設定変更後は再生成ボタンを押してください。"
+    thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。\n数値を上げると、ブラウザでの見た目がきれいになりますが、動作が重くなる場合があります。\n設定変更後は再生成ボタンを押してください。",
+    loadThumbnailsInFullsized: "ブラウザをズーム時にフルサイズの画像を読み込む。(高スペックPC向け)",
+    loadThumbnailsInFullsizedDescriptions: "ブラウザでのサムネイルサイズが、上記で生成したサイズを超えた場合にフルサイズの画像を読み込みます。\n動作が重いと感じた場合は、この設定を無効にすることをおすすめします。"
   },
   imageImporter: {
     importing: "画像ファイルを読込中..."

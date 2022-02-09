@@ -64,6 +64,7 @@
                 v-for="(data) in visibleBrowserThumbnails"
                 :key="data.petaImage.id"
                 :browserThumbnail="data"
+                :fullsized="fullsized"
                 @add="addPanel"
                 @select="selectThumbnail"
                 @menu="petaImageMenu"
@@ -81,9 +82,9 @@
             type="range"
             v-model="thumbnailsSize"
             @change="$settings.browserThumbnailSize = Number($event.target.value)"
-            min="64"
-            max="256"
-            step="16"
+            :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
+            :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
+            :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
           >
         </section>
       </section>
@@ -479,12 +480,18 @@ export default class VBrowser extends Vue {
         position: position,
         width: this.thumbnailWidth,
         height: height,
-        visible: (this.areaMinY < position.y && position.y < this.areaMaxY) || (this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
+        visible: 
+          (this.areaMinY < position.y && position.y < this.areaMaxY)
+          ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
+          ||(this.areaMinY > position.y && position.y + height > this.areaMaxY)
       }
     });
   }
   get visibleBrowserThumbnails(): BrowserThumbnail[] {
     return this.browserThumbnails.filter((p) => p.visible);
+  }
+  get fullsized() {
+    return this.$settings.loadThumbnailsInFullsized && this.thumbnailWidth > this.$settings.thumbnails.size;
   }
 }
 interface Tag {

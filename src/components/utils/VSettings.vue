@@ -89,7 +89,7 @@
         >
           <option
             :value="size"
-            v-for="size in thumbnailsSize"
+            v-for="size in $defines.BROWSER_THUMBNAIL_SIZE"
             :key="size"
           >
             {{size}}
@@ -105,7 +105,7 @@
         >
           <option
             :value="quality"
-            v-for="quality in thumbnailsQuality"
+            v-for="quality in $defines.BROWSER_THUMBNAIL_QUALITY"
             :key="quality"
           >
             {{quality}}
@@ -122,6 +122,15 @@
           {{regenerateThumbnailsDone}}/{{regenerateThumbnailsCount}}
         </label>
         <p>{{$t("settings.thumbnailsDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.loadThumbnailsInFullsized"
+            @change="$settings.loadThumbnailsInFullsized = Boolean($event.target.checked)"
+          >
+          {{$t("settings.loadThumbnailsInFullsized")}}
+        </label>
+        <p>{{$t("settings.loadThumbnailsInFullsizedDescriptions")}}</p>
       </section>
       <!--
         Others
@@ -159,7 +168,6 @@ import VModal from "@/components/modal/VModal.vue";
 import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/api";
-import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/defines";
 @Options({
   components: {
     VModal,
@@ -198,12 +206,6 @@ export default class VSettings extends Vue {
   }
   regenerateThumbnails() {
     API.send("regenerateThumbnails");
-  }
-  get thumbnailsSize() {
-    return BROWSER_THUMBNAIL_SIZE;
-  }
-  get thumbnailsQuality() {
-    return BROWSER_THUMBNAIL_QUALITY;
   }
 }
 </script>

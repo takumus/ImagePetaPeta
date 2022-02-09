@@ -55,6 +55,7 @@ import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 import { ImageType } from "@/datas/imageType";
+import { watch } from "@vue/runtime-core";
 // import { API } from "@/api";
 @Options({
   components: {
@@ -64,11 +65,13 @@ import { ImageType } from "@/datas/imageType";
 export default class VThumbnail extends Vue {
   @Prop()
   browserThumbnail!: BrowserThumbnail;
+  @Prop()
+  fullsized = false;
   imageURL = "";
   pressing = false;
   click: ClickChecker = new ClickChecker();
   mounted() {
-    this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+    this.changeFullsized();
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
@@ -116,6 +119,14 @@ export default class VThumbnail extends Vue {
   }
   get loaded() {
     return this.imageURL != "";
+  }
+  @Watch("fullsized")
+  changeFullsized() {
+    if (this.fullsized) {
+      this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.FULLSIZED);
+    } else {
+      this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+    }
   }
 }
 </script>
