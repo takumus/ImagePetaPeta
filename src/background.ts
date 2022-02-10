@@ -24,6 +24,7 @@ import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { ImageType } from "./datas/imageType";
 import { defaultStates, States, upgradeStates } from "./datas/states";
+import { encode } from "blurhash";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -312,12 +313,14 @@ import { defaultStates, States, upgradeStates } from "./datas/states";
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         const data = await asyncFile.readFile(path.resolve(DIR_IMAGES, image.fileName));
-        await generateThumbnail(
+        const result = await generateThumbnail(
           data,
           getImagePathFromFilename(image.fileName, ImageType.THUMBNAIL),
           settingsConfig.data.thumbnails.size,
           settingsConfig.data.thumbnails.quality
         );
+        image.placeholder = result.placeholder;
+        await savePetaImage(image, UpdateMode.UPDATE);
         logger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
         sendToRenderer("regenerateThumbnailsProgress", i + 1, images.length);
       }
@@ -472,7 +475,8 @@ import { defaultStates, States, upgradeStates } from "./datas/states";
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
       width: 1,
-      height: output.height / output.width,
+      height: output.sharp.height / output.sharp.width,
+      placeholder: output.placeholder,
       id: id,
       tags: [],
       _selected: false
@@ -484,11 +488,32 @@ import { defaultStates, States, upgradeStates } from "./datas/states";
       exists: false
     };
   }
-  function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
-    return sharp(data)
+  async function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
+    const result = await sharp(data)
     .resize(size)
     .webp({ quality: quality })
     .toFile(fileName);
+    const placeholder = await new Promise<string>((res, rej) => {
+      sharp(data)
+      .raw()
+      .ensureAlpha()
+      .resize(32, 32, { fit: "inside" })
+      .toBuffer((err, buffer, { width, height }) => {
+        if (err) {
+          rej(err);
+        }
+        try {
+          const d = encode(new Uint8ClampedArray(buffer), width, height, 4, 4);
+          res(d);
+        } catch(e) {
+          rej(e);
+        }
+      });
+    })
+    return {
+      sharp: result,
+      placeholder
+    };
   }
   function minimId(id: string) {
     return id.substring(0, 6);

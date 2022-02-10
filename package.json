@@ -21,6 +21,7 @@
     "@types/sharp": "^0.28.6",
     "@types/uuid": "^8.3.1",
     "axios": "^0.21.4",
+    "blurhash": "^1.1.4",
     "core-js": "^3.6.5",
     "data-uri-to-buffer": "^3.0.1",
     "license-checker": "^25.0.1",

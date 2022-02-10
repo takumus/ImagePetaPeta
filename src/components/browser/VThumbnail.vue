@@ -8,15 +8,25 @@
     }"
   >
     <div class="wrapper">
-      <img
-        draggable="false"
-        :src="imageURL"
+      <div
+        class="img"
         @mousedown="mousedown($event)"
-        v-if="loaded"
         :class="{
           'selected-image': browserThumbnail.petaImage._selected
         }"
       >
+        <canvas
+          ref="canvas"
+          v-if="loading"
+        ></canvas>
+        <img
+          draggable="false"
+          :src="imageURL"
+          v-show="!loading"
+          loading="lazy"
+          @load="loaded"
+        >
+      </div>
       <div class="info">
         <span
           class="tags"
@@ -55,8 +65,7 @@ import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 import { ImageType } from "@/datas/imageType";
-import { watch } from "@vue/runtime-core";
-// import { API } from "@/api";
+import { decode } from "blurhash";
 @Options({
   components: {
   },
@@ -67,11 +76,23 @@ export default class VThumbnail extends Vue {
   browserThumbnail!: BrowserThumbnail;
   @Prop()
   fullsized = false;
+  @Ref("canvas")
+  canvas!: HTMLCanvasElement;
   imageURL = "";
   pressing = false;
+  loading = true;
   click: ClickChecker = new ClickChecker();
   mounted() {
     this.changeFullsized();
+    const pixels = decode(this.browserThumbnail.petaImage.placeholder, 32, 32);
+    this.canvas.width = 32;
+    this.canvas.height = 32;
+    const ctx = this.canvas.getContext("2d");
+    if (ctx){ 
+      const imageData = ctx.createImageData(32, 32);
+      imageData.data.set(pixels);
+      ctx.putImageData(imageData, 0, 0);
+    }
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
@@ -117,8 +138,8 @@ export default class VThumbnail extends Vue {
       }
     }
   }
-  get loaded() {
-    return this.imageURL != "";
+  loaded() {
+    this.loading = false;
   }
   @Watch("fullsized")
   changeFullsized() {
@@ -143,7 +164,7 @@ export default class VThumbnail extends Vue {
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
-    >img {
+    >.img {
       display: block;
       width: 100%;
       height: 100%;
@@ -155,10 +176,26 @@ export default class VThumbnail extends Vue {
         border-radius: var(--rounded);
         padding: 2px;
       }
+      >img {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      >canvas {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
     }
     &:hover {
       box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
-      >img {
+      >.img {
         filter: brightness(1);
       }
     }
