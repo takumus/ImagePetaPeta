@@ -65,7 +65,7 @@ import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 import { ImageType } from "@/datas/imageType";
-import { decode } from "blurhash";
+import { decode as decodePlaceholder } from "blurhash";
 @Options({
   components: {
   },
@@ -84,7 +84,7 @@ export default class VThumbnail extends Vue {
   click: ClickChecker = new ClickChecker();
   mounted() {
     this.changeFullsized();
-    const pixels = decode(this.browserThumbnail.petaImage.placeholder, 32, 32);
+    const pixels = decodePlaceholder(this.browserThumbnail.petaImage.placeholder, 32, 32);
     this.canvas.width = 32;
     this.canvas.height = 32;
     const ctx = this.canvas.getContext("2d");

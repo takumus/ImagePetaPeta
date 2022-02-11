@@ -24,7 +24,7 @@ import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { ImageType } from "./datas/imageType";
 import { defaultStates, States, upgradeStates } from "./datas/states";
-import { encode } from "blurhash";
+import { encode as encodePlaceholder } from "blurhash";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -509,7 +509,7 @@ import { encode } from "blurhash";
           rej(err);
         }
         try {
-          const d = encode(new Uint8ClampedArray(buffer), width, height, 4, 4);
+          const d = encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4);
           res(d);
         } catch(e) {
           rej(e);
