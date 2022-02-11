@@ -81,6 +81,7 @@
           <input
             type="range"
             v-model="thumbnailsSize"
+            tabindex="-1"
             @change="$settings.browserThumbnailSize = Number($event.target.value)"
             :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
             :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
