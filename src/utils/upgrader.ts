@@ -3,24 +3,28 @@ import { defaultSettings, Settings } from "@/datas/settings";
 import { States } from "@/datas/states";
 
 export function upgradePetaImage(petaImage: PetaImage) {
+  //v1.6.0
   if (petaImage.placeholder === undefined) {
-    petaImage.placeholder = ""; //v1.6.0
+    petaImage.placeholder = "";
   }
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {
+  // v0.8.4
   if (settings.zoomSensitivity === undefined) {
     settings.zoomSensitivity = defaultSettings.zoomSensitivity;
   }
   if (settings.moveSensitivity === undefined) {
     settings.moveSensitivity = defaultSettings.moveSensitivity;
   }
+  // v1.4.0
   if (settings.thumbnails === undefined) {
     settings.thumbnails = {
       size: defaultSettings.thumbnails.size,
       quality: defaultSettings.thumbnails.quality
     }
   }
+  // v1.5.0
   if (settings.browserThumbnailSize === undefined) {
     settings.browserThumbnailSize = defaultSettings.browserThumbnailSize;
   }
