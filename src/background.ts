@@ -48,12 +48,18 @@ import { encode } from "blurhash";
   loadStates();
   const window = await initWindow(customTitlebar);
   window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
+  if (statesConfig.data.windowIsMaximized) {
+    window.maximize();
+  }
   window.on("close", () => {
-    statesConfig.data.windowSize.width = window.getSize()[0];
-    statesConfig.data.windowSize.height = window.getSize()[1];
+    if (!window.isMaximized()) {
+      statesConfig.data.windowSize.width = window.getSize()[0];
+      statesConfig.data.windowSize.height = window.getSize()[1];
+    }
+    statesConfig.data.windowIsMaximized = window.isMaximized();
     statesConfig.save();
     logger.mainLog("#Save Window Size", statesConfig.data.windowSize);
-  })
+  });
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;
     const returnPath = path.resolve(DIR_IMAGES, filename);

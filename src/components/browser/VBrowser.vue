@@ -107,7 +107,7 @@ import VEditableLabel from "@/components/utils/VEditableLabel.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { API, log } from "@/api";
-import { BOARD_ADD_MULTIPLE_OFFSET, BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
+import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { SortMode } from "@/datas/sortMode";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";

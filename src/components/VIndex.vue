@@ -61,7 +61,7 @@ import VInfo from "@/components/utils/VInfo.vue";
 import VSettings from "@/components/utils/VSettings.vue";
 // Others
 import { API, log } from "@/api";
-import { BOARD_ADD_MULTIPLE_OFFSET, BOARD_MAX_PETAPANEL_ADD_COUNT, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
+import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
 import { PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
@@ -143,7 +143,7 @@ export default class Index extends Vue {
       if (!this.orderedAddPanelDragEvent) return;
       const panel = createPetaPanel(
         petaImage,
-        vec2FromMouseEvent(this.orderedAddPanelDragEvent).add(BOARD_ADD_MULTIPLE_OFFSET.clone().mult(i)),
+        vec2FromMouseEvent(this.orderedAddPanelDragEvent).add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
         DEFAULT_IMAGE_SIZE,
         petaImage.height * DEFAULT_IMAGE_SIZE
       );

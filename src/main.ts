@@ -15,9 +15,9 @@ import GlobalDefines from "@/globals/globalDefines";
   });
   app.use(i18n);
   app.use(GlboalKeyboard);
+  app.use(GlobalDefines);
   await GlobalSettings.install(app);
   await GlobalSystemInfo.install(app);
-  await GlobalDefines.install(app);
   app.config.globalProperties.$globalComponents = reactive({
     currentModalId: [],
     currentModalZIndex: 0
