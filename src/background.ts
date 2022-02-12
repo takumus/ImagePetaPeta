@@ -525,4 +525,40 @@ import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrad
   function minimId(id: string) {
     return id.substring(0, 6);
   }
+  // function download(url: string, filename: string, callback: (res: string) => void) {
+  //   const file = fs.createWriteStream(filename);
+  //   let receivedBytes = 0
+  //   // Send request to the given URL
+  //   let totalBytes = 0;
+  //   request.get(url)
+  //   .on('response', (response) => {
+  //     if (response.statusCode !== 200) {
+  //       return callback('Response status was ' + response.statusCode);
+  //     }
+  //     const cl = response.headers['content-length'];
+  //     if (cl) {
+  //       totalBytes = parseInt(cl);
+  //     }
+  //   })
+  //   .on('data', (chunk) => {
+  //     receivedBytes += chunk.length;
+  //     console.log(receivedBytes / totalBytes * 100);
+  //   })
+  //   .pipe(file)
+  //   .on('error', (err) => {
+  //     file.close();
+  //     asyncFile.rm(filename);
+  //     callback(err.message);
+  //   });
+  //   file
+  //   .on('finish', () => {
+  //     file.close();
+  //     callback("fin");
+  //   })
+  //   .on('error', (err) => {
+  //     asyncFile.rm(filename);
+  //     return callback(err.message);
+  //   });
+  // }
 })();
+// import request from "request";

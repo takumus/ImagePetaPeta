@@ -513,7 +513,6 @@ export default class VBrowser extends Vue {
           ||(this.areaMinY > position.y && position.y + height > this.areaMaxY)
       }
     });
-    // console.log(images.filter((i) => i.visible).length);
     return images;
   }
   get visibleBrowserThumbnails(): BrowserThumbnail[] {
