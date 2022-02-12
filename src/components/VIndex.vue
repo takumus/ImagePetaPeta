@@ -54,7 +54,7 @@ import { Ref, Watch } from "vue-property-decorator";
 import VBrowser from "@/components/browser/VBrowser.vue";
 import VBoard from "@/components/board/VBoard.vue";
 import VImageImporter from "@/components/utils/VImageImporter.vue";
-import VTabBar from "@/components/tab/VTabBar.vue";
+import VTabBar from "@/components/tabBar/VTabBar.vue";
 import VContextMenu from "@/components/utils/VContextMenu.vue";
 import VComplement from "@/components/utils/VComplement.vue";
 import VInfo from "@/components/utils/VInfo.vue";

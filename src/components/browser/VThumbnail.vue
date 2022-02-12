@@ -60,7 +60,7 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { ImageLoader } from "@/imageLoader";
+import { getImageURL } from "@/utils/imageURL";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
@@ -144,9 +144,9 @@ export default class VThumbnail extends Vue {
   @Watch("fullsized")
   changeFullsized() {
     if (this.fullsized) {
-      this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.FULLSIZED);
+      this.imageURL = getImageURL(this.browserThumbnail.petaImage, ImageType.FULLSIZED);
     } else {
-      this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+      this.imageURL = getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
     }
   }
 }

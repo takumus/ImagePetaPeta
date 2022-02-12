@@ -49,7 +49,7 @@ import { Prop, Ref } from "vue-property-decorator";
 import VDottedBox from "@/components/utils/VDottedBox.vue";
 // Others
 import { Vec2 } from "@/utils/vec2";
-import { ImageLoader } from "@/imageLoader";
+import { getImageURL } from "@/utils/imageURL";
 import { IMG_TAG_WIDTH } from "@/defines";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
@@ -81,7 +81,7 @@ export default class VCrop extends Vue {
   clicker: ClickChecker = new ClickChecker();
   mounted() {
     if (this.petaPanel._petaImage) {
-      this.imageURL = ImageLoader.getImageURL(this.petaPanel._petaImage, ImageType.FULLSIZED);
+      this.imageURL = getImageURL(this.petaPanel._petaImage, ImageType.FULLSIZED);
     }
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);

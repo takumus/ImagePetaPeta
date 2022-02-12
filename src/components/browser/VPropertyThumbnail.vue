@@ -23,7 +23,7 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
-import { ImageLoader } from "@/imageLoader";
+import { getImageURL } from "@/utils/imageURL";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { ImageType } from "@/datas/imageType";
 @Options({
@@ -35,7 +35,7 @@ export default class VPropertyThumbnail extends Vue {
   browserThumbnail!: BrowserThumbnail;
   imageURL = "";
   mounted() {
-    this.imageURL = ImageLoader.getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+    this.imageURL = getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
   }
   get loaded() {
     return this.imageURL != "";

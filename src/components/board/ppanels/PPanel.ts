@@ -1,7 +1,6 @@
 import { ImageType } from '@/datas/imageType';
-import { PetaImage } from '@/datas/petaImage';
 import { PetaPanel } from '@/datas/petaPanel';
-import { ImageLoader } from '@/imageLoader';
+import { getImageURL } from '@/utils/imageURL';
 import { Vec2 } from '@/utils/vec2';
 import * as PIXI from 'pixi.js';
 export class PPanel extends PIXI.Sprite {
@@ -15,7 +14,7 @@ export class PPanel extends PIXI.Sprite {
   private selection = new PIXI.Graphics();
   private noImageGraphics = new PIXI.Graphics();
   private loader = new PIXI.Loader();
-  private isSame = valueChecker();
+  private isSameAll = valueChecker().isSameAll;
   private defaultHeight = 0;
   constructor(public petaPanel: PetaPanel) {
     super();
@@ -29,7 +28,7 @@ export class PPanel extends PIXI.Sprite {
     this.update();
   }
   public loadTexture(type: ImageType): Promise<void> {
-    const url = this.petaPanel._petaImage ? ImageLoader.getImageURL(this.petaPanel._petaImage, type): "";
+    const url = this.petaPanel._petaImage ? getImageURL(this.petaPanel._petaImage, type): "";
     this.noImage = true;
     return new Promise((res, rej) => {
       if (!this.petaPanel._petaImage) {
@@ -53,7 +52,7 @@ export class PPanel extends PIXI.Sprite {
           rej("cannot load texture");
           return;
         }
-        this.image.texture = resources[ImageLoader.getImageURL(this.petaPanel._petaImage, type)].texture!;
+        this.image.texture = resources[getImageURL(this.petaPanel._petaImage, type)].texture!;
         this.noImage = false;
         this.update();
         res();
@@ -61,22 +60,20 @@ export class PPanel extends PIXI.Sprite {
     });
   }
   public update() {
-    // if (!this.petaPanel._petaImage) {
-    //   return;
-    // }
-    if (
-      this.isSame("petaPanel.width", this.petaPanel.width)
-      && this.isSame("petaPanel.height", this.petaPanel.height)
-      && this.isSame("petaPanel.crop.width", this.petaPanel.crop.width)
-      && this.isSame("petaPanel.crop.height", this.petaPanel.crop.height)
-      && this.isSame("petaPanel.crop.position.x", this.petaPanel.crop.position.x)
-      && this.isSame("petaPanel.crop.position.y", this.petaPanel.crop.position.y)
-      && this.isSame("petaPanel.position.x", this.petaPanel.position.x)
-      && this.isSame("petaPanel.position.y", this.petaPanel.position.y)
-      && this.isSame("petaPanel.rotation", this.petaPanel.rotation)
-      && this.isSame("unselected", this.unselected)
-      && this.isSame("selected", this.selected)
-    ) {
+    // 前回の描画時と値に変更があるかチェック
+    if (this.isSameAll(
+      "petaPanel.width", this.petaPanel.width,
+      "petaPanel.height", this.petaPanel.height,
+      "petaPanel.crop.width", this.petaPanel.crop.width,
+      "petaPanel.crop.height", this.petaPanel.crop.height,
+      "petaPanel.crop.position.x", this.petaPanel.crop.position.x,
+      "petaPanel.crop.position.y", this.petaPanel.crop.position.y,
+      "petaPanel.position.x", this.petaPanel.position.x,
+      "petaPanel.position.y", this.petaPanel.position.y,
+      "petaPanel.rotation", this.petaPanel.rotation,
+      "unselected", this.unselected,
+      "selected", this.selected
+    )) {
       return;
     }
     const panelWidth = this.absPanelWidth();
@@ -169,11 +166,26 @@ export class PPanel extends PIXI.Sprite {
 }
 function valueChecker() {
   const values: {[key: string]: any} = {};
-  return function(key: string, value: any) {
+  function isSame(key: string, value: any) {
     if (values[key] != value) {
       values[key] = value;
       return false;
     }
     return true;
   }
+  function isSameAll(...pairs: any[]) {
+    let result = true;
+    for (let i = 0; i < pairs.length / 2; i++) {
+      const key = pairs[i * 2] as string;
+      const value = pairs[i * 2 + 1];
+      if (!isSame(key, value)) {
+        result = false;
+      }
+    }
+    return result;
+  }
+  return {
+    isSame,
+    isSameAll
+  };
 }
