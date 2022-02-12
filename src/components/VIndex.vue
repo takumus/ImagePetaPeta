@@ -116,7 +116,10 @@ export default class Index extends Vue {
     });
     API.send("checkUpdate").then(async (result) => {
       if (!isLatest(result.current, result.latest)) {
-        if (await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+        if (
+          this.$systemInfo.platform == "win32"
+          && await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0
+        ) {
           API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
         }
       }
