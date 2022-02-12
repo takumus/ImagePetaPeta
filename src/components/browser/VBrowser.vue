@@ -146,6 +146,7 @@ export default class VBrowser extends Vue {
   scrollAreaResizer?: ResizeObserver;
   firstSelectedBrowserThumbnail: BrowserThumbnail | null = null;
   thumbnailsSize = 0;
+  currentScrollThumbnailId = "";
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0].contentRect);
@@ -181,14 +182,34 @@ export default class VBrowser extends Vue {
       }
     }
   }
-  updateScrollArea() {
-    const offset = this.scrollAreaHeight * 0.3;
+  saveScrollPosition() {
+    let min = Infinity;
+    this.browserThumbnails.forEach((t) => {
+      const d = Math.abs(t.position.y - this.thumbnails.scrollTop);
+      if (d < min) {
+        min = d;
+        this.currentScrollThumbnailId = t.petaImage.id;
+      }
+    });
+  }
+  restoreScrollPosition() {
+    const current = this.browserThumbnails.find((bt) => bt.petaImage.id == this.currentScrollThumbnailId);
+    if (current) {
+      this.thumbnails.scrollTo(0, current.position.y);
+    }
+  }
+  updateScrollArea(event?: Event) {
+    const offset = this.scrollAreaHeight * 0;
     this.areaMinY = this.thumbnails.scrollTop - offset;
     this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + offset;
+    if (this.scrollAreaHeight && event) {
+      this.saveScrollPosition();
+    }
   }
   resizeScrollArea(rect: DOMRectReadOnly) {
     const areaHeight = rect.height;
     this.scrollAreaHeight = areaHeight;
+    this.restoreScrollPosition();
     this.updateScrollArea();
   }
   resizeImages(rect: DOMRectReadOnly) {
@@ -385,6 +406,11 @@ export default class VBrowser extends Vue {
   @Watch("selectedTags")
   changeSelectedTags() {
     this.thumbnails.scrollTo(0, 0);
+    this.currentScrollThumbnailId = "";
+  }
+  @Watch("thumbnailsSize")
+  changeThumbnailsSize() {
+    this.restoreScrollPosition();
   }
   get selectedTagsArray() {
     return this.selectedTags.split(" ").filter((tag) => tag != "");
@@ -461,7 +487,7 @@ export default class VBrowser extends Vue {
     for (let i = 0; i < hc; i++) {
       yList.push(0);
     }
-    return this.filteredPetaImages.map((p) => {
+    const images = this.filteredPetaImages.map((p) => {
       let minY = Number.MAX_VALUE;
       let mvi = 0;
       yList.forEach((y, vi) => {
@@ -487,6 +513,8 @@ export default class VBrowser extends Vue {
           ||(this.areaMinY > position.y && position.y + height > this.areaMaxY)
       }
     });
+    // console.log(images.filter((i) => i.visible).length);
+    return images;
   }
   get visibleBrowserThumbnails(): BrowserThumbnail[] {
     return this.browserThumbnails.filter((p) => p.visible);
