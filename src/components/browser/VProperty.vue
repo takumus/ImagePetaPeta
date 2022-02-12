@@ -218,6 +218,9 @@ export default class VProperty extends Vue {
   height: 100%;
   // color: #333333;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   >.previews {
     position: relative;
     width: 100%;
@@ -225,28 +228,38 @@ export default class VProperty extends Vue {
     overflow: hidden;
     border-radius: var(--rounded);
     box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.5);
+    background-color: var(--bg-color);
   }
   >.buttons {
     text-align: center;
   }
-  >.tags ul {
-    white-space: nowrap;
-    padding: 0px;
-    >li {
-      list-style-type: none;
-      padding: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      &:hover * {
-        text-decoration: underline;
-      }
-      &::before {
-        width: 16px;
-        display: inline-block;
-        content: "・";
-      }
-      &.add::before {
-        content: "＋";
+  >.tags {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    ul {
+      white-space: nowrap;
+      padding: 0px;
+      flex-grow: 1;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      >li {
+        list-style-type: none;
+        padding: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        &:hover * {
+          text-decoration: underline;
+        }
+        &::before {
+          width: 16px;
+          display: inline-block;
+          content: "・";
+        }
+        &.add::before {
+          content: "＋";
+        }
       }
     }
   }
