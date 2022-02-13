@@ -72,7 +72,8 @@ export class PPanel extends PIXI.Sprite {
       "petaPanel.position.y", this.petaPanel.position.y,
       "petaPanel.rotation", this.petaPanel.rotation,
       "unselected", this.unselected,
-      "selected", this.selected
+      "selected", this.selected,
+      "noImage", this.noImage
     )) {
       return;
     }
