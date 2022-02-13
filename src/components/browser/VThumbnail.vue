@@ -66,6 +66,7 @@ import { MouseButton } from "@/datas/mouseButton";
 import { ClickChecker } from "@/utils/clickChecker";
 import { ImageType } from "@/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
+import { log } from "@/api";
 @Options({
   components: {
   },
@@ -84,14 +85,20 @@ export default class VThumbnail extends Vue {
   click: ClickChecker = new ClickChecker();
   mounted() {
     this.changeFullsized();
-    const pixels = decodePlaceholder(this.browserThumbnail.petaImage.placeholder, 32, 32);
-    this.canvas.width = 32;
-    this.canvas.height = 32;
-    const ctx = this.canvas.getContext("2d");
-    if (ctx){ 
-      const imageData = ctx.createImageData(32, 32);
-      imageData.data.set(pixels);
-      ctx.putImageData(imageData, 0, 0);
+    if (this.browserThumbnail.petaImage.placeholder != "") {
+      try {
+        const pixels = decodePlaceholder(this.browserThumbnail.petaImage.placeholder, 32, 32);
+        this.canvas.width = 32;
+        this.canvas.height = 32;
+        const ctx = this.canvas.getContext("2d");
+        if (ctx){ 
+          const imageData = ctx.createImageData(32, 32);
+          imageData.data.set(pixels);
+          ctx.putImageData(imageData, 0, 0);
+        }
+      }catch(e) {
+        log("blurhash error:", e);
+      }
     }
   }
   unmounted() {
