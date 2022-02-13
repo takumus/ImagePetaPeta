@@ -199,7 +199,7 @@ export default class VBrowser extends Vue {
     }
   }
   updateScrollArea(event?: Event) {
-    const offset = this.scrollAreaHeight * 0;
+    const offset = this.scrollAreaHeight * 0.1;
     this.areaMinY = this.thumbnails.scrollTop - offset;
     this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + offset;
     if (this.scrollAreaHeight && event) {
