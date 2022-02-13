@@ -27,7 +27,7 @@ module.exports = {
         productName: packageJSON.productName,
         asar: true,
         win: {
-          // icon: "build/favicon.ico",
+          icon: "build/icon.ico",
           target: ["nsis"]
         },
         mac: {
