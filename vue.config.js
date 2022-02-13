@@ -24,7 +24,7 @@ module.exports = {
       preload: 'src/preload.ts',
       builderOptions: {
         appId: "io.takumus.imagepetapeta-beta",
-        productName: packageJSON.name,
+        productName: packageJSON.productName,
         asar: true,
         win: {
           // icon: "build/favicon.ico",

@@ -123,6 +123,7 @@ export default class Index extends Vue {
     this.getSystemDarkMode();
     await this.getPetaImages();
     await this.getPetaBoards();
+    document.title = this.title;
     this.$nextTick(() => {
       API.send("showMainWindow");
     });

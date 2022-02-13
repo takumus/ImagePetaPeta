@@ -1,8 +1,10 @@
 {
-  "name": "ImagePetaPeta-beta",
+  "name": "imagepetapeta-beta",
   "productName": "ImagePetaPeta-beta",
   "version": "1.5.3-beta",
   "private": true,
+  "author": "takumus",
+  "description": "image viewer",
   "scripts": {
     "serve": "yarn generate-licenses && vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
@@ -15,11 +17,6 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@types/mime-types": "^2.1.1",
-    "@types/nedb": "^1.8.12",
-    "@types/resize-observer-browser": "^0.1.6",
-    "@types/sharp": "^0.28.6",
-    "@types/uuid": "^8.3.1",
     "axios": "^0.21.4",
     "blurhash": "^1.1.4",
     "core-js": "^3.6.5",
@@ -32,11 +29,15 @@
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
     "vue-i18n": "^9.2.0-beta.6",
-    "vue-property-decorator": "^9.1.2",
-    "vuex": "^4.0.0-0"
+    "vue-property-decorator": "^9.1.2"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",
+    "@types/mime-types": "^2.1.1",
+    "@types/nedb": "^1.8.12",
+    "@types/resize-observer-browser": "^0.1.6",
+    "@types/sharp": "^0.28.6",
+    "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-babel": "~4.5.0",
