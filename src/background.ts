@@ -26,6 +26,7 @@ import { MainFunctions } from "@/api/main";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
 import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
+import { v4 as uuid } from "uuid";
 (async () => {
   const customTitlebar = process.platform == "win32";
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -247,9 +248,10 @@ import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrad
     checkUpdate: async (event) => {
       try {
         logger.mainLog("#Check Update");
-        logger.mainLog("url:", PACKAGE_JSON_URL);
+        const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
+        logger.mainLog("url:", url);
         logger.mainLog("currentVersion:", app.getVersion());
-        const packageJSON = (await axios.get(PACKAGE_JSON_URL, { responseType: "json" })).data;
+        const packageJSON = (await axios.get(url, { responseType: "json" })).data;
         logger.mainLog("latestVersion:", packageJSON.version);
         return {
           current: app.getVersion(),

@@ -61,7 +61,7 @@ import VInfo from "@/components/utils/VInfo.vue";
 import VSettings from "@/components/utils/VSettings.vue";
 // Others
 import { API, log } from "@/api";
-import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/defines";
+import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/defines";
 import { PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
@@ -114,16 +114,6 @@ export default class Index extends Vue {
       // log("on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
-    API.send("checkUpdate").then(async (result) => {
-      if (!isLatest(result.current, result.latest)) {
-        if (
-          this.$systemInfo.platform == "win32"
-          && await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0
-        ) {
-          API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
-        }
-      }
-    });
     API.on("windowFocused", (e, focused) => {
       this.windowIsFocused = focused;
     });
@@ -135,7 +125,22 @@ export default class Index extends Vue {
     await this.getPetaBoards();
     this.$nextTick(() => {
       API.send("showMainWindow");
-    })
+    });
+    this.checkUpdate();
+  }
+  checkUpdate() {
+    API.send("checkUpdate").then(async (result) => {
+      if (!isLatest(result.current, result.latest)) {
+        if (
+          this.$systemInfo.platform == "win32"
+          && await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0
+        ) {
+          API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
+        }
+      } else {
+        setTimeout(this.checkUpdate, UPDATE_CHECK_INTERVAL);
+      }
+    });
   }
   async getPetaImages() {
     this.petaImages = await API.send("getPetaImages");
