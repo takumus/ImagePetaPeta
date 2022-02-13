@@ -480,7 +480,10 @@ export default class VBrowser extends Vue {
     return this.selectedTagsArray.length == 0;
   }
   get browserThumbnails(): BrowserThumbnail[] {
-    const hc = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
+    let hc = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
+    if (hc < 1) {
+      hc = 1;
+    }
     this.thumbnailWidth = this.thumbnailsWidth / hc;
     const yList: number[] = [];
     this.scrollHeight = 0;
