@@ -38,7 +38,7 @@
         </li>
         <li class="add">
           <VEditableLabel
-            :label="'tag-name'"
+            :label="''"
             :labelLook="$t('browser.property.clickToAddTag')"
             :growWidth="true"
             :clickToEdit="true"
