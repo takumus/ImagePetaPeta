@@ -1,6 +1,6 @@
 <template>
   <article
-    class="thumbnail-root"
+    class="property-thumbnail-root"
     :style="{
       top: browserThumbnail.position.y + 'px',
       left: browserThumbnail.position.x + 'px',
@@ -44,7 +44,7 @@ export default class VPropertyThumbnail extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.thumbnail-root {
+.property-thumbnail-root {
   display: block;
   position: absolute;
   >.wrapper {
