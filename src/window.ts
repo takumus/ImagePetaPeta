@@ -4,7 +4,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer"
 import * as path from "path";
 import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/defines";
 
-export async function initWindow(customTitlebar: boolean): Promise<BrowserWindow> {
+export async function initWindow(): Promise<BrowserWindow> {
   return new Promise((res, rej) => {
     if (!app.requestSingleInstanceLock()) app.quit();
     const isDevelopment = process.env.NODE_ENV !== "production"

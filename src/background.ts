@@ -48,7 +48,7 @@ import { v4 as uuid } from "uuid";
   const statesConfig = new Config<States>(path.resolve(DIR_ROOT, "states.json"), defaultStates);
   loadSettings();
   loadStates();
-  const window = await initWindow(customTitlebar);
+  const window = await initWindow();
   window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
   if (statesConfig.data.windowIsMaximized) {
     window.maximize();
