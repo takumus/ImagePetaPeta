@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
 import * as path from "path";
 import axios from "axios";
 import sharp from "sharp";
@@ -28,19 +28,13 @@ import { defaultStates, States } from "@/datas/states";
 import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
 import { v4 as uuid } from "uuid";
 (async () => {
-  const customTitlebar = process.platform == "win32";
+  if (!app.requestSingleInstanceLock()) app.quit();
   const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
   const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
   const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
-  try {
-    fs.mkdirSync(DIR_ROOT);
-  } catch(err) { }
-  try {
-    fs.mkdirSync(DIR_IMAGES);
-  } catch(err) { }
-  try {
-    fs.mkdirSync(DIR_THUMBNAILS);
-  } catch(err) { }
+  try { fs.mkdirSync(DIR_ROOT); } catch(err) { }
+  try { fs.mkdirSync(DIR_IMAGES); } catch(err) { }
+  try { fs.mkdirSync(DIR_THUMBNAILS); } catch(err) { }
   const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
   const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
   const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
@@ -48,19 +42,31 @@ import { v4 as uuid } from "uuid";
   const statesConfig = new Config<States>(path.resolve(DIR_ROOT, "states.json"), defaultStates);
   loadSettings();
   loadStates();
-  const window = await initWindow();
-  window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
-  if (statesConfig.data.windowIsMaximized) {
-    window.maximize();
-  }
-  window.on("close", () => {
-    if (!window.isMaximized()) {
-      statesConfig.data.windowSize.width = window.getSize()[0];
-      statesConfig.data.windowSize.height = window.getSize()[1];
+  let window: BrowserWindow;
+  protocol.registerSchemesAsPrivileged([{
+    scheme: "app",
+    privileges: {
+      secure: true,
+      standard: true
     }
-    statesConfig.data.windowIsMaximized = window.isMaximized();
-    statesConfig.save();
-    logger.mainLog("#Save Window Size", statesConfig.data.windowSize);
+  }]);
+  app.on("window-all-closed", () => {
+    logger.mainLog("#Electron event: window-all-closed");
+    if (process.platform != "darwin") {
+      app.quit();
+    }
+  });
+  app.on("activate", async () => {
+    logger.mainLog("#Electron event: activate");
+    if (BrowserWindow.getAllWindows().length === 0) {
+      window = await initWindow();
+    }
+  });
+  await new Promise<void>((res) => {
+    app.on("ready", async () => {
+      logger.mainLog("#Electron event: ready");
+      res();
+    });
   });
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;
@@ -335,13 +341,23 @@ import { v4 as uuid } from "uuid";
       }
       sendToRenderer("regenerateThumbnailsComplete");
     }
-    // setAlwaysOnTop: async (event, value) => {
-    //   logger.mainLog("#Set Always On Top", value);
-    //   window.setAlwaysOnTop(value);
-    // }
   }
   Object.keys(mainFunctions).forEach((key) => {
     ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
+  });
+  window = await initWindow();
+  window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
+  if (statesConfig.data.windowIsMaximized) {
+    window.maximize();
+  }
+  window.on("close", () => {
+    if (!window.isMaximized()) {
+      statesConfig.data.windowSize.width = window.getSize()[0];
+      statesConfig.data.windowSize.height = window.getSize()[1];
+    }
+    statesConfig.data.windowIsMaximized = window.isMaximized();
+    statesConfig.save();
+    logger.mainLog("#Save Window Size", statesConfig.data.windowSize);
   });
   window.addListener("blur", () => {
     sendToRenderer("windowFocused", false);
@@ -398,34 +414,34 @@ import { v4 as uuid } from "uuid";
     try {
       settingsConfig.load();
     } catch(e) {
-      logger.mainLog("settings load error:", e);
+      logger.mainLog("Settings load error:", e);
       settingsConfig.data = defaultSettings;
       try {
         settingsConfig.save();
-        logger.mainLog("recreate settings");
+        logger.mainLog("recreate Settings");
       } catch(e) {
-        logger.mainLog("cannot recreate settings");
+        logger.mainLog("cannot recreate Settings");
       }
     };
     settingsConfig.data = upgradeSettings(settingsConfig.data);
-    logger.mainLog("settings loaded");
+    logger.mainLog("Settings loaded");
   }
   function loadStates() {
     logger.mainLog("#Load States");
     try {
       statesConfig.load();
     } catch(e) {
-      logger.mainLog("states load error:", e);
+      logger.mainLog("States load error:", e);
       statesConfig.data = defaultStates;
       try {
         statesConfig.save();
-        logger.mainLog("recreate states");
+        logger.mainLog("recreate States");
       } catch(e) {
-        logger.mainLog("cannot recreate states");
+        logger.mainLog("cannot recreate States");
       }
     };
     statesConfig.data = upgradeStates(statesConfig.data);
-    logger.mainLog("states loaded");
+    logger.mainLog("States loaded");
   }
   async function importImages(filePaths: string[]) {
     sendToRenderer("importImagesBegin", filePaths.length);
