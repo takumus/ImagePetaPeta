@@ -485,6 +485,9 @@ export default class VBrowser extends Vue {
       hc = 1;
     }
     this.thumbnailWidth = this.thumbnailsWidth / hc;
+    if (this.thumbnailWidth == 0) {
+      return [];
+    }
     const yList: number[] = [];
     this.scrollHeight = 0;
     for (let i = 0; i < hc; i++) {
