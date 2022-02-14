@@ -16,7 +16,7 @@ const newDatas = Object.keys(datas).map((name) => {
   }
   return {
     name: name,
-    licenses: licenses
+    licenses: String(licenses).replace(/\r\n/g, "\n")
   }
 });
 fs.rmSync("./licenses.json");
