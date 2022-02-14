@@ -31,7 +31,7 @@ module.exports = {
           target: ["nsis"]
         },
         mac: {
-          // icon: "build/logo.png"
+           icon: "icon/icon.png"
         },
         nsis: {
           oneClick: false,
