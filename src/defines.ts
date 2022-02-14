@@ -27,4 +27,4 @@ export const BROWSER_THUMBNAIL_SIZE = [128, 256, 512, 1024] as const;
 export const BROWSER_THUMBNAIL_ZOOM_MIN = 64;
 export const BROWSER_THUMBNAIL_ZOOM_MAX = 512;
 export const BROWSER_THUMBNAIL_ZOOM_STEP = 16;
-export const UPDATE_CHECK_INTERVAL = 1000 * 60 * 60 * 2; // 2時間
+export const UPDATE_CHECK_INTERVAL = 1000 * 60 * 60 * 1; // 1時間
