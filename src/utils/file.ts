@@ -21,16 +21,30 @@ export function readFile(path: string): Promise<Buffer> {
     });
   });
 }
-export function mkdir(path: string, recursive = false): Promise<boolean> {
+export function mkdir(path: string, recursive = false): Promise<string> {
   return new Promise((res, rej) => {
     fs.mkdir(path, { recursive }, (err) => {
       if (err) {
-        rej(err);
+        if (err.code == "EEXIST") {
+          res(path);
+        } else {
+          rej(err);
+        }
         return;
       }
-      res(true);
+      res(path);
     });
   })
+}
+export function mkdirSync(path: string, recursive = false) {
+  try {
+    fs.mkdirSync(path, { recursive });
+  } catch (err: any) {
+    if (err && err.code != "EEXIST") {
+      throw new Error("cannot create directory: " + path);
+    }
+  }
+  return path;
 }
 export function rm(path: string): Promise<boolean> {
   return new Promise((res, rej) => {

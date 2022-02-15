@@ -3,16 +3,16 @@ import * as path from "path";
 import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
-import fs from "fs";
 import dataURIToBuffer from "data-uri-to-buffer";
 import { encode as encodePlaceholder } from "blurhash";
+import { v4 as uuid } from "uuid";
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
-import * as asyncFile from "@/utils/asyncFile";
+import * as file from "@/utils/file";
 import DB from "@/utils/db";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
 import Logger from "@/utils/logger";
 import Config from "@/utils/config";
-import { initWindow } from "@/window";
+import { createWindow } from "@/window";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { addPetaBoardProperties, PetaBoard, createPetaBoard } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
@@ -26,48 +26,227 @@ import { MainFunctions } from "@/api/main";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
 import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
-import { v4 as uuid } from "uuid";
-(async () => {
-  if (!app.requestSingleInstanceLock()) app.quit();
-  const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
-  const DIR_IMAGES = path.resolve(DIR_ROOT, "images");
-  const DIR_THUMBNAILS = path.resolve(DIR_ROOT, "thumbnails");
-  try { fs.mkdirSync(DIR_ROOT); } catch(err) { }
-  try { fs.mkdirSync(DIR_IMAGES); } catch(err) { }
-  try { fs.mkdirSync(DIR_THUMBNAILS); } catch(err) { }
-  const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
-  const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
-  const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
-  const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
-  const statesConfig = new Config<States>(path.resolve(DIR_ROOT, "states.json"), defaultStates);
-  loadSettings();
-  loadStates();
-  let window: BrowserWindow;
-  protocol.registerSchemesAsPrivileged([{
-    scheme: "app",
-    privileges: {
-      secure: true,
-      standard: true
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+}
+const DIR_ROOT = file.mkdirSync(path.resolve(app.getPath("pictures"), "imagePetaPeta"));
+const DIR_IMAGES = file.mkdirSync(path.resolve(DIR_ROOT, "images"));
+const DIR_THUMBNAILS = file.mkdirSync(path.resolve(DIR_ROOT, "thumbnails"));
+const logger = new Logger(path.resolve(DIR_ROOT, "logs.log"));
+const petaImagesDB = new DB<PetaImage>(path.resolve(DIR_ROOT, "images.db"));
+const boardsDB = new DB<PetaBoard>(path.resolve(DIR_ROOT, "boards.db"));
+const settingsConfig = new Config<Settings>(path.resolve(DIR_ROOT, "settings.json"), defaultSettings);
+const statesConfig = new Config<States>(path.resolve(DIR_ROOT, "states.json"), defaultStates);
+let window: BrowserWindow;
+//-------------------------------------------------------------------------------------------------//
+/*
+  初期化
+*/
+//-------------------------------------------------------------------------------------------------//
+upgradeSettings(settingsConfig.data);
+upgradeStates(statesConfig.data);
+protocol.registerSchemesAsPrivileged([{
+  scheme: "app",
+  privileges: {
+    secure: true,
+    standard: true
+  }
+}]);
+app.on("window-all-closed", () => {
+  logger.mainLog("#Electron event: window-all-closed");
+  if (process.platform != "darwin") {
+    app.quit();
+  }
+});
+app.on("activate", async () => {
+  logger.mainLog("#Electron event: activate");
+  if (BrowserWindow.getAllWindows().length === 0) {
+    initWindow();
+  }
+});
+//-------------------------------------------------------------------------------------------------//
+/*
+  色々な関数
+*/
+//-------------------------------------------------------------------------------------------------//
+async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
+  logger.mainLog("##Save PetaImage");
+  logger.mainLog("mode:", mode);
+  logger.mainLog("image:", minimId(petaImage.id));
+  petaImage.tags = Array.from(new Set(petaImage.tags));
+  if (mode == UpdateMode.REMOVE) {
+    await petaImagesDB.remove({ id: petaImage.id });
+    logger.mainLog("removed db");
+    await file.rm(getImagePath(petaImage, ImageType.FULLSIZED)).catch((e) => {});
+    logger.mainLog("removed file");
+    await file.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
+    logger.mainLog("removed thumbnail");
+    return true;
+  }
+  petaImage._selected = undefined;
+  await petaImagesDB.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
+  logger.mainLog("updated");
+  sendToRenderer("updatePetaImage", petaImage);
+  return true;
+}
+async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
+  logger.mainLog("##Save PetaBoard");
+  logger.mainLog("mode:", mode);
+  logger.mainLog("board:", minimId(board.id));
+  if (mode == UpdateMode.REMOVE) {
+    await boardsDB.remove({ id: board.id });
+    logger.mainLog("removed");
+    return true;
+  }
+  await boardsDB.update({ id: board.id }, board, mode == UpdateMode.INSERT);
+  logger.mainLog("updated");
+  return true;
+}
+function getImagePathFromFilename(fileName: string, type: ImageType) {
+  const thumbnail = type == ImageType.THUMBNAIL;
+  return path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
+}
+function getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
+  return getImagePathFromFilename(petaImage.fileName, thumbnail);
+}
+function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
+  window.webContents.send(key, ...args);
+}
+async function importImages(filePaths: string[]) {
+  sendToRenderer("importImagesBegin", filePaths.length);
+  logger.mainLog("##Import Images");
+  logger.mainLog("files:", filePaths.length);
+  let addedFileCount = 0;
+  const petaImages: PetaImage[] = [];
+  const addDate = new Date();
+  for (let i = 0; i < filePaths.length; i++) {
+    const filePath = filePaths[i];
+    logger.mainLog("import:", i + 1, "/", filePaths.length);
+    let result = ImportImageResult.SUCCESS;
+    try {
+      const data = await file.readFile(filePath);
+      const name = path.basename(filePath);
+      const extName = path.extname(filePath);
+      const fileDate = (await file.stat(filePath)).mtime;
+      const addResult = await addImage(data, name, extName, fileDate, addDate);
+      petaImages.push(addResult.petaImage);
+      if (addResult.exists) {
+        result = ImportImageResult.EXISTS;
+      }
+      // success
+      addedFileCount++;
+      logger.mainLog("imported", name, result);
+    } catch (err) {
+      logger.mainLog("error:", err);
+      result = ImportImageResult.ERROR;
     }
-  }]);
-  app.on("window-all-closed", () => {
-    logger.mainLog("#Electron event: window-all-closed");
-    if (process.platform != "darwin") {
-      app.quit();
-    }
-  });
-  app.on("activate", async () => {
-    logger.mainLog("#Electron event: activate");
-    if (BrowserWindow.getAllWindows().length === 0) {
-      window = await initWindow();
-    }
-  });
-  await new Promise<void>((res) => {
-    app.on("ready", async () => {
-      logger.mainLog("#Electron event: ready");
-      res();
+    sendToRenderer("importImagesProgress", (i + 1) / filePaths.length, filePath, result);
+  }
+  logger.mainLog("return:", addedFileCount, "/", filePaths.length);
+  sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
+  return petaImages;
+}
+async function getPetaImage(id: string) {
+  return (await petaImagesDB.find({ id }))[0];
+}
+async function addImage(data: Buffer, name: string, extName: string, fileDate: Date, addDate: Date): Promise<AddImageResult> {
+  const id = crypto.createHash("sha256").update(data).digest("hex");
+  const exists = await getPetaImage(id);
+  if (exists) return {
+    petaImage: exists,
+    exists: true
+  };
+  const fileName = `${id}${extName}`;
+  const output = await generateThumbnail(
+    data,
+    getImagePathFromFilename(fileName, ImageType.THUMBNAIL),
+    settingsConfig.data.thumbnails.size,
+    settingsConfig.data.thumbnails.quality
+  );
+  const petaImage: PetaImage = {
+    fileName: fileName,
+    name: name,
+    fileDate: fileDate.getTime(),
+    addDate: addDate.getTime(),
+    width: 1,
+    height: output.sharp.height / output.sharp.width,
+    placeholder: output.placeholder,
+    id: id,
+    tags: [],
+    _selected: false
+  }
+  await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), data);
+  await petaImagesDB.update({ id: petaImage.id }, petaImage, true);
+  return {
+    petaImage: petaImage,
+    exists: false
+  };
+}
+async function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
+  const result = await sharp(data)
+  .resize(size)
+  .webp({ quality: quality })
+  .toFile(fileName);
+  const placeholder = await new Promise<string>((res, rej) => {
+    sharp(data)
+    .raw()
+    .ensureAlpha()
+    .resize(32, 32, { fit: "inside" })
+    .toBuffer((err, buffer, { width, height }) => {
+      if (err) {
+        rej(err);
+      }
+      try {
+        const d = encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4);
+        res(d);
+      } catch(e) {
+        rej(e);
+      }
     });
+  })
+  return {
+    sharp: result,
+    placeholder
+  };
+}
+function minimId(id: string) {
+  return id.substring(0, 6);
+}
+async function initWindow() {
+  window = await createWindow();
+  window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
+  if (statesConfig.data.windowIsMaximized) {
+    window.maximize();
+  }
+  window.on("close", () => {
+    if (!window.isMaximized()) {
+      statesConfig.data.windowSize.width = window.getSize()[0];
+      statesConfig.data.windowSize.height = window.getSize()[1];
+    }
+    statesConfig.data.windowIsMaximized = window.isMaximized();
+    statesConfig.save();
+    logger.mainLog("#Save Window Size", statesConfig.data.windowSize);
   });
+  window.addListener("blur", () => {
+    sendToRenderer("windowFocused", false);
+  });
+  window.addListener("focus", () => {
+    sendToRenderer("windowFocused", true);
+  });
+  window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
+}
+//-------------------------------------------------------------------------------------------------//
+/*
+  アプリ準備完了
+*/
+//-------------------------------------------------------------------------------------------------//
+app.on("ready", () => {
+  //-------------------------------------------------------------------------------------------------//
+  /*
+    画像用URL
+  */
+  //-------------------------------------------------------------------------------------------------//
   session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
     const filename = request.url.split("/").pop()!;
     const returnPath = path.resolve(DIR_IMAGES, filename);
@@ -78,10 +257,21 @@ import { v4 as uuid } from "uuid";
     const returnPath = path.resolve(DIR_THUMBNAILS, filename + ".webp");
     cb({ path: returnPath });
   });
+  //-------------------------------------------------------------------------------------------------//
+  /*
+    IPCのメインプロセス側のAPI
+  */
+  //-------------------------------------------------------------------------------------------------//
   const mainFunctions: MainFunctions = {
+    /*------------------------------------
+      ウインドウを表示
+    ------------------------------------*/
     showMainWindow: async () => {
       window.show();
     },
+    /*------------------------------------
+      画像を開く
+    ------------------------------------*/
     browseImages: async () => {
       logger.mainLog("#Browse Images");
       const file = await dialog.showOpenDialog(window, {
@@ -95,6 +285,9 @@ import { v4 as uuid } from "uuid";
       importImages(file.filePaths);
       return file.filePaths.length;
     },
+    /*------------------------------------
+      URLからインポート
+    ------------------------------------*/
     importImageFromURL: async (event, url) => {
       try {
         sendToRenderer("importImagesBegin", 1);
@@ -127,6 +320,9 @@ import { v4 as uuid } from "uuid";
       }
       return "";
     },
+    /*------------------------------------
+      ファイルからインポート
+    ------------------------------------*/
     importImagesFromFilePaths: async (event, filePaths) =>{
       try {
         logger.mainLog("#Import Images From File Paths");
@@ -138,6 +334,9 @@ import { v4 as uuid } from "uuid";
       }
       return [];
     },
+    /*------------------------------------
+      全PetaImage取得
+    ------------------------------------*/
     getPetaImages: async (event) => {
       try {
         logger.mainLog("#Get PetaImages");
@@ -154,6 +353,9 @@ import { v4 as uuid } from "uuid";
       }
       return {};
     },
+    /*------------------------------------
+      PetaImage 追加|更新|削除
+    ------------------------------------*/
     savePetaImages: async (event, datas, mode) => {
       logger.mainLog("#Save PetaImages");
       try {
@@ -169,6 +371,9 @@ import { v4 as uuid } from "uuid";
       logger.mainLog("return:", true);
       return true;
     },
+    /*------------------------------------
+      全PetaBoard取得
+    ------------------------------------*/
     getPetaBoards: async (event) => {
       try {
         logger.mainLog("#Get PetaBoards");
@@ -178,7 +383,7 @@ import { v4 as uuid } from "uuid";
           addPetaBoardProperties(board);
           board.petaPanels.forEach((petaPanel) => {
             addPetaPanelProperties(petaPanel);
-          })
+          });
         })
         if (data.length == 0) {
           logger.mainLog("no boards");
@@ -196,6 +401,9 @@ import { v4 as uuid } from "uuid";
       }
       return [];
     },
+    /*------------------------------------
+      PetaBoard 追加|更新|削除
+    ------------------------------------*/
     savePetaBoards: async (event, boards, mode) => {
       try {
         logger.mainLog("#Save PetaBoards");
@@ -209,10 +417,16 @@ import { v4 as uuid } from "uuid";
       }
       return false;
     },
+    /*------------------------------------
+      ログ
+    ------------------------------------*/
     log: async (event, ...args: any) => {
       logger.log(LogFrom.RENDERER, ...args);
       return true;
     },
+    /*------------------------------------
+      ダイアログ
+    ------------------------------------*/
     dialog: async (event, message, buttons) => {
       logger.mainLog("#Dialog");
       logger.mainLog("dialog:", message, buttons);
@@ -223,15 +437,24 @@ import { v4 as uuid } from "uuid";
       });
       return value.response;
     },
+    /*------------------------------------
+      WebブラウザでURLを開く
+    ------------------------------------*/
     openURL: async (event, url) => {
       logger.mainLog("#Open URL");
       logger.mainLog("url:", url);
       shell.openExternal(url);
       return true;
     },
+    /*------------------------------------
+      PetaImageのファイルを開く
+    ------------------------------------*/
     openImageFile: async (event, petaImage) => {
       shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
     },
+    /*------------------------------------
+      アプリ情報
+    ------------------------------------*/
     getAppInfo: async (event) => {
       logger.mainLog("#Get App Info");
       const info = {
@@ -241,16 +464,25 @@ import { v4 as uuid } from "uuid";
       logger.mainLog("return:", info);
       return info;
     },
+    /*------------------------------------
+      DBフォルダを開く
+    ------------------------------------*/
     showDBFolder: async (event) => {
       logger.mainLog("#Show DB Folder");
       shell.showItemInFolder(DIR_ROOT);
       return true;
     },
+    /*------------------------------------
+      全PetaBoard取得
+    ------------------------------------*/
     showImageInFolder: async (event, petaImage) => {
       logger.mainLog("#Show Image In Folder");
       shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
       return true;
     },
+    /*------------------------------------
+      アップデート確認
+    ------------------------------------*/
     checkUpdate: async (event) => {
       try {
         logger.mainLog("#Check Update");
@@ -271,6 +503,9 @@ import { v4 as uuid } from "uuid";
         latest: "0.0.0"
       };
     },
+    /*------------------------------------
+      設定保存
+    ------------------------------------*/
     updateSettings: async (event, settings) => {
       try {
         logger.mainLog("#Update Settings");
@@ -288,6 +523,9 @@ import { v4 as uuid } from "uuid";
       }
       return false;
     },
+    /*------------------------------------
+      設定取得
+    ------------------------------------*/
     getSettings: async (event) => {
       try {
         logger.mainLog("#Get Settings");
@@ -298,15 +536,27 @@ import { v4 as uuid } from "uuid";
       }
       return defaultSettings;
     },
+    /*------------------------------------
+      ウインドウのフォーカス取得
+    ------------------------------------*/
     getWindowIsFocused: async (event) => {
       return window.isFocused();
     },
+    /*------------------------------------
+      ズームレベル変更
+    ------------------------------------*/
     setZoomLevel: async (event, level) => {
       window.webContents.setZoomLevel(level);
     },
+    /*------------------------------------
+      最小化
+    ------------------------------------*/
     windowMinimize: async (event) => {
       window.minimize();
     },
+    /*------------------------------------
+      最大化
+    ------------------------------------*/
     windowMaximize: async (event) => {
       if (window.isMaximized()) {
         window.unmaximize();
@@ -314,12 +564,21 @@ import { v4 as uuid } from "uuid";
       }
       window.maximize();
     },
+    /*------------------------------------
+      閉じる
+    ------------------------------------*/
     windowClose: async (event) => {
       app.quit();
     },
+    /*------------------------------------
+      OS情報取得
+    ------------------------------------*/
     getPlatform: async (event) => {
       return process.platform;
     },
+    /*------------------------------------
+      サムネイル再生成
+    ------------------------------------*/
     regenerateThumbnails: async (event) => {
       logger.mainLog("#Regenerate Thumbnails");
       logger.mainLog("preset:", settingsConfig.data.thumbnails);
@@ -327,7 +586,7 @@ import { v4 as uuid } from "uuid";
       const images = await petaImagesDB.find({});
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
-        const data = await asyncFile.readFile(path.resolve(DIR_IMAGES, image.fileName));
+        const data = await file.readFile(path.resolve(DIR_IMAGES, image.fileName));
         const result = await generateThumbnail(
           data,
           getImagePathFromFilename(image.fileName, ImageType.THUMBNAIL),
@@ -342,207 +601,16 @@ import { v4 as uuid } from "uuid";
       sendToRenderer("regenerateThumbnailsComplete");
     }
   }
+  // 上のAPIをipcのやつに登録
   Object.keys(mainFunctions).forEach((key) => {
     ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
   });
-  window = await initWindow();
-  window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
-  if (statesConfig.data.windowIsMaximized) {
-    window.maximize();
-  }
-  window.on("close", () => {
-    if (!window.isMaximized()) {
-      statesConfig.data.windowSize.width = window.getSize()[0];
-      statesConfig.data.windowSize.height = window.getSize()[1];
-    }
-    statesConfig.data.windowIsMaximized = window.isMaximized();
-    statesConfig.save();
-    logger.mainLog("#Save Window Size", statesConfig.data.windowSize);
-  });
-  window.addListener("blur", () => {
-    sendToRenderer("windowFocused", false);
-  });
-  window.addListener("focus", () => {
-    sendToRenderer("windowFocused", true);
-  });
-  window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
-  async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    logger.mainLog(" ##Save PetaImage");
-    logger.mainLog(" mode:", mode);
-    logger.mainLog(" image:", minimId(petaImage.id));
-    petaImage.tags = Array.from(new Set(petaImage.tags));
-    if (mode == UpdateMode.REMOVE) {
-      await petaImagesDB.remove({ id: petaImage.id });
-      logger.mainLog(" removed db");
-      await asyncFile.rm(getImagePath(petaImage, ImageType.FULLSIZED)).catch((e) => {});
-      logger.mainLog(" removed file");
-      await asyncFile.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
-      logger.mainLog(" removed thumbnail");
-      return true;
-    }
-    petaImage._selected = undefined;
-    await petaImagesDB.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
-    logger.mainLog(" updated");
-    sendToRenderer("updatePetaImage", petaImage);
-    return true;
-  }
-  async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    logger.mainLog(" ##Save PetaBoard");
-    logger.mainLog(" mode:", mode);
-    logger.mainLog(" board:", minimId(board.id));
-    if (mode == UpdateMode.REMOVE) {
-      await boardsDB.remove({ id: board.id });
-      logger.mainLog(" removed");
-      return true;
-    }
-    await boardsDB.update({ id: board.id }, board, mode == UpdateMode.INSERT);
-    logger.mainLog(" updated");
-    return true;
-  }
-  function getImagePathFromFilename(fileName: string, type: ImageType) {
-    const thumbnail = type == ImageType.THUMBNAIL;
-    return path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
-  }
-  function getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
-    return getImagePathFromFilename(petaImage.fileName, thumbnail);
-  }
-  function sendToRenderer<U extends keyof Renderer>(key: U, ...args: Parameters<Renderer[U]>): void {
-    window.webContents.send(key, ...args);
-  }
-  function loadSettings() {
-    logger.mainLog("#Load Settings");
-    try {
-      settingsConfig.load();
-    } catch(e) {
-      logger.mainLog("Settings load error:", e);
-      settingsConfig.data = defaultSettings;
-      try {
-        settingsConfig.save();
-        logger.mainLog("recreate Settings");
-      } catch(e) {
-        logger.mainLog("cannot recreate Settings");
-      }
-    };
-    settingsConfig.data = upgradeSettings(settingsConfig.data);
-    logger.mainLog("Settings loaded");
-  }
-  function loadStates() {
-    logger.mainLog("#Load States");
-    try {
-      statesConfig.load();
-    } catch(e) {
-      logger.mainLog("States load error:", e);
-      statesConfig.data = defaultStates;
-      try {
-        statesConfig.save();
-        logger.mainLog("recreate States");
-      } catch(e) {
-        logger.mainLog("cannot recreate States");
-      }
-    };
-    statesConfig.data = upgradeStates(statesConfig.data);
-    logger.mainLog("States loaded");
-  }
-  async function importImages(filePaths: string[]) {
-    sendToRenderer("importImagesBegin", filePaths.length);
-    logger.mainLog(" ##Import Images");
-    logger.mainLog(" files:", filePaths.length);
-    let addedFileCount = 0;
-    const petaImages: PetaImage[] = [];
-    const addDate = new Date();
-    for (let i = 0; i < filePaths.length; i++) {
-      const filePath = filePaths[i];
-      logger.mainLog(" import:", i + 1, "/", filePaths.length);
-      let result = ImportImageResult.SUCCESS;
-      try {
-        const data = await asyncFile.readFile(filePath);
-        const name = path.basename(filePath);
-        const extName = path.extname(filePath);
-        const fileDate = (await asyncFile.stat(filePath)).mtime;
-        const addResult = await addImage(data, name, extName, fileDate, addDate);
-        petaImages.push(addResult.petaImage);
-        if (addResult.exists) {
-          result = ImportImageResult.EXISTS;
-        }
-        // success
-        addedFileCount++;
-        logger.mainLog(" imported", name, result);
-      } catch (err) {
-        logger.mainLog(" error:", err);
-        result = ImportImageResult.ERROR;
-      }
-      sendToRenderer("importImagesProgress", (i + 1) / filePaths.length, filePath, result);
-    }
-    logger.mainLog(" return:", addedFileCount, "/", filePaths.length);
-    sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
-    return petaImages;
-  }
-  async function getPetaImage(id: string) {
-    return (await petaImagesDB.find({ id }))[0];
-  }
-  async function addImage(data: Buffer, name: string, extName: string, fileDate: Date, addDate: Date): Promise<AddImageResult> {
-    const id = crypto.createHash("sha256").update(data).digest("hex");
-    const exists = await getPetaImage(id);
-    if (exists) return {
-      petaImage: exists,
-      exists: true
-    };
-    const fileName = `${id}${extName}`;
-    const output = await generateThumbnail(
-      data,
-      getImagePathFromFilename(fileName, ImageType.THUMBNAIL),
-      settingsConfig.data.thumbnails.size,
-      settingsConfig.data.thumbnails.quality
-    );
-    const petaImage: PetaImage = {
-      fileName: fileName,
-      name: name,
-      fileDate: fileDate.getTime(),
-      addDate: addDate.getTime(),
-      width: 1,
-      height: output.sharp.height / output.sharp.width,
-      placeholder: output.placeholder,
-      id: id,
-      tags: [],
-      _selected: false
-    }
-    await asyncFile.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), data);
-    await petaImagesDB.update({ id: petaImage.id }, petaImage, true);
-    return {
-      petaImage: petaImage,
-      exists: false
-    };
-  }
-  async function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
-    const result = await sharp(data)
-    .resize(size)
-    .webp({ quality: quality })
-    .toFile(fileName);
-    const placeholder = await new Promise<string>((res, rej) => {
-      sharp(data)
-      .raw()
-      .ensureAlpha()
-      .resize(32, 32, { fit: "inside" })
-      .toBuffer((err, buffer, { width, height }) => {
-        if (err) {
-          rej(err);
-        }
-        try {
-          const d = encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4);
-          res(d);
-        } catch(e) {
-          rej(e);
-        }
-      });
-    })
-    return {
-      sharp: result,
-      placeholder
-    };
-  }
-  function minimId(id: string) {
-    return id.substring(0, 6);
-  }
+  //-------------------------------------------------------------------------------------------------//
+  /*
+    ウインドウ生成と初期化
+  */
+  //-------------------------------------------------------------------------------------------------//
+  initWindow();
   // function download(url: string, filename: string, callback: (res: string) => void) {
   //   const file = fs.createWriteStream(filename);
   //   let receivedBytes = 0
@@ -578,5 +646,5 @@ import { v4 as uuid } from "uuid";
   //     return callback(err.message);
   //   });
   // }
-})();
+});
 // import request from "request";

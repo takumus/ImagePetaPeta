@@ -4,7 +4,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import * as path from "path";
 import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/defines";
 
-export async function initWindow(): Promise<BrowserWindow> {
+export async function createWindow(): Promise<BrowserWindow> {
   // Scheme must be registered before the app is ready
   const win = new BrowserWindow({
     width: WINDOW_DEFAULT_WIDTH,
