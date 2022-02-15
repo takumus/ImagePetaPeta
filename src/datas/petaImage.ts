@@ -8,6 +8,7 @@ export interface PetaImage {
   height: number,
   id: string,
   placeholder: string,
+  nsfw: boolean,
   _selected?: boolean
 }
 export type PetaImages = {[id: string]: PetaImage};

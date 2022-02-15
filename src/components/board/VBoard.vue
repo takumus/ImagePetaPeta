@@ -502,6 +502,7 @@ export default class VBoard extends Vue {
       return false;
     }
     const pPanel = new PPanel(petaPanel);
+    pPanel.showNsfw = this.$settings.showNsfwWithoutConfirm;
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
     await pPanel.loadTexture(ImageType.FULLSIZED);
@@ -555,6 +556,12 @@ export default class VBoard extends Vue {
   }
   get scalePercent() {
     return Math.floor(this.board.transform.scale * 100);
+  }
+  @Watch("$settings.showNsfwWithoutConfirm")
+  changeShowNsfwWithoutConfirm() {
+    this.pPanelsArray.forEach((pp) => {
+      pp.showNsfw = this.$settings.showNsfwWithoutConfirm;
+    });
   }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {

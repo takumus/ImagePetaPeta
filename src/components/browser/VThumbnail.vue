@@ -26,6 +26,9 @@
           loading="lazy"
           @load="loaded"
         >
+        <div class="nsfw" v-if="showNsfw">
+          NSFW
+        </div>
       </div>
       <div class="info">
         <span
@@ -96,7 +99,7 @@ export default class VThumbnail extends Vue {
           imageData.data.set(pixels);
           ctx.putImageData(imageData, 0, 0);
         }
-      }catch(e) {
+      } catch(e) {
         log("blurhash error:", e);
       }
     }
@@ -148,6 +151,9 @@ export default class VThumbnail extends Vue {
   loaded() {
     this.loading = false;
   }
+  get showNsfw() {
+    return this.browserThumbnail.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
+  }
   @Watch("fullsized")
   changeFullsized() {
     if (this.fullsized) {
@@ -198,6 +204,21 @@ export default class VThumbnail extends Vue {
         display: block;
         width: 100%;
         height: 100%;
+      }
+      >.nsfw {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #666666;
+        font-weight: bold;
       }
     }
     &:hover {

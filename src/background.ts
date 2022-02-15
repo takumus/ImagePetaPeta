@@ -6,13 +6,12 @@ import crypto from "crypto";
 import dataURIToBuffer from "data-uri-to-buffer";
 import { encode as encodePlaceholder } from "blurhash";
 import { v4 as uuid } from "uuid";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL } from "@/defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/defines";
 import * as file from "@/utils/file";
 import DB from "@/utils/db";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
 import Logger from "@/utils/logger";
 import Config from "@/utils/config";
-import { createWindow } from "@/window";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { addPetaBoardProperties, PetaBoard, createPetaBoard } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
@@ -26,10 +25,12 @@ import { MainFunctions } from "@/api/main";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
 import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
+import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
+
 const DIR_ROOT = file.mkdirSync(path.resolve(app.getPath("pictures"), "imagePetaPeta"));
 const DIR_IMAGES = file.mkdirSync(path.resolve(DIR_ROOT, "images"));
 const DIR_THUMBNAILS = file.mkdirSync(path.resolve(DIR_ROOT, "thumbnails"));
@@ -87,7 +88,7 @@ async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
   petaImage._selected = undefined;
   await petaImagesDB.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
   logger.mainLog("updated");
-  sendToRenderer("updatePetaImage", petaImage);
+  // sendToRenderer("updatePetaImage", petaImage);
   return true;
 }
 async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
@@ -174,6 +175,7 @@ async function addImage(data: Buffer, name: string, extName: string, fileDate: D
     placeholder: output.placeholder,
     id: id,
     tags: [],
+    nsfw: false,
     _selected: false
   }
   await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), data);
@@ -214,7 +216,29 @@ function minimId(id: string) {
   return id.substring(0, 6);
 }
 async function initWindow() {
-  window = await createWindow();
+  window = new BrowserWindow({
+    width: WINDOW_DEFAULT_WIDTH,
+    height: WINDOW_DEFAULT_HEIGHT,
+    minWidth: WINDOW_MIN_WIDTH,
+    minHeight: WINDOW_MIN_HEIGHT,
+    frame: false,
+    titleBarStyle: "hiddenInset",
+    show: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload:path.join(__dirname, "preload.js")
+    }
+  });
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    await window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
+    if (!process.env.IS_TEST) {
+      window.webContents.openDevTools({ mode: "detach" });
+    }
+  } else {
+    await window.loadURL("app://./index.html");
+  }
+  window.setMenuBarVisibility(false);
   window.setSize(statesConfig.data.windowSize.width, statesConfig.data.windowSize.height);
   if (statesConfig.data.windowIsMaximized) {
     window.maximize();
@@ -235,6 +259,7 @@ async function initWindow() {
     sendToRenderer("windowFocused", true);
   });
   window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
+  return window;
 }
 //-------------------------------------------------------------------------------------------------//
 /*
@@ -610,6 +635,7 @@ app.on("ready", () => {
     ウインドウ生成と初期化
   */
   //-------------------------------------------------------------------------------------------------//
+  createProtocol("app");
   initWindow();
   // function download(url: string, filename: string, callback: (res: string) => void) {
   //   const file = fs.createWriteStream(filename);

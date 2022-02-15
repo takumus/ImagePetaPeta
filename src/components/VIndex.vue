@@ -268,6 +268,13 @@ body, html {
   user-select: none;
   margin: 0px;
   padding: 0px;
+  font-size: 12px;
+  font-family: "Helvetica Neue",
+    Arial,
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    Meiryo,
+    sans-serif;
 }
 .root {
   --rounded: 6px;
@@ -301,13 +308,6 @@ body, html {
   }
   background-color: var(--bg-color);
   color: var(--font-color);
-  font-size: 12px;
-  font-family: "Helvetica Neue",
-    Arial,
-    "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans",
-    Meiryo,
-    sans-serif;
   ::-webkit-scrollbar {
     width: 8px;
   }

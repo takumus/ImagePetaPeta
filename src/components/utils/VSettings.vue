@@ -148,6 +148,15 @@
         <label>
           <input
             type="checkbox"
+            :checked="$settings.showNsfwWithoutConfirm"
+            @change="$settings.showNsfwWithoutConfirm = Boolean($event.target.checked)"
+          >
+          {{$t("settings.showNsfwWithoutConfirm")}}
+        </label><br>
+        <p>{{$t("settings.showNsfwWithoutConfirmDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
             :checked="$settings.showFPS"
             @change="$settings.showFPS = Boolean($event.target.checked)"
           >

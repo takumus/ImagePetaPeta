@@ -12,18 +12,26 @@ export class PPanel extends PIXI.Sprite {
   public noImage = false;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
-  private noImageGraphics = new PIXI.Graphics();
+  private cover = new PIXI.Graphics();
+  private coverLabel = new PIXI.Text("?", {
+    fontFamily: window.getComputedStyle(document.body).getPropertyValue("font-family"),
+    fontWeight: "bold",
+    fill: 0x666666,
+    fontSize: 64
+  });
   private loader = new PIXI.Loader();
   private isSameAll = valueChecker().isSameAll;
   private defaultHeight = 0;
+  public showNsfw = false;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
-    // this.image.anchor.set(0.5, 0.5);
     this.image.mask = this.masker;
-    this.addChild(this.image, this.masker, this.noImageGraphics, this.selection);
+    this.addChild(this.image, this.masker, this.cover, this.coverLabel, this.selection);
     this.interactive = true;
-    this.noImageGraphics.visible = false;
+    this.cover.visible = false;
+    this.coverLabel.visible = false;
+    this.coverLabel.anchor.set(0.5, 0.5);
     this.defaultHeight = petaPanel.height / petaPanel.width;
     this.update();
   }
@@ -73,7 +81,8 @@ export class PPanel extends PIXI.Sprite {
       "petaPanel.rotation", this.petaPanel.rotation,
       "unselected", this.unselected,
       "selected", this.selected,
-      "noImage", this.noImage
+      "noImage", this.noImage,
+      "nsfw", this.petaPanel._petaImage?.nsfw && !this.showNsfw
     )) {
       return;
     }
@@ -123,21 +132,33 @@ export class PPanel extends PIXI.Sprite {
         panelHeight
       );
     }
-    this.noImageGraphics.visible = this.noImage;
     if (this.noImage) {
-      this.noImageGraphics.clear();
-      this.noImageGraphics.beginFill(0xCCCCCC, 1);
-      this.noImageGraphics.drawRect(
+      this.coverLabel.text = "?";
+    } else if (this.petaPanel._petaImage?.nsfw && !this.showNsfw) {
+      this.coverLabel.text = "NSFW";
+    }
+    if (this.noImage || (this.petaPanel._petaImage?.nsfw && !this.showNsfw)) {
+      this.cover.visible = this.coverLabel.visible = true;
+      this.cover.clear();
+      this.cover.beginFill(0xffffff, 1);
+      this.cover.drawRect(
         -panelWidth / 2,
         -panelHeight / 2,
         panelWidth,
         panelHeight
       );
-      this.noImageGraphics.lineStyle(1, 0x333333, 1, undefined, true);
-      this.noImageGraphics.moveTo(-panelWidth / 2, -panelHeight / 2);
-      this.noImageGraphics.lineTo(-panelWidth / 2 + panelWidth, -panelHeight / 2 + panelHeight);
-      this.noImageGraphics.moveTo(-panelWidth / 2 + panelWidth, -panelHeight / 2);
-      this.noImageGraphics.lineTo(-panelWidth / 2, -panelHeight / 2 + panelHeight);
+      const clr = this.coverLabel.width / this.coverLabel.height;
+      const ilr = this.petaPanel.width / this.petaPanel.height;
+      const scale = 0.3;
+      if (clr > ilr) {
+        this.coverLabel.width = this.petaPanel.width * scale;
+        this.coverLabel.height = this.petaPanel.width / clr  * scale;
+      } else {
+        this.coverLabel.height = this.petaPanel.height * scale;
+        this.coverLabel.width = this.petaPanel.height * clr * scale;
+      }
+    } else {
+      this.cover.visible = this.coverLabel.visible = false;
     }
     this.x = this.petaPanel.position.x;
     this.y = this.petaPanel.position.y;

@@ -4,6 +4,7 @@ export default class Config<T> {
   data: T;
   constructor(private path: string, private defaultData: T) {
     this.data = JSON.parse(JSON.stringify(defaultData));
+    this.load();
   }
   load() {
     let buffer: Buffer | null = null;
@@ -12,8 +13,13 @@ export default class Config<T> {
     } catch (e) {
       this.save();
     }
-    if (buffer) {
-      this.data = JSON.parse(buffer.toString());
+    try {
+      if (buffer) {
+        this.data = JSON.parse(buffer.toString());
+      }
+    } catch(e) {
+      this.data = JSON.parse(JSON.stringify(this.defaultData));
+      this.save();
     }
   }
   save() {

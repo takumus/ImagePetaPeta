@@ -48,6 +48,16 @@
         </li>
       </ul>
     </section>
+    <section>
+      <label>
+        <input
+          type="checkbox"
+          :checked="nsfw"
+          @change="changeNsfw(Boolean($event.target.checked))"
+        >
+          NSFW
+        </label>
+    </section>
   </article>
 </template>
 
@@ -208,6 +218,29 @@ export default class VProperty extends Vue {
   }
   get noImage() {
     return this.petaImages.length == 0;
+  }
+  get nsfw() {
+    let nsfw = false;
+    let same = true;
+    this.petaImages.forEach((pi, i) => {
+      if (i == 0) {
+        nsfw = pi.nsfw;
+        return;
+      }
+      if (nsfw != pi.nsfw) {
+        same = false;
+      }
+    })
+    if (same) {
+      return nsfw;
+    }
+    return "not-same";
+  }
+  changeNsfw(value: boolean) {
+    this.petaImages.forEach((pi, i) => {
+      pi.nsfw = value;
+    });
+    API.send("savePetaImages", this.petaImages, UpdateMode.UPDATE);
   }
 }
 </script>

@@ -3,9 +3,13 @@ import { defaultSettings, Settings } from "@/datas/settings";
 import { States } from "@/datas/states";
 
 export function upgradePetaImage(petaImage: PetaImage) {
-  //v1.6.0
+  //v1.5.1
   if (petaImage.placeholder === undefined) {
     petaImage.placeholder = "";
+  }
+  //v1.6.0
+  if (petaImage.nsfw === undefined) {
+    petaImage.nsfw = false;
   }
   return petaImage;
 }
@@ -30,6 +34,10 @@ export function upgradeSettings(settings: Settings) {
   }
   if (settings.loadThumbnailsInFullsized === undefined) {
     settings.loadThumbnailsInFullsized = false;
+  }
+  // v1.6.0
+  if (settings.showNsfwWithoutConfirm === undefined) {
+    settings.showNsfwWithoutConfirm = false;
   }
   return settings;
 }

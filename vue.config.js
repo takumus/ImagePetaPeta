@@ -1,5 +1,11 @@
 const fs = require("fs");
 const packageJSON = JSON.parse(fs.readFileSync("./package.json"));
+let appxConfig = null;
+try {
+  appxConfig = require("./electron.config.appx.js");
+} catch (err) {
+  console.error("Cannot build appx. './electron.config.appx.js' is not found.");
+}
 module.exports = {
   chainWebpack: config => {
     config.module
@@ -23,12 +29,12 @@ module.exports = {
     electronBuilder: {
       preload: 'src/preload.ts',
       builderOptions: {
-        appId: "io.takumus.imagepetapeta-beta",
+        appId: "io.takumus." + packageJSON.name,
         productName: packageJSON.productName,
         asar: true,
         win: {
           icon: "build/icon.ico",
-          target: ["nsis"]
+          target: ["nsis", ...(appxConfig ? ["appx"] : [])]
         },
         mac: {
            icon: "icon/icon.png"
@@ -36,7 +42,8 @@ module.exports = {
         nsis: {
           oneClick: false,
           allowToChangeInstallationDirectory: true
-        }
+        },
+        ...appxConfig
       }
     }
   }

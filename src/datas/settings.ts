@@ -16,6 +16,7 @@ export const defaultSettings = {
     quality: BROWSER_THUMBNAIL_QUALITY[1]
   },
   browserThumbnailSize: 128,
-  loadThumbnailsInFullsized: false
+  loadThumbnailsInFullsized: false,
+  showNsfwWithoutConfirm: false
 }
 export type Settings = typeof defaultSettings;
