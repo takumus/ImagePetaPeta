@@ -5,8 +5,9 @@ export default class DB<T> {
   constructor(path: string) {
     this.nedb = new Nedb<T>({
       filename: path,
-      autoload: true
+      autoload: true,
     });
+    this.nedb.persistence.setAutocompactionInterval(5000);
   }
   find(query: any = {}): Promise<T[]> {
     return new Promise((res, rej) => {
