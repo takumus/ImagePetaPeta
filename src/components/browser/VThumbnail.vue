@@ -15,6 +15,9 @@
           'selected-image': browserThumbnail.petaImage._selected
         }"
       >
+        <div class="nsfw" v-if="showNsfw">
+          NSFW
+        </div>
         <canvas
           ref="canvas"
           v-if="loading"
@@ -26,9 +29,6 @@
           loading="lazy"
           @load="loaded"
         >
-        <div class="nsfw" v-if="showNsfw">
-          NSFW
-        </div>
       </div>
       <div class="info">
         <span
@@ -190,6 +190,7 @@ export default class VThumbnail extends Vue {
         padding: 2px;
       }
       >img {
+        z-index: 0;
         position: absolute;
         top: 0px;
         left: 0px;
@@ -199,6 +200,7 @@ export default class VThumbnail extends Vue {
       }
       >canvas {
         position: relative;
+        z-index: 1;
         top: 0px;
         left: 0px;
         display: block;
@@ -206,10 +208,10 @@ export default class VThumbnail extends Vue {
         height: 100%;
       }
       >.nsfw {
+        z-index: 2;
         position: relative;
         top: 0px;
         left: 0px;
-        display: block;
         width: 100%;
         height: 100%;
         background-color: #ffffff;
