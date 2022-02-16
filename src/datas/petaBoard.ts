@@ -59,7 +59,7 @@ export function dbPetaBoardsToPetaBoards(boards: PetaBoard[], petaImages: PetaIm
   });
 }
 export function petaBoardsToDBPetaBoards(board: PetaBoard) {
-  const b = deepcopy(board) as PetaBoard;
+  const b = deepcopy(board);
   b.petaPanels.forEach((pp) => {
     pp._petaImage = undefined;
   });
