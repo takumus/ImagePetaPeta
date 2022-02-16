@@ -9,6 +9,5 @@ declare module '*.vue' {
   export default component
 }
 declare module 'deepcopy' {
-  function deepcopy<T>(value: T): T;
-  export default deepcopy;
+  export default function<T>(value: T): T;
 }
