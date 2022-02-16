@@ -1,5 +1,5 @@
 import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
-import * as path from "path";
+import path from "path";
 import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
@@ -160,7 +160,7 @@ async function addImage(data: Buffer, name: string, extName: string, fileDate: D
     petaImage: exists,
     exists: true
   };
-  const fileName = `${id}${extName}`;
+  const fileName = `${id}.${extName}`;
   const output = await generateThumbnail(
     data,
     getImagePathFromFilename(fileName, ImageType.THUMBNAIL),
@@ -202,8 +202,7 @@ async function generateThumbnail(data: Buffer, fileName: string, size: number, q
         rej(err);
       }
       try {
-        const d = encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4);
-        res(d);
+        res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4));
       } catch(e) {
         rej(e);
       }
@@ -326,7 +325,7 @@ app.on("ready", () => {
           logger.mainLog("normal url:", url);
           data = (await axios.get(url, { responseType: "arraybuffer" })).data;
         }
-        const extName = "." + imageFormatToExtention((await sharp(data).metadata()).format);
+        const extName = imageFormatToExtention((await sharp(data).metadata()).format);
         if (!extName) {
           logger.mainLog("invalid image file");
           throw new Error("invalid image file");
@@ -636,40 +635,4 @@ app.on("ready", () => {
   //-------------------------------------------------------------------------------------------------//
   createProtocol("app");
   initWindow();
-  // function download(url: string, filename: string, callback: (res: string) => void) {
-  //   const file = fs.createWriteStream(filename);
-  //   let receivedBytes = 0
-  //   // Send request to the given URL
-  //   let totalBytes = 0;
-  //   request.get(url)
-  //   .on('response', (response) => {
-  //     if (response.statusCode !== 200) {
-  //       return callback('Response status was ' + response.statusCode);
-  //     }
-  //     const cl = response.headers['content-length'];
-  //     if (cl) {
-  //       totalBytes = parseInt(cl);
-  //     }
-  //   })
-  //   .on('data', (chunk) => {
-  //     receivedBytes += chunk.length;
-  //     console.log(receivedBytes / totalBytes * 100);
-  //   })
-  //   .pipe(file)
-  //   .on('error', (err) => {
-  //     file.close();
-  //     asyncFile.rm(filename);
-  //     callback(err.message);
-  //   });
-  //   file
-  //   .on('finish', () => {
-  //     file.close();
-  //     callback("fin");
-  //   })
-  //   .on('error', (err) => {
-  //     asyncFile.rm(filename);
-  //     return callback(err.message);
-  //   });
-  // }
 });
-// import request from "request";
