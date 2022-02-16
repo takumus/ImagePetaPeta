@@ -221,7 +221,7 @@ async function initWindow() {
     minHeight: WINDOW_MIN_HEIGHT,
     frame: false,
     titleBarStyle: "hiddenInset",
-    show: true,
+    show: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -257,6 +257,21 @@ async function initWindow() {
     sendToRenderer("windowFocused", true);
   });
   window.setAlwaysOnTop(settingsConfig.data.alwaysOnTop);
+  return window;
+}
+async function initSplash() {
+  const window = new BrowserWindow({
+    width: 300,
+    height: 100,
+    frame: false,
+    show: true
+  });
+  window.center();
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+  } else {
+    await window.loadURL("app://./splash.html");
+  }
+  window.setAlwaysOnTop(true);
   return window;
 }
 //-------------------------------------------------------------------------------------------------//
@@ -634,5 +649,7 @@ app.on("ready", () => {
   */
   //-------------------------------------------------------------------------------------------------//
   createProtocol("app");
-  initWindow();
+  initSplash().then(() => {
+    initWindow();
+  });
 });
