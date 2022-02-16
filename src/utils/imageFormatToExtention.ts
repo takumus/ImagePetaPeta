@@ -3,7 +3,5 @@ const formats: {[key: string]: string} = {
 }
 export function imageFormatToExtention(format: string | undefined | null) {
   if (!format) return format;
-  const extention = formats[format];
-  if (extention) return extention;
-  return format;
+  return formats[format] || format;
 }
