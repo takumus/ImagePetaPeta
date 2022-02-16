@@ -59,7 +59,7 @@ import { PPanel } from "@/components/board/ppanels/PPanel";
 import { PTransformer } from "@/components/board/ppanels/PTransformer";
 import { hitTest } from "@/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/defines";
-import deepcopy from "deepcopy";
+import { minimId } from "@/utils/utils";
 @Options({
   components: {
     VCrop,
@@ -486,12 +486,12 @@ export default class VBoard extends Vue {
       const progress =  `${i + 1}/${this.board.petaPanels.length}`;
       await this.loadFullsized(petaPanel).then((result) => {
         if (result) {
-          log(`loaded(${petaPanel._petaImage?.fileName}):`, progress);
-          this.loadingLog = `loaded(${petaPanel._petaImage?.fileName}):${progress}\n` + this.loadingLog;
+          log(`loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
+          this.loadingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
         }
       }).catch((err) => {
-        log(`loderr(${petaPanel._petaImage?.fileName}):`, progress, err);
-        this.loadingLog = `loaderr(${petaPanel._petaImage?.fileName}):${progress}\n` + this.loadingLog;
+        log(`loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, err);
+        this.loadingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
       });
       this.loadingProgress = ((i + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();

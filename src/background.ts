@@ -6,6 +6,8 @@ import crypto from "crypto";
 import dataURIToBuffer from "data-uri-to-buffer";
 import { encode as encodePlaceholder } from "blurhash";
 import { v4 as uuid } from "uuid";
+import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/defines";
 import * as file from "@/utils/file";
 import DB from "@/utils/db";
@@ -25,7 +27,7 @@ import { MainFunctions } from "@/api/main";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
 import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
-import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+import { minimId } from "@/utils/utils";
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -211,9 +213,6 @@ async function generateThumbnail(data: Buffer, fileName: string, size: number, q
     sharp: result,
     placeholder
   };
-}
-function minimId(id: string) {
-  return id.substring(0, 6);
 }
 async function initWindow() {
   window = new BrowserWindow({
