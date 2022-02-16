@@ -221,7 +221,7 @@ async function initWindow() {
     minHeight: WINDOW_MIN_HEIGHT,
     frame: false,
     titleBarStyle: "hiddenInset",
-    show: false,
+    show: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
