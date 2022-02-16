@@ -59,6 +59,7 @@ import { PPanel } from "@/components/board/ppanels/PPanel";
 import { PTransformer } from "@/components/board/ppanels/PTransformer";
 import { hitTest } from "@/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/defines";
+import deepcopy from "deepcopy";
 @Options({
   components: {
     VCrop,

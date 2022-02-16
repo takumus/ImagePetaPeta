@@ -1,10 +1,10 @@
-import { PetaBoard } from '@/datas/petaBoard';
-import { PetaImage, PetaImages } from '@/datas/petaImage';
-import { UpdateMode } from '@/datas/updateMode';
-import { AppInfo } from '@/datas/appInfo';
-import { IpcMainInvokeEvent } from 'electron';
-import { Settings } from '@/datas/settings';
-import { ImageType } from '@/datas/imageType';
+import { PetaBoard } from "@/datas/petaBoard";
+import { PetaImage, PetaImages } from "@/datas/petaImage";
+import { UpdateMode } from "@/datas/updateMode";
+import { AppInfo } from "@/datas/appInfo";
+import { IpcMainInvokeEvent } from "electron";
+import { Settings } from "@/datas/settings";
+import { ImageType } from "@/datas/imageType";
 export interface Main {
   showMainWindow: () => Promise<void>;
   browseImages: () => Promise<number>;

@@ -1,7 +1,7 @@
 import { Main } from "@/api/main";
 import { Renderer } from "@/api/renderer";
 import { IpcRendererEvent } from "electron/main";
-
+import deepcopy from "deepcopy";
 export const NAME = "main";
 export interface MainAPI {
   send<U extends keyof Main>(event: U, ...args: Parameters<Main[U]>): ReturnType<Main[U]>;
@@ -11,7 +11,7 @@ export interface MainAPI {
 export const _API = (window as any)[NAME] as (MainAPI);
 export const API = {
   send: (e: any, ...args: any[]) => {
-    args = args.map((arg) => arg === undefined ? undefined : arg === null ? null : JSON.parse(JSON.stringify(arg)));
+    args = args.map((arg) => arg === undefined ? undefined : arg === null ? null : deepcopy(arg));
     return _API.send(e, ...args);
   },
   on: (e: any, cb: any) => {

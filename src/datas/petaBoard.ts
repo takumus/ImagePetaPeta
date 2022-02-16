@@ -3,6 +3,7 @@ import { PetaPanel } from "./petaPanel";
 import { Vec2 } from "@/utils/vec2";
 import { PetaImages } from "./petaImage";
 import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR, BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
+import deepcopy from "deepcopy";
 
 export interface PetaBoard {
   petaPanels: PetaPanel[],
@@ -58,7 +59,7 @@ export function dbPetaBoardsToPetaBoards(boards: PetaBoard[], petaImages: PetaIm
   });
 }
 export function petaBoardsToDBPetaBoards(board: PetaBoard) {
-  const b = JSON.parse(JSON.stringify(board)) as PetaBoard;
+  const b = deepcopy(board) as PetaBoard;
   b.petaPanels.forEach((pp) => {
     pp._petaImage = undefined;
   });

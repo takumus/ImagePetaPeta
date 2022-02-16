@@ -1,4 +1,4 @@
-import Nedb from "nedb";
+import Nedb from "@seald-io/nedb";
 
 export default class DB<T> {
   nedb: Nedb<T>;

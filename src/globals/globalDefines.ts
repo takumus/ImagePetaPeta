@@ -8,7 +8,7 @@ const Plugin = {
       Object.defineProperty(app.config.globalProperties.$defines, key, {
         value: (defines as any)[key],
         writable: false
-    });
+      });
     })
   }
 }

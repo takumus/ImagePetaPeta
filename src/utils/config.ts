@@ -1,9 +1,10 @@
+import deepcopy from "deepcopy";
 import fs from "fs";
 
 export default class Config<T> {
   data: T;
   constructor(private path: string, private defaultData: T) {
-    this.data = JSON.parse(JSON.stringify(defaultData));
+    this.data = deepcopy(defaultData);
     this.load();
   }
   load() {
@@ -18,7 +19,7 @@ export default class Config<T> {
         this.data = JSON.parse(buffer.toString());
       }
     } catch(e) {
-      this.data = JSON.parse(JSON.stringify(this.defaultData));
+      this.data = deepcopy(this.defaultData);
       this.save();
     }
   }

@@ -34,7 +34,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "src/preload.ts"  ],
+    "src/preload.ts", "src/@types"  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,6 +1,4 @@
 import * as PIXI from "pixi.js";
-import Logo from "@/assets/dashedLineTexture.png";
-import { Vec2 } from '@/utils/vec2';
 import RotateCursor1x from "@/assets/rotateCursor1x.png";
 import RotateCursor2x from "@/assets/rotateCursor2x.png";
 export class PControlPoint extends PIXI.Container {

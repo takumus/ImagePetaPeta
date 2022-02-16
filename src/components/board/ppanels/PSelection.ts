@@ -1,6 +1,6 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from "pixi.js";
 import Logo from "@/assets/dashedLineTexture.png";
-import { Vec2 } from '@/utils/vec2';
+import { Vec2 } from "@/utils/vec2";
 export class PSelection extends PIXI.Container {
   texture?: PIXI.TilingSprite;
   graphics: PIXI.Graphics = new PIXI.Graphics();

@@ -1,11 +1,12 @@
-import * as PIXI from 'pixi.js';
-import { Vec2 } from '@/utils/vec2';
+import * as PIXI from "pixi.js";
+import { Vec2 } from "@/utils/vec2";
 import { PPanel } from "@/components/board/ppanels/PPanel";
 import { PetaPanel } from "@/datas/petaPanel";
-import { MouseButton } from '@/datas/mouseButton';
-import { ClickChecker } from '@/utils/clickChecker';
+import { MouseButton } from "@/datas/mouseButton";
+import { ClickChecker } from "@/utils/clickChecker";
 import { PSelection } from "@/components/board/ppanels/PSelection";
 import { PControlPoint } from "@/components/board/ppanels/PControlPoint";
+import deepcopy from "deepcopy";
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",
@@ -67,7 +68,7 @@ export class PTransformer extends PIXI.Container {
     this.sizingCornerIndex = index;
     this.beginSizingPosition = new Vec2(e.data.global);
     this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
-      const p = JSON.parse(JSON.stringify(pPanel.petaPanel));
+      const p = deepcopy(pPanel.petaPanel);
       delete p._petaImage;
       return p;
     });
@@ -76,7 +77,7 @@ export class PTransformer extends PIXI.Container {
   }
   beginRotating(index: number, e: PIXI.InteractionEvent) {
     this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
-      const p = JSON.parse(JSON.stringify(pPanel.petaPanel));
+      const p = deepcopy(pPanel.petaPanel);
       delete p._petaImage;
       return p;
     });
