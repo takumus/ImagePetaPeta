@@ -37,16 +37,6 @@ export function createPetaBoard(name: string, index = 0, dark: boolean) {
   }
   return board;
 }
-export function addPetaBoardProperties(board: PetaBoard) {
-  // バージョンアップで旧ファイルとの整合性を取る
-  if (!board.background) {
-    // v0.5.0の追加パラメータ
-    board.background = {
-      fillColor: BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-      lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR
-    }
-  }
-}
 export function dbPetaBoardsToPetaBoards(boards: PetaBoard[], petaImages: PetaImages) {
   return boards.forEach((board) => {
     board.transform.position = new Vec2(board.transform.position);

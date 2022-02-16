@@ -1,6 +1,8 @@
+import { PetaBoard } from "@/datas/petaBoard";
 import { PetaImage } from "@/datas/petaImage";
 import { defaultSettings, Settings } from "@/datas/settings";
 import { States } from "@/datas/states";
+import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
 
 export function upgradePetaImage(petaImage: PetaImage) {
   //v1.5.1
@@ -43,4 +45,14 @@ export function upgradeSettings(settings: Settings) {
 }
 export function upgradeStates(states: States) {
   return states;
+}
+export function upgradePetaBoard(board: PetaBoard) {
+  // v0.5.0
+  if (board.background === undefined) {
+    board.background = {
+      fillColor: BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+      lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR
+    }
+  }
+  return board;
 }

@@ -15,7 +15,7 @@ import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
 import Logger from "@/utils/logger";
 import Config from "@/utils/config";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { addPetaBoardProperties, PetaBoard, createPetaBoard } from "@/datas/petaBoard";
+import { PetaBoard, createPetaBoard } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { UpdateMode } from "@/datas/updateMode";
 import { LogFrom } from "@/datas/logFrom";
@@ -26,7 +26,7 @@ import { Renderer } from "@/api/renderer";
 import { MainFunctions } from "@/api/main";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
-import { upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
+import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
 import { minimId } from "@/utils/utils";
 
 if (!app.requestSingleInstanceLock()) {
@@ -404,7 +404,7 @@ app.on("ready", () => {
         const data = await boardsDB.find({});
         data.forEach((board) => {
           // バージョンアップ時のプロパティ更新
-          addPetaBoardProperties(board);
+          upgradePetaBoard(board);
           board.petaPanels.forEach((petaPanel) => {
             addPetaPanelProperties(petaPanel);
           });
