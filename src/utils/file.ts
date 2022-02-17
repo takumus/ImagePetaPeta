@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 export function writeFile(filePath: string, buffer: Buffer): Promise<boolean> {
   return new Promise((res, rej) => {
     fs.writeFile(filePath, buffer, (err) => {
@@ -41,7 +42,7 @@ export function mkdirSync(path: string, recursive = false) {
     fs.mkdirSync(path, { recursive });
   } catch (err: any) {
     if (err && err.code != "EEXIST") {
-      throw new Error("cannot create directory: " + path);
+      throw err;
     }
   }
   return path;
@@ -67,4 +68,21 @@ export function stat(path: string): Promise<fs.Stats> {
       res(stats);
     });
   })
+}
+export function writable(p: string, isDirectory: boolean) {
+  let stat: fs.Stats;
+  try {
+    // 存在確認
+    stat = fs.statSync(p);
+  } catch (err) {
+    // 存在しない場合は親ディレクトリのアクセス権確認
+    fs.accessSync(path.resolve(p, "../"), fs.constants.W_OK | fs.constants.R_OK);
+    return;
+  }
+  // 存在する場合はファイルの種類の確認
+  if (stat.isDirectory() != isDirectory) {
+    throw new Error(`File type is incorrect. "${p}" is not ${ isDirectory ? "directory" : "file" }.`);
+  }
+  // 存在する場合はパスのアクセス権確認
+  fs.accessSync(p, fs.constants.W_OK | fs.constants.R_OK);
 }
