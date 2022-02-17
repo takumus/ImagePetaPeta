@@ -41,6 +41,12 @@ export function upgradeSettings(settings: Settings) {
   if (settings.showNsfwWithoutConfirm === undefined) {
     settings.showNsfwWithoutConfirm = false;
   }
+  if (settings.petaImageDirectory === undefined) {
+    settings.petaImageDirectory = {
+      default: defaultSettings.petaImageDirectory.default,
+      path: defaultSettings.petaImageDirectory.path
+    };
+  }
   return settings;
 }
 export function upgradeStates(states: States) {

@@ -1,7 +1,6 @@
 import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/defines";
 
 export const defaultSettings = {
-  dbDirectory: "",
   lowMemoryMode: false,
   darkMode: false,
   autoDarkMode: true,
@@ -17,6 +16,10 @@ export const defaultSettings = {
   },
   browserThumbnailSize: 128,
   loadThumbnailsInFullsized: false,
-  showNsfwWithoutConfirm: false
+  showNsfwWithoutConfirm: false,
+  petaImageDirectory: {
+    default: true,
+    path: ""
+  }
 }
 export type Settings = typeof defaultSettings;

@@ -9,7 +9,7 @@
       <p>{{$t("settings.settings")}}</p>
       <ul>
         <li
-          v-for="tab in ['general', 'control', 'browser', 'others']"
+          v-for="tab in tabs"
           :key="tab"
           :class="{
             selected: currentTab == tab
@@ -133,6 +133,25 @@
         <p>{{$t("settings.loadThumbnailsInFullsizedDescriptions")}}</p>
       </section>
       <!--
+        Datas
+      -->
+      <section v-show="currentTab == 'datas'">
+        <button
+          @click="browsePetaImageDirectory"
+        >
+          {{$t("settings.browsePetaImageDirectoryButton")}}
+        </button>
+        <input type="text" v-model="tempPetaImageDirectory" class="file-path">
+        <br>
+        <button
+          @click="changePetaImageDirectory"
+          :disabled="tempPetaImageDirectory == ''"
+        >
+          {{$t("settings.changePetaImageDirectoryButton")}}
+        </button>
+        <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
+      </section>
+      <!--
         Others
       -->
       <section v-show="currentTab == 'others'">
@@ -154,19 +173,6 @@
           {{$t("settings.showNsfwWithoutConfirm")}}
         </label><br>
         <p>{{$t("settings.showNsfwWithoutConfirmDescriptions")}}</p>
-        <button
-          @click="browsePetaImageDirectory"
-        >
-          {{$t("settings.browsePetaImageDirectoryButton")}}
-        </button>
-        <br>
-        <button
-          @click="changePetaImageDirectory"
-          :disabled="tempPetaImageDirectory == null"
-        >
-          {{$t("settings.changePetaImageDirectoryButton")}}
-        </button>
-        <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
         <label>
           <input
             type="checkbox"
@@ -201,9 +207,9 @@ export default class VSettings extends Vue {
   regenerateThumbnailsCompleted = true;
   regenerateThumbnailsDone = 0;
   regenerateThumbnailsCount = 0;
-  tabs = ["general", "control", "browser", "others"];
+  tabs = ["general", "control", "browser", "datas", "others"];
   currentTab = "general";
-  tempPetaImageDirectory: string | null = null;
+  tempPetaImageDirectory = "";
   async mounted() {
     this.$globalComponents.settings = this;
     API.on("regenerateThumbnailsProgress", (_, done, count) => {
@@ -216,10 +222,10 @@ export default class VSettings extends Vue {
     API.on("regenerateThumbnailsComplete", (_) => {
       this.regenerateThumbnailsCompleted = true;
     });
-    this.open();
   }
   open() {
     this.visible = true;
+    this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
   }
   close() {
     this.visible = false;
@@ -233,13 +239,29 @@ export default class VSettings extends Vue {
   }
   async browsePetaImageDirectory() {
     const path = await API.send("browsePetaImageDirectory");
-    this.tempPetaImageDirectory = path;
-    console.log(path);
+    if (path) {
+      this.tempPetaImageDirectory = path;
+    }
   }
   async changePetaImageDirectory() {
     if (this.tempPetaImageDirectory) {
-      const result = await API.send("changePetaImageDirectory", this.tempPetaImageDirectory);
-      console.log(result);
+      const result = await API.send(
+        "dialog",
+        this.$t("settings.changePetaImageDirectoryDialog", [this.tempPetaImageDirectory]),
+        [this.$t("shared.yes"), this.$t("shared.no")]
+      );
+      if (result == 0) {
+        if (!await API.send("changePetaImageDirectory", this.tempPetaImageDirectory)) {
+          await API.send(
+            "dialog",
+            this.$t("settings.changePetaImageDirectoryErrorDialog", [this.tempPetaImageDirectory]),
+            [this.$t("shared.yes")]
+          );
+          this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
+        }
+      } else {
+        this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
+      }
     }
   }
 }
@@ -267,6 +289,9 @@ export default class VSettings extends Vue {
       font-size: 0.8em;
       margin-left: 16px;
       white-space: pre;
+    }
+    .file-path {
+      width: 100%;
     }
   }
 }

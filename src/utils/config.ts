@@ -3,24 +3,19 @@ import fs from "fs";
 
 export default class Config<T> {
   data: T;
-  constructor(private path: string, private defaultData: T) {
+  constructor(private path: string, private defaultData: T, upgrader?: (data: T) => T) {
     this.data = deepcopy(defaultData);
     this.load();
+    if (upgrader) {
+      this.data = upgrader(this.data);
+    }
   }
   load() {
-    let buffer: Buffer | null = null;
     try {
-      buffer = fs.readFileSync(this.path);
+      const buffer = fs.readFileSync(this.path);
+      this.data = JSON.parse(buffer.toString());
     } catch (e) {
-      this.save();
-    }
-    try {
-      if (buffer) {
-        this.data = JSON.parse(buffer.toString());
-      }
-    } catch(e) {
       this.data = deepcopy(this.defaultData);
-      this.save();
     }
   }
   save() {

@@ -96,6 +96,7 @@ const ja = {
     general: "基本",
     control: "操作",
     browser: "ブラウザ",
+    datas: "データ",
     others: "その他",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
@@ -118,7 +119,16 @@ const ja = {
     loadThumbnailsInFullsized: "ブラウザをズーム時にフルサイズの画像を読み込む。(高スペックPC向け)",
     loadThumbnailsInFullsizedDescriptions: "ブラウザでのサムネイルサイズが、上記で生成したサイズを超えた場合にフルサイズの画像を読み込みます。\n動作が重いと感じた場合は、この設定を無効にすることをおすすめします。",
     showNsfwWithoutConfirm: "NSFWな画像をを表示",
-    showNsfwWithoutConfirmDescriptions: "NSFWとしてマークした画像を常に表示します。気をつけてください。"
+    showNsfwWithoutConfirmDescriptions: "NSFWとしてマークした画像を常に表示します。気をつけてください。",
+    browsePetaImageDirectoryButton: "データの保存先を選ぶ",
+    changePetaImageDirectoryButton: "データの保存先を適用",
+    changePetaImageDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
+    changePetaImageDirectoryDialog: (ctx: any) => {
+      return `データの保存先を"${ctx.list(0)}"に変更しますか？\n"はい"を押すと再起動します。`
+    },
+    changePetaImageDirectoryErrorDialog: (ctx: any) => {
+      return `データの保存先を"${ctx.list(0)}"に変更出来ませんでした。\n他のフォルダを選んでください。`
+    },
   },
   imageImporter: {
     importing: "画像ファイルを読込中..."
