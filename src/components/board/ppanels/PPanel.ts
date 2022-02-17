@@ -43,26 +43,31 @@ export class PPanel extends PIXI.Sprite {
         rej("_petaImage is undefined");
         return;
       }
+      const imageURL = getImageURL(this.petaPanel._petaImage, type);
       const texture = PIXI.utils.TextureCache[url];
       if (texture) {
+        if (!texture.baseTexture) {
+          rej("texture is destroyed");
+          return;
+        }
         this.image.texture = texture;
         this.noImage = false;
-        this.update();
         res();
         return;
       }
       this.loader.add(url);
       this.loader.onError.add((error) => {
+        this.loader.resources[imageURL]?.texture?.destroy();
         rej("cannot load texture");
       });
       this.loader.load((_, resources) => {
-        if (!this.petaPanel._petaImage) {
+        const texture = resources[imageURL].texture;
+        if (!texture || !texture.baseTexture) {
           rej("cannot load texture");
           return;
         }
-        this.image.texture = resources[getImageURL(this.petaPanel._petaImage, type)].texture!;
+        this.image.texture = texture;
         this.noImage = false;
-        this.update();
         res();
       });
     });

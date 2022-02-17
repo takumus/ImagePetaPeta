@@ -507,6 +507,7 @@ export default class VBoard extends Vue {
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
     await pPanel.loadTexture(ImageType.FULLSIZED);
+    pPanel.update();
     return true;
   }
   clearCache() {
