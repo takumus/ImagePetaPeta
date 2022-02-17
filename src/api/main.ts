@@ -49,6 +49,8 @@ export interface Main {
   // alwaysOnTop
   // setAlwaysOnTop: (value: boolean) => Promise<void>;
   regenerateThumbnails: () => Promise<void>;
+  browsePetaImageDirectory: () => Promise<string | null>;
+  changePetaImageDirectory: (path: string) => Promise<boolean>;
 }
 export type MainFunctions = {
   [P in keyof Main]: (event: IpcMainInvokeEvent, ...args: Parameters<Main[P]>) => ReturnType<Main[P]>

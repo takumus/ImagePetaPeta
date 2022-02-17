@@ -154,6 +154,19 @@
           {{$t("settings.showNsfwWithoutConfirm")}}
         </label><br>
         <p>{{$t("settings.showNsfwWithoutConfirmDescriptions")}}</p>
+        <button
+          @click="browsePetaImageDirectory"
+        >
+          {{$t("settings.browsePetaImageDirectoryButton")}}
+        </button>
+        <br>
+        <button
+          @click="changePetaImageDirectory"
+          :disabled="tempPetaImageDirectory == null"
+        >
+          {{$t("settings.changePetaImageDirectoryButton")}}
+        </button>
+        <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
         <label>
           <input
             type="checkbox"
@@ -190,6 +203,7 @@ export default class VSettings extends Vue {
   regenerateThumbnailsCount = 0;
   tabs = ["general", "control", "browser", "others"];
   currentTab = "general";
+  tempPetaImageDirectory: string | null = null;
   async mounted() {
     this.$globalComponents.settings = this;
     API.on("regenerateThumbnailsProgress", (_, done, count) => {
@@ -202,6 +216,7 @@ export default class VSettings extends Vue {
     API.on("regenerateThumbnailsComplete", (_) => {
       this.regenerateThumbnailsCompleted = true;
     });
+    this.open();
   }
   open() {
     this.visible = true;
@@ -215,6 +230,17 @@ export default class VSettings extends Vue {
   }
   regenerateThumbnails() {
     API.send("regenerateThumbnails");
+  }
+  async browsePetaImageDirectory() {
+    const path = await API.send("browsePetaImageDirectory");
+    this.tempPetaImageDirectory = path;
+    console.log(path);
+  }
+  async changePetaImageDirectory() {
+    if (this.tempPetaImageDirectory) {
+      const result = await API.send("changePetaImageDirectory", this.tempPetaImageDirectory);
+      console.log(result);
+    }
   }
 }
 </script>
