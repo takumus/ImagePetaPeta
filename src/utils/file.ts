@@ -69,6 +69,19 @@ export function stat(path: string): Promise<fs.Stats> {
     });
   })
 }
+export function initFile(...paths: string[]) {
+  const res = path.resolve(...paths);
+  writable(res, false);
+  return res;
+}
+export function initDirectory(create: boolean, ...paths: string[]) {
+  const res = path.resolve(...paths);
+  writable(res, true);
+  if (create) {
+    mkdirSync(res);
+  }
+  return res;
+}
 export function writable(p: string, isDirectory: boolean) {
   let stat: fs.Stats;
   try {
