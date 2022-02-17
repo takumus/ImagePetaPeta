@@ -230,7 +230,7 @@ import { minimId, noHtml } from "@/utils/utils";
       try {
         const data = await file.readFile(filePath);
         const name = path.basename(filePath);
-        const extName = path.extname(filePath);
+        const extName = path.extname(filePath).replace(/\./g, "");
         const fileDate = (await file.stat(filePath)).mtime;
         const addResult = await addImage(data, name, extName, fileDate, addDate);
         petaImages.push(addResult.petaImage);
