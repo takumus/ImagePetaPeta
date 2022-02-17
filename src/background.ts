@@ -33,12 +33,12 @@ import { minimId, noHtml } from "@/utils/utils";
     app.quit();
   }
   let paths: Paths;
-  let logger: Logger;
+  let datas: Datas;
   let window: BrowserWindow;
   try {
     paths = initPaths();
   } catch (err) {
-    showError("Initialization Error", String(err));
+    showError("M", 1, "Initialization Error", String(err));
     return;
   }
   const {
@@ -51,18 +51,24 @@ import { minimId, noHtml } from "@/utils/utils";
     FILE_SETTINGS,
     FILE_STATES
   } = paths;
-  logger = new Logger(FILE_LOG);
-  const petaImagesDB = new DB<PetaImage>(FILE_IMAGES_DB);
-  const boardsDB = new DB<PetaBoard>(FILE_BOARDS_DB);
-  const settingsConfig = new Config<Settings>(FILE_SETTINGS, defaultSettings);
-  const statesConfig = new Config<States>(FILE_STATES, defaultStates);
+  try {
+    datas = initDatas();
+  } catch (err) {
+    showError("M", 2, "Initialization Error", String(err));
+    return;
+  }
+  const {
+    logger,
+    petaImagesDB,
+    boardsDB,
+    settingsConfig,
+    statesConfig
+  } = datas;
   //-------------------------------------------------------------------------------------------------//
   /*
     初期化
   */
   //-------------------------------------------------------------------------------------------------//
-  upgradeSettings(settingsConfig.data);
-  upgradeStates(statesConfig.data);
   protocol.registerSchemesAsPrivileged([{
     scheme: "app",
     privileges: {
@@ -87,6 +93,24 @@ import { minimId, noHtml } from "@/utils/utils";
     色々な関数
   */
   //-------------------------------------------------------------------------------------------------//
+  function initDatas() {
+    try {
+      const logger = new Logger(FILE_LOG);
+      const petaImagesDB = new DB<PetaImage>(FILE_IMAGES_DB);
+      const boardsDB = new DB<PetaBoard>(FILE_BOARDS_DB);
+      const settingsConfig = new Config<Settings>(FILE_SETTINGS, defaultSettings);
+      const statesConfig = new Config<States>(FILE_STATES, defaultStates);
+      return {
+        logger,
+        petaImagesDB,
+        boardsDB,
+        settingsConfig,
+        statesConfig
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
   function initPaths(): Paths {
     try {
       const DIR_ROOT = path.resolve(app.getPath("pictures"), "imagePetaPeta");
@@ -128,17 +152,17 @@ import { minimId, noHtml } from "@/utils/utils";
       throw err;
     }
   }
-  function showError(title: string, error: string) {
-    if (logger) {
-      try {
+  function showError(category: "M" | "R", code: number, title: string, error: string) {
+    try {
+      if (logger) {
         logger.mainLog("#Show Error", error);
-      } catch { }
-    }
-    if (window) {
-      try {
+      }
+    } catch { }
+    try {
+      if (window) {
         window.loadURL("data:text/html;charset=utf-8,");
-      } catch { }
-    }
+      }
+    } catch { }
     function createWindow() {
       const errorWindow = new BrowserWindow({
         width: 512,
@@ -155,10 +179,10 @@ import { minimId, noHtml } from "@/utils/utils";
         `data:text/html;charset=utf-8,
         <head>
         <title>${noHtml(app.getName())} Fatal Error</title>
-        <style>pre { white-space: pre-wrap; }</style>
+        <style>pre { white-space: pre-wrap; } h1 { font-family: monospace; }</style>
         </head>
         <body>
-        <h1>${noHtml(title)}</h1>
+        <h1>${category}${noHtml(('000' + code).slice(-3))} ${noHtml(title)}</h1>
         <pre>${noHtml(error)}</pre>
         </body>`
       );
@@ -383,7 +407,16 @@ import { minimId, noHtml } from "@/utils/utils";
     アプリ準備完了
   */
   //-------------------------------------------------------------------------------------------------//
-  app.on("ready", () => {
+  app.on("ready", async () => {
+    try {
+      await boardsDB.init();
+      await petaImagesDB.init();
+    } catch (error) {
+      showError("M", 3, "Initialization Error", String(error));
+      return;
+    }
+    upgradeSettings(settingsConfig.data);
+    upgradeStates(statesConfig.data);
     //-------------------------------------------------------------------------------------------------//
     /*
       画像用URL
@@ -492,7 +525,7 @@ import { minimId, noHtml } from "@/utils/utils";
           return petaImages;
         } catch(e) {
           logger.mainLog("error:", e);
-          showError("Get PetaImages Error", String(e));
+          showError("M", 4, "Get PetaImages Error", String(e));
         }
         return {};
       },
@@ -507,7 +540,7 @@ import { minimId, noHtml } from "@/utils/utils";
           }
         } catch (err) {
           logger.mainLog("error:", err);
-          showError("Save PetaImages Error", String(err));
+          showError("M", 5, "Save PetaImages Error", String(err));
         }
         if (mode != UpdateMode.UPDATE) {
           sendToRenderer("updatePetaImages");
@@ -542,7 +575,7 @@ import { minimId, noHtml } from "@/utils/utils";
           }
         } catch(e) {
           logger.mainLog("error:", e);
-          showError("Get PetaBoards Error", String(e));
+          showError("M", 6, "Get PetaBoards Error", String(e));
         }
         return [];
       },
@@ -559,7 +592,7 @@ import { minimId, noHtml } from "@/utils/utils";
           return true;
         } catch(e) {
           logger.mainLog("error:", e);
-          showError("Save PetaBoards Error", String(e));
+          showError("M", 7, "Save PetaBoards Error", String(e));
         }
         return false;
       },
@@ -666,7 +699,7 @@ import { minimId, noHtml } from "@/utils/utils";
           return true;
         } catch(e) {
           logger.mainLog(e);
-          showError("Update Settings Error", String(e));
+          showError("M", 8, "Update Settings Error", String(e));
         }
         return false;
       },
@@ -680,7 +713,7 @@ import { minimId, noHtml } from "@/utils/utils";
           return settingsConfig.data;
         } catch(e) {
           logger.mainLog(e);
-          showError("Get Settings Error", String(e));
+          showError("M", 9, "Get Settings Error", String(e));
         }
         return defaultSettings;
       },
@@ -749,7 +782,7 @@ import { minimId, noHtml } from "@/utils/utils";
           }
           sendToRenderer("regenerateThumbnailsComplete");
         } catch (err) {
-          showError("Regenerate Thumbnails Error", String(err));
+          showError("M", 10, "Regenerate Thumbnails Error", String(err));
         }
       },
       browsePetaImageDirectory: async (event) => {
@@ -791,3 +824,23 @@ import { minimId, noHtml } from "@/utils/utils";
     // });
   });
 })();
+
+interface Paths {
+  DIR_ROOT: string;
+  DIR_APP: string;
+  DIR_LOG: string;
+  DIR_IMAGES: string;
+  DIR_THUMBNAILS: string;
+  FILE_BOARDS_DB: string;
+  FILE_IMAGES_DB: string;
+  FILE_LOG: string;
+  FILE_SETTINGS: string;
+  FILE_STATES: string;
+}
+interface Datas {
+  logger: Logger
+  petaImagesDB: DB<PetaImage>
+  boardsDB: DB<PetaBoard>,
+  settingsConfig: Config<Settings>,
+  statesConfig: Config<States>
+}
