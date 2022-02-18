@@ -1,11 +1,9 @@
 const fs = require("fs");
 const Path = require("path");
 const config = {
-  root: "./src",
   types: ["ts", "vue"],
   exclude: ["./src/assets/licenses.ts"]
 }
-
 function search(path) {
   path = Path.resolve(path);
   let count = 0;
@@ -27,5 +25,4 @@ function search(path) {
   });
   return count;
 }
-
-console.log(search(config.root), "lines");
+console.log(search("./src"), "lines");
