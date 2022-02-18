@@ -1,5 +1,4 @@
-const fs = require("fs");
-const packageJSON = JSON.parse(fs.readFileSync("./package.json"));
+const packageJSON = require("./package.json");
 module.exports = {
   appx: {
     identityName: "XXXXtakumus." + packageJSON.productName,

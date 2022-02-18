@@ -1,5 +1,4 @@
-const fs = require("fs");
-const packageJSON = JSON.parse(fs.readFileSync("./package.json"));
+const packageJSON = require("./package.json");
 let appxConfig = null;
 try {
   appxConfig = require("./electron.config.appx.js");
@@ -8,17 +7,23 @@ try {
 }
 module.exports = {
   chainWebpack: config => {
+    config
+      .entry("app")
+      .clear();
+    config
+      .entry("app")
+      .add("./src/renderer/vue.ts");
     config.module
-      .rule('vue')
-      .use('vue-loader')
+      .rule("vue")
+      .use("vue-loader")
       .tap(options => {
         options.hotReload = false
         return options
       });
     config.module
-      .rule('images')
+      .rule("images")
       .test(/\.(png)(\?.*)?$/)
-      .use('url-loader')
+      .use("url-loader")
       .options({
         limit: 0,
         name: `assets/[name].[hash].[ext]`
@@ -27,7 +32,8 @@ module.exports = {
   productionSourceMap: false,
   pluginOptions: {
     electronBuilder: {
-      preload: 'src/preload.ts',
+      preload: "./src/main/preload.ts",
+      mainProcessFile: "./src/main/background.ts",
       builderOptions: {
         appId: "io.takumus." + packageJSON.name,
         productName: packageJSON.productName,

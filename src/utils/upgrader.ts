@@ -5,11 +5,15 @@ import { States } from "@/datas/states";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
 
 export function upgradePetaImage(petaImage: PetaImage) {
-  //v1.5.1
+  // v0.2.0
+  if (petaImage.tags === undefined) {
+    petaImage.tags = [];
+  }
+  // v1.5.1
   if (petaImage.placeholder === undefined) {
     petaImage.placeholder = "";
   }
-  //v1.6.0
+  // v1.6.0
   if (petaImage.nsfw === undefined) {
     petaImage.nsfw = false;
   }

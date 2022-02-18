@@ -1,7 +1,6 @@
-import ja from "./ja-default";
+import ja from "./@ja";
 // import en from "./en";
-const languages = {
+export default {
   ja,
   // en
 }
-export default languages;
