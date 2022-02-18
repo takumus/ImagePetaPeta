@@ -48,7 +48,7 @@
         </li>
       </ul>
     </section>
-    <section>
+    <section v-show="!noImage">
       <label>
         <input
           type="checkbox"
