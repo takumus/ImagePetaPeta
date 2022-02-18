@@ -1,5 +1,5 @@
 # ImagePetaPeta
-<img src="./icon/icon.png" width="128px">
+<img src="./rawAssets/icon/icon.png" width="128px">
 
 お絵かき屋さんのための、画像閲覧、管理ソフト。PureRefのような物です。
 ## ダウンロード
