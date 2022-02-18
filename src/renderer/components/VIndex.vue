@@ -25,7 +25,7 @@
     />
     <section
       class="modals"
-      v-show="this.$globalComponents.currentModalId.length > 0"
+      v-show="this.$globalComponents.modalIds.length > 0"
     >
       <VBrowser
         :petaImages="petaImages"

@@ -22,7 +22,7 @@ interface GLOBALS {
     close: () => void
   },
   importImages: () => void,
-  currentModalId: string[],
+  modalIds: string[],
   currentModalZIndex: number
 }
 declare module '@vue/runtime-core' {

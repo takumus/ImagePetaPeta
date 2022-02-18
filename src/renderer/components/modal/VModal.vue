@@ -9,6 +9,7 @@
       ...(parentStyle ? parentStyle : {}),
       zIndex: zIndex
     }"
+    ref="background"
   >
     <div
       class="modal"
@@ -50,6 +51,8 @@ export default class VModal extends Vue {
   visibleCloseButton = true;
   zIndex = 0;
   noBackground = false;
+  @Ref("background")
+  background!: HTMLElement;
   centerStyle = {
     position: "absolute",
     top: "50%",
@@ -57,29 +60,46 @@ export default class VModal extends Vue {
     transform: "translate(-50%, -50%)"
   }
   modalId = uuid();
+  clickBackground = false;
   async mounted() {
     // this.appInfo = await API.send("getAppInfo");
+    this.background.addEventListener("mousedown", this.mousedown);
+    this.background.addEventListener("mouseup", this.mouseup);
+  }
+  unmounted() {
+    this.background.removeEventListener("mousedown", this.mousedown);
+    this.background.removeEventListener("mouseup", this.mouseup);
   }
   close() {
     this.$emit("close");
   }
-  isActive() {
-    return this.modalId == this.$globalComponents.currentModalId[this.$globalComponents.currentModalId.length - 1];
+  mousedown(event: MouseEvent) {
+    this.clickBackground = event.target == this.background;
   }
-  @Watch("$globalComponents.currentModalId")
+  mouseup(event: MouseEvent) {
+    if (event.target == this.background && this.clickBackground) {
+      this.close();
+      this.clickBackground = false;
+    }
+  }
+  isActive() {
+    return this.modalId == this.$globalComponents.modalIds[this.$globalComponents.modalIds.length - 1];
+  }
+  @Watch("$globalComponents.modalIds")
   changeModal() {
     this.noBackground = !this.isActive();
   }
   @Watch("visible")
   changeVisible() {
-    this.$globalComponents.currentModalId = this.$globalComponents.currentModalId.filter((id) => id != this.modalId);
+    // 自分のidを除外
+    this.$globalComponents.modalIds = this.$globalComponents.modalIds.filter((id) => id != this.modalId);
     if (this.visible) {
-      if (this.$globalComponents.currentModalId.indexOf(this.modalId) < 0) {
-        this.$globalComponents.currentModalId.push(this.modalId);
-      }
+      // 自分のidを追加
+      this.$globalComponents.modalIds.push(this.modalId);
       this.zIndex = this.$globalComponents.currentModalZIndex + 3;
       this.$globalComponents.currentModalZIndex ++;
     }
+    console.log(this.$globalComponents.modalIds);
   }
   @Watch("$keyboards.escape")
   pressEscape() {

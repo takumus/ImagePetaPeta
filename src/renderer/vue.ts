@@ -19,7 +19,7 @@ import GlobalDefines from "@/renderer/globals/globalDefines";
   await GlobalSettings.install(app);
   await GlobalSystemInfo.install(app);
   app.config.globalProperties.$globalComponents = reactive({
-    currentModalId: [],
+    modalIds: [],
     currentModalZIndex: 0
   });
   app.mount("#app");
