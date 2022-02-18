@@ -1,7 +1,7 @@
 {
   "name": "imagepetapeta-beta",
   "productName": "ImagePetaPeta-beta",
-  "version": "1.6.1-beta",
+  "version": "1.6.2-beta",
   "private": true,
   "author": "takumus",
   "description": "image viewer",
@@ -18,7 +18,7 @@
     "preserve": "yarn generate-assets",
     "prebuild": "rimraf ./dist_electron && yarn generate-assets",
     "generate-assets": "yarn generate-licenses && yarn generate-icons && yarn generate-cursors",
-    "release": "node ./scripts/release.js && yarn build"
+    "release": "yarn generate-licenses && node ./scripts/release.js && yarn build"
   },
   "main": "background.js",
   "dependencies": {
