@@ -99,7 +99,6 @@ export default class VModal extends Vue {
       this.zIndex = this.$globalComponents.currentModalZIndex + 3;
       this.$globalComponents.currentModalZIndex ++;
     }
-    console.log(this.$globalComponents.modalIds);
   }
   @Watch("$keyboards.escape")
   pressEscape() {
