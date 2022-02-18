@@ -246,7 +246,6 @@ import isValidFilePath from "@/utils/isValidFilePath";
           const petaImages: PetaImages = {};
           data.forEach((pi) => {
             petaImages[pi.id] = upgradePetaImage(pi);
-            pi._selected = false;
           });
           dataLogger.mainLog("return:", data.length);
           return petaImages;
@@ -640,7 +639,6 @@ import isValidFilePath from "@/utils/isValidFilePath";
       dataLogger.mainLog("removed thumbnail");
       return true;
     }
-    petaImage._selected = undefined;
     await dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
     dataLogger.mainLog("updated");
     // sendToRenderer("updatePetaImage", petaImage);
@@ -750,8 +748,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
       placeholder: output.placeholder,
       id: id,
       tags: [],
-      nsfw: false,
-      _selected: false
+      nsfw: false
     }
     await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), data);
     await dataPetaImages.update({ id: petaImage.id }, petaImage, true);

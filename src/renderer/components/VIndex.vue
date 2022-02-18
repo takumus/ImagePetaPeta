@@ -62,7 +62,7 @@ import VSettings from "@/renderer/components/settings/VSettings.vue";
 // Others
 import { API, log } from "@/renderer/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/defines";
-import { PetaImages } from "@/datas/petaImage";
+import { dbPetaImagesToPetaImages, PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/datas/importImageResult";
 import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
@@ -144,7 +144,7 @@ export default class Index extends Vue {
     });
   }
   async getPetaImages() {
-    this.petaImages = await API.send("getPetaImages");
+    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"));
     let offsetIndex = 0;
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];
@@ -167,7 +167,7 @@ export default class Index extends Vue {
   }
   async getPetaBoards() {
     this.boards = await API.send("getPetaBoards");
-    dbPetaBoardsToPetaBoards(this.boards, this.petaImages);
+    dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);

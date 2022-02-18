@@ -75,6 +75,7 @@ import { MAX_PREVIEW_COUNT } from "@/defines";
 import { PetaImage } from "@/datas/petaImage";
 import { UpdateMode } from "@/datas/updateMode";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
+import { savePetaImages } from "@/renderer/libs/savePetaImages";
 @Options({
   components: {
     VEditableLabel,
@@ -141,7 +142,7 @@ export default class VProperty extends Vue {
       }
       pi.tags.sort();
     });
-    API.send("savePetaImages", this.petaImages, UpdateMode.UPDATE);
+    savePetaImages(this.petaImages, UpdateMode.UPDATE);
     // if (changed) {
       // API.send("dialog", this.$t("browser.property.clearSelectionDialog"), [this.$t("shared.yes"), this.$t("shared.no")]).then((index) => {
       //   if (index == 0) {
@@ -240,7 +241,7 @@ export default class VProperty extends Vue {
     this.petaImages.forEach((pi, i) => {
       pi.nsfw = value;
     });
-    API.send("savePetaImages", this.petaImages, UpdateMode.UPDATE);
+    savePetaImages(this.petaImages, UpdateMode.UPDATE);
   }
 }
 </script>

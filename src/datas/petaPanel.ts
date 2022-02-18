@@ -1,6 +1,7 @@
 import { Vec2 } from "@/utils/vec2";
-import { PetaImage } from "./petaImage";
+import { PetaImage, PetaImages } from "./petaImage";
 import { v4 as uuid } from "uuid";
+import deepcopy from "deepcopy";
 
 export interface PetaPanel {
   petaImageId: string,
@@ -37,4 +38,16 @@ export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: num
     _petaImage: petaImage
   }
   return panel;
+}
+export function petaPanelToDBPetaPanel(petaPanel: PetaPanel, copy = true) {
+  const dbPetaPanel = copy ? deepcopy(petaPanel) : petaPanel;
+  dbPetaPanel._petaImage = undefined;
+  return dbPetaPanel;
+}
+export function dbPetaPanelToPetaPanel(dbPetaPanel: PetaPanel, petaImages: PetaImages, copy = true) {
+  const petaPanel = copy ? deepcopy(dbPetaPanel) : dbPetaPanel;
+  petaPanel._petaImage = petaImages[petaPanel.petaImageId];
+  petaPanel.position = new Vec2(petaPanel.position);
+  petaPanel.crop.position = new Vec2(petaPanel.crop.position);
+  return petaPanel;
 }
