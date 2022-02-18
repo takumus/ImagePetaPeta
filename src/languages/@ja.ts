@@ -118,7 +118,7 @@ const ja = {
     thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。\n数値を上げると、ブラウザでの見た目がきれいになりますが、動作が重くなる場合があります。\n設定変更後は再生成ボタンを押してください。",
     loadThumbnailsInFullsized: "ブラウザをズーム時にフルサイズの画像を読み込む。(高スペックPC向け)",
     loadThumbnailsInFullsizedDescriptions: "ブラウザでのサムネイルサイズが、上記で生成したサイズを超えた場合にフルサイズの画像を読み込みます。\n動作が重いと感じた場合は、この設定を無効にすることをおすすめします。",
-    showNsfwWithoutConfirm: "NSFWな画像をを表示",
+    showNsfwWithoutConfirm: "NSFWな画像を表示",
     showNsfwWithoutConfirmDescriptions: "NSFWとしてマークした画像を常に表示します。気をつけてください。",
     browsePetaImageDirectoryButton: "データの保存先を選ぶ",
     changePetaImageDirectoryButton: "データの保存先を適用",
