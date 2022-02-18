@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as path from "path";
+import * as Path from "path";
 export function writeFile(filePath: string, buffer: Buffer): Promise<boolean> {
   return new Promise((res, rej) => {
     fs.writeFile(filePath, buffer, (err) => {
@@ -70,32 +70,32 @@ export function stat(path: string): Promise<fs.Stats> {
   })
 }
 export function initFile(...paths: string[]) {
-  const res = path.resolve(...paths);
+  const res = Path.resolve(...paths);
   writable(res, false);
   return res;
 }
 export function initDirectory(create: boolean, ...paths: string[]) {
-  const res = path.resolve(...paths);
+  const res = Path.resolve(...paths);
   writable(res, true);
   if (create) {
     mkdirSync(res);
   }
   return res;
 }
-export function writable(p: string, isDirectory: boolean) {
+export function writable(path: string, isDirectory: boolean) {
   let stat: fs.Stats;
   try {
     // 存在確認
-    stat = fs.statSync(p);
+    stat = fs.statSync(path);
   } catch (err) {
     // 存在しない場合は親ディレクトリのアクセス権確認
-    fs.accessSync(path.resolve(p, "../"), fs.constants.W_OK | fs.constants.R_OK);
+    fs.accessSync(Path.resolve(path, "../"), fs.constants.W_OK | fs.constants.R_OK);
     return;
   }
   // 存在する場合はファイルの種類の確認
   if (stat.isDirectory() != isDirectory) {
-    throw new Error(`File type is incorrect. "${p}" is not ${ isDirectory ? "directory" : "file" }.`);
+    throw new Error(`File type is incorrect. "${path}" is not ${ isDirectory ? "directory" : "file" }.`);
   }
   // 存在する場合はパスのアクセス権確認
-  fs.accessSync(p, fs.constants.W_OK | fs.constants.R_OK);
+  fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
 }

@@ -1,5 +1,5 @@
 import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
-import path from "path";
+import * as Path from "path";
 import axios from "axios";
 import sharp from "sharp";
 import crypto from "crypto";
@@ -28,6 +28,7 @@ import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
 import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
 import { minimId, noHtml } from "@/utils/utils";
+import isValidFilePath from "@/utils/isValidFilePath";
 (() => {
   if (!app.requestSingleInstanceLock()) {
     app.quit();
@@ -57,12 +58,14 @@ import { minimId, noHtml } from "@/utils/utils";
       dataSettings.data.petaImageDirectory.path = DIR_ROOT;
     } else {
       try {
-        if (path.resolve(dataSettings.data.petaImageDirectory.path) == path.resolve()) {
-          throw new Error("");
+        if (!isValidFilePath(dataSettings.data.petaImageDirectory.path)) {
+          throw new Error();
         }
         DIR_ROOT = file.initDirectory(true, dataSettings.data.petaImageDirectory.path);
       } catch (error) {
-        DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
+        dataSettings.data.petaImageDirectory.default = true;
+        dataSettings.save();
+        throw new Error(`Cannot access PetaImage directory: "${dataSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
       }
     }
     DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
@@ -118,12 +121,12 @@ import { minimId, noHtml } from "@/utils/utils";
     //-------------------------------------------------------------------------------------------------//
     session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
       const filename = request.url.split("/").pop()!;
-      const returnPath = path.resolve(DIR_IMAGES, filename);
+      const returnPath = Path.resolve(DIR_IMAGES, filename);
       cb({ path: returnPath });
     });
     session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (request, cb) => {
       const filename = request.url.split("/").pop()!;
-      const returnPath = path.resolve(DIR_THUMBNAILS, filename + ".webp");
+      const returnPath = Path.resolve(DIR_THUMBNAILS, filename + ".webp");
       cb({ path: returnPath });
     });
     //-------------------------------------------------------------------------------------------------//
@@ -475,7 +478,7 @@ import { minimId, noHtml } from "@/utils/utils";
           const images = await dataPetaImages.find({});
           for (let i = 0; i < images.length; i++) {
             const image = images[i];
-            const data = await file.readFile(path.resolve(DIR_IMAGES, image.fileName));
+            const data = await file.readFile(Path.resolve(DIR_IMAGES, image.fileName));
             const result = await generateThumbnail(
               data,
               getImagePathFromFilename(image.fileName, ImageType.THUMBNAIL),
@@ -507,27 +510,27 @@ import { minimId, noHtml } from "@/utils/utils";
         if (file.filePaths.length < 1) {
           return null;
         }
-        let filePath = path.resolve(file.filePaths[0]);
-        if (path.basename(filePath) != "PetaImage") {
-          filePath = path.resolve(filePath, "PetaImage");
+        let path = Path.resolve(file.filePaths[0]);
+        if (Path.basename(path) != "PetaImage") {
+          path = Path.resolve(path, "PetaImage");
         }
-        dataLogger.mainLog("return:", filePath);
-        return filePath;
+        dataLogger.mainLog("return:", path);
+        return path;
       },
       /*------------------------------------
         PetaImageフォルダを変更
       ------------------------------------*/
-      changePetaImageDirectory: async (event, newPath) => {
+      changePetaImageDirectory: async (event, path) => {
         try {
-          if (path.resolve() == path.resolve(newPath)) {
+          if (Path.resolve() == Path.resolve(path)) {
             return false;
           }
-          if (DIR_APP == path.resolve(newPath)) {
+          if (DIR_APP == Path.resolve(path)) {
             return false;
           }
-          newPath = file.initDirectory(true, newPath);
+          path = file.initDirectory(true, path);
           dataSettings.data.petaImageDirectory.default = false;
-          dataSettings.data.petaImageDirectory.path = newPath;
+          dataSettings.data.petaImageDirectory.path = path;
           dataSettings.save();
           relaunch();
           return true;
@@ -646,7 +649,7 @@ import { minimId, noHtml } from "@/utils/utils";
   ------------------------------------*/
   function getImagePathFromFilename(fileName: string, type: ImageType) {
     const thumbnail = type == ImageType.THUMBNAIL;
-    return path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
+    return Path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
   }
   /*------------------------------------
     PetaImageからパスを取得
@@ -676,8 +679,8 @@ import { minimId, noHtml } from "@/utils/utils";
       let result = ImportImageResult.SUCCESS;
       try {
         const data = await file.readFile(filePath);
-        const name = path.basename(filePath);
-        const extName = path.extname(filePath).replace(/\./g, "");
+        const name = Path.basename(filePath);
+        const extName = Path.extname(filePath).replace(/\./g, "");
         const fileDate = (await file.stat(filePath)).mtime;
         const addResult = await addImage(data, name, extName, fileDate, addDate);
         petaImages.push(addResult.petaImage);
@@ -783,7 +786,7 @@ import { minimId, noHtml } from "@/utils/utils";
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        preload: path.join(__dirname, "preload.js")
+        preload: Path.join(__dirname, "preload.js")
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
