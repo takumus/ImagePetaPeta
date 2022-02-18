@@ -10,3 +10,11 @@ export function noHtml(str: string | null | undefined){
   .replace(/</g,'&lt;')
   .replace(/>/g,'&gt;'); 
 }
+
+export function arrLast<T>(array: T[], defaultValue: T): T {
+  const value = array[array.length - 1];
+  if (value === undefined) {
+    return defaultValue;
+  }
+  return value;
+}

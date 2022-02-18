@@ -27,12 +27,20 @@ import { MainFunctions } from "@/api/mainFunctions";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
 import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
-import { minimId, noHtml } from "@/utils/utils";
+import { arrLast, minimId, noHtml } from "@/utils/utils";
 import isValidFilePath from "@/utils/isValidFilePath";
 (() => {
+  /*------------------------------------
+    シングルインスタンス化
+  ------------------------------------*/
   if (!app.requestSingleInstanceLock()) {
     app.quit();
   }
+  //-------------------------------------------------------------------------------------------------//
+  /*
+    window, ファイルパス, DBの定義
+  */
+  //-------------------------------------------------------------------------------------------------//
   let window: BrowserWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -49,6 +57,11 @@ import isValidFilePath from "@/utils/isValidFilePath";
   let dataPetaBoards: DB<PetaBoard>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
+  //-------------------------------------------------------------------------------------------------//
+  /*
+    ファイルパスとDBの、検証・読み込み・作成
+  */
+  //-------------------------------------------------------------------------------------------------//
   try {
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
@@ -79,14 +92,19 @@ import isValidFilePath from "@/utils/isValidFilePath";
     dataPetaImages = new DB<PetaImage>(FILE_IMAGES_DB);
     dataPetaBoards = new DB<PetaBoard>(FILE_BOARDS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
-    // console.log({ DIR_ROOT, DIR_APP, DIR_LOG, DIR_IMAGES, DIR_THUMBNAILS, FILE_LOG, FILE_IMAGES_DB, FILE_BOARDS_DB, FILE_SETTINGS, FILE_STATES });
   } catch (err) {
+    //-------------------------------------------------------------------------------------------------//
+    /*
+      何らかの原因でファイルとディレクトリの準備が失敗した場合
+      エラー画面を出してアプリ終了
+    */
+    //-------------------------------------------------------------------------------------------------//
     showError("M", 1, "Initialization Error", String(err));
     return;
   }
   //-------------------------------------------------------------------------------------------------//
   /*
-    初期化
+    electronのready前にやらないといけない事
   */
   //-------------------------------------------------------------------------------------------------//
   protocol.registerSchemesAsPrivileged([{
@@ -110,7 +128,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
   });
   //-------------------------------------------------------------------------------------------------//
   /*
-    アプリ準備完了
+    electronのready
   */
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
@@ -119,15 +137,15 @@ import isValidFilePath from "@/utils/isValidFilePath";
       画像用URL作成
     */
     //-------------------------------------------------------------------------------------------------//
-    session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (request, cb) => {
-      const filename = request.url.split("/").pop()!;
-      const returnPath = Path.resolve(DIR_IMAGES, filename);
-      cb({ path: returnPath });
+    session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (req, res) => {
+      res({
+        path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), ""))
+      });
     });
-    session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (request, cb) => {
-      const filename = request.url.split("/").pop()!;
-      const returnPath = Path.resolve(DIR_THUMBNAILS, filename + ".webp");
-      cb({ path: returnPath });
+    session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (req, res) => {
+      res({
+        path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "") + ".webp")
+      });
     });
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -138,7 +156,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
       await dataPetaBoards.init();
       await dataPetaImages.init();
     } catch (error) {
-      showError("M", 3, "Initialization Error", String(error));
+      showError("M", 2, "Initialization Error", String(error));
       return;
     }
     //-------------------------------------------------------------------------------------------------//
@@ -234,7 +252,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           return petaImages;
         } catch(e) {
           dataLogger.mainLog("error:", e);
-          showError("M", 4, "Get PetaImages Error", String(e));
+          showError("M", 3, "Get PetaImages Error", String(e));
         }
         return {};
       },
@@ -249,7 +267,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           }
         } catch (err) {
           dataLogger.mainLog("error:", err);
-          showError("M", 5, "Save PetaImages Error", String(err));
+          showError("M", 4, "Save PetaImages Error", String(err));
         }
         if (mode != UpdateMode.UPDATE) {
           sendToRenderer("updatePetaImages");
@@ -284,7 +302,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           }
         } catch(e) {
           dataLogger.mainLog("error:", e);
-          showError("M", 6, "Get PetaBoards Error", String(e));
+          showError("M", 5, "Get PetaBoards Error", String(e));
         }
         return [];
       },
@@ -301,7 +319,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           return true;
         } catch(e) {
           dataLogger.mainLog("error:", e);
-          showError("M", 7, "Save PetaBoards Error", String(e));
+          showError("M", 6, "Save PetaBoards Error", String(e));
         }
         return false;
       },
@@ -409,7 +427,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           return true;
         } catch(e) {
           dataLogger.mainLog(e);
-          showError("M", 8, "Update Settings Error", String(e));
+          showError("M", 7, "Update Settings Error", String(e));
         }
         return false;
       },
@@ -423,7 +441,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           return dataSettings.data;
         } catch(e) {
           dataLogger.mainLog(e);
-          showError("M", 9, "Get Settings Error", String(e));
+          showError("M", 8, "Get Settings Error", String(e));
         }
         return defaultSettings;
       },
@@ -492,7 +510,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           }
           sendToRenderer("regenerateThumbnailsComplete");
         } catch (err) {
-          showError("M", 10, "Regenerate Thumbnails Error", String(err));
+          showError("M", 9, "Regenerate Thumbnails Error", String(err));
         }
       },
       /*------------------------------------
