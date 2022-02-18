@@ -9,6 +9,7 @@
     "serve": "vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
     "lint": "vue-cli-service lint",
+    "linecount": "node ./scripts/linecount",
     "generate-licenses": "license-checker --production --json > ./licenses.json && node ./scripts/generateLicenses.js",
     "generate-icons": "node ./scripts/generateIcons.js",
     "generate-cursors": "node ./scripts/generateCursors.js",
