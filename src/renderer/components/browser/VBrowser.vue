@@ -388,7 +388,10 @@ export default class VBrowser extends Vue {
     ], position);
   }
   open() {
-    this.visible = true;
+    this.visible = false;
+    this.$nextTick(() => {
+      this.visible = true;
+    });
   }
   close() {
     this.visible = false;

@@ -224,7 +224,10 @@ export default class VSettings extends Vue {
     });
   }
   open() {
-    this.visible = true;
+    this.visible = false;
+    this.$nextTick(() => {
+      this.visible = true;
+    });
     this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
   }
   close() {

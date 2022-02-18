@@ -74,7 +74,9 @@ export default class VModal extends Vue {
   changeVisible() {
     this.$globalComponents.currentModalId = this.$globalComponents.currentModalId.filter((id) => id != this.modalId);
     if (this.visible) {
-      this.$globalComponents.currentModalId.push(this.modalId);
+      if (this.$globalComponents.currentModalId.indexOf(this.modalId) < 0) {
+        this.$globalComponents.currentModalId.push(this.modalId);
+      }
       this.zIndex = this.$globalComponents.currentModalZIndex + 3;
       this.$globalComponents.currentModalZIndex ++;
     }

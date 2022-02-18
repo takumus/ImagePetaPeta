@@ -72,7 +72,10 @@ export default class VInfo extends Vue {
     API.send("showDBFolder");
   }
   open() {
-    this.visible = true;
+    this.visible = false;
+    this.$nextTick(() => {
+      this.visible = true;
+    });
   }
   close() {
     this.visible = false;
