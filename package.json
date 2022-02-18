@@ -6,15 +6,18 @@
   "author": "takumus",
   "description": "image viewer",
   "scripts": {
-    "serve": "yarn generate-licenses && vue-cli-service electron:serve",
+    "serve": "vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
     "lint": "vue-cli-service lint",
     "generate-licenses": "license-checker --production --json > ./licenses.json && node ./scripts/generateLicenses.js",
     "generate-icons": "node ./scripts/generateIcons.js",
+    "generate-cursors": "node ./scripts/generateCursors.js",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "prebuild": "rimraf ./dist_electron && yarn generate-licenses && yarn generate-icons",
-    "release": "yarn generate-licenses && node ./scripts/release.js && yarn build"
+    "preserve": "yarn generate-assets",
+    "prebuild": "rimraf ./dist_electron && yarn generate-assets",
+    "generate-assets": "yarn generate-licenses && yarn generate-icons && yarn generate-cursors",
+    "release": "node ./scripts/release.js && yarn build"
   },
   "main": "background.js",
   "dependencies": {

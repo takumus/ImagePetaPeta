@@ -12,7 +12,7 @@ const sharp = require("sharp");
     .resize(size)
     .toBuffer();
     ico.addFromPng(buf, false, false);
-    console.log(`icon ${size}x`);
+    console.log(`icon ${size}px`);
   }
   fs.writeFileSync('./build/icon.ico', ico.encode());
   console.log("generate icons complete");
