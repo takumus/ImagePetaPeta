@@ -1,8 +1,10 @@
+import { DB_COMPACTION_DELAY } from "@/defines";
 import Nedb from "@seald-io/nedb";
 
 export default class DB<T> {
   nedb: Nedb<T> | null = null;
   loaded = false;
+  execCompationIntervalId!: NodeJS.Timeout;
   constructor(private path: string) {
   }
   init() {
@@ -20,8 +22,17 @@ export default class DB<T> {
           res(true);
         }
       });
-      this.nedb.persistence.setAutocompactionInterval(5000);
+      this.nedb.persistence.stopAutocompaction();
     })
+  }
+  orderCompaction() {
+    clearTimeout(this.execCompationIntervalId);
+    this.execCompationIntervalId = setTimeout(this.compaction, DB_COMPACTION_DELAY);
+  }
+  compaction = () => {
+    if (this.nedb && this.loaded) {
+      this.nedb.persistence.compactDatafile();
+    }
   }
   find(query: any = {}): Promise<T[]> {
     return new Promise((res, rej) => {
@@ -49,6 +60,7 @@ export default class DB<T> {
           rej(err);
           return;
         }
+        this.orderCompaction();
         res(true);
       });
     });
@@ -64,6 +76,7 @@ export default class DB<T> {
           rej(err);
           return;
         }
+        this.orderCompaction();
         res(true);
       });
     });
