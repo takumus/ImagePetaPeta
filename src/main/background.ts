@@ -406,8 +406,8 @@ import isValidFilePath from "@/utils/isValidFilePath";
           dataLogger.mainLog("error:", e);
         }
         return {
-          current: "0.0.0",
-          latest: "0.0.0"
+          current: app.getVersion(),
+          latest: app.getVersion()
         };
       },
       /*------------------------------------
@@ -836,24 +836,6 @@ import isValidFilePath from "@/utils/isValidFilePath";
       sendToRenderer("windowFocused", true);
     });
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
-    return window;
-  }
-  /*------------------------------------
-    スプラッシュ画面初期化
-  ------------------------------------*/
-  async function initSplash() {
-    const window = new BrowserWindow({
-      width: 300,
-      height: 100,
-      frame: false,
-      show: true
-    });
-    window.center();
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-    } else {
-      await window.loadURL("app://./splash.html");
-    }
-    window.setAlwaysOnTop(true);
     return window;
   }
   /*------------------------------------
