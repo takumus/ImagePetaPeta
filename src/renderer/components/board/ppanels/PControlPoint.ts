@@ -5,7 +5,7 @@ export class PControlPoint extends PIXI.Container {
   size = new PIXI.Graphics();
   rotate = new PIXI.Graphics();
   public currentRotation = 0;
-  constructor(public positionIndex: number = 0) {
+  constructor() {
     super();
     this.size.interactive = true;
     this.rotate.interactive = true;

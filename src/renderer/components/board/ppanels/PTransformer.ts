@@ -45,7 +45,6 @@ export class PTransformer extends PIXI.Container {
     this.corners.push(new PControlPoint());
     this.addChild(this.pMultipleSelection);
     this.corners.forEach((c, i) => {
-      c.positionIndex = i;
       c.size.on("pointerdown", (e) => {
         this.beginSizing(i, e);
       });
