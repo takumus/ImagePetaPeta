@@ -50,7 +50,7 @@ export function dbPetaBoardsToPetaBoards(dbBoards: PetaBoard[], petaImages: Peta
 export function petaBoardsToDBPetaBoards(board: PetaBoard, copy = true) {
   const b = copy ? deepcopy(board) : board;
   b.petaPanels.forEach((pp) => {
-    petaPanelToDBPetaPanel(pp, false)
+    petaPanelToDBPetaPanel(pp, false);
   });
   return b;
 }
