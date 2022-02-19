@@ -144,7 +144,7 @@ export default class Index extends Vue {
     });
   }
   async getPetaImages() {
-    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"));
+    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
     let offsetIndex = 0;
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];
