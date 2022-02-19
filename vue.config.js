@@ -24,10 +24,10 @@ module.exports = {
       .rule("images")
       .test(/\.(png)(\?.*)?$/)
       .use("url-loader")
-      .options({
-        limit: 8192,
-        name: `assets/[name].[hash].[ext]`
-      });
+      // .options({
+      //   limit: 8192,
+      //   name: `assets/[name].[hash].[ext]`
+      // });
   },
   productionSourceMap: false,
   pluginOptions: {
