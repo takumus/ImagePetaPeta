@@ -30,3 +30,4 @@ export const BROWSER_THUMBNAIL_ZOOM_STEP = 16;
 export const UPDATE_CHECK_INTERVAL = 1000 * 60 * 60 * 1; // 1時間
 export const GLOBAL_API_NAME = "main-api";
 export const DB_COMPACTION_DELAY = 1000;
+export const ROTATION_BLOCK_INCREMENT = 45;

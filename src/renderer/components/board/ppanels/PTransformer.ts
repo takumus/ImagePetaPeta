@@ -7,6 +7,7 @@ import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { PSelection } from "@/renderer/components/board/ppanels/PSelection";
 import { PControlPoint } from "@/renderer/components/board/ppanels/PControlPoint";
 import deepcopy from "deepcopy";
+import { ROTATION_BLOCK_INCREMENT } from "@/defines";
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",
@@ -150,8 +151,8 @@ export class PTransformer extends PIXI.Container {
       if (this.fit) {
         const diff = center.getDiff(this.beginTransformCorners[3]);
         const r = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
-        const rot = Math.floor(r / Math.PI * 180 + 90 / 2) % 360;
-        this.rotatingRotation = Math.floor((rot + (rot < 0 ? 360 : 0)) / 90) * (Math.PI / 2) - diff.atan2() + this.beginRotatingRotation;
+        const rot = Math.floor(r / Math.PI * 180 + ROTATION_BLOCK_INCREMENT / 2) % 360;
+        this.rotatingRotation = Math.floor((rot + (rot < 0 ? 360 : 0)) / ROTATION_BLOCK_INCREMENT) * (ROTATION_BLOCK_INCREMENT / 180 * Math.PI) - diff.atan2() + this.beginRotatingRotation;
       }
       this.selectedPPanels.forEach((pPanel, i) => {
         pPanel.petaPanel.rotation = this.beginSizingPetaPanels[i].rotation + this.rotatingRotation - this.beginRotatingRotation;
