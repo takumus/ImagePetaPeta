@@ -4,7 +4,8 @@ import RotateCursor2x from "@/assets/rotateCursor2x.png";
 export class PControlPoint extends PIXI.Container {
   size = new PIXI.Graphics();
   rotate = new PIXI.Graphics();
-  constructor() {
+  public currentRotation = 0;
+  constructor(public positionIndex: number = 0) {
     super();
     this.size.interactive = true;
     this.rotate.interactive = true;
@@ -26,11 +27,15 @@ export class PControlPoint extends PIXI.Container {
     this.size.pivot.x = 10 * scale / 2;
     this.size.pivot.y = 10 * scale / 2;
 
-    this.rotate.hitArea = new PIXI.Rectangle(0, 0, 40 * scale, 40 * scale);
+    const hitArea = 20;
+    this.rotate.hitArea = new PIXI.Circle(0, 0, hitArea * scale);
     // this.rotate.clear();
     // this.rotate.beginFill(0x00ff00);
-    // this.rotate.drawRect(0, 0, 40 * scale, 40 * scale);
-    this.rotate.pivot.x = 40 * scale / 2;
-    this.rotate.pivot.y = 40 * scale / 2;
+    // this.rotate.drawCircle(0, 0, hitArea * scale);
+    const r = this.currentRotation + Math.PI;
+    const radius = 40 * scale / 2;
+
+    this.rotate.pivot.x = Math.cos(r) * radius;
+    this.rotate.pivot.y = Math.sin(r) * radius;
   }
 }

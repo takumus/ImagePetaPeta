@@ -45,6 +45,7 @@ export class PTransformer extends PIXI.Container {
     this.corners.push(new PControlPoint());
     this.addChild(this.pMultipleSelection);
     this.corners.forEach((c, i) => {
+      c.positionIndex = i;
       c.size.on("pointerdown", (e) => {
         this.beginSizing(i, e);
       });
@@ -102,6 +103,13 @@ export class PTransformer extends PIXI.Container {
       center.add(new Vec2(c));
     });
     return center.div(this.beginTransformCorners.length);
+  }
+  getCornersCenter() {
+    const center = new Vec2(0, 0);
+    this.corners.forEach((c) => {
+      center.add(new Vec2(c));
+    });
+    return center.div(this.corners.length);
   }
   get selectedPPanels() {
     return this.pPanelsArray.filter((pPanel) => pPanel.selected);
@@ -191,6 +199,7 @@ export class PTransformer extends PIXI.Container {
         const d = diff.getLength();
         c.x = Math.cos(r) * d + center.x;
         c.y = Math.sin(r) * d + center.y;
+        c.currentRotation = r;
       });
     } else {
       if (this.selectedPPanels.length == 1) {
@@ -231,6 +240,11 @@ export class PTransformer extends PIXI.Container {
         .div(2)
         .setTo(c);
       }
+      const center = this.getCornersCenter();
+      this.corners.forEach((c) => {
+        const r = center.getDiff(c.position).atan2();
+        c.currentRotation = r;
+      })
     }
     if (this.selectedPPanels.length > 0) {
       this.pMultipleSelection.setCorners(this.corners.map((c) => new Vec2(c)));
@@ -239,5 +253,8 @@ export class PTransformer extends PIXI.Container {
       this.pMultipleSelection.visible = false;
     }
     this.pMultipleSelection.update();
+    this.corners.forEach((c) => {
+      c.setScale(this._scale);
+    });
   }
 }
