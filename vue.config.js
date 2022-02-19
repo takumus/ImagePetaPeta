@@ -38,6 +38,10 @@ module.exports = {
         appId: "io.takumus." + packageJSON.name,
         productName: packageJSON.productName,
         asar: true,
+        directories: {
+          buildResources: "build",
+          output: "dist_electron"
+        },
         win: {
           icon: "build/icon.ico",
           target: ["nsis", ...(appxConfig ? ["appx"] : [])]
@@ -47,6 +51,7 @@ module.exports = {
         },
         nsis: {
           oneClick: false,
+          perMachine: true,
           allowToChangeInstallationDirectory: true
         },
         ...appxConfig
