@@ -25,7 +25,7 @@ module.exports = {
       .test(/\.(png)(\?.*)?$/)
       .use("url-loader")
       .options({
-        limit: 0,
+        limit: 8192,
         name: `assets/[name].[hash].[ext]`
       });
   },
