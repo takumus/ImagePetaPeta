@@ -19,6 +19,8 @@
           }"
           v-show="uiVisible"
         >
+          <span class="draggable left">
+          </span>
           <span
             class="tab"
             :class="{ selected: b == board }"
@@ -321,6 +323,7 @@ export default class VTabBar extends Vue {
 <style lang="scss" scoped>
 .tab-root {
   --tab-height: 24px;
+  --top-draggable-height: 10px;
   position: fixed;
   top: 0px;
   left: 0px;
@@ -339,11 +342,8 @@ export default class VTabBar extends Vue {
       >.draggable {
         flex-grow: 1;
         -webkit-app-region: drag;
-        text-align: left;
-        display: inline-block;
-        padding-left: 6px;
-        font-size: 0.8em;
-        height: 10px;
+        display: block;
+        height: var(--top-draggable-height);
       }
       >.tabs {
         width: 100%;
@@ -351,13 +351,16 @@ export default class VTabBar extends Vue {
         color: var(--font-color);
         height: var(--tab-height);
         display: flex;
-        padding-left: 10px;
-        &.mac {
-          padding-left: 70px;
-        }
         >.draggable {
           -webkit-app-region: drag;
           flex-grow: 1;
+          &.left {
+            flex-grow: 0;
+            width: calc(var(--tab-height) + var(--top-draggable-height));
+            &.mac {
+              width: calc(var(--tab-height) + var(--top-draggable-height) + 100);
+            }
+          }
         }
         >.tab {
           display: block;
