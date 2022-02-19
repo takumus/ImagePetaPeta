@@ -12,8 +12,18 @@ const sharp = require("sharp");
     .resize(size)
     .toBuffer();
     ico.addFromPng(buf, false, false);
-    console.log(`icon ${size}px`);
   }
   fs.writeFileSync('./build/icon.ico', ico.encode());
+  console.log(`./build/icon.ico`);
+  await exportImage("./rawAssets/icon/icon.png", "./build/Square44x44Logo.png", 44);
+  await exportImage("./rawAssets/icon/icon.png", "./build/Square150x150Logo.png", 150);
+  await exportImage("./rawAssets/icon/icon.png", "./build/StoreLogo.png", 50);
   console.log("generate icons complete");
 })();
+
+async function exportImage(from, to, size) {
+  await sharp(from)
+  .resize(size)
+  .toFile(to);
+  console.log(to);
+}
