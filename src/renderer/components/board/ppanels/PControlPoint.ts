@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
-import RotateCursor1x from "@/assets/rotateCursor1x.png";
-import RotateCursor2x from "@/assets/rotateCursor2x.png";
+import * as Cursor from "@/renderer/libs/cursor";
 export class PControlPoint extends PIXI.Container {
   size = new PIXI.Graphics();
   rotate = new PIXI.Graphics();
@@ -14,10 +13,33 @@ export class PControlPoint extends PIXI.Container {
     this.addChild(this.rotate, this.size);
     this.setScale(1);
     this.size.cursor = "pointer";
-    this.rotate.cursor = `-webkit-image-set(
-      url('${RotateCursor1x}') 1x,
-      url('${RotateCursor2x}') 2x
-    ) 11 11, auto`;
+    this.initCursor();
+  }
+  initCursor() {
+    let mouseover = false;
+    let dragging = false;
+    this.rotate.on("mouseover", () => {
+      mouseover = true;
+      Cursor.setCursor(Cursor.ROTATE_CURSOR);
+    });
+    this.rotate.on("mouseout", () => {
+      mouseover = false;
+      if (!dragging) {
+        Cursor.setDefaultCursor();
+      }
+    });
+    this.rotate.on("mousedown", () => {
+      dragging = true;
+    });
+    window.addEventListener("mouseup", () => {
+      if (!dragging) {
+        return;
+      }
+      dragging = false;
+      if (!mouseover) {
+        Cursor.setDefaultCursor();
+      }
+    });
   }
   setScale(scale: number) {
     this.size.clear();
@@ -27,13 +49,13 @@ export class PControlPoint extends PIXI.Container {
     this.size.pivot.x = 10 * scale / 2;
     this.size.pivot.y = 10 * scale / 2;
 
-    const hitArea = 20;
+    const hitArea = 16;
     this.rotate.hitArea = new PIXI.Circle(0, 0, hitArea * scale);
     // this.rotate.clear();
     // this.rotate.beginFill(0x00ff00);
     // this.rotate.drawCircle(0, 0, hitArea * scale);
     const r = this.currentRotation + Math.PI;
-    const radius = 40 * scale / 2;
+    const radius = 30 * scale / 2;
 
     this.rotate.pivot.x = Math.cos(r) * radius;
     this.rotate.pivot.y = Math.sin(r) * radius;
