@@ -9,7 +9,7 @@ export class PPanel extends PIXI.Sprite {
   public dragging = false;
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
-  public noImage = false;
+  public noImage = true;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private cover = new PIXI.Graphics();
@@ -89,6 +89,10 @@ export class PPanel extends PIXI.Sprite {
       "noImage", this.noImage,
       "nsfw", this.petaPanel._petaImage?.nsfw && !this.showNsfw
     )) {
+      return;
+    }
+    if (!this.image.texture) {
+      // 何故か分からないけど、テクスチャがnullの時がある。なぜ。
       return;
     }
     const panelWidth = this.absPanelWidth();
