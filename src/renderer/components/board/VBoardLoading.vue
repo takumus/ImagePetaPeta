@@ -25,10 +25,7 @@ import VProgressBar from "@/renderer/components/utils/VProgressBar.vue";
   components: {
     VModal,
     VProgressBar
-  },
-  emits: [
-    "addPanelByDragAndDrop"
-  ]
+  }
 })
 export default class VBoardLoading extends Vue {
   @Prop()
