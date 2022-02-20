@@ -107,7 +107,24 @@ export default class VImageImporter extends Vue {
     });
     window.addEventListener("mousemove", (event) => {
       this.currentMousePosition = vec2FromMouseEvent(event);
-    })
+    });
+    document.addEventListener("paste", async (event) => {
+      const items = event.clipboardData?.files;
+      if (!items || items.length < 1) {
+        return;
+      }
+      const buffers: Buffer[] = [];
+      for (let i = 0; i < items.length; i ++) {
+        const item = items[i];
+        const data = await item?.arrayBuffer();
+        if (!data) {
+          continue;
+        }
+        buffers.push(Buffer.from(data));
+      }
+      const ids = await API.send("importImagesFromClipboard", buffers);
+      this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition);
+    });
   }
   ok() {
     this.hasErrors = false;
@@ -118,8 +135,8 @@ export default class VImageImporter extends Vue {
     if (!value) {
       return;
     }
-    const id = await API.send("getImageFromClipboard");
-    this.$emit("addPanelByDragAndDrop", [id], this.currentMousePosition);
+    // const id = await API.send("getImageFromClipboard");
+    // this.$emit("addPanelByDragAndDrop", [id], this.currentMousePosition);
   }
 }
 </script>

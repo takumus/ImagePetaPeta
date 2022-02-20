@@ -555,26 +555,24 @@ import isValidFilePath from "@/utils/isValidFilePath";
           return false;
         }
       },
-      getImageFromClipboard: async (event) => {
-        try {
-          dataLogger.mainLog("#GetImageFromClipboard");
-          const clipboardImage = clipboard.readImage("clipboard");
-          if (!clipboardImage.isEmpty()) {
-            sendToRenderer("importImagesBegin", 1);
-            const buffer = clipboardImage.toPNG();
+      importImagesFromClipboard: async (event, buffers) => {
+        dataLogger.mainLog("#GetImageFromClipboard");
+        sendToRenderer("importImagesBegin", buffers.length);
+        let ids: string[] = [];
+        let succeeded = 0;
+        for (let i = 0; i < buffers.length; i++) {
+          const buffer = buffers[i];
+          try {
             const result = await addImage(buffer, "clipboard", "png", new Date(), new Date());
-            sendToRenderer("importImagesProgress", 1, "clipboard", result.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
-            sendToRenderer("importImagesComplete", 1, 1);
-            dataLogger.mainLog("return: ", minimId(result.petaImage.id));
-            return result.petaImage.id;
+            ids.push(result.petaImage.id);
+            sendToRenderer("importImagesProgress", i, "clipboard", result.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
+            succeeded++;
+          } catch (err) {
+            sendToRenderer("importImagesProgress", i, "clipboard", ImportImageResult.ERROR);
           }
-        } catch (err) {
-          dataLogger.mainLog("error: ", err);
-          sendToRenderer("importImagesProgress", 1, "clipboard", ImportImageResult.ERROR);
-          sendToRenderer("importImagesComplete", 1, 0);
         }
-        dataLogger.mainLog('return: ""');
-        return "";
+        sendToRenderer("importImagesComplete", succeeded, buffers.length);
+        return ids;
       }
     } as {
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>
