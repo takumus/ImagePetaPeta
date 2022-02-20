@@ -43,6 +43,8 @@ import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import { API } from "@/renderer/api";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { setCursor, setDefaultCursor } from "@/renderer/libs/cursor";
+import { promiseSerial } from "@araki-packages/promise-serial";
+import { map } from "@/utils/promiseSerial";
 @Options({
   components: {
     VModal,
@@ -58,9 +60,10 @@ export default class VImageImporter extends Vue {
   hasErrors = false;
   log = "";
   currentMousePosition = new Vec2();
+  fileCount = 0;
   mounted() {
     API.on("importImagesProgress", (e, progress, file, result) => {
-      this.progress = Math.floor(progress * 100);
+      this.progress = Math.floor(progress / this.fileCount * 100);
       this.log = result + " -> " + file + "\n" + this.log;
     });
     API.on("importImagesBegin", (e, fileCount) => {
@@ -68,6 +71,7 @@ export default class VImageImporter extends Vue {
       this.loading = true;
       this.hasErrors = false;
       this.log = "";
+      this.fileCount = fileCount;
       setCursor("wait");
     });
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
@@ -114,14 +118,14 @@ export default class VImageImporter extends Vue {
         return;
       }
       const buffers: Buffer[] = [];
-      for (let i = 0; i < items.length; i ++) {
-        const item = items[i];
-        const data = await item?.arrayBuffer();
+      const readBuffer = async (item: File, index: number) => {
+        const data = await item.arrayBuffer();
         if (!data) {
-          continue;
+          return;
         }
         buffers.push(Buffer.from(data));
       }
+      await promiseSerial(map(readBuffer, [...items])).value;
       const ids = await API.send("importImagesFromClipboard", buffers);
       this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition);
     });

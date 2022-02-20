@@ -29,6 +29,8 @@ import { defaultStates, States } from "@/datas/states";
 import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
 import { arrLast, minimId, noHtml } from "@/utils/utils";
 import isValidFilePath from "@/utils/isValidFilePath";
+import { promiseSerial } from "@araki-packages/promise-serial";
+import { map } from "@/utils/promiseSerial";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -261,9 +263,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
       savePetaImages: async (event, datas, mode) => {
         dataLogger.mainLog("#Save PetaImages");
         try {
-          for (let i = 0; i < datas.length; i ++) {
-            await savePetaImage(datas[i], mode);
-          }
+          await promiseSerial(map((data) => savePetaImage(data, mode), datas)).value;
         } catch (err) {
           dataLogger.mainLog("error:", err);
           showError("M", 4, "Save PetaImages Error", String(err));
@@ -311,9 +311,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
       savePetaBoards: async (event, boards, mode) => {
         try {
           dataLogger.mainLog("#Save PetaBoards");
-          for (let i = 0; i < boards.length; i ++) {
-            await savePetaBoard(boards[i], mode);
-          }
+          await promiseSerial(map((board) => savePetaBoard(board, mode), boards)).value;
           dataLogger.mainLog("return:", true);
           return true;
         } catch(e) {
@@ -493,8 +491,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
           dataLogger.mainLog("preset:", dataSettings.data.thumbnails);
           sendToRenderer("regenerateThumbnailsBegin");
           const images = await dataPetaImages.find({});
-          for (let i = 0; i < images.length; i++) {
-            const image = images[i];
+          const generate = async (image: PetaImage, i: number) => {
             const data = await file.readFile(Path.resolve(DIR_IMAGES, image.fileName));
             const result = await generateThumbnail(
               data,
@@ -507,6 +504,7 @@ import isValidFilePath from "@/utils/isValidFilePath";
             dataLogger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
             sendToRenderer("regenerateThumbnailsProgress", i + 1, images.length);
           }
+          await promiseSerial(map(generate, images)).value;
           sendToRenderer("regenerateThumbnailsComplete");
         } catch (err) {
           showError("M", 9, "Regenerate Thumbnails Error", String(err));
@@ -560,18 +558,18 @@ import isValidFilePath from "@/utils/isValidFilePath";
         sendToRenderer("importImagesBegin", buffers.length);
         let ids: string[] = [];
         let succeeded = 0;
-        for (let i = 0; i < buffers.length; i++) {
-          const buffer = buffers[i];
+        const importImage = async (buffer: Buffer, index: number) => {
           try {
             const result = await addImage(buffer, "clipboard", "png", new Date(), new Date());
             ids.push(result.petaImage.id);
-            sendToRenderer("importImagesProgress", i, "clipboard", result.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
+            sendToRenderer("importImagesProgress", index + 1, "clipboard", result.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
             succeeded++;
           } catch (err) {
-            sendToRenderer("importImagesProgress", i, "clipboard", ImportImageResult.ERROR);
+            sendToRenderer("importImagesProgress", index + 1, "clipboard", ImportImageResult.ERROR);
           }
         }
-        sendToRenderer("importImagesComplete", succeeded, buffers.length);
+        await promiseSerial(map(importImage, buffers)).value;
+        sendToRenderer("importImagesComplete", buffers.length, succeeded);
         return ids;
       }
     } as {
@@ -708,9 +706,8 @@ import isValidFilePath from "@/utils/isValidFilePath";
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
     const addDate = new Date();
-    for (let i = 0; i < filePaths.length; i++) {
-      const filePath = filePaths[i];
-      dataLogger.mainLog("import:", i + 1, "/", filePaths.length);
+    const importImage = async (filePath: string, index: number) => {
+      dataLogger.mainLog("import:", index + 1, "/", filePaths.length);
       let result = ImportImageResult.SUCCESS;
       try {
         const data = await file.readFile(filePath);
@@ -728,8 +725,9 @@ import isValidFilePath from "@/utils/isValidFilePath";
         dataLogger.mainLog("error:", err);
         result = ImportImageResult.ERROR;
       }
-      sendToRenderer("importImagesProgress", (i + 1) / filePaths.length, filePath, result);
+      sendToRenderer("importImagesProgress", index + 1, filePath, result);
     }
+    await promiseSerial(map(importImage, filePaths)).value;
     dataLogger.mainLog("return:", addedFileCount, "/", filePaths.length);
     sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
     return petaImages;

@@ -60,6 +60,8 @@ import { PTransformer } from "@/renderer/components/board/ppanels/PTransformer";
 import { hitTest } from "@/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/defines";
 import { minimId } from "@/utils/utils";
+import { promiseSerial } from "@araki-packages/promise-serial";
+import { map } from "@/utils/promiseSerial";
 @Options({
   components: {
     VCrop,
@@ -481,9 +483,8 @@ export default class VBoard extends Vue {
     this.loadingLog = "";
   }
   async loadAllFullsized() {
-    for (let i = 0; i < this.board.petaPanels.length; i++) {
-      const petaPanel = this.board.petaPanels[i];
-      const progress =  `${i + 1}/${this.board.petaPanels.length}`;
+    const load = async (petaPanel: PetaPanel, index: number) => {
+      const progress =  `${index + 1}/${this.board.petaPanels.length}`;
       await this.loadFullsized(petaPanel).then((result) => {
         if (result) {
           log(`loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
@@ -493,9 +494,10 @@ export default class VBoard extends Vue {
         log(`loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, err);
         this.loadingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
       });
-      this.loadingProgress = ((i + 1) / this.board.petaPanels.length) * 100;
+      this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();
     }
+    await promiseSerial(map(load, this.board.petaPanels)).value;
     log("load complete");
   }
   async loadFullsized(petaPanel: PetaPanel) {
