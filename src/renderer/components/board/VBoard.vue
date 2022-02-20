@@ -508,6 +508,7 @@ export default class VBoard extends Vue {
     this.panelsCenterWrapper.addChild(pPanel);
     await pPanel.loadTexture(ImageType.FULLSIZED);
     pPanel.update();
+    this.orderPIXIRender();
     return true;
   }
   clearCache() {
