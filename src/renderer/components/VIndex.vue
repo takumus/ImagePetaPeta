@@ -91,7 +91,7 @@ export default class Index extends Vue {
   boards: PetaBoard[] = [];
   currentPetaBoard: PetaBoard | null = null;
   orderedAddPanelIds: string[] = [];
-  orderedAddPanelDragEvent?: DragEvent;
+  orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
   systemDarkMode = false;
@@ -152,7 +152,7 @@ export default class Index extends Vue {
       if (!this.orderedAddPanelDragEvent) return;
       const panel = createPetaPanel(
         petaImage,
-        vec2FromMouseEvent(this.orderedAddPanelDragEvent).add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
+        this.orderedAddPanelDragEvent.clone().add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
         DEFAULT_IMAGE_SIZE,
         petaImage.height * DEFAULT_IMAGE_SIZE
       );
@@ -178,7 +178,7 @@ export default class Index extends Vue {
       }
     });
   }
-  addPanelByDragAndDrop(ids: string[], mouse: DragEvent) {
+  addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
     this.orderedAddPanelIds = ids;
     this.orderedAddPanelDragEvent = mouse;
   }

@@ -32,4 +32,5 @@ export interface MainFunctions {
   regenerateThumbnails: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
+  getImageFromClipboard: () => Promise<string>;
 }

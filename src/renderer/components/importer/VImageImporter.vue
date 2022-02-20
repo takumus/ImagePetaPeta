@@ -34,13 +34,15 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VModal from "@/renderer/components/modal/VModal.vue";
 import VProgressBar from "@/renderer/components/utils/VProgressBar.vue";
 // Others
 import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import { API } from "@/renderer/api";
+import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
+import { setCursor, setDefaultCursor } from "@/renderer/libs/cursor";
 @Options({
   components: {
     VModal,
@@ -55,6 +57,7 @@ export default class VImageImporter extends Vue {
   loading = false;
   hasErrors = false;
   log = "";
+  currentMousePosition = new Vec2();
   mounted() {
     API.on("importImagesProgress", (e, progress, file, result) => {
       this.progress = Math.floor(progress * 100);
@@ -65,6 +68,7 @@ export default class VImageImporter extends Vue {
       this.loading = true;
       this.hasErrors = false;
       this.log = "";
+      setCursor("wait");
     });
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
       if (fileCount != addedFileCount) {
@@ -75,6 +79,7 @@ export default class VImageImporter extends Vue {
           this.loading = false;
         }, 500);
       }
+      setDefaultCursor();
     });
     document.addEventListener('drop', async (event) => {
       event.preventDefault();
@@ -92,7 +97,7 @@ export default class VImageImporter extends Vue {
           ids = await API.send("importImagesFromFilePaths", filePaths);
         }
         // if (ids.length == 1) {
-        this.$emit("addPanelByDragAndDrop", ids, event);
+        this.$emit("addPanelByDragAndDrop", ids, vec2FromMouseEvent(event));
         // }
       }
     });
@@ -100,10 +105,21 @@ export default class VImageImporter extends Vue {
       e.preventDefault();
       e.stopPropagation();
     });
+    window.addEventListener("mousemove", (event) => {
+      this.currentMousePosition = vec2FromMouseEvent(event);
+    })
   }
   ok() {
     this.hasErrors = false;
     this.loading = false;
+  }
+  @Watch("$keyboards.v")
+  async keyV(value: boolean) {
+    if (!value) {
+      return;
+    }
+    const id = await API.send("getImageFromClipboard");
+    this.$emit("addPanelByDragAndDrop", [id], this.currentMousePosition);
   }
 }
 </script>

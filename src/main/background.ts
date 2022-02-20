@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, clipboard } from "electron";
 import * as Path from "path";
 import axios from "axios";
 import sharp from "sharp";
@@ -554,6 +554,27 @@ import isValidFilePath from "@/utils/isValidFilePath";
         } catch(error) {
           return false;
         }
+      },
+      getImageFromClipboard: async (event) => {
+        try {
+          dataLogger.mainLog("#GetImageFromClipboard");
+          const clipboardImage = clipboard.readImage("clipboard");
+          if (!clipboardImage.isEmpty()) {
+            sendToRenderer("importImagesBegin", 1);
+            const buffer = clipboardImage.toPNG();
+            const result = await addImage(buffer, "clipboard", "png", new Date(), new Date());
+            sendToRenderer("importImagesProgress", 1, "clipboard", result.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
+            sendToRenderer("importImagesComplete", 1, 1);
+            dataLogger.mainLog("return: ", minimId(result.petaImage.id));
+            return result.petaImage.id;
+          }
+        } catch (err) {
+          dataLogger.mainLog("error: ", err);
+          sendToRenderer("importImagesProgress", 1, "clipboard", ImportImageResult.ERROR);
+          sendToRenderer("importImagesComplete", 1, 0);
+        }
+        dataLogger.mainLog('return: ""');
+        return "";
       }
     } as {
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>

@@ -5,7 +5,9 @@ const keyboards = reactive({
   cmd: false,
   delete: false,
   escape: false,
-  current: ""
+  current: "",
+  v: false,
+  c: false
 });
 const Plugin = {
   install(app: App) {
@@ -26,6 +28,9 @@ const Plugin = {
         case "escape":
           keyboards.escape = true;
           break;
+        case "v":
+          keyboards.v = true;
+          break;
       }
       keyboards.current = e.key.toLowerCase();
     });
@@ -44,6 +49,9 @@ const Plugin = {
           break;
         case "escape":
           keyboards.escape = false;
+          break;
+        case "v":
+          keyboards.v = false;
           break;
       }
       if (keyboards.current == e.key.toLowerCase()) keyboards.current = "";
