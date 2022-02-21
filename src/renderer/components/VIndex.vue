@@ -38,7 +38,7 @@
       />
     </section>
     <VDialog
-      :zIndex="10"
+      :zIndex="6"
     ></VDialog>
     <VContextMenu
       :zIndex="4"
@@ -374,14 +374,6 @@ body, html {
     top: 0px;
     left: 0px;
     z-index: 2;
-  }
-  >.dialogs {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0px;
-    left: 0px;
-    z-index: 5;
   }
 }
 </style>

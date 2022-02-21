@@ -8,7 +8,6 @@
   >
     <div
       class="modal"
-      :style="centerStyle"
     >
       <div class="content">
         <p>
@@ -39,18 +38,12 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
   },
 })
 export default class VModal extends Vue {
-  visible = false;
   @Prop()
   zIndex = 0;
   items: string[] = [];
   label = "";
+  visible = false;
   resolve: (index: number) => void = (index: number) => index;
-  centerStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)"
-  }
   async mounted() {
     this.$globalComponents.dialog = this;
   }
@@ -95,6 +88,10 @@ export default class VModal extends Vue {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     >.title {
       text-align: right;
       >.close {
