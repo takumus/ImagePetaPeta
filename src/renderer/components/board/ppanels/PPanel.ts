@@ -156,15 +156,13 @@ export class PPanel extends PIXI.Sprite {
         panelWidth,
         panelHeight
       );
-      const clr = this.coverLabel.width / this.coverLabel.height;
-      const ilr = this.petaPanel.width / this.petaPanel.height;
+      this.coverLabel.scale.set(1, 1);
       const scale = 0.3;
-      if (clr > ilr) {
-        this.coverLabel.width = this.petaPanel.width * scale;
-        this.coverLabel.height = this.petaPanel.width / clr  * scale;
+      // 縦横比で縦横どちらを基準にするか決める。
+      if (this.coverLabel.width / this.coverLabel.height > this.petaPanel.width / this.petaPanel.height) {
+        this.coverLabel.scale.set((this.petaPanel.width * scale) / this.coverLabel.width);
       } else {
-        this.coverLabel.height = this.petaPanel.height * scale;
-        this.coverLabel.width = this.petaPanel.height * clr * scale;
+        this.coverLabel.scale.set((this.petaPanel.height * scale) / this.coverLabel.height);
       }
     } else {
       this.cover.visible = this.coverLabel.visible = false;
