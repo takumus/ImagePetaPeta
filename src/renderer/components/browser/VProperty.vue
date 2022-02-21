@@ -73,7 +73,7 @@ import { API, log } from "@/renderer/api";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/defines";
 import { PetaImage } from "@/datas/petaImage";
-import { UpdateMode } from "@/datas/updateMode";
+import { UpdateMode } from "@/api/interfaces/updateMode";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { savePetaImages } from "@/renderer/libs/savePetaImages";
 @Options({

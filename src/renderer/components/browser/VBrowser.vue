@@ -113,7 +113,7 @@ import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { SortMode } from "@/datas/sortMode";
 import { BrowserThumbnail } from "@/datas/browserThumbnail";
 import { createPetaPanel } from "@/datas/petaPanel";
-import { UpdateMode } from "@/datas/updateMode";
+import { UpdateMode } from "@/api/interfaces/updateMode";
 import { savePetaImages } from "@/renderer/libs/savePetaImages";
 @Options({
   components: {
@@ -156,7 +156,6 @@ export default class VBrowser extends Vue {
       this.resizeScrollArea(entries[0].contentRect);
     });
     this.thumbnails.addEventListener("scroll", this.updateScrollArea);
-    window.addEventListener("keydown", this.keydown);
     this.thumbnailsResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.thumbnails);
 
@@ -165,23 +164,10 @@ export default class VBrowser extends Vue {
   }
   unmounted() {
     this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
-    window.removeEventListener("keydown", this.keydown);
     this.thumbnailsResizer?.unobserve(this.thumbsWrapper);
     this.scrollAreaResizer?.unobserve(this.thumbnails);
     this.thumbnailsResizer?.disconnect();
     this.scrollAreaResizer?.disconnect();
-  }
-  keydown(e: KeyboardEvent) {
-    switch(e.key.toLowerCase()) {
-      case "a": {
-        if (e.ctrlKey || e.metaKey) {
-          this.filteredPetaImages.forEach((pi) => {
-            pi._selected = true;
-          });
-        }
-        break;
-      }
-    }
   }
   saveScrollPosition() {
     let min = Infinity;
@@ -236,7 +222,7 @@ export default class VBrowser extends Vue {
     }
   }
   async addPanel(thumb: BrowserThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    if (!this.$keyboards.shift && !this.$keyboards.ctrl && !thumb.petaImage._selected) {
+    if (!this.$keyboards.shift && !this.$keyboards.control && !this.$keyboards.meta && !thumb.petaImage._selected) {
       this.clearSelectionAllImages();
     }
     // 複数同時追加
@@ -244,7 +230,7 @@ export default class VBrowser extends Vue {
     thumbnails.push(...this.selectedPetaImages)
     thumbnails.reverse();
     if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
-      if (await API.send("dialog", this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+      if (await this.$globalComponents.dialog.show(this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
       }
     }
@@ -268,13 +254,13 @@ export default class VBrowser extends Vue {
     this.close();
   }
   selectThumbnail(thumb: BrowserThumbnail, force = false) {
-    if (this.selectedPetaImages.length < 1 || (!this.$keyboards.ctrl && !this.$keyboards.shift)) {
+    if (this.selectedPetaImages.length < 1 || (!this.$keyboards.control && !this.$keyboards.meta && !this.$keyboards.shift)) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedBrowserThumbnail = thumb;
     }
     // 全選択解除するが、選択サムネイルは状態を保持する。
     const prevSelection = thumb.petaImage._selected;
-    if (!this.$keyboards.ctrl) {
+    if (!this.$keyboards.control && !this.$keyboards.meta) {
       // コントロールキーが押されていなければ選択をリセット
       this.clearSelectionAllImages();
     }
@@ -328,13 +314,13 @@ export default class VBrowser extends Vue {
     }
     let remove = false;
     if (newName == "") {
-      remove = await API.send("dialog", this.$t("browser.removeTagDialog", [oldName]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0;
+      remove = await this.$globalComponents.dialog.show(this.$t("browser.removeTagDialog", [oldName]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0;
       if (!remove) {
         return;
       }
     }
     if (this.tags.find((c) => c.name == newName)) {
-      API.send("dialog", this.$t("browser.tagAlreadyExistsDialog", [newName]), []);
+      this.$globalComponents.dialog.show(this.$t("browser.tagAlreadyExistsDialog", [newName]), []);
       return;
     }
     const changed: PetaImage[] = [];
@@ -375,7 +361,7 @@ export default class VBrowser extends Vue {
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
-          if (await API.send("dialog", this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+          if (await this.$globalComponents.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
             await savePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }
@@ -530,6 +516,16 @@ export default class VBrowser extends Vue {
   }
   get fullsized() {
     return this.$settings.loadThumbnailsInFullsized && this.thumbnailWidth > this.$settings.thumbnails.size;
+  }
+  @Watch("$keyboards.a")
+  keyA(value: boolean) {
+    if (value) {
+      if (this.$keyboards.control || this.$keyboards.meta) {
+        this.filteredPetaImages.forEach((pi) => {
+          pi._selected = true;
+        });
+      }
+    }
   }
 }
 interface Tag {

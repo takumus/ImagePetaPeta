@@ -12,14 +12,13 @@ import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEF
 import * as file from "@/libs/file";
 import DB from "@/libs/db";
 import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
-import Logger from "@/libs/logger";
+import { Logger, LogFrom } from "@/libs/logger";
 import Config from "@/libs/config";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard } from "@/datas/petaBoard";
-import { ImportImageResult } from "@/datas/importImageResult";
-import { UpdateMode } from "@/datas/updateMode";
-import { LogFrom } from "@/datas/logFrom";
-import { AddImageResult } from "@/datas/addImageResult";
+import { ImportImageResult } from "@/api/interfaces/importImageResult";
+import { UpdateMode } from "@/api/interfaces/updateMode";
+import { AddImageResult } from "@/api/interfaces/addImageResult";
 import { Settings, defaultSettings } from "@/datas/settings";
 import { addPetaPanelProperties } from "@/datas/petaPanel";
 import { MainEvents } from "@/api/mainEvents";
@@ -29,8 +28,7 @@ import { defaultStates, States } from "@/datas/states";
 import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
 import { arrLast, minimId, noHtml } from "@/utils/utils";
 import isValidFilePath from "@/utils/isValidFilePath";
-import { promiseSerial } from "@araki-packages/promise-serial";
-import { map } from "@/utils/promiseSerial";
+import { promiseSerial } from "@/utils/promiseSerial";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -186,7 +184,7 @@ import { map } from "@/utils/promiseSerial";
           return 0;
         }
         dataLogger.mainLog("return:", file.filePaths.length);
-        importImages(file.filePaths);
+        importImagesFromFilePaths(file.filePaths);
         return file.filePaths.length;
       },
       /*------------------------------------
@@ -194,7 +192,6 @@ import { map } from "@/utils/promiseSerial";
       ------------------------------------*/
       importImageFromURL: async (event, url) => {
         try {
-          sendToRenderer("importImagesBegin", 1);
           dataLogger.mainLog("#Import Image From URL");
           let data: Buffer;
           if (url.trim().indexOf("http") != 0) {
@@ -206,21 +203,10 @@ import { map } from "@/utils/promiseSerial";
             dataLogger.mainLog("normal url:", url);
             data = (await axios.get(url, { responseType: "arraybuffer" })).data;
           }
-          const extName = imageFormatToExtention((await sharp(data).metadata()).format);
-          if (!extName) {
-            dataLogger.mainLog("invalid image file");
-            throw new Error("invalid image file");
-          }
-          const now = new Date();
-          const addResult = await addImage(data, now.toLocaleString(), extName, now, now);
-          sendToRenderer("importImagesProgress", 1, url, addResult.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
-          sendToRenderer("importImagesComplete", 1, 1);
-          dataLogger.mainLog("return: ", minimId(addResult.petaImage.id));
-          return addResult.petaImage.id;
+          const id = (await importImagesFromBuffers([data], "download"))[0].id;
+          return id;
         } catch (err) {
           dataLogger.mainLog("error: ", err);
-          sendToRenderer("importImagesProgress", 1, url, ImportImageResult.ERROR);
-          sendToRenderer("importImagesComplete", 1, 0);
         }
         return "";
       },
@@ -230,11 +216,10 @@ import { map } from "@/utils/promiseSerial";
       importImagesFromFilePaths: async (event, filePaths) =>{
         try {
           dataLogger.mainLog("#Import Images From File Paths");
-          const images = (await importImages(filePaths)).map((image) => image.id);
-          dataLogger.mainLog("return:", true);
+          const images = (await importImagesFromFilePaths(filePaths)).map((image) => image.id);
           return images;
         } catch(e) {
-          dataLogger.mainLog("error:", e);
+          dataLogger.mainError(e);
         }
         return [];
       },
@@ -252,7 +237,7 @@ import { map } from "@/utils/promiseSerial";
           dataLogger.mainLog("return:", data.length);
           return petaImages;
         } catch(e) {
-          dataLogger.mainLog("error:", e);
+          dataLogger.mainError(e);
           showError("M", 3, "Get PetaImages Error", String(e));
         }
         return {};
@@ -263,13 +248,13 @@ import { map } from "@/utils/promiseSerial";
       savePetaImages: async (event, datas, mode) => {
         dataLogger.mainLog("#Save PetaImages");
         try {
-          await promiseSerial(map((data) => savePetaImage(data, mode), datas)).value;
+          await promiseSerial((data) => savePetaImage(data, mode), datas).value;
         } catch (err) {
-          dataLogger.mainLog("error:", err);
+          dataLogger.mainError(err);
           showError("M", 4, "Save PetaImages Error", String(err));
         }
         if (mode != UpdateMode.UPDATE) {
-          sendToRenderer("updatePetaImages");
+          emitMainEvent("updatePetaImages");
         }
         dataLogger.mainLog("return:", true);
         return true;
@@ -300,7 +285,7 @@ import { map } from "@/utils/promiseSerial";
             return data;
           }
         } catch(e) {
-          dataLogger.mainLog("error:", e);
+          dataLogger.mainError(e);
           showError("M", 5, "Get PetaBoards Error", String(e));
         }
         return [];
@@ -311,11 +296,11 @@ import { map } from "@/utils/promiseSerial";
       savePetaBoards: async (event, boards, mode) => {
         try {
           dataLogger.mainLog("#Save PetaBoards");
-          await promiseSerial(map((board) => savePetaBoard(board, mode), boards)).value;
+          await promiseSerial((board) => savePetaBoard(board, mode), boards).value;
           dataLogger.mainLog("return:", true);
           return true;
         } catch(e) {
-          dataLogger.mainLog("error:", e);
+          dataLogger.mainError(e);
           showError("M", 6, "Save PetaBoards Error", String(e));
         }
         return false;
@@ -330,17 +315,17 @@ import { map } from "@/utils/promiseSerial";
       /*------------------------------------
         ダイアログ
       ------------------------------------*/
-      dialog: async (event, message, buttons) => {
-        dataLogger.mainLog("#Dialog");
-        dataLogger.mainLog("dialog:", message, buttons);
-        const value = await dialog.showMessageBox(window, {
-          title: "Petapeta",
-          message: message,
-          buttons: buttons,
-          cancelId: -1
-        });
-        return value.response;
-      },
+      // dialog: async (event, message, buttons) => {
+      //   dataLogger.mainLog("#Dialog");
+      //   dataLogger.mainLog("dialog:", message, buttons);
+      //   const value = await dialog.showMessageBox(window, {
+      //     title: "Petapeta",
+      //     message: message,
+      //     buttons: buttons,
+      //     cancelId: -1
+      //   });
+      //   return value.response;
+      // },
       /*------------------------------------
         WebブラウザでURLを開く
       ------------------------------------*/
@@ -400,7 +385,7 @@ import { map } from "@/utils/promiseSerial";
             latest: packageJSON.version
           }
         } catch(e) {
-          dataLogger.mainLog("error:", e);
+          dataLogger.mainError(e);
         }
         return {
           current: app.getVersion(),
@@ -413,10 +398,6 @@ import { map } from "@/utils/promiseSerial";
       updateSettings: async (event, settings) => {
         try {
           dataLogger.mainLog("#Update Settings");
-          if (dataSettings.data.enableHardwareAcceleration != settings.enableHardwareAcceleration) {
-            dataLogger.mainLog("change hardware accelaration:", settings.enableHardwareAcceleration);
-            // app.relaunch();
-          }
           dataSettings.data = settings;
           window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
           await dataSettings.save();
@@ -489,7 +470,7 @@ import { map } from "@/utils/promiseSerial";
         try {
           dataLogger.mainLog("#Regenerate Thumbnails");
           dataLogger.mainLog("preset:", dataSettings.data.thumbnails);
-          sendToRenderer("regenerateThumbnailsBegin");
+          emitMainEvent("regenerateThumbnailsBegin");
           const images = await dataPetaImages.find({});
           const generate = async (image: PetaImage, i: number) => {
             const data = await file.readFile(Path.resolve(DIR_IMAGES, image.fileName));
@@ -502,10 +483,10 @@ import { map } from "@/utils/promiseSerial";
             image.placeholder = result.placeholder;
             await savePetaImage(image, UpdateMode.UPDATE);
             dataLogger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
-            sendToRenderer("regenerateThumbnailsProgress", i + 1, images.length);
+            emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
           }
-          await promiseSerial(map(generate, images)).value;
-          sendToRenderer("regenerateThumbnailsComplete");
+          await promiseSerial(generate, images).value;
+          emitMainEvent("regenerateThumbnailsComplete");
         } catch (err) {
           showError("M", 9, "Regenerate Thumbnails Error", String(err));
         }
@@ -554,23 +535,14 @@ import { map } from "@/utils/promiseSerial";
         }
       },
       importImagesFromClipboard: async (event, buffers) => {
-        dataLogger.mainLog("#GetImageFromClipboard");
-        sendToRenderer("importImagesBegin", buffers.length);
-        let ids: string[] = [];
-        let succeeded = 0;
-        const importImage = async (buffer: Buffer, index: number) => {
-          try {
-            const result = await addImage(buffer, "clipboard", "png", new Date(), new Date());
-            ids.push(result.petaImage.id);
-            sendToRenderer("importImagesProgress", index + 1, "clipboard", result.exists ? ImportImageResult.EXISTS : ImportImageResult.SUCCESS);
-            succeeded++;
-          } catch (err) {
-            sendToRenderer("importImagesProgress", index + 1, "clipboard", ImportImageResult.ERROR);
-          }
+        try {
+          dataLogger.mainLog("#Import Image From Clipboard");
+          const ids = (await importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id)
+          return ids;
+        } catch (error) {
+          dataLogger.mainError(error);
         }
-        await promiseSerial(map(importImage, buffers)).value;
-        sendToRenderer("importImagesComplete", buffers.length, succeeded);
-        return ids;
+        return [];
       }
     } as {
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>
@@ -658,7 +630,7 @@ import { map } from "@/utils/promiseSerial";
     }
     await dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
     dataLogger.mainLog("updated");
-    // sendToRenderer("updatePetaImage", petaImage);
+    // emitMainEvent("updatePetaImage", petaImage);
     return true;
   }
   /*------------------------------------
@@ -693,19 +665,18 @@ import { map } from "@/utils/promiseSerial";
   /*------------------------------------
     レンダラへipcで送信
   ------------------------------------*/
-  function sendToRenderer<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
+  function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
     window.webContents.send(key, ...args);
   }
   /*------------------------------------
-    画像インポート
+    画像インポート(ファイルパス)
   ------------------------------------*/
-  async function importImages(filePaths: string[]) {
-    sendToRenderer("importImagesBegin", filePaths.length);
-    dataLogger.mainLog("##Import Images");
+  async function importImagesFromFilePaths(filePaths: string[]) {
+    emitMainEvent("importImagesBegin", filePaths.length);
+    dataLogger.mainLog("##Import Images From File Paths");
     dataLogger.mainLog("files:", filePaths.length);
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
-    const addDate = new Date();
     const importImage = async (filePath: string, index: number) => {
       dataLogger.mainLog("import:", index + 1, "/", filePaths.length);
       let result = ImportImageResult.SUCCESS;
@@ -714,7 +685,9 @@ import { map } from "@/utils/promiseSerial";
         const name = Path.basename(filePath);
         const extName = Path.extname(filePath).replace(/\./g, "");
         const fileDate = (await file.stat(filePath)).mtime;
-        const addResult = await addImage(data, name, extName, fileDate, addDate);
+        const addResult = await addImage({
+          data, name, extName, fileDate
+        });
         petaImages.push(addResult.petaImage);
         if (addResult.exists) {
           result = ImportImageResult.EXISTS;
@@ -722,14 +695,47 @@ import { map } from "@/utils/promiseSerial";
         addedFileCount++;
         dataLogger.mainLog("imported", name, result);
       } catch (err) {
-        dataLogger.mainLog("error:", err);
+        dataLogger.mainError(err);
         result = ImportImageResult.ERROR;
       }
-      sendToRenderer("importImagesProgress", index + 1, filePath, result);
+      emitMainEvent("importImagesProgress", index + 1, filePath, result);
     }
-    await promiseSerial(map(importImage, filePaths)).value;
+    await promiseSerial(importImage, filePaths).value;
     dataLogger.mainLog("return:", addedFileCount, "/", filePaths.length);
-    sendToRenderer("importImagesComplete", filePaths.length, addedFileCount);
+    emitMainEvent("importImagesComplete", filePaths.length, addedFileCount);
+    return petaImages;
+  }
+  /*------------------------------------
+    画像インポート(バッファー)
+  ------------------------------------*/
+  async function importImagesFromBuffers(buffers: Buffer[], name: string) {
+    emitMainEvent("importImagesBegin", buffers.length);
+    dataLogger.mainLog("##Import Images From Buffers");
+    dataLogger.mainLog("buffers:", buffers.length);
+    let addedFileCount = 0;
+    const petaImages: PetaImage[] = [];
+    const importImage = async (buffer: Buffer, index: number) => {
+      dataLogger.mainLog("import:", index + 1, "/", buffers.length);
+      let result = ImportImageResult.SUCCESS;
+      try {
+        const addResult = await addImage({
+          data: buffer, name
+        });
+        petaImages.push(addResult.petaImage);
+        if (addResult.exists) {
+          result = ImportImageResult.EXISTS;
+        }
+        addedFileCount++;
+        dataLogger.mainLog("imported", name, result);
+      } catch (err) {
+        dataLogger.mainError(err);
+        result = ImportImageResult.ERROR;
+      }
+      emitMainEvent("importImagesProgress", index + 1, name, result);
+    }
+    await promiseSerial(importImage, buffers).value;
+    dataLogger.mainLog("return:", addedFileCount, "/", buffers.length);
+    emitMainEvent("importImagesComplete", buffers.length, addedFileCount);
     return petaImages;
   }
   /*------------------------------------
@@ -741,23 +747,29 @@ import { map } from "@/utils/promiseSerial";
   /*------------------------------------
     PetaImage追加
   ------------------------------------*/
-  async function addImage(data: Buffer, name: string, extName: string, fileDate: Date, addDate: Date): Promise<AddImageResult> {
-    const id = crypto.createHash("sha256").update(data).digest("hex");
+  async function addImage(param: { data: Buffer, name: string, extName?: string, fileDate?: Date, addDate?: Date }): Promise<AddImageResult> {
+    const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await getPetaImage(id);
     if (exists) return {
       petaImage: exists,
       exists: true
     };
+    const extName = param.extName || imageFormatToExtention((await sharp(param.data).metadata()).format);
+    if (!extName) {
+      throw new Error("invalid image file type");
+    }
+    const addDate = param.addDate || new Date();
+    const fileDate = param.fileDate || new Date();
     const fileName = `${id}.${extName}`;
     const output = await generateThumbnail(
-      data,
+      param.data,
       getImagePathFromFilename(fileName, ImageType.THUMBNAIL),
       dataSettings.data.thumbnails.size,
       dataSettings.data.thumbnails.quality
     );
     const petaImage: PetaImage = {
       fileName: fileName,
-      name: name,
+      name: param.name,
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
       width: 1,
@@ -767,7 +779,7 @@ import { map } from "@/utils/promiseSerial";
       tags: [],
       nsfw: false
     }
-    await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), data);
+    await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), param.data);
     await dataPetaImages.update({ id: petaImage.id }, petaImage, true);
     return {
       petaImage: petaImage,
@@ -844,10 +856,10 @@ import { map } from "@/utils/promiseSerial";
       dataLogger.mainLog("#Save Window Size", dataStates.data.windowSize);
     });
     window.addListener("blur", () => {
-      sendToRenderer("windowFocused", false);
+      emitMainEvent("windowFocused", false);
     });
     window.addListener("focus", () => {
-      sendToRenderer("windowFocused", true);
+      emitMainEvent("windowFocused", true);
     });
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
     return window;

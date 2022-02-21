@@ -1,7 +1,7 @@
 import { PetaBoard } from "@/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { UpdateMode } from "@/datas/updateMode";
-import { AppInfo } from "@/datas/appInfo";
+import { UpdateMode } from "@/api/interfaces/updateMode";
+import { AppInfo } from "@/api/interfaces/appInfo";
 import { Settings } from "@/datas/settings";
 
 export interface MainFunctions {
@@ -14,7 +14,7 @@ export interface MainFunctions {
   getPetaBoards: () => Promise<PetaBoard[]>;
   savePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   log: (...args: any[]) => Promise<boolean>;
-  dialog: (message: string, buttons: string[]) => Promise<number>;
+  // dialog: (message: string, buttons: string[]) => Promise<number>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;

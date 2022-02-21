@@ -1,7 +1,13 @@
 <template>
   <VModal
     :visible="visible"
-    :center="true"
+    :parentStyle="{
+      padding: '74px'
+    }"
+    :childStyle="{
+      width: '100%',
+      height: '100%'
+    }"
     :visibleCloseButton="true"
     @close="close"
   >
@@ -248,15 +254,13 @@ export default class VSettings extends Vue {
   }
   async changePetaImageDirectory() {
     if (this.tempPetaImageDirectory) {
-      const result = await API.send(
-        "dialog",
+      const result = await this.$globalComponents.dialog.show(
         this.$t("settings.changePetaImageDirectoryDialog", [this.tempPetaImageDirectory]),
         [this.$t("shared.yes"), this.$t("shared.no")]
       );
       if (result == 0) {
         if (!await API.send("changePetaImageDirectory", this.tempPetaImageDirectory)) {
-          await API.send(
-            "dialog",
+          await this.$globalComponents.dialog.show(
             this.$t("settings.changePetaImageDirectoryErrorDialog", [this.tempPetaImageDirectory]),
             [this.$t("shared.yes")]
           );

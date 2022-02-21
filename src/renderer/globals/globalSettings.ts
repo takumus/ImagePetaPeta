@@ -1,11 +1,11 @@
 import { API } from "@/renderer/api";
 import { defaultSettings, Settings } from "@/datas/settings";
 import { reactive, App } from "vue";
-const settings: Settings = reactive(defaultSettings);
+let settings: Settings = defaultSettings;
 const Plugin = {
   async install(app: App) {
+    settings = reactive(await API.send("getSettings"));
     app.config.globalProperties.$settings = settings;
-    Object.assign(settings, await API.send("getSettings"));
   }
 }
 export default Plugin;

@@ -43,8 +43,7 @@ import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
 import { API } from "@/renderer/api";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { setCursor, setDefaultCursor } from "@/renderer/libs/cursor";
-import { promiseSerial } from "@araki-packages/promise-serial";
-import { map } from "@/utils/promiseSerial";
+import { promiseSerial } from "@/utils/promiseSerial";
 @Options({
   components: {
     VModal,
@@ -125,7 +124,7 @@ export default class VImageImporter extends Vue {
         }
         buffers.push(Buffer.from(data));
       }
-      await promiseSerial(map(readBuffer, [...items])).value;
+      await promiseSerial(readBuffer, [...items]).value;
       const ids = await API.send("importImagesFromClipboard", buffers);
       this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition);
     });
@@ -133,14 +132,6 @@ export default class VImageImporter extends Vue {
   ok() {
     this.hasErrors = false;
     this.loading = false;
-  }
-  @Watch("$keyboards.v")
-  async keyV(value: boolean) {
-    if (!value) {
-      return;
-    }
-    // const id = await API.send("getImageFromClipboard");
-    // this.$emit("addPanelByDragAndDrop", [id], this.currentMousePosition);
   }
 }
 </script>

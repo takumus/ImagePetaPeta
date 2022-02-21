@@ -21,6 +21,9 @@ interface GLOBALS {
     open: () => void
     close: () => void
   },
+  dialog: {
+    show: (label: string, items: string[]) => Promise<number>
+  }
   importImages: () => void,
   modalIds: string[],
   currentModalZIndex: number

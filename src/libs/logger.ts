@@ -1,6 +1,5 @@
-import { LogFrom } from "@/datas/logFrom";
 import { createWriteStream, WriteStream } from "original-fs";
-export default class Logger {
+export class Logger {
   logFile: WriteStream;
   constructor(path: string) {
     this.logFile = createWriteStream(path, { flags: "a" });
@@ -13,4 +12,11 @@ export default class Logger {
   mainLog(...args: any[]) {
     this.log(LogFrom.MAIN, ...args);
   }
+  mainError(error: any) {
+    this.log(LogFrom.MAIN, "Error:", error);
+  }
+}
+export enum LogFrom {
+  MAIN = "MAIN",
+  RENDERER = "REND"
 }

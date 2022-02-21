@@ -37,6 +37,9 @@
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />
     </section>
+    <VDialog
+      :zIndex="10"
+    ></VDialog>
     <VContextMenu
       :zIndex="4"
     />
@@ -59,14 +62,15 @@ import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VComplement from "@/renderer/components/utils/VComplement.vue";
 import VInfo from "@/renderer/components/info/VInfo.vue";
 import VSettings from "@/renderer/components/settings/VSettings.vue";
+import VDialog from "@/renderer/components/VDialog.vue";
 // Others
 import { API, log } from "@/renderer/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/defines";
 import { dbPetaImagesToPetaImages, PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
-import { ImportImageResult } from "@/datas/importImageResult";
+import { ImportImageResult } from "@/api/interfaces/importImageResult";
 import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
-import { UpdateMode } from "@/datas/updateMode";
+import { UpdateMode } from "@/api/interfaces/updateMode";
 import { DelayUpdater } from "@/renderer/libs/delayUpdater";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { isLatest } from "@/utils/versionCheck";
@@ -79,7 +83,8 @@ import { isLatest } from "@/utils/versionCheck";
     VContextMenu,
     VComplement,
     VInfo,
-    VSettings
+    VSettings,
+    VDialog
   },
 })
 export default class Index extends Vue {
@@ -128,13 +133,16 @@ export default class Index extends Vue {
       API.send("showMainWindow");
     });
     this.checkUpdate();
+    // this.$globalComponents.dialog.show("Hello", ["Yes", "No"]);
   }
   checkUpdate() {
     API.send("checkUpdate").then(async (result) => {
       if (!isLatest(result.current, result.latest)) {
         if (
           this.$systemInfo.platform == "win32"
-          && await API.send("dialog", this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0
+          && await this.$globalComponents.dialog.show(
+            this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]
+          ) == 0
         ) {
           API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
         }
@@ -204,7 +212,7 @@ export default class Index extends Vue {
     }
   }
   async removePetaBoard(board: PetaBoard) {
-    if (await API.send("dialog", this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+    if (await this.$globalComponents.dialog.show(this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
       return;
     }
     this.boardUpdaters[board.id].forceUpdate();
@@ -366,6 +374,14 @@ body, html {
     top: 0px;
     left: 0px;
     z-index: 2;
+  }
+  >.dialogs {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 5;
   }
 }
 </style>

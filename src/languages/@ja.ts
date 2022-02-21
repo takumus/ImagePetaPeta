@@ -7,7 +7,7 @@ const ja = {
   },
   utils: {
     updateDialog: (ctx: any) => {
-      return `新しいアップデートがあります。\n現在のバージョン:${ctx.list(0)}\n最新のバージョン:${ctx.list(1)}\nダウンロードしますか？`;
+      return `新しいアップデートがあります。\n現在のバージョン:${ctx.list(0)}\n最新のバージョン:${ctx.list(1)}\nダウンロードしますか?`;
     }
   },
   home: {
@@ -18,7 +18,7 @@ const ja = {
   },
   boards: {
     removeDialog: (ctx: any) => {
-      return `ボード"${ctx.list(0)}"を削除しますか？`
+      return `ボード"${ctx.list(0)}"を削除しますか?`
     },
     menu: {
       openBrowser: "ブラウザを開く",
@@ -33,10 +33,10 @@ const ja = {
     },
     imageLoadError: "画像読み込みエラー",
     loadManyImageDialog: (ctx: any) => {
-      return `このボードには${ctx.list(0)}枚の大量の画像が存在します。\n場合によってはメモリ不足になりますが、読み込みますか？`
+      return `このボードには${ctx.list(0)}枚の大量の画像が存在します。\n場合によってはメモリ不足になりますが、読み込みますか?`
     },
     addManyImageDialog: (ctx: any) => {
-      return `${ctx.list(0)}枚の画像をボードに追加しますか？`
+      return `${ctx.list(0)}枚の画像をボードに追加しますか?`
     },
     loading: "読込中..."
   },
@@ -53,10 +53,10 @@ const ja = {
       openImageFile: "画像ファイルの場所を開く"
     },
     removeImageDialog: (ctx: any) => {
-      return `${ctx.list(0)}"枚の画像を削除しますか？`
+      return `${ctx.list(0)}枚の画像を削除しますか?`
     },
     removeTagDialog: (ctx: any) => {
-      return `タグ"${ctx.list(0)}"を削除しますか？`
+      return `タグ"${ctx.list(0)}"を削除しますか?`
     },
     tagAlreadyExistsDialog: (ctx: any) => {
       return `タグ"${ctx.list(0)}"はすでに存在します`
@@ -72,7 +72,7 @@ const ja = {
         },
       },
       clearSelectionButton: "選択解除",
-      clearSelectionDialog: "選択解除しますか？",
+      clearSelectionDialog: "選択解除しますか?",
       tags: "タグ一覧"
     },
     untagged: "タグ未設定",
@@ -124,7 +124,7 @@ const ja = {
     changePetaImageDirectoryButton: "データの保存先を適用",
     changePetaImageDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
     changePetaImageDirectoryDialog: (ctx: any) => {
-      return `データの保存先を"${ctx.list(0)}"に変更しますか？\n"はい"を押すと再起動します。`
+      return `データの保存先を"${ctx.list(0)}"に変更しますか?\n"はい"を押すと再起動します。`
     },
     changePetaImageDirectoryErrorDialog: (ctx: any) => {
       return `データの保存先を"${ctx.list(0)}"に変更出来ませんでした。\n他のフォルダを選んでください。`

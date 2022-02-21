@@ -1,4 +1,4 @@
-import { ImportImageResult } from "@/datas/importImageResult";
+import { ImportImageResult } from "@/api/interfaces/importImageResult";
 import { PetaImage } from "@/datas/petaImage";
 
 export interface MainEvents {

@@ -60,8 +60,7 @@ import { PTransformer } from "@/renderer/components/board/ppanels/PTransformer";
 import { hitTest } from "@/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/defines";
 import { minimId } from "@/utils/utils";
-import { promiseSerial } from "@araki-packages/promise-serial";
-import { map } from "@/utils/promiseSerial";
+import { promiseSerial } from "@/utils/promiseSerial";
 @Options({
   components: {
     VCrop,
@@ -497,7 +496,7 @@ export default class VBoard extends Vue {
       this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();
     }
-    await promiseSerial(map(load, this.board.petaPanels)).value;
+    await promiseSerial(load, this.board.petaPanels).value;
     log("load complete");
   }
   async loadFullsized(petaPanel: PetaPanel) {
@@ -570,6 +569,12 @@ export default class VBoard extends Vue {
   }
   @Watch("$keyboards.delete")
   keyDelete(value: boolean) {
+    if (value) {
+      this.removeSelectedPanels();
+    }
+  }
+  @Watch("$keyboards.backspace")
+  keyBackspace(value: boolean) {
     if (value) {
       this.removeSelectedPanels();
     }
