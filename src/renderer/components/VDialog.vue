@@ -58,7 +58,6 @@ export default class VModal extends Vue {
     //
   }
   select(index: number) {
-    console.log(index);
     this.resolve(index);
     this.visible = false;
   }
