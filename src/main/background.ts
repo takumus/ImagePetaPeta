@@ -29,6 +29,7 @@ import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } fr
 import { arrLast, minimId, noHtml } from "@/utils/utils";
 import isValidFilePath from "@/utils/isValidFilePath";
 import { promiseSerial } from "@/utils/promiseSerial";
+import dateFormat from "dateformat";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -810,7 +811,7 @@ import { promiseSerial } from "@/utils/promiseSerial";
       height: output.sharp.height / output.sharp.width,
       placeholder: output.placeholder,
       id: id,
-      tags: [],
+      tags: dataSettings.data.autoAddTag ? [dateFormat(addDate, "yyyy-mm-dd")] : [],
       nsfw: false
     }
     await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), param.data);
