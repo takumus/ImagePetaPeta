@@ -20,6 +20,7 @@ export const defaultSettings = {
   petaImageDirectory: {
     default: true,
     path: ""
-  }
+  },
+  autoAddTag: true,
 }
 export type Settings = typeof defaultSettings;

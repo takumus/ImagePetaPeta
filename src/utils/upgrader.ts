@@ -51,6 +51,10 @@ export function upgradeSettings(settings: Settings) {
       path: defaultSettings.petaImageDirectory.path
     };
   }
+  // v1.7.0
+  if (settings.autoAddTag === undefined) {
+    settings.autoAddTag = true;
+  }
   return settings;
 }
 export function upgradeStates(states: States) {
