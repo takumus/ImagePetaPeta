@@ -37,7 +37,7 @@ export default {
         modalIds: [],
         currentModalZIndex: 0
       }
-    });
+    } as Partial<GLOBALS>);
   }
 }
 declare module '@vue/runtime-core' {
