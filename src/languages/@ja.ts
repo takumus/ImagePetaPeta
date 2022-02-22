@@ -13,7 +13,8 @@ const ja = {
   home: {
     infoButton: "情報",
     settingsButton: "設定",
-    importImagesButton: "インポート",
+    importImagesFromFilesButton: "ファイル",
+    importImagesFromDirectoriesButton: "フォルダ",
     openBrowserButton: "ブラウザ"
   },
   boards: {

@@ -143,13 +143,13 @@
           tabindex="-1"
           @click="$api.send('importImageFiles')"
         >
-          {{$t("home.importImagesButton")}}
+          {{$t("home.importImagesFromFilesButton")}}
         </button>
         <button
           tabindex="-1"
           @click="$api.send('importImageDirectories')"
         >
-          {{$t("home.importImagesButton")}}
+          {{$t("home.importImagesFromDirectoriesButton")}}
         </button>
       </article>
       <article class="shared-buttons right">
