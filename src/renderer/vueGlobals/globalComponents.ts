@@ -1,5 +1,6 @@
 import { ContextMenuItem } from "@/datas/contextMenuItem";
 import { Vec2 } from "@/utils/vec2";
+import { reactive, App } from "vue";
 // let app: App;
 interface GLOBALS {
   contextMenu: {
@@ -24,11 +25,23 @@ interface GLOBALS {
   dialog: {
     show: (label: string, items: string[]) => Promise<number>
   }
-  modalIds: string[],
-  currentModalZIndex: number
+  modal: {
+    modalIds: string[],
+    currentModalZIndex: number
+  }
+}
+export default {
+  install(app: App) {
+    app.config.globalProperties.$components = reactive({
+      modal: {
+        modalIds: [],
+        currentModalZIndex: 0
+      }
+    });
+  }
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
-    $globalComponents: GLOBALS;
+    $components: GLOBALS;
   }
 }

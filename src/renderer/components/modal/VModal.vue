@@ -83,21 +83,21 @@ export default class VModal extends Vue {
     }
   }
   isActive() {
-    return this.modalId == this.$globalComponents.modalIds[this.$globalComponents.modalIds.length - 1];
+    return this.modalId == this.$components.modal.modalIds[this.$components.modal.modalIds.length - 1];
   }
-  @Watch("$globalComponents.modalIds")
+  @Watch("$components.modal.modalIds")
   changeModal() {
     this.noBackground = !this.isActive();
   }
   @Watch("visible")
   changeVisible() {
     // 自分のidを除外
-    this.$globalComponents.modalIds = this.$globalComponents.modalIds.filter((id) => id != this.modalId);
+    this.$components.modal.modalIds = this.$components.modal.modalIds.filter((id) => id != this.modalId);
     if (this.visible) {
       // 自分のidを追加
-      this.$globalComponents.modalIds.push(this.modalId);
-      this.zIndex = this.$globalComponents.currentModalZIndex + 3;
-      this.$globalComponents.currentModalZIndex ++;
+      this.$components.modal.modalIds.push(this.modalId);
+      this.zIndex = this.$components.modal.currentModalZIndex + 3;
+      this.$components.modal.currentModalZIndex ++;
     }
   }
   @Watch("$keyboards.escape")

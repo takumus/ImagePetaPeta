@@ -159,7 +159,7 @@ export default class VBrowser extends Vue {
     this.thumbnailsResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.thumbnails);
 
-    this.$globalComponents.browser = this;
+    this.$components.browser = this;
     this.thumbnailsSize = this.$settings.browserThumbnailSize;
   }
   unmounted() {
@@ -230,7 +230,7 @@ export default class VBrowser extends Vue {
     thumbnails.push(...this.selectedPetaImages)
     thumbnails.reverse();
     if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
-      if (await this.$globalComponents.dialog.show(this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+      if (await this.$components.dialog.show(this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
       }
     }
@@ -295,10 +295,10 @@ export default class VBrowser extends Vue {
     }
   }
   complementTag(event: FocusEvent) {
-    this.$globalComponents.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
+    this.$components.complement.open(event.target as HTMLInputElement, this.tags.map((c) => c.name));
   }
   tagMenu(event: MouseEvent, tag: string) {
-    this.$globalComponents.contextMenu.open([
+    this.$components.contextMenu.open([
       {
         label: this.$t("browser.tagMenu.remove", [tag]),
         click: () => {
@@ -314,13 +314,13 @@ export default class VBrowser extends Vue {
     }
     let remove = false;
     if (newName == "") {
-      remove = await this.$globalComponents.dialog.show(this.$t("browser.removeTagDialog", [oldName]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0;
+      remove = await this.$components.dialog.show(this.$t("browser.removeTagDialog", [oldName]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0;
       if (!remove) {
         return;
       }
     }
     if (this.tags.find((c) => c.name == newName)) {
-      this.$globalComponents.dialog.show(this.$t("browser.tagAlreadyExistsDialog", [newName]), []);
+      this.$components.dialog.show(this.$t("browser.tagAlreadyExistsDialog", [newName]), []);
       return;
     }
     const changed: PetaImage[] = [];
@@ -357,11 +357,11 @@ export default class VBrowser extends Vue {
     if (!thumb.petaImage._selected) {
       this.selectThumbnail(thumb, true);
     }
-    this.$globalComponents.contextMenu.open([
+    this.$components.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
-          if (await this.$globalComponents.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+          if (await this.$components.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
             await savePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }

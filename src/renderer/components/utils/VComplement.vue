@@ -45,7 +45,7 @@ export default class VComplement extends Vue {
   target?: HTMLInputElement;
   currentIndex = 0;
   mounted() {
-    this.$globalComponents.complement = this;
+    this.$components.complement = this;
     window.addEventListener("mousedown", (event) => {
       if ((event.target as HTMLElement).parentElement != this.complement) {
         this.select();

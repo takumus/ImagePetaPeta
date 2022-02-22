@@ -135,7 +135,7 @@
       <article class="shared-buttons left">
         <button
           tabindex="-1"
-          @click="$globalComponents.browser.open()"
+          @click="$components.browser.open()"
         >
           {{$t("home.openBrowserButton")}}
         </button>
@@ -155,13 +155,13 @@
       <article class="shared-buttons right">
         <button
           tabindex="-1"
-          @click="$globalComponents.info.open"
+          @click="$components.info.open"
         >
         {{$t("home.infoButton")}}
         </button>
         <button
           tabindex="-1"
-          @click="$globalComponents.settings.open"
+          @click="$components.settings.open"
         >
         {{$t("home.settingsButton")}}
         </button>
@@ -231,7 +231,7 @@ export default class VTabBar extends Vue {
     this.beforeSortSelectedIndex = this.selectedIndex;
   }
   menu(event: MouseEvent, board: PetaBoard) {
-    this.$globalComponents.contextMenu.open([{
+    this.$components.contextMenu.open([{
       label: this.$t("tab.menu.remove", [board.name]),
       click: () => {
         this.removePetaBoard(board);

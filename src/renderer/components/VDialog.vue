@@ -45,7 +45,7 @@ export default class VModal extends Vue {
   visible = false;
   resolve: (index: number) => void = (index: number) => index;
   async mounted() {
-    this.$globalComponents.dialog = this;
+    this.$components.dialog = this;
   }
   unmounted() {
     //

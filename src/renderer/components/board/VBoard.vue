@@ -209,10 +209,10 @@ export default class VBoard extends Vue {
           this.selectedPPanels.forEach((pPanel) => pPanel.dragging = false);
           this.petaPanelMenu(pPanel, new Vec2(e.data.global));
         } else {
-          this.$globalComponents.contextMenu.open([{
+          this.$components.contextMenu.open([{
             label: this.$t("boards.menu.openBrowser"),
             click: () => {
-              this.$globalComponents.browser.open();
+              this.$components.browser.open();
             }
           }, { separate: true }, {
             label: this.$t("boards.menu.resetPosition"),
@@ -380,7 +380,7 @@ export default class VBoard extends Vue {
     delete this.pPanels[pPanel.petaPanel.id];
   }
   petaPanelMenu(pPanel: PPanel, position: Vec2) {
-    this.$globalComponents.contextMenu.open([{
+    this.$components.contextMenu.open([{
       label: this.$t("boards.panelMenu.crop"),
       click: () => {
         this.editCrop(pPanel.petaPanel);

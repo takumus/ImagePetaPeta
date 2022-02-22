@@ -25,7 +25,7 @@
     />
     <section
       class="modals"
-      v-show="this.$globalComponents.modalIds.length > 0"
+      v-show="this.$components.modal.modalIds.length > 0"
     >
       <VBrowser
         :petaImages="petaImages"
@@ -130,14 +130,14 @@ export default class Index extends Vue {
       API.send("showMainWindow");
     });
     this.checkUpdate();
-    // this.$globalComponents.dialog.show("Hello", ["Yes", "No"]);
+    // this.$components.dialog.show("Hello", ["Yes", "No"]);
   }
   checkUpdate() {
     API.send("checkUpdate").then(async (result) => {
       if (!isLatest(result.current, result.latest)) {
         if (
           this.$systemInfo.platform == "win32"
-          && await this.$globalComponents.dialog.show(
+          && await this.$components.dialog.show(
             this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]
           ) == 0
         ) {
@@ -161,7 +161,7 @@ export default class Index extends Vue {
         DEFAULT_IMAGE_SIZE,
         petaImage.height * DEFAULT_IMAGE_SIZE
       );
-      if (!this.$globalComponents.browser.visible) {
+      if (!this.$components.browser.visible) {
         this.addPanel(panel, offsetIndex++);
       }
     });
@@ -209,7 +209,7 @@ export default class Index extends Vue {
     }
   }
   async removePetaBoard(board: PetaBoard) {
-    if (await this.$globalComponents.dialog.show(this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+    if (await this.$components.dialog.show(this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
       return;
     }
     this.boardUpdaters[board.id].forceUpdate();

@@ -217,7 +217,7 @@ export default class VSettings extends Vue {
   currentTab = "general";
   tempPetaImageDirectory = "";
   async mounted() {
-    this.$globalComponents.settings = this;
+    this.$components.settings = this;
     API.on("regenerateThumbnailsProgress", (_, done, count) => {
       this.regenerateThumbnailsDone = done;
       this.regenerateThumbnailsCount = count;
@@ -254,13 +254,13 @@ export default class VSettings extends Vue {
   }
   async changePetaImageDirectory() {
     if (this.tempPetaImageDirectory) {
-      const result = await this.$globalComponents.dialog.show(
+      const result = await this.$components.dialog.show(
         this.$t("settings.changePetaImageDirectoryDialog", [this.tempPetaImageDirectory]),
         [this.$t("shared.yes"), this.$t("shared.no")]
       );
       if (result == 0) {
         if (!await API.send("changePetaImageDirectory", this.tempPetaImageDirectory)) {
-          await this.$globalComponents.dialog.show(
+          await this.$components.dialog.show(
             this.$t("settings.changePetaImageDirectoryErrorDialog", [this.tempPetaImageDirectory]),
             [this.$t("shared.yes")]
           );
