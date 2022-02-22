@@ -48,7 +48,7 @@ const ja = {
     },
     petaImageMenu: {
       remove: (ctx: any) => {
-        return `${ctx.list(0)}"枚の画像を削除`
+        return `${ctx.list(0)}枚の画像を削除`
       },
       openImageFile: "画像ファイルの場所を開く"
     },
@@ -56,7 +56,7 @@ const ja = {
       return `${ctx.list(0)}枚の画像を削除しますか?`
     },
     removeTagDialog: (ctx: any) => {
-      return `タグ"${ctx.list(0)}"を削除しますか?`
+      return `タグ"${ctx.list(0)}"を削除しますか?\n画像は削除されません。`
     },
     tagAlreadyExistsDialog: (ctx: any) => {
       return `タグ"${ctx.list(0)}"はすでに存在します`
@@ -115,9 +115,9 @@ const ja = {
     thumbnailsQuality: "サムネイル品質",
     thumbnailsRegenerateButton: "サムネイル再生成",
     thumbnailsRegenerateConfirm: "サムネイルの再生成には時間がかかりますが、よろしいですか?",
-    thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。\n数値を上げると、ブラウザでの見た目がきれいになりますが、動作が重くなる場合があります。\n設定変更後は再生成ボタンを押してください。",
+    thumbnailsDescriptions: "ブラウザ上のサムネイルの画質を設定します。数値を上げると、ブラウザでの見た目がきれいになりますが、動作が重くなる場合があります。設定変更後は再生成ボタンを押してください。",
     loadThumbnailsInFullsized: "ブラウザをズーム時にフルサイズの画像を読み込む。(高スペックPC向け)",
-    loadThumbnailsInFullsizedDescriptions: "ブラウザでのサムネイルサイズが、上記で生成したサイズを超えた場合にフルサイズの画像を読み込みます。\n動作が重いと感じた場合は、この設定を無効にすることをおすすめします。",
+    loadThumbnailsInFullsizedDescriptions: "ブラウザでのサムネイルサイズが、上記で生成したサイズを超えた場合にフルサイズの画像を読み込みます。動作が重いと感じた場合は、この設定を無効にすることをおすすめします。",
     showNsfwWithoutConfirm: "NSFWな画像を表示",
     showNsfwWithoutConfirmDescriptions: "NSFWとしてマークした画像を常に表示します。気をつけてください。",
     browsePetaImageDirectoryButton: "データの保存先を選ぶ",
