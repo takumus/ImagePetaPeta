@@ -1,7 +1,7 @@
 //
 // https://github.com/wise9/enchant.js/blob/master/dev/src/Entity.js
 
-import { Vec2 } from "../../utils/vec2";
+import { Vec2 } from "@/utils/vec2";
 
 //
 interface Rect {

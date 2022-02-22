@@ -1,4 +1,4 @@
-import { PetaImage } from "../../datas/petaImage";
+import { PetaImage } from "@/datas/petaImage";
 
 export interface AddImageResult {
   exists: boolean,
