@@ -12,7 +12,7 @@ module.exports = {
       .clear();
     config
       .entry("app")
-      .add("./src/rendererProcess/vue.ts");
+      .add("./src/rendererProcess/index.ts");
     config.module
       .rule("vue")
       .use("vue-loader")
@@ -33,7 +33,7 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       preload: "./src/mainProcess/preload.ts",
-      mainProcessFile: "./src/mainProcess/background.ts",
+      mainProcessFile: "./src/mainProcess/index.ts",
       builderOptions: {
         appId: "io.takumus." + packageJSON.name,
         productName: packageJSON.productName,
