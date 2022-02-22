@@ -118,6 +118,11 @@ export default class Index extends Vue {
     });
     API.on("windowFocused", (e, focused) => {
       this.windowIsFocused = focused;
+      if (!focused) {
+        this.vPetaBoard.clearSelectionAll(true);
+        this.vPetaBoard.orderPIXIRender();
+      }
+      console.log(focused);
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
     const info = await API.send("getAppInfo");
