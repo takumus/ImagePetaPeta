@@ -3,12 +3,12 @@ import { createI18n } from "vue-i18n";
 import languages from "@/languages";
 import App from "@/renderer/components/VIndex.vue";
 import { App as _App, reactive } from "vue";
-import GlboalKeyboard from "@/renderer/vueGlobals/globalKeyboard";
-import GlobalSettings from "@/renderer/vueGlobals/globalSettings";
-import GlobalSystemInfo from "@/renderer/vueGlobals/globalSystemInfo";
-import GlobalDefines from "@/renderer/vueGlobals/globalDefines";
-import GlobalAPI from "@/renderer/vueGlobals/globalAPI";
-import GlobalComponents from "./vueGlobals/globalComponents";
+import GlboalKeyboard from "@/renderer/vueComponentCustomProperties/keyboards";
+import GlobalSettings from "@/renderer/vueComponentCustomProperties/settings";
+import GlobalSystemInfo from "@/renderer/vueComponentCustomProperties/systemInfo";
+import GlobalDefines from "@/renderer/vueComponentCustomProperties/defines";
+import GlobalAPI from "@/renderer/vueComponentCustomProperties/api";
+import GlobalComponents from "./vueComponentCustomProperties/components";
 (async () => {
   const app = createApp(App);
   const i18n = createI18n({
