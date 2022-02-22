@@ -58,6 +58,9 @@ export function upgradeSettings(settings: Settings) {
   return settings;
 }
 export function upgradeStates(states: States) {
+  if (states.selectedPetaBoardId === undefined) {
+    states.selectedPetaBoardId = "";
+  } 
   return states;
 }
 export function upgradePetaBoard(board: PetaBoard) {

@@ -134,7 +134,6 @@ export default class Index extends Vue {
       API.send("showMainWindow");
     });
     this.checkUpdate();
-    // this.$components.dialog.show("Hello", ["Yes", "No"]);
   }
   checkUpdate() {
     API.send("checkUpdate").then(async (result) => {
@@ -186,6 +185,14 @@ export default class Index extends Vue {
         });
       }
     });
+    // const id = (await API.send("getStates")).selectedPetaBoardId;
+    // let index = -1;
+    // this.boards.forEach((b, i) => {
+    //   if (b.id == id) {
+    //     index = i;
+    //   }
+    // });
+    // this.vTabBar.selectPetaBoardByIndex(index);
   }
   addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
     this.orderedAddPanelIds = ids;

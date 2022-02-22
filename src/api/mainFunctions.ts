@@ -3,6 +3,7 @@ import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { UpdateMode } from "@/api/interfaces/updateMode";
 import { AppInfo } from "@/api/interfaces/appInfo";
 import { Settings } from "@/datas/settings";
+import { States } from "@/datas/states";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
@@ -20,6 +21,7 @@ export interface MainFunctions {
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;
+  getStates: () => Promise<States>;
   showDBFolder: () => Promise<boolean>;
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
   checkUpdate: () => Promise<{ current: string, latest: string }>;
@@ -34,4 +36,5 @@ export interface MainFunctions {
   regenerateThumbnails: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
+  setSelectedPetaBoard: (petaBoardId: string) => Promise<void>;
 }

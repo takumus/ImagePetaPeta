@@ -563,10 +563,14 @@ import dateFormat from "dateformat";
       ------------------------------------*/
       changePetaImageDirectory: async (event, path) => {
         try {
-          if (Path.resolve() == Path.resolve(path)) {
+          dataLogger.mainLog("#Change PetaImage Directory");
+          path = Path.resolve(path);
+          if (Path.resolve() == path) {
+            dataLogger.mainError("Invalid file path:", path);
             return false;
           }
-          if (DIR_APP == Path.resolve(path)) {
+          if (DIR_APP == path) {
+            dataLogger.mainError("Invalid file path:", path);
             return false;
           }
           path = file.initDirectory(true, path);
@@ -576,8 +580,26 @@ import dateFormat from "dateformat";
           relaunch();
           return true;
         } catch(error) {
+          dataLogger.mainError(error);
           return false;
         }
+      },
+      /*------------------------------------
+        States
+      ------------------------------------*/
+      getStates: async (event) => {
+        dataLogger.mainLog("#Get States");
+        return dataStates.data;
+      },
+      /*------------------------------------
+        選択中のボードのidを保存
+      ------------------------------------*/
+      setSelectedPetaBoard: async (event, petaBoardId: string) => {
+        dataLogger.mainLog("#Set Selected PetaBoard");
+        dataLogger.mainLog("id:", petaBoardId);
+        dataStates.data.selectedPetaBoardId = petaBoardId;
+        dataStates.save();
+        return;
       }
     } as {
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>

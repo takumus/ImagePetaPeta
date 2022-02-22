@@ -467,6 +467,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
+    await API.send("setSelectedPetaBoard", this.board.id);
     log("load", this.board.name);
     this.loading = true;
     // this.clearCache();

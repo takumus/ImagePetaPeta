@@ -12,8 +12,8 @@ export class Logger {
   mainLog(...args: any[]) {
     this.log(LogFrom.MAIN, ...args);
   }
-  mainError(error: any) {
-    this.log(LogFrom.MAIN, "Error:", error);
+  mainError(...errors: any) {
+    this.log(LogFrom.MAIN, "Error:", ...errors);
   }
 }
 export enum LogFrom {
