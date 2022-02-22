@@ -24,7 +24,6 @@ interface GLOBALS {
   dialog: {
     show: (label: string, items: string[]) => Promise<number>
   }
-  importImages: () => void,
   modalIds: string[],
   currentModalZIndex: number
 }

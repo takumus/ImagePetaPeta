@@ -174,18 +174,35 @@ import { promiseSerial } from "@/utils/promiseSerial";
       /*------------------------------------
         画像を開く
       ------------------------------------*/
-      browseImages: async () => {
-        dataLogger.mainLog("#Browse Images");
-        const file = await dialog.showOpenDialog(window, {
+      importImageFiles: async () => {
+        dataLogger.mainLog("#Browse Image Files");
+        const result = await dialog.showOpenDialog(window, {
           properties: ["openFile", "multiSelections"]
         });
-        if (file.canceled) {
+        if (result.canceled) {
           dataLogger.mainLog("canceled");
           return 0;
         }
-        dataLogger.mainLog("return:", file.filePaths.length);
-        importImagesFromFilePaths(file.filePaths);
-        return file.filePaths.length;
+        dataLogger.mainLog("return:", result.filePaths.length);
+        importImagesFromFilePaths(result.filePaths);
+        return result.filePaths.length;
+      },
+      /*------------------------------------
+        画像を開く
+      ------------------------------------*/
+      importImageDirectories: async () => {
+        dataLogger.mainLog("#Browse Image Directories");
+        const result = await dialog.showOpenDialog(window, {
+          properties: ["openDirectory"]
+        });
+        if (result.canceled) {
+          dataLogger.mainLog("canceled");
+          return 0;
+        }
+        const filePaths = await file.readDirRecursive(result.filePaths[0]);
+        dataLogger.mainLog("return:", filePaths.length);
+        importImagesFromFilePaths(filePaths);
+        return filePaths.length;
       },
       /*------------------------------------
         URLからインポート
@@ -206,7 +223,7 @@ import { promiseSerial } from "@/utils/promiseSerial";
           const id = (await importImagesFromBuffers([data], "download"))[0].id;
           return id;
         } catch (err) {
-          dataLogger.mainLog("error: ", err);
+          dataLogger.mainError(err);
         }
         return "";
       },
@@ -216,10 +233,26 @@ import { promiseSerial } from "@/utils/promiseSerial";
       importImagesFromFilePaths: async (event, filePaths) =>{
         try {
           dataLogger.mainLog("#Import Images From File Paths");
-          const images = (await importImagesFromFilePaths(filePaths)).map((image) => image.id);
+          const _filePaths: string[] = [];
+          await promiseSerial(async (path, index) => {
+            _filePaths.push(...await file.readDirRecursive(path));
+          }, filePaths).value;
+          const images = (await importImagesFromFilePaths(_filePaths)).map((image) => image.id);
           return images;
         } catch(e) {
           dataLogger.mainError(e);
+        }
+        return [];
+      },
+      /*------------------------------------
+        クリップボードからインポート
+      ------------------------------------*/
+      importImagesFromClipboard: async (event, buffers) => {
+        try {
+          dataLogger.mainLog("#Import Images From Clipboard");
+          return (await importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id);
+        } catch (error) {
+          dataLogger.mainError(error);
         }
         return [];
       },
@@ -339,6 +372,7 @@ import { promiseSerial } from "@/utils/promiseSerial";
         PetaImageのファイルを開く
       ------------------------------------*/
       openImageFile: async (event, petaImage) => {
+        dataLogger.mainLog("#Open Image File");
         shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
       },
       /*------------------------------------
@@ -427,24 +461,31 @@ import { promiseSerial } from "@/utils/promiseSerial";
         ウインドウのフォーカス取得
       ------------------------------------*/
       getWindowIsFocused: async (event) => {
-        return window.isFocused();
+        dataLogger.mainLog("#Get Window Is Focused");
+        const isFocued = window.isFocused();
+        dataLogger.mainLog("return:", isFocued);
+        return isFocued;
       },
       /*------------------------------------
         ズームレベル変更
       ------------------------------------*/
       setZoomLevel: async (event, level) => {
+        dataLogger.mainLog("#Set Zoom Level");
+        dataLogger.mainLog("level:", level);
         window.webContents.setZoomLevel(level);
       },
       /*------------------------------------
         最小化
       ------------------------------------*/
       windowMinimize: async (event) => {
+        dataLogger.mainLog("#Window Minimize");
         window.minimize();
       },
       /*------------------------------------
         最大化
       ------------------------------------*/
       windowMaximize: async (event) => {
+        dataLogger.mainLog("#Window Maximize");
         if (window.isMaximized()) {
           window.unmaximize();
           return;
@@ -455,12 +496,15 @@ import { promiseSerial } from "@/utils/promiseSerial";
         閉じる
       ------------------------------------*/
       windowClose: async (event) => {
+        dataLogger.mainLog("#Window Close");
         app.quit();
       },
       /*------------------------------------
         OS情報取得
       ------------------------------------*/
       getPlatform: async (event) => {
+        dataLogger.mainLog("#Get Platform");
+        dataLogger.mainLog("return:", process.platform);
         return process.platform;
       },
       /*------------------------------------
@@ -533,16 +577,6 @@ import { promiseSerial } from "@/utils/promiseSerial";
         } catch(error) {
           return false;
         }
-      },
-      importImagesFromClipboard: async (event, buffers) => {
-        try {
-          dataLogger.mainLog("#Import Image From Clipboard");
-          const ids = (await importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id)
-          return ids;
-        } catch (error) {
-          dataLogger.mainError(error);
-        }
-        return [];
       }
     } as {
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>

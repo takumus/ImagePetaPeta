@@ -9,7 +9,7 @@ const keyboards = reactive({
   v: false,
   c: false
 });
-const Plugin = {
+export default {
   install(app: App) {
     app.config.globalProperties.$keyboards = keyboards;
     function key(key: string, pressed: boolean) {
@@ -19,7 +19,6 @@ const Plugin = {
     window.addEventListener("keyup", (e) => key(e.key, false));
   }
 }
-export default Plugin;
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
     $keyboards: typeof keyboards;

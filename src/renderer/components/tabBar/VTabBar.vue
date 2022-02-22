@@ -141,7 +141,13 @@
         </button>
         <button
           tabindex="-1"
-          @click="$globalComponents.importImages"
+          @click="$api.send('importImageFiles')"
+        >
+          {{$t("home.importImagesButton")}}
+        </button>
+        <button
+          tabindex="-1"
+          @click="$api.send('importImageDirectories')"
         >
           {{$t("home.importImagesButton")}}
         </button>
@@ -183,7 +189,7 @@ import { MouseButton } from "@/datas/mouseButton";
     "remove",
     "add",
     "select",
-    "sort",
+    "sort"
   ]
 })
 export default class VTabBar extends Vue {

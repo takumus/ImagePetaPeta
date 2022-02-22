@@ -99,3 +99,36 @@ export function writable(path: string, isDirectory: boolean) {
   // 存在する場合はパスのアクセス権確認
   fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
 }
+export function readdir(path: string) {
+  return new Promise((res:(files: string[]) => void, rej) => {
+    fs.readdir(path, {}, (err, files) => {
+      if (err) {
+        rej(err);
+        return;
+      }
+      res(files as string[]);
+    })
+  })
+}
+export async function readDirRecursive(path: string) {
+  path = Path.resolve(path);
+  try {
+    const _files: string[] = [];
+    const files = await readdir(path);
+    for (let i = 0; i < files.length; i++) {
+      const cPath = Path.resolve(path, files[i]);
+      try {
+        if (fs.statSync(cPath).isDirectory()) {
+          _files.push(...await readDirRecursive(cPath));
+        } else {
+          _files.push(cPath);
+        }
+      } catch (e) {
+        //
+      }
+    }
+    return _files;
+  } catch (err) {
+    return [path];
+  }
+}

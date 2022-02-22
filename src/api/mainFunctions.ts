@@ -6,9 +6,11 @@ import { Settings } from "@/datas/settings";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
-  browseImages: () => Promise<number>;
+  importImageFiles: () => Promise<number>;
+  importImageDirectories: () => Promise<number>;
   importImageFromURL: (url: string) => Promise<string>;
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
+  importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
   getPetaImages: () => Promise<PetaImages>;
   savePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<PetaBoard[]>;
@@ -32,5 +34,4 @@ export interface MainFunctions {
   regenerateThumbnails: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
-  importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
 }

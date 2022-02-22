@@ -106,9 +106,6 @@ export default class Index extends Vue {
       log("window error:", e);
     }
     log("INIT RENDERER!");
-    this.$globalComponents.importImages = () => {
-      API.send("browseImages");
-    }
     API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
       this.getPetaImages();
     });

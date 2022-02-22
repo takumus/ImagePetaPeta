@@ -3,10 +3,11 @@ import { createI18n } from "vue-i18n";
 import languages from "@/languages";
 import App from "@/renderer/components/VIndex.vue"
 import { App as _App, reactive } from "vue";
-import GlboalKeyboard from "@/renderer/globals/globalKeyboard";
-import GlobalSettings from "@/renderer/globals/globalSettings";
-import GlobalSystemInfo from "@/renderer/globals/globalSystemInfo";
-import GlobalDefines from "@/renderer/globals/globalDefines";
+import GlboalKeyboard from "@/renderer/vueGlobals/globalKeyboard";
+import GlobalSettings from "@/renderer/vueGlobals/globalSettings";
+import GlobalSystemInfo from "@/renderer/vueGlobals/globalSystemInfo";
+import GlobalDefines from "@/renderer/vueGlobals/globalDefines";
+import GlobalAPI from "@/renderer/vueGlobals/globalAPI";
 (async () => {
   const app = createApp(App);
   const i18n = createI18n({
@@ -16,6 +17,7 @@ import GlobalDefines from "@/renderer/globals/globalDefines";
   app.use(i18n);
   app.use(GlboalKeyboard);
   app.use(GlobalDefines);
+  app.use(GlobalAPI);
   await GlobalSettings.install(app);
   await GlobalSystemInfo.install(app);
   app.config.globalProperties.$globalComponents = reactive({
