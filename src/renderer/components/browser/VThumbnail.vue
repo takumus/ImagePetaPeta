@@ -63,10 +63,10 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { getImageURL } from "@/utils/imageURL";
-import { BrowserThumbnail } from "@/datas/browserThumbnail";
+import { getImageURL } from "@/renderer/utils/imageURL";
+import { BrowserThumbnail } from "@/renderer/components/browser/browserThumbnail";
 import { MouseButton } from "@/datas/mouseButton";
-import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { ImageType } from "@/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
 import { log } from "@/renderer/api";

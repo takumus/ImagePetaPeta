@@ -23,8 +23,8 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
-import { getImageURL } from "@/utils/imageURL";
-import { BrowserThumbnail } from "@/datas/browserThumbnail";
+import { getImageURL } from "@/renderer/utils/imageURL";
+import { BrowserThumbnail } from "@/renderer/components/browser/browserThumbnail";
 import { ImageType } from "@/datas/imageType";
 @Options({
   components: {

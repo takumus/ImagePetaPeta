@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import * as Cursor from "@/renderer/libs/cursor";
+import * as Cursor from "@/renderer/utils/cursor";
 export class PControlPoint extends PIXI.Container {
   size = new PIXI.Graphics();
   rotate = new PIXI.Graphics();

@@ -49,11 +49,11 @@ import { Prop, Ref } from "vue-property-decorator";
 import VDottedBox from "@/renderer/components/utils/VDottedBox.vue";
 // Others
 import { Vec2 } from "@/utils/vec2";
-import { getImageURL } from "@/utils/imageURL";
+import { getImageURL } from "@/renderer/utils/imageURL";
 import { IMG_TAG_WIDTH } from "@/defines";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
-import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { ImageType } from "@/datas/imageType";
 @Options({
   components: {

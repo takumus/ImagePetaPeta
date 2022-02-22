@@ -71,7 +71,7 @@ import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPet
 import { ImportImageResult } from "@/api/interfaces/importImageResult";
 import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
 import { UpdateMode } from "@/api/interfaces/updateMode";
-import { DelayUpdater } from "@/renderer/libs/delayUpdater";
+import { DelayUpdater } from "@/renderer/utils/delayUpdater";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { isLatest } from "@/utils/versionCheck";
 @Options({

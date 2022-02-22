@@ -74,8 +74,8 @@ import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/defines";
 import { PetaImage } from "@/datas/petaImage";
 import { UpdateMode } from "@/api/interfaces/updateMode";
-import { BrowserThumbnail } from "@/datas/browserThumbnail";
-import { savePetaImages } from "@/renderer/libs/savePetaImages";
+import { BrowserThumbnail } from "@/renderer/components/browser/browserThumbnail";
+import { savePetaImages } from "@/renderer/utils/savePetaImages";
 @Options({
   components: {
     VEditableLabel,

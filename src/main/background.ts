@@ -9,11 +9,11 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/defines";
-import * as file from "@/libs/file";
-import DB from "@/libs/db";
-import { imageFormatToExtention } from "@/utils/imageFormatToExtention";
-import { Logger, LogFrom } from "@/libs/logger";
-import Config from "@/libs/config";
+import * as file from "@/main/storages/file";
+import DB from "@/main/storages/db";
+import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
+import { Logger, LogFrom } from "@/main/storages/logger";
+import Config from "@/main/storages/config";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { PetaBoard, createPetaBoard } from "@/datas/petaBoard";
 import { ImportImageResult } from "@/api/interfaces/importImageResult";
@@ -25,9 +25,9 @@ import { MainEvents } from "@/api/mainEvents";
 import { MainFunctions } from "@/api/mainFunctions";
 import { ImageType } from "@/datas/imageType";
 import { defaultStates, States } from "@/datas/states";
-import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/utils/upgrader";
+import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/main/utils/upgrader";
 import { arrLast, minimId, noHtml } from "@/utils/utils";
-import isValidFilePath from "@/utils/isValidFilePath";
+import isValidFilePath from "@/main/utils/isValidFilePath";
 import { promiseSerial } from "@/utils/promiseSerial";
 import dateFormat from "dateformat";
 (() => {

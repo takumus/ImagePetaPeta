@@ -1,4 +1,4 @@
-import { ContextMenuItem } from "@/datas/contextMenuItem";
+import { ContextMenuItem } from "@/renderer/components/utils/contextMenuItem";
 import { Vec2 } from "@/utils/vec2";
 import { reactive, App } from "vue";
 // let app: App;

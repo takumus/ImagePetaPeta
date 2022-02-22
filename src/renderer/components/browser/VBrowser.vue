@@ -111,10 +111,10 @@ import { API, log } from "@/renderer/api";
 import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
 import { PetaImage, PetaImages } from "@/datas/petaImage";
 import { SortMode } from "@/datas/sortMode";
-import { BrowserThumbnail } from "@/datas/browserThumbnail";
+import { BrowserThumbnail } from "@/renderer/components/browser/browserThumbnail";
 import { createPetaPanel } from "@/datas/petaPanel";
 import { UpdateMode } from "@/api/interfaces/updateMode";
-import { savePetaImages } from "@/renderer/libs/savePetaImages";
+import { savePetaImages } from "@/renderer/utils/savePetaImages";
 @Options({
   components: {
     VThumbnail,

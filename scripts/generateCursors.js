@@ -7,7 +7,7 @@ const sharp = require("sharp");
     const size = sizes[i];
     await sharp("./rawAssets/cursor/rotate.png")
     .resize(size)
-    .toFile(`./src/assets/rotateCursor${ i + 1 }x.png`);
+    .toFile(`./src/@assets/rotateCursor${ i + 1 }x.png`);
     console.log(`cursor ${size}px`);
   }
   console.log("generate cursors complete");

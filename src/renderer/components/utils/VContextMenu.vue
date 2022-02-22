@@ -30,7 +30,7 @@ import { Prop, Ref } from "vue-property-decorator";
 // Others
 import { Vec2 } from "@/utils/vec2";
 import { v4 as uuid } from "uuid";
-import { ContextMenuItem } from "@/datas/contextMenuItem";
+import { ContextMenuItem } from "@/renderer/components/utils/contextMenuItem";
 @Options({
   components: {
   }

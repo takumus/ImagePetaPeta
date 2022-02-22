@@ -2,7 +2,7 @@ const fs = require("fs");
 const Path = require("path");
 const config = {
   types: ["ts", "vue"],
-  exclude: ["./src/assets/licenses.ts"]
+  exclude: ["./src/@assets/licenses.ts"]
 }
 function search(path) {
   path = Path.resolve(path);

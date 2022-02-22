@@ -1,5 +1,5 @@
 import { Vec2 } from "@/utils/vec2";
-import { PetaImage } from "./petaImage";
+import { PetaImage } from "@/datas/petaImage";
 
 export interface BrowserThumbnail {
   petaImage: PetaImage,

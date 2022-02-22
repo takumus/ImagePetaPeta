@@ -39,10 +39,10 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VModal from "@/renderer/components/modal/VModal.vue";
 import VProgressBar from "@/renderer/components/utils/VProgressBar.vue";
 // Others
-import { getURLFromImgTag } from "@/utils/getURLFromImgTag";
+import { getURLFromImgTag } from "@/renderer/utils/getURLFromImgTag";
 import { API } from "@/renderer/api";
 import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { setCursor, setDefaultCursor } from "@/renderer/libs/cursor";
+import { setCursor, setDefaultCursor } from "@/renderer/utils/cursor";
 import { promiseSerial } from "@/utils/promiseSerial";
 @Options({
   components: {

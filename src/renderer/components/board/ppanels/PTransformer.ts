@@ -3,7 +3,7 @@ import { Vec2 } from "@/utils/vec2";
 import { PPanel } from "@/renderer/components/board/ppanels/PPanel";
 import { PetaPanel } from "@/datas/petaPanel";
 import { MouseButton } from "@/datas/mouseButton";
-import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { PSelection } from "@/renderer/components/board/ppanels/PSelection";
 import { PControlPoint } from "@/renderer/components/board/ppanels/PControlPoint";
 import deepcopy from "deepcopy";

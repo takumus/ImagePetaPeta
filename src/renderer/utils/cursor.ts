@@ -1,5 +1,5 @@
-import RotateCursor1x from "@/assets/rotateCursor1x.png";
-import RotateCursor2x from "@/assets/rotateCursor2x.png";
+import RotateCursor1x from "@/@assets/rotateCursor1x.png";
+import RotateCursor2x from "@/@assets/rotateCursor2x.png";
 export const ROTATE_CURSOR = `-webkit-image-set(
   url('${RotateCursor1x}') 1x,
   url('${RotateCursor2x}') 2x

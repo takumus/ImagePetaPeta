@@ -38,7 +38,7 @@ import { Prop, Ref } from "vue-property-decorator";
 // Components
 import VModal from "@/renderer/components/modal/VModal.vue";
 // Others
-import { LICENSES } from "@/assets/licenses";
+import { LICENSES } from "@/@assets/licenses";
 import { API } from "@/renderer/api";
 import { AppInfo } from "@/api/interfaces/appInfo";
 @Options({
