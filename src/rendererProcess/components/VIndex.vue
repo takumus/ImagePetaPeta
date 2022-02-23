@@ -73,6 +73,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
 import { Vec2 } from "@/commons/utils/vec2";
 import { isLatest } from "@/commons/utils/versionCheck";
+import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
 @Options({
   components: {
     VBrowser,
@@ -225,13 +226,8 @@ export default class Index extends Vue {
     await this.getPetaBoards();
   }
   async addPetaBoard() {
-    const basename = DEFAULT_BOARD_NAME;
-    const names = this.boards.map((b) => b.name);
-    let name = basename;
-    for (let i = 2; names.includes(name); i++) {
-      name = basename + (i > 0 ? `(${i})` : "");
-    }
-    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$settings.darkMode);
+    const name = getNameAvoidDuplication(DEFAULT_BOARD_NAME, this.boards.map((b) => b.name));
+    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.darkMode);
     await API.send(
       "savePetaBoards",
       [board],
@@ -291,31 +287,33 @@ body, html {
     --border-color: #999999;
     --font-color: #333333;
     --button-bg-color: #ffffff;
-    --button-hover-bg-color: #eeeeee;
-    --button-active-bg-color: #eeeeee;
+    --button-hover-bg-color: #e9e9e9;
+    --button-active-bg-color: #dddddd;
     --tab-bg-color: #e9e9e9;
     --tab-selected-color: #ffffff;
     --tab-hovered-color: #f5f5f5;
     --tab-border-color: #cccccc;
     --window-buttons-hover: #cccccc;
     --window-buttons-close-hover: #ff0000;
-    --petapanel-bg-color: #eeeeee;
+    --contextmenu-item-color: #ffffff;
+    --contextmenu-item-hover-color: #e9e9e9;
   }
   &.dark {
-    --bg-color: #333333;
-    --modal-bg-color: #ffffff50;
-    --border-color: #cccccc;
-    --font-color: #ffffff;
-    --button-bg-color: #444444;
-    --button-hover-bg-color: #555555;
+    --bg-color: #141414;
+    --modal-bg-color: #ffffff30;
+    --border-color: #5c5c5c;
+    --font-color: #d3d3d3;
+    --button-bg-color: #141414;
+    --button-hover-bg-color: #272727;
     --button-active-bg-color: #555555;
-    --tab-bg-color: #333333;
+    --tab-bg-color: #272727;
     --tab-selected-color: #141414;
-    --tab-hovered-color: #272727;
+    --tab-hovered-color: #202020;
     --tab-border-color: #444444;
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;
-    --petapanel-bg-color: #555555;
+    --contextmenu-item-color: #272727;
+    --contextmenu-item-hover-color: #444444;
   }
   background-color: var(--bg-color);
   color: var(--font-color);

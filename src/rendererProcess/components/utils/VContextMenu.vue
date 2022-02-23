@@ -80,10 +80,10 @@ export default class VContextMenu extends Vue {
 <style lang="scss" scoped>
 .context-menu-root {
   position: fixed;
-  background-color: var(--button-bg-color);
+  background-color: var(--contextmenu-item-color);
   padding: 0px;
   margin: 0px;
-  box-shadow: 2px 2px 5px rgba($color: #000000, $alpha: 0.5);
+  box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
   color: var(--font-color);
   >.item {
     white-space: nowrap;
@@ -94,7 +94,7 @@ export default class VContextMenu extends Vue {
     font-size: 1em;
     cursor: pointer;
     &:hover {
-      background-color: var(--button-hover-bg-color);
+      background-color: var(--contextmenu-item-hover-color);
     }
   }
   >.separate {

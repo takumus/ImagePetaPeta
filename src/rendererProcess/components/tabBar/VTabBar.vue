@@ -27,14 +27,12 @@
             :style="{ opacity: b == board && dragging ? 0 : 1 }"
             v-for="(b, index) in boards"
             @mousedown="mousedown($event, index, $target)"
+            @contextmenu="menu($event, b)"
             :key="b.id"
             :ref="`tab-${b.id}`"
           >
             <span class="wrapper">
-              <span
-                class="label"
-                @contextmenu="menu($event, b)"
-              >
+              <span class="label">
                 <VEditableLabel
                   @change="(v) => changePetaBoardName(b, v)"
                   :label="b.name"

@@ -346,20 +346,6 @@ import dateFormat from "dateformat";
         return true;
       },
       /*------------------------------------
-        ダイアログ
-      ------------------------------------*/
-      // dialog: async (event, message, buttons) => {
-      //   dataLogger.mainLog("#Dialog");
-      //   dataLogger.mainLog("dialog:", message, buttons);
-      //   const value = await dialog.showMessageBox(window, {
-      //     title: "Petapeta",
-      //     message: message,
-      //     buttons: buttons,
-      //     cancelId: -1
-      //   });
-      //   return value.response;
-      // },
-      /*------------------------------------
         WebブラウザでURLを開く
       ------------------------------------*/
       openURL: async (event, url) => {
