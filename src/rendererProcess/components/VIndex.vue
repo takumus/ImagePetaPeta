@@ -68,11 +68,10 @@ import { API, log } from "@/rendererProcess/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/commons/datas/petaBoard";
-import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import { PetaPanel, createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { isLatest } from "@/commons/utils/versionCheck";
 @Options({
   components: {
@@ -99,7 +98,6 @@ export default class Index extends Vue {
   orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
-  systemDarkMode = false;
   title = "";
   async mounted() {
     window.onerror = (e) => {
@@ -126,7 +124,6 @@ export default class Index extends Vue {
     this.windowIsFocused = await API.send("getWindowIsFocused");
     const info = await API.send("getAppInfo");
     this.title = `${info.name} ${info.version}`;
-    this.getSystemDarkMode();
     await this.getPetaImages();
     await this.getPetaBoards();
     document.title = this.title;
@@ -249,18 +246,12 @@ export default class Index extends Vue {
   }
   get darkMode() {
     if (this.$settings.autoDarkMode) {
-      return this.systemDarkMode;
+      return this.$systemDarkMode.value;
     }
     return this.$settings.darkMode;
   }
   get uiVisible() {
     return this.$settings.autoHideUI ? this.windowIsFocused : true;
-  }
-  getSystemDarkMode() {
-    this.systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setTimeout(() => {
-      this.getSystemDarkMode();
-    }, 1000);
   }
   changePetaBoard(board: PetaBoard) {
     this.savePetaBoard(board, false);

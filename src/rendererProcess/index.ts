@@ -8,7 +8,8 @@ import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/setti
 import GlobalSystemInfo from "@/rendererProcess/vueComponentCustomProperties/systemInfo";
 import GlobalDefines from "@/rendererProcess/vueComponentCustomProperties/defines";
 import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
-import GlobalComponents from "./vueComponentCustomProperties/components";
+import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
+import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 (async () => {
   const app = createApp(App);
   const appUse = async (plugin: Plugin) => await plugin.install!(app);
@@ -21,6 +22,7 @@ import GlobalComponents from "./vueComponentCustomProperties/components";
   appUse(GlobalDefines);
   appUse(GlobalAPI);
   appUse(GlobalComponents);
+  appUse(GlobalSystemDarkMode);
   await appUse(GlobalSettings)
   await appUse(GlobalSystemInfo);
   app.mount("#app");
