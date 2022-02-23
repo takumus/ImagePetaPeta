@@ -285,20 +285,22 @@ body, html {
 }
 .root {
   --rounded: 6px;
-  --bg-color: #ffffff;
-  --modal-bg-color: #00000070;
-  --border-color: #999999;
-  --font-color: #333333;
-  --button-bg-color: #ffffff;
-  --button-hover-bg-color: #eeeeee;
-  --button-active-bg-color: #eeeeee;
-  --tab-bg-color: #e9e9e9;
-  --tab-selected-color: #ffffff;
-  --tab-hovered-color: #f5f5f5;
-  --tab-border-color: #cccccc;
-  --window-buttons-hover: #cccccc;
-  --window-buttons-close-hover: #ff0000;
-  --petapanel-bg-color: #eeeeee;
+  & {
+    --bg-color: #ffffff;
+    --modal-bg-color: #00000070;
+    --border-color: #999999;
+    --font-color: #333333;
+    --button-bg-color: #ffffff;
+    --button-hover-bg-color: #eeeeee;
+    --button-active-bg-color: #eeeeee;
+    --tab-bg-color: #e9e9e9;
+    --tab-selected-color: #ffffff;
+    --tab-hovered-color: #f5f5f5;
+    --tab-border-color: #cccccc;
+    --window-buttons-hover: #cccccc;
+    --window-buttons-close-hover: #ff0000;
+    --petapanel-bg-color: #eeeeee;
+  }
   &.dark {
     --bg-color: #333333;
     --modal-bg-color: #ffffff50;
