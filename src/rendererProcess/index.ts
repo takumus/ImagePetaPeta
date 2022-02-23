@@ -1,6 +1,6 @@
 import { createApp, Plugin } from "vue";
 import { createI18n } from "vue-i18n";
-import languages from "@/languages";
+import languages from "@/commons/languages";
 import App from "@/rendererProcess/components/VIndex.vue";
 import { App as _App, reactive } from "vue";
 import GlboalKeyboard from "@/rendererProcess/vueComponentCustomProperties/keyboards";

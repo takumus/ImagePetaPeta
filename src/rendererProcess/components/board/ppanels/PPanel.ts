@@ -1,7 +1,7 @@
-import { ImageType } from "@/datas/imageType";
-import { PetaPanel } from "@/datas/petaPanel";
+import { ImageType } from "@/commons/datas/imageType";
+import { PetaPanel } from "@/commons/datas/petaPanel";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { Vec2 } from "@/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 export class PPanel extends PIXI.Sprite {
   public selected = false;

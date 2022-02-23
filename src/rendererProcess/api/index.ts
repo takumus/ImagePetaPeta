@@ -1,8 +1,8 @@
-import { MainFunctions } from "@/api/mainFunctions";
-import { MainEvents } from "@/api/mainEvents";
+import { MainFunctions } from "@/commons/api/mainFunctions";
+import { MainEvents } from "@/commons/api/mainEvents";
 import { IpcRendererEvent } from "electron/main";
 import deepcopy from "deepcopy";
-import { GLOBAL_API_NAME } from "@/defines";
+import { GLOBAL_API_NAME } from "@/commons/defines";
 interface API {
   send<U extends keyof MainFunctions>(event: U, ...args: Parameters<MainFunctions[U]>): ReturnType<MainFunctions[U]>;
   on<U extends keyof MainEvents>(event: U, callback:(event: IpcRendererEvent, ...args: Parameters<MainEvents[U]>) => void): string;

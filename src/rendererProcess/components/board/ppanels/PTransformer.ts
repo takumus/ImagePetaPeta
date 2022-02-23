@@ -1,13 +1,13 @@
 import * as PIXI from "pixi.js";
-import { Vec2 } from "@/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
-import { PetaPanel } from "@/datas/petaPanel";
-import { MouseButton } from "@/datas/mouseButton";
+import { PetaPanel } from "@/commons/datas/petaPanel";
+import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { PSelection } from "@/rendererProcess/components/board/ppanels/PSelection";
 import { PControlPoint } from "@/rendererProcess/components/board/ppanels/PControlPoint";
 import deepcopy from "deepcopy";
-import { ROTATION_BLOCK_INCREMENT } from "@/defines";
+import { ROTATION_BLOCK_INCREMENT } from "@/commons/defines";
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",

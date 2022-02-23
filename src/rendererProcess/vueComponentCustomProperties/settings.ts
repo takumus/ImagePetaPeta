@@ -1,5 +1,5 @@
 import { API } from "@/rendererProcess/api";
-import { defaultSettings, Settings } from "@/datas/settings";
+import { defaultSettings, Settings } from "@/commons/datas/settings";
 import { reactive, App } from "vue";
 let settings: Settings = defaultSettings;
 export default {

@@ -47,20 +47,20 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { PetaBoard, PetaBoardTransform } from "@/datas/petaBoard";
-import { PetaPanel } from "@/datas/petaPanel";
-import { MouseButton } from "@/datas/mouseButton";
+import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { PetaBoard, PetaBoardTransform } from "@/commons/datas/petaBoard";
+import { PetaPanel } from "@/commons/datas/petaPanel";
+import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { API, log } from "@/rendererProcess/api";
-import { ImageType } from "@/datas/imageType";
+import { ImageType } from "@/commons/datas/imageType";
 import * as PIXI from "pixi.js";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformer } from "@/rendererProcess/components/board/ppanels/PTransformer";
 import { hitTest } from "@/rendererProcess/utils/hitTest";
-import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/defines";
-import { minimId } from "@/utils/utils";
-import { promiseSerial } from "@/utils/promiseSerial";
+import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
+import { minimId } from "@/commons/utils/utils";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
 @Options({
   components: {
     VCrop,

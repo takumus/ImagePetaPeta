@@ -65,15 +65,15 @@ import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/VDialog.vue";
 // Others
 import { API, log } from "@/rendererProcess/api";
-import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/defines";
-import { dbPetaImagesToPetaImages, PetaImages } from "@/datas/petaImage";
-import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/datas/petaBoard";
-import { ImportImageResult } from "@/api/interfaces/importImageResult";
-import { PetaPanel, createPetaPanel } from "@/datas/petaPanel";
-import { UpdateMode } from "@/api/interfaces/updateMode";
+import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
+import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
+import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/commons/datas/petaBoard";
+import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
+import { PetaPanel, createPetaPanel } from "@/commons/datas/petaPanel";
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
-import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { isLatest } from "@/utils/versionCheck";
+import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { isLatest } from "@/commons/utils/versionCheck";
 @Options({
   components: {
     VBrowser,

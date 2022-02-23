@@ -1,9 +1,9 @@
-import { PetaBoard } from "@/datas/petaBoard";
-import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { UpdateMode } from "@/api/interfaces/updateMode";
-import { AppInfo } from "@/api/interfaces/appInfo";
-import { Settings } from "@/datas/settings";
-import { States } from "@/datas/states";
+import { PetaBoard } from "@/commons/datas/petaBoard";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
+import { AppInfo } from "@/commons/datas/appInfo";
+import { Settings } from "@/commons/datas/settings";
+import { States } from "@/commons/datas/states";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;

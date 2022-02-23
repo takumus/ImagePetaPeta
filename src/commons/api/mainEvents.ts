@@ -1,5 +1,5 @@
-import { ImportImageResult } from "@/api/interfaces/importImageResult";
-import { PetaImage } from "@/datas/petaImage";
+import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
+import { PetaImage } from "@/commons/datas/petaImage";
 
 export interface MainEvents {
   updatePetaImages: () => void;

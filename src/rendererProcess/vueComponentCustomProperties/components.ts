@@ -1,5 +1,5 @@
 import { ContextMenuItem } from "@/rendererProcess/components/utils/contextMenuItem";
-import { Vec2 } from "@/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { reactive, App } from "vue";
 // let app: App;
 interface GLOBALS {

@@ -1,5 +1,5 @@
 import { reactive, App } from "vue";
-import * as defines from "@/defines";
+import * as defines from "@/commons/defines";
 export default {
   install(app: App) {
     app.config.globalProperties.$defines = {};

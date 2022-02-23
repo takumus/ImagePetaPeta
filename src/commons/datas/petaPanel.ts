@@ -1,4 +1,4 @@
-import { Vec2 } from "@/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { PetaImage, PetaImages } from "./petaImage";
 import { v4 as uuid } from "uuid";
 import deepcopy from "deepcopy";

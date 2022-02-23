@@ -178,9 +178,9 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API, log } from "@/rendererProcess/api";
-import { vec2FromMouseEvent } from "@/utils/vec2";
-import { PetaBoard } from "@/datas/petaBoard";
-import { MouseButton } from "@/datas/mouseButton";
+import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { PetaBoard } from "@/commons/datas/petaBoard";
+import { MouseButton } from "@/commons/datas/mouseButton";
 @Options({
   components: {
     VEditableLabel

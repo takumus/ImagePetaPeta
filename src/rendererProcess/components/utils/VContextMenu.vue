@@ -28,7 +28,7 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Others
-import { Vec2 } from "@/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { v4 as uuid } from "uuid";
 import { ContextMenuItem } from "@/rendererProcess/components/utils/contextMenuItem";
 @Options({

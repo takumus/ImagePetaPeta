@@ -1,8 +1,8 @@
 import { v4 as uuid } from "uuid";
 import { dbPetaPanelToPetaPanel, PetaPanel, petaPanelToDBPetaPanel } from "./petaPanel";
-import { Vec2 } from "@/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { PetaImages } from "./petaImage";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR, BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
+import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR, BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import deepcopy from "deepcopy";
 
 export interface PetaBoard {

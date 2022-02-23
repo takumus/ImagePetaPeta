@@ -1,4 +1,4 @@
-import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/defines";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 
 export const defaultSettings = {
   lowMemoryMode: false,

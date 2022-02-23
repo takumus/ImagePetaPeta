@@ -1,5 +1,5 @@
-import { CLICK_OFFSET } from "@/defines";
-import { Vec2, XYObject } from "@/utils/vec2";
+import { CLICK_OFFSET } from "@/commons/defines";
+import { Vec2, XYObject } from "@/commons/utils/vec2";
 export class ClickChecker {
   clickPosition = new Vec2();
   click = false;

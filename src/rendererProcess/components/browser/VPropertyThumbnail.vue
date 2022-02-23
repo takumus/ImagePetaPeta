@@ -25,7 +25,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
-import { ImageType } from "@/datas/imageType";
+import { ImageType } from "@/commons/datas/imageType";
 @Options({
   components: {
   }

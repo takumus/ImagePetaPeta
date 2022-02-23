@@ -106,14 +106,14 @@ import VThumbnail from "@/rendererProcess/components/browser/VThumbnail.vue";
 import VProperty from "@/rendererProcess/components/browser/VProperty.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
+import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API, log } from "@/rendererProcess/api";
-import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/defines";
-import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { SortMode } from "@/datas/sortMode";
+import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/commons/defines";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { SortMode } from "@/commons/datas/sortMode";
 import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
-import { createPetaPanel } from "@/datas/petaPanel";
-import { UpdateMode } from "@/api/interfaces/updateMode";
+import { createPetaPanel } from "@/commons/datas/petaPanel";
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { savePetaImages } from "@/rendererProcess/utils/savePetaImages";
 @Options({
   components: {

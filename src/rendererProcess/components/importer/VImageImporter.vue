@@ -41,9 +41,9 @@ import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 // Others
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { API } from "@/rendererProcess/api";
-import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
+import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { setCursor, setDefaultCursor } from "@/rendererProcess/utils/cursor";
-import { promiseSerial } from "@/utils/promiseSerial";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
 @Options({
   components: {
     VModal,

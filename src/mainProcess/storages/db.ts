@@ -1,4 +1,4 @@
-import { DB_COMPACTION_DELAY } from "@/defines";
+import { DB_COMPACTION_DELAY } from "@/commons/defines";
 import Nedb from "@seald-io/nedb";
 
 export default class DB<T> {

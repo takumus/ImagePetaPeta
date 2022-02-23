@@ -70,10 +70,10 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import VPropertyThumbnail from "@/rendererProcess/components/browser/VPropertyThumbnail.vue";
 // Others
 import { API, log } from "@/rendererProcess/api";
-import { Vec2, vec2FromMouseEvent } from "@/utils/vec2";
-import { MAX_PREVIEW_COUNT } from "@/defines";
-import { PetaImage } from "@/datas/petaImage";
-import { UpdateMode } from "@/api/interfaces/updateMode";
+import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { MAX_PREVIEW_COUNT } from "@/commons/defines";
+import { PetaImage } from "@/commons/datas/petaImage";
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
 import { savePetaImages } from "@/rendererProcess/utils/savePetaImages";
 @Options({

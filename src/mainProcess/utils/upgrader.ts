@@ -1,8 +1,8 @@
-import { PetaBoard } from "@/datas/petaBoard";
-import { PetaImage } from "@/datas/petaImage";
-import { defaultSettings, Settings } from "@/datas/settings";
-import { States } from "@/datas/states";
-import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/defines";
+import { PetaBoard } from "@/commons/datas/petaBoard";
+import { PetaImage } from "@/commons/datas/petaImage";
+import { defaultSettings, Settings } from "@/commons/datas/settings";
+import { States } from "@/commons/datas/states";
+import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 
 export function upgradePetaImage(petaImage: PetaImage) {
   // v0.2.0

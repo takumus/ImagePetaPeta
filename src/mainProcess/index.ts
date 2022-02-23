@@ -8,27 +8,26 @@ import { encode as encodePlaceholder } from "blurhash";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
 import Config from "@/mainProcess/storages/config";
-import { PetaImage, PetaImages } from "@/datas/petaImage";
-import { PetaBoard, createPetaBoard } from "@/datas/petaBoard";
-import { ImportImageResult } from "@/api/interfaces/importImageResult";
-import { UpdateMode } from "@/api/interfaces/updateMode";
-import { AddImageResult } from "@/api/interfaces/addImageResult";
-import { Settings, defaultSettings } from "@/datas/settings";
-import { addPetaPanelProperties } from "@/datas/petaPanel";
-import { MainEvents } from "@/api/mainEvents";
-import { MainFunctions } from "@/api/mainFunctions";
-import { ImageType } from "@/datas/imageType";
-import { defaultStates, States } from "@/datas/states";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
+import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
+import { Settings, defaultSettings } from "@/commons/datas/settings";
+import { addPetaPanelProperties } from "@/commons/datas/petaPanel";
+import { MainEvents } from "@/commons/api/mainEvents";
+import { MainFunctions } from "@/commons/api/mainFunctions";
+import { ImageType } from "@/commons/datas/imageType";
+import { defaultStates, States } from "@/commons/datas/states";
 import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
-import { arrLast, minimId, noHtml } from "@/utils/utils";
+import { arrLast, minimId, noHtml } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
-import { promiseSerial } from "@/utils/promiseSerial";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
 import dateFormat from "dateformat";
 (() => {
   /*------------------------------------
@@ -804,7 +803,7 @@ import dateFormat from "dateformat";
   /*------------------------------------
     PetaImage追加
   ------------------------------------*/
-  async function addImage(param: { data: Buffer, name: string, extName?: string, fileDate?: Date, addDate?: Date }): Promise<AddImageResult> {
+  async function addImage(param: { data: Buffer, name: string, extName?: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await getPetaImage(id);
     if (exists) return {
