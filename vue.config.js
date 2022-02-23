@@ -2,7 +2,7 @@ const packageJSON = require("./package.json");
 const files = {
   main: {
     entry: "./src/rendererProcess/index.ts",
-    template: "./src/rendererProcess/template/index.html"
+    template: "./src/rendererProcess/index.html"
   },
   renderer: {
     preload: "./src/mainProcess/preload.ts",
