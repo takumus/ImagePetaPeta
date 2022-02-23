@@ -294,6 +294,7 @@ body, html {
   --button-active-bg-color: #eeeeee;
   --tab-bg-color: #e9e9e9;
   --tab-selected-color: #ffffff;
+  --tab-hovered-color: #f5f5f5;
   --tab-border-color: #cccccc;
   --window-buttons-hover: #cccccc;
   --window-buttons-close-hover: #ff0000;
@@ -308,6 +309,7 @@ body, html {
     --button-active-bg-color: #555555;
     --tab-bg-color: #333333;
     --tab-selected-color: #141414;
+    --tab-hovered-color: #272727;
     --tab-border-color: #444444;
     --window-buttons-hover: #444444;
     --window-buttons-close-hover: #ff0000;

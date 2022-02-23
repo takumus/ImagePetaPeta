@@ -378,6 +378,7 @@ export default class VTabBar extends Vue {
           cursor: pointer;
           overflow: hidden;
           position: relative;
+          border-radius: var(--rounded) var(--rounded) 0px 0px;
           &.drag {
             position: absolute;
             pointer-events: none;
@@ -395,7 +396,12 @@ export default class VTabBar extends Vue {
             background-color: var(--tab-selected-color);
             flex-shrink: 0;
             border: none;
-            border-radius: var(--rounded) var(--rounded) 0px 0px;
+            &:hover {
+              background-color: var(--tab-selected-color);
+            }
+          }
+          &:hover {
+            background-color: var(--tab-hovered-color);
           }
           >.wrapper {
             display: flex;
