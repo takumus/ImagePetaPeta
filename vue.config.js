@@ -1,9 +1,20 @@
 const packageJSON = require("./package.json");
+const files = {
+  main: {
+    entry: "./src/rendererProcess/index.ts",
+    template: "./src/rendererProcess/template/index.html"
+  },
+  renderer: {
+    preload: "./src/mainProcess/preload.ts",
+    main: "./src/mainProcess/index.ts"
+  },
+  appxConfig: "./electron.config.appx.js"
+}
 let appxConfig = null;
 try {
-  appxConfig = require("./electron.config.appx.js");
+  appxConfig = require(files.appxConfig);
 } catch (err) {
-  console.error("Cannot build appx. './electron.config.appx.js' is not found.");
+  console.error(`Cannot build appx. '${files.appxConfig}' is not found.`);
 }
 module.exports = {
   chainWebpack: config => {
@@ -12,7 +23,12 @@ module.exports = {
       .clear();
     config
       .entry("app")
-      .add("./src/rendererProcess/index.ts");
+      .add(files.main.entry);
+    config.plugin('html')
+      .tap((args) => {
+        args[0].template = files.main.template
+        return args;
+      })
     config.module
       .rule("vue")
       .use("vue-loader")
@@ -32,8 +48,8 @@ module.exports = {
   productionSourceMap: false,
   pluginOptions: {
     electronBuilder: {
-      preload: "./src/mainProcess/preload.ts",
-      mainProcessFile: "./src/mainProcess/index.ts",
+      preload: files.renderer.preload,
+      mainProcessFile: files.renderer.main,
       builderOptions: {
         appId: "io.takumus." + packageJSON.name,
         productName: packageJSON.productName,
