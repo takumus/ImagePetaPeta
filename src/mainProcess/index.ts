@@ -278,13 +278,13 @@ import dateFormat from "dateformat";
       /*------------------------------------
         PetaImage 追加|更新|削除
       ------------------------------------*/
-      savePetaImages: async (event, datas, mode) => {
-        dataLogger.mainLog("#Save PetaImages");
+      updatePetaImages: async (event, datas, mode) => {
+        dataLogger.mainLog("#Update PetaImages");
         try {
-          await promiseSerial((data) => savePetaImage(data, mode), datas).value;
+          await promiseSerial((data) => updatePetaImage(data, mode), datas).value;
         } catch (err) {
           dataLogger.mainError(err);
-          showError("M", 4, "Save PetaImages Error", String(err));
+          showError("M", 4, "Update PetaImages Error", String(err));
         }
         if (mode != UpdateMode.UPDATE) {
           emitMainEvent("updatePetaImages");
@@ -309,7 +309,7 @@ import dateFormat from "dateformat";
           if (data.length == 0) {
             dataLogger.mainLog("no boards");
             const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, dataSettings.data.darkMode);
-            await savePetaBoard(board, UpdateMode.INSERT);
+            await updatePetaBoard(board, UpdateMode.INSERT);
             data.push(board);
             dataLogger.mainLog("return:", data.length);
             return data;
@@ -329,7 +329,7 @@ import dateFormat from "dateformat";
       savePetaBoards: async (event, boards, mode) => {
         try {
           dataLogger.mainLog("#Save PetaBoards");
-          await promiseSerial((board) => savePetaBoard(board, mode), boards).value;
+          await promiseSerial((board) => updatePetaBoard(board, mode), boards).value;
           dataLogger.mainLog("return:", true);
           return true;
         } catch(e) {
@@ -525,7 +525,7 @@ import dateFormat from "dateformat";
               dataSettings.data.thumbnails.quality
             );
             image.placeholder = result.placeholder;
-            await savePetaImage(image, UpdateMode.UPDATE);
+            await updatePetaImage(image, UpdateMode.UPDATE);
             dataLogger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
             emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
           }
@@ -670,8 +670,8 @@ import dateFormat from "dateformat";
   /*------------------------------------
     PetaImage更新
   ------------------------------------*/
-  async function savePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    dataLogger.mainLog("##Save PetaImage");
+  async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
+    dataLogger.mainLog("##Update PetaImage");
     dataLogger.mainLog("mode:", mode);
     dataLogger.mainLog("image:", minimId(petaImage.id));
     petaImage.tags = Array.from(new Set(petaImage.tags));
@@ -692,8 +692,8 @@ import dateFormat from "dateformat";
   /*------------------------------------
     PetaBoard更新
   ------------------------------------*/
-  async function savePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    dataLogger.mainLog("##Save PetaBoard");
+  async function updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
+    dataLogger.mainLog("##Update PetaBoard");
     dataLogger.mainLog("mode:", mode);
     dataLogger.mainLog("board:", minimId(board.id));
     if (mode == UpdateMode.REMOVE) {

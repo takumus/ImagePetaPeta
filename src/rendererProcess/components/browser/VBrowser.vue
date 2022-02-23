@@ -114,7 +114,7 @@ import { SortMode } from "@/commons/datas/sortMode";
 import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
 import { createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { savePetaImages } from "@/rendererProcess/utils/savePetaImages";
+import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 @Options({
   components: {
     VThumbnail,
@@ -335,7 +335,7 @@ export default class VBrowser extends Vue {
         changed.push(pi);
       }
     });
-    await savePetaImages(changed, UpdateMode.UPDATE);
+    await updatePetaImages(changed, UpdateMode.UPDATE);
     this.selectTag(newName);
   }
   changePetaImageTag(oldName: string, newName: string) {
@@ -362,7 +362,7 @@ export default class VBrowser extends Vue {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
           if (await this.$components.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
-            await savePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
+            await updatePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }
       },

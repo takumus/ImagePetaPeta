@@ -13,7 +13,7 @@ export interface MainFunctions {
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
   importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
   getPetaImages: () => Promise<PetaImages>;
-  savePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
+  updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<PetaBoard[]>;
   savePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   log: (...args: any[]) => Promise<boolean>;
