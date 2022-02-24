@@ -1,13 +1,7 @@
 <template>
   <VModal
     :visible="visible"
-    :parentStyle="{
-      padding: '74px'
-    }"
-    :childStyle="{
-      width: '100%',
-      height: '100%'
-    }"
+    :center="true"
     :visibleCloseButton="true"
     @close="close"
   >
@@ -25,179 +19,181 @@
           {{$t("settings." + tab)}}
         </li>
       </ul>
-      <!--
-        General
-      -->
-      <section v-show="currentTab == 'general'">
-        <label>
+      <article class="content">
+        <!--
+          General
+        -->
+        <section v-show="currentTab == 'general'">
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.darkMode"
+              :disabled="$settings.autoDarkMode"
+              @change="$settings.darkMode = Boolean($event.target.checked)"
+            >
+            {{$t("settings.darkMode")}}
+          </label>
+          <br>
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.autoDarkMode"
+              @change="$settings.autoDarkMode = Boolean($event.target.checked)"
+            >
+            {{$t("settings.autoDarkMode")}}
+          </label>
+          <p>{{$t("settings.autoDarkModeDescriptions")}}</p>
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.alwaysOnTop"
+              @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+            >
+            {{$t("settings.alwaysOnTop")}}
+          </label>
+          <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.autoAddTag"
+              @change="$settings.autoAddTag = Boolean($event.target.checked)"
+            >
+            {{$t("settings.autoAddTag")}}
+          </label>
+          <p>{{$t("settings.autoAddTagDescriptions")}}</p>
+        </section>
+        <!--
+          Control
+        -->
+        <section v-show="currentTab == 'control'">
+          <label>
+            {{$t("settings.zoomSensitivity")}}:
+          </label>
           <input
-            type="checkbox"
-            :checked="$settings.darkMode"
-            :disabled="$settings.autoDarkMode"
-            @change="$settings.darkMode = Boolean($event.target.checked)"
+            type="number"
+            :value="$settings.zoomSensitivity"
+            @change="$settings.zoomSensitivity = Number($event.target.value)"
           >
-          {{$t("settings.darkMode")}}
-        </label>
-        <br>
-        <label>
+          <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
+          <label>
+            {{$t("settings.moveSensitivity")}}:
+          </label>
           <input
-            type="checkbox"
-            :checked="$settings.autoDarkMode"
-            @change="$settings.autoDarkMode = Boolean($event.target.checked)"
+            type="number"
+            :value="$settings.moveSensitivity"
+            @change="$settings.moveSensitivity = Number($event.target.value)"
           >
-          {{$t("settings.autoDarkMode")}}
-        </label>
-        <p>{{$t("settings.autoDarkModeDescriptions")}}</p>
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.alwaysOnTop"
-            @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+          <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
+        </section>
+        <!--
+          Browser
+        -->
+        <section v-show="currentTab == 'browser'">
+          <label>
+            {{$t("settings.thumbnailsSize")}}:
+          </label>
+          <select
+            :value="$settings.thumbnails.size"
+            @change="$settings.thumbnails.size = Number($event.target.value)"
+            :disabled="!regenerateThumbnailsCompleted"
           >
-          {{$t("settings.alwaysOnTop")}}
-        </label>
-        <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.autoAddTag"
-            @change="$settings.autoAddTag = Boolean($event.target.checked)"
+            <option
+              :value="size"
+              v-for="size in $defines.BROWSER_THUMBNAIL_SIZE"
+              :key="size"
+            >
+              {{size}}
+            </option>
+          </select>px, 
+          <label>
+            {{$t("settings.thumbnailsQuality")}}:
+          </label>
+          <select
+            :value="$settings.thumbnails.quality"
+            @change="$settings.thumbnails.quality = Number($event.target.value)"
+            :disabled="!regenerateThumbnailsCompleted"
           >
-          {{$t("settings.autoAddTag")}}
-        </label>
-        <p>{{$t("settings.autoAddTagDescriptions")}}</p>
-      </section>
-      <!--
-        Control
-      -->
-      <section v-show="currentTab == 'control'">
-        <label>
-          {{$t("settings.zoomSensitivity")}}:
-        </label>
-        <input
-          type="number"
-          :value="$settings.zoomSensitivity"
-          @change="$settings.zoomSensitivity = Number($event.target.value)"
-        >
-        <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
-        <label>
-          {{$t("settings.moveSensitivity")}}:
-        </label>
-        <input
-          type="number"
-          :value="$settings.moveSensitivity"
-          @change="$settings.moveSensitivity = Number($event.target.value)"
-        >
-        <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
-      </section>
-      <!--
-        Browser
-      -->
-      <section v-show="currentTab == 'browser'">
-        <label>
-          {{$t("settings.thumbnailsSize")}}:
-        </label>
-        <select
-          :value="$settings.thumbnails.size"
-          @change="$settings.thumbnails.size = Number($event.target.value)"
-          :disabled="!regenerateThumbnailsCompleted"
-        >
-          <option
-            :value="size"
-            v-for="size in $defines.BROWSER_THUMBNAIL_SIZE"
-            :key="size"
+            <option
+              :value="quality"
+              v-for="quality in $defines.BROWSER_THUMBNAIL_QUALITY"
+              :key="quality"
+            >
+              {{quality}}
+            </option>
+          </select>
+          <button
+            @click="regenerateThumbnails"
           >
-            {{size}}
-          </option>
-        </select>px, 
-        <label>
-          {{$t("settings.thumbnailsQuality")}}:
-        </label>
-        <select
-          :value="$settings.thumbnails.quality"
-          @change="$settings.thumbnails.quality = Number($event.target.value)"
-          :disabled="!regenerateThumbnailsCompleted"
-        >
-          <option
-            :value="quality"
-            v-for="quality in $defines.BROWSER_THUMBNAIL_QUALITY"
-            :key="quality"
+            {{$t("settings.thumbnailsRegenerateButton")}}
+          </button>
+          <label
+            v-show="!regenerateThumbnailsCompleted"
           >
-            {{quality}}
-          </option>
-        </select>
-        <button
-          @click="regenerateThumbnails"
-        >
-          {{$t("settings.thumbnailsRegenerateButton")}}
-        </button>
-        <label
-          v-show="!regenerateThumbnailsCompleted"
-        >
-          {{regenerateThumbnailsDone}}/{{regenerateThumbnailsCount}}
-        </label>
-        <p>{{$t("settings.thumbnailsDescriptions")}}</p>
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.loadThumbnailsInFullsized"
-            @change="$settings.loadThumbnailsInFullsized = Boolean($event.target.checked)"
+            {{regenerateThumbnailsDone}}/{{regenerateThumbnailsCount}}
+          </label>
+          <p>{{$t("settings.thumbnailsDescriptions")}}</p>
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.loadThumbnailsInFullsized"
+              @change="$settings.loadThumbnailsInFullsized = Boolean($event.target.checked)"
+            >
+            {{$t("settings.loadThumbnailsInFullsized")}}
+          </label>
+          <p>{{$t("settings.loadThumbnailsInFullsizedDescriptions")}}</p>
+        </section>
+        <!--
+          Datas
+        -->
+        <section v-show="currentTab == 'datas'">
+          <button
+            @click="browsePetaImageDirectory"
           >
-          {{$t("settings.loadThumbnailsInFullsized")}}
-        </label>
-        <p>{{$t("settings.loadThumbnailsInFullsizedDescriptions")}}</p>
-      </section>
-      <!--
-        Datas
-      -->
-      <section v-show="currentTab == 'datas'">
-        <button
-          @click="browsePetaImageDirectory"
-        >
-          {{$t("settings.browsePetaImageDirectoryButton")}}
-        </button>
-        <input type="text" v-model="tempPetaImageDirectory" class="file-path">
-        <br>
-        <button
-          @click="changePetaImageDirectory"
-          :disabled="tempPetaImageDirectory == ''"
-        >
-          {{$t("settings.changePetaImageDirectoryButton")}}
-        </button>
-        <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
-      </section>
-      <!--
-        Others
-      -->
-      <section v-show="currentTab == 'others'">
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.autoHideUI"
-            @change="$settings.autoHideUI = Boolean($event.target.checked)"
+            {{$t("settings.browsePetaImageDirectoryButton")}}
+          </button>
+          <input type="text" v-model="tempPetaImageDirectory" class="file-path">
+          <br>
+          <button
+            @click="changePetaImageDirectory"
+            :disabled="tempPetaImageDirectory == ''"
           >
-          {{$t("settings.autoHideUI")}}
-        </label><br>
-        <p>{{$t("settings.autoHideUIDescriptions")}}</p>
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.showNsfwWithoutConfirm"
-            @change="$settings.showNsfwWithoutConfirm = Boolean($event.target.checked)"
-          >
-          {{$t("settings.showNsfwWithoutConfirm")}}
-        </label><br>
-        <p>{{$t("settings.showNsfwWithoutConfirmDescriptions")}}</p>
-        <label>
-          <input
-            type="checkbox"
-            :checked="$settings.showFPS"
-            @change="$settings.showFPS = Boolean($event.target.checked)"
-          >
-          {{$t("settings.showFPS")}}
-        </label><br>
-        <p>{{$t("settings.showFPSDescriptions")}}</p>
-      </section>
+            {{$t("settings.changePetaImageDirectoryButton")}}
+          </button>
+          <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
+        </section>
+        <!--
+          Others
+        -->
+        <section v-show="currentTab == 'others'">
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.autoHideUI"
+              @change="$settings.autoHideUI = Boolean($event.target.checked)"
+            >
+            {{$t("settings.autoHideUI")}}
+          </label><br>
+          <p>{{$t("settings.autoHideUIDescriptions")}}</p>
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.showNsfwWithoutConfirm"
+              @change="$settings.showNsfwWithoutConfirm = Boolean($event.target.checked)"
+            >
+            {{$t("settings.showNsfwWithoutConfirm")}}
+          </label><br>
+          <p>{{$t("settings.showNsfwWithoutConfirmDescriptions")}}</p>
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.showFPS"
+              @change="$settings.showFPS = Boolean($event.target.checked)"
+            >
+            {{$t("settings.showFPS")}}
+          </label><br>
+          <p>{{$t("settings.showFPSDescriptions")}}</p>
+        </section>
+      </article>
     </article>
   </VModal>
 </template>
@@ -286,7 +282,6 @@ export default class VSettings extends Vue {
 <style lang="scss" scoped>
 .settings-root {
   text-align: center;
-  // color: #333333;
   >ul {
     list-style-type: none;
     padding: 0px;
@@ -299,15 +294,23 @@ export default class VSettings extends Vue {
       }
     }
   }
-  >section {
-    text-align: left;
-    >p {
-      font-size: 0.8em;
-      margin-left: 16px;
-      white-space: pre;
-    }
-    .file-path {
-      width: 100%;
+  >.content {
+    // color: #333333;
+    height: 160px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    >section {
+      text-align: left;
+      >p {
+        font-size: 0.8em;
+        margin-left: 16px;
+        white-space: pre;
+        word-break: break-all;
+        white-space: pre-wrap;
+      }
+      .file-path {
+        width: 100%;
+      }
     }
   }
 }
