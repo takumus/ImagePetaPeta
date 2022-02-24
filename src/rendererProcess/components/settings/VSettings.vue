@@ -2,6 +2,9 @@
   <VModal
     :visible="visible"
     :center="true"
+    :childStyle="{
+      width: '500px'
+    }"
     :visibleCloseButton="true"
     @close="close"
   >
@@ -296,7 +299,7 @@ export default class VSettings extends Vue {
   }
   >.content {
     // color: #333333;
-    height: 160px;
+    height: 190px;
     overflow-y: scroll;
     overflow-x: hidden;
     >section {
