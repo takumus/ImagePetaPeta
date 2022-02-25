@@ -211,6 +211,7 @@ export default class VTabBar extends Vue {
   mounted() {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
+    // this.changeDarkMode(this.darkMode);
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
@@ -368,7 +369,7 @@ export default class VTabBar extends Vue {
         }
         >.tab {
           display: block;
-          margin: 0px;
+          margin: 0px 1px 0px 1px;
           // border-right: solid 1px var(--tab-border-color);
           // border-left: solid 1px;
           margin-right: -1px;
@@ -376,7 +377,7 @@ export default class VTabBar extends Vue {
           cursor: pointer;
           overflow: hidden;
           position: relative;
-          border-radius: var(--rounded) var(--rounded) 0px 0px;
+          border-radius: var(--rounded);
           &.drag {
             position: absolute;
             pointer-events: none;
@@ -391,11 +392,29 @@ export default class VTabBar extends Vue {
             }
           }
           &.selected {
+            border-radius: var(--rounded) var(--rounded) 0px 0px;
+            overflow: visible;
             background-color: var(--tab-selected-color);
             flex-shrink: 0;
             border: none;
             &:hover {
               background-color: var(--tab-selected-color);
+            }
+            &::before, &::after {
+              content: '';
+              display: inline-block;
+              position: absolute;
+              bottom: 0;
+              left: calc(var(--rounded) * -1);
+              width: var(--rounded);
+              height: var(--rounded);
+              border-radius: 0 0 100% 0;
+              box-shadow: var(--rounded) var(--rounded) 0px calc(var(--rounded) * 0.95) var(--tab-selected-color);
+            }
+            &::after {
+              left: unset;
+              right: calc(var(--rounded) * -1);
+              transform: scaleX(-1);
             }
           }
           &:hover {
