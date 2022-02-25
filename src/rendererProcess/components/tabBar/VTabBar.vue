@@ -369,7 +369,7 @@ export default class VTabBar extends Vue {
         }
         >.tab {
           display: block;
-          margin: 0px 1px 0px 1px;
+          margin: 0px;
           // border-right: solid 1px var(--tab-border-color);
           // border-left: solid 1px;
           margin-right: -1px;
