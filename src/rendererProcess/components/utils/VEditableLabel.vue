@@ -113,9 +113,13 @@ export default class VEditableLabel extends Vue {
     border: none;
     background: none;
     cursor: pointer;
+    outline: none;
     min-width: 32px;
     height: 16px;
     width: 100%;
+    &.editing {
+      text-decoration: underline;
+    }
     &::after {
       content: "";
       display: inline-block;

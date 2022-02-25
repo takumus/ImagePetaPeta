@@ -409,7 +409,7 @@ export default class VTabBar extends Vue {
               width: var(--rounded);
               height: var(--rounded);
               border-radius: 0 0 100% 0;
-              box-shadow: var(--rounded) var(--rounded) 0px calc(var(--rounded) * 0.95) var(--tab-selected-color);
+              box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-selected-color);
             }
             &::after {
               left: unset;
