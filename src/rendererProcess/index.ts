@@ -3,7 +3,6 @@ import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import App from "@/rendererProcess/components/VIndex.vue";
 import { App as _App, reactive } from "vue";
-import GlboalKeyboard from "@/rendererProcess/vueComponentCustomProperties/keyboards";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalSystemInfo from "@/rendererProcess/vueComponentCustomProperties/systemInfo";
 import GlobalDefines from "@/rendererProcess/vueComponentCustomProperties/defines";
@@ -18,7 +17,6 @@ import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties
     messages: languages,
   });
   appUse(i18n);
-  appUse(GlboalKeyboard);
   appUse(GlobalDefines);
   appUse(GlobalAPI);
   appUse(GlobalComponents);
