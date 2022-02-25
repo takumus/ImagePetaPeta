@@ -61,6 +61,7 @@ import { hitTest } from "@/rendererProcess/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { minimId } from "@/commons/utils/utils";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
     VCrop,
@@ -112,6 +113,7 @@ export default class VBoard extends Vue {
   mousePosition = new Vec2();
   frame = 0;
   fps = 0;
+  keyboards = new Keyboards();
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -148,6 +150,10 @@ export default class VBoard extends Vue {
       this.frame = 0;
     }, 1000);
     this.renderPIXI();
+    this.keyboards.enabled = true;
+    this.keyboards.on("delete", this.keyDelete);
+    this.keyboards.on("backspace", this.keyBackspace);
+    this.keyboards.on("shift", this.keyShift);
   }
   unmounted() {
     this.pixi.view.removeEventListener("dblclick", this.resetTransform);
@@ -156,6 +162,7 @@ export default class VBoard extends Vue {
     this.resizer?.disconnect();
     this.panelsBackground.removeChild(this.pixi.view);
     this.pixi.destroy();
+    this.keyboards.destroy();
     cancelAnimationFrame(this.requestAnimationFrameHandle);
   }
   resize(rect: DOMRectReadOnly) {
@@ -442,7 +449,7 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   clearSelectionAll(force = false) {
-    if (!this.$keyboards.shift || force) {
+    if (!this.keyboards.isPressed("shift") || force) {
       this.pPanelsArray.forEach((p) => {
         p.selected = false;
       });
@@ -518,7 +525,7 @@ export default class VBoard extends Vue {
     PIXI.utils.clearTextureCache();
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
-    if (!this.$keyboards.shift && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
+    if (!this.keyboards.isPressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
       this.toFront(pPanel);
@@ -550,6 +557,19 @@ export default class VBoard extends Vue {
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
   }
+  keyDelete(value: boolean) {
+    if (value) {
+      this.removeSelectedPanels();
+    }
+  }
+  keyBackspace(value: boolean) {
+    if (value) {
+      this.removeSelectedPanels();
+    }
+  }
+  keyShift(value: boolean) {
+    this.pTransformer.fit = value;
+  }
   get pPanelsArray() {
     return Object.values(this.pPanels);
   }
@@ -567,22 +587,6 @@ export default class VBoard extends Vue {
     this.pPanelsArray.forEach((pp) => {
       pp.showNsfw = this.$settings.showNsfwWithoutConfirm;
     });
-  }
-  @Watch("$keyboards.delete")
-  keyDelete(value: boolean) {
-    if (value) {
-      this.removeSelectedPanels();
-    }
-  }
-  @Watch("$keyboards.backspace")
-  keyBackspace(value: boolean) {
-    if (value) {
-      this.removeSelectedPanels();
-    }
-  }
-  @Watch("$keyboards.shift")
-  keyShift(value: boolean) {
-    this.pTransformer.fit = value;
   }
   @Watch("board.petaPanels", { deep: true })
   changeBoard() {

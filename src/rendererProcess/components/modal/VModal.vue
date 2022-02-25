@@ -34,6 +34,7 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { v4 as uuid } from "uuid";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
   },
@@ -61,14 +62,18 @@ export default class VModal extends Vue {
   }
   modalId = uuid();
   clickBackground = false;
+  keyboards = new Keyboards();
   async mounted() {
     // this.appInfo = await API.send("getAppInfo");
     this.background.addEventListener("mousedown", this.mousedown);
     this.background.addEventListener("mouseup", this.mouseup);
+    this.keyboards.enabled = true;
+    this.keyboards.on("escape", this.pressEscape);
   }
   unmounted() {
     this.background.removeEventListener("mousedown", this.mousedown);
     this.background.removeEventListener("mouseup", this.mouseup);
+    this.keyboards.destroy();
   }
   close() {
     this.$emit("close");
@@ -100,9 +105,9 @@ export default class VModal extends Vue {
       this.$components.modal.currentModalZIndex ++;
     }
   }
-  @Watch("$keyboards.escape")
-  pressEscape() {
-    if (this.$keyboards.escape) {
+  pressEscape(pressed: boolean) {
+    console.log(pressed);
+    if (pressed) {
       if (this.isActive()) {
         this.close();
       }

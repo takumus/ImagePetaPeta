@@ -115,6 +115,7 @@ import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserTh
 import { createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
     VThumbnail,
@@ -148,6 +149,7 @@ export default class VBrowser extends Vue {
   firstSelectedBrowserThumbnail: BrowserThumbnail | null = null;
   thumbnailsSize = 0;
   currentScrollThumbnailId = "";
+  keyboards = new Keyboards();
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0].contentRect);
@@ -161,6 +163,8 @@ export default class VBrowser extends Vue {
 
     this.$components.browser = this;
     this.thumbnailsSize = this.$settings.browserThumbnailSize;
+    this.keyboards.enabled = true;
+    this.keyboards.on("a", this.keyA);
   }
   unmounted() {
     this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
@@ -168,6 +172,7 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer?.unobserve(this.thumbnails);
     this.thumbnailsResizer?.disconnect();
     this.scrollAreaResizer?.disconnect();
+    this.keyboards.destroy();
   }
   saveScrollPosition() {
     let min = Infinity;
@@ -206,13 +211,13 @@ export default class VBrowser extends Vue {
     const tags = [...this.selectedTagsArray];
     const index = tags.indexOf(tag);
     if (index < 0) {
-      if (!this.$keyboards.shift) {
+      if (!this.keyboards.isPressed("shift")) {
         tags.length = 0;
       }
       tags.push(tag);
       this.selectedTags = tags.join(" ");
     } else {
-      if (!this.$keyboards.shift) {
+      if (!this.keyboards.isPressed("shift")) {
         tags.length = 0;
         tags.push(tag);
       } else {
@@ -222,7 +227,7 @@ export default class VBrowser extends Vue {
     }
   }
   async addPanel(thumb: BrowserThumbnail, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    if (!this.$keyboards.shift && !this.$keyboards.control && !this.$keyboards.meta && !thumb.petaImage._selected) {
+    if (!this.keyboards.isPressed("shift") && !this.keyboards.isPressed("control") && !this.keyboards.isPressed("meta") && !thumb.petaImage._selected) {
       this.clearSelectionAllImages();
     }
     // 複数同時追加
@@ -254,20 +259,20 @@ export default class VBrowser extends Vue {
     this.close();
   }
   selectThumbnail(thumb: BrowserThumbnail, force = false) {
-    if (this.selectedPetaImages.length < 1 || (!this.$keyboards.control && !this.$keyboards.meta && !this.$keyboards.shift)) {
+    if (this.selectedPetaImages.length < 1 || (!this.keyboards.isPressed("control") && !this.keyboards.isPressed("meta") && !this.keyboards.isPressed("shift"))) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedBrowserThumbnail = thumb;
     }
     // 全選択解除するが、選択サムネイルは状態を保持する。
     const prevSelection = thumb.petaImage._selected;
-    if (!this.$keyboards.control && !this.$keyboards.meta) {
+    if (!this.keyboards.isPressed("control") && !this.keyboards.isPressed("meta")) {
       // コントロールキーが押されていなければ選択をリセット
       this.clearSelectionAllImages();
     }
     thumb.petaImage._selected = prevSelection;
     // 選択サムネイルを反転
     thumb.petaImage._selected = !thumb.petaImage._selected || force;
-    if (this.firstSelectedBrowserThumbnail && this.$keyboards.shift) {
+    if (this.firstSelectedBrowserThumbnail && this.keyboards.isPressed("shift")) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
         Math.min(this.firstSelectedBrowserThumbnail.position.x, thumb.position.x),
@@ -517,10 +522,9 @@ export default class VBrowser extends Vue {
   get fullsized() {
     return this.$settings.loadThumbnailsInFullsized && this.thumbnailWidth > this.$settings.thumbnails.size;
   }
-  @Watch("$keyboards.a")
   keyA(value: boolean) {
     if (value) {
-      if (this.$keyboards.control || this.$keyboards.meta) {
+      if (this.keyboards.isPressed("control") || this.keyboards.isPressed("meta")) {
         this.filteredPetaImages.forEach((pi) => {
           pi._selected = true;
         });

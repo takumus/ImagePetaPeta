@@ -19,8 +19,8 @@ export default {
     window.addEventListener("keyup", (e) => key(e.key, false));
   }
 }
-declare module '@vue/runtime-core' {
-  export interface ComponentCustomProperties {
-    $keyboards: typeof keyboards;
-  }
-}
+// declare module '@vue/runtime-core' {
+//   export interface ComponentCustomProperties {
+//     $keyboards: typeof keyboards;
+//   }
+// }
