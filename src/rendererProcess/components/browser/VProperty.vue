@@ -38,7 +38,7 @@
         </li>
         <li class="add">
           <VEditableLabel
-            :label="''"
+            :label="$t('browser.property.tagName')"
             :labelLook="$t('browser.property.clickToAddTag')"
             :growWidth="true"
             :clickToEdit="true"
@@ -110,7 +110,6 @@ export default class VProperty extends Vue {
     this.previewHeight = rect.height;
   }
   changeTag(oldName: string, newName: string) {
-    newName = newName.replace(/\s+/g, "");
     let changed = false;
     this.petaImages.forEach((pi) => {
       const index = pi.tags.indexOf(oldName);
