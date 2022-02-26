@@ -9,6 +9,7 @@
       height: '100%'
     }"
     :visibleCloseButton="true"
+    @state="onModalState"
     @close="close"
   >
     <article class="browser-root">
@@ -397,6 +398,9 @@ export default class VBrowser extends Vue {
         return b.addDate - a.addDate;
       }
     }
+  }
+  onModalState(value: boolean) {
+    this.keyboards.enabled = value;
   }
   @Watch("selectedTags")
   changeSelectedTags() {

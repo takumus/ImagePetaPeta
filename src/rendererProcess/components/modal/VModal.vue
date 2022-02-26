@@ -38,6 +38,10 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
   },
+  emits: [
+    "state",
+    "close"
+  ]
 })
 export default class VModal extends Vue {
   @Prop()
@@ -87,12 +91,12 @@ export default class VModal extends Vue {
       this.clickBackground = false;
     }
   }
-  isActive() {
+  get isActive() {
     return this.modalId == this.$components.modal.modalIds[this.$components.modal.modalIds.length - 1];
   }
   @Watch("$components.modal.modalIds")
   changeModal() {
-    this.noBackground = !this.isActive();
+    this.noBackground = !this.isActive;
   }
   @Watch("visible")
   changeVisible() {
@@ -105,10 +109,13 @@ export default class VModal extends Vue {
       this.$components.modal.currentModalZIndex ++;
     }
   }
+  @Watch("isActive")
+  changeActive(value: boolean) {
+    this.$emit("state", value);
+  }
   pressEscape(pressed: boolean) {
-    console.log(pressed);
     if (pressed) {
-      if (this.isActive()) {
+      if (this.isActive) {
         this.close();
       }
     }
