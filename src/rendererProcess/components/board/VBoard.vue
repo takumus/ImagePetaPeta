@@ -458,14 +458,14 @@ export default class VBoard extends Vue {
   toFront(pPanel: PPanel) {
     const maxIndex = this.getMaxIndex();
     pPanel.petaPanel.index = maxIndex + 1;
+    this.sortIndex();
+  }
+  sortIndex() {
     this.board.petaPanels
     .sort((a, b) => a.index - b.index)
     .forEach((petaPanel, i) => {
       petaPanel.index = i;
     });
-    this.sortIndex();
-  }
-  sortIndex() {
     this.panelsCenterWrapper.children.sort((a, b) => {
       return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
     });
@@ -537,11 +537,14 @@ export default class VBoard extends Vue {
     }
     pPanel.selected = true;
     this.draggingPanels = true;
+    const maxIndex = this.getMaxIndex();
     this.selectedPPanels.forEach((pPanel) => {
       const pos = new Vec2(e.data.global);
       pPanel.draggingOffset = new Vec2(pPanel.position).sub(this.panelsCenterWrapper.toLocal(pos));
       pPanel.dragging = true;
+      pPanel.petaPanel.index += maxIndex;
     });
+    this.sortIndex();
   }
   setBackgroundBrightness(value: number) {
     this.backgroundFilter.brightness(value, false);
