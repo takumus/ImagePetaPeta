@@ -29,6 +29,7 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
   }
@@ -44,6 +45,7 @@ export default class VComplement extends Vue {
   show = false;
   target?: HTMLInputElement;
   currentIndex = 0;
+  keyboards: Keyboards = new Keyboards();
   mounted() {
     this.$components.complement = this;
     window.addEventListener("mousedown", (event) => {
@@ -52,17 +54,19 @@ export default class VComplement extends Vue {
         return;
       }
     });
-    window.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (!this.show || !this.target) return;
-      if (event.key == "ArrowUp") {
-        this.currentIndex--;
+    this.keyboards.on("arrowup", (state) => {
+      if (!this.target || !state) return;
+      this.currentIndex--;
+      this.moveSelection();
+    });
+    this.keyboards.on("arrowdown", (state) => {
+      if (!this.target || !state) return;
+      this.currentIndex++;
         this.moveSelection();
-      } else if (event.key == "ArrowDown") {
-        this.currentIndex++;
-        this.moveSelection();
-      } else if (event.key == "Enter") {
-        this.select(this.filteredItems[this.currentIndex]);
-      }
+    });
+    this.keyboards.on("enter", (state) => {
+      if (!this.target || !state) return;
+      this.select(this.filteredItems[this.currentIndex]);
     });
   }
   normalizeIndex() {
@@ -109,9 +113,13 @@ export default class VComplement extends Vue {
     input.addEventListener("blur", this.blur);
     input.addEventListener("input", this.input);
     this.input();
+    this.keyboards.enabled = true;
   }
   blur() {
-    this.show = false;
+    setTimeout(() => {
+      this.show = false;
+      this.keyboards.enabled = false;
+    }, 100);
     if (this.target) {
       this.target.removeEventListener("blur", this.blur);
       this.target.removeEventListener("input", this.input);
@@ -142,6 +150,7 @@ export default class VComplement extends Vue {
   select(item?: string) {
     if (this.show && item && this.target) {
       this.target.innerText = item;
+      console.log("complement:", item);
       this.target.dispatchEvent(new Event('input'));
     }
   }
