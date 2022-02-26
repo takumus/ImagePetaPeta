@@ -288,9 +288,8 @@ export default class VTabBar extends Vue {
     }
   }
   changePetaBoardName(board: PetaBoard, name: string) {
-    name = name.trim();
     if (name == "") {
-      name = board.name;
+      return;
     }
     board.name = name;
   }
