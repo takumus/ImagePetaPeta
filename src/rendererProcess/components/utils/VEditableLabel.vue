@@ -10,6 +10,7 @@
       :class="{ editing: editing }"
       v-text="labelLook && !editing ? labelLook : tempText"
       ref="label"
+      placeholder=""
       :style="{ width: labelWidth + 'px', height: labelHeight + 'px' }"
       :contenteditable="editing"
       @blur="apply"
@@ -59,9 +60,15 @@ export default class VEditableLabel extends Vue {
     //
   }
   async edit(dblclick = false) {
-    if (!this.clickToEdit && !dblclick) return;
-    if (this.readonly) return;
+    if (this.readonly || this.editing) {
+      return;
+    }
+    if (!this.clickToEdit && !dblclick) {
+      // ワンクリック編集が有効じゃなかったら、ワンクリックで反応しない。
+      return;
+    }
     this.editing = true;
+    this.tempText = this.label;
     this.$nextTick(() => {
       this.labelInput.focus();
       const range = document.createRange();
@@ -73,14 +80,20 @@ export default class VEditableLabel extends Vue {
   }
   apply() {
     // blur又はenterと当時にapplyすると、色々厄介だから少し待つ
+    if (!this.editing) {
+      return;
+    }
+    this.editing = false;
+    this.tempText = this.tempText.trim();
     setTimeout(() => {
-      if (!this.editing) return;
-      this.editing = false;
-      if (this.readonly) return;
-      if (this.label == this.tempText) return;
+      if (this.readonly) {
+        return;
+      }
+      if (this.label == this.tempText || this.tempText == "") {
+        this.tempText = this.label;
+        return;
+      }
       this.$emit("change", this.tempText);
-      // もとに戻す
-      this.tempText = this.label;
     }, 10);
   }
   focus(event: FocusEvent) {
@@ -91,7 +104,7 @@ export default class VEditableLabel extends Vue {
   }
   @Watch("label")
   changeLabel() {
-    this.tempText = this.label;
+    this.tempText = this.label.trim();
   }
 }
 </script>
@@ -113,17 +126,15 @@ export default class VEditableLabel extends Vue {
     border: none;
     background: none;
     cursor: pointer;
-    outline: none;
     min-width: 32px;
     height: 16px;
     width: 100%;
     &.editing {
-      text-decoration: underline;
-    }
-    &::after {
-      content: "";
-      display: inline-block;
-      width: 16px;
+      &::after {
+        content: "";
+        display: inline-block;
+        width: 16px;
+      }
     }
   }
 }
