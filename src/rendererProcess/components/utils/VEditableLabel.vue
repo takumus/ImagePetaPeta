@@ -2,16 +2,15 @@
   <article
     class="editable-label-root"
     :style="{
-      width: growWidth ? '100%' : 'unset'
+      width: growWidth ? 'unset' : 'unset'
     }"
+    :class="{ editing: editing }"
   >
     <span
       class="editable-label"
-      :class="{ editing: editing }"
       v-text="labelLook && !editing ? labelLook : tempText"
       ref="label"
       placeholder=""
-      :style="{ width: labelWidth + 'px', height: labelHeight + 'px' }"
       :contenteditable="editing"
       @blur="apply"
       @keydown.enter="apply"
@@ -114,26 +113,29 @@ export default class VEditableLabel extends Vue {
   padding: 0px;
   margin: 0px;
   display: inline-block;
-  // color: #333333;
   >.editable-label {
     line-height: 1.0em;
     font-size: 1.0em;
     text-align: left;
     padding: 0px;
     margin: 0px;
-    overflow: visible;
+    // overflow: visible;
     white-space: nowrap;
     border: none;
     background: none;
     cursor: pointer;
-    min-width: 32px;
     height: 16px;
     width: 100%;
-    &.editing {
+    word-break: break-all;
+    white-space: pre-wrap;
+    display: inline-block;
+    text-decoration: inherit;
+  }
+  &.editing {
+    >.editable-label {
       &::after {
-        content: "";
+        content: "   ";
         display: inline-block;
-        width: 16px;
       }
     }
   }
