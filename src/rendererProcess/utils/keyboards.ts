@@ -34,7 +34,7 @@ export class Keyboards extends EventEmitter {
     if (!value) {
       Object.keys(this.pressedKeys).forEach((key) => {
         if (this.pressedKeys[key]) {
-          this.emit("up", key);
+          this.emit(key, false);
           this.pressedKeys[key] = false;
         }
       });
