@@ -565,6 +565,8 @@ interface Tag {
       text-align: center;
       white-space: nowrap;
       display: flex;
+      width: 20%;
+      max-width: 180px;
       >header {
         >.search {
           border-radius: var(--rounded);
@@ -573,6 +575,7 @@ interface Tag {
           padding: 4px;
           font-weight: bold;
           font-size: 1.0em;
+          width: 100%;
         }
       }
       >ul {
@@ -590,6 +593,7 @@ interface Tag {
           list-style-type: none;
           font-weight: bold;
           cursor: pointer;
+          display: flex;
           &:hover * {
             text-decoration: underline;
           }
@@ -597,6 +601,7 @@ interface Tag {
             content: "・";
             width: 16px;
             display: inline-block;
+            flex-shrink: 0;
           }
           &.selected::before {
             content: "✔";
@@ -619,7 +624,7 @@ interface Tag {
     }
     >.property {
       width: 20%;
-      min-width: 180px;
+      max-width: 180px;
       padding: 8px;
       display: flex;
       flex-direction: column;

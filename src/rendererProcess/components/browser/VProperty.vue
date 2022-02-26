@@ -282,6 +282,7 @@ export default class VProperty extends Vue {
         padding: 4px;
         font-weight: bold;
         cursor: pointer;
+        display: flex;
         &:hover * {
           text-decoration: underline;
         }
