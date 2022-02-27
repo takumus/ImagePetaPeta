@@ -111,6 +111,7 @@ export default class VProperty extends Vue {
   }
   changeTag(oldName: string, newName: string) {
     let changed = false;
+    newName = newName.replace(/\s+/g, "");
     this.petaImages.forEach((pi) => {
       const index = pi.tags.indexOf(oldName);
       if (index < 0) {
