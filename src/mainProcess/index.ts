@@ -24,11 +24,12 @@ import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
-import { upgradePetaBoard, upgradePetaImage, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
+import { upgradePetaBoard, upgradePetaImage, upgradePetaTag, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
 import { arrLast, minimId, noHtml } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import dateFormat from "dateformat";
+import { PetaTag } from "@/commons/datas/petaTag";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -50,11 +51,13 @@ import dateFormat from "dateformat";
   let FILE_LOG: string;
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
+  let FILE_TAGS_DB: string;
   let FILE_SETTINGS: string;
   let FILE_STATES: string;
   let dataLogger: Logger;
   let dataPetaImages: DB<PetaImage>;
   let dataPetaBoards: DB<PetaBoard>;
+  let dataPetaTags: DB<PetaTag>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
   //-------------------------------------------------------------------------------------------------//
@@ -85,12 +88,14 @@ import dateFormat from "dateformat";
     DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, "thumbnails");
     FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
     FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
+    FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
     FILE_STATES = file.initFile(DIR_APP, "states.json");
     DIR_LOG = file.initDirectory(false, app.getPath("logs"));
     FILE_LOG = file.initFile(DIR_LOG, "logs.log");
     dataLogger = new Logger(FILE_LOG);
     dataPetaImages = new DB<PetaImage>(FILE_IMAGES_DB);
     dataPetaBoards = new DB<PetaBoard>(FILE_BOARDS_DB);
+    dataPetaTags = new DB<PetaTag>(FILE_TAGS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
   } catch (err) {
     //-------------------------------------------------------------------------------------------------//
@@ -155,6 +160,13 @@ import dateFormat from "dateformat";
     try {
       await dataPetaBoards.init();
       await dataPetaImages.init();
+      await dataPetaTags.init();
+      const data = await dataPetaImages.find({});
+      const petaImages: PetaImages = {};
+      data.forEach((pi) => {
+        petaImages[pi.id] = upgradePetaImage(pi);
+      });
+      await upgradePetaTag(dataPetaTags, petaImages);
     } catch (error) {
       showError("M", 2, "Initialization Error", String(error));
       return;

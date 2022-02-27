@@ -1,8 +1,12 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaTag } from "@/commons/datas/petaTag";
 import { defaultSettings, Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { v4 as uuid } from "uuid";
+import DB from "../storages/db";
 
 export function upgradePetaImage(petaImage: PetaImage) {
   // v0.2.0
@@ -72,4 +76,34 @@ export function upgradePetaBoard(board: PetaBoard) {
     }
   }
   return board;
+}
+export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImages) {
+  const petaImagesArr = Object.values(petaImages);
+  const addTags = async (petaImage: PetaImage, index: number) => {
+    console.log("petaImage", index);
+    await promiseSerial(async (tag) => {
+      const petaTag = (await petaTags.find({ name: tag }))[0];
+      if (petaTag) {
+        console.log(petaTag.name, "(exist) <-", petaImage.id);
+        petaTag.petaImages.push(petaImage.id);
+        await petaTags.update({ id: petaTag.id }, petaTag, false);
+      } else {
+        console.log(tag, "(add) <-", petaImage.id);
+        const id = uuid();
+        await petaTags.update(
+          { id: id },
+          {
+            id: id,
+            name: tag,
+            index: 0,
+            petaImages: [petaImage.id]
+          },
+          true
+        );
+      }
+    },
+    petaImage.tags).value;
+  }
+  await promiseSerial(addTags, petaImagesArr).value;
+  console.log("complete");
 }
