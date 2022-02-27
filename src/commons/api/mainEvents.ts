@@ -4,7 +4,7 @@ import { PetaImage } from "@/commons/datas/petaImage";
 export interface MainEvents {
   updatePetaImages: () => void;
   updatePetaImage: (petaImage: PetaImage) => void;
-  updateTags: () => void;
+  updatePetaTags: () => void;
   importImagesBegin: (fileCount: number) => void;
   importImagesProgress: (progress: number, file: string, result: ImportImageResult) => void;
   importImagesComplete: (fileCount: number, addedFileCount: number) => void;

@@ -29,7 +29,7 @@ import { arrLast, minimId, noHtml } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import dateFormat from "dateformat";
-import { PetaTag } from "@/commons/datas/petaTag";
+import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -161,12 +161,15 @@ import { PetaTag } from "@/commons/datas/petaTag";
       await dataPetaBoards.init();
       await dataPetaImages.init();
       await dataPetaTags.init();
-      const data = await dataPetaImages.find({});
+      const petaImagesArray = await dataPetaImages.find({});
       const petaImages: PetaImages = {};
-      data.forEach((pi) => {
+      petaImagesArray.forEach((pi) => {
         petaImages[pi.id] = upgradePetaImage(pi);
       });
-      await upgradePetaTag(dataPetaTags, petaImages);
+      if (await upgradePetaTag(dataPetaTags, petaImages)) {
+        dataLogger.mainLog("Upgrade Tags");
+        await promiseSerial((pi) => updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
+      }
     } catch (error) {
       showError("M", 2, "Initialization Error", String(error));
       return;
@@ -347,6 +350,38 @@ import { PetaTag } from "@/commons/datas/petaTag";
         } catch(e) {
           dataLogger.mainError(e);
           showError("M", 6, "Save PetaBoards Error", String(e));
+        }
+        return false;
+      },
+      /*------------------------------------
+        全PetaTag取得
+      ------------------------------------*/
+      getPetaTags: async (event) => {
+        try {
+          dataLogger.mainLog("#Get PetaTags");
+          const tags = await dataPetaTags.find({});
+          dataLogger.mainLog("return:", tags.length);
+          return tags;
+        } catch (error) {
+          showError("M", 6, "Get PetaTags Error", String(error));
+        }
+        return [];
+      },
+      /*------------------------------------
+        PetaTag 追加|更新|削除
+      ------------------------------------*/
+      updatePetaTags: async (event, tags, mode) => {
+        try {
+          dataLogger.mainLog("#Update PetaTags");
+          await promiseSerial((tag) => updatePetaTag(tag, mode), tags).value;
+          if (mode != UpdateMode.UPDATE) {
+            emitMainEvent("updatePetaTags");
+          }
+          dataLogger.mainLog("return:", true);
+          return true;
+        } catch (error) {
+          dataLogger.mainError(error);
+          showError("M", 6, "Update PetaTags Error", String(error));
         }
         return false;
       },
@@ -672,7 +707,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
     dataLogger.mainLog("##Update PetaImage");
     dataLogger.mainLog("mode:", mode);
     dataLogger.mainLog("image:", minimId(petaImage.id));
-    petaImage.tags = Array.from(new Set(petaImage.tags));
     if (mode == UpdateMode.REMOVE) {
       await dataPetaImages.remove({ id: petaImage.id });
       dataLogger.mainLog("removed db");
@@ -700,6 +734,19 @@ import { PetaTag } from "@/commons/datas/petaTag";
       return true;
     }
     await dataPetaBoards.update({ id: board.id }, board, mode == UpdateMode.INSERT);
+    dataLogger.mainLog("updated");
+    return true;
+  }
+  async function updatePetaTag(tag: PetaTag, mode: UpdateMode) {
+    dataLogger.mainLog("##Update PetaTag");
+    dataLogger.mainLog("mode:", mode);
+    dataLogger.mainLog("tag:", minimId(tag.id));
+    if (mode == UpdateMode.REMOVE) {
+      await dataPetaTags.remove({ id: tag.id });
+      dataLogger.mainLog("removed");
+      return true;
+    }
+    await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.INSERT);
     dataLogger.mainLog("updated");
     return true;
   }
@@ -757,6 +804,9 @@ import { PetaTag } from "@/commons/datas/petaTag";
     await promiseSerial(importImage, filePaths).value;
     dataLogger.mainLog("return:", addedFileCount, "/", filePaths.length);
     emitMainEvent("importImagesComplete", filePaths.length, addedFileCount);
+    if (dataSettings.data.autoAddTag) {
+      emitMainEvent("updatePetaTags");
+    }
     return petaImages;
   }
   /*------------------------------------
@@ -790,6 +840,9 @@ import { PetaTag } from "@/commons/datas/petaTag";
     await promiseSerial(importImage, buffers).value;
     dataLogger.mainLog("return:", addedFileCount, "/", buffers.length);
     emitMainEvent("importImagesComplete", buffers.length, addedFileCount);
+    if (dataSettings.data.autoAddTag) {
+      emitMainEvent("updatePetaTags");
+    }
     return petaImages;
   }
   /*------------------------------------
@@ -830,8 +883,12 @@ import { PetaTag } from "@/commons/datas/petaTag";
       height: output.sharp.height / output.sharp.width,
       placeholder: output.placeholder,
       id: id,
-      tags: dataSettings.data.autoAddTag ? [dateFormat(addDate, "yyyy-mm-dd")] : [],
       nsfw: false
+    }
+    if (dataSettings.data.autoAddTag) {
+      const datePetaTag = createPetaTag(dateFormat(addDate, "yyyy-mm-dd"));
+      datePetaTag.petaImages.push(petaImage.id);
+      await updatePetaTag(datePetaTag, UpdateMode.INSERT);
     }
     await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), param.data);
     await dataPetaImages.update({ id: petaImage.id }, petaImage, true);

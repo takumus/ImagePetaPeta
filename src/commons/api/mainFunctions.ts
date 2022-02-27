@@ -4,6 +4,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
+import { PetaTag } from "../datas/petaTag";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
@@ -16,8 +17,9 @@ export interface MainFunctions {
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<PetaBoard[]>;
   savePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
+  getPetaTags: () => Promise<PetaTag[]>;
+  updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
   log: (...args: any[]) => Promise<boolean>;
-  // dialog: (message: string, buttons: string[]) => Promise<number>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;

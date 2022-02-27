@@ -26,12 +26,12 @@
     <section v-show="!noImage" class="tags">
       <p>{{$t("browser.property.tags")}}</p>
       <ul>
-        <li v-for="tag, i in tags" :key="i">
+        <li v-for="tag in tags" :key="tag.id">
           <VEditableLabel
-            :label="tag"
-            :labelLook="`${tag}`"
+            :label="tag.name"
+            :labelLook="`${tag.name}`"
             :growWidth="true"
-            @change="(name) => changeTag(tag, name)"
+            :readonly="true"
             @focus="complementTag"
             @contextmenu="tagMenu($event, tag)"
           />
@@ -42,7 +42,7 @@
             :labelLook="$t('browser.property.clickToAddTag')"
             :growWidth="true"
             :clickToEdit="true"
-            @change="(name) => changeTag('', name)"
+            @change="(name) => addTag(name)"
             @focus="complementTag"
           />
         </li>
@@ -76,6 +76,8 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
+import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
+import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
 @Options({
   components: {
     VEditableLabel,
@@ -89,7 +91,7 @@ export default class VProperty extends Vue {
   @Prop()
   petaImages!: PetaImage[];
   @Prop()
-  allTags!: string[];
+  allPetaTags!: PetaTag[];
   @Ref("previews")
   previews!: HTMLElement;
   previewWidth = 0;
@@ -109,47 +111,23 @@ export default class VProperty extends Vue {
     this.previewWidth = rect.width;
     this.previewHeight = rect.height;
   }
-  changeTag(oldName: string, newName: string) {
-    let changed = false;
-    newName = newName.replace(/\s+/g, "");
-    this.petaImages.forEach((pi) => {
-      const index = pi.tags.indexOf(oldName);
-      if (index < 0) {
-        // 新規追加の場合
-        if (pi.tags.indexOf(newName) < 0) {
-          // 新規の名前が無ければ追加
-          if (newName != "") {
-            // 空欄じゃなければ追加
-            pi.tags.push(newName);
-            changed = true;
-          }
-        }
-      } else {
-        // 更新の場合
-        if (newName == "") {
-          // 空欄の場合削除
-          pi.tags.splice(index, 1);
-          changed = true;
-        } else {
-          // 空欄じゃなければ更新
-          if (pi.tags.indexOf(newName) < 0) {
-            // 新規の名前が無ければ追加
-            pi.tags[index] = newName;
-            changed = true;
-          }
-        }
-        this.$emit("changeTag", oldName, newName);
-      }
-      pi.tags.sort();
+  addTag(name: string) {
+    name = name.replace(/\s+/g, "");
+    let petaTag = this.allPetaTags.find((petaTag) => petaTag.name == name);
+    if (petaTag) {
+      petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
+      API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
+    } else {
+      petaTag = createPetaTag(name);
+      petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
+      API.send("updatePetaTags", [petaTag], UpdateMode.INSERT);
+    }
+  }
+  removeTag(petaTag: PetaTag) {
+    this.petaImages.forEach((petaImage) => {
+      petaTag.petaImages = petaTag.petaImages.filter((id) => id != petaImage.id);
     });
-    updatePetaImages(this.petaImages, UpdateMode.UPDATE);
-    // if (changed) {
-      // API.send("dialog", this.$t("browser.property.clearSelectionDialog"), [this.$t("shared.yes"), this.$t("shared.no")]).then((index) => {
-      //   if (index == 0) {
-      //     this.clearSelection();
-      //   }
-      // })
-    // }
+    API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
   }
   clearSelection() {
     this.petaImages.forEach((pi) => {
@@ -157,33 +135,40 @@ export default class VProperty extends Vue {
     })
   }
   complementTag(event: FocusEvent) {
-    this.$components.complement.open(event.target as HTMLInputElement, this.allTags);
+    this.$components.complement.open(event.target as HTMLInputElement, this.allPetaTags.map((petaTag) => petaTag.name));
   }
-  tagMenu(event: MouseEvent, tag: string) {
+  tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
       {
-        label: this.$t("browser.property.tagMenu.remove", [tag]),
+        label: this.$t("browser.property.tagMenu.remove", [tag.name]),
         click: () => {
-          this.changeTag(tag, "");
+          this.removeTag(tag);
         }
       }
     ], vec2FromMouseEvent(event));
   }
-  get tags(): string[] {
+  get tags(): PetaTag[] {
     if (this.noImage) {
       return [];
     }
-    const tags: {[tag: string]: number} = {};
+    const tags: {[tag: string]: {
+      count: number,
+      petaTag: PetaTag
+    }} = {};
     this.petaImages.forEach((pi) => {
-      pi.tags.forEach((tag) => {
-        if (!tags[tag]) {
-          tags[tag] = 1;
+      getPetaTagsOfPetaImage(pi, this.allPetaTags).forEach((tag) => {
+        if (!tags[tag.id]) {
+          tags[tag.id] = {
+            count: 1,
+            petaTag: tag
+          }
+          tags[tag.id].count = 1;
         } else {
-          tags[tag]++;
+          tags[tag.id].count++;
         }
       });
     });
-    return [...Object.keys(tags).filter((tag) => tags[tag] == this.petaImages.length)];
+    return Object.values(tags).filter((tag) => tag.count == this.petaImages.length).map((t) => t.petaTag);
   }
   get browserThumbnails(): BrowserThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;

@@ -29,6 +29,7 @@
     >
       <VBrowser
         :petaImages="petaImages"
+        :petaTags="petaTags"
         @addPanel="addPanel"
       />
       <VInfo />
@@ -74,6 +75,7 @@ import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
 import { Vec2 } from "@/commons/utils/vec2";
 import { isLatest } from "@/commons/utils/versionCheck";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
+import { PetaTag } from "@/commons/datas/petaTag";
 @Options({
   components: {
     VBrowser,
@@ -94,6 +96,7 @@ export default class Index extends Vue {
   vTabBar!: VTabBar;
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
+  petaTags: PetaTag[] = [];
   currentPetaBoard: PetaBoard | null = null;
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
@@ -111,6 +114,9 @@ export default class Index extends Vue {
     API.on("updatePetaImages", (e) => {
       this.getPetaImages();
     });
+    API.on("updatePetaTags", (e) => {
+      this.getPetaTags();
+    });
     API.on("updatePetaImage", (e, petaImage) => {
       // log("on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
@@ -127,6 +133,7 @@ export default class Index extends Vue {
     this.title = `${info.name} ${info.version}`;
     await this.getPetaImages();
     await this.getPetaBoards();
+    await this.getPetaTags();
     document.title = this.title;
     this.$nextTick(() => {
       API.send("showMainWindow");
@@ -191,6 +198,9 @@ export default class Index extends Vue {
     //   }
     // });
     // this.vTabBar.selectPetaBoardByIndex(index);
+  }
+  async getPetaTags() {
+    this.petaTags = await API.send("getPetaTags");
   }
   addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
     this.orderedAddPanelIds = ids;

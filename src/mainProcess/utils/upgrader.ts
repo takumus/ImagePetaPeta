@@ -10,9 +10,9 @@ import DB from "../storages/db";
 
 export function upgradePetaImage(petaImage: PetaImage) {
   // v0.2.0
-  if (petaImage.tags === undefined) {
-    petaImage.tags = [];
-  }
+  // if (petaImage.tags === undefined) {
+  //   petaImage.tags = [];
+  // }
   // v1.5.1
   if (petaImage.placeholder === undefined) {
     petaImage.placeholder = "";
@@ -77,18 +77,20 @@ export function upgradePetaBoard(board: PetaBoard) {
   }
   return board;
 }
+// 1.8.0
 export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImages) {
   const petaImagesArr = Object.values(petaImages);
+  let upgraded = false;
   const addTags = async (petaImage: PetaImage, index: number) => {
-    console.log("petaImage", index);
+    const anyPetaImage = (petaImage as any);
     await promiseSerial(async (tag) => {
       const petaTag = (await petaTags.find({ name: tag }))[0];
+      upgraded = true;
       if (petaTag) {
-        console.log(petaTag.name, "(exist) <-", petaImage.id);
         petaTag.petaImages.push(petaImage.id);
+        petaTag.petaImages = Array.from(new Set(petaTag.petaImages));
         await petaTags.update({ id: petaTag.id }, petaTag, false);
       } else {
-        console.log(tag, "(add) <-", petaImage.id);
         const id = uuid();
         await petaTags.update(
           { id: id },
@@ -102,8 +104,9 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
         );
       }
     },
-    petaImage.tags).value;
+    (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).value;
+    anyPetaImage["tags"] = [];
   }
   await promiseSerial(addTags, petaImagesArr).value;
-  console.log("complete");
+  return upgraded;
 }

@@ -33,14 +33,14 @@
       <div class="info">
         <span
           class="tags"
-          v-for="k in browserThumbnail.petaImage.tags"
-          :key="k"
+          v-for="petaTag in myPetaTags"
+          :key="petaTag.id"
         >
-          {{k}}
+          {{petaTag.name}}
         </span>
         <span
           class="tags"
-          v-if="browserThumbnail.petaImage.tags.length == 0"
+          v-if="myPetaTags.length == 0"
         >
           {{$t("browser.untagged")}}
         </span>
@@ -70,6 +70,7 @@ import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
 import { log } from "@/rendererProcess/api";
+import { PetaTag } from "@/commons/datas/petaTag";
 @Options({
   components: {
   },
@@ -80,6 +81,8 @@ export default class VThumbnail extends Vue {
   browserThumbnail!: BrowserThumbnail;
   @Prop()
   fullsized = false;
+  @Prop()
+  petaTags!: PetaTag[];
   @Ref("canvas")
   canvas!: HTMLCanvasElement;
   imageURL = "";
@@ -153,6 +156,11 @@ export default class VThumbnail extends Vue {
   }
   get showNsfw() {
     return this.browserThumbnail.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
+  }
+  get myPetaTags() {
+    return this.petaTags.filter((petaTag) => {
+      return petaTag.petaImages.indexOf(this.browserThumbnail.petaImage.id) >= 0;
+    });
   }
   @Watch("fullsized")
   changeFullsized() {
