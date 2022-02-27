@@ -48,12 +48,6 @@ export default class VComplement extends Vue {
   keyboards: Keyboards = new Keyboards();
   mounted() {
     this.$components.complement = this;
-    window.addEventListener("mousedown", (event) => {
-      if ((event.target as HTMLElement).parentElement != this.complement) {
-        this.select();
-        return;
-      }
-    });
     this.keyboards.on("arrowup", (state) => {
       if (!this.target || !state) return;
       this.currentIndex--;
@@ -62,7 +56,7 @@ export default class VComplement extends Vue {
     this.keyboards.on("arrowdown", (state) => {
       if (!this.target || !state) return;
       this.currentIndex++;
-        this.moveSelection();
+      this.moveSelection();
     });
     this.keyboards.on("enter", (state) => {
       if (!this.target || !state) return;
@@ -88,7 +82,7 @@ export default class VComplement extends Vue {
     this.normalizeIndex();
     this.$nextTick(() => {
       if (this.target) {
-         const range = document.createRange();
+        const range = document.createRange();
         range.selectNodeContents(this.target);
         const sel = window.getSelection();
         sel?.removeAllRanges();
@@ -102,24 +96,23 @@ export default class VComplement extends Vue {
     }
     this.target = input as HTMLInputElement;
     this.filteredItems = [];
-    if (this.show) {
-      this.select();
-    }
     const rect = input.getBoundingClientRect();
     this.position.x = rect.x;
     this.position.y = rect.y + rect.height;
     this.items = items;
-    this.show = true;
     input.addEventListener("blur", this.blur);
     input.addEventListener("input", this.input);
+    this.show = true;
     this.input();
     this.keyboards.enabled = true;
+    // this.keyboards.lock();
   }
   blur() {
     setTimeout(() => {
       this.show = false;
       this.keyboards.enabled = false;
-    }, 100);
+      // this.keyboards.unlock();
+    }, 10);
     if (this.target) {
       this.target.removeEventListener("blur", this.blur);
       this.target.removeEventListener("input", this.input);
@@ -147,11 +140,11 @@ export default class VComplement extends Vue {
       return ai - bi;
     });
   }
-  select(item?: string) {
+  select(item: string) {
     if (this.show && item && this.target) {
       this.target.innerText = item;
-      console.log("complement:", item);
       this.target.dispatchEvent(new Event('input'));
+      // this.target.dispatchEvent(new Event('blur'));
     }
   }
 }

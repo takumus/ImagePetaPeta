@@ -13,7 +13,6 @@
       placeholder=""
       :contenteditable="editing"
       @blur="apply"
-      @keydown.enter="apply"
       @focus="focus($event)"
       @dblclick="edit(true)"
       @click="edit()"
@@ -25,6 +24,7 @@
 
 <script lang="ts">
 // Vue
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 @Options({
@@ -52,8 +52,14 @@ export default class VEditableLabel extends Vue {
   editing = false;
   labelWidth = 0;
   labelHeight = 0;
+  keyboard = new Keyboards();
   mounted() {
     this.changeLabel();
+    this.keyboard.on("enter", (state) => {
+      if (state) {
+        this.apply();
+      }
+    });
   }
   unmounted() {
     //
@@ -66,6 +72,7 @@ export default class VEditableLabel extends Vue {
       // ワンクリック編集が有効じゃなかったら、ワンクリックで反応しない。
       return;
     }
+    this.keyboard.enabled = true;
     this.editing = true;
     this.tempText = this.label;
     this.$nextTick(() => {
@@ -78,13 +85,13 @@ export default class VEditableLabel extends Vue {
     });
   }
   apply() {
-    // blur又はenterと当時にapplyすると、色々厄介だから少し待つ
     if (!this.editing) {
       return;
     }
     this.editing = false;
-    this.tempText = this.tempText.trim();
+    this.keyboard.enabled = false;
     setTimeout(() => {
+      this.tempText = this.tempText.trim();
       if (this.readonly) {
         return;
       }
@@ -93,7 +100,7 @@ export default class VEditableLabel extends Vue {
         return;
       }
       this.$emit("change", this.tempText);
-    }, 10);
+    }, 100);
   }
   focus(event: FocusEvent) {
     this.$emit("focus", event);
@@ -103,7 +110,7 @@ export default class VEditableLabel extends Vue {
   }
   @Watch("label")
   changeLabel() {
-    this.tempText = this.label.trim();
+    this.tempText = this.label.trim().replace(/\r?\n/g, "");
   }
 }
 </script>
@@ -119,7 +126,6 @@ export default class VEditableLabel extends Vue {
     text-align: left;
     padding: 0px;
     margin: 0px;
-    // overflow: visible;
     white-space: nowrap;
     border: none;
     background: none;
