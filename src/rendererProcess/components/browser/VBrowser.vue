@@ -78,7 +78,7 @@
           <VProperty
             :petaImages="selectedPetaImages"
             :allPetaTags="petaTags"
-            @changeTag="changePetaImageTag"
+            @selectTag="(tag) => selectTag(tag.name, true)"
           />
           <input
             type="range"
@@ -213,17 +213,17 @@ export default class VBrowser extends Vue {
   resizeImages(rect: DOMRectReadOnly) {
     this.thumbnailsWidth = rect.width;
   }
-  selectTag(tag: string) {
+  selectTag(tag: string, single = false) {
     const tags = [...this.selectedTagsArray];
     const index = tags.indexOf(tag);
     if (index < 0) {
-      if (!this.keyboards.isPressed("shift")) {
+      if (!this.keyboards.isPressed("shift") || single) {
         tags.length = 0;
       }
       tags.push(tag);
       this.selectedTags = tags.join(" ");
     } else {
-      if (!this.keyboards.isPressed("shift")) {
+      if (!this.keyboards.isPressed("shift") || single) {
         tags.length = 0;
         tags.push(tag);
       } else {

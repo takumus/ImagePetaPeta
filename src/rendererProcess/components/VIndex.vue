@@ -186,7 +186,7 @@ export default class Index extends Vue {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
         this.boardUpdaters[board.id].initData(petaBoardsToDBPetaBoards(board));
         this.boardUpdaters[board.id].onUpdate((board) => {
-          API.send("savePetaBoards", [board], UpdateMode.UPDATE);
+          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
         });
       }
     });
@@ -232,16 +232,16 @@ export default class Index extends Vue {
       return;
     }
     this.boardUpdaters[board.id].forceUpdate();
-    await API.send("savePetaBoards", [board], UpdateMode.REMOVE);
+    await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();
   }
   async addPetaBoard() {
     const name = getNameAvoidDuplication(DEFAULT_BOARD_NAME, this.boards.map((b) => b.name));
     const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.darkMode);
     await API.send(
-      "savePetaBoards",
+      "updatePetaBoards",
       [board],
-      UpdateMode.INSERT
+      UpdateMode.UPSERT
     );
     log("PetaBoard Added", board.name);
     await this.getPetaBoards();

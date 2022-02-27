@@ -16,7 +16,7 @@ export interface MainFunctions {
   getPetaImages: () => Promise<PetaImages>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<PetaBoard[]>;
-  savePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
+  updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   getPetaTags: () => Promise<PetaTag[]>;
   updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
   log: (...args: any[]) => Promise<boolean>;

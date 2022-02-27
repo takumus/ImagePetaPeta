@@ -33,6 +33,7 @@
             :growWidth="true"
             :readonly="true"
             @focus="complementTag"
+            @click="selectTag(tag)"
             @contextmenu="tagMenu($event, tag)"
           />
         </li>
@@ -84,7 +85,7 @@ import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPet
     VPropertyThumbnail
   },
   emits: [
-    "changeTag"
+    "selectTag"
   ]
 })
 export default class VProperty extends Vue {
@@ -113,15 +114,10 @@ export default class VProperty extends Vue {
   }
   addTag(name: string) {
     name = name.replace(/\s+/g, "");
-    let petaTag = this.allPetaTags.find((petaTag) => petaTag.name == name);
-    if (petaTag) {
-      petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
-      API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
-    } else {
-      petaTag = createPetaTag(name);
-      petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
-      API.send("updatePetaTags", [petaTag], UpdateMode.INSERT);
-    }
+    // タグを探す。なかったら作る。
+    const petaTag = this.allPetaTags.find((petaTag) => petaTag.name == name) || createPetaTag(name);
+    petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
+    API.send("updatePetaTags", [petaTag], UpdateMode.UPSERT);
   }
   removeTag(petaTag: PetaTag) {
     this.petaImages.forEach((petaImage) => {
@@ -146,6 +142,9 @@ export default class VProperty extends Vue {
         }
       }
     ], vec2FromMouseEvent(event));
+  }
+  selectTag(tag: PetaTag) {
+    this.$emit("selectTag", tag);
   }
   get tags(): PetaTag[] {
     if (this.noImage) {

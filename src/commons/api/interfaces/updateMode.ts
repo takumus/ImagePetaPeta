@@ -1,5 +1,5 @@
 export enum UpdateMode {
-  INSERT = "insert",
+  UPSERT = "insert",
   UPDATE = "update",
   REMOVE = "remove"
 }

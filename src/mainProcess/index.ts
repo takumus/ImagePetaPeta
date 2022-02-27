@@ -324,7 +324,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           if (data.length == 0) {
             dataLogger.mainLog("no boards");
             const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, dataSettings.data.darkMode);
-            await updatePetaBoard(board, UpdateMode.INSERT);
+            await updatePetaBoard(board, UpdateMode.UPSERT);
             data.push(board);
             dataLogger.mainLog("return:", data.length);
             return data;
@@ -341,7 +341,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       /*------------------------------------
         PetaBoard 追加|更新|削除
       ------------------------------------*/
-      savePetaBoards: async (event, boards, mode) => {
+      updatePetaBoards: async (event, boards, mode) => {
         try {
           dataLogger.mainLog("#Save PetaBoards");
           await promiseSerial((board) => updatePetaBoard(board, mode), boards).value;
@@ -716,7 +716,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       dataLogger.mainLog("removed thumbnail");
       return true;
     }
-    await dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.INSERT);
+    await dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.UPSERT);
     dataLogger.mainLog("updated");
     // emitMainEvent("updatePetaImage", petaImage);
     return true;
@@ -733,7 +733,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       dataLogger.mainLog("removed");
       return true;
     }
-    await dataPetaBoards.update({ id: board.id }, board, mode == UpdateMode.INSERT);
+    await dataPetaBoards.update({ id: board.id }, board, mode == UpdateMode.UPSERT);
     dataLogger.mainLog("updated");
     return true;
   }
@@ -746,7 +746,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       dataLogger.mainLog("removed");
       return true;
     }
-    await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.INSERT);
+    await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
     dataLogger.mainLog("updated");
     return true;
   }
@@ -888,7 +888,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     if (dataSettings.data.autoAddTag) {
       const datePetaTag = createPetaTag(dateFormat(addDate, "yyyy-mm-dd"));
       datePetaTag.petaImages.push(petaImage.id);
-      await updatePetaTag(datePetaTag, UpdateMode.INSERT);
+      await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
     await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), param.data);
     await dataPetaImages.update({ id: petaImage.id }, petaImage, true);
