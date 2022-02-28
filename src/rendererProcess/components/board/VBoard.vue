@@ -142,7 +142,7 @@ export default class VBoard extends Vue {
     this.pixi.stage.interactive = true;
     this.pixi.ticker.stop();
     this.resizer = new ResizeObserver((entries) => {
-      this.resize(entries[0].contentRect);
+      this.resize(entries[0]!.contentRect);
     });
     this.resizer.observe(this.panelsBackground);
     setInterval(() => {
@@ -346,10 +346,10 @@ export default class VBoard extends Vue {
         pPanel.selected = hitTest(
           selection,
           {
-            leftTop: pPanelCorners[0],
-            rightTop: pPanelCorners[1],
-            rightBottom: pPanelCorners[2],
-            leftBottom: pPanelCorners[3]
+            leftTop: pPanelCorners[0]!,
+            rightTop: pPanelCorners[1]!,
+            rightBottom: pPanelCorners[2]!,
+            leftBottom: pPanelCorners[3]!
           }
         );
       });
@@ -427,6 +427,9 @@ export default class VBoard extends Vue {
     this.loadFullsized(petaPanel);
     const offset = new Vec2(20, 20).mult(offsetIndex);
     const pPanel = this.pPanels[petaPanel.id];
+    if (!pPanel) {
+      return;
+    }
     petaPanel.width *= 1 / this.board.transform.scale;
     petaPanel.height *= 1 / this.board.transform.scale;
     petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));

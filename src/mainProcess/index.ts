@@ -7,6 +7,7 @@ import dataURIToBuffer from "data-uri-to-buffer";
 import { encode as encodePlaceholder } from "blurhash";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+import dateFormat from "dateformat";
 
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
@@ -19,7 +20,6 @@ import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
 import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Settings, defaultSettings } from "@/commons/datas/settings";
-import { addPetaPanelProperties } from "@/commons/datas/petaPanel";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
@@ -28,7 +28,6 @@ import { upgradePetaBoard, upgradePetaImage, upgradePetaTag, upgradeSettings, up
 import { arrLast, minimId, noHtml } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
-import dateFormat from "dateformat";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 (() => {
   /*------------------------------------
@@ -214,7 +213,12 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           dataLogger.mainLog("canceled");
           return 0;
         }
-        const filePaths = await file.readDirRecursive(result.filePaths[0]);
+        const filePath = result.filePaths[0];
+        if (!filePath) {
+          dataLogger.mainError("filePath is empty");
+          return 0;
+        }
+        const filePaths = await file.readDirRecursive(filePath);
         dataLogger.mainLog("return:", filePaths.length);
         importImagesFromFilePaths(filePaths);
         return filePaths.length;
@@ -235,8 +239,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
             dataLogger.mainLog("normal url:", url);
             data = (await axios.get(url, { responseType: "arraybuffer" })).data;
           }
-          const id = (await importImagesFromBuffers([data], "download"))[0].id;
-          return id;
+          return (await importImagesFromBuffers([data], "download"))[0]?.id || "";
         } catch (err) {
           dataLogger.mainError(err);
         }
@@ -317,9 +320,6 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           data.forEach((board) => {
             // バージョンアップ時のプロパティ更新
             upgradePetaBoard(board);
-            board.petaPanels.forEach((petaPanel) => {
-              addPetaPanelProperties(petaPanel);
-            });
           })
           if (data.length == 0) {
             dataLogger.mainLog("no boards");
@@ -580,10 +580,11 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           dataLogger.mainLog("canceled");
           return null;
         }
-        if (file.filePaths.length < 1) {
+        const filePath = file.filePaths[0];
+        if (!filePath) {
           return null;
         }
-        let path = Path.resolve(file.filePaths[0]);
+        let path = Path.resolve(filePath);
         if (Path.basename(path) != "PetaImage") {
           path = Path.resolve(path, "PetaImage");
         }
@@ -886,7 +887,8 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       nsfw: false
     }
     if (dataSettings.data.autoAddTag) {
-      const datePetaTag = createPetaTag(dateFormat(addDate, "yyyy-mm-dd"));
+      const name = dateFormat(addDate, "yyyy-mm-dd");
+      const datePetaTag = (await dataPetaTags.find({name: name}))[0] || createPetaTag(name);
       datePetaTag.petaImages.push(petaImage.id);
       await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
@@ -959,8 +961,8 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     }
     window.on("close", () => {
       if (!window.isMaximized()) {
-        dataStates.data.windowSize.width = window.getSize()[0];
-        dataStates.data.windowSize.height = window.getSize()[1];
+        dataStates.data.windowSize.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+        dataStates.data.windowSize.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
       }
       dataStates.data.windowIsMaximized = window.isMaximized();
       dataStates.save();

@@ -61,7 +61,7 @@ export class PPanel extends PIXI.Sprite {
         rej("cannot load texture");
       });
       this.loader.load((_, resources) => {
-        const texture = resources[imageURL].texture;
+        const texture = resources[imageURL]?.texture;
         if (!texture || !texture.baseTexture) {
           rej("cannot load texture");
           return;

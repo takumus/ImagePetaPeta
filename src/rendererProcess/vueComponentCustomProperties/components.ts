@@ -7,7 +7,7 @@ interface GLOBALS {
     open: (items: ContextMenuItem[], position: Vec2) => void;
   }
   complement: {
-    open: (element: HTMLElement, items: string[]) => void;
+    open: (element: any, items: string[]) => void;
   }
   browser: {
     open: () => void;

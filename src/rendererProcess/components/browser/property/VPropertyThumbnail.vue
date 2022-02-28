@@ -2,10 +2,10 @@
   <article
     class="property-thumbnail-root"
     :style="{
-      top: browserThumbnail.position.y + 'px',
-      left: browserThumbnail.position.x + 'px',
-      width: this.browserThumbnail.width + 'px',
-      height: this.browserThumbnail.height + 'px'
+      top: propertyThumbnail.position.y + 'px',
+      left: propertyThumbnail.position.x + 'px',
+      width: this.propertyThumbnail.width + 'px',
+      height: this.propertyThumbnail.height + 'px'
     }"
   >
     <div class="wrapper">
@@ -24,18 +24,18 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
 import { ImageType } from "@/commons/datas/imageType";
+import { PropertyThumbnail } from "./propertyThumbnail";
 @Options({
   components: {
   }
 })
 export default class VPropertyThumbnail extends Vue {
   @Prop()
-  browserThumbnail!: BrowserThumbnail;
+  propertyThumbnail!: PropertyThumbnail;
   imageURL = "";
   mounted() {
-    this.imageURL = getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+    this.imageURL = getImageURL(this.propertyThumbnail.petaImage, ImageType.THUMBNAIL);
   }
   get loaded() {
     return this.imageURL != "";

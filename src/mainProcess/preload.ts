@@ -1,6 +1,6 @@
-import { GLOBAL_API_NAME } from "@/commons/defines";
 import { contextBridge, ipcRenderer, webFrame } from "electron";
 import { v4 as uuid } from "uuid";
+import { GLOBAL_API_NAME } from "@/commons/defines";
 const listeners: {[key: string]: { key: string, cb: (...argv: any) => void }} = {};
 webFrame.setZoomLevel(1);
 contextBridge.exposeInMainWorld(

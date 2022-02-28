@@ -89,7 +89,7 @@ export default class VCrop extends Vue {
     this.cropBegin.set(this.petaPanel.crop.position);
     this.cropEnd.x = this.cropBegin.x + this.petaPanel.crop.width;
     this.cropEnd.y = this.cropBegin.y + this.petaPanel.crop.height;
-    this.imageResizer = new ResizeObserver((entries: ResizeObserverEntry[]) => this.resizeImage(entries[0].contentRect));
+    this.imageResizer = new ResizeObserver((entries: ResizeObserverEntry[]) => this.resizeImage(entries[0]!.contentRect));
     this.imageResizer.observe(this.size);
   }
   unmounted() {

@@ -2,9 +2,9 @@
   <article
     class="thumbnail-root"
     :style="{
-      transform: `translate(${browserThumbnail.position.x + 'px'}, ${browserThumbnail.position.y + 'px'})`,
-      width: browserThumbnail.width + 'px',
-      height: browserThumbnail.height + 'px'
+      transform: `translate(${tile.position.x + 'px'}, ${tile.position.y + 'px'})`,
+      width: tile.width + 'px',
+      height: tile.height + 'px'
     }"
   >
     <div class="wrapper">
@@ -12,7 +12,7 @@
         class="img"
         @mousedown="mousedown($event)"
         :class="{
-          'selected-image': browserThumbnail.petaImage._selected
+          'selected-image': tile.petaImage._selected
         }"
       >
         <div class="nsfw" v-if="showNsfw">
@@ -47,7 +47,7 @@
       </div>
       <div
         class="selected"
-        v-show="browserThumbnail.petaImage._selected"
+        v-show="tile.petaImage._selected"
       >
         <div class="checkbox">
           ✔
@@ -64,7 +64,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
+import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
@@ -76,9 +76,9 @@ import { PetaTag } from "@/commons/datas/petaTag";
   },
   emits: ["select", "add", "menu"]
 })
-export default class VThumbnail extends Vue {
+export default class VTile extends Vue {
   @Prop()
-  browserThumbnail!: BrowserThumbnail;
+  tile!: Tile;
   @Prop()
   fullsized = false;
   @Prop()
@@ -91,9 +91,9 @@ export default class VThumbnail extends Vue {
   click: ClickChecker = new ClickChecker();
   mounted() {
     this.changeFullsized();
-    if (this.browserThumbnail.petaImage.placeholder != "") {
+    if (this.tile.petaImage.placeholder != "") {
       try {
-        const pixels = decodePlaceholder(this.browserThumbnail.petaImage.placeholder, 32, 32);
+        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, 32, 32);
         this.canvas.width = 32;
         this.canvas.height = 32;
         const ctx = this.canvas.getContext("2d");
@@ -132,7 +132,7 @@ export default class VThumbnail extends Vue {
         elementRect.x + elementRect.width / 2,
         elementRect.y + elementRect.height / 2
       );
-      this.$emit("add", this.browserThumbnail, vec2FromMouseEvent(event), position);
+      this.$emit("add", this.tile, vec2FromMouseEvent(event), position);
       this.pressing = false;
     }
   }
@@ -143,10 +143,10 @@ export default class VThumbnail extends Vue {
     if (this.click.isClick) {
       switch(event.button) {
         case MouseButton.LEFT:
-          this.$emit("select", this.browserThumbnail);
+          this.$emit("select", this.tile);
           break;
         case MouseButton.RIGHT:
-          this.$emit("menu", this.browserThumbnail, vec2FromMouseEvent(event));
+          this.$emit("menu", this.tile, vec2FromMouseEvent(event));
           break;
       }
     }
@@ -155,19 +155,19 @@ export default class VThumbnail extends Vue {
     this.loading = false;
   }
   get showNsfw() {
-    return this.browserThumbnail.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
+    return this.tile.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
   }
   get myPetaTags() {
     return this.petaTags.filter((petaTag) => {
-      return petaTag.petaImages.indexOf(this.browserThumbnail.petaImage.id) >= 0;
+      return petaTag.petaImages.indexOf(this.tile.petaImage.id) >= 0;
     });
   }
   @Watch("fullsized")
   changeFullsized() {
     if (this.fullsized) {
-      this.imageURL = getImageURL(this.browserThumbnail.petaImage, ImageType.FULLSIZED);
+      this.imageURL = getImageURL(this.tile.petaImage, ImageType.FULLSIZED);
     } else {
-      this.imageURL = getImageURL(this.browserThumbnail.petaImage, ImageType.THUMBNAIL);
+      this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
     }
   }
 }

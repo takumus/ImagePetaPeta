@@ -17,7 +17,7 @@ export function getURLFromImgTag(html: string) {
     let maxSize = 0;
     let maxSizeSrc = "";
     srcset.split(",").map((src) => src.split(" ").filter((v) => v.trim()!= "")).forEach((params) => {
-      const url = params[0];
+      const url = params[0]!;
       const sizeStr = params[1];
       if (!sizeStr) return;
       const result = /([0-9]+\.?[0-9]*)/.exec(sizeStr);

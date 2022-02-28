@@ -27,6 +27,10 @@
 // Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
+
+// Components
+import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
+
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
@@ -43,7 +47,7 @@ export default class VComplement extends Vue {
   filteredItems: string[] = [];
   position = new Vec2(0, 0);
   show = false;
-  target?: HTMLInputElement;
+  target?: VEditableLabel;
   currentIndex = 0;
   keyboards: Keyboards = new Keyboards();
   mounted() {
@@ -80,42 +84,44 @@ export default class VComplement extends Vue {
   }
   moveSelection() {
     this.normalizeIndex();
-    this.$nextTick(() => {
-      if (this.target) {
-        const range = document.createRange();
-        range.selectNodeContents(this.target);
+    this.moveCursorToLast();
+  }
+  moveCursorToLast() {
+    setTimeout(() => {
+      const range = document.createRange();
+      if (this.target?.labelInput.firstChild) {
+        range.setStart(this.target.labelInput.firstChild, this.target.tempText.length);
+        range.collapse(true)
         const sel = window.getSelection();
         sel?.removeAllRanges();
         sel?.addRange(range);
       }
-    });
+    }, 1);
   }
-  open(input: HTMLElement, items: string[]): void {
+  open(input: VEditableLabel, items: string[]): void {
     if (input == this.target && this.show) {
       return;
     }
-    this.target = input as HTMLInputElement;
+    this.target = input;
     this.filteredItems = [];
-    const rect = input.getBoundingClientRect();
+    const rect = input.$el.getBoundingClientRect();
     this.position.x = rect.x;
     this.position.y = rect.y + rect.height;
     this.items = items;
-    input.addEventListener("blur", this.blur);
-    input.addEventListener("input", this.input);
+    input.labelInput.addEventListener("blur", this.blur);
+    input.labelInput.addEventListener("input", this.input);
     this.show = true;
     this.input();
     this.keyboards.enabled = true;
-    // this.keyboards.lock();
+    this.keyboards.lock();
   }
   blur() {
-    setTimeout(() => {
-      this.show = false;
-      this.keyboards.enabled = false;
-      // this.keyboards.unlock();
-    }, 10);
+    this.show = false;
+    this.keyboards.enabled = false;
+    this.keyboards.unlock();
     if (this.target) {
-      this.target.removeEventListener("blur", this.blur);
-      this.target.removeEventListener("input", this.input);
+      this.target.labelInput.removeEventListener("blur", this.blur);
+      this.target.labelInput.removeEventListener("input", this.input);
     }
   }
   input() {
@@ -123,7 +129,7 @@ export default class VComplement extends Vue {
       return;
     }
     this.currentIndex = -1;
-    const value = this.target.innerText.toLowerCase().trim();
+    const value = this.target.tempText.toLowerCase().trim();
     if (value == "") {
       this.filteredItems = [];
       return;
@@ -139,13 +145,20 @@ export default class VComplement extends Vue {
       }
       return ai - bi;
     });
-  }
-  select(item: string) {
-    if (this.show && item && this.target) {
-      this.target.innerText = item;
-      this.target.dispatchEvent(new Event('input'));
-      // this.target.dispatchEvent(new Event('blur'));
+    if (this.filteredItems.length == 0) {
+      this.keyboards.unlock();
+    } else {
+      this.keyboards.lock();
     }
+  }
+  select(item?: string) {
+    setTimeout(() => {
+      if (this.target) {
+        this.target.tempText = (item || this.target.tempText).replace(/\s+/g, "");
+        this.blur();
+        this.target.labelInput.blur();
+      }
+    }, 1);
   }
 }
 </script>
@@ -153,11 +166,13 @@ export default class VComplement extends Vue {
 <style lang="scss" scoped>
 .complement-root {
   position: fixed;
-  background-color: #333333;
+  background-color: var(--contextmenu-item-color);
   padding: 0px;
   margin: 0px;
-  box-shadow: 2px 2px 5px rgba($color: #000000, $alpha: 0.5);
-  color: #ffffff;
+  box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
+  color: var(--font-color);
+  border-radius: var(--rounded);
+  overflow: hidden;
   >.item {
     white-space: nowrap;
     list-style-type: none;
@@ -167,7 +182,7 @@ export default class VComplement extends Vue {
     font-size: 1em;
     cursor: pointer;
     &:hover, &.selected {
-      background-color: #555555;
+      background-color: var(--contextmenu-item-hover-color);
     }
   }
   >.separate {

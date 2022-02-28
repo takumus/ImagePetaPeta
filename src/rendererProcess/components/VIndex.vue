@@ -63,7 +63,7 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VInfo from "@/rendererProcess/components/info/VInfo.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
-import VDialog from "@/rendererProcess/components/VDialog.vue";
+import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API, log } from "@/rendererProcess/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
@@ -184,8 +184,8 @@ export default class Index extends Vue {
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id].initData(petaBoardsToDBPetaBoards(board));
-        this.boardUpdaters[board.id].onUpdate((board) => {
+        this.boardUpdaters[board.id]!.initData(petaBoardsToDBPetaBoards(board));
+        this.boardUpdaters[board.id]!.onUpdate((board) => {
           API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
         });
       }
@@ -222,16 +222,16 @@ export default class Index extends Vue {
     });
   }
   savePetaBoard(board: PetaBoard, immidiately: boolean) {
-    this.boardUpdaters[board.id].order(petaBoardsToDBPetaBoards(board));
+    this.boardUpdaters[board.id]!.order(petaBoardsToDBPetaBoards(board));
     if (immidiately) {
-      this.boardUpdaters[board.id].forceUpdate();
+      this.boardUpdaters[board.id]!.forceUpdate();
     }
   }
   async removePetaBoard(board: PetaBoard) {
     if (await this.$components.dialog.show(this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
       return;
     }
-    this.boardUpdaters[board.id].forceUpdate();
+    this.boardUpdaters[board.id]!.forceUpdate();
     await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();
   }

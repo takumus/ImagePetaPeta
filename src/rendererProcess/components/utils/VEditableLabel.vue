@@ -2,7 +2,7 @@
   <article
     class="editable-label-root"
     :style="{
-      width: growWidth ? 'unset' : 'unset'
+      width: growWidth ? '100%' : 'unset'
     }"
     :class="{ editing: editing }"
   >
@@ -47,7 +47,7 @@ export default class VEditableLabel extends Vue {
   @Prop()
   clickToEdit!: boolean;
   @Ref("label")
-  labelInput!: HTMLInputElement;
+  labelInput!: HTMLElement;
   tempText = "Hello";
   editing = false;
   labelWidth = 0;
@@ -103,7 +103,7 @@ export default class VEditableLabel extends Vue {
     }, 100);
   }
   focus(event: FocusEvent) {
-    this.$emit("focus", event);
+    this.$emit("focus", this);
   }
   input(event: InputEvent) {
     this.tempText = (event.target as HTMLElement).innerText;

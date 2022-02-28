@@ -42,6 +42,7 @@ export class Keyboards extends EventEmitter {
   public set enabled(value: boolean) {
     this._enabled = value;
     if (!value) {
+      this.unlock();
       Object.keys(this.pressedKeys).forEach((key) => {
         if (this.pressedKeys[key]) {
           this.emit(key, false);

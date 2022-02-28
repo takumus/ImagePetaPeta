@@ -6,9 +6,9 @@
       v-show="!noImage"
     >
       <VPropertyThumbnail
-        v-for="(data) in browserThumbnails"
+        v-for="(data) in propertyThumbnails"
         :key="data.petaImage.id"
-        :browserThumbnail="data"
+        :propertyThumbnail="data"
       />
     </section>
     <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
@@ -26,11 +26,10 @@
     <section v-show="!noImage" class="tags">
       <p>{{$t("browser.property.tags")}}</p>
       <ul>
-        <li v-for="tag in tags" :key="tag.id">
+        <li v-for="tag in sharedPetaTags" :key="tag.id">
           <VEditableLabel
             :label="tag.name"
             :labelLook="`${tag.name}`"
-            :growWidth="true"
             :readonly="true"
             @focus="complementTag"
             @click="selectTag(tag)"
@@ -41,7 +40,6 @@
           <VEditableLabel
             :label="$t('browser.property.tagName')"
             :labelLook="$t('browser.property.clickToAddTag')"
-            :growWidth="true"
             :clickToEdit="true"
             @change="(name) => addTag(name)"
             @focus="complementTag"
@@ -68,14 +66,14 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref } from "vue-property-decorator";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
-import VPropertyThumbnail from "@/rendererProcess/components/browser/VPropertyThumbnail.vue";
+import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
 import { API, log } from "@/rendererProcess/api";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { BrowserThumbnail } from "@/rendererProcess/components/browser/browserThumbnail";
+import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
@@ -100,7 +98,7 @@ export default class VProperty extends Vue {
   previewsResizer?: ResizeObserver;
   mounted() {
     this.previewsResizer = new ResizeObserver((entries) => {
-      this.resizePreviews(entries[0].contentRect);
+      this.resizePreviews(entries[0]!.contentRect);
     });
     this.previewsResizer.observe(this.previews);
   }
@@ -130,8 +128,8 @@ export default class VProperty extends Vue {
       pi._selected = false;
     })
   }
-  complementTag(event: FocusEvent) {
-    this.$components.complement.open(event.target as HTMLInputElement, this.allPetaTags.map((petaTag) => petaTag.name));
+  complementTag(editableLabel: VEditableLabel) {
+    this.$components.complement.open(editableLabel, this.allPetaTags.map((petaTag) => petaTag.name));
   }
   tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
@@ -146,7 +144,7 @@ export default class VProperty extends Vue {
   selectTag(tag: PetaTag) {
     this.$emit("selectTag", tag);
   }
-  get tags(): PetaTag[] {
+  get sharedPetaTags(): PetaTag[] {
     if (this.noImage) {
       return [];
     }
@@ -156,25 +154,22 @@ export default class VProperty extends Vue {
     }} = {};
     this.petaImages.forEach((pi) => {
       getPetaTagsOfPetaImage(pi, this.allPetaTags).forEach((tag) => {
-        if (!tags[tag.id]) {
-          tags[tag.id] = {
-            count: 1,
-            petaTag: tag
-          }
-          tags[tag.id].count = 1;
-        } else {
-          tags[tag.id].count++;
-        }
+        const t = tags[tag.id] || {
+          count: 0,
+          petaTag: tag
+        };
+        tags[tag.id] = t;
+        t.count++;
       });
     });
     return Object.values(tags).filter((tag) => tag.count == this.petaImages.length).map((t) => t.petaTag);
   }
-  get browserThumbnails(): BrowserThumbnail[] {
+  get propertyThumbnails(): PropertyThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
     const petaImages = [...this.petaImages];
     // プレビュー数の最大を抑える。
     petaImages.splice(0, petaImages.length - MAX_PREVIEW_COUNT);
-    const thumbnails = petaImages.map((p, i) => {
+    const thumbnails = petaImages.map((p, i): PropertyThumbnail => {
       let width = 0;
       let height = 0;
       if (p.height / p.width < this.previewHeight / maxWidth) {
@@ -188,11 +183,10 @@ export default class VProperty extends Vue {
         petaImage: p,
         position: new Vec2(0, 0),
         width: width,
-        height: height,
-        visible: true
+        height: height
       }
     });
-    const last = thumbnails[thumbnails.length - 1];
+    const last = thumbnails[thumbnails.length - 1]!;
     thumbnails.forEach((thumb, i) => {
       thumb.position = new Vec2(
         petaImages.length > 1 ? (this.previewWidth - last.width) * (i / (petaImages.length - 1)) : this.previewWidth / 2 - thumb.width / 2,

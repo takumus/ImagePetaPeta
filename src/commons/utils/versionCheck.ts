@@ -6,8 +6,8 @@ export function isLatest(me: string, remote: string) {
   const remoteArr = remote.split(".");
   const length = Math.min(meArr.length, remoteArr.length);
   for (let i = 0; i < length; i++) {
-    const mN = parseInt(meArr[i].replace(/[^0-9]/g, ""));
-    const rN = parseInt(remoteArr[i].replace(/[^0-9]/g, ""));
+    const mN = parseInt(meArr[i]!.replace(/[^0-9]/g, ""));
+    const rN = parseInt(remoteArr[i]!.replace(/[^0-9]/g, ""));
     if (mN < rN) return false;
     if (mN > rN) return true;
   }

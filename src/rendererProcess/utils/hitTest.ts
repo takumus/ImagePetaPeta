@@ -54,15 +54,15 @@ export function hitTest (rect1: Rect, rect2: Rect) {
     c: number,
     c1: number,
     c2: number;
-  if (t1[0] * (cy2 - lt1.y) - t1[1] * (cx2 - lt1.x) > 0 &&
-    r1[0] * (cy2 - rt1.y) - r1[1] * (cx2 - rt1.x) > 0 &&
-    b1[0] * (cy2 - rb1.y) - b1[1] * (cx2 - rb1.x) > 0 &&
-    l1[0] * (cy2 - lb1.y) - l1[1] * (cx2 - lb1.x) > 0) {
+  if (t1[0]! * (cy2 - lt1.y) - t1[1]! * (cx2 - lt1.x) > 0 &&
+    r1[0]! * (cy2 - rt1.y) - r1[1]! * (cx2 - rt1.x) > 0 &&
+    b1[0]! * (cy2 - rb1.y) - b1[1]! * (cx2 - rb1.x) > 0 &&
+    l1[0]! * (cy2 - lb1.y) - l1[1]! * (cx2 - lb1.x) > 0) {
     return true;
-  } else if (t2[0] * (cy1 - lt2.y) - t2[1] * (cx1 - lt2.x) > 0 &&
-    r2[0] * (cy1 - rt2.y) - r2[1] * (cx1 - rt2.x) > 0 &&
-    b2[0] * (cy1 - rb2.y) - b2[1] * (cx1 - rb2.x) > 0 &&
-    l2[0] * (cy1 - lb2.y) - l2[1] * (cx1 - lb2.x) > 0) {
+  } else if (t2[0]! * (cy1 - lt2.y) - t2[1]! * (cx1 - lt2.x) > 0 &&
+    r2[0]! * (cy1 - rt2.y) - r2[1]! * (cx1 - rt2.x) > 0 &&
+    b2[0]! * (cy1 - rb2.y) - b2[1]! * (cx1 - rb2.x) > 0 &&
+    l2[0]! * (cy1 - lb2.y) - l2[1]! * (cx1 - lb2.x) > 0) {
     return true;
   } else {
     poss1 = [ lt1, rt1, rb1, lb1 ];
@@ -70,15 +70,15 @@ export function hitTest (rect1: Rect, rect2: Rect) {
     dirs1 = [ t1, r1, b1, l1 ];
     dirs2 = [ t2, r2, b2, l2 ];
     for (i = 0; i < 4; i++) {
-      pos1 = poss1[i];
+      pos1 = poss1[i]!;
       px1 = pos1.x; py1 = pos1.y;
-      dir1 = dirs1[i];
-      dx1 = dir1[0]; dy1 = dir1[1];
+      dir1 = dirs1[i]!;
+      dx1 = dir1[0]!; dy1 = dir1[1]!;
       for (j = 0; j < 4; j++) {
-        pos2 = poss2[j];
+        pos2 = poss2[j]!;
         px2 = pos2.x; py2 = pos2.y;
-        dir2 = dirs2[j];
-        dx2 = dir2[0]; dy2 = dir2[1];
+        dir2 = dirs2[j]!;
+        dx2 = dir2[0]!; dy2 = dir2[1]!;
         c = dx1 * dy2 - dy1 * dx2;
         if (c !== 0) {
           vx = px2 - px1;

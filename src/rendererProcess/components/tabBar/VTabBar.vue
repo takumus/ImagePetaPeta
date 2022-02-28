@@ -309,7 +309,7 @@ export default class VTabBar extends Vue {
     this.$emit("add");
   }
   get board() {
-    return this.boards[this.selectedIndex];
+    return this.boards[this.selectedIndex]!;
   }
   get removable() {
     return true;// this.boards.length > 1;

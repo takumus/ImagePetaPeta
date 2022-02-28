@@ -4,7 +4,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
-import { PetaTag } from "../datas/petaTag";
+import { PetaTag } from "@/commons/datas/petaTag";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;

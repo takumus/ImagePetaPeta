@@ -85,6 +85,8 @@ export default class VContextMenu extends Vue {
   margin: 0px;
   box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
   color: var(--font-color);
+  border-radius: var(--rounded);
+  overflow: hidden;
   >.item {
     white-space: nowrap;
     list-style-type: none;
