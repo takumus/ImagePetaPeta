@@ -1,38 +1,5 @@
 <template>
   <article class="tags-root">
-    <header>
-      <!-- <input
-        class="search"
-        type="text"
-        v-model="selectedTags"
-      > -->
-      <span
-        v-for="tag in selectedPetaTags"
-        :key="tag.id"
-        class="selectedTag"
-      >
-        <VEditableLabel
-          :label="tag.name"
-          :labelLook="tag.label"
-          :clickToEdit="true"
-          :allowEmpty="true"
-          @focus="complementTag"
-          @change="(value) => editSearchTag(tag, value)"
-        />
-      </span>
-      <span class="selectedTag last">
-        <VEditableLabel
-          :label="''"
-          :labelLook="'+       '"
-          :clickToEdit="true"
-          @change="addSelectedTag"
-          @focus="complementTag"
-          :growWidth="true"
-          :noOutline="true"
-          ref="searchInput"
-        />
-      </span>
-    </header>
     <ul>
       <li
         @click="selectPetaTag()"
@@ -87,8 +54,6 @@ import { vec2FromMouseEvent } from "@/commons/utils/vec2";
   ]
 })
 export default class VTags extends Vue {
-  @Ref("searchInput")
-  searchInput!: VEditableLabel;
   @Prop()
   petaImagesArray: PetaImage[] = [];
   @Prop()
@@ -99,22 +64,9 @@ export default class VTags extends Vue {
   keyboards = new Keyboards();
   mounted() {
     this.keyboards.enabled = true;
-    this.searchInput.keyboard.on("backspace", (state) => {
-      if (state) {
-        this.removeLastPetaTag();
-      }
-    });
-    this.searchInput.keyboard.on("delete", (state) => {
-      if (state) {
-        this.removeLastPetaTag();
-      }
-    });
   }
   unmounted() {
     this.keyboards.destroy();
-  }
-  complementTag(editableLabel: VEditableLabel) {
-    this.$components.complement.open(editableLabel, this.complementItems);
   }
   tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
@@ -144,36 +96,6 @@ export default class VTags extends Vue {
     await API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
     this.selectPetaTag(petaTag);
   }
-  removeLastPetaTag() {
-    if (this.searchInput.tempText == "") {
-      const last = this.selectedPetaTags[this.selectedPetaTags.length - 1];
-      if (last) {
-        this.editSearchTag(last, "");
-      }
-    }
-  }
-  editSearchTag(tag: PetaTag, value: string) {
-    value = value.trim().replace(/\r?\n/g, "");
-    const index = this.selectedPetaTags.findIndex((petaTag) => petaTag == tag);
-    this.selectedPetaTags.splice(index, 1);
-    if (value != "") {
-      const petaTag = this.petaTags.find((petaTag) => petaTag.name == value);
-      if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
-        this.selectedPetaTags.splice(index, 0, petaTag);
-      }
-    }
-    this.$components.complement.updateItems(this.complementItems);
-  }
-  addSelectedTag(tagName: string) {
-    const petaTag = this.petaTags.find((petaTag) => petaTag.name == tagName);
-    if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
-      this.selectedPetaTags.push(petaTag);
-    }
-    this.$nextTick(() => {
-      this.$components.complement.updateItems(this.complementItems);
-      this.searchInput.edit();
-    });
-  }
   selectPetaTag(petaTag?: PetaTag, single = false) {
     if (!this.keyboards.isPressed("shift") || single) {
       this.selectedPetaTags.length = 0;
@@ -181,13 +103,6 @@ export default class VTags extends Vue {
     if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
       this.selectedPetaTags.push(petaTag);
     }
-  }
-  get complementItems() {
-    return this.petaTags.filter((petaTag) => {
-      return this.selectedPetaTags.indexOf(petaTag) < 0
-    }).map((petaTag) => {
-      return petaTag.name;
-    });
   }
   get browserTags(): BrowserTag[] {
     const browserTags = this.petaTags.map((petaTag): BrowserTag => {
@@ -217,9 +132,6 @@ export default class VTags extends Vue {
       readonly: true
     }, ...browserTags];
   }
-  get tagsForComplement() {
-    return this.browserTags.filter((c) => c.petaTag.name != UNTAGGED_TAG_NAME).map(c => c.petaTag.name);
-  }
   get uncategorizedImages() {
     return this.petaImagesArray.filter((petaImage) => {
       return getPetaTagsOfPetaImage(petaImage, this.petaTags).length == 0;
@@ -239,26 +151,6 @@ export default class VTags extends Vue {
   display: flex;
   width: 100%;
   height: 100%;
-  >header {
-    border-radius: var(--rounded);
-    border: solid 1.2px #333333;
-    outline: none;
-    padding: 4px;
-    font-weight: bold;
-    font-size: 1.0em;
-    width: 100%;
-    word-break: break-all;
-    white-space: pre-wrap;
-    text-align: left;
-    >.selectedTag {
-      display: inline-block;
-      margin: 0px 4px;
-      border-radius: var(--rounded);
-      &.last {
-        width: 100%;
-      }
-    }
-  }
   >ul {
     text-align: left;
     padding-left: 0px;

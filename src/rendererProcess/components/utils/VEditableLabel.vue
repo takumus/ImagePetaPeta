@@ -21,6 +21,7 @@
       @dblclick="edit(true)"
       @click="edit()"
       @input="input"
+      @keydown.enter="preventLineBreak"
     >
     </span>
   </article>
@@ -90,6 +91,9 @@ export default class VEditableLabel extends Vue {
       sel?.removeAllRanges();
       sel?.addRange(range);
     });
+  }
+  preventLineBreak(e: KeyboardEvent) {
+    e.preventDefault();
   }
   apply() {
     if (!this.editing) {

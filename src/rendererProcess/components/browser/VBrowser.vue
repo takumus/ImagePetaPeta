@@ -13,6 +13,14 @@
     @close="close"
   >
     <article class="browser-root">
+      <section class="header">
+        <section class="input">
+          <VSearch
+            :petaTags="petaTags"
+            :selectedPetaTags="selectedPetaTags"
+          />
+        </section>
+      </section>
       <section class="top">
         <section class="tags">
           <VTags
@@ -75,6 +83,7 @@ import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
+import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API, log } from "@/rendererProcess/api";
@@ -94,7 +103,8 @@ import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPet
     VProperty,
     VEditableLabel,
     VModal,
-    VTags
+    VTags,
+    VSearch
   },
   emits: [
     "select",
@@ -409,6 +419,14 @@ export default class VBrowser extends Vue {
   display: flex;
   flex-direction: column;
   // color: #333333;
+  >.header {
+    width: 100%;
+    >.input {
+      display: block;
+      max-width: 512px;
+      margin: 0 auto;
+    }
+  }
   >.bottom {
     text-align: center;
   }
