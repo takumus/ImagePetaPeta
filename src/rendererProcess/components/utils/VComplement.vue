@@ -104,16 +104,15 @@ export default class VComplement extends Vue {
     }
     this.target = input;
     this.filteredItems = [];
-    const rect = input.$el.getBoundingClientRect();
-    this.position.x = rect.x;
-    this.position.y = rect.y + rect.height;
     this.items = items;
     input.labelInput.addEventListener("blur", this.blur);
     input.labelInput.addEventListener("input", this.input);
     this.show = true;
     this.input();
     this.keyboards.enabled = true;
-    this.keyboards.lock();
+  }
+  updateItems(items: string[]) {
+    this.items = items;
   }
   blur() {
     this.show = false;
@@ -128,10 +127,11 @@ export default class VComplement extends Vue {
     if (!this.show || !this.target) {
       return;
     }
-    this.currentIndex = -1;
+    this.currentIndex = 0;
     const value = this.target.tempText.toLowerCase().trim();
     if (value == "") {
       this.filteredItems = [];
+      this.keyboards.unlock();
       return;
     }
     this.filteredItems = this.items.filter((item) => {
@@ -149,6 +149,9 @@ export default class VComplement extends Vue {
       this.keyboards.unlock();
     } else {
       this.keyboards.lock();
+      const rect = this.target.$el.getBoundingClientRect();
+      this.position.x = rect.x;
+      this.position.y = rect.y + rect.height;
     }
   }
   select(item?: string) {

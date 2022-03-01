@@ -19,7 +19,6 @@
             :petaImagesArray="petaImagesArray"
             :petaTags="petaTags"
             :selectedPetaTags="selectedPetaTags"
-            @changeSelectedPetaTags="changeSelectedPetaTags"
           />
         </section>
         <section class="thumbnails-wrapper">
@@ -139,7 +138,6 @@ export default class VBrowser extends Vue {
 
     this.$components.browser = this;
     this.thumbnailsSize = this.$settings.tileSize;
-    this.keyboards.enabled = true;
     this.keyboards.on("a", this.keyA);
   }
   unmounted() {
@@ -282,9 +280,6 @@ export default class VBrowser extends Vue {
       }
     ], position);
   }
-  changeSelectedPetaTags(petaTags: PetaTag[]) {
-    this.selectedPetaTags = petaTags;
-  }
   open() {
     this.visible = false;
     this.$nextTick(() => {
@@ -307,10 +302,12 @@ export default class VBrowser extends Vue {
   onModalState(value: boolean) {
     this.keyboards.enabled = value;
   }
-  @Watch("selectedTagNameArray")
+  @Watch("selectedPetaTags", { deep: true })
   changeSelectedTags() {
-    this.thumbnails.scrollTo(0, 0);
     this.currentScrollThumbnailId = "";
+    this.$nextTick(() => {
+      this.thumbnails.scrollTop = 0;
+    });
   }
   @Watch("thumbnailsSize")
   changeThumbnailsSize() {
@@ -392,6 +389,9 @@ export default class VBrowser extends Vue {
   }
   keyA(value: boolean) {
     if (value) {
+      if (Boolean(document.activeElement?.getAttribute("lock-keyboard")) == true) {
+        return;
+      }
       if (this.keyboards.isPressed("control") || this.keyboards.isPressed("meta")) {
         this.filteredPetaImages.forEach((pi) => {
           pi._selected = true;

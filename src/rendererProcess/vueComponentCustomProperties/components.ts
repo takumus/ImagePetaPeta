@@ -8,6 +8,7 @@ interface GLOBALS {
   }
   complement: {
     open: (element: any, items: string[]) => void;
+    updateItems: (items: string[]) => void;
   }
   browser: {
     open: () => void;

@@ -6,17 +6,36 @@
         type="text"
         v-model="selectedTags"
       > -->
-      <VEditableLabel
-        :label="selectedTags"
-        :clickToEdit="true"
-        @change="(tags) => selectedTags = tags"
-        :growWidth="true"
-        :noOutline="true"
-      />
+      <span
+        v-for="tag in selectedPetaTags"
+        :key="tag.id"
+        class="selectedTag"
+      >
+        <VEditableLabel
+          :label="tag.name"
+          :labelLook="tag.label"
+          :clickToEdit="true"
+          :allowEmpty="true"
+          @focus="complementTag"
+          @change="(value) => editSearchTag(tag, value)"
+        />,
+      </span>
+      <span class="selectedTag last">
+        <VEditableLabel
+          :label="''"
+          :labelLook="'+       '"
+          :clickToEdit="true"
+          @change="addSelectedTag"
+          @focus="complementTag"
+          :growWidth="true"
+          :noOutline="true"
+          ref="searchInput"
+        />
+      </span>
     </header>
     <ul>
       <li
-        @click="selectTag('')"
+        @click="selectPetaTag()"
         :class="{ selected: selectedAll }"
       >
         <VEditableLabel
@@ -28,7 +47,7 @@
         v-for="c in browserTags"
         :key="c.petaTag.id"
         :class="{ selected: c.selected }"
-        @click="selectTag(c.petaTag.name)"
+        @click="selectPetaTag(c.petaTag)"
       >
         <VEditableLabel
           :label="c.petaTag.name"
@@ -65,26 +84,37 @@ import { vec2FromMouseEvent } from "@/commons/utils/vec2";
     VEditableLabel
   },
   emits:[
-    "changeSelectedPetaTags"
   ]
 })
 export default class VTags extends Vue {
+  @Ref("searchInput")
+  searchInput!: VEditableLabel;
   @Prop()
   petaImagesArray: PetaImage[] = [];
   @Prop()
   petaTags: PetaTag[] = [];
   @Prop()
   selectedPetaTags: PetaTag[] = [];
-  selectedTags = "";
+  tempSelectedTags = "";
   keyboards = new Keyboards();
   mounted() {
     this.keyboards.enabled = true;
+    this.searchInput.keyboard.on("backspace", (state) => {
+      if (state) {
+        this.removeLastPetaTag();
+      }
+    });
+    this.searchInput.keyboard.on("delete", (state) => {
+      if (state) {
+        this.removeLastPetaTag();
+      }
+    });
   }
   unmounted() {
     this.keyboards.destroy();
   }
-  complementTag(event: FocusEvent) {
-    this.$components.complement.open(event.target as HTMLInputElement, this.browserTags.map((c) => c.petaTag.name));
+  complementTag(editableLabel: VEditableLabel) {
+    this.$components.complement.open(editableLabel, this.complementItems);
   }
   tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
@@ -112,27 +142,52 @@ export default class VTags extends Vue {
     }
     petaTag.name = newName;
     await API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
-    this.selectTag(newName);
+    this.selectPetaTag(petaTag);
   }
-  selectTag(tag: string, single = false) {
-    const tagNames = [...this.selectedPetaTags.map((petaTag) => petaTag.name)];
-    const index = tagNames.indexOf(tag);
-    if (index < 0) {
-      if (!this.keyboards.isPressed("shift") || single) {
-        tagNames.length = 0;
+  removeLastPetaTag() {
+    if (this.searchInput.tempText == "") {
+      const last = this.selectedPetaTags[this.selectedPetaTags.length - 1];
+      if (last) {
+        this.editSearchTag(last, "");
       }
-      tagNames.push(tag);
-      this.selectedTags = tagNames.join(" ");
-    } else {
-      if (!this.keyboards.isPressed("shift") || single) {
-        tagNames.length = 0;
-        tagNames.push(tag);
-      } else {
-        tagNames.splice(index, 1);
-      }
-      this.selectedTags = tagNames.join(" ");
     }
-    // this.$emit("changeTags", this.selectedTagNameArray);
+  }
+  editSearchTag(tag: PetaTag, value: string) {
+    value = value.trim().replace(/\r?\n/g, "");
+    const index = this.selectedPetaTags.findIndex((petaTag) => petaTag == tag);
+    this.selectedPetaTags.splice(index, 1);
+    if (value != "") {
+      const petaTag = this.petaTags.find((petaTag) => petaTag.name == value);
+      if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+        this.selectedPetaTags.splice(index, 0, petaTag);
+      }
+    }
+    this.$components.complement.updateItems(this.complementItems);
+  }
+  addSelectedTag(tagName: string) {
+    const petaTag = this.petaTags.find((petaTag) => petaTag.name == tagName);
+    if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+      this.selectedPetaTags.push(petaTag);
+    }
+    this.$nextTick(() => {
+      this.$components.complement.updateItems(this.complementItems);
+      this.searchInput.edit();
+    });
+  }
+  selectPetaTag(petaTag?: PetaTag, single = false) {
+    if (!this.keyboards.isPressed("shift") || single) {
+      this.selectedPetaTags.length = 0;
+    }
+    if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+      this.selectedPetaTags.push(petaTag);
+    }
+  }
+  get complementItems() {
+    return this.petaTags.filter((petaTag) => {
+      return this.selectedPetaTags.indexOf(petaTag) < 0
+    }).map((petaTag) => {
+      return petaTag.name;
+    });
   }
   get browserTags(): BrowserTag[] {
     const browserTags = this.petaTags.map((petaTag): BrowserTag => {
@@ -173,24 +228,6 @@ export default class VTags extends Vue {
   get selectedAll() {
     return this.selectedPetaTags.length == 0;
   }
-  @Watch("selectedTags")
-  changeSelectedTags() {
-    const selectedTags = this.selectedTags.split(" ")
-    .map((tagName) => {
-      return this.browserTags.find((browserTag) => {
-        return browserTag.petaTag.name == tagName;
-      });
-    }).filter((browserTag) => {
-      return browserTag != undefined;
-    }).map((browserTag) => {
-      return browserTag?.petaTag;
-    });
-    this.$emit("changeSelectedPetaTags", selectedTags);
-  }
-  @Watch("selectedPetaTags", {deep: true})
-  changeSelectedPetaTags() {
-    this.selectedTags = this.selectedPetaTags.map((petaTag) => petaTag.name).join(" ");
-  }
 }
 </script>
 
@@ -210,6 +247,17 @@ export default class VTags extends Vue {
     font-weight: bold;
     font-size: 1.0em;
     width: 100%;
+    word-break: break-all;
+    white-space: pre-wrap;
+    text-align: left;
+    >.selectedTag {
+      display: inline-block;
+      margin: 0px 2px;
+      border-radius: var(--rounded);
+      &.last {
+        width: 100%;
+      }
+    }
   }
   >ul {
     text-align: left;

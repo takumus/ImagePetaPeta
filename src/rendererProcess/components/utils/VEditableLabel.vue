@@ -8,10 +8,14 @@
   >
     <span
       class="editable-label"
+      :class="{
+        'no-outline': noOutline
+      }"
       v-text="labelLook && !editing ? labelLook : tempText"
       ref="label"
       placeholder=""
       :contenteditable="editing"
+      lock-keyboard="true"
       @blur="apply"
       @focus="focus($event)"
       @dblclick="edit(true)"
@@ -32,7 +36,8 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
   },
   emits: [
     "change",
-    "focus"
+    "focus",
+    "input"
   ]
 })
 export default class VEditableLabel extends Vue {
@@ -46,6 +51,10 @@ export default class VEditableLabel extends Vue {
   readonly!: boolean;
   @Prop()
   clickToEdit!: boolean;
+  @Prop()
+  noOutline!: boolean;
+  @Prop()
+  allowEmpty!: boolean;
   @Ref("label")
   labelInput!: HTMLElement;
   tempText = "Hello";
@@ -56,9 +65,7 @@ export default class VEditableLabel extends Vue {
   mounted() {
     this.changeLabel();
     this.keyboard.on("enter", (state) => {
-      if (state) {
-        this.apply();
-      }
+      this.apply();
     });
   }
   unmounted() {
@@ -90,23 +97,26 @@ export default class VEditableLabel extends Vue {
     }
     this.editing = false;
     this.keyboard.enabled = false;
+    if (this.readonly) {
+      return;
+    }
     setTimeout(() => {
       this.tempText = this.tempText.trim();
-      if (this.readonly) {
-        return;
-      }
-      if (this.label == this.tempText || this.tempText == "") {
-        this.tempText = this.label;
-        return;
+      if (!this.allowEmpty) {
+        if (this.label == this.tempText || this.tempText == "") {
+          this.tempText = this.label;
+          return;
+        }
       }
       this.$emit("change", this.tempText);
-    }, 100);
-  }
-  focus(event: FocusEvent) {
-    this.$emit("focus", this);
+    }, 1);
   }
   input(event: InputEvent) {
     this.tempText = (event.target as HTMLElement).innerText;
+    this.$emit("input", this.tempText);
+  }
+  focus(event: FocusEvent) {
+    this.$emit("focus", this);
   }
   @Watch("label")
   changeLabel() {
@@ -126,7 +136,6 @@ export default class VEditableLabel extends Vue {
     text-align: left;
     padding: 0px;
     margin: 0px;
-    white-space: nowrap;
     border: none;
     background: none;
     cursor: pointer;
@@ -136,12 +145,18 @@ export default class VEditableLabel extends Vue {
     white-space: pre-wrap;
     display: inline-block;
     text-decoration: inherit;
+    &.no-outline {
+      outline: none;
+    }
+    &::after {
+      content: "";
+      display: inline-block;
+    }
   }
   &.editing {
     >.editable-label {
       &::after {
         content: "   ";
-        display: inline-block;
       }
     }
   }
