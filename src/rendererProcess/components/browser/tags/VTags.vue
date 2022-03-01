@@ -18,7 +18,7 @@
           :allowEmpty="true"
           @focus="complementTag"
           @change="(value) => editSearchTag(tag, value)"
-        />,
+        />
       </span>
       <span class="selectedTag last">
         <VEditableLabel
@@ -252,7 +252,7 @@ export default class VTags extends Vue {
     text-align: left;
     >.selectedTag {
       display: inline-block;
-      margin: 0px 2px;
+      margin: 0px 4px;
       border-radius: var(--rounded);
       &.last {
         width: 100%;
