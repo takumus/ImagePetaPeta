@@ -116,7 +116,7 @@ export async function readDirRecursive(path: string) {
     const _files: string[] = [];
     const files = await readdir(path);
     for (let i = 0; i < files.length; i++) {
-      const cPath = Path.resolve(path, files[i]);
+      const cPath = Path.resolve(path, files[i]!);
       try {
         if (fs.statSync(cPath).isDirectory()) {
           _files.push(...await readDirRecursive(cPath));

@@ -1,4 +1,4 @@
-import { createWriteStream, WriteStream } from "original-fs";
+import { createWriteStream, WriteStream } from "fs";
 export class Logger {
   logFile: WriteStream;
   constructor(path: string) {
