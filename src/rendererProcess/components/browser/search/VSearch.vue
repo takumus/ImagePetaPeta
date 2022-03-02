@@ -38,15 +38,10 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 
 // Others
-import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
-import { UNTAGGED_TAG_NAME } from "@/commons/defines";
-import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 @Options({
   components: {
     VEditableLabel
@@ -63,15 +58,11 @@ export default class VSearch extends Vue {
   selectedPetaTags: PetaTag[] = [];
   keyboards = new Keyboards();
   mounted() {
-    this.searchInput.keyboard.on("backspace", (state) => {
-      if (state) {
-        this.removeLastPetaTag();
-      }
+    this.searchInput.keyboard.down(["backspace"], () => {
+      this.removeLastPetaTag();
     });
-    this.searchInput.keyboard.on("delete", (state) => {
-      if (state) {
-        this.removeLastPetaTag();
-      }
+    this.searchInput.keyboard.down(["delete"], () => {
+      this.removeLastPetaTag();
     });
     this.keyboards.enabled = true;
   }
@@ -137,7 +128,7 @@ export default class VSearch extends Vue {
 <style lang="scss" scoped>
 .search-root {
   border-radius: var(--rounded);
-  border: solid 1.2px #333333;
+  border: solid 1.2px var(--border-color);
   outline: none;
   padding: 4px 4px 0px 0px;
   font-weight: bold;
@@ -157,7 +148,7 @@ export default class VSearch extends Vue {
     margin: 0px 0px 4px 4px;
     border-radius: var(--rounded);
     padding: 4px;
-    background-color: #363636;
+    background-color: var(--tab-bg-color);
     // border: solid 1.2px var(--border-color);
     &.last {
       width: 100%;

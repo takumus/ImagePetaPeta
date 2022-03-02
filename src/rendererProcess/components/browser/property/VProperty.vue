@@ -51,6 +51,7 @@
       <label>
         <input
           type="checkbox"
+          tabindex="-1"
           :checked="nsfw"
           @change="changeNsfw(Boolean($event.target.checked))"
         >

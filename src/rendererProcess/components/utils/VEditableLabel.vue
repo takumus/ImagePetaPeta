@@ -22,6 +22,7 @@
       @click="edit()"
       @input="input"
       @keydown.enter="preventLineBreak"
+      @keydown.tab="preventLineBreak"
     >
     </span>
   </article>
@@ -65,7 +66,7 @@ export default class VEditableLabel extends Vue {
   keyboard = new Keyboards();
   mounted() {
     this.changeLabel();
-    this.keyboard.on("enter", (state) => {
+    this.keyboard.down(["enter"], () => {
       this.apply();
     });
   }

@@ -13,14 +13,6 @@
     @close="close"
   >
     <article class="browser-root">
-      <section class="header">
-        <section class="input">
-          <VSearch
-            :petaTags="petaTags"
-            :selectedPetaTags="selectedPetaTags"
-          />
-        </section>
-      </section>
       <section class="top">
         <section class="tags">
           <VTags
@@ -29,27 +21,37 @@
             :selectedPetaTags="selectedPetaTags"
           />
         </section>
-        <section class="thumbnails-wrapper">
-          <section
-            class="thumbnails"
-            ref="thumbnails"
-          >
-            <div
-              class="thumbs-wrapper"
-              ref="thumbsWrapper"
-              :style="{height: scrollHeight + 8 + 'px'}"
-            >
-              <VTile
-                v-for="(data) in visibleTiles"
-                :key="data.petaImage.id"
-                :tile="data"
-                :fullsized="fullsized"
+        <section class="center">
+          <section class="header">
+            <section class="input">
+              <VSearch
                 :petaTags="petaTags"
-                @add="addPanel"
-                @select="selectThumbnail"
-                @menu="petaImageMenu"
+                :selectedPetaTags="selectedPetaTags"
               />
-            </div>
+            </section>
+          </section>
+          <section class="thumbnails-wrapper">
+            <section
+              class="thumbnails"
+              ref="thumbnails"
+            >
+              <div
+                class="thumbs-wrapper"
+                ref="thumbsWrapper"
+                :style="{height: scrollHeight + 8 + 'px'}"
+              >
+                <VTile
+                  v-for="(data) in visibleTiles"
+                  :key="data.petaImage.id"
+                  :tile="data"
+                  :fullsized="fullsized"
+                  :petaTags="petaTags"
+                  @add="addPanel"
+                  @select="selectThumbnail"
+                  @menu="petaImageMenu"
+                />
+              </div>
+            </section>
           </section>
         </section>
         <section class="property">
@@ -87,7 +89,7 @@ import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API, log } from "@/rendererProcess/api";
-import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_TAG_NAME } from "@/commons/defines";
+import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
@@ -148,7 +150,7 @@ export default class VBrowser extends Vue {
 
     this.$components.browser = this;
     this.thumbnailsSize = this.$settings.tileSize;
-    this.keyboards.on("a", this.keyA);
+    this.keyboards.down(["a"], this.keyA);
   }
   unmounted() {
     this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
@@ -392,21 +394,20 @@ export default class VBrowser extends Vue {
     return images;
   }
   get visibleTiles(): Tile[] {
-    return this.tiles.filter((p) => p.visible);
+    const tiles = this.tiles.filter((p) => p.visible);
+    return tiles;
   }
   get fullsized() {
     return this.$settings.loadThumbnailsInFullsized && this.thumbnailWidth > this.$settings.thumbnails.size;
   }
-  keyA(value: boolean) {
-    if (value) {
-      if (Boolean(document.activeElement?.getAttribute("lock-keyboard")) == true) {
-        return;
-      }
-      if (this.keyboards.isPressed("control") || this.keyboards.isPressed("meta")) {
-        this.filteredPetaImages.forEach((pi) => {
-          pi._selected = true;
-        });
-      }
+  keyA() {
+    if (Boolean(document.activeElement?.getAttribute("lock-keyboard")) == true) {
+      return;
+    }
+    if (this.keyboards.isPressed("control") || this.keyboards.isPressed("meta")) {
+      this.filteredPetaImages.forEach((pi) => {
+        pi._selected = true;
+      });
     }
   }
 }
@@ -419,17 +420,6 @@ export default class VBrowser extends Vue {
   display: flex;
   flex-direction: column;
   // color: #333333;
-  >.header {
-    width: 100%;
-    >.input {
-      display: block;
-      max-width: 512px;
-      margin: 0 auto;
-    }
-  }
-  >.bottom {
-    text-align: center;
-  }
   >.top {
     display: flex;
     flex: 1;
@@ -439,17 +429,33 @@ export default class VBrowser extends Vue {
       width: 20%;
       max-width: 180px;
     }
-    >.thumbnails-wrapper {
+    >.center {
+      display: flex;
+      flex-direction: column;
       width: 100%;
       height: 100%;
-      position: relative;
       padding: 8px;
-      >.thumbnails {
+      >.header {
+        width: 100%;
+        >.input {
+          display: block;
+          max-width: 512px;
+          margin: 0 auto;
+        }
+      }
+      >.thumbnails-wrapper {
         width: 100%;
         height: 100%;
         position: relative;
-        overflow-y: scroll;
-        overflow-x: hidden;
+        flex: 1;
+        overflow: hidden;
+        >.thumbnails {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          overflow-y: scroll;
+          overflow-x: hidden;
+        }
       }
     }
     >.property {

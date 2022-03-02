@@ -151,9 +151,9 @@ export default class VBoard extends Vue {
     }, 1000);
     this.renderPIXI();
     this.keyboards.enabled = true;
-    this.keyboards.on("delete", this.keyDelete);
-    this.keyboards.on("backspace", this.keyBackspace);
-    this.keyboards.on("shift", this.keyShift);
+    this.keyboards.down(["delete"], this.keyDelete);
+    this.keyboards.down(["backspace"], this.keyBackspace);
+    this.keyboards.change(["shift"], this.keyShift);
   }
   unmounted() {
     this.pixi.view.removeEventListener("dblclick", this.resetTransform);
@@ -563,18 +563,14 @@ export default class VBoard extends Vue {
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
   }
-  keyDelete(value: boolean) {
-    if (value) {
-      this.removeSelectedPanels();
-    }
+  keyDelete() {
+    this.removeSelectedPanels();
   }
-  keyBackspace(value: boolean) {
-    if (value) {
-      this.removeSelectedPanels();
-    }
+  keyBackspace() {
+    this.removeSelectedPanels();
   }
-  keyShift(value: boolean) {
-    this.pTransformer.fit = value;
+  keyShift(pressed: boolean) {
+    this.pTransformer.fit = pressed;
   }
   get pPanelsArray() {
     return Object.values(this.pPanels);

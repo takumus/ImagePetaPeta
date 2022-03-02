@@ -72,7 +72,7 @@ export default class VModal extends Vue {
     this.background.addEventListener("mousedown", this.mousedown);
     this.background.addEventListener("mouseup", this.mouseup);
     this.keyboards.enabled = true;
-    this.keyboards.on("escape", this.pressEscape);
+    this.keyboards.down(["escape"], this.pressEscape);
   }
   unmounted() {
     this.background.removeEventListener("mousedown", this.mousedown);
@@ -114,10 +114,8 @@ export default class VModal extends Vue {
     this.$emit("state", value);
   }
   pressEscape(pressed: boolean) {
-    if (pressed) {
-      if (this.isActive) {
-        this.close();
-      }
+    if (this.isActive) {
+      this.close();
     }
   }
 }

@@ -40,7 +40,6 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
-import { UNTAGGED_TAG_NAME } from "@/commons/defines";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
@@ -123,7 +122,7 @@ export default class VTags extends Vue {
     return [{
       petaTag: {
         id: "untagged",
-        name:UNTAGGED_TAG_NAME,
+        name: this.$t("browser.untagged"),
         index: 0,
         petaImages: []
       },

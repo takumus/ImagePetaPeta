@@ -52,18 +52,23 @@ export default class VComplement extends Vue {
   keyboards: Keyboards = new Keyboards();
   mounted() {
     this.$components.complement = this;
-    this.keyboards.on("arrowup", (state) => {
-      if (!this.target || !state) return;
+    this.keyboards.down(["arrowup"], () => {
+      if (!this.target) return;
       this.currentIndex--;
       this.moveSelection();
     });
-    this.keyboards.on("arrowdown", (state) => {
-      if (!this.target || !state) return;
+    this.keyboards.down(["arrowdown"], () => {
+      if (!this.target) return;
       this.currentIndex++;
       this.moveSelection();
     });
-    this.keyboards.on("enter", (state) => {
-      if (!this.target || !state) return;
+    this.keyboards.down(["tab"], () => {
+      if (!this.target) return;
+      this.currentIndex += this.keyboards.isPressed("shift") ? -1 : 1;
+      this.moveSelection();
+    });
+    this.keyboards.down(["enter"], () => {
+      if (!this.target) return;
       this.select(this.filteredItems[this.currentIndex]);
     });
   }

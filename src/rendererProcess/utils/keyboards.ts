@@ -1,30 +1,27 @@
 import { EventEmitter } from "eventemitter3";
-
-export class Keyboards extends EventEmitter {
-  pressedKeys: { [key: string]: boolean } = {};
+export class Keyboards {
   private _enabled = false;
-  static id = 0;
-  static locked = -1;
   private id = 0;
+  private downListeners: { [key: string]: Set<KeyboardsCallback> };
+  private upListeners: { [key: string]: Set<KeyboardsCallback> };
   constructor() {
-    super();
     this.id = Keyboards.id ++;
-    window.addEventListener("keydown", this.keydown);
-    window.addEventListener("keyup", this.keyup);
+    this.downListeners = {};
+    this.upListeners = {};
+    Keyboards.init();
+    Keyboards.add(this);
   }
   private keydown = (event: KeyboardEvent) => {
     const key = event.key.toLowerCase();
-    if (this.enabled && !this.pressedKeys[key]) {
-      this.emit(key, true);
+    if (this.enabled) {
+      this.emit(key, true, event);
     }
-    this.pressedKeys[key] = true;
   }
   private keyup = (event: KeyboardEvent) => {
     const key = event.key.toLowerCase();
-    if (this.enabled && this.pressedKeys[key]) {
-      this.emit(key, false);
+    if (this.enabled) {
+      this.emit(key, false, event);
     }
-    this.pressedKeys[key] = false;
   }
   public lock() {
     Keyboards.locked = this.id;
@@ -33,25 +30,76 @@ export class Keyboards extends EventEmitter {
     Keyboards.locked = -1;
   }
   public destroy() {
-    window.removeEventListener("keydown", this.keydown);
-    window.removeEventListener("keydown", this.keyup);
+    Keyboards.remove(this);
+    this.downListeners = {};
+    this.upListeners = {};
   }
   public isPressed(key: string) {
-    return this.pressedKeys[key];
+    return Keyboards.pressedKeys[key];
+  }
+  public down(keys: string[], callback: KeyboardsCallback) {
+    keys.forEach((key) => {
+      const listeners = this.downListeners[key] || (this.downListeners[key] = new Set());
+      listeners.add(callback);
+    });
+  }
+  public up(keys: string[], callback: KeyboardsCallback) {
+    keys.forEach((key) => {
+      const listeners = this.upListeners[key] || (this.upListeners[key] = new Set());
+      listeners.add(callback);
+    });
+  }
+  public change(keys: string[], callback: KeyboardsCallback) {
+    this.down(keys, callback);
+    this.up(keys, callback);
+  }
+  private emit(key: string, pressed: boolean, event: KeyboardEvent) {
+    (pressed ? this.downListeners : this.upListeners)[key]
+    ?.forEach((callback) => {
+      callback(pressed, event);
+    });
   }
   public set enabled(value: boolean) {
     this._enabled = value;
     if (!value) {
       this.unlock();
-      Object.keys(this.pressedKeys).forEach((key) => {
-        if (this.pressedKeys[key]) {
-          this.emit(key, false);
-          this.pressedKeys[key] = false;
-        }
-      });
     }
   }
   public get enabled() {
     return this._enabled && (Keyboards.locked < 0 || Keyboards.locked == this.id);
   }
+
+  // statics
+  static listeners = new Set<Keyboards>();
+  static inited = false;
+  static locked = -1;
+  static id = 0;
+  static pressedKeys: { [key: string]: boolean } = {};
+  static init() {
+    if (Keyboards.inited) {
+      return;
+    }
+    Keyboards.inited = true;
+    window.addEventListener("keydown", (event) => {
+      Keyboards.listeners.forEach((keyboards) => {
+        keyboards.keydown(event);
+        Keyboards.pressedKeys[event.key.toLowerCase()] = true;
+      });
+    });
+    window.addEventListener("keyup", (event) => {
+      Keyboards.listeners.forEach((keyboards) => {
+        keyboards.keyup(event);
+        Keyboards.pressedKeys[event.key.toLowerCase()] = false;
+      });
+    });
+  }
+  static add(keyboards: Keyboards) {
+    if (!Keyboards.listeners.has(keyboards)) {
+      Keyboards.listeners.add(keyboards);
+    }
+  }
+  static remove(keyboards: Keyboards) {
+    Keyboards.listeners.delete(keyboards);
+  }
 }
+type KeyboardsCallback = (pressed: boolean, event: KeyboardEvent) => void;
