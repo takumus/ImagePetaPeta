@@ -3,13 +3,17 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
+import { AnimatedGIF } from '@pixi/gif';
 export class PPanel extends PIXI.Sprite {
   public selected = false;
   public unselected = false;
   public dragging = false;
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
+  public gif: AnimatedGIF | undefined;
+  public imageWrapper = new PIXI.Sprite();
   public noImage = true;
+  public updateGIF: ((frame: number) => void) | undefined;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private cover = new PIXI.Graphics();
@@ -26,8 +30,9 @@ export class PPanel extends PIXI.Sprite {
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
-    this.image.mask = this.masker;
-    this.addChild(this.image, this.masker, this.cover, this.coverLabel, this.selection);
+    this.imageWrapper.mask = this.masker;
+    this.imageWrapper.addChild(this.image);
+    this.addChild(this.imageWrapper, this.masker, this.cover, this.coverLabel, this.selection);
     this.interactive = true;
     this.cover.visible = false;
     this.coverLabel.visible = false;
@@ -58,17 +63,32 @@ export class PPanel extends PIXI.Sprite {
       this.loader.add(url);
       this.loader.onError.add((error) => {
         this.loader.resources[imageURL]?.texture?.destroy();
-        rej("cannot load texture");
+        rej("cannot load texture" + error);
       });
       this.loader.load((_, resources) => {
-        const texture = resources[imageURL]?.texture;
-        if (!texture || !texture.baseTexture) {
-          rej("cannot load texture");
+        const resource = resources[imageURL];
+        const texture = resource?.texture;
+        const animated = resource?.animation as AnimatedGIF | undefined;
+        if (animated) {
+          if (this.gif) {
+            this.imageWrapper.removeChild(this.gif);
+            this.gif.destroy();
+          }
+          this.gif = animated;
+          this.imageWrapper.addChild(this.gif);
+          this.gif.onFrameChange = this.updateGIF;
+          this.gif.stop();
+          this.noImage = false;
+          res();
           return;
         }
-        this.image.texture = texture;
-        this.noImage = false;
-        res();
+        if (texture?.baseTexture) {
+          this.image.texture = texture;
+          this.noImage = false;
+          res();
+          return;
+        }
+        rej("cannot load texture");
       });
     });
   }
@@ -99,19 +119,19 @@ export class PPanel extends PIXI.Sprite {
     const panelHeight = this.absPanelHeight();
     const flippedX = this.petaPanel.width < 0;
     const flippedY = this.petaPanel.height < 0;
-    this.image.scale.set(
+    this.imageWrapper.scale.set(
       flippedX ? -1 : 1,
       flippedY ? -1 : 1
     );
-    this.image.anchor.set(
+    this.imageWrapper.anchor.set(
       flippedX ? 1 : 0,
       flippedY ? 1 : 0
     );
     if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
-      this.image.mask = this.masker;
+      this.imageWrapper.mask = this.masker;
       this.masker.visible = true;
     } else {
-      this.image.mask = null;
+      this.imageWrapper.mask = null;
       this.masker.visible = false;
     }
     const imageWidth = panelWidth * (1 / this.petaPanel.crop.width);
@@ -121,7 +141,13 @@ export class PPanel extends PIXI.Sprite {
     this.image.height = imageHeight;
     this.image.x = -panelWidth / 2 - (flippedX ? 1 - this.petaPanel.crop.position.x - this.petaPanel.crop.width : this.petaPanel.crop.position.x) * imageWidth;
     this.image.y = -panelHeight / 2 - (flippedY ? 1 - this.petaPanel.crop.position.y - this.petaPanel.crop.height : this.petaPanel.crop.position.y) * imageHeight;
-    if (this.image.mask) {
+    if (this.gif) {
+      this.gif.width = this.image.width;
+      this.gif.height = this.image.height;
+      this.gif.x = this.image.x;
+      this.gif.y = this.image.y;
+    }
+    if (this.imageWrapper.mask) {
       this.masker.clear();
       this.masker.beginFill(0xff0000);
       this.masker.drawRect(
@@ -183,8 +209,18 @@ export class PPanel extends PIXI.Sprite {
   }
   public destroy() {
     this.image.destroy();
+    this.gif?.destroy();
     this.loader.destroy();
     super.destroy();
+  }
+  public get isGIF() {
+    return this.gif ? true : false;
+  }
+  public playGIF() {
+    this.gif?.play();
+  }
+  public stopGIF() {
+    this.gif?.stop();
   }
   private absPanelWidth() {
     return Math.abs(this.petaPanel.width);

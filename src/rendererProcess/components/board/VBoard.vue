@@ -62,6 +62,9 @@ import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { minimId } from "@/commons/utils/utils";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { Loader as PIXILoader } from '@pixi/loaders';
+import { AnimatedGIFLoader } from '@pixi/gif';
+PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
     VCrop,
@@ -114,6 +117,7 @@ export default class VBoard extends Vue {
   frame = 0;
   fps = 0;
   keyboards = new Keyboards();
+  cancel: (() => void) | undefined;
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -488,11 +492,17 @@ export default class VBoard extends Vue {
     this.pTransformer.pPanels = this.pPanels;
     await this.loadAllFullsized();
     this.orderPIXIRender();
+    Object.values(this.pPanels).forEach((pPanel) => {
+      pPanel.playGIF();
+    });
     this.loading = false;
     this.loadingProgress = 0;
     this.loadingLog = "";
   }
   async loadAllFullsized() {
+    if (this.cancel) {
+      this.cancel();
+    }
     const load = async (petaPanel: PetaPanel, index: number) => {
       const progress =  `${index + 1}/${this.board.petaPanels.length}`;
       await this.loadFullsized(petaPanel).then((result) => {
@@ -507,8 +517,14 @@ export default class VBoard extends Vue {
       this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();
     }
-    await promiseSerial(load, this.board.petaPanels).value;
-    log("load complete");
+    try {
+      const result = promiseSerial(load, [...this.board.petaPanels]);
+      this.cancel = result.cancel;
+      await result.value;
+      this.cancel = undefined;
+    } catch (err) {
+      //
+    }
   }
   async loadFullsized(petaPanel: PetaPanel) {
     if (this.pPanels[petaPanel.id]) {
@@ -516,6 +532,9 @@ export default class VBoard extends Vue {
     }
     const pPanel = new PPanel(petaPanel);
     pPanel.showNsfw = this.$settings.showNsfwWithoutConfirm;
+    pPanel.updateGIF = () => {
+      this.orderPIXIRender();
+    }
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
     await pPanel.loadTexture(ImageType.FULLSIZED);
