@@ -452,7 +452,7 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   clearSelectionAll(force = false) {
-    if (!this.keyboards.isPressed("shift") || force) {
+    if (!Keyboards.pressed("shift") || force) {
       this.pPanelsArray.forEach((p) => {
         p.selected = false;
       });
@@ -528,7 +528,7 @@ export default class VBoard extends Vue {
     PIXI.utils.clearTextureCache();
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
-    if (!this.keyboards.isPressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
+    if (!Keyboards.pressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
       this.toFront(pPanel);

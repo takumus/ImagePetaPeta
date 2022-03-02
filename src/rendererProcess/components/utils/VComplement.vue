@@ -64,7 +64,7 @@ export default class VComplement extends Vue {
     });
     this.keyboards.down(["tab"], () => {
       if (!this.target) return;
-      this.currentIndex += this.keyboards.isPressed("shift") ? -1 : 1;
+      this.currentIndex += Keyboards.pressed("shift") ? -1 : 1;
       this.moveSelection();
     });
     this.keyboards.down(["enter"], () => {

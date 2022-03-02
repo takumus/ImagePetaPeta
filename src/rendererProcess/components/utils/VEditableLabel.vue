@@ -160,7 +160,7 @@ export default class VEditableLabel extends Vue {
   }
   &.editing {
     >.editable-label {
-      &::after {
+      &:empty::after {
         content: "   ";
       }
     }

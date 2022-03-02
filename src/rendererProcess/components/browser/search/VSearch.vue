@@ -56,7 +56,6 @@ export default class VSearch extends Vue {
   petaTags: PetaTag[] = [];
   @Prop()
   selectedPetaTags: PetaTag[] = [];
-  keyboards = new Keyboards();
   mounted() {
     this.searchInput.keyboard.down(["backspace"], () => {
       this.removeLastPetaTag();
@@ -64,10 +63,9 @@ export default class VSearch extends Vue {
     this.searchInput.keyboard.down(["delete"], () => {
       this.removeLastPetaTag();
     });
-    this.keyboards.enabled = true;
   }
   unmounted() {
-    this.keyboards.destroy();
+    //
   }
   async removeTag(petaTag: PetaTag) {
     if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
@@ -105,7 +103,7 @@ export default class VSearch extends Vue {
     });
   }
   selectPetaTag(petaTag?: PetaTag, single = false) {
-    if (!this.keyboards.isPressed("shift") || single) {
+    if (!Keyboards.pressedOR("shift") || single) {
       this.selectedPetaTags.length = 0;
     }
     if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {

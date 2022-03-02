@@ -62,10 +62,10 @@ export default class VTags extends Vue {
   tempSelectedTags = "";
   keyboards = new Keyboards();
   mounted() {
-    this.keyboards.enabled = true;
+    //
   }
   unmounted() {
-    this.keyboards.destroy();
+    //
   }
   tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
@@ -96,7 +96,7 @@ export default class VTags extends Vue {
     this.selectPetaTag(petaTag);
   }
   selectPetaTag(petaTag?: PetaTag, single = false) {
-    if (!this.keyboards.isPressed("shift") || single) {
+    if (!Keyboards.pressed("shift") || single) {
       this.selectedPetaTags.length = 0;
     }
     if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {

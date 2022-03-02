@@ -1,4 +1,3 @@
-import { EventEmitter } from "eventemitter3";
 export class Keyboards {
   private _enabled = false;
   private id = 0;
@@ -30,23 +29,19 @@ export class Keyboards {
     Keyboards.locked = -1;
   }
   public destroy() {
+    this.unlock();
     Keyboards.remove(this);
     this.downListeners = {};
     this.upListeners = {};
   }
-  public isPressed(key: string) {
-    return Keyboards.pressedKeys[key];
-  }
   public down(keys: string[], callback: KeyboardsCallback) {
     keys.forEach((key) => {
-      const listeners = this.downListeners[key] || (this.downListeners[key] = new Set());
-      listeners.add(callback);
+      (this.downListeners[key] || (this.downListeners[key] = new Set())).add(callback);
     });
   }
   public up(keys: string[], callback: KeyboardsCallback) {
     keys.forEach((key) => {
-      const listeners = this.upListeners[key] || (this.upListeners[key] = new Set());
-      listeners.add(callback);
+      (this.upListeners[key] || (this.upListeners[key] = new Set())).add(callback);
     });
   }
   public change(keys: string[], callback: KeyboardsCallback) {
@@ -100,6 +95,25 @@ export class Keyboards {
   }
   static remove(keyboards: Keyboards) {
     Keyboards.listeners.delete(keyboards);
+  }
+  public static pressedOR(...keys: string[]) {
+    for (let i = 0; i < keys.length; i++) {
+      if (Keyboards.pressed(keys[i]!)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  public static pressedAND(...keys: string[]) {
+    for (let i = 0; i < keys.length; i++) {
+      if (!Keyboards.pressed(keys[i]!)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  public static pressed(key: string) {
+    return Keyboards.pressedKeys[key] ? true : false;
   }
 }
 type KeyboardsCallback = (pressed: boolean, event: KeyboardEvent) => void;

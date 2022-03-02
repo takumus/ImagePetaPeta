@@ -194,7 +194,7 @@ export default class VBrowser extends Vue {
     this.thumbnailsWidth = rect.width;
   }
   async addPanel(thumb: Tile, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    if (!this.keyboards.isPressed("shift") && !this.keyboards.isPressed("control") && !this.keyboards.isPressed("meta") && !thumb.petaImage._selected) {
+    if (!Keyboards.pressedOR("shift", "control", "meta") && !thumb.petaImage._selected) {
       this.clearSelectionAllImages();
     }
     // 複数同時追加
@@ -226,20 +226,20 @@ export default class VBrowser extends Vue {
     this.close();
   }
   selectThumbnail(thumb: Tile, force = false) {
-    if (this.selectedPetaImages.length < 1 || (!this.keyboards.isPressed("control") && !this.keyboards.isPressed("meta") && !this.keyboards.isPressed("shift"))) {
+    if (this.selectedPetaImages.length < 1 || (!Keyboards.pressedOR("control", "meta", "shift"))) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedTile = thumb;
     }
     // 全選択解除するが、選択サムネイルは状態を保持する。
     const prevSelection = thumb.petaImage._selected;
-    if (!this.keyboards.isPressed("control") && !this.keyboards.isPressed("meta")) {
+    if (!Keyboards.pressedOR("control", "meta")) {
       // コントロールキーが押されていなければ選択をリセット
       this.clearSelectionAllImages();
     }
     thumb.petaImage._selected = prevSelection;
     // 選択サムネイルを反転
     thumb.petaImage._selected = !thumb.petaImage._selected || force;
-    if (this.firstSelectedTile && this.keyboards.isPressed("shift")) {
+    if (this.firstSelectedTile && Keyboards.pressed("shift")) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
         Math.min(this.firstSelectedTile.position.x, thumb.position.x),
@@ -404,7 +404,7 @@ export default class VBrowser extends Vue {
     if (Boolean(document.activeElement?.getAttribute("lock-keyboard")) == true) {
       return;
     }
-    if (this.keyboards.isPressed("control") || this.keyboards.isPressed("meta")) {
+    if (Keyboards.pressedOR("control", "meta")) {
       this.filteredPetaImages.forEach((pi) => {
         pi._selected = true;
       });
