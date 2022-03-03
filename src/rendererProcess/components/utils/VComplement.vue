@@ -162,7 +162,7 @@ export default class VComplement extends Vue {
   select(item?: string) {
     setTimeout(() => {
       if (this.target) {
-        this.target.tempText = (item || this.target.tempText).replace(/\s+/g, "");
+        this.target.tempText = item || this.target.tempText;
         this.blur();
         this.target.labelInput.blur();
       }

@@ -112,7 +112,6 @@ export default class VProperty extends Vue {
     this.previewHeight = rect.height;
   }
   addTag(name: string) {
-    name = name.replace(/\s+/g, "");
     // タグを探す。なかったら作る。
     const petaTag = this.allPetaTags.find((petaTag) => petaTag.name == name) || createPetaTag(name);
     petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));

@@ -83,7 +83,6 @@ export default class VTags extends Vue {
     }
   }
   async changeTag(petaTag: PetaTag, newName: string) {
-    newName = newName.replace(/\s+/g, "");
     if (petaTag.name == newName) {
       return;
     }
