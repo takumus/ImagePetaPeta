@@ -26,6 +26,8 @@ const ja = {
       resetPosition: "位置をリセット"
     },
     panelMenu: {
+      playGIF: "GIFを再生",
+      stopGIF: "GIFを停止",
       crop: "トリミング",
       flipHorizontal: "左右反転",
       flipVertical: "上下反転",

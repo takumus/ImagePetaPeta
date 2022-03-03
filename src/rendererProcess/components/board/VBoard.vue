@@ -158,6 +158,7 @@ export default class VBoard extends Vue {
     this.keyboards.down(["delete"], this.keyDelete);
     this.keyboards.down(["backspace"], this.keyBackspace);
     this.keyboards.change(["shift"], this.keyShift);
+    PIXI.Ticker.shared.add(this.updateAnimatedGIF);
   }
   unmounted() {
     this.pixi.view.removeEventListener("dblclick", this.resetTransform);
@@ -167,6 +168,7 @@ export default class VBoard extends Vue {
     this.panelsBackground.removeChild(this.pixi.view);
     this.pixi.destroy();
     this.keyboards.destroy();
+    PIXI.Ticker.shared.remove(this.updateAnimatedGIF);
     cancelAnimationFrame(this.requestAnimationFrameHandle);
   }
   resize(rect: DOMRectReadOnly) {
@@ -391,38 +393,67 @@ export default class VBoard extends Vue {
     delete this.pPanels[pPanel.petaPanel.id];
   }
   petaPanelMenu(pPanel: PPanel, position: Vec2) {
-    this.$components.contextMenu.open([{
-      label: this.$t("boards.panelMenu.crop"),
-      click: () => {
-        this.editCrop(pPanel.petaPanel);
+    const isMultiple = this.selectedPPanels.length > 1;
+    this.$components.contextMenu.open([
+      {
+        skip: isMultiple || !pPanel.isGIF,
+        label: pPanel.isPlayingGIF ? this.$t("boards.panelMenu.stopGIF") : this.$t("boards.panelMenu.playGIF"),
+        click: () => {
+          if (pPanel.isPlayingGIF) {
+            pPanel.stopGIF();
+          } else {
+            pPanel.playGIF();
+          }
+        }
+      },
+      {
+        separate: true
+      },
+      {
+        skip: isMultiple,
+        label: this.$t("boards.panelMenu.crop"),
+        click: () => {
+          this.editCrop(pPanel.petaPanel);
+        }
+      }, {
+        skip: isMultiple,
+        separate: true
+      }, {
+        label: this.$t("boards.panelMenu.flipHorizontal"),
+        click: () => {
+          this.selectedPPanels.forEach((pPanel) => {
+            pPanel.petaPanel.width = -pPanel.petaPanel.width;
+          });
+        }
+      }, {
+        label: this.$t("boards.panelMenu.flipVertical"),
+        click: () => {
+          this.selectedPPanels.forEach((pPanel) => {
+            pPanel.petaPanel.height = -pPanel.petaPanel.height;
+          });
+        }
+      }, {
+        separate: true
+      }, {
+        label: this.$t("boards.panelMenu.reset"),
+        click: () => {
+          this.selectedPPanels.forEach((pPanel) => {
+            pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
+            pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
+            pPanel.petaPanel.crop.position.set(0, 0);
+            pPanel.petaPanel.crop.width = 1;
+            pPanel.petaPanel.crop.height = 1;
+            pPanel.petaPanel.rotation = 0;
+            this.updateCrop(pPanel.petaPanel);
+          });
+        }
+      }, { separate: true }, {
+        label: this.$t("boards.panelMenu.remove"),
+        click: () => {
+          this.removeSelectedPanels();
+        }
       }
-    }, { separate: true }, {
-      label: this.$t("boards.panelMenu.flipHorizontal"),
-      click: () => {
-        pPanel.petaPanel.width = -pPanel.petaPanel.width;
-      }
-    }, {
-      label: this.$t("boards.panelMenu.flipVertical"),
-      click: () => {
-        pPanel.petaPanel.height = -pPanel.petaPanel.height;
-      }
-    }, { separate: true }, {
-      label: this.$t("boards.panelMenu.reset"),
-      click: () => {
-        pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
-        pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
-        pPanel.petaPanel.crop.position.set(0, 0);
-        pPanel.petaPanel.crop.width = 1;
-        pPanel.petaPanel.crop.height = 1;
-        pPanel.petaPanel.rotation = 0;
-        this.updateCrop(pPanel.petaPanel);
-      }
-    }, { separate: true }, {
-      label: this.$t("boards.panelMenu.remove"),
-      click: () => {
-        this.removeSelectedPanels();
-      }
-    }], position);
+    ], position);
   }
   async addPanel(petaPanel: PetaPanel, offsetIndex: number){
     if (offsetIndex == 0) {
@@ -493,7 +524,9 @@ export default class VBoard extends Vue {
     await this.loadAllOriginal();
     this.orderPIXIRender();
     Object.values(this.pPanels).forEach((pPanel) => {
-      pPanel.playGIF();
+      if (!pPanel.petaPanel.gif.stopped) {
+        pPanel.playGIF();
+      }
     });
     this.loading = false;
     this.loadingProgress = 0;
@@ -532,7 +565,7 @@ export default class VBoard extends Vue {
     }
     const pPanel = new PPanel(petaPanel);
     pPanel.showNsfw = this.$settings.showNsfwWithoutConfirm;
-    pPanel.updateGIF = () => {
+    pPanel.onUpdateGIF = () => {
       this.orderPIXIRender();
     }
     this.pPanels[petaPanel.id] = pPanel;
@@ -581,6 +614,13 @@ export default class VBoard extends Vue {
       this.renderOrdered = false;
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
+  }
+  updateAnimatedGIF(deltaTime: number) {
+    Object.values(this.pPanels).forEach((pPanel) => {
+      if (pPanel.isGIF) {
+        pPanel.updateGIF(deltaTime);
+      }
+    });
   }
   keyDelete() {
     this.removeSelectedPanels();

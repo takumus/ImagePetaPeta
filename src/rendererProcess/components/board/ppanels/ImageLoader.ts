@@ -45,8 +45,8 @@ export function getImage(petaImage: PetaImage | undefined) {
       const texture = resource?.texture;
       const animatedGIF = resource?.animation as AnimatedGIF | undefined;
       if (animatedGIF) {
+        animatedGIF.autoUpdate = false;
         addAnimatedGIF(imageURL, animatedGIF);
-        animatedGIF.stop();
         res({ animatedGIF: animatedGIF.clone() });
         return;
       }

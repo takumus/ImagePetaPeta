@@ -10,12 +10,13 @@
     }"
   >
     <li
-      v-for="item in items"
+      v-for="item in filteredItems"
       :key="item._id"
       @click="select(item)"
       :class="{
         item: !item.separate,
-        separate: item.separate
+        separate: item.separate,
+        disabled: item.disabled
       }"
     >
       {{item.label}}
@@ -74,6 +75,9 @@ export default class VContextMenu extends Vue {
       }
     }
   }
+  get filteredItems() {
+    return this.items.filter((item) => item.skip != true);
+  }
 }
 </script>
 
@@ -97,6 +101,11 @@ export default class VContextMenu extends Vue {
     cursor: pointer;
     &:hover {
       background-color: var(--contextmenu-item-hover-color);
+    }
+    >.disabled {
+      &:hover {
+        background-color: var(--contextmenu-item-color);
+      }
     }
   }
   >.separate {

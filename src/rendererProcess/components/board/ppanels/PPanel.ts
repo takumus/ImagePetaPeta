@@ -12,7 +12,7 @@ export class PPanel extends PIXI.Sprite {
   public gif: AnimatedGIF | undefined;
   public imageWrapper = new PIXI.Sprite();
   public noImage = true;
-  public updateGIF: ((frame: number) => void) | undefined;
+  public onUpdateGIF: ((frame: number) => void) | undefined;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private cover = new PIXI.Graphics();
@@ -47,8 +47,12 @@ export class PPanel extends PIXI.Sprite {
         this.gif.destroy();
       }
       this.gif = result.animatedGIF;
-      this.gif.onFrameChange = this.updateGIF;
+      this.gif.onFrameChange = this.onUpdateGIF;
       this.imageWrapper.addChild(this.gif);
+      if (this.petaPanel.gif.stopped) {
+        this.gif.stop();
+        this.gif.currentFrame = this.petaPanel.gif.frame;
+      }
       this.noImage = false;
     } else if (result.texture) {
       this.image.texture = result.texture;
@@ -178,11 +182,24 @@ export class PPanel extends PIXI.Sprite {
   public get isGIF() {
     return this.gif ? true : false;
   }
+  public get isPlayingGIF() {
+    return this.gif?.playing ? true : false;
+  }
   public playGIF() {
-    this.gif?.play();
+    if (this.gif) {
+      this.gif.play();
+      this.petaPanel.gif.stopped = false;
+    }
   }
   public stopGIF() {
-    this.gif?.stop();
+    if (this.gif) {
+      this.gif.stop();
+      this.petaPanel.gif.frame = this.gif.currentFrame;
+      this.petaPanel.gif.stopped = true;
+    }
+  }
+  public updateGIF(deltaTime: number) {
+    this.gif?.update(deltaTime);
   }
   private absPanelWidth() {
     return Math.abs(this.petaPanel.width);

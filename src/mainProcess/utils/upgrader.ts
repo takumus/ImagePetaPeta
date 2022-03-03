@@ -1,5 +1,6 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaPanel } from "@/commons/datas/petaPanel";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { defaultSettings, Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
@@ -82,6 +83,9 @@ export function upgradePetaBoard(board: PetaBoard) {
       lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR
     }
   }
+  board.petaPanels.forEach((petaPanel) => {
+    upgradePetaPanel(petaPanel);
+  })
   return board;
 }
 // 1.8.0
@@ -102,4 +106,15 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
   }
   await promiseSerial(addTags, petaImagesArr).value;
   return upgraded;
+}
+
+// 1.8.0
+export function upgradePetaPanel(petaPanel: PetaPanel) {
+  if (petaPanel.gif === undefined) {
+    petaPanel.gif = {
+      stopped: false,
+      frame: 0
+    }
+  }
+  return petaPanel;
 }

@@ -16,6 +16,10 @@ export interface PetaPanel {
   },
   id: string,
   index: number,
+  gif: {
+    stopped: boolean,
+    frame: number
+  }
   _petaImage?: PetaImage
 }
 export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
@@ -32,6 +36,10 @@ export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: num
     },
     id: uuid(),
     index: 0,
+    gif: {
+      stopped: false,
+      frame: 0
+    },
     _petaImage: petaImage
   }
   return panel;
