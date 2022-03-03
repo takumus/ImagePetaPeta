@@ -559,6 +559,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
               quality: dataSettings.data.thumbnails.quality
             });
             image.placeholder = result.placeholder;
+            image.file.thumbnail = `${image.file.original}.${result.extname}`;
             await updatePetaImage(image, UpdateMode.UPDATE);
             dataLogger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
             emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
