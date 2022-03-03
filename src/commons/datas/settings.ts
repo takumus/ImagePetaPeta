@@ -15,7 +15,7 @@ export const defaultSettings = {
     quality: BROWSER_THUMBNAIL_QUALITY[1]
   },
   tileSize: 128,
-  loadThumbnailsInFullsized: false,
+  loadThumbnailsInOriginal: false,
   showNsfwWithoutConfirm: false,
   petaImageDirectory: {
     default: true,

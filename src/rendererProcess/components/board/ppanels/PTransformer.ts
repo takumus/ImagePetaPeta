@@ -117,7 +117,7 @@ export class PTransformer extends PIXI.Container {
     return Object.values(this.pPanels);
   }
   mouseup(e: PIXI.InteractionEvent) {
-    // this.loadFullsized();
+    // this.loadOriginal();
     this.controlStatus = ControlStatus.NONE;
     if (e.data.button == MouseButton.LEFT) {
       this.pPanelsArray.forEach((pPanel) => {

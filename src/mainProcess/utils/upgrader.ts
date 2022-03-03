@@ -21,6 +21,13 @@ export function upgradePetaImage(petaImage: PetaImage) {
   if (petaImage.nsfw === undefined) {
     petaImage.nsfw = false;
   }
+  // v1.8.1
+  if (petaImage.file === undefined) {
+    petaImage.file = {
+      original: (petaImage as any).fileName,
+      thumbnail: (petaImage as any).fileName + ".webp"
+    }
+  }
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {
@@ -42,8 +49,8 @@ export function upgradeSettings(settings: Settings) {
   if (settings.tileSize === undefined) {
     settings.tileSize = defaultSettings.tileSize;
   }
-  if (settings.loadThumbnailsInFullsized === undefined) {
-    settings.loadThumbnailsInFullsized = false;
+  if (settings.loadThumbnailsInOriginal === undefined) {
+    settings.loadThumbnailsInOriginal = false;
   }
   // v1.6.0
   if (settings.showNsfwWithoutConfirm === undefined) {

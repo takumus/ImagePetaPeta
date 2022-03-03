@@ -141,14 +141,14 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       画像用URL作成
     */
     //-------------------------------------------------------------------------------------------------//
-    session.defaultSession.protocol.registerFileProtocol("image-fullsized", async (req, res) => {
+    session.defaultSession.protocol.registerFileProtocol("image-original", async (req, res) => {
       res({
         path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), ""))
       });
     });
     session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (req, res) => {
       res({
-        path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "") + ".webp")
+        path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), ""))
       });
     });
     //-------------------------------------------------------------------------------------------------//
@@ -406,7 +406,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       ------------------------------------*/
       openImageFile: async (event, petaImage) => {
         dataLogger.mainLog("#Open Image File");
-        shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
+        shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
       },
       /*------------------------------------
         アプリ情報
@@ -433,7 +433,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       ------------------------------------*/
       showImageInFolder: async (event, petaImage) => {
         dataLogger.mainLog("#Show Image In Folder");
-        shell.showItemInFolder(getImagePath(petaImage, ImageType.FULLSIZED));
+        shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
         return true;
       },
       /*------------------------------------
@@ -550,13 +550,14 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           emitMainEvent("regenerateThumbnailsBegin");
           const images = await dataPetaImages.find({});
           const generate = async (image: PetaImage, i: number) => {
-            const data = await file.readFile(Path.resolve(DIR_IMAGES, image.fileName));
-            const result = await generateThumbnail(
+            upgradePetaImage(image);
+            const data = await file.readFile(Path.resolve(DIR_IMAGES, image.file.original));
+            const result = await generateThumbnail({
               data,
-              getImagePathFromFilename(image.fileName, ImageType.THUMBNAIL),
-              dataSettings.data.thumbnails.size,
-              dataSettings.data.thumbnails.quality
-            );
+              outputFilePath: Path.resolve(DIR_THUMBNAILS, image.file.original),
+              size: dataSettings.data.thumbnails.size,
+              quality: dataSettings.data.thumbnails.quality
+            });
             image.placeholder = result.placeholder;
             await updatePetaImage(image, UpdateMode.UPDATE);
             dataLogger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
@@ -711,7 +712,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     if (mode == UpdateMode.REMOVE) {
       await dataPetaImages.remove({ id: petaImage.id });
       dataLogger.mainLog("removed db");
-      await file.rm(getImagePath(petaImage, ImageType.FULLSIZED)).catch((e) => {});
+      await file.rm(getImagePath(petaImage, ImageType.ORIGINAL)).catch((e) => {});
       dataLogger.mainLog("removed file");
       await file.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
       dataLogger.mainLog("removed thumbnail");
@@ -752,17 +753,14 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     return true;
   }
   /*------------------------------------
-    ファイル名からパスを取得
-  ------------------------------------*/
-  function getImagePathFromFilename(fileName: string, type: ImageType) {
-    const thumbnail = type == ImageType.THUMBNAIL;
-    return Path.resolve(thumbnail ? DIR_THUMBNAILS : DIR_IMAGES, fileName + (thumbnail ? ".webp" : ""));
-  }
-  /*------------------------------------
     PetaImageからパスを取得
   ------------------------------------*/
   function getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
-    return getImagePathFromFilename(petaImage.fileName, thumbnail);
+    if (thumbnail == ImageType.ORIGINAL) {
+      return Path.resolve(DIR_IMAGES, petaImage.file.original);
+    } else {
+      return Path.resolve(DIR_THUMBNAILS, petaImage.file.thumbnail);
+    }
   }
   /*------------------------------------
     レンダラへipcで送信
@@ -859,7 +857,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await getPetaImage(id);
     if (exists) return {
-      petaImage: exists,
+      petaImage: upgradePetaImage(exists),
       exists: true
     };
     const extName = param.extName || imageFormatToExtention((await sharp(param.data).metadata()).format);
@@ -868,21 +866,24 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     }
     const addDate = param.addDate || new Date();
     const fileDate = param.fileDate || new Date();
-    const fileName = `${id}.${extName}`;
-    const output = await generateThumbnail(
-      param.data,
-      getImagePathFromFilename(fileName, ImageType.THUMBNAIL),
-      dataSettings.data.thumbnails.size,
-      dataSettings.data.thumbnails.quality
-    );
+    const originalFileName = `${id}.${extName}`;
+    const thumbnail = await generateThumbnail({
+      data: param.data,
+      outputFilePath: Path.resolve(DIR_THUMBNAILS, originalFileName),
+      size: dataSettings.data.thumbnails.size,
+      quality: dataSettings.data.thumbnails.quality
+    });
     const petaImage: PetaImage = {
-      fileName: fileName,
+      file: {
+        original: originalFileName,
+        thumbnail: `${originalFileName}.${thumbnail.extname}`
+      },
       name: param.name,
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
       width: 1,
-      height: output.sharp.height / output.sharp.width,
-      placeholder: output.placeholder,
+      height: thumbnail.sharp.height / thumbnail.sharp.width,
+      placeholder: thumbnail.placeholder,
       id: id,
       nsfw: false
     }
@@ -892,7 +893,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       datePetaTag.petaImages.push(petaImage.id);
       await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
-    await file.writeFile(getImagePathFromFilename(fileName, ImageType.FULLSIZED), param.data);
+    await file.writeFile(Path.resolve(DIR_IMAGES, originalFileName), param.data);
     await dataPetaImages.update({ id: petaImage.id }, petaImage, true);
     return {
       petaImage: petaImage,
@@ -902,13 +903,32 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
   /*------------------------------------
     サムネイル作成
   ------------------------------------*/
-  async function generateThumbnail(data: Buffer, fileName: string, size: number, quality: number) {
-    const result = await sharp(data)
-    .resize(size)
-    .webp({ quality: quality })
-    .toFile(fileName);
+  async function generateThumbnail(params: {
+    data: Buffer,
+    outputFilePath: string,
+    size: number,
+    quality: number
+  }) {
+    let result: sharp.OutputInfo;
+    const extname = params.outputFilePath.split(".").pop();
+    let isGIF = extname == "gif";
+    if (isGIF) {
+      result = await sharp(params.data)
+      .resize(params.size)
+      .webp({ quality: params.quality })
+      .toFile(params.outputFilePath + ".gif");
+      await file.writeFile(
+        params.outputFilePath + ".gif",
+        params.data
+      );
+    } else {
+      result = await sharp(params.data)
+      .resize(params.size)
+      .webp({ quality: params.quality })
+      .toFile(params.outputFilePath + ".webp");
+    }
     const placeholder = await new Promise<string>((res, rej) => {
-      sharp(data)
+      sharp(params.data)
       .raw()
       .ensureAlpha()
       .resize(32, 32, { fit: "inside" })
@@ -925,7 +945,8 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     })
     return {
       sharp: result,
-      placeholder
+      placeholder,
+      extname: isGIF ? "gif" : "webp"
     };
   }
   /*------------------------------------

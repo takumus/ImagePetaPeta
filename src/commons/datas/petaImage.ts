@@ -1,7 +1,10 @@
 import deepcopy from "deepcopy";
 
 export interface PetaImage {
-  fileName: string,
+  file: {
+    original: string
+    thumbnail: string
+  }
   name: string,
   fileDate: number,
   addDate: number,

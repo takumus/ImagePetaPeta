@@ -80,7 +80,7 @@ export default class VTile extends Vue {
   @Prop()
   tile!: Tile;
   @Prop()
-  fullsized = false;
+  original = false;
   @Prop()
   petaTags!: PetaTag[];
   @Ref("canvas")
@@ -90,7 +90,7 @@ export default class VTile extends Vue {
   loading = true;
   click: ClickChecker = new ClickChecker();
   mounted() {
-    this.changeFullsized();
+    this.changeOriginal();
     if (this.tile.petaImage.placeholder != "") {
       try {
         const pixels = decodePlaceholder(this.tile.petaImage.placeholder, 32, 32);
@@ -162,10 +162,10 @@ export default class VTile extends Vue {
       return petaTag.petaImages.indexOf(this.tile.petaImage.id) >= 0;
     });
   }
-  @Watch("fullsized")
-  changeFullsized() {
-    if (this.fullsized) {
-      this.imageURL = getImageURL(this.tile.petaImage, ImageType.FULLSIZED);
+  @Watch("original")
+  changeOriginal() {
+    if (this.original) {
+      this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
     } else {
       this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
     }

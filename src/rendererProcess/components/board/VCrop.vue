@@ -81,7 +81,7 @@ export default class VCrop extends Vue {
   clicker: ClickChecker = new ClickChecker();
   mounted() {
     if (this.petaPanel._petaImage) {
-      this.imageURL = getImageURL(this.petaPanel._petaImage, ImageType.FULLSIZED);
+      this.imageURL = getImageURL(this.petaPanel._petaImage, ImageType.ORIGINAL);
     }
     window.addEventListener("mousedown", this.mousedown);
     window.addEventListener("mousemove", this.mousemove);

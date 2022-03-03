@@ -1,9 +1,8 @@
-import { ImageType } from "@/commons/datas/imageType";
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 import { AnimatedGIF } from '@pixi/gif';
+import { getImage } from "./ImageLoader";
 export class PPanel extends PIXI.Sprite {
   public selected = false;
   public unselected = false;
@@ -23,7 +22,6 @@ export class PPanel extends PIXI.Sprite {
     fill: 0x666666,
     fontSize: 64
   });
-  private loader = new PIXI.Loader();
   private isSameAll = valueChecker().isSameAll;
   private defaultHeight = 0;
   public showNsfw = false;
@@ -40,57 +38,22 @@ export class PPanel extends PIXI.Sprite {
     this.defaultHeight = petaPanel.height / petaPanel.width;
     this.update();
   }
-  public loadTexture(type: ImageType): Promise<void> {
-    const url = this.petaPanel._petaImage ? getImageURL(this.petaPanel._petaImage, type): "";
+  public async load() {
     this.noImage = true;
-    return new Promise((res, rej) => {
-      if (!this.petaPanel._petaImage) {
-        rej("_petaImage is undefined");
-        return;
+    const result = await getImage(this.petaPanel._petaImage);
+    if (result.animatedGIF) {
+      if (this.gif) {
+        this.imageWrapper.removeChild(this.gif);
+        this.gif.destroy();
       }
-      const imageURL = getImageURL(this.petaPanel._petaImage, type);
-      const texture = PIXI.utils.TextureCache[url];
-      if (texture) {
-        if (!texture.baseTexture) {
-          rej("texture is destroyed");
-          return;
-        }
-        this.image.texture = texture;
-        this.noImage = false;
-        res();
-        return;
-      }
-      this.loader.add(url);
-      this.loader.onError.add((error) => {
-        this.loader.resources[imageURL]?.texture?.destroy();
-        rej("cannot load texture" + error);
-      });
-      this.loader.load((_, resources) => {
-        const resource = resources[imageURL];
-        const texture = resource?.texture;
-        const animated = resource?.animation as AnimatedGIF | undefined;
-        if (animated) {
-          if (this.gif) {
-            this.imageWrapper.removeChild(this.gif);
-            this.gif.destroy();
-          }
-          this.gif = animated;
-          this.imageWrapper.addChild(this.gif);
-          this.gif.onFrameChange = this.updateGIF;
-          this.gif.stop();
-          this.noImage = false;
-          res();
-          return;
-        }
-        if (texture?.baseTexture) {
-          this.image.texture = texture;
-          this.noImage = false;
-          res();
-          return;
-        }
-        rej("cannot load texture");
-      });
-    });
+      this.gif = result.animatedGIF;
+      this.gif.onFrameChange = this.updateGIF;
+      this.imageWrapper.addChild(this.gif);
+      this.noImage = false;
+    } else if (result.texture) {
+      this.image.texture = result.texture;
+      this.noImage = false;
+    }
   }
   public update() {
     // 前回の描画時と値に変更があるかチェック
@@ -210,7 +173,6 @@ export class PPanel extends PIXI.Sprite {
   public destroy() {
     this.image.destroy();
     this.gif?.destroy();
-    this.loader.destroy();
     super.destroy();
   }
   public get isGIF() {

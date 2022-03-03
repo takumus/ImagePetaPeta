@@ -44,7 +44,7 @@
                   v-for="(data) in visibleTiles"
                   :key="data.petaImage.id"
                   :tile="data"
-                  :fullsized="fullsized"
+                  :original="original"
                   :petaTags="petaTags"
                   @add="addPanel"
                   @select="selectThumbnail"
@@ -397,8 +397,8 @@ export default class VBrowser extends Vue {
     const tiles = this.tiles.filter((p) => p.visible);
     return tiles;
   }
-  get fullsized() {
-    return this.$settings.loadThumbnailsInFullsized && this.thumbnailWidth > this.$settings.thumbnails.size;
+  get original() {
+    return this.$settings.loadThumbnailsInOriginal && this.thumbnailWidth > this.$settings.thumbnails.size;
   }
   keyA() {
     if (Boolean(document.activeElement?.getAttribute("lock-keyboard")) == true) {
