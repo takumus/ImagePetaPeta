@@ -437,6 +437,7 @@ export default class VBrowser extends Vue {
       padding: 8px;
       >.header {
         width: 100%;
+        padding-bottom: 8px;
         >.input {
           display: block;
           max-width: 512px;
