@@ -34,6 +34,7 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import FuzzySearch from 'fuzzy-search';
 @Options({
   components: {
   }
@@ -50,6 +51,7 @@ export default class VComplement extends Vue {
   target?: VEditableLabel;
   currentIndex = 0;
   keyboards: Keyboards = new Keyboards();
+  searcher?: FuzzySearch<string>;
   mounted() {
     this.$components.complement = this;
     this.keyboards.down(["arrowup"], () => {
@@ -70,6 +72,9 @@ export default class VComplement extends Vue {
     this.keyboards.down(["enter"], () => {
       if (!this.target) return;
       this.select(this.filteredItems[this.currentIndex]);
+    });
+    this.keyboards.down(["escape"], () => {
+      this.blur();
     });
   }
   normalizeIndex() {
@@ -107,6 +112,9 @@ export default class VComplement extends Vue {
     if (input == this.target && this.show) {
       return;
     }
+    this.searcher = new FuzzySearch(items, undefined, {
+      sort: true
+    });
     this.target = input;
     this.filteredItems = [];
     this.items = items;
@@ -132,24 +140,29 @@ export default class VComplement extends Vue {
     if (!this.show || !this.target) {
       return;
     }
-    this.currentIndex = 0;
-    const value = this.target.tempText.toLowerCase().trim();
+    this.currentIndex = -1;
+    const value = this.target.tempText.trim();
     if (value == "") {
       this.filteredItems = [];
       this.keyboards.unlock();
       return;
     }
-    this.filteredItems = this.items.filter((item) => {
-      item = item.toLowerCase();
-      return item.indexOf(value) >= 0 && item != value;
-    }).sort((a, b) => {
-      const ai = a.toLowerCase().indexOf(value);
-      const bi = b.toLowerCase().indexOf(value);
-      if (ai == bi) {
-        return a.length - b.length;
-      }
-      return ai - bi;
-    });
+    // -Fuzzy
+    if (this.searcher) {
+      this.filteredItems = this.searcher?.search(value);
+    }
+    // -Takumu
+    // this.filteredItems = this.items.filter((item) => {
+    //   item = item.toLowerCase();
+    //   return item.indexOf(value) >= 0 && item != value;
+    // }).sort((a, b) => {
+    //   const ai = a.toLowerCase().indexOf(value);
+    //   const bi = b.toLowerCase().indexOf(value);
+    //   if (ai == bi) {
+    //     return a.length - b.length;
+    //   }
+    //   return ai - bi;
+    // });
     if (this.filteredItems.length == 0) {
       this.keyboards.unlock();
     } else {
