@@ -261,12 +261,12 @@ export default class VTile extends Vue {
       border-radius: var(--rounded);
       width: 100%;
       height: 100%;
-      background-color: rgba($color: #ffffff, $alpha: 0.4);
-      border: solid 4px #222222;
+      // background-color: rgba($color: #ffffff, $alpha: 0.4);
+      border: solid 4px var(--font-color);
       >.checkbox {
         border-radius: var(--rounded) 0px 0px 0px;
-        background-color: #222222;
-        color: #ffffff;
+        background-color: var(--font-color);
+        color: var(--bg-color);
         position: absolute;
         padding: 0px 6px;
         margin-right: -2px;

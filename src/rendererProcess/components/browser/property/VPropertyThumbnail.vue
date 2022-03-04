@@ -52,6 +52,7 @@ export default class VPropertyThumbnail extends Vue {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    border-radius: var(--rounded);
     >img {
       display: block;
       width: 100%;
