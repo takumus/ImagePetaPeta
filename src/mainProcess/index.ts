@@ -59,6 +59,8 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
   let dataPetaTags: DB<PetaTag>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
+
+  let cancelImportImages: (() => void) | undefined;
   //-------------------------------------------------------------------------------------------------//
   /*
     ファイルパスとDBの、検証・読み込み・作成
@@ -218,10 +220,9 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           dataLogger.mainError("filePath is empty");
           return 0;
         }
-        const filePaths = await file.readDirRecursive(filePath);
-        dataLogger.mainLog("return:", filePaths.length);
-        importImagesFromFilePaths(filePaths);
-        return filePaths.length;
+        // dataLogger.mainLog("return:", files.length);
+        importImagesFromFilePaths([filePath]);
+        return filePath.length;
       },
       /*------------------------------------
         URLからインポート
@@ -251,11 +252,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       importImagesFromFilePaths: async (event, filePaths) =>{
         try {
           dataLogger.mainLog("#Import Images From File Paths");
-          const _filePaths: string[] = [];
-          await promiseSerial(async (path, index) => {
-            _filePaths.push(...await file.readDirRecursive(path));
-          }, filePaths).value;
-          const images = (await importImagesFromFilePaths(_filePaths)).map((image) => image.id);
+          const images = (await importImagesFromFilePaths(filePaths)).map((image) => image.id);
           return images;
         } catch(e) {
           dataLogger.mainError(e);
@@ -273,6 +270,15 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           dataLogger.mainError(error);
         }
         return [];
+      },
+      /*------------------------------------
+        インポートのキャンセル
+      ------------------------------------*/
+      cancelImportImages: async () => {
+        if (cancelImportImages) {
+          cancelImportImages();
+          cancelImportImages = undefined;
+        }
       },
       /*------------------------------------
         全PetaImage取得
@@ -773,13 +779,41 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     画像インポート(ファイルパス)
   ------------------------------------*/
   async function importImagesFromFilePaths(filePaths: string[]) {
-    emitMainEvent("importImagesBegin", filePaths.length);
+    if (cancelImportImages) {
+      cancelImportImages();
+      cancelImportImages = undefined;
+    }
     dataLogger.mainLog("##Import Images From File Paths");
-    dataLogger.mainLog("files:", filePaths.length);
+    dataLogger.mainLog("###List Files", filePaths.length);
+    emitMainEvent("importImagesBegin");
+    emitMainEvent("importImagesProgress", {
+      progress: 0,
+      file: filePaths.join("\n"),
+      result: ImportImageResult.LIST
+    });
+    const _filePaths: string[] = [];
+    try {
+      for (let i = 0; i < filePaths.length; i++) {
+        const filePath = filePaths[i];
+        if (!filePath) continue;
+        const readDirResult = file.readDirRecursive(filePath, (filePaths) => {
+          console.log(filePaths);
+        });
+        cancelImportImages = readDirResult.cancel;
+        _filePaths.push(...(await readDirResult.files));
+      }
+    } catch (error) {
+      emitMainEvent("importImagesComplete", {
+        addedFileCount: 0,
+        fileCount: filePaths.length
+      });
+      return [];
+    }
+    dataLogger.mainLog("complete", _filePaths.length);
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
     const importImage = async (filePath: string, index: number) => {
-      dataLogger.mainLog("import:", index + 1, "/", filePaths.length);
+      dataLogger.mainLog("import:", index + 1, "/", _filePaths.length);
       let result = ImportImageResult.SUCCESS;
       try {
         const data = await file.readFile(filePath);
@@ -799,11 +833,25 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
         dataLogger.mainError(err);
         result = ImportImageResult.ERROR;
       }
-      emitMainEvent("importImagesProgress", index + 1, filePath, result);
+      emitMainEvent("importImagesProgress", {
+        progress: (index + 1) / _filePaths.length,
+        file: filePath,
+        result: result
+      });
     }
-    await promiseSerial(importImage, filePaths).value;
-    dataLogger.mainLog("return:", addedFileCount, "/", filePaths.length);
-    emitMainEvent("importImagesComplete", filePaths.length, addedFileCount);
+    const result = promiseSerial(importImage, _filePaths);
+    cancelImportImages = result.cancel;
+    try {
+      await result.value;
+    } catch (err) {
+      //
+    }
+    cancelImportImages = undefined;
+    dataLogger.mainLog("return:", addedFileCount, "/", _filePaths.length);
+    emitMainEvent("importImagesComplete", {
+      addedFileCount: addedFileCount,
+      fileCount: _filePaths.length
+    });
     if (dataSettings.data.autoAddTag) {
       emitMainEvent("updatePetaTags");
     }
@@ -813,7 +861,11 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     画像インポート(バッファー)
   ------------------------------------*/
   async function importImagesFromBuffers(buffers: Buffer[], name: string) {
-    emitMainEvent("importImagesBegin", buffers.length);
+    if (cancelImportImages) {
+      cancelImportImages();
+      cancelImportImages = undefined;
+    }
+    emitMainEvent("importImagesBegin");
     dataLogger.mainLog("##Import Images From Buffers");
     dataLogger.mainLog("buffers:", buffers.length);
     let addedFileCount = 0;
@@ -835,11 +887,21 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
         dataLogger.mainError(err);
         result = ImportImageResult.ERROR;
       }
-      emitMainEvent("importImagesProgress", index + 1, name, result);
+      emitMainEvent("importImagesProgress", {
+        progress: (index + 1) / buffers.length,
+        file: name,
+        result: result
+      });
     }
-    await promiseSerial(importImage, buffers).value;
+    const result =  promiseSerial(importImage, buffers);
+    cancelImportImages = result.cancel;
+    await result.value;
+    cancelImportImages = undefined;
     dataLogger.mainLog("return:", addedFileCount, "/", buffers.length);
-    emitMainEvent("importImagesComplete", buffers.length, addedFileCount);
+    emitMainEvent("importImagesComplete", {
+      addedFileCount: addedFileCount,
+      fileCount: buffers.length
+    });
     if (dataSettings.data.autoAddTag) {
       emitMainEvent("updatePetaTags");
     }

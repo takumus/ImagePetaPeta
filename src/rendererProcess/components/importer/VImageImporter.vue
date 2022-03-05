@@ -22,6 +22,11 @@
       <section class="confirms">
         <button
           tabindex="-1"
+          @click="cancel">
+          Cancel
+        </button>
+        <button
+          tabindex="-1"
           @click="ok"
           v-if="this.hasErrors">
           OK
@@ -59,24 +64,22 @@ export default class VImageImporter extends Vue {
   hasErrors = false;
   log = "";
   currentMousePosition = new Vec2();
-  fileCount = 0;
   mounted() {
-    API.on("importImagesProgress", (e, progress, file, result) => {
-      this.progress = Math.floor(progress / this.fileCount * 100);
-      this.log = result + " -> " + file + "\n" + this.log;
+    API.on("importImagesProgress", (e, params) => {
+      this.progress = Math.floor(params.progress * 100);
+      this.log = params.result + " -> " + params.file + "\n" + this.log;
     });
-    API.on("importImagesBegin", (e, fileCount) => {
+    API.on("importImagesBegin", (e) => {
       this.progress = 0;
       this.loading = true;
       this.hasErrors = false;
       this.log = "";
-      this.fileCount = fileCount;
       setCursor("wait");
     });
-    API.on("importImagesComplete", (e, fileCount, addedFileCount) => {
-      if (fileCount != addedFileCount) {
+    API.on("importImagesComplete", (e, params) => {
+      if (params.fileCount != params.addedFileCount) {
         this.hasErrors = true;
-        this.log = `Error!\n${addedFileCount}/${fileCount} files added.` + "\n" + this.log;
+        this.log = `Error!\n${params.addedFileCount}/${params.fileCount} files added.` + "\n" + this.log;
       } else {
         setTimeout(() => {
           this.loading = false;
@@ -132,6 +135,9 @@ export default class VImageImporter extends Vue {
   ok() {
     this.hasErrors = false;
     this.loading = false;
+  }
+  cancel() {
+    API.send("cancelImportImages");
   }
 }
 </script>

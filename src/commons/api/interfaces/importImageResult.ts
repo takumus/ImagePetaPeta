@@ -1,5 +1,6 @@
 export enum ImportImageResult {
   SUCCESS = "success",
   EXISTS = "exists",
-  ERROR = "error"
+  ERROR = "error",
+  LIST = "list"
 }
