@@ -22,14 +22,15 @@
       <section class="confirms">
         <button
           tabindex="-1"
-          @click="cancel">
-          Cancel
+          @click="cancel"
+          v-if="!canceled">
+          {{$t("imageImporter.cancel")}}
         </button>
         <button
           tabindex="-1"
           @click="ok"
-          v-if="this.hasErrors">
-          OK
+          v-if="hasErrors">
+          {{$t("shared.closeButton")}}
         </button>
       </section>
     </article>
@@ -64,6 +65,7 @@ export default class VImageImporter extends Vue {
   hasErrors = false;
   log = "";
   currentMousePosition = new Vec2();
+  canceled = false;
   mounted() {
     API.on("importImagesProgress", (e, params) => {
       this.progress = Math.floor(params.progress * 100);
@@ -74,6 +76,7 @@ export default class VImageImporter extends Vue {
       this.loading = true;
       this.hasErrors = false;
       this.log = "";
+      this.canceled = false;
       setCursor("wait");
     });
     API.on("importImagesComplete", (e, params) => {
@@ -85,6 +88,7 @@ export default class VImageImporter extends Vue {
           this.loading = false;
         }, 500);
       }
+      this.canceled = true;
       setDefaultCursor();
     });
     document.addEventListener('drop', async (event) => {

@@ -137,7 +137,8 @@ const ja = {
     },
   },
   imageImporter: {
-    importing: "画像ファイルを読込中..."
+    importing: "画像ファイルを読込中...",
+    cancel: "中止"
   }
 };
 export default ja;
