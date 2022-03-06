@@ -159,7 +159,7 @@ export default class VTile extends Vue {
   }
   get myPetaTags() {
     return this.petaTags.filter((petaTag) => {
-      return petaTag.petaImages.indexOf(this.tile.petaImage.id) >= 0;
+      return petaTag.petaImages.includes(this.tile.petaImage.id);
     });
   }
   @Watch("original")

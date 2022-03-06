@@ -86,7 +86,7 @@ export default class VSearch extends Vue {
     this.selectedPetaTags.splice(index, 1);
     if (value != "") {
       const petaTag = this.petaTags.find((petaTag) => petaTag.name == value);
-      if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+      if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
         this.selectedPetaTags.splice(index, 0, petaTag);
       }
     }
@@ -94,7 +94,7 @@ export default class VSearch extends Vue {
   }
   addSelectedTag(tagName: string) {
     const petaTag = this.petaTags.find((petaTag) => petaTag.name == tagName);
-    if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+    if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
       this.selectedPetaTags.push(petaTag);
     }
     this.$nextTick(() => {
@@ -106,7 +106,7 @@ export default class VSearch extends Vue {
     if (!Keyboards.pressedOR("shift") || single) {
       this.selectedPetaTags.length = 0;
     }
-    if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+    if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
       this.selectedPetaTags.push(petaTag);
     }
   }
@@ -115,7 +115,7 @@ export default class VSearch extends Vue {
   }
   get complementItems() {
     return this.petaTags.filter((petaTag) => {
-      return this.selectedPetaTags.indexOf(petaTag) < 0
+      return !this.selectedPetaTags.includes(petaTag)
     }).map((petaTag) => {
       return petaTag.name;
     });

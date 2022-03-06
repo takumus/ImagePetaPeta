@@ -98,7 +98,7 @@ export default class VTags extends Vue {
     if (!Keyboards.pressed("shift") || single) {
       this.selectedPetaTags.length = 0;
     }
-    if (petaTag && this.selectedPetaTags.indexOf(petaTag) < 0) {
+    if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
       this.selectedPetaTags.push(petaTag);
     }
   }
@@ -107,7 +107,7 @@ export default class VTags extends Vue {
       return {
         petaTag: petaTag,
         count: petaTag.petaImages.filter((id) => this.petaImagesArray.find((petaImage) => petaImage.id == id)).length,
-        selected: this.selectedPetaTags.indexOf(petaTag) >= 0,
+        selected: this.selectedPetaTags.includes(petaTag),
         readonly: false
       };
     })

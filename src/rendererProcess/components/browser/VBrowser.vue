@@ -344,7 +344,7 @@ export default class VBrowser extends Vue {
       let result = true;
       this.selectedPetaTags.forEach((k) => {
         const petaTag = this.petaTags.find((petaTag) => petaTag.id == k.id);
-        if (petaTag && petaTag.petaImages.indexOf(d.id) < 0) {
+        if (petaTag && !petaTag.petaImages.includes(d.id)) {
           result = false;
         }
       });

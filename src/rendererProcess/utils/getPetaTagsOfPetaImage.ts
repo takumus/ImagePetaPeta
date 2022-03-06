@@ -3,6 +3,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
 
 export function getPetaTagsOfPetaImage(petaImage: PetaImage, allPetaTags: PetaTag[]) {
   return allPetaTags.filter((petaTag) => {
-    return petaTag.petaImages.indexOf(petaImage.id) >= 0
+    return petaTag.petaImages.includes(petaImage.id)
   });
 }
