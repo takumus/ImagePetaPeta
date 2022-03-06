@@ -306,6 +306,17 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
         dataLogger.mainLog("#Update PetaImages");
         try {
           await promiseSerial((data) => updatePetaImage(data, mode), datas).value;
+          if (mode == UpdateMode.REMOVE) {
+            await promiseSerial(async (petaTag) => {
+              petaTag.petaImages = petaTag.petaImages.filter((petaImageId) => {
+                return !datas.find((petaImage) => {
+                  return petaImage.id == petaImageId;
+                });
+              });
+              updatePetaTag(petaTag, UpdateMode.UPDATE);
+            }, await dataPetaTags.find({})).value;
+            emitMainEvent("updatePetaTags");
+          }
         } catch (err) {
           dataLogger.mainError(err);
           showError("M", 4, "Update PetaImages Error", String(err));
