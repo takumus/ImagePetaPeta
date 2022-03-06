@@ -746,6 +746,9 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     dataLogger.mainLog("updated");
     return true;
   }
+  /*------------------------------------
+    PetaTag更新
+  ------------------------------------*/
   async function updatePetaTag(tag: PetaTag, mode: UpdateMode) {
     dataLogger.mainLog("##Update PetaTag");
     dataLogger.mainLog("mode:", mode);
@@ -755,6 +758,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       dataLogger.mainLog("removed");
       return true;
     }
+    tag.petaImages = Array.from(new Set(tag.petaImages));
     await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
     dataLogger.mainLog("updated");
     return true;
