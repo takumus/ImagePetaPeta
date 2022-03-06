@@ -106,7 +106,7 @@ export default class VTags extends Vue {
     const browserTags = this.petaTags.map((petaTag): BrowserTag => {
       return {
         petaTag: petaTag,
-        count: petaTag.petaImages.filter((id) => this.petaImagesArray.find((petaImage) => petaImage.id == id)).length,
+        count: petaTag.petaImages.length,
         selected: this.selectedPetaTags.includes(petaTag),
         readonly: false
       };
