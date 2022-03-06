@@ -90,7 +90,6 @@ export default class VSearch extends Vue {
         this.selectedPetaTags.splice(index, 0, petaTag);
       }
     }
-    this.$components.complement.updateItems(this.complementItems);
   }
   addSelectedTag(tagName: string) {
     const petaTag = this.petaTags.find((petaTag) => petaTag.name == tagName);
@@ -98,7 +97,6 @@ export default class VSearch extends Vue {
       this.selectedPetaTags.push(petaTag);
     }
     this.$nextTick(() => {
-      this.$components.complement.updateItems(this.complementItems);
       this.searchInput.edit();
     });
   }
@@ -119,6 +117,10 @@ export default class VSearch extends Vue {
     }).map((petaTag) => {
       return petaTag.name;
     });
+  }
+  @Watch("complementItems")
+  updateComplements() {
+    this.$components.complement.updateItems(this.complementItems);
   }
 }
 </script>

@@ -112,12 +112,9 @@ export default class VComplement extends Vue {
     if (input == this.target && this.show) {
       return;
     }
-    this.searcher = new FuzzySearch(items, undefined, {
-      sort: true
-    });
+    this.updateItems(items);
     this.target = input;
     this.filteredItems = [];
-    this.items = items;
     input.labelInput.addEventListener("blur", this.blur);
     input.labelInput.addEventListener("input", this.input);
     this.show = true;
@@ -126,6 +123,9 @@ export default class VComplement extends Vue {
   }
   updateItems(items: string[]) {
     this.items = items;
+    this.searcher = new FuzzySearch(items, undefined, {
+      sort: true
+    });
   }
   blur() {
     this.show = false;
@@ -134,6 +134,8 @@ export default class VComplement extends Vue {
     if (this.target) {
       this.target.labelInput.removeEventListener("blur", this.blur);
       this.target.labelInput.removeEventListener("input", this.input);
+      this.target.labelInput.blur();
+      this.target = undefined;
     }
   }
   input() {
@@ -173,13 +175,12 @@ export default class VComplement extends Vue {
     }
   }
   select(item?: string) {
-    setTimeout(() => {
-      if (this.target) {
-        this.target.tempText = item || this.target.tempText;
-        this.blur();
-        this.target.labelInput.blur();
-      }
-    }, 1);
+    // setTimeout(() => {
+    if (this.target) {
+      this.target.tempText = item || this.target.tempText;
+      this.blur();
+    }
+    // }, 1);
   }
 }
 </script>
