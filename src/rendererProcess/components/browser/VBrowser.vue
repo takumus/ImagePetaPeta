@@ -99,6 +99,7 @@ import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
+import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 @Options({
   components: {
     VTile,
@@ -401,7 +402,7 @@ export default class VBrowser extends Vue {
     return this.$settings.loadThumbnailsInOriginal && this.thumbnailWidth > this.$settings.thumbnails.size;
   }
   keyA() {
-    if (Boolean(document.activeElement?.getAttribute("lock-keyboard")) == true) {
+    if (isKeyboardLocked()) {
       return;
     }
     if (Keyboards.pressedOR("control", "meta")) {

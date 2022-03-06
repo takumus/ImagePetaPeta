@@ -15,7 +15,6 @@
       ref="label"
       placeholder=""
       :contenteditable="editing"
-      lock-keyboard="true"
       @blur="apply"
       @focus="focus($event)"
       @dblclick="edit(true)"
@@ -23,6 +22,7 @@
       @input="input"
       @keydown.enter="preventLineBreak"
       @keydown.tab="preventLineBreak"
+      lock-keyboard
     >
     </span>
   </article>
