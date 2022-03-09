@@ -4,7 +4,7 @@
 お絵かき屋さんのための、画像閲覧、管理ソフト。PureRefのような物です。
 ## ダウンロード
 下記urlのzipファイルをダウンロードしてください。  
-<https://github.com/takumus/ImagePetaPeta/releases/tag/1.9.3-beta>
+<https://github.com/takumus/ImagePetaPeta/releases/tag/1.9.5-beta>
 ## インストール
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
 <img src="./README/1.png" width="256px">
