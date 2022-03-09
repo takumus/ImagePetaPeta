@@ -31,7 +31,12 @@
           v-show="!loading"
           loading="lazy"
           @load="loaded"
+          class="image"
         >
+        <section
+          class="transparent-background"
+        >
+        </section>
       </div>
       <div class="info">
         <span
@@ -74,6 +79,7 @@ import { ImageType } from "@/commons/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
 import { log } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
+import TransparentBackground from "@/@assets/transparentBackground.png";
 @Options({
   components: {
   },
@@ -165,6 +171,9 @@ export default class VTile extends Vue {
       return petaTag.petaImages.includes(this.tile.petaImage.id);
     });
   }
+  get transparentBackground() {
+    return TransparentBackground;
+  }
   @Watch("original")
   changeOriginal() {
     if (this.original) {
@@ -206,8 +215,8 @@ export default class VTile extends Vue {
         border-radius: var(--rounded);
         padding: 2px;
       }
-      >img {
-        z-index: 0;
+      >.image {
+        z-index: 1;
         position: absolute;
         top: 0px;
         left: 0px;
@@ -215,16 +224,27 @@ export default class VTile extends Vue {
         width: 100%;
         height: 100%;
       }
+      >.transparent-background {
+        z-index: 0;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-repeat: repeat;
+        background-image: url("~@/@assets/transparentBackground.png");
+      }
       >.placeholder {
         position: relative;
-        z-index: 1;
+        z-index: 2;
         top: 0px;
         left: 0px;
         display: block;
         width: 100%;
         height: 100%;
         &.loaded {
-          animation: fadein-keyframes 200ms ease-in-out 0s 1 forwards;
+          animation: fadein-keyframes 300ms ease-in-out 0s 1 forwards;
           @keyframes fadein-keyframes {
             0% {
               opacity: 1;
@@ -262,8 +282,9 @@ export default class VTile extends Vue {
       position: absolute;
       bottom: 0px;
       pointer-events: none;
-      word-break: break-word;
+      overflow-wrap: break-word;
       padding: 8px;
+      line-height: 1.2em;
       >.tags {
         background-color: rgba($color: (#000000), $alpha: 0.5);
         color: #ffffff;
