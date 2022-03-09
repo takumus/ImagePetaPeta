@@ -128,6 +128,8 @@ export default class VBrowser extends Vue {
   thumbnailWidth = 0;
   areaMaxY = 0;
   areaMinY = 0;
+  areaPreVisibleMaxY = 0;
+  areaPreVisibleMinY = 0;
   scrollHeight = 0;
   scrollAreaHeight = 0;
   sortMode = SortMode.ADD_DATE;
@@ -178,9 +180,12 @@ export default class VBrowser extends Vue {
     }
   }
   updateScrollArea(event?: Event) {
-    const offset = this.scrollAreaHeight * 0.1;
-    this.areaMinY = this.thumbnails.scrollTop - offset;
-    this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + offset;
+    const preVisibleOffset = this.scrollAreaHeight * 2;
+    const visibleOffset = this.scrollAreaHeight * 0.5;
+    this.areaMinY = this.thumbnails.scrollTop - visibleOffset;
+    this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + visibleOffset;
+    this.areaPreVisibleMinY = this.thumbnails.scrollTop - preVisibleOffset;
+    this.areaPreVisibleMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + preVisibleOffset;
     if (this.scrollAreaHeight && event) {
       this.saveScrollPosition();
     }
@@ -389,13 +394,17 @@ export default class VBrowser extends Vue {
         visible: 
           (this.areaMinY < position.y && position.y < this.areaMaxY)
           ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
-          ||(this.areaMinY > position.y && position.y + height > this.areaMaxY)
+          ||(this.areaMinY > position.y && position.y + height > this.areaMaxY),
+        preVisible: 
+          (this.areaPreVisibleMinY < position.y && position.y < this.areaPreVisibleMaxY)
+          ||(this.areaPreVisibleMinY < position.y + height && position.y + height < this.areaPreVisibleMaxY)
+          ||(this.areaPreVisibleMinY > position.y && position.y + height > this.areaPreVisibleMaxY),
       }
     });
     return images;
   }
   get visibleTiles(): Tile[] {
-    const tiles = this.tiles.filter((p) => p.visible);
+    const tiles = this.tiles.filter((p) => p.preVisible);
     return tiles;
   }
   get original() {

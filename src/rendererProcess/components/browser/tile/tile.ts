@@ -6,5 +6,6 @@ export interface Tile {
   position: Vec2
   width: number,
   height: number,
-  visible: boolean
+  visible: boolean,
+  preVisible: boolean
 }

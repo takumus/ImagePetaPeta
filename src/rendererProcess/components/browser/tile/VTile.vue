@@ -20,7 +20,10 @@
         </div>
         <canvas
           ref="canvas"
-          v-if="loading"
+          class="placeholder"
+          :class="{
+            loaded: !loading
+          }"
         ></canvas>
         <img
           draggable="false"
@@ -90,15 +93,14 @@ export default class VTile extends Vue {
   loading = true;
   click: ClickChecker = new ClickChecker();
   mounted() {
-    this.changeOriginal();
     if (this.tile.petaImage.placeholder != "") {
       try {
-        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, 32, 32);
-        this.canvas.width = 32;
-        this.canvas.height = 32;
+        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, 8, 8);
+        this.canvas.width = 8;
+        this.canvas.height = 8;
         const ctx = this.canvas.getContext("2d");
         if (ctx){ 
-          const imageData = ctx.createImageData(32, 32);
+          const imageData = ctx.createImageData(8, 8);
           imageData.data.set(pixels);
           ctx.putImageData(imageData, 0, 0);
         }
@@ -106,6 +108,7 @@ export default class VTile extends Vue {
         log("blurhash error:", e);
       }
     }
+    this.changeVisible();
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
@@ -170,6 +173,12 @@ export default class VTile extends Vue {
       this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
     }
   }
+  @Watch("tile.visible")
+  changeVisible() {
+    if (this.tile.visible) {
+      this.changeOriginal();
+    }
+  }
 }
 </script>
 
@@ -206,7 +215,7 @@ export default class VTile extends Vue {
         width: 100%;
         height: 100%;
       }
-      >canvas {
+      >.placeholder {
         position: relative;
         z-index: 1;
         top: 0px;
@@ -214,6 +223,17 @@ export default class VTile extends Vue {
         display: block;
         width: 100%;
         height: 100%;
+        &.loaded {
+          animation: fadein-keyframes 200ms ease-in-out 0s 1 forwards;
+          @keyframes fadein-keyframes {
+            0% {
+              opacity: 1;
+            }
+            100% {
+              opacity: 0;
+            }
+          }
+        }
       }
       >.nsfw {
         z-index: 2;

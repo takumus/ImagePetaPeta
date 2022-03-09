@@ -1009,13 +1009,13 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       sharp(params.data)
       .raw()
       .ensureAlpha()
-      .resize(32, 32, { fit: "inside" })
+      .resize(8, 8, { fit: "inside" })
       .toBuffer((err, buffer, { width, height }) => {
         if (err) {
           rej(err);
         }
         try {
-          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4));
+          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 2, 2));
         } catch(e) {
           rej(e);
         }
