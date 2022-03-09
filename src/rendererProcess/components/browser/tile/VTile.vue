@@ -203,12 +203,14 @@ export default class VTile extends Vue {
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
+    transition: box-shadow 100ms ease-in-out;
     >.img {
       display: block;
       width: 100%;
       height: 100%;
       cursor: pointer;
       filter: brightness(0.7);
+      transition: filter 100ms ease-in-out;
       // background-color: #ffffff;
       &.selected-image {
         filter: brightness(1.0);
@@ -243,16 +245,10 @@ export default class VTile extends Vue {
         display: block;
         width: 100%;
         height: 100%;
+        opacity: 1;
+        transition: opacity 200ms ease-in-out;
         &.loaded {
-          animation: fadein-keyframes 300ms ease-in-out 0s 1 forwards;
-          @keyframes fadein-keyframes {
-            0% {
-              opacity: 1;
-            }
-            100% {
-              opacity: 0;
-            }
-          }
+          opacity: 0;
         }
       }
       >.nsfw {
