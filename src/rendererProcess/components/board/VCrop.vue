@@ -1,239 +1,136 @@
 <template>
-  <article class="crop-root">
-    <div class="wrapper">
-      <div
-        ref="size"
-        class="size"
-      >
-
-      </div>
-      <div
-        ref="images"
-        class="images"
-        :style="{
-          width: imageWidth + 'px',
-          height: imageHeight + 'px'
-        }"
-      >
-        <img
-          :src="imageURL"
-          draggable="false"
-          class="back"
-        >
-        <img
-          :src="imageURL"
-          draggable="false"
-          :style="{
-            clipPath: `polygon(${cropX}px ${cropY}px, ${cropX + renderCropWidth}px ${cropY}px, ${cropX + renderCropWidth}px ${cropY + renderCropHeight}px, ${cropX}px ${cropY + renderCropHeight}px)`
-          }"
-          class="front"
-        >
-        <div class="dottedbox">
-          <VDottedBox
-            :x="cropX"
-            :y="cropY"
-            :width="renderCropWidth"
-            :height="renderCropHeight"
-          />
-        </div>
-      </div>
-    </div>
+  <article
+    class="crop-root"
+    ref="cropRoot"
+  >
   </article>
 </template>
 
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
-import VDottedBox from "@/rendererProcess/components/utils/VDottedBox.vue";
+
 // Others
-import { Vec2 } from "@/commons/utils/vec2";
-import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { IMG_TAG_WIDTH } from "@/commons/defines";
-import { PetaPanel } from "@/commons/datas/petaPanel";
-import { MouseButton } from "@/commons/datas/mouseButton";
+import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
-import { ImageType } from "@/commons/datas/imageType";
+import * as PIXI from "pixi.js";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { Loader as PIXILoader } from '@pixi/loaders';
+import { AnimatedGIFLoader } from '@pixi/gif';
+import { PetaPanel } from "@/commons/datas/petaPanel";
+import { PPanel } from "./ppanels/PPanel";
+PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
-    VDottedBox
   },
   emits: [
-    "update"
+    "change"
   ]
 })
-export default class VCrop extends Vue {
+export default class VBoard extends Vue {
+  @Ref("cropRoot")
+  cropRoot!: HTMLElement;
   @Prop()
   petaPanel!: PetaPanel;
-  @Ref("size")
-  size!: HTMLDivElement;
-  @Ref("images")
-  images!: HTMLDivElement;
-  imageURL = "";
-  dragging = false;
-  dragBeginPosition: Vec2 = new Vec2();
-  cropBegin: Vec2 = new Vec2(0, 0);
-  cropEnd: Vec2 = new Vec2(1, 1);
-  imageWidth = 0;
-  imageHeight = 0;
-  imageResizer?: ResizeObserver;
-  clicker: ClickChecker = new ClickChecker();
+  click = new ClickChecker();
+  resizer?: ResizeObserver;
+  pixi!: PIXI.Application;
+  rootContainer = new PIXI.Container();
+  renderOrdered = false;
+  requestAnimationFrameHandle = 0;
+  stageRect = new Vec2();
+  mousePosition = new Vec2();
+  keyboards = new Keyboards();
   mounted() {
-    if (this.petaPanel._petaImage) {
-      this.imageURL = getImageURL(this.petaPanel._petaImage, ImageType.ORIGINAL);
-    }
-    window.addEventListener("mousedown", this.mousedown);
-    window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("mouseup", this.mouseup);
-    this.cropBegin.set(this.petaPanel.crop.position);
-    this.cropEnd.x = this.cropBegin.x + this.petaPanel.crop.width;
-    this.cropEnd.y = this.cropBegin.y + this.petaPanel.crop.height;
-    this.imageResizer = new ResizeObserver((entries: ResizeObserverEntry[]) => this.resizeImage(entries[0]!.contentRect));
-    this.imageResizer.observe(this.size);
+    this.pixi = new PIXI.Application({
+      resolution: window.devicePixelRatio,
+      antialias: true
+    });
+    this.pixi.stage.on("pointerdown", this.mousedown);
+    this.pixi.stage.on("pointerup", this.mouseup);
+    this.pixi.stage.on("pointerupoutside", this.mouseup);
+    this.pixi.stage.on("pointermove", this.mousemove);
+    this.pixi.stage.on("pointermoveoutside", this.mousemove);
+    this.pixi.stage.addChild(this.rootContainer);
+    this.cropRoot.appendChild(this.pixi.view);
+    this.pixi.stage.interactive = true;
+    this.pixi.ticker.stop();
+    this.resizer = new ResizeObserver((entries) => {
+      this.resize(entries[0]!.contentRect);
+    });
+    this.resizer.observe(this.cropRoot);
+    this.renderPIXI();
+    this.keyboards.enabled = true;
+    this.changePetaPanel();
   }
   unmounted() {
-    window.removeEventListener("mousedown", this.mousedown);
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("mouseup", this.mouseup);
-    this.imageResizer?.unobserve(this.size);
-    this.imageResizer?.disconnect();
+    this.resizer?.unobserve(this.cropRoot);
+    this.resizer?.disconnect();
+    this.cropRoot.removeChild(this.pixi.view);
+    this.pixi.destroy();
+    this.keyboards.destroy();
+    cancelAnimationFrame(this.requestAnimationFrameHandle);
   }
-  mousedown(e: MouseEvent) {
-    if (e.button != MouseButton.LEFT) return;
-    const imgRect = this.images.getBoundingClientRect();
-    const mouse = new Vec2(
-      (e.clientX - imgRect.x) / imgRect.width,
-      (e.clientY - imgRect.y) / imgRect.height
-    );
-    this.dragBeginPosition = mouse;
-    this.dragging = true;
-    this.cropBegin.set(mouse);
-    this.cropEnd.set(mouse);
-    this.dragging = true;
-    this.clicker.down(new Vec2(e.clientX, e.clientY));
+  resize(rect: DOMRectReadOnly) {
+    this.stageRect.x = rect.width;
+    this.stageRect.y = rect.height;
+    this.pixi.renderer.resize(rect.width, rect.height);
+    this.pixi.view.style.width = rect.width + "px";
+    this.pixi.view.style.height = rect.height + "px";
+    this.rootContainer.x = rect.width / 2;
+    this.rootContainer.y = rect.height / 2 ;
+    this.updateRect();
+    this.orderPIXIRender();
   }
-  mousemove(e: MouseEvent) {
-    this.clicker.move(new Vec2(e.clientX, e.clientY));
-    if (!this.dragging) return;
-    const imgRect = this.images.getBoundingClientRect();
-    const mouse = new Vec2(
-      (e.clientX - imgRect.x) / imgRect.width,
-      (e.clientY - imgRect.y) / imgRect.height
-    );
-    if (!this.clicker.isClick) {
-      this.cropEnd.set(mouse);
+  mousedown(e: PIXI.InteractionEvent) {
+    this.orderPIXIRender();
+  }
+  mouseup(e: PIXI.InteractionEvent) {
+    this.orderPIXIRender();
+  }
+  mousemove(e: PIXI.InteractionEvent) {
+    this.mousePosition = new Vec2(e.data.global);
+    this.click.move(this.mousePosition);
+    this.orderPIXIRender();
+  }
+  updateRect() {
+    //
+  }
+  animate() {
+    //
+  }
+  orderPIXIRender() {
+    this.renderOrdered = true;
+  }
+  renderPIXI() {
+    if (this.renderOrdered) {
+      this.animate();
+      this.pixi.render();
+      this.renderOrdered = false;
     }
+    this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
   }
-  mouseup(e: MouseEvent) {
-    if (this.dragging) {
-      if (this.clicker.isClick) {
-        //
-      } else {
-        let width = this.cropWidth;
-        let height = this.cropHeight;
-        this.petaPanel.crop.position.set(this.cropPosition);
-        if (width * IMG_TAG_WIDTH < 5) {
-          width = 5 / IMG_TAG_WIDTH;
-        }
-        if (height * IMG_TAG_WIDTH < 5) {
-          height = 5 / IMG_TAG_WIDTH;
-        }
-        this.petaPanel.crop.width = width;
-        this.petaPanel.crop.height = height;
-      }
-      this.$emit("update", this.petaPanel);
-    }
-    this.dragging = false;
-  }
-  get cropPosition() {
-    return new Vec2(
-      this.arrangeValue(Math.min(this.cropBegin.x, this.cropEnd.x)),
-      this.arrangeValue(Math.min(this.cropBegin.y, this.cropEnd.y))
-    );
-  }
-  get cropWidth() {
-    return Math.abs(this.arrangeValue(this.cropBegin.x) - this.arrangeValue(this.cropEnd.x));
-  }
-  get cropHeight() {
-    return Math.abs(this.arrangeValue(this.cropBegin.y) - this.arrangeValue(this.cropEnd.y));
-  }
-  arrangeValue(value: number) {
-    if (value < 0) return 0;
-    if (value > 1) return 1;
-    return value;
-  }
-  resizeImage(rect: DOMRectReadOnly) {
-    if (!this.petaPanel._petaImage) {
-      return;
-    }
-    if (this.petaPanel._petaImage.height / this.petaPanel._petaImage.width < rect.height / rect.width) {
-      this.imageWidth = rect.width;
-      this.imageHeight = rect.width * this.petaPanel._petaImage.height;
-    } else {
-      this.imageHeight = rect.height;
-      this.imageWidth = rect.height / this.petaPanel._petaImage.height;
-    }
-  }
-  get cropX() {
-    return this.cropPosition.x * this.imageWidth;
-  }
-  get cropY() {
-    return this.cropPosition.y * this.imageHeight;
-  }
-  get renderCropWidth() {
-    return this.cropWidth * this.imageWidth;
-  }
-  get renderCropHeight() {
-    return this.cropHeight * this.imageHeight;
+  @Watch("petaPanel")
+  changePetaPanel() {
+    console.log(this.petaPanel);
+    const pPanel = new PPanel(this.petaPanel);
+    this.rootContainer.addChild(pPanel);
+    (async () => {
+      await pPanel.load();
+      pPanel.update();
+    })();
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .crop-root {
+  position: absolute;
+  top: 0px;
+  left: 0px;
   width: 100%;
   height: 100%;
-  padding: 128px;
-  cursor: crosshair;
-  >.wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    >.images {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
-      >img {
-        position: absolute;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        &.back {
-          filter: invert(100%) brightness(30%);
-        }
-        &.front {
-          pointer-events: none;
-        }
-      }
-      >.dottedbox {
-        position: absolute;
-        z-index: 2;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-    }
-    >.size {
-      width: 100%;
-      height: 100%;
-    }
-  }
 }
 </style>
