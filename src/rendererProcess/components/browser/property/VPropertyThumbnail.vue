@@ -53,6 +53,8 @@ export default class VPropertyThumbnail extends Vue {
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
+    background-repeat: repeat;
+    background-image: url("~@/@assets/transparentBackground.png");
     >img {
       display: block;
       width: 100%;

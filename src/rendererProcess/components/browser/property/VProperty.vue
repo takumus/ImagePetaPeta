@@ -238,9 +238,6 @@ export default class VProperty extends Vue {
     width: 100%;
     height: 30%;
     overflow: hidden;
-    border-radius: var(--rounded);
-    box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.5);
-    background-color: var(--bg-color);
   }
   >.buttons {
     text-align: center;
