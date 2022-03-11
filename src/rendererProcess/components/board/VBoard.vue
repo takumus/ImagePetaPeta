@@ -521,16 +521,20 @@ export default class VBoard extends Vue {
     });
     this.pPanels = {};
     this.pTransformer.pPanels = this.pPanels;
-    await this.loadAllOriginal();
-    this.orderPIXIRender();
-    Object.values(this.pPanels).forEach((pPanel) => {
-      if (!pPanel.petaPanel.gif.stopped) {
-        pPanel.playGIF();
-      }
-    });
-    this.loading = false;
-    this.loadingProgress = 0;
-    this.loadingLog = "";
+    try {
+      await this.loadAllOriginal();
+      this.orderPIXIRender();
+      Object.values(this.pPanels).forEach((pPanel) => {
+        if (!pPanel.petaPanel.gif.stopped) {
+          pPanel.playGIF();
+        }
+      });
+      this.loading = false;
+      this.loadingProgress = 0;
+      this.loadingLog = "";
+    } catch (error) {
+      log("error", error);
+    }
   }
   async loadAllOriginal() {
     if (this.cancel) {
@@ -556,7 +560,7 @@ export default class VBoard extends Vue {
       await result.value;
       this.cancel = undefined;
     } catch (err) {
-      //
+      throw "canceled";
     }
   }
   async loadOriginal(petaPanel: PetaPanel) {
