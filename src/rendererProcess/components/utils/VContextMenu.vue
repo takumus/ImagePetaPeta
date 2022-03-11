@@ -65,6 +65,15 @@ export default class VContextMenu extends Vue {
     this.position.y = position.y + 8;
     this.items = items;
     this.show = true;
+    this.$nextTick(() => {
+      const rect = this.contextMenu.getBoundingClientRect();
+      if (rect.right > document.body.clientWidth) {
+        this.position.x = document.body.clientWidth - rect.width - 8;
+      }
+      if (rect.bottom > document.body.clientHeight) {
+        this.position.y = document.body.clientHeight - rect.height - 8;
+      }
+    });
   }
   select(item?: ContextMenuItem) {
     if (!this.show) return;
