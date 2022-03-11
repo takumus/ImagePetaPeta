@@ -35,8 +35,12 @@ export class PPanel extends PIXI.Sprite {
     this.cover.visible = false;
     this.coverLabel.visible = false;
     this.coverLabel.anchor.set(0.5, 0.5);
-    this.defaultHeight = petaPanel.height / petaPanel.width;
+    this.setPetaPanel(this.petaPanel);
     this.update();
+  }
+  public setPetaPanel(petaPanel: PetaPanel) {
+    this.petaPanel = petaPanel;
+    this.defaultHeight = petaPanel.height / petaPanel.width;
   }
   public async load() {
     this.noImage = true;
