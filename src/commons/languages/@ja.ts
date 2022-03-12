@@ -43,7 +43,8 @@ const ja = {
     },
     crop: {
       apply: "適用",
-      reset: "リセット"
+      reset: "リセット",
+      cancel: "キャンセル"
     },
     loading: "読込中..."
   },

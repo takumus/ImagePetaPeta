@@ -8,6 +8,7 @@
   >
     <button @click="updateCrop">{{$t("boards.crop.apply")}}</button>
     <button @click="resetCrop">{{$t("boards.crop.reset")}}</button>
+    <button @click="cancelCrop">{{$t("boards.crop.cancel")}}</button>
   </section>
   </article>
 </template>
@@ -218,18 +219,6 @@ export default class VBoard extends Vue {
     if (this.maxY > 1) {
       this.maxY = 1;
     }
-    this.petaPanel.crop.position.x = this.minX;
-    this.petaPanel.crop.position.y = this.minY;
-    this.petaPanel.crop.width = this.maxX - this.minX;
-    this.petaPanel.crop.height = this.maxY - this.minY;
-    // this.blackMask.clear();
-    // this.blackMask.beginFill(0xff0000, 0.3);
-    // this.blackMask.drawRect(
-    //   -this.stageRect.x / 2,
-    //   -this.stageRect.y / 2,
-    //   this.minX * this.width - this.pPanel.petaPanel.width / 2,
-    //   this.minY * this.width * this.petaPanel._petaImage.height - this.pPanel.petaPanel.height / 2
-    // );
   }
   orderPIXIRender() {
     this.renderOrdered = true;
@@ -243,6 +232,13 @@ export default class VBoard extends Vue {
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
   }
   updateCrop() {
+    this.petaPanel.crop.position.x = this.minX;
+    this.petaPanel.crop.position.y = this.minY;
+    this.petaPanel.crop.width = this.maxX - this.minX;
+    this.petaPanel.crop.height = this.maxY - this.minY;
+    this.$emit("update", this.petaPanel);
+  }
+  cancelCrop() {
     this.$emit("update", this.petaPanel);
   }
   resetCrop() {
@@ -278,14 +274,14 @@ export default class VBoard extends Vue {
   }
   get sevenCorners() {
     const corners = [
-      this.petaPanel.crop.position.clone(),
-      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width / 2, 0)),
-      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width, 0)),
-      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width, this.petaPanel.crop.height / 2)),
-      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width, this.petaPanel.crop.height)),
-      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width / 2, this.petaPanel.crop.height)),
-      this.petaPanel.crop.position.clone().add(new Vec2(0, this.petaPanel.crop.height)),
-      this.petaPanel.crop.position.clone().add(new Vec2(0, this.petaPanel.crop.height / 2)),
+      new Vec2(this.minX, this.minY),
+      new Vec2((this.maxX + this.minX) / 2, this.minY),
+      new Vec2(this.maxX, this.minY),
+      new Vec2(this.maxX, (this.maxY + this.minY) / 2),
+      new Vec2(this.maxX, this.maxY),
+      new Vec2((this.maxX + this.minX) / 2, this.maxY),
+      new Vec2(this.minX, this.maxY),
+      new Vec2(this.minX, (this.maxY + this.minY) / 2),
     ];
     return corners.map((p) => new Vec2(
       p.x * this.width,
