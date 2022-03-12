@@ -407,6 +407,7 @@ export default class VBoard extends Vue {
         }
       },
       {
+        skip: isMultiple || !pPanel.isGIF,
         separate: true
       },
       {
