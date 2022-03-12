@@ -79,8 +79,8 @@ export default class VBoard extends Vue {
     this.pixi.ticker.stop();
     this.pixi.stage.addChild(this.rootContainer);
     this.cropRoot.appendChild(this.pixi.view);
-    this.rootContainer.addChild(this.selectionContainer);
-    this.selectionContainer.addChild(this.blackMask, this.selection);
+    this.rootContainer.addChild(this.blackMask, this.selectionContainer);
+    this.selectionContainer.addChild(this.selection);
     this.selection.interactive = true;
     this.selection.on("pointerdown", this.beginMoveSelection);
     for (let i = 0; i < 8; i++) {
@@ -200,7 +200,6 @@ export default class VBoard extends Vue {
     if (this.dragging) {
       const diff = this.mousePosition.clone().sub(this.prevMousePosition);
       this.prevMousePosition = this.mousePosition.clone();
-      console.log(diff);
       diff.x /= this.width;
       diff.y /= this.height;
       this.minX += diff.x;
@@ -238,6 +237,36 @@ export default class VBoard extends Vue {
     this.corners.forEach((corner, i) => {
       this.sevenCorners[i]?.setTo(corner);
     });
+    this.blackMask.x = -this.rootContainer.x;
+    this.blackMask.y = -this.rootContainer.y;
+    const topLeft = new Vec2(this.selection.toGlobal(new Vec2(this.minX * this.width, this.minY * this.height)));
+    const bottomRight = new Vec2(topLeft).add(new Vec2((this.maxX - this.minX) * this.width, (this.maxY - this.minY) * this.height));
+    this.blackMask.clear();
+    this.blackMask.beginFill(0x000000, 0.5);
+    this.blackMask.drawRect(
+      0,
+      0,
+      this.stageRect.x,
+      topLeft.y
+    );
+    this.blackMask.drawRect(
+      0,
+      bottomRight.y,
+      this.stageRect.x,
+      this.stageRect.y - bottomRight.y
+    );
+    this.blackMask.drawRect(
+      0,
+      topLeft.y,
+      topLeft.x,
+      bottomRight.y - topLeft.y
+    );
+    this.blackMask.drawRect(
+      bottomRight.x,
+      topLeft.y,
+      this.stageRect.x - bottomRight.x,
+      bottomRight.y - topLeft.y
+    );
   }
   orderPIXIRender() {
     this.renderOrdered = true;
@@ -261,14 +290,10 @@ export default class VBoard extends Vue {
     this.$emit("update", this.petaPanel);
   }
   resetCrop() {
-    this.petaPanel.crop.position.x = 0;
-    this.petaPanel.crop.position.y = 0;
-    this.petaPanel.crop.width = 1;
-    this.petaPanel.crop.height = 1;
-    this.minX = this.petaPanel.crop.position.x;
-    this.minY = this.petaPanel.crop.position.y;
-    this.maxX = this.petaPanel.crop.width + this.petaPanel.crop.position.x;
-    this.maxY = this.petaPanel.crop.height + this.petaPanel.crop.position.y;
+    this.minX = 0;
+    this.minY = 0;
+    this.maxX = 1;
+    this.maxY = 1;
     this.orderPIXIRender();
   }
   get height() {
