@@ -2,14 +2,15 @@
   <article
     class="crop-root"
     ref="cropRoot"
+    v-show="loaded"
   >
-  <section
-    class="buttons"
-  >
-    <button @click="updateCrop">{{$t("boards.crop.apply")}}</button>
-    <button @click="resetCrop">{{$t("boards.crop.reset")}}</button>
-    <button @click="cancelCrop">{{$t("boards.crop.cancel")}}</button>
-  </section>
+    <section
+      class="buttons"
+    >
+      <button @click="updateCrop">{{$t("boards.crop.apply")}}</button>
+      <button @click="resetCrop">{{$t("boards.crop.reset")}}</button>
+      <button @click="cancelCrop">{{$t("boards.crop.cancel")}}</button>
+    </section>
   </article>
 </template>
 
@@ -63,13 +64,13 @@ export default class VBoard extends Vue {
   minY = 0;
   maxY = 0;
   dragging = false;
+  loaded = false;
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
       antialias: true,
       backgroundAlpha: 0
     });
-    this.pixi.stage.on("pointerdown", this.mousedown);
     this.pixi.stage.on("pointerup", this.mouseup);
     this.pixi.stage.on("pointerupoutside", this.mouseup);
     this.pixi.stage.on("pointermove", this.mousemove);
@@ -144,12 +145,8 @@ export default class VBoard extends Vue {
     this.rootContainer.y = rect.height / 2;
     this.orderPIXIRender();
   }
-  mousedown(e: PIXI.InteractionEvent) {
-    this.orderPIXIRender();
-  }
   mouseup(e: PIXI.InteractionEvent) {
     this.draggingControlPoint = undefined;
-    this.orderPIXIRender();
     this.dragging = false;
   }
   mousemove(e: PIXI.InteractionEvent) {
@@ -351,6 +348,7 @@ export default class VBoard extends Vue {
       }
       await this.pPanel.load();
       this.pPanel.playGIF();
+      this.loaded = true;
     })();
   }
 }
