@@ -110,8 +110,8 @@ export class PPanel extends PIXI.Sprite {
     const imageHeight = panelWidth * tempImageHeight * (1 / this.petaPanel.crop.width);
     this.image.width = imageWidth;
     this.image.height = imageHeight;
-    this.image.x = -panelWidth / 2 - (flippedX ? 1 - this.petaPanel.crop.position.x - this.petaPanel.crop.width : this.petaPanel.crop.position.x) * imageWidth;
-    this.image.y = -panelHeight / 2 - (flippedY ? 1 - this.petaPanel.crop.position.y - this.petaPanel.crop.height : this.petaPanel.crop.position.y) * imageHeight;
+    this.image.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
+    this.image.y = -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
     if (this.gif) {
       this.gif.width = this.image.width;
       this.gif.height = this.image.height;
