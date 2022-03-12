@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 export class PControlPoint extends PIXI.Container {
-  size = new PIXI.Graphics();
-  rotate = new PIXI.Graphics();
+  public size = new PIXI.Graphics();
+  public rotate = new PIXI.Graphics();
   public currentRotation = 0;
+  public xPosition: -1 | 0 | 1 = 0;
+  public yPosition: -1 | 0 | 1 = 0;
   constructor() {
     super();
     this.size.interactive = true;
