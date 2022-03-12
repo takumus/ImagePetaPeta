@@ -3,6 +3,12 @@
     class="crop-root"
     ref="cropRoot"
   >
+  <section
+    class="buttons"
+  >
+    <button @click="updateCrop">{{$t("boards.crop.apply")}}</button>
+    <button @click="resetCrop">{{$t("boards.crop.reset")}}</button>
+  </section>
   </article>
 </template>
 
@@ -59,7 +65,7 @@ export default class VBoard extends Vue {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
       antialias: true,
-      transparent: true
+      backgroundAlpha: 0
     });
     this.pixi.stage.on("pointerdown", this.mousedown);
     this.pixi.stage.on("pointerup", this.mouseup);
@@ -70,6 +76,7 @@ export default class VBoard extends Vue {
     this.pixi.ticker.stop();
     this.pixi.stage.addChild(this.rootContainer);
     this.cropRoot.appendChild(this.pixi.view);
+    this.rootContainer.addChild(this.blackMask);
     this.rootContainer.addChild(this.selectionContainer);
     this.selectionContainer.addChild(this.selection);
     for (let i = 0; i < 8; i++) {
@@ -99,7 +106,6 @@ export default class VBoard extends Vue {
       this.corners.push(cp);
     }
     this.selectionContainer.addChild(...this.corners);
-    this.selectionContainer.addChild(this.blackMask);
     PIXI.Ticker.shared.add(this.updateAnimatedGIF);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0]!.contentRect);
@@ -136,9 +142,6 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   mouseup(e: PIXI.InteractionEvent) {
-    if (this.draggingControlPoint) {
-      this.$emit("update", this.petaPanel);
-    }
     this.draggingControlPoint = undefined;
     this.orderPIXIRender();
   }
@@ -159,19 +162,22 @@ export default class VBoard extends Vue {
     if (!this.pPanel) {
       return;
     }
+    if (!this.petaPanel._petaImage) {
+      return;
+    }
     this.selection.setCorners(this.sevenCorners);
     this.selection.update();
     this.pPanel.position.x = 0;
     this.pPanel.position.y = 0;
     this.pPanel.petaPanel.width = this.width;
-    this.pPanel.petaPanel.height = this.width * (this.pPanel.petaPanel._petaImage?.height || 0);
+    this.pPanel.petaPanel.height = this.height;
     this.selectionContainer.x = -this.pPanel.petaPanel.width / 2;
     this.selectionContainer.y = -this.pPanel.petaPanel.height / 2;
     this.pPanel.update();
     this.corners.forEach((corner, i) => {
       this.sevenCorners[i]?.setTo(corner);
     });
-    if (this.draggingControlPoint && this.petaPanel._petaImage) {
+    if (this.draggingControlPoint) {
       const pos = this.selectionContainer.toLocal(this.mousePosition);
       if (this.draggingControlPoint.xPosition != 0) {
         // this.draggingControlPoint.x = pos.x;
@@ -186,10 +192,10 @@ export default class VBoard extends Vue {
         this.maxX = pos.x / this.width;
       }
       if (this.draggingControlPoint.yPosition == -1) {
-        this.minY = pos.y / (this.width * this.petaPanel._petaImage.height);
+        this.minY = pos.y / this.height;
       }
       if (this.draggingControlPoint.yPosition == 1) {
-        this.maxY = pos.y / (this.width * this.petaPanel._petaImage.height);
+        this.maxY = pos.y / this.height;
       }
     }
     const minX = Math.min(this.minX, this.maxX);
@@ -216,6 +222,14 @@ export default class VBoard extends Vue {
     this.petaPanel.crop.position.y = this.minY;
     this.petaPanel.crop.width = this.maxX - this.minX;
     this.petaPanel.crop.height = this.maxY - this.minY;
+    // this.blackMask.clear();
+    // this.blackMask.beginFill(0xff0000, 0.3);
+    // this.blackMask.drawRect(
+    //   -this.stageRect.x / 2,
+    //   -this.stageRect.y / 2,
+    //   this.minX * this.width - this.pPanel.petaPanel.width / 2,
+    //   this.minY * this.width * this.petaPanel._petaImage.height - this.pPanel.petaPanel.height / 2
+    // );
   }
   orderPIXIRender() {
     this.renderOrdered = true;
@@ -227,6 +241,23 @@ export default class VBoard extends Vue {
       this.renderOrdered = false;
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
+  }
+  updateCrop() {
+    this.$emit("update", this.petaPanel);
+  }
+  resetCrop() {
+    this.petaPanel.crop.position.x = 0;
+    this.petaPanel.crop.position.y = 0;
+    this.petaPanel.crop.width = 1;
+    this.petaPanel.crop.height = 1;
+    this.minX = this.petaPanel.crop.position.x;
+    this.minY = this.petaPanel.crop.position.y;
+    this.maxX = this.petaPanel.crop.width + this.petaPanel.crop.position.x;
+    this.maxY = this.petaPanel.crop.height + this.petaPanel.crop.position.y;
+    this.orderPIXIRender();
+  }
+  get height() {
+    return this.width * (this.petaPanel._petaImage?.height || 0);
   }
   get width() {
     if (!this.pPanel || !this.petaPanel._petaImage) {
@@ -256,10 +287,9 @@ export default class VBoard extends Vue {
       this.petaPanel.crop.position.clone().add(new Vec2(0, this.petaPanel.crop.height)),
       this.petaPanel.crop.position.clone().add(new Vec2(0, this.petaPanel.crop.height / 2)),
     ];
-    const height = (this.petaPanel._petaImage?.height || 0) * this.width;
     return corners.map((p) => new Vec2(
       p.x * this.width,
-      p.y * height
+      p.y * this.height
     ));
   }
   @Watch("petaPanel")
@@ -301,5 +331,12 @@ export default class VBoard extends Vue {
   height: 100%;
   background-repeat: repeat;
   background-image: url("~@/@assets/transparentBackground.png");
+  >.buttons {
+    display: block;
+    position: absolute;
+    transform: translateX(-50%);
+    bottom: 8px;
+    left: 50%;
+  }
 }
 </style>

@@ -41,6 +41,10 @@ const ja = {
     addManyImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像をボードに追加しますか?`
     },
+    crop: {
+      apply: "適用",
+      reset: "リセット"
+    },
     loading: "読込中..."
   },
   browser: {

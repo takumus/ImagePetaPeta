@@ -701,7 +701,6 @@ export default class VBoard extends Vue {
     left: 0px;
     width: 100%;
     height: 100%;
-    background-color: rgba($color: #000000, $alpha: 0.7);
   }
   >.info {
     position: absolute;
