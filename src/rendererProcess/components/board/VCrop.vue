@@ -52,6 +52,7 @@ export default class VBoard extends Vue {
   requestAnimationFrameHandle = 0;
   stageRect = new Vec2();
   mousePosition = new Vec2();
+  prevMousePosition = new Vec2();
   keyboards = new Keyboards();
   selection: PSelection = new PSelection();
   pPanel: PPanel | undefined;
@@ -62,6 +63,7 @@ export default class VBoard extends Vue {
   maxX = 0;
   minY = 0;
   maxY = 0;
+  dragging = false;
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -77,9 +79,10 @@ export default class VBoard extends Vue {
     this.pixi.ticker.stop();
     this.pixi.stage.addChild(this.rootContainer);
     this.cropRoot.appendChild(this.pixi.view);
-    this.rootContainer.addChild(this.blackMask);
     this.rootContainer.addChild(this.selectionContainer);
-    this.selectionContainer.addChild(this.selection);
+    this.selectionContainer.addChild(this.blackMask, this.selection);
+    this.selection.interactive = true;
+    this.selection.on("pointerdown", this.beginMoveSelection);
     for (let i = 0; i < 8; i++) {
       const cp = new PControlPoint();
       cp.rotate.interactive = false;
@@ -119,6 +122,10 @@ export default class VBoard extends Vue {
   startDrag(e: PIXI.InteractionEvent, controlPoint: PControlPoint) {
     this.draggingControlPoint = controlPoint;
   }
+  beginMoveSelection(e: PIXI.InteractionEvent) {
+    this.prevMousePosition = new Vec2(e.data.global);
+    this.dragging = true;
+  }
   unmounted() {
     this.resizer?.unobserve(this.cropRoot);
     this.resizer?.disconnect();
@@ -145,47 +152,12 @@ export default class VBoard extends Vue {
   mouseup(e: PIXI.InteractionEvent) {
     this.draggingControlPoint = undefined;
     this.orderPIXIRender();
+    this.dragging = false;
   }
   mousemove(e: PIXI.InteractionEvent) {
     this.mousePosition = new Vec2(e.data.global);
-    this.click.move(this.mousePosition);
-    this.orderPIXIRender();
-  }
-  updateAnimatedGIF(deltaTime: number) {
-    if (this.pPanel?.isGIF) {
-      this.pPanel.updateGIF(deltaTime);
-    }
-  }
-  updateRect() {
-    //
-  }
-  animate() {
-    if (!this.pPanel) {
-      return;
-    }
-    if (!this.petaPanel._petaImage) {
-      return;
-    }
-    this.selection.setCorners(this.sevenCorners);
-    this.selection.update();
-    this.pPanel.position.x = 0;
-    this.pPanel.position.y = 0;
-    this.pPanel.petaPanel.width = this.width;
-    this.pPanel.petaPanel.height = this.height;
-    this.selectionContainer.x = -this.pPanel.petaPanel.width / 2;
-    this.selectionContainer.y = -this.pPanel.petaPanel.height / 2;
-    this.pPanel.update();
-    this.corners.forEach((corner, i) => {
-      this.sevenCorners[i]?.setTo(corner);
-    });
     if (this.draggingControlPoint) {
       const pos = this.selectionContainer.toLocal(this.mousePosition);
-      if (this.draggingControlPoint.xPosition != 0) {
-        // this.draggingControlPoint.x = pos.x;
-      }
-      if (this.draggingControlPoint.yPosition != 0) {
-        // this.draggingControlPoint.y = pos.y;
-      }
       if (this.draggingControlPoint.xPosition == -1) {
         this.minX = pos.x / this.width;
       }
@@ -219,6 +191,53 @@ export default class VBoard extends Vue {
     if (this.maxY > 1) {
       this.maxY = 1;
     }
+    this.selection.hitArea = new PIXI.Rectangle(
+      this.minX * this.width,
+      this.minY * this.height,
+      (this.maxX - this.minX) * this.width,
+      (this.maxY - this.minY) * this.height
+    );
+    if (this.dragging) {
+      const diff = this.mousePosition.clone().sub(this.prevMousePosition);
+      this.prevMousePosition = this.mousePosition.clone();
+      console.log(diff);
+      diff.x /= this.width;
+      diff.y /= this.height;
+      this.minX += diff.x;
+      this.maxX += diff.x;
+      this.minY += diff.y;
+      this.maxY += diff.y;
+    }
+    this.click.move(this.mousePosition);
+    this.orderPIXIRender();
+  }
+  updateAnimatedGIF(deltaTime: number) {
+    if (this.pPanel?.isGIF) {
+      this.pPanel.updateGIF(deltaTime);
+    }
+  }
+  updateRect() {
+    //
+  }
+  animate() {
+    if (!this.pPanel) {
+      return;
+    }
+    if (!this.petaPanel._petaImage) {
+      return;
+    }
+    this.selection.setCorners(this.sevenCorners);
+    this.selection.update();
+    this.pPanel.position.x = 0;
+    this.pPanel.position.y = 0;
+    this.pPanel.petaPanel.width = this.width;
+    this.pPanel.petaPanel.height = this.height;
+    this.selectionContainer.x = -this.pPanel.petaPanel.width / 2;
+    this.selectionContainer.y = -this.pPanel.petaPanel.height / 2;
+    this.pPanel.update();
+    this.corners.forEach((corner, i) => {
+      this.sevenCorners[i]?.setTo(corner);
+    });
   }
   orderPIXIRender() {
     this.renderOrdered = true;
