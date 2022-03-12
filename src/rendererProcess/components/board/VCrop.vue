@@ -43,7 +43,6 @@ export default class VBoard extends Vue {
   cropRoot!: HTMLElement;
   @Prop()
   petaPanel!: PetaPanel;
-  click = new ClickChecker();
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;
   rootContainer = new PIXI.Container();
@@ -142,8 +141,7 @@ export default class VBoard extends Vue {
     this.pixi.view.style.width = rect.width + "px";
     this.pixi.view.style.height = rect.height + "px";
     this.rootContainer.x = rect.width / 2;
-    this.rootContainer.y = rect.height / 2 ;
-    this.updateRect();
+    this.rootContainer.y = rect.height / 2;
     this.orderPIXIRender();
   }
   mousedown(e: PIXI.InteractionEvent) {
@@ -170,33 +168,8 @@ export default class VBoard extends Vue {
       if (this.draggingControlPoint.yPosition == 1) {
         this.maxY = pos.y / this.height;
       }
+      this.orderPIXIRender();
     }
-    const minX = Math.min(this.minX, this.maxX);
-    const maxX = Math.max(this.minX, this.maxX);
-    const minY = Math.min(this.minY, this.maxY);
-    const maxY = Math.max(this.minY, this.maxY);
-    this.minX = minX;
-    this.maxX = maxX;
-    this.minY = minY;
-    this.maxY = maxY;
-    if (this.minX < 0) {
-      this.minX = 0;
-    }
-    if (this.maxX > 1) {
-      this.maxX = 1;
-    }
-    if (this.minY < 0) {
-      this.minY = 0;
-    }
-    if (this.maxY > 1) {
-      this.maxY = 1;
-    }
-    this.selection.hitArea = new PIXI.Rectangle(
-      this.minX * this.width,
-      this.minY * this.height,
-      (this.maxX - this.minX) * this.width,
-      (this.maxY - this.minY) * this.height
-    );
     if (this.dragging) {
       const diff = this.mousePosition.clone().sub(this.prevMousePosition);
       this.prevMousePosition = this.mousePosition.clone();
@@ -206,23 +179,44 @@ export default class VBoard extends Vue {
       this.maxX += diff.x;
       this.minY += diff.y;
       this.maxY += diff.y;
+      this.orderPIXIRender();
     }
-    this.click.move(this.mousePosition);
-    this.orderPIXIRender();
+    if (this.draggingControlPoint || this.dragging) {
+      const minX = Math.min(this.minX, this.maxX);
+      const maxX = Math.max(this.minX, this.maxX);
+      const minY = Math.min(this.minY, this.maxY);
+      const maxY = Math.max(this.minY, this.maxY);
+      this.minX = minX;
+      this.maxX = maxX;
+      this.minY = minY;
+      this.maxY = maxY;
+      if (this.minX < 0) {
+        this.minX = 0;
+      }
+      if (this.maxX > 1) {
+        this.maxX = 1;
+      }
+      if (this.minY < 0) {
+        this.minY = 0;
+      }
+      if (this.maxY > 1) {
+        this.maxY = 1;
+      }
+      this.selection.hitArea = new PIXI.Rectangle(
+        this.minX * this.width,
+        this.minY * this.height,
+        (this.maxX - this.minX) * this.width,
+        (this.maxY - this.minY) * this.height
+      );
+    }
   }
   updateAnimatedGIF(deltaTime: number) {
     if (this.pPanel?.isGIF) {
       this.pPanel.updateGIF(deltaTime);
     }
   }
-  updateRect() {
-    //
-  }
   animate() {
     if (!this.pPanel) {
-      return;
-    }
-    if (!this.petaPanel._petaImage) {
       return;
     }
     this.selection.setCorners(this.sevenCorners);
