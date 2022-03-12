@@ -22,12 +22,13 @@ import { AnimatedGIFLoader } from '@pixi/gif';
 import { createPetaPanel, PetaPanel } from "@/commons/datas/petaPanel";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PSelection } from "@/rendererProcess/components/board/ppanels/PSelection";
+import { PControlPoint } from "@/rendererProcess/components/board/ppanels/PControlPoint";
 PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
   },
   emits: [
-    "change"
+    "update"
   ]
 })
 export default class VBoard extends Vue {
@@ -39,6 +40,7 @@ export default class VBoard extends Vue {
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;
   rootContainer = new PIXI.Container();
+  selectionContainer = new PIXI.Container();
   renderOrdered = false;
   requestAnimationFrameHandle = 0;
   stageRect = new Vec2();
@@ -46,22 +48,59 @@ export default class VBoard extends Vue {
   keyboards = new Keyboards();
   selection: PSelection = new PSelection();
   pPanel: PPanel | undefined;
+  corners: PControlPoint[] = [];
+  blackMask = new PIXI.Graphics();
+  draggingControlPoint: PControlPoint | undefined;
+  minX = 0;
+  maxX = 0;
+  minY = 0;
+  maxY = 0;
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
-      antialias: true
+      antialias: true,
+      transparent: true
     });
     this.pixi.stage.on("pointerdown", this.mousedown);
     this.pixi.stage.on("pointerup", this.mouseup);
     this.pixi.stage.on("pointerupoutside", this.mouseup);
     this.pixi.stage.on("pointermove", this.mousemove);
     this.pixi.stage.on("pointermoveoutside", this.mousemove);
-    this.pixi.stage.addChild(this.rootContainer);
-    PIXI.Ticker.shared.add(this.updateAnimatedGIF);
-    this.rootContainer.addChild(this.selection);
-    this.cropRoot.appendChild(this.pixi.view);
     this.pixi.stage.interactive = true;
     this.pixi.ticker.stop();
+    this.pixi.stage.addChild(this.rootContainer);
+    this.cropRoot.appendChild(this.pixi.view);
+    this.rootContainer.addChild(this.selectionContainer);
+    this.selectionContainer.addChild(this.selection);
+    for (let i = 0; i < 8; i++) {
+      const cp = new PControlPoint();
+      cp.rotate.interactive = false;
+      if (i != 3 && i != 7) {
+        if (i == 0 || i == 1 || i == 2) {
+          cp.yPosition = -1;
+        } else {
+          cp.yPosition = 1;
+        }
+      } else {
+        cp.yPosition = 0;
+      }
+      if (i != 1 && i != 5) {
+        if (i == 2 || i == 3 || i == 4) {
+          cp.xPosition = 1;
+        } else {
+          cp.xPosition = -1;
+        }
+      } else {
+        cp.xPosition = 0;
+      }
+      cp.size.on("pointerdown", (e) => {
+        this.startDrag(e, cp);
+      });
+      this.corners.push(cp);
+    }
+    this.selectionContainer.addChild(...this.corners);
+    this.selectionContainer.addChild(this.blackMask);
+    PIXI.Ticker.shared.add(this.updateAnimatedGIF);
     this.resizer = new ResizeObserver((entries) => {
       this.resize(entries[0]!.contentRect);
     });
@@ -69,6 +108,9 @@ export default class VBoard extends Vue {
     this.renderPIXI();
     this.keyboards.enabled = true;
     this.changePetaPanel();
+  }
+  startDrag(e: PIXI.InteractionEvent, controlPoint: PControlPoint) {
+    this.draggingControlPoint = controlPoint;
   }
   unmounted() {
     this.resizer?.unobserve(this.cropRoot);
@@ -94,6 +136,10 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   mouseup(e: PIXI.InteractionEvent) {
+    if (this.draggingControlPoint) {
+      this.$emit("update", this.petaPanel);
+    }
+    this.draggingControlPoint = undefined;
     this.orderPIXIRender();
   }
   mousemove(e: PIXI.InteractionEvent) {
@@ -113,11 +159,63 @@ export default class VBoard extends Vue {
     if (!this.pPanel) {
       return;
     }
+    this.selection.setCorners(this.sevenCorners);
     this.selection.update();
-    this.pPanel.update();
     this.pPanel.position.x = 0;
     this.pPanel.position.y = 0;
-    console.log(1);
+    this.pPanel.petaPanel.width = this.width;
+    this.pPanel.petaPanel.height = this.width * (this.pPanel.petaPanel._petaImage?.height || 0);
+    this.selectionContainer.x = -this.pPanel.petaPanel.width / 2;
+    this.selectionContainer.y = -this.pPanel.petaPanel.height / 2;
+    this.pPanel.update();
+    this.corners.forEach((corner, i) => {
+      this.sevenCorners[i]?.setTo(corner);
+    });
+    if (this.draggingControlPoint && this.petaPanel._petaImage) {
+      const pos = this.selectionContainer.toLocal(this.mousePosition);
+      if (this.draggingControlPoint.xPosition != 0) {
+        // this.draggingControlPoint.x = pos.x;
+      }
+      if (this.draggingControlPoint.yPosition != 0) {
+        // this.draggingControlPoint.y = pos.y;
+      }
+      if (this.draggingControlPoint.xPosition == -1) {
+        this.minX = pos.x / this.width;
+      }
+      if (this.draggingControlPoint.xPosition == 1) {
+        this.maxX = pos.x / this.width;
+      }
+      if (this.draggingControlPoint.yPosition == -1) {
+        this.minY = pos.y / (this.width * this.petaPanel._petaImage.height);
+      }
+      if (this.draggingControlPoint.yPosition == 1) {
+        this.maxY = pos.y / (this.width * this.petaPanel._petaImage.height);
+      }
+    }
+    const minX = Math.min(this.minX, this.maxX);
+    const maxX = Math.max(this.minX, this.maxX);
+    const minY = Math.min(this.minY, this.maxY);
+    const maxY = Math.max(this.minY, this.maxY);
+    this.minX = minX;
+    this.maxX = maxX;
+    this.minY = minY;
+    this.maxY = maxY;
+    if (this.minX < 0) {
+      this.minX = 0;
+    }
+    if (this.maxX > 1) {
+      this.maxX = 1;
+    }
+    if (this.minY < 0) {
+      this.minY = 0;
+    }
+    if (this.maxY > 1) {
+      this.maxY = 1;
+    }
+    this.petaPanel.crop.position.x = this.minX;
+    this.petaPanel.crop.position.y = this.minY;
+    this.petaPanel.crop.width = this.maxX - this.minX;
+    this.petaPanel.crop.height = this.maxY - this.minY;
   }
   orderPIXIRender() {
     this.renderOrdered = true;
@@ -130,13 +228,50 @@ export default class VBoard extends Vue {
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
   }
+  get width() {
+    if (!this.pPanel || !this.petaPanel._petaImage) {
+      return 0;
+    }
+    let width = 0;
+    let height = 0;
+    const maxWidth = this.stageRect.x * 0.95;
+    const maxHeight = this.stageRect.y * 0.70;
+    if (this.petaPanel._petaImage.height / this.petaPanel._petaImage.width < maxHeight / maxWidth) {
+      width = maxWidth;
+      height = maxWidth * this.petaPanel._petaImage.height;
+    } else {
+      height = maxHeight;
+      width = maxHeight / this.petaPanel._petaImage.height;
+    }
+    return width;
+  }
+  get sevenCorners() {
+    const corners = [
+      this.petaPanel.crop.position.clone(),
+      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width / 2, 0)),
+      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width, 0)),
+      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width, this.petaPanel.crop.height / 2)),
+      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width, this.petaPanel.crop.height)),
+      this.petaPanel.crop.position.clone().add(new Vec2(this.petaPanel.crop.width / 2, this.petaPanel.crop.height)),
+      this.petaPanel.crop.position.clone().add(new Vec2(0, this.petaPanel.crop.height)),
+      this.petaPanel.crop.position.clone().add(new Vec2(0, this.petaPanel.crop.height / 2)),
+    ];
+    const height = (this.petaPanel._petaImage?.height || 0) * this.width;
+    return corners.map((p) => new Vec2(
+      p.x * this.width,
+      p.y * height
+    ));
+  }
   @Watch("petaPanel")
   changePetaPanel() {
     if (!this.petaPanel._petaImage) {
       return;
     }
     const petaPanel = createPetaPanel(this.petaPanel._petaImage, new Vec2(0, 0), 400);
-    console.log(petaPanel);
+    this.minX = this.petaPanel.crop.position.x;
+    this.minY = this.petaPanel.crop.position.y;
+    this.maxX = this.petaPanel.crop.width + this.petaPanel.crop.position.x;
+    this.maxY = this.petaPanel.crop.height + this.petaPanel.crop.position.y;
     if (!this.pPanel) {
       this.pPanel = new PPanel(petaPanel);
       this.pPanel.onUpdateGIF = () => {
@@ -152,18 +287,6 @@ export default class VBoard extends Vue {
       }
       await this.pPanel.load();
       this.pPanel.playGIF();
-      const corners = this.pPanel.getCorners();
-      
-      this.selection.setCorners([
-        corners[0]!,
-        new Vec2(0, corners[0]!.y),
-        corners[1]!,
-        new Vec2(corners[1]!.x, 0),
-        corners[2]!,
-        new Vec2(0, corners[2]!.y),
-        corners[3]!,
-        new Vec2(corners[3]!.x, 0),
-      ]);
     })();
   }
 }
@@ -176,5 +299,7 @@ export default class VBoard extends Vue {
   left: 0px;
   width: 100%;
   height: 100%;
+  background-repeat: repeat;
+  background-image: url("~@/@assets/transparentBackground.png");
 }
 </style>
