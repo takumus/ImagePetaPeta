@@ -2,8 +2,9 @@
   <article
     class="board-root"
     ref="boardRoot"
+    v-show="board"
     :style="{
-      backgroundColor: board.background.fillColor,
+      backgroundColor: fillColor,
       zIndex: zIndex
     }"
   >
@@ -76,7 +77,7 @@ PIXILoader.registerPlugin(AnimatedGIFLoader);
 })
 export default class VBoard extends Vue {
   @Prop()
-  board!: PetaBoard;
+  board?: PetaBoard;
   @Prop()
   zIndex = 0;
   @Ref("panelsBackground")
@@ -186,6 +187,9 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   mousedown(e: PIXI.InteractionEvent) {
+    if (!this.board) {
+      return;
+    }
     this.click.down(e.data.global);
     if (e.data.button == MouseButton.RIGHT) {
       this.mouseRightPressing = true;
@@ -255,6 +259,9 @@ export default class VBoard extends Vue {
     }
   }
   wheel(event: WheelEvent) {
+    if (!this.board) {
+      return;
+    }
     const mouse = vec2FromMouseEvent(event).sub(this.stageRect.clone().div(2));
     if (event.ctrlKey || this.$systemInfo.platform == "win32") {
       const currentZoom = this.board.transform.scale;
@@ -280,6 +287,9 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   updateRect() {
+    if (!this.board) {
+      return;
+    }
     this.crossLine.clear();
     this.crossLine.lineStyle(1, Number(this.board.background.lineColor.replace("#", "0x")), 1, undefined, true);
     this.crossLine.moveTo(-this.stageRect.x, 0);
@@ -291,6 +301,9 @@ export default class VBoard extends Vue {
     this.backgroundSprite.drawRect(0, 0, this.stageRect.x, this.stageRect.y);
   }
   animate() {
+    if (!this.board) {
+      return;
+    }
     this.frame++;
     this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
       pPanel.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(this.mousePosition)).add(pPanel.draggingOffset);
@@ -377,11 +390,17 @@ export default class VBoard extends Vue {
     this.pTransformer.update();
   }
   resetTransform() {
+    if (!this.board) {
+      return;
+    }
     this.board.transform.scale = 1;
     this.board.transform.position.set(0, 0);
     this.orderPIXIRender();
   }
   removeSelectedPanels() {
+    if (!this.board) {
+      return;
+    }
     this.pPanelsArray.filter((pPanel) => pPanel.selected).forEach((pPanel) => {
       this.removePPanel(pPanel);
     })
@@ -458,6 +477,9 @@ export default class VBoard extends Vue {
     ], position);
   }
   async addPanel(petaPanel: PetaPanel, offsetIndex: number){
+    if (!this.board) {
+      return;
+    }
     this.endCrop();
     if (offsetIndex == 0) {
       this.clearSelectionAll();
@@ -507,6 +529,9 @@ export default class VBoard extends Vue {
     this.sortIndex();
   }
   sortIndex() {
+    if (!this.board) {
+      return;
+    }
     this.board.petaPanels
     .sort((a, b) => a.index - b.index)
     .forEach((petaPanel, i) => {
@@ -517,11 +542,17 @@ export default class VBoard extends Vue {
     });
   }
   getMaxIndex() {
+    if (!this.board) {
+      return -1;
+    }
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
     this.endCrop();
-    await API.send("setSelectedPetaBoard", this.board.id);
+    if (!this.board) {
+      return;
+    }
+    API.send("setSelectedPetaBoard", this.board.id);
     log("load", this.board.name);
     this.loading = true;
     // this.clearCache();
@@ -549,7 +580,13 @@ export default class VBoard extends Vue {
     if (this.cancel) {
       this.cancel();
     }
+    if (!this.board) {
+      return;
+    }
     const load = async (petaPanel: PetaPanel, index: number) => {
+      if (!this.board) {
+        return;
+      }
       const progress =  `${index + 1}/${this.board.petaPanels.length}`;
       await this.loadOriginal(petaPanel).then((result) => {
         if (result) {
@@ -593,6 +630,9 @@ export default class VBoard extends Vue {
     PIXI.utils.clearTextureCache();
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
+    if (!this.board) {
+      return;
+    }
     if (!Keyboards.pressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
@@ -654,7 +694,16 @@ export default class VBoard extends Vue {
     return this.pPanelsArray.filter((pPanel) => !pPanel.selected);
   }
   get scalePercent() {
+    if (!this.board) {
+      return 100;
+    }
     return Math.floor(this.board.transform.scale * 100);
+  }
+  get fillColor() {
+    if (!this.board) {
+      return "#ff0000";
+    }
+    return this.board.background.fillColor;
   }
   @Watch("$settings.showNsfwWithoutConfirm")
   changeShowNsfwWithoutConfirm() {
@@ -664,26 +713,26 @@ export default class VBoard extends Vue {
   }
   @Watch("board.petaPanels", { deep: true })
   changeBoard() {
-    this.$emit("change", this.board);
+    // this.$emit("change", this.board);
   }
   @Watch("board.transform", { deep: true })
   changeBoardTransform() {
     this.updateRect();
-    this.$emit("change", this.board);
+    // this.$emit("change", this.board);
   }
   @Watch("board.background", { deep: true })
   changeBoardBackground() {
     this.updateRect();
-    this.$emit("change", this.board);
+    // this.$emit("change", this.board);
     this.orderPIXIRender();
   }
   @Watch("board.name")
   changeBoardName() {
-    this.$emit("change", this.board);
+    // this.$emit("change", this.board);
   }
   @Watch("board.index")
   changeBoardIndex() {
-    this.$emit("change", this.board);
+    // this.$emit("change", this.board);
   }
 }
 </script>

@@ -7,7 +7,6 @@
   >
     <VBoard
       :zIndex="1"
-      v-if="currentPetaBoard"
       :board="currentPetaBoard"
       ref="vPetaBoard"
       @change="changePetaBoard"
@@ -97,11 +96,11 @@ export default class Index extends Vue {
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
   petaTags: PetaTag[] = [];
-  currentPetaBoard: PetaBoard | null = null;
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
+  currentPetaBoardId = "";
   title = "";
   async mounted() {
     window.onerror = (e) => {
@@ -216,7 +215,7 @@ export default class Index extends Vue {
       return;
     }
     log("PetaBoard Selected", board.name);
-    this.currentPetaBoard = board;
+    this.currentPetaBoardId = board.id;
     this.$nextTick(() => {
       this.vPetaBoard.load();
     });
@@ -247,6 +246,9 @@ export default class Index extends Vue {
     await this.getPetaBoards();
     this.vTabBar.selectPetaBoardByIndex(this.boards.length - 1);
   }
+  get currentPetaBoard() {
+    return this.boards.find((board) => board.id == this.currentPetaBoardId);
+  }
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
   }
@@ -260,6 +262,9 @@ export default class Index extends Vue {
     return this.$settings.autoHideUI ? this.windowIsFocused : true;
   }
   changePetaBoard(board: PetaBoard) {
+    if (!board) {
+      return;
+    }
     this.savePetaBoard(board, false);
   }
   changePetaBoards() {
