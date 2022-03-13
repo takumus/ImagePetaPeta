@@ -14,7 +14,7 @@
     </section>
     <section
       class="crop"
-      v-if="croppingPetaPanel"
+      v-show="cropping"
     >
       <VCrop
         :petaPanel="croppingPetaPanel"
@@ -86,7 +86,8 @@ export default class VBoard extends Vue {
   loading = false;
   loadingLog = "";
   loadingProgress = 0;
-  croppingPetaPanel?: PetaPanel | null = null;
+  croppingPetaPanel: PetaPanel | null = null;
+  cropping = false;
   dragOffset = new Vec2();
   click = new ClickChecker();
   resizer?: ResizeObserver;
@@ -414,7 +415,7 @@ export default class VBoard extends Vue {
         skip: isMultiple,
         label: this.$t("boards.panelMenu.crop"),
         click: () => {
-          this.editCrop(pPanel.petaPanel);
+          this.beginCrop(pPanel.petaPanel);
         }
       }, {
         skip: isMultiple,
@@ -457,6 +458,7 @@ export default class VBoard extends Vue {
     ], position);
   }
   async addPanel(petaPanel: PetaPanel, offsetIndex: number){
+    this.endCrop();
     if (offsetIndex == 0) {
       this.clearSelectionAll();
     }
@@ -475,14 +477,19 @@ export default class VBoard extends Vue {
     this.draggingPanels = true;
     this.toFront(pPanel);
   }
-  editCrop(petaPanel: PetaPanel) {
+  beginCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
+    this.cropping = true;
+  }
+  endCrop() {
+    this.croppingPetaPanel = null;
+    this.cropping = false;
   }
   updateCrop(petaPanel: PetaPanel) {
     if (!petaPanel._petaImage) {
       return;
     }
-    this.croppingPetaPanel = null;
+    this.endCrop();
     const sign = 1;
     petaPanel.height = Math.abs(petaPanel.width * ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width))) * sign;
     this.orderPIXIRender();
@@ -513,6 +520,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load() {
+    this.endCrop();
     await API.send("setSelectedPetaBoard", this.board.id);
     log("load", this.board.name);
     this.loading = true;
