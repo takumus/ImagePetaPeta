@@ -4,8 +4,11 @@ export class PControlPoint extends PIXI.Container {
   public size = new PIXI.Graphics();
   public rotate = new PIXI.Graphics();
   public currentRotation = 0;
+  public currentParentRotation = 0;
   public xPosition: -1 | 0 | 1 = 0;
   public yPosition: -1 | 0 | 1 = 0;
+  public index = 0;
+  resizeCursors = [ "ns-resize", "nesw-resize", "ew-resize", "nwse-resize", "ns-resize", "nesw-resize", "ew-resize", "nwse-resize" ];
   constructor() {
     super();
     this.size.interactive = true;
@@ -14,34 +17,65 @@ export class PControlPoint extends PIXI.Container {
     this.rotate.name = "transformer";
     this.addChild(this.rotate, this.size);
     this.setScale(1);
-    this.size.cursor = "pointer";
     this.initCursor();
   }
   initCursor() {
     let mouseover = false;
-    let dragging = false;
+    let rotating = false;
+    let sizing = false;
     this.rotate.on("mouseover", () => {
+      if (sizing) {
+        return;
+      }
       mouseover = true;
       Cursor.setCursor(Cursor.ROTATE_CURSOR);
     });
     this.rotate.on("mouseout", () => {
+      if (sizing) {
+        return;
+      }
       mouseover = false;
-      if (!dragging) {
+      if (!rotating) {
         Cursor.setDefaultCursor();
       }
     });
     this.rotate.on("mousedown", () => {
-      dragging = true;
+      rotating = true;
     });
-    window.addEventListener("mouseup", () => {
-      if (!dragging) {
+    this.size.on("mouseover", () => {
+      if (rotating) {
         return;
       }
-      dragging = false;
+      mouseover = true;
+      Cursor.setCursor(this.getResizeCursor(this.index));
+    });
+    this.size.on("mouseout", () => {
+      if (rotating) {
+        return;
+      }
+      mouseover = false;
+      if (!sizing) {
+        Cursor.setDefaultCursor();
+      }
+    });
+    this.size.on("mousedown", () => {
+      sizing = true;
+    });
+    window.addEventListener("mouseup", () => {
+      if (!sizing && !rotating) {
+        return;
+      }
+      rotating = false;
+      sizing = false;
       if (!mouseover) {
         Cursor.setDefaultCursor();
       }
     });
+  }
+  getResizeCursor(index: number) {
+    const rot = Math.floor(this.currentParentRotation / Math.PI * 180 + 45 / 2) % 360;
+    const offset = Math.floor((rot + (rot < 0 ? 360 : 0)) / 45) + 8;
+    return this.resizeCursors[(offset + index - 1) % 8]!;
   }
   setScale(scale: number) {
     this.size.clear();
