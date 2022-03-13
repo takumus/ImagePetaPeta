@@ -43,7 +43,7 @@ export default class VBoard extends Vue {
   @Ref("cropRoot")
   cropRoot!: HTMLElement;
   @Prop()
-  petaPanel!: PetaPanel;
+  petaPanel!: PetaPanel | null;
   resizer?: ResizeObserver;
   pixi!: PIXI.Application;
   rootContainer = new PIXI.Container();
@@ -165,7 +165,6 @@ export default class VBoard extends Vue {
       if (this.draggingControlPoint.yPosition == 1) {
         this.maxY = pos.y / this.height;
       }
-      this.orderPIXIRender();
     }
     if (this.dragging) {
       const diff = this.mousePosition.clone().sub(this.prevMousePosition);
@@ -176,7 +175,6 @@ export default class VBoard extends Vue {
       this.maxX += diff.x;
       this.minY += diff.y;
       this.maxY += diff.y;
-      this.orderPIXIRender();
     }
     if (this.draggingControlPoint || this.dragging) {
       const minX = Math.min(this.minX, this.maxX);
@@ -199,12 +197,7 @@ export default class VBoard extends Vue {
       if (this.maxY > 1) {
         this.maxY = 1;
       }
-      this.selection.hitArea = new PIXI.Rectangle(
-        this.minX * this.width,
-        this.minY * this.height,
-        (this.maxX - this.minX) * this.width,
-        (this.maxY - this.minY) * this.height
-      );
+      this.orderPIXIRender();
     }
   }
   updateAnimatedGIF(deltaTime: number) {
@@ -258,6 +251,12 @@ export default class VBoard extends Vue {
       this.stageRect.x - bottomRight.x,
       bottomRight.y - topLeft.y
     );
+    this.selection.hitArea = new PIXI.Rectangle(
+      this.minX * this.width,
+      this.minY * this.height,
+      (this.maxX - this.minX) * this.width,
+      (this.maxY - this.minY) * this.height
+    );
   }
   orderPIXIRender() {
     this.renderOrdered = true;
@@ -271,6 +270,9 @@ export default class VBoard extends Vue {
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
   }
   updateCrop() {
+    if (!this.petaPanel) {
+      return;
+    }
     this.petaPanel.crop.position.x = this.minX;
     this.petaPanel.crop.position.y = this.minY;
     this.petaPanel.crop.width = this.maxX - this.minX;
@@ -288,10 +290,13 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   get height() {
+    if (!this.petaPanel) {
+      return 0;
+    }
     return this.width * (this.petaPanel._petaImage?.height || 0);
   }
   get width() {
-    if (!this.pPanel || !this.petaPanel._petaImage) {
+    if (!this.pPanel || !this.petaPanel?._petaImage) {
       return 0;
     }
     let width = 0;
@@ -325,7 +330,7 @@ export default class VBoard extends Vue {
   }
   @Watch("petaPanel")
   changePetaPanel() {
-    if (!this.petaPanel._petaImage) {
+    if (!this.petaPanel?._petaImage) {
       return;
     }
     const petaPanel = createPetaPanel(this.petaPanel._petaImage, new Vec2(0, 0), 400);
