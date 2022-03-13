@@ -26,6 +26,7 @@ export interface MainFunctions {
   getAppInfo: () => Promise<AppInfo>;
   getStates: () => Promise<States>;
   showDBFolder: () => Promise<boolean>;
+  showConfigFolder: () => Promise<boolean>;
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
   checkUpdate: () => Promise<{ current: string, latest: string }>;
   updateSettings: (settings: Settings) => Promise<boolean>;

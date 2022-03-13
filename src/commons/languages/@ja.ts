@@ -98,6 +98,7 @@ const ja = {
     githubButton: "Github",
     issuesButton: "バグ/要望",
     dbFolderButton: "データベースフォルダ",
+    configFolderButton: "コンフィグフォルダ",
     licenses: "ライセンス情報"
   },
   settings: {

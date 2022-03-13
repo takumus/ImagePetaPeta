@@ -25,6 +25,11 @@
         @click="showDBFolder">
         {{$t("info.dbFolderButton")}}
       </button>
+      <button
+        tabindex="-1"
+        @click="showConfigFolder">
+        {{$t("info.configFolderButton")}}
+      </button>
       <p>{{$t("info.licenses")}}</p>
       <pre>{{ licenses }}</pre>
     </article>
@@ -70,6 +75,9 @@ export default class VInfo extends Vue {
   }
   showDBFolder() {
     API.send("showDBFolder");
+  }
+  showConfigFolder() {
+    API.send("showConfigFolder");
   }
   open() {
     this.visible = false;

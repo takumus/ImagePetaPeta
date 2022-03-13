@@ -445,6 +445,14 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
         return true;
       },
       /*------------------------------------
+        Configフォルダを開く
+      ------------------------------------*/
+      showConfigFolder: async (event) => {
+        dataLogger.mainLog("#Show Config Folder");
+        shell.showItemInFolder(DIR_APP);
+        return true;
+      },
+      /*------------------------------------
         全PetaBoard取得
       ------------------------------------*/
       showImageInFolder: async (event, petaImage) => {
