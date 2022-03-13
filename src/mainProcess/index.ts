@@ -312,7 +312,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
                   return petaImage.id == petaImageId;
                 });
               });
-              updatePetaTag(petaTag, UpdateMode.UPDATE);
+              await updatePetaTag(petaTag, UpdateMode.UPDATE);
             }, await dataPetaTags.find({})).value;
             emitMainEvent("updatePetaTags");
           }
