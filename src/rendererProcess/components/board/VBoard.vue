@@ -14,7 +14,7 @@
     </section>
     <section
       class="crop"
-      v-show="cropping"
+      v-if="cropping"
     >
       <VCrop
         :petaPanel="croppingPetaPanel"
