@@ -125,12 +125,10 @@ export default class VBrowser extends Vue {
   @Ref("thumbsWrapper")
   thumbsWrapper!: HTMLDivElement;
   thumbnailsWidth = 0;
-  thumbnailWidth = 0;
   areaMaxY = 0;
   areaMinY = 0;
   areaPreVisibleMaxY = 0;
   areaPreVisibleMinY = 0;
-  scrollHeight = 0;
   scrollAreaHeight = 0;
   sortMode = SortMode.ADD_DATE;
   thumbnailsResizer?: ResizeObserver;
@@ -217,7 +215,7 @@ export default class VBrowser extends Vue {
       const panel = createPetaPanel(
         pi,
         worldPosition.clone(),
-        this.thumbnailWidth
+        this.actualThumbnailSize
       );
       this.$emit(
         "addPanel",
@@ -357,18 +355,29 @@ export default class VBrowser extends Vue {
       return result;
     });
   }
-  get tiles(): Tile[] {
-    let hc = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
-    if (hc < 1) {
-      hc = 1;
+  get thumbnailsRowCount() {
+    let c = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
+    if (c < 1) {
+      return 1;
     }
-    this.thumbnailWidth = this.thumbnailsWidth / hc;
-    if (this.thumbnailWidth == 0) {
+    return c;
+  }
+  get actualThumbnailSize() {
+    return this.thumbnailsWidth / this.thumbnailsRowCount;
+  }
+  get scrollHeight() {
+    return this.tiles.map((tile) => {
+      return tile.position.y + tile.height
+    }).reduce((a, b) => {
+      return a > b ? a : b;
+    }, 0);
+  }
+  get tiles(): Tile[] {
+    if (this.actualThumbnailSize == 0) {
       return [];
     }
     const yList: number[] = [];
-    this.scrollHeight = 0;
-    for (let i = 0; i < hc; i++) {
+    for (let i = 0; i < this.thumbnailsRowCount; i++) {
       yList.push(0);
     }
     const images = this.filteredPetaImages.map((p) => {
@@ -380,16 +389,13 @@ export default class VBrowser extends Vue {
           mvi = vi;
         }
       });
-      const position = new Vec2(mvi * this.thumbnailWidth, yList[mvi]);
-      const height = p.height * this.thumbnailWidth;
+      const position = new Vec2(mvi * this.actualThumbnailSize, yList[mvi]);
+      const height = p.height * this.actualThumbnailSize;
       yList[mvi] += height;
-      if (this.scrollHeight < yList[mvi]!) {
-        this.scrollHeight = yList[mvi]!;
-      }
       return {
         petaImage: p,
         position: position,
-        width: this.thumbnailWidth,
+        width: this.actualThumbnailSize,
         height: height,
         visible: 
           (this.areaMinY < position.y && position.y < this.areaMaxY)
@@ -408,7 +414,7 @@ export default class VBrowser extends Vue {
     return tiles;
   }
   get original() {
-    return this.$settings.loadThumbnailsInOriginal && this.thumbnailWidth > this.$settings.thumbnails.size;
+    return this.$settings.loadThumbnailsInOriginal && this.actualThumbnailSize > this.$settings.thumbnails.size;
   }
   keyA() {
     if (isKeyboardLocked()) {
