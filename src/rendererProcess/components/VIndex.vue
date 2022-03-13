@@ -131,10 +131,11 @@ export default class Index extends Vue {
     this.windowIsFocused = await API.send("getWindowIsFocused");
     const info = await API.send("getAppInfo");
     this.title = `${info.name} ${info.version}`;
+    document.title = this.title;
     await this.getPetaImages();
     await this.getPetaBoards();
     await this.getPetaTags();
-    document.title = this.title;
+    await this.restoreBoard();
     this.$nextTick(() => {
       API.send("showMainWindow");
     });
@@ -155,6 +156,14 @@ export default class Index extends Vue {
         setTimeout(this.checkUpdate, UPDATE_CHECK_INTERVAL);
       }
     });
+  }
+  async restoreBoard() {
+    const id = (await API.send("getStates")).selectedPetaBoardId;
+    const lastBoard = this.boards.find((board) => board.id == id);
+    this.selectPetaBoard(lastBoard);
+    if (!lastBoard) {
+      this.selectPetaBoard(this.boards[0]);
+    }
   }
   async getPetaImages() {
     this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
@@ -190,11 +199,6 @@ export default class Index extends Vue {
         });
       }
     });
-    const id = (await API.send("getStates")).selectedPetaBoardId;
-    this.selectPetaBoard(this.boards.find((board) => board.id == id));
-    if (!this.currentPetaBoard) {
-      this.selectPetaBoard(this.boards[0]);
-    }
   }
   async getPetaTags() {
     this.petaTags = await API.send("getPetaTags");
@@ -230,8 +234,15 @@ export default class Index extends Vue {
       return;
     }
     this.boardUpdaters[board.id]!.forceUpdate();
+    const leftBoardId = this.boards[this.boards.findIndex((b) => b.id == board.id) - 1]?.id;
     await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();
+    const leftBoard = this.boards.find((board) => board.id == leftBoardId);
+    if (leftBoard) {
+      this.selectPetaBoard(leftBoard);
+    } else {
+      this.selectPetaBoard(this.boards[0]);
+    }
   }
   async addPetaBoard() {
     const name = getNameAvoidDuplication(DEFAULT_BOARD_NAME, this.boards.map((b) => b.name));
