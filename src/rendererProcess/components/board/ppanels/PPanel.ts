@@ -45,11 +45,12 @@ export class PPanel extends PIXI.Sprite {
   public async load() {
     this.noImage = true;
     const result = await getImage(this.petaPanel._petaImage);
+    if (this.gif) {
+      this.imageWrapper.removeChild(this.gif);
+      this.gif.destroy();
+      this.gif = undefined;
+    }
     if (result.animatedGIF) {
-      if (this.gif) {
-        this.imageWrapper.removeChild(this.gif);
-        this.gif.destroy();
-      }
       this.gif = result.animatedGIF;
       this.gif.onFrameChange = this.onUpdateGIF;
       this.imageWrapper.addChild(this.gif);
