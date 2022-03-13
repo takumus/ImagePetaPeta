@@ -206,7 +206,7 @@ export default class VBoard extends Vue {
     }
   }
   animate() {
-    if (!this.pPanel) {
+    if (!this.pPanel || !this.petaPanel) {
       return;
     }
     this.selection.setCorners(this.sevenCorners);
