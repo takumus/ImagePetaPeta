@@ -26,7 +26,7 @@
             :class="{ selected: b == board }"
             :style="{ opacity: b == board && dragging ? 0 : 1 }"
             v-for="(b, index) in boards"
-            @mousedown="mousedown($event, index, $target)"
+            @mousedown="mousedown($event, b, index, $target)"
             @contextmenu="menu($event, b)"
             :key="b.id"
             :ref="`tab-${b.id}`"
@@ -54,11 +54,11 @@
             class="tab selected drag"
             ref="draggingTab"
             :style="{ display: dragging ? 'block' : 'none' }"
-            v-if="board"
+            v-show="dragging"
           >
             <span class="wrapper">
               <span class="label">
-                <VEditableLabel :label="board.name" />
+                <VEditableLabel :label="board.name" v-if="board" />
               </span>
             </span>
           </span>
@@ -199,35 +199,36 @@ export default class VTabBar extends Vue {
   title = "";
   @Prop()
   zIndex = 0;
+  @Prop()
+  currentPetaBoardId = "";
   @Ref("draggingTab")
   draggingTab!: HTMLElement;
   dragging = false;
   pressing = false;
   mousedownOffsetX = 0;
   editName = false;
-  selectedIndex = 0;
   beforeSortSelectedIndex = 0;
-  draggingPetaBoard!: PetaBoard;
+  afterSortSelectedIndex = 0;
+  draggingPetaBoard: PetaBoard | undefined;
   mounted() {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
-    // this.changeDarkMode(this.darkMode);
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
   }
-  mousedown(event: MouseEvent, index: number, target: HTMLElement) {
+  mousedown(event: MouseEvent, board: PetaBoard, index: number, target: HTMLElement) {
     if (event.button != MouseButton.LEFT) return;
-    this.selectPetaBoardByIndex(index);
+    this.selectPetaBoard(board);
     this.pressing = true;
-    this.draggingPetaBoard = this.board;
+    this.draggingPetaBoard = board;
     const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect();
     if (!rect) return;
     this.mousedownOffsetX = rect.x - event.clientX;
     this.draggingTab.style.left = `${rect.x}px`;
     this.draggingTab.style.height = `${rect.height}px`;
-    this.beforeSortSelectedIndex = this.selectedIndex;
+    this.beforeSortSelectedIndex = index;
   }
   menu(event: MouseEvent, board: PetaBoard) {
     this.$components.contextMenu.open([{
@@ -260,7 +261,7 @@ export default class VTabBar extends Vue {
           newIndex = index;
         }
       });
-      this.selectedIndex = newIndex;
+      this.afterSortSelectedIndex = newIndex;
     }
     this.dragging = true;
   }
@@ -268,24 +269,12 @@ export default class VTabBar extends Vue {
     if (!this.pressing) return;
     this.dragging = false;
     this.pressing = false;
-    if (this.beforeSortSelectedIndex != this.selectedIndex) {
+    if (this.beforeSortSelectedIndex != this.afterSortSelectedIndex) {
       this.$emit("sort");
     }
   }
-  selectPetaBoardByIndex(index: number, force = false) {
-    if (this.boards.length == 0) return;
-    const prevPetaBoard = this.boards[this.selectedIndex];
-    this.selectedIndex = index;
-    if (this.selectedIndex >= this.boards.length) {
-      this.selectedIndex = this.boards.length - 1;
-    } else if (index < 0) {
-      this.selectedIndex = 0;
-    }
-    const currentPetaBoard = this.boards[this.selectedIndex];
-    if (currentPetaBoard != prevPetaBoard || force) {
-      if (!currentPetaBoard) return;
-      this.$emit("select", currentPetaBoard);
-    }
+  selectPetaBoard(board: PetaBoard) {
+    this.$emit("select", board);
   }
   changePetaBoardName(board: PetaBoard, name: string) {
     if (name == "") {
@@ -309,7 +298,7 @@ export default class VTabBar extends Vue {
     this.$emit("add");
   }
   get board() {
-    return this.boards[this.selectedIndex]!;
+    return this.boards.find((board) => board.id == this.currentPetaBoardId);
   }
   get removable() {
     return true;// this.boards.length > 1;
@@ -317,10 +306,10 @@ export default class VTabBar extends Vue {
   get isMac() {
     return this.$systemInfo.platform == "darwin";
   }
-  @Watch("boards", { deep: false, immediate: true })
-  changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
-    this.selectPetaBoardByIndex(this.selectedIndex, true);
-  }
+  // @Watch("boards", { deep: false, immediate: true })
+  // changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
+  //   // this.selectPetaBoard(this.boards[this.selectedIndex]);
+  // }
 }
 </script>
 

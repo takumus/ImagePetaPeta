@@ -16,6 +16,7 @@
       :uiVisible="uiVisible"
       :boards="sortedPetaBoards"
       :title="title"
+      :currentPetaBoardId="currentPetaBoardId"
       @remove="removePetaBoard"
       @add="addPetaBoard"
       @select="selectPetaBoard"
@@ -104,9 +105,9 @@ export default class Index extends Vue {
   title = "";
   async mounted() {
     window.onerror = (e) => {
-      log("window error:", e);
+      log("vIndex", "window error:", e);
     }
-    log("INIT RENDERER!");
+    log("vIndex", "INIT RENDERER!");
     API.on("importImagesComplete", () => {
       this.getPetaImages();
     });
@@ -117,7 +118,7 @@ export default class Index extends Vue {
       this.getPetaTags();
     });
     API.on("updatePetaImage", (e, petaImage) => {
-      // log("on savePetaImage", petaImage.id);
+      // log("vIndex", "on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
     API.on("windowFocused", (e, focused) => {
@@ -189,14 +190,11 @@ export default class Index extends Vue {
         });
       }
     });
-    // const id = (await API.send("getStates")).selectedPetaBoardId;
-    // let index = -1;
-    // this.boards.forEach((b, i) => {
-    //   if (b.id == id) {
-    //     index = i;
-    //   }
-    // });
-    // this.vTabBar.selectPetaBoardByIndex(index);
+    const id = (await API.send("getStates")).selectedPetaBoardId;
+    this.selectPetaBoard(this.boards.find((board) => board.id == id));
+    if (!this.currentPetaBoard) {
+      this.selectPetaBoard(this.boards[0]);
+    }
   }
   async getPetaTags() {
     this.petaTags = await API.send("getPetaTags");
@@ -210,15 +208,16 @@ export default class Index extends Vue {
     this.currentPetaBoard.petaPanels.push(petaPanel);
     this.vPetaBoard.addPanel(petaPanel, offsetIndex);
   }
-  selectPetaBoard(board: PetaBoard) {
+  selectPetaBoard(board: PetaBoard | undefined) {
+    if (!board) {
+      return;
+    }
     if (this.currentPetaBoard?.id == board.id) {
       return;
     }
-    log("PetaBoard Selected", board.name);
+    log("vIndex", "PetaBoard Selected", board.name);
+    API.send("setSelectedPetaBoard", board.id);
     this.currentPetaBoardId = board.id;
-    this.$nextTick(() => {
-      this.vPetaBoard.load();
-    });
   }
   savePetaBoard(board: PetaBoard, immidiately: boolean) {
     this.boardUpdaters[board.id]!.order(petaBoardsToDBPetaBoards(board));
@@ -242,9 +241,9 @@ export default class Index extends Vue {
       [board],
       UpdateMode.UPSERT
     );
-    log("PetaBoard Added", board.name);
+    log("vIndex", "PetaBoard Added", board.name);
     await this.getPetaBoards();
-    this.vTabBar.selectPetaBoardByIndex(this.boards.length - 1);
+    this.selectPetaBoard(board);
   }
   get currentPetaBoard() {
     return this.boards.find((board) => board.id == this.currentPetaBoardId);

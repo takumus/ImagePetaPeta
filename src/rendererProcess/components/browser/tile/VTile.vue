@@ -111,7 +111,7 @@ export default class VTile extends Vue {
           ctx.putImageData(imageData, 0, 0);
         }
       } catch(e) {
-        log("blurhash error:", e);
+        log("vTile", "blurhash error:", e);
       }
     }
     this.changeVisible();

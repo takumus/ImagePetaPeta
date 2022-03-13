@@ -552,8 +552,7 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
-    API.send("setSelectedPetaBoard", this.board.id);
-    log("load", this.board.name);
+    log("vBoard", "load", this.board.name);
     this.loading = true;
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
@@ -573,7 +572,7 @@ export default class VBoard extends Vue {
       this.loadingProgress = 0;
       this.loadingLog = "";
     } catch (error) {
-      log("error", error);
+      log("vBoard", "error", error);
     }
   }
   async loadAllOriginal() {
@@ -590,11 +589,11 @@ export default class VBoard extends Vue {
       const progress =  `${index + 1}/${this.board.petaPanels.length}`;
       await this.loadOriginal(petaPanel).then((result) => {
         if (result) {
-          log(`loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
+          log("vBoard", `loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
           this.loadingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
         }
       }).catch((err) => {
-        log(`loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, err);
+        log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, err);
         this.loadingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
       });
       this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
@@ -712,27 +711,31 @@ export default class VBoard extends Vue {
     });
   }
   @Watch("board.petaPanels", { deep: true })
-  changeBoard() {
-    // this.$emit("change", this.board);
+  changeBoardPetaPanels() {
+    this.$emit("change", this.board);
   }
   @Watch("board.transform", { deep: true })
   changeBoardTransform() {
     this.updateRect();
-    // this.$emit("change", this.board);
+    this.$emit("change", this.board);
   }
   @Watch("board.background", { deep: true })
   changeBoardBackground() {
     this.updateRect();
-    // this.$emit("change", this.board);
+    this.$emit("change", this.board);
     this.orderPIXIRender();
   }
   @Watch("board.name")
   changeBoardName() {
-    // this.$emit("change", this.board);
+    this.$emit("change", this.board);
   }
   @Watch("board.index")
   changeBoardIndex() {
-    // this.$emit("change", this.board);
+    this.$emit("change", this.board);
+  }
+  @Watch("board")
+  changeBoard() {
+    this.load();
   }
 }
 </script>
