@@ -502,10 +502,12 @@ export default class VBoard extends Vue {
   beginCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
     this.cropping = true;
+    this.keyboards.enabled = false;
   }
   endCrop() {
     this.croppingPetaPanel = null;
     this.cropping = false;
+    this.keyboards.enabled = true;
   }
   updateCrop(petaPanel: PetaPanel) {
     this.endCrop();
