@@ -1,15 +1,13 @@
 import { API } from "@/rendererProcess/api";
-import { defaultSettings, Settings } from "@/commons/datas/settings";
+import { Settings } from "@/commons/datas/settings";
 import { reactive, App } from "vue";
-let settings: Settings = defaultSettings;
 export default {
   async install(app: App) {
-    settings = reactive(await API.send("getSettings"));
-    app.config.globalProperties.$settings = settings;
+    app.config.globalProperties.$settings = reactive(await API.send("getSettings"));
   }
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
-    $settings: typeof settings;
+    $settings: Settings;
   }
 }

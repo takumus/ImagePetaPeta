@@ -19,7 +19,7 @@ import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
 import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { Settings, defaultSettings } from "@/commons/datas/settings";
+import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
@@ -69,7 +69,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
   try {
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
-    dataSettings = new Config<Settings>(FILE_SETTINGS, defaultSettings, upgradeSettings);
+    dataSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
     if (dataSettings.data.petaImageDirectory.default) {
       DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
       dataSettings.data.petaImageDirectory.path = DIR_ROOT;
@@ -496,15 +496,9 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
         設定取得
       ------------------------------------*/
       getSettings: async (event) => {
-        try {
-          dataLogger.mainLog("#Get Settings");
-          dataLogger.mainLog("return:", dataSettings.data);
-          return dataSettings.data;
-        } catch(e) {
-          dataLogger.mainLog(e);
-          showError("M", 8, "Get Settings Error", String(e));
-        }
-        return defaultSettings;
+        dataLogger.mainLog("#Get Settings");
+        dataLogger.mainLog("return:", dataSettings.data);
+        return dataSettings.data;
       },
       /*------------------------------------
         ウインドウのフォーカス取得

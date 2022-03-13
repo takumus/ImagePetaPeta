@@ -1,6 +1,7 @@
 import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
+import deepcopy from "deepcopy";
 
-export const defaultSettings = {
+const defaultSettings = {
   lowMemoryMode: false,
   darkMode: false,
   autoDarkMode: true,
@@ -22,5 +23,14 @@ export const defaultSettings = {
     path: ""
   },
   autoAddTag: true,
+}
+export function getDefaultSettings() {
+  const settings = deepcopy(defaultSettings);
+  console.log(process.platform);
+  if (process.platform == "darwin") {
+    settings.moveSensitivity = 75;
+    settings.zoomSensitivity = 750;
+  }
+  return settings;
 }
 export type Settings = typeof defaultSettings;
