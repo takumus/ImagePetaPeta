@@ -486,10 +486,10 @@ export default class VBoard extends Vue {
     this.cropping = false;
   }
   updateCrop(petaPanel: PetaPanel) {
+    this.endCrop();
     if (!petaPanel._petaImage) {
       return;
     }
-    this.endCrop();
     const sign = 1;
     petaPanel.height = Math.abs(petaPanel.width * ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width))) * sign;
     this.orderPIXIRender();

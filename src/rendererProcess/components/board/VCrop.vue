@@ -331,6 +331,7 @@ export default class VBoard extends Vue {
   @Watch("petaPanel")
   changePetaPanel() {
     if (!this.petaPanel?._petaImage) {
+      this.cancelCrop();
       return;
     }
     const petaPanel = createPetaPanel(this.petaPanel._petaImage, new Vec2(0, 0), 400);
