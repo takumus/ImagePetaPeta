@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/7zip-bin/-/7zip-bin-5.1.1.tgz#9274ec7460652f9c632c59addf24efb1684ef876"
   integrity sha512-sAP4LldeWNz0lNzmTird3uWfFDWWTeg6V/MsmyyLR9X1idwKBWIgt/ZvinqQldJm3LecKEs1emkbquO6PCiLVQ==
 
-"@araki-packages/promise-serial@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@araki-packages/promise-serial/-/promise-serial-0.2.1.tgz#8fed59283cc5314bbf56553e91111d8aab563e68"
-  integrity sha512-1cQ8tRLUGL2ucSPWfeKZxZ2jXPQJARcj3Mi0mbbP6OJxTyD0XebLkmKuSs7f28xCOPzo94kItSVhdmmlL+P6LQ==
+"@araki-packages/promise-serial@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@araki-packages/promise-serial/-/promise-serial-0.3.2.tgz#64e3c7eba5dac3fac1a5e2683ef243d29a24bb31"
+  integrity sha512-1WPRVWRmypRBhvO5GAMp0U+YhAQLC2OkpGPwIYKYC+OIAJUUIKmvMKaXBCOyFbko7l6Q/jbP5wtENpL7nQVIZw==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.14.5", "@babel/code-frame@^7.15.8", "@babel/code-frame@^7.8.3":
   version "7.15.8"
