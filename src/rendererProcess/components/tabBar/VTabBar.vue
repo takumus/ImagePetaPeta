@@ -304,16 +304,9 @@ export default class VTabBar extends Vue {
   get board() {
     return this.boards.find((board) => board.id == this.currentPetaBoardId);
   }
-  get removable() {
-    return true;// this.boards.length > 1;
-  }
   get isMac() {
     return this.$systemInfo.platform == "darwin";
   }
-  // @Watch("boards", { deep: false, immediate: true })
-  // changePetaBoards(n?: PetaBoard[], o?: PetaBoard[]) {
-  //   // this.selectPetaBoard(this.boards[this.selectedIndex]);
-  // }
 }
 </script>
 
