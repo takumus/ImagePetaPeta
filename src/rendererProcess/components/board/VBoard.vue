@@ -54,7 +54,6 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { API, log } from "@/rendererProcess/api";
-import { ImageType } from "@/commons/datas/imageType";
 import * as PIXI from "pixi.js";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformer } from "@/rendererProcess/components/board/ppanels/PTransformer";
@@ -119,7 +118,7 @@ export default class VBoard extends Vue {
   frame = 0;
   fps = 0;
   keyboards = new Keyboards();
-  cancel: (() => void) | undefined;
+  cancel: (() => Promise<Promise<void>[]>) | undefined;
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -554,7 +553,7 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
-    log("vBoard", "load", this.board.name);
+    log("vBoard", "load", minimId(this.board.id));
     this.loading = true;
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
@@ -579,7 +578,8 @@ export default class VBoard extends Vue {
   }
   async loadAllOriginal() {
     if (this.cancel) {
-      this.cancel();
+      log("vBoard", `cancelling loading`);
+      await this.cancel();
     }
     if (!this.board) {
       return;
@@ -726,14 +726,6 @@ export default class VBoard extends Vue {
     this.updateRect();
     this.$emit("change", this.board);
     this.orderPIXIRender();
-  }
-  @Watch("board.name")
-  changeBoardName() {
-    this.$emit("change", this.board);
-  }
-  @Watch("board.index")
-  changeBoardIndex() {
-    this.$emit("change", this.board);
   }
   @Watch("board")
   changeBoard() {

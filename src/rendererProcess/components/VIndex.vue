@@ -21,6 +21,7 @@
       @add="addPetaBoard"
       @select="selectPetaBoard"
       @sort="changePetaBoards"
+      @change="changePetaBoard"
       ref="vTabBar"
     />
     <section

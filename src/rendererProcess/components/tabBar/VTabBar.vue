@@ -187,7 +187,8 @@ import { MouseButton } from "@/commons/datas/mouseButton";
     "remove",
     "add",
     "select",
-    "sort"
+    "sort",
+    "change"
   ]
 })
 export default class VTabBar extends Vue {
@@ -281,6 +282,7 @@ export default class VTabBar extends Vue {
       return;
     }
     board.name = name;
+    this.$emit("change", board);
   }
   minimizeWindow() {
     API.send("windowMinimize");
