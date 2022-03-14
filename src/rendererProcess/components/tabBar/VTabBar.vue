@@ -179,6 +179,7 @@ import { API, log } from "@/rendererProcess/api";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
+import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 @Options({
   components: {
     VEditableLabel
@@ -220,6 +221,7 @@ export default class VTabBar extends Vue {
     window.removeEventListener("mouseup", this.mouseup);
   }
   mousedown(event: MouseEvent, board: PetaBoard, index: number, target: HTMLElement) {
+    if (isKeyboardLocked()) return;
     if (event.button != MouseButton.LEFT) return;
     this.selectPetaBoard(board);
     this.pressing = true;
@@ -368,6 +370,7 @@ export default class VTabBar extends Vue {
           overflow: hidden;
           position: relative;
           border-radius: var(--rounded);
+          z-index: 1;
           &.drag {
             position: absolute;
             pointer-events: none;
@@ -382,6 +385,7 @@ export default class VTabBar extends Vue {
             }
           }
           &.selected {
+            z-index: 2;
             border-radius: var(--rounded) var(--rounded) 0px 0px;
             overflow: visible;
             background-color: var(--tab-selected-color);
@@ -407,8 +411,26 @@ export default class VTabBar extends Vue {
               transform: scaleX(-1);
             }
           }
-          &:hover {
+          &:hover:not(.selected) {
             background-color: var(--tab-hovered-color);
+            overflow: visible;
+            flex-shrink: 0;
+            &::before, &::after {
+              content: '';
+              display: inline-block;
+              position: absolute;
+              bottom: 0;
+              left: calc(var(--rounded) * -1);
+              width: var(--rounded);
+              height: var(--rounded);
+              border-radius: 0 0 100% 0;
+              box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-hovered-color);
+            }
+            &::after {
+              left: unset;
+              right: calc(var(--rounded) * -1);
+              transform: scaleX(-1);
+            }
           }
           >.wrapper {
             display: flex;
