@@ -64,6 +64,7 @@ import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@pixi/gif';
+import { setCursor, setDefaultCursor } from "@/rendererProcess/utils/cursor";
 PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -555,6 +556,7 @@ export default class VBoard extends Vue {
     }
     log("vBoard", "load", minimId(this.board.id));
     this.loading = true;
+    setCursor("wait");
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
@@ -575,6 +577,7 @@ export default class VBoard extends Vue {
     } catch (error) {
       log("vBoard", "error", error);
     }
+    setDefaultCursor();
   }
   async loadAllOriginal() {
     if (this.cancel) {
