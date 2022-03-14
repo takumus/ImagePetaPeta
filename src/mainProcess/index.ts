@@ -359,13 +359,13 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       ------------------------------------*/
       updatePetaBoards: async (event, boards, mode) => {
         try {
-          dataLogger.mainLog("#Save PetaBoards");
+          dataLogger.mainLog("#Update PetaBoards");
           await promiseSerial((board) => updatePetaBoard(board, mode), boards).value;
           dataLogger.mainLog("return:", true);
           return true;
         } catch(e) {
           dataLogger.mainError(e);
-          showError("M", 6, "Save PetaBoards Error", String(e));
+          showError("M", 6, "Update PetaBoards Error", String(e));
         }
         return false;
       },
