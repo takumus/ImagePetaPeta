@@ -22,7 +22,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@araki-packages/promise-serial": "^0.3.2",
+    "@araki-packages/promise-serial": "^1.1.0",
     "@pixi/gif": "^1.0.2",
     "@seald-io/nedb": "^2.2.1",
     "@types/fuzzy-search": "^2.1.2",

@@ -549,13 +549,18 @@ export default class VBoard extends Vue {
     }
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
-  async load() {
+  async load(): Promise<void> {
+    if (this.cancel) {
+      log("vBoard", `canceling loading`);
+      await this.cancel();
+      log("vBoard", `canceled loading`);
+      return this.load();
+    }
     this.endCrop();
     if (!this.board) {
       return;
     }
     log("vBoard", "load", minimId(this.board.id));
-    this.loading = true;
     setCursor("wait");
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
@@ -563,30 +568,20 @@ export default class VBoard extends Vue {
     });
     this.pPanels = {};
     this.pTransformer.pPanels = this.pPanels;
-    try {
-      await this.loadAllOriginal();
-      this.orderPIXIRender();
-      Object.values(this.pPanels).forEach((pPanel) => {
-        if (!pPanel.petaPanel.gif.stopped) {
-          pPanel.playGIF();
-        }
-      });
-      this.loading = false;
-      this.loadingProgress = 0;
-      this.loadingLog = "";
-    } catch (error) {
-      log("vBoard", "error", error);
-    }
+    await this.loadAllOriginal();
+    this.orderPIXIRender();
+    Object.values(this.pPanels).forEach((pPanel) => {
+      if (!pPanel.petaPanel.gif.stopped) {
+        pPanel.playGIF();
+      }
+    });
     setDefaultCursor();
   }
   async loadAllOriginal() {
-    if (this.cancel) {
-      log("vBoard", `cancelling loading`);
-      await this.cancel();
-    }
     if (!this.board) {
       return;
     }
+    this.loading = true;
     const load = async (petaPanel: PetaPanel, index: number) => {
       if (!this.board) {
         return;
@@ -604,14 +599,17 @@ export default class VBoard extends Vue {
       this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();
     }
+    const result = promiseSerial(load, [...this.board.petaPanels]);
+    this.cancel = result.cancel;
     try {
-      const result = promiseSerial(load, [...this.board.petaPanels]);
-      this.cancel = result.cancel;
       await result.value;
-      this.cancel = undefined;
-    } catch (err) {
-      throw "canceled";
+    } catch (error) {
+      log("vBoard", "load error:", error);
     }
+    this.loading = false;
+    this.loadingProgress = 0;
+    this.loadingLog = "";
+    this.cancel = undefined;
   }
   async loadOriginal(petaPanel: PetaPanel) {
     if (this.pPanels[petaPanel.id]) {

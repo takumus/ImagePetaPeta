@@ -306,7 +306,7 @@ body, html {
     sans-serif;
 }
 .root {
-  --rounded: 6px;
+  --rounded: 8px;
   & {
     --bg-color: #ffffff;
     --modal-bg-color: #00000070;

@@ -3,6 +3,8 @@ import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 import { AnimatedGIF } from '@pixi/gif';
 import { getImage } from "./ImageLoader";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { clearTextureCache } from "@pixi/utils";
 export class PPanel extends PIXI.Sprite {
   public selected = false;
   public unselected = false;

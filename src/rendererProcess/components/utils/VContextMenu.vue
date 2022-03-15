@@ -119,7 +119,7 @@ export default class VContextMenu extends Vue {
   }
   >.separate {
     border-bottom: solid 1px #CCCCCC;
-    margin: 0px 8px;
+    margin: 4px 8px;
     height: 0px;
     overflow: hidden;
   }

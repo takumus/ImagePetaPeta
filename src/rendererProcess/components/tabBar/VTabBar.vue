@@ -45,7 +45,9 @@
             @click="addPetaBoard()"
           >
             <span class="wrapper">
-              <span class="label">+</span>
+              <span class="label">
+                <VEditableLabel :label="'+'" :readonly="true"/>
+              </span>
             </span>
           </span>
           <span class="draggable">
