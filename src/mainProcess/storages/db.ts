@@ -1,4 +1,5 @@
 import { DB_COMPACTION_DELAY } from "@/commons/defines";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
 import Nedb from "@seald-io/nedb";
 
 export default class DB<T> {
@@ -34,7 +35,7 @@ export default class DB<T> {
       this.nedb.persistence.compactDatafile();
     }
   }
-  find(query: any = {}): Promise<T[]> {
+  find(query: Partial<T> | any = {}): Promise<T[]> {
     return new Promise((res, rej) => {
       if (!this.nedb || !this.loaded) {
         rej("DB is not initialized");
@@ -49,19 +50,34 @@ export default class DB<T> {
       });
     });
   }
-  remove(query: Partial<T>): Promise<boolean> {
+  count(query: Partial<T> | any = {}): Promise<number> {
     return new Promise((res, rej) => {
       if (!this.nedb || !this.loaded) {
         rej("DB is not initialized");
         return;
       }
-      this.nedb.remove(query, {}, (err) => {
+      this.nedb.count(query).exec(async (err, data) => {
+        if (err) {
+          rej(err);
+          return;
+        }
+        res(data);
+      });
+    });
+  }
+  remove(query: Partial<T>): Promise<number> {
+    return new Promise((res, rej) => {
+      if (!this.nedb || !this.loaded) {
+        rej("DB is not initialized");
+        return;
+      }
+      this.nedb.remove(query, { multi: true }, (err, n) => {
         if (err) {
           rej(err);
           return;
         }
         this.orderCompaction();
-        res(true);
+        res(n);
       });
     });
   }
@@ -80,5 +96,13 @@ export default class DB<T> {
         res(true);
       });
     });
+  }
+  ensureIndex(ensureIndexOptions: Nedb.EnsureIndexOptions) {
+    return new Promise((res) => {
+      if (!this.nedb) {
+        return;
+      }
+      this.nedb.ensureIndex(ensureIndexOptions, res);
+    })
   }
 }

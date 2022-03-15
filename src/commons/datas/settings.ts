@@ -26,7 +26,6 @@ const defaultSettings = {
 }
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);
-  console.log(process.platform);
   if (process.platform == "darwin") {
     settings.moveSensitivity = 75;
     settings.zoomSensitivity = 750;

@@ -3,7 +3,7 @@ export interface PetaTag {
   name: string,
   id: string,
   index: number,
-  petaImages: string[]
+  // petaImages: string[]
 }
 
 export function createPetaTag(name: string): PetaTag {
@@ -11,6 +11,6 @@ export function createPetaTag(name: string): PetaTag {
     name: name,
     id: uuid(),
     index: 0,
-    petaImages: []
+    // petaImages: []
   }
 }

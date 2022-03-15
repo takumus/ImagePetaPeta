@@ -17,7 +17,7 @@
         <section class="tags">
           <VTags
             :petaImagesArray="petaImagesArray"
-            :petaTags="petaTags"
+            :petaTagInfos="petaTagInfos"
             :selectedPetaTags="selectedPetaTags"
           />
         </section>
@@ -25,7 +25,7 @@
           <section class="header">
             <section class="input">
               <VSearch
-                :petaTags="petaTags"
+                :petaTagInfos="petaTagInfos"
                 :selectedPetaTags="selectedPetaTags"
               />
             </section>
@@ -45,7 +45,7 @@
                   :key="data.petaImage.id"
                   :tile="data"
                   :original="original"
-                  :petaTags="petaTags"
+                  :petaTagInfos="petaTagInfos"
                   @add="addPanel"
                   @select="selectThumbnail"
                   @menu="petaImageMenu"
@@ -57,7 +57,7 @@
         <section class="property">
           <VProperty
             :petaImages="selectedPetaImages"
-            :allPetaTags="petaTags"
+            :petaTagInfos="petaTagInfos"
             @selectTag="(tag) => selectedPetaTags = [tag]"
           />
           <input
@@ -98,8 +98,8 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {
     VTile,
@@ -118,7 +118,7 @@ export default class VBrowser extends Vue {
   @Prop()
   petaImages: PetaImages = {};
   @Prop()
-  petaTags: PetaTag[] = [];
+  petaTagInfos: PetaTagInfo[] = [];
   visible = false;
   @Ref("thumbnails")
   thumbnails!: HTMLDivElement;
@@ -138,6 +138,7 @@ export default class VBrowser extends Vue {
   currentScrollThumbnailId = "";
   keyboards = new Keyboards();
   selectedPetaTags: PetaTag[] = [];
+  filteredPetaImages: PetaImage[] = [];
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0]!.contentRect);
@@ -324,6 +325,15 @@ export default class VBrowser extends Vue {
     this.$nextTick(() => {
       this.thumbnails.scrollTop = 0;
     });
+    this.fetchFilteredPetaImages();
+  }
+  @Watch("petaImagesArray")
+  changePetaImagesArray() {
+    this.fetchFilteredPetaImages();
+  }
+  @Watch("petaTagInfos")
+  changePetaTagInfos() {
+    this.fetchFilteredPetaImages();
   }
   @Watch("thumbnailsSize")
   changeThumbnailsSize() {
@@ -335,26 +345,38 @@ export default class VBrowser extends Vue {
   get selectedPetaImages() {
     return this.petaImagesArray.filter((pi) => pi._selected);
   }
-  get uncategorizedImages() {
-    return this.petaImagesArray.filter((petaImage) => {
-      return getPetaTagsOfPetaImage(petaImage, this.petaTags).length == 0;
-    });
-  }
-  get filteredPetaImages() {
-    if (this.selectedPetaTags.find((petaTag) => petaTag.id == "untagged")) {
-      return this.uncategorizedImages;
+  uncategorizedImages: PetaImage[] = [];
+  async fetchFilteredPetaImages() {
+    if (this.selectedPetaTags.length == 0) {
+      this.filteredPetaImages = this.petaImagesArray;
+      return;
     }
-    return this.petaImagesArray.filter((d) => {
-      let result = true;
-      this.selectedPetaTags.forEach((k) => {
-        const petaTag = this.petaTags.find((petaTag) => petaTag.id == k.id);
-        if (petaTag && !petaTag.petaImages.includes(d.id)) {
-          result = false;
-        }
-      });
-      return result;
-    });
+    const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === "untagged")
+    const results = await API.send(
+      "getPetaImageIdsByPetaTagIds",
+      untagged ? [] : this.selectedPetaTags.map((petaTag) => petaTag.id)
+    );
+    this.filteredPetaImages = Array.from(new Set(results.map((id) => {
+      return this.petaImages[id]!;
+    }).filter((petaImage) => {
+      return petaImage;
+    }))).sort(this.sort);
   }
+  // get filteredPetaImages() {
+  //   if (this.selectedPetaTags.find((petaTag) => petaTag.id == "untagged")) {
+  //     return this.uncategorizedImages;
+  //   }
+  //   return this.petaImagesArray.filter((d) => {
+  //     let result = true;
+  //     // this.selectedPetaTags.forEach((k) => {
+  //     //   const petaTag = this.petaTags.find((petaTag) => petaTag.id == k.id);
+  //     //   if (petaTag && !petaTag.petaImages.includes(d.id)) {
+  //     //     result = false;
+  //     //   }
+  //     // });
+  //     return result;
+  //   });
+  // }
   get thumbnailsRowCount() {
     let c = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
     if (c < 1) {
@@ -397,6 +419,7 @@ export default class VBrowser extends Vue {
         position: position,
         width: this.actualThumbnailSize,
         height: height,
+        petaTags: [],
         visible: 
           (this.areaMinY < position.y && position.y < this.areaMaxY)
           ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)

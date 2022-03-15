@@ -64,7 +64,7 @@
 <script lang="ts">
 // Vue
 import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
@@ -77,7 +77,8 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
+import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {
     VEditableLabel,
@@ -91,7 +92,7 @@ export default class VProperty extends Vue {
   @Prop()
   petaImages!: PetaImage[];
   @Prop()
-  allPetaTags!: PetaTag[];
+  petaTagInfos!: PetaTagInfo[];
   @Ref("previews")
   previews!: HTMLElement;
   previewWidth = 0;
@@ -111,17 +112,29 @@ export default class VProperty extends Vue {
     this.previewWidth = rect.width;
     this.previewHeight = rect.height;
   }
-  addTag(name: string) {
+  async addTag(name: string) {
     // タグを探す。なかったら作る。
-    const petaTag = this.allPetaTags.find((petaTag) => petaTag.name == name) || createPetaTag(name);
-    petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
-    API.send("updatePetaTags", [petaTag], UpdateMode.UPSERT);
+    const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == name)?.petaTag || createPetaTag(name);
+    // petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
+    await API.send("updatePetaTags", [petaTag], UpdateMode.UPSERT);
+    await API.send("updatePetaImagesPetaTags", this.petaImages.map((pi): PetaImagePetaTag => {
+      return {
+        id: pi.id + petaTag.id,
+        petaImageId: pi.id,
+        petaTagId: petaTag.id
+      }
+    }), UpdateMode.UPSERT);
+    this.fetchPetaTags();
   }
-  removeTag(petaTag: PetaTag) {
-    this.petaImages.forEach((petaImage) => {
-      petaTag.petaImages = petaTag.petaImages.filter((id) => id != petaImage.id);
-    });
-    API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
+  async removeTag(petaTag: PetaTag) {
+    await API.send("updatePetaImagesPetaTags", this.petaImages.map((petaImage): PetaImagePetaTag => {
+      return {
+        id: petaImage.id + petaTag.id,
+        petaImageId: petaImage.id,
+        petaTagId: petaTag.id
+      }
+    }), UpdateMode.REMOVE);
+    this.fetchPetaTags();
   }
   clearSelection() {
     this.petaImages.forEach((pi) => {
@@ -129,7 +142,7 @@ export default class VProperty extends Vue {
     })
   }
   complementTag(editableLabel: VEditableLabel) {
-    this.$components.complement.open(editableLabel, this.allPetaTags.map((petaTag) => petaTag.name));
+    this.$components.complement.open(editableLabel, this.petaTagInfos.map((pti) => pti.petaTag.name));
   }
   tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
@@ -144,25 +157,10 @@ export default class VProperty extends Vue {
   selectTag(tag: PetaTag) {
     this.$emit("selectTag", tag);
   }
-  get sharedPetaTags(): PetaTag[] {
-    if (this.noImage) {
-      return [];
-    }
-    const tags: {[tag: string]: {
-      count: number,
-      petaTag: PetaTag
-    }} = {};
-    this.petaImages.forEach((pi) => {
-      getPetaTagsOfPetaImage(pi, this.allPetaTags).forEach((tag) => {
-        const t = tags[tag.id] || {
-          count: 0,
-          petaTag: tag
-        };
-        tags[tag.id] = t;
-        t.count++;
-      });
-    });
-    return Object.values(tags).filter((tag) => tag.count == this.petaImages.length).map((t) => t.petaTag);
+  sharedPetaTags: PetaTag[] = [];
+  async fetchPetaTags() {
+    const result = await API.send("getPetaTagIdsByPetaImageIds", this.petaImages.map((petaImage) => petaImage.id));
+    this.sharedPetaTags = this.petaTagInfos.filter((pti) => result.find((id) => id == pti.petaTag.id)).map((pi) => pi.petaTag);
   }
   get propertyThumbnails(): PropertyThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
@@ -220,6 +218,14 @@ export default class VProperty extends Vue {
       pi.nsfw = value;
     });
     updatePetaImages(this.petaImages, UpdateMode.UPDATE);
+  }
+  @Watch("petaImages")
+  changePetaImages() {
+    this.fetchPetaTags();
+  }
+  @Watch("petaTagInfos")
+  changeFetchTags() {
+    this.fetchPetaTags();
   }
 }
 </script>

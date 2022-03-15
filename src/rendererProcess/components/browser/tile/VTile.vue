@@ -77,9 +77,10 @@ import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
-import { log } from "@/rendererProcess/api";
+import { API, log } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import TransparentBackground from "@/@assets/transparentBackground.png";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {
   },
@@ -91,7 +92,7 @@ export default class VTile extends Vue {
   @Prop()
   original = false;
   @Prop()
-  petaTags!: PetaTag[];
+  petaTagInfos!: PetaTagInfo[];
   @Ref("canvas")
   canvas!: HTMLCanvasElement;
   imageURL = "";
@@ -115,6 +116,7 @@ export default class VTile extends Vue {
       }
     }
     this.changeVisible();
+    this.fetchPetaTags();
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
@@ -166,10 +168,12 @@ export default class VTile extends Vue {
   get showNsfw() {
     return this.tile.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
   }
-  get myPetaTags() {
-    return this.petaTags.filter((petaTag) => {
-      return petaTag.petaImages.includes(this.tile.petaImage.id);
-    });
+  myPetaTags: PetaTag[] = [];
+  async fetchPetaTags() {
+    const result = await API.send("getPetaTagIdsByPetaImageIds", [this.tile.petaImage.id]);
+    this.myPetaTags = this.petaTagInfos
+    .filter((petaTagInfo) => result.find((id) => id == petaTagInfo.petaTag.id))
+    .map((pti) => pti.petaTag);
   }
   get transparentBackground() {
     return TransparentBackground;
@@ -187,6 +191,10 @@ export default class VTile extends Vue {
     if (this.tile.visible) {
       this.changeOriginal();
     }
+  }
+  @Watch("petaTagInfos")
+  changeFetchTags() {
+    this.fetchPetaTags();
   }
 }
 </script>

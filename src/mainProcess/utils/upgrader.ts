@@ -1,14 +1,16 @@
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { defaultSettings, Settings } from "@/commons/datas/settings";
+import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import DB from "@/mainProcess/storages/db";
 import { v4 as uuid } from "uuid";
-
+const defaultSettings = getDefaultSettings();
 export function upgradePetaImage(petaImage: PetaImage) {
   // v0.2.0
   // if (petaImage.tags === undefined) {
@@ -95,7 +97,7 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
   const addTags = async (petaImage: PetaImage, index: number) => {
     const anyPetaImage = (petaImage as any);
     await promiseSerial(async (tag) => {
-      const petaTag = (await petaTags.find({ name: tag }))[0] || createPetaTag(tag);
+      const petaTag = ((await petaTags.find({ name: tag }))[0] || createPetaTag(tag)) as any;
       petaTag.petaImages.push(petaImage.id);
       petaTag.petaImages = Array.from(new Set(petaTag.petaImages));
       await petaTags.update({ id: petaTag.id }, petaTag, true);
@@ -117,4 +119,35 @@ export function upgradePetaPanel(petaPanel: PetaPanel) {
     }
   }
   return petaPanel;
+}
+
+// 2.0.1
+export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImagesPetaTags: DB<PetaImagePetaTag>, petaImages: PetaImages) {
+  let changed = false;
+  try {
+    await promiseSerial(async (petaTag) => {
+      await promiseSerial(async (petaImageId) => {
+        if (!petaImages[petaImageId]) {
+          // console.error(petaImageId, "is undefined");
+          return;
+        }
+        const pipt = createPetaPetaImagePetaTag(petaImageId, petaTag.id);
+        await petaImagesPetaTags.update(
+          { id: pipt.id },
+          pipt,
+          true
+        );
+        changed = true;
+      }, (petaTag as any).petaImages as string[]).value;
+      // petaTag.petaImages = [];
+      await petaTags.update(
+        { id: petaTag.id },
+        petaTag,
+        false
+      );
+    }, (await petaTags.find({}))).value;
+  } catch (error) {
+    //
+  }
+  return changed;
 }

@@ -42,6 +42,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {
     VEditableLabel
@@ -53,7 +54,7 @@ export default class VSearch extends Vue {
   @Ref("searchInput")
   searchInput!: VEditableLabel;
   @Prop()
-  petaTags: PetaTag[] = [];
+  petaTagInfos: PetaTagInfo[] = [];
   @Prop()
   selectedPetaTags: PetaTag[] = [];
   mounted() {
@@ -85,14 +86,14 @@ export default class VSearch extends Vue {
     const index = this.selectedPetaTags.findIndex((petaTag) => petaTag == tag);
     this.selectedPetaTags.splice(index, 1);
     if (value != "") {
-      const petaTag = this.petaTags.find((petaTag) => petaTag.name == value);
+      const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == value)?.petaTag;
       if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
         this.selectedPetaTags.splice(index, 0, petaTag);
       }
     }
   }
   addSelectedTag(tagName: string) {
-    const petaTag = this.petaTags.find((petaTag) => petaTag.name == tagName);
+    const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == tagName)?.petaTag;
     if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
       this.selectedPetaTags.push(petaTag);
     }
@@ -112,10 +113,10 @@ export default class VSearch extends Vue {
     this.$components.complement.open(editableLabel, this.complementItems);
   }
   get complementItems() {
-    return this.petaTags.filter((petaTag) => {
-      return !this.selectedPetaTags.includes(petaTag)
-    }).map((petaTag) => {
-      return petaTag.name;
+    return this.petaTagInfos.filter((pti) => {
+      return !this.selectedPetaTags.includes(pti.petaTag)
+    }).map((pti) => {
+      return pti.petaTag.name;
     });
   }
   @Watch("complementItems")

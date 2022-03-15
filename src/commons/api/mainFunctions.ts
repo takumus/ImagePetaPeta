@@ -5,6 +5,8 @@ import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
+import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
@@ -20,6 +22,10 @@ export interface MainFunctions {
   updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   getPetaTags: () => Promise<PetaTag[]>;
   updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
+  getPetaImageIdsByPetaTagIds: (petaTagIds?: string[]) => Promise<string[]>;
+  getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
+  getPetaTagInfos: () => Promise<PetaTagInfo[]>;
+  updatePetaImagesPetaTags: (tags: PetaImagePetaTag[], mode: UpdateMode) => Promise<boolean>;
   log: (...args: any[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;

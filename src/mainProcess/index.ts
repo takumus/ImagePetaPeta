@@ -24,11 +24,13 @@ import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
-import { upgradePetaBoard, upgradePetaImage, upgradePetaTag, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
+import { upgradePetaBoard, upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
 import { arrLast, minimId, noHtml } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
+import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -51,12 +53,14 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
   let FILE_TAGS_DB: string;
+  let FILE_IMAGES_TAGS_DB: string;
   let FILE_SETTINGS: string;
   let FILE_STATES: string;
   let dataLogger: Logger;
   let dataPetaImages: DB<PetaImage>;
   let dataPetaBoards: DB<PetaBoard>;
   let dataPetaTags: DB<PetaTag>;
+  let dataPetaImagesPetaTags: DB<PetaImagePetaTag>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
 
@@ -90,12 +94,14 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
     FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
     FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
+    FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
     FILE_STATES = file.initFile(DIR_APP, "states.json");
     DIR_LOG = file.initDirectory(false, app.getPath("logs"));
     dataLogger = new Logger(DIR_LOG);
     dataPetaImages = new DB<PetaImage>(FILE_IMAGES_DB);
     dataPetaBoards = new DB<PetaBoard>(FILE_BOARDS_DB);
     dataPetaTags = new DB<PetaTag>(FILE_TAGS_DB);
+    dataPetaImagesPetaTags = new DB<PetaImagePetaTag>(FILE_IMAGES_TAGS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
   } catch (err) {
     //-------------------------------------------------------------------------------------------------//
@@ -161,6 +167,11 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       await dataPetaBoards.init();
       await dataPetaImages.init();
       await dataPetaTags.init();
+      await dataPetaImagesPetaTags.init();
+      await dataPetaTags.ensureIndex({
+        fieldName: "id",
+        unique: true
+      });
       const petaImagesArray = await dataPetaImages.find({});
       const petaImages: PetaImages = {};
       petaImagesArray.forEach((pi) => {
@@ -169,6 +180,9 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
       if (await upgradePetaTag(dataPetaTags, petaImages)) {
         dataLogger.mainLog("Upgrade Tags");
         await promiseSerial((pi) => updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
+      }
+      if (await upgradePetaImagesPetaTags(dataPetaTags, dataPetaImagesPetaTags, petaImages)) {
+        dataLogger.mainLog("Upgrade PetaImagesPetaTags");
       }
     } catch (error) {
       showError("M", 2, "Initialization Error", String(error));
@@ -320,14 +334,6 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           try {
             await promiseSerial((data) => updatePetaImage(data, mode), datas).value;
             if (mode == UpdateMode.REMOVE) {
-              await promiseSerial(async (petaTag) => {
-                petaTag.petaImages = petaTag.petaImages.filter((petaImageId) => {
-                  return !datas.find((petaImage) => {
-                    return petaImage.id == petaImageId;
-                  });
-                });
-                await updatePetaTag(petaTag, UpdateMode.UPDATE);
-              }, await dataPetaTags.find({})).value;
               emitMainEvent("updatePetaTags");
             }
           } catch (err) {
@@ -412,6 +418,90 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
           } catch (error) {
             dataLogger.mainError(error);
             showError("M", 6, "Update PetaTags Error", String(error));
+          }
+          return false;
+        },
+        getPetaImageIdsByPetaTagIds: async (event, petaTagIds) => {
+          try {
+            // all
+            if (!petaTagIds) {
+              return (await dataPetaImages.find({})).map((pi) => pi.id);
+            }
+            // untagged
+            if (petaTagIds.length == 0) {
+              const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => pipt.petaImageId)));
+              return (await dataPetaImages.find({
+                id: {
+                  $nin: taggedIds.map((id) => id)
+                }
+              })).map((pi) => pi.id);
+            }
+            // filter by ids
+            const pipts = (await dataPetaImagesPetaTags.find({
+              $or: petaTagIds.map((id) => {
+                return {
+                  petaTagId: id
+                }
+              })
+            }));
+            const ids = Array.from(new Set(pipts.map((pipt) => pipt.petaImageId)));
+            return ids.filter((id) => pipts.filter((pipt) => pipt.petaImageId == id).length == petaTagIds.length);
+          } catch(error) {
+            //
+          }
+          return [];
+        },
+        getPetaTagIdsByPetaImageIds: async (event, petaImageIds) => {
+          try {
+            // all
+            if (petaImageIds.length == 0) {
+              return (await dataPetaImagesPetaTags.find({})).map((pipt) => pipt.petaTagId);
+            }
+            // filter by ids
+            const pipts = (await dataPetaImagesPetaTags.find({
+              $or: petaImageIds.map((id) => {
+                return {
+                  petaImageId: id
+                }
+              })
+            }));
+            const ids = Array.from(new Set(pipts.map((pipt) => pipt.petaTagId)));
+            return ids.filter((id) => pipts.filter((pipt) => pipt.petaTagId == id).length == petaImageIds.length);
+          } catch(error) {
+            //
+          }
+          return[];
+        },
+        getPetaTagInfos: async () => {
+          try {
+            const petaTags = await dataPetaTags.find({});
+            let values: PetaTagInfo[] = [];
+            const result = promiseSerial(async (petaTag) => {
+              const info = {
+                petaTag,
+                count: await dataPetaImagesPetaTags.count({ petaTagId: petaTag.id })
+              } as PetaTagInfo;
+              values.push(info);
+              return info;
+            }, petaTags);
+            const values2 = await result.value;
+            return values;
+          } catch (error) {
+            //
+          }
+          return [];
+        },
+        updatePetaImagesPetaTags: async (event, tags, mode) => {
+          try {
+            dataLogger.mainLog("#Update PetaTags");
+            await promiseSerial((tag) => updatePetaImagePetaTag(tag, mode), tags).value;
+            if (mode != UpdateMode.UPDATE) {
+              emitMainEvent("updatePetaTags");
+            }
+            dataLogger.mainLog("return:", true);
+            return true;
+          } catch(error) {
+            //
           }
           return false;
         },
@@ -732,6 +822,8 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     dataLogger.mainLog("mode:", mode);
     dataLogger.mainLog("image:", minimId(petaImage.id));
     if (mode == UpdateMode.REMOVE) {
+      await dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
+      dataLogger.mainLog("removed tags");
       await dataPetaImages.remove({ id: petaImage.id });
       dataLogger.mainLog("removed db");
       await file.rm(getImagePath(petaImage, ImageType.ORIGINAL)).catch((e) => {});
@@ -769,12 +861,29 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     dataLogger.mainLog("mode:", mode);
     dataLogger.mainLog("tag:", minimId(tag.id));
     if (mode == UpdateMode.REMOVE) {
+      await dataPetaImagesPetaTags.remove({ petaTagId: tag.id });
       await dataPetaTags.remove({ id: tag.id });
       dataLogger.mainLog("removed");
       return true;
     }
-    tag.petaImages = Array.from(new Set(tag.petaImages));
+    // tag.petaImages = Array.from(new Set(tag.petaImages));
     await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
+    dataLogger.mainLog("updated");
+    return true;
+  }
+  /*------------------------------------
+    PetaImagePetaTag更新
+  ------------------------------------*/
+  async function updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
+    dataLogger.mainLog("##Update PetaImagePetaTag");
+    dataLogger.mainLog("mode:", mode);
+    dataLogger.mainLog("tag:", minimId(petaImagePetaTag.id));
+    if (mode == UpdateMode.REMOVE) {
+      await dataPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
+      dataLogger.mainLog("removed");
+      return true;
+    }
+    await dataPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode == UpdateMode.UPSERT);
     dataLogger.mainLog("updated");
     return true;
   }
@@ -816,7 +925,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
         const filePath = filePaths[i];
         if (!filePath) continue;
         const readDirResult = file.readDirRecursive(filePath, (filePaths) => {
-          console.log(filePaths);
+          // console.log(filePaths);
         });
         cancelImportImages = readDirResult.cancel;
         _filePaths.push(...(await readDirResult.files));
@@ -972,7 +1081,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
     if (dataSettings.data.autoAddTag) {
       const name = dateFormat(addDate, "yyyy-mm-dd");
       const datePetaTag = (await dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-      datePetaTag.petaImages.push(petaImage.id);
+      await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
       await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
     await file.writeFile(Path.resolve(DIR_IMAGES, originalFileName), param.data);

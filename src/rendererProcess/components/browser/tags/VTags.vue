@@ -39,12 +39,12 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 // Others
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { getPetaTagsOfPetaImage } from "@/rendererProcess/utils/getPetaTagsOfPetaImage";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {
     VEditableLabel
@@ -56,7 +56,7 @@ export default class VTags extends Vue {
   @Prop()
   petaImagesArray: PetaImage[] = [];
   @Prop()
-  petaTags: PetaTag[] = [];
+  petaTagInfos: PetaTagInfo[] = [];
   @Prop()
   selectedPetaTags: PetaTag[] = [];
   tempSelectedTags = "";
@@ -103,11 +103,11 @@ export default class VTags extends Vue {
     }
   }
   get browserTags(): BrowserTag[] {
-    const browserTags = this.petaTags.map((petaTag): BrowserTag => {
+    const browserTags = this.petaTagInfos.map((petaTagInfo): BrowserTag => {
       return {
-        petaTag: petaTag,
-        count: petaTag.petaImages.length,
-        selected: this.selectedPetaTags.includes(petaTag),
+        petaTag: petaTagInfo.petaTag,
+        count: petaTagInfo.count,
+        selected: this.selectedPetaTags.includes(petaTagInfo.petaTag),
         readonly: false
       };
     })
@@ -123,7 +123,7 @@ export default class VTags extends Vue {
         id: "untagged",
         name: this.$t("browser.untagged"),
         index: 0,
-        petaImages: []
+        // petaImages: []
       },
       count: this.uncategorizedImages.length,
       selected: this.selectedPetaTags.find((petaTag) => petaTag.id == "untagged") != undefined,
@@ -131,9 +131,10 @@ export default class VTags extends Vue {
     }, ...browserTags];
   }
   get uncategorizedImages() {
-    return this.petaImagesArray.filter((petaImage) => {
-      return getPetaTagsOfPetaImage(petaImage, this.petaTags).length == 0;
-    });
+    return this.petaImagesArray;
+    // .filter((petaImage) => {
+    //   return getPetaTagsOfPetaImage(petaImage, this.petaTags).length == 0;
+    // });
   }
   get selectedAll() {
     return this.selectedPetaTags.length == 0;

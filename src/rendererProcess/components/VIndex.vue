@@ -30,7 +30,7 @@
     >
       <VBrowser
         :petaImages="petaImages"
-        :petaTags="petaTags"
+        :petaTagInfos="petaTagInfos"
         @addPanel="addPanel"
       />
       <VInfo />
@@ -77,6 +77,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 import { isLatest } from "@/commons/utils/versionCheck";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
 import { PetaTag } from "@/commons/datas/petaTag";
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {
     VBrowser,
@@ -97,7 +98,7 @@ export default class Index extends Vue {
   vTabBar!: VTabBar;
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
-  petaTags: PetaTag[] = [];
+  petaTagInfos: PetaTagInfo[] = [];
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
@@ -116,7 +117,7 @@ export default class Index extends Vue {
       this.getPetaImages();
     });
     API.on("updatePetaTags", (e) => {
-      this.getPetaTags();
+      this.getPetaTagInfos();
     });
     API.on("updatePetaImage", (e, petaImage) => {
       // log("vIndex", "on savePetaImage", petaImage.id);
@@ -135,7 +136,7 @@ export default class Index extends Vue {
     document.title = this.title;
     await this.getPetaImages();
     await this.getPetaBoards();
-    await this.getPetaTags();
+    await this.getPetaTagInfos();
     await this.restoreBoard();
     this.$nextTick(() => {
       API.send("showMainWindow");
@@ -201,8 +202,8 @@ export default class Index extends Vue {
       }
     });
   }
-  async getPetaTags() {
-    this.petaTags = await API.send("getPetaTags");
+  async getPetaTagInfos() {
+    this.petaTagInfos = await API.send("getPetaTagInfos");
   }
   addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
     this.orderedAddPanelIds = ids;
