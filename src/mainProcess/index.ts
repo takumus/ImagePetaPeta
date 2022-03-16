@@ -478,24 +478,21 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
               });
             }
             // filter by ids
-            console.time("getPetaImageIdsByPetaTagIds-1");
+            const timerUUID = uuid().substring(0, 5);
+            console.time("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
             let pipts: PetaImagePetaTag[] = [];
             await promiseSerial(async (petaImageId) => {
               pipts.push(...(await dataPetaImagesPetaTags.find({ petaImageId })));
             }, petaImageIds).value;
-            console.timeEnd("getPetaImageIdsByPetaTagIds-1");
-            console.time("getPetaImageIdsByPetaTagIds-2");
+            console.timeEnd("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
             const ids = Array.from(new Set(pipts.map((pipt) => {
               return pipt.petaTagId;
             })));
-            console.timeEnd("getPetaImageIdsByPetaTagIds-2");
-            console.time("getPetaImageIdsByPetaTagIds-3");
             const petaTagIds = ids.filter((id) => {
               return pipts.filter((pipt) => {
                 return pipt.petaTagId == id;
               }).length == petaImageIds.length;
             });
-            console.timeEnd("getPetaImageIdsByPetaTagIds-3");
             return petaTagIds;
           } catch(error) {
             dataLogger.mainError(error);
