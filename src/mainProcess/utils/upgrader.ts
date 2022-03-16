@@ -126,9 +126,12 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
   let changed = false;
   try {
     await promiseSerial(async (petaTag) => {
+      const petaImageIds = ((petaTag as any).petaImages) as string[] | undefined;
+      if (!petaImageIds) {
+        return;
+      }
       await promiseSerial(async (petaImageId) => {
         if (!petaImages[petaImageId]) {
-          // console.error(petaImageId, "is undefined");
           return;
         }
         const pipt = createPetaPetaImagePetaTag(petaImageId, petaTag.id);
@@ -138,8 +141,10 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
           true
         );
         changed = true;
-      }, (petaTag as any).petaImages as string[]).value;
-      // petaTag.petaImages = [];
+      }, petaImageIds).value;
+      // remove petaImages property
+      (petaTag as any).petaImages = undefined;
+      // update
       await petaTags.update(
         { id: petaTag.id },
         petaTag,
