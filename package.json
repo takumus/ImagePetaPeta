@@ -24,7 +24,7 @@
   "dependencies": {
     "@araki-packages/promise-serial": "^1.1.0",
     "@pixi/gif": "^1.0.2",
-    "@seald-io/nedb": "^2.2.1",
+    "@seald-io/nedb": "2.2.1",
     "@types/fuzzy-search": "^2.1.2",
     "axios": "^0.21.4",
     "blurhash": "^1.1.4",

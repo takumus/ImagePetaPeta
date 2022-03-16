@@ -1306,7 +1306,7 @@
   resolved "https://registry.yarnpkg.com/@seald-io/binary-search-tree/-/binary-search-tree-1.0.2.tgz#9f0e5cec5e0acf97f1b495f2f6d3476ddb6a94ed"
   integrity sha512-+pYGvPFAk7wUR+ONMOlc6A+LUN4kOCFwyPLjyaeS7wVibADPHWYJNYsNtyIAwjF1AXQkuaXElnIc4XjKt55QZA==
 
-"@seald-io/nedb@^2.2.1":
+"@seald-io/nedb@2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@seald-io/nedb/-/nedb-2.2.1.tgz#e46fc4bb079f2c4f9da8e8d7485e581621db6a57"
   integrity sha512-uUAUpMT8SyWIc+KISyRqQy95mCjY0hx8tudzFTuvyhtON1xnfrqSfMRNxaVhx/W2aeWqLRNUqhDH6L3Tm9sBhQ==
