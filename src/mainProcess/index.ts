@@ -126,13 +126,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     }
   }]);
   app.on("window-all-closed", () => {
-    dataLogger.mainLog("#Electron event: window-all-closed");
+    dataLogger.task().mainLog("#Electron event: window-all-closed");
     if (process.platform != "darwin") {
       app.quit();
     }
   });
   app.on("activate", async () => {
-    dataLogger.mainLog("#Electron event: activate");
+    dataLogger.task().mainLog("#Electron event: activate");
     if (BrowserWindow.getAllWindows().length === 0) {
       initWindow();
     }
@@ -178,11 +178,11 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
         petaImages[pi.id] = upgradePetaImage(pi);
       });
       if (await upgradePetaTag(dataPetaTags, petaImages)) {
-        dataLogger.mainLog("Upgrade Tags");
+        dataLogger.task().mainLog("Upgrade Tags");
         await promiseSerial((pi) => updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
       }
       if (await upgradePetaImagesPetaTags(dataPetaTags, dataPetaImagesPetaTags, petaImages)) {
-        dataLogger.mainLog("Upgrade PetaImagesPetaTags");
+        dataLogger.task().mainLog("Upgrade PetaImagesPetaTags");
       }
     } catch (error) {
       showError("M", 2, "Initialization Error", String(error));
@@ -218,15 +218,16 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           画像を開く
         ------------------------------------*/
         importImageFiles: async () => {
-          dataLogger.mainLog("#Browse Image Files");
+          const log = dataLogger.task();
+          log.mainLog("#Browse Image Files");
           const result = await dialog.showOpenDialog(window, {
             properties: ["openFile", "multiSelections"]
           });
           if (result.canceled) {
-            dataLogger.mainLog("canceled");
+            log.mainLog("canceled");
             return 0;
           }
-          dataLogger.mainLog("return:", result.filePaths.length);
+          log.mainLog("return:", result.filePaths.length);
           importImagesFromFilePaths(result.filePaths);
           return result.filePaths.length;
         },
@@ -234,20 +235,21 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           画像を開く
         ------------------------------------*/
         importImageDirectories: async () => {
-          dataLogger.mainLog("#Browse Image Directories");
+          const log = dataLogger.task();
+          log.mainLog("#Browse Image Directories");
           const result = await dialog.showOpenDialog(window, {
             properties: ["openDirectory"]
           });
           if (result.canceled) {
-            dataLogger.mainLog("canceled");
+            log.mainLog("canceled");
             return 0;
           }
           const filePath = result.filePaths[0];
           if (!filePath) {
-            dataLogger.mainError("filePath is empty");
+            log.mainError("filePath is empty");
             return 0;
           }
-          // dataLogger.mainLog("return:", files.length);
+          // log.mainLog("return:", files.length);
           importImagesFromFilePaths([filePath]);
           return filePath.length;
         },
@@ -255,21 +257,22 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           URLからインポート
         ------------------------------------*/
         importImageFromURL: async (event, url) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Import Image From URL");
+            log.mainLog("#Import Image From URL");
             let data: Buffer;
             if (url.trim().indexOf("http") != 0) {
               // dataURIだったら
-              dataLogger.mainLog("data uri");
+              log.mainLog("data uri");
               data = dataURIToBuffer(url);
             } else {
               // 普通のurlだったら
-              dataLogger.mainLog("normal url:", url);
+              log.mainLog("normal url:", url);
               data = (await axios.get(url, { responseType: "arraybuffer" })).data;
             }
             return (await importImagesFromBuffers([data], "download"))[0]?.id || "";
           } catch (err) {
-            dataLogger.mainError(err);
+            log.mainError(err);
           }
           return "";
         },
@@ -277,12 +280,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           ファイルからインポート
         ------------------------------------*/
         importImagesFromFilePaths: async (event, filePaths) =>{
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Import Images From File Paths");
+            log.mainLog("#Import Images From File Paths");
             const images = (await importImagesFromFilePaths(filePaths)).map((image) => image.id);
             return images;
           } catch(e) {
-            dataLogger.mainError(e);
+            log.mainError(e);
           }
           return [];
         },
@@ -290,11 +294,12 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           クリップボードからインポート
         ------------------------------------*/
         importImagesFromClipboard: async (event, buffers) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Import Images From Clipboard");
+            log.mainLog("#Import Images From Clipboard");
             return (await importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id);
           } catch (error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
           }
           return [];
         },
@@ -311,17 +316,18 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           全PetaImage取得
         ------------------------------------*/
         getPetaImages: async (event) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Get PetaImages");
+            log.mainLog("#Get PetaImages");
             const data = await dataPetaImages.find({});
             const petaImages: PetaImages = {};
             data.forEach((pi) => {
               petaImages[pi.id] = upgradePetaImage(pi);
             });
-            dataLogger.mainLog("return:", data.length);
+            log.mainLog("return:", data.length);
             return petaImages;
           } catch(e) {
-            dataLogger.mainError(e);
+            log.mainError(e);
             showError("M", 3, "Get PetaImages Error", String(e));
           }
           return {};
@@ -330,46 +336,48 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImage 追加|更新|削除
         ------------------------------------*/
         updatePetaImages: async (event, datas, mode) => {
-          dataLogger.mainLog("#Update PetaImages");
+          const log = dataLogger.task();
+          log.mainLog("#Update PetaImages");
           try {
             await promiseSerial((data) => updatePetaImage(data, mode), datas).value;
             if (mode == UpdateMode.REMOVE) {
               emitMainEvent("updatePetaTags");
             }
           } catch (err) {
-            dataLogger.mainError(err);
+            log.mainError(err);
             showError("M", 4, "Update PetaImages Error", String(err));
           }
           if (mode != UpdateMode.UPDATE) {
             emitMainEvent("updatePetaImages");
           }
-          dataLogger.mainLog("return:", true);
+          log.mainLog("return:", true);
           return true;
         },
         /*------------------------------------
           全PetaBoard取得
         ------------------------------------*/
         getPetaBoards: async (event) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Get PetaBoards");
+            log.mainLog("#Get PetaBoards");
             const data = await dataPetaBoards.find({});
             data.forEach((board) => {
               // バージョンアップ時のプロパティ更新
               upgradePetaBoard(board);
             })
             if (data.length == 0) {
-              dataLogger.mainLog("no boards");
+              log.mainLog("no boards");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, dataSettings.data.darkMode);
               await updatePetaBoard(board, UpdateMode.UPSERT);
               data.push(board);
-              dataLogger.mainLog("return:", data.length);
+              log.mainLog("return:", data.length);
               return data;
             } else {
-              dataLogger.mainLog("return:", data.length);
+              log.mainLog("return:", data.length);
               return data;
             }
           } catch(e) {
-            dataLogger.mainError(e);
+            log.mainError(e);
             showError("M", 5, "Get PetaBoards Error", String(e));
           }
           return [];
@@ -378,13 +386,14 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaBoard 追加|更新|削除
         ------------------------------------*/
         updatePetaBoards: async (event, boards, mode) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Update PetaBoards");
+            log.mainLog("#Update PetaBoards");
             await promiseSerial((board) => updatePetaBoard(board, mode), boards).value;
-            dataLogger.mainLog("return:", true);
+            log.mainLog("return:", true);
             return true;
           } catch(e) {
-            dataLogger.mainError(e);
+            log.mainError(e);
             showError("M", 6, "Update PetaBoards Error", String(e));
           }
           return false;
@@ -393,23 +402,25 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaTag 追加|更新|削除
         ------------------------------------*/
         updatePetaTags: async (event, tags, mode) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Update PetaTags");
+            log.mainLog("#Update PetaTags");
             await promiseSerial((tag) => updatePetaTag(tag, mode), tags).value;
             if (mode != UpdateMode.UPDATE) {
               emitMainEvent("updatePetaTags");
             }
-            dataLogger.mainLog("return:", true);
+            log.mainLog("return:", true);
             return true;
           } catch (error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
             showError("M", 6, "Update PetaTags Error", String(error));
           }
           return false;
         },
         updatePetaImagesPetaTags: async (event, petaImageIds, petaTagIds, mode) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Update PetaImagesPetaTags");
+            log.mainLog("#Update PetaImagesPetaTags");
             await promiseSerial(async (petaImageId) => {
               await promiseSerial(async (petaTagId) => {
                 await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
@@ -418,34 +429,41 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
             if (mode != UpdateMode.UPDATE) {
               emitMainEvent("updatePetaTags");
             }
-            dataLogger.mainLog("return:", true);
+            log.mainLog("return:", true);
             return true;
           } catch(error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
             showError("M", 6, "Update PetaImagesPetaTags Error", String(error));
           }
           return false;
         },
         getPetaImageIdsByPetaTagIds: async (event, petaTagIds) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Get PetaImageIds By PetaTagIds");
-            console.time("getPetaImageIdsByPetaTagIds");
+            log.mainLog("#Get PetaImageIds By PetaTagIds");
             // all
             if (!petaTagIds) {
-              return (await dataPetaImages.find({})).map((pi) => pi.id);
+              log.mainLog("type: all");
+              const ids = (await dataPetaImages.find({})).map((pi) => pi.id);
+              log.mainLog("return:", ids.length);
+              return ids;
             }
             // untagged
             if (petaTagIds.length == 0) {
+              log.mainLog("type: untagged");
               const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
                 return pipt.petaImageId;
               })));
-              return (await dataPetaImages.find({
+              const ids = (await dataPetaImages.find({
                 id: {
                   $nin: taggedIds
                 }
               })).map((pi) => pi.id);
+              log.mainLog("return:", ids.length);
+              return ids;
             }
             // filter by ids
+            log.mainLog("type: filter");
             const pipts = (await dataPetaImagesPetaTags.find({
               $or: petaTagIds.map((id) => {
                 return {
@@ -455,36 +473,41 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
             }));
             const ids = Array.from(new Set(pipts.map((pipt) => {
               return pipt.petaImageId;
-            })));
-            console.timeEnd("getPetaImageIdsByPetaTagIds");
-            return ids.filter((id) => {
+            }))).filter((id) => {
               return pipts.filter((pipt) => {
                 return pipt.petaImageId === id;
               }).length == petaTagIds.length
             });
+            log.mainLog("return:", ids.length);
+            return ids;
           } catch(error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
             showError("M", 6, "Get PetaImageIds By PetaTagIds Error", String(error));
           }
           return [];
         },
         getPetaTagIdsByPetaImageIds: async (event, petaImageIds) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Get PetaTagIds By PetaImageIds");
+            log.mainLog("#Get PetaTagIds By PetaImageIds");
             // all
             if (petaImageIds.length == 0) {
-              return (await dataPetaImagesPetaTags.find({})).map((pipt) => {
+              const ids = (await dataPetaImagesPetaTags.find({})).map((pipt) => {
                 return pipt.petaTagId;
               });
+              log.mainLog("type: all");
+              log.mainLog("return:", ids.length);
+              return ids;
             }
+            log.mainLog("type: filter");
             // filter by ids
-            const timerUUID = uuid().substring(0, 5);
-            console.time("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
+            // const timerUUID = uuid().substring(0, 5);
+            // console.time("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
             let pipts: PetaImagePetaTag[] = [];
             await promiseSerial(async (petaImageId) => {
               pipts.push(...(await dataPetaImagesPetaTags.find({ petaImageId })));
             }, petaImageIds).value;
-            console.timeEnd("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
+            // console.timeEnd("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
             const ids = Array.from(new Set(pipts.map((pipt) => {
               return pipt.petaTagId;
             })));
@@ -493,16 +516,18 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
                 return pipt.petaTagId == id;
               }).length == petaImageIds.length;
             });
+            log.mainLog("return:", ids.length);
             return petaTagIds;
           } catch(error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
             showError("M", 6, "Get PetaTagIds By PetaImageIds Error", String(error));
           }
           return [];
         },
         getPetaTagInfos: async () => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Get PetaTagInfos");
+            log.mainLog("#Get PetaTagInfos");
             const petaTags = await dataPetaTags.find({});
             let values: PetaTagInfo[] = [];
             const result = promiseSerial(async (petaTag) => {
@@ -514,10 +539,10 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
               return info;
             }, petaTags);
             const values2 = await result.value;
-            dataLogger.mainLog("return:", values.length);
+            log.mainLog("return:", values.length);
             return values;
           } catch (error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
             showError("M", 6, "Get PetaTagInfos Error", String(error));
           }
           return [];
@@ -525,16 +550,17 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
         /*------------------------------------
           ログ
         ------------------------------------*/
-        log: async (event, ...args: any) => {
-          dataLogger.log(LogFrom.RENDERER, ...args);
+        log: async (event, id: string, ...args: any) => {
+          dataLogger.log(LogFrom.RENDERER, id, ...args);
           return true;
         },
         /*------------------------------------
           WebブラウザでURLを開く
         ------------------------------------*/
         openURL: async (event, url) => {
-          dataLogger.mainLog("#Open URL");
-          dataLogger.mainLog("url:", url);
+          const log = dataLogger.task();
+          log.mainLog("#Open URL");
+          log.mainLog("url:", url);
           shell.openExternal(url);
           return true;
         },
@@ -542,26 +568,29 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImageのファイルを開く
         ------------------------------------*/
         openImageFile: async (event, petaImage) => {
-          dataLogger.mainLog("#Open Image File");
+          const log = dataLogger.task();
+          log.mainLog("#Open Image File");
           shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
         },
         /*------------------------------------
           アプリ情報
         ------------------------------------*/
         getAppInfo: async (event) => {
-          dataLogger.mainLog("#Get App Info");
+          const log = dataLogger.task();
+          log.mainLog("#Get App Info");
           const info = {
             name: app.getName(),
             version: app.getVersion()
           };
-          dataLogger.mainLog("return:", info);
+          log.mainLog("return:", info);
           return info;
         },
         /*------------------------------------
           DBフォルダを開く
         ------------------------------------*/
         showDBFolder: async (event) => {
-          dataLogger.mainLog("#Show DB Folder");
+          const log = dataLogger.task();
+          log.mainLog("#Show DB Folder");
           shell.showItemInFolder(DIR_ROOT);
           return true;
         },
@@ -569,7 +598,8 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           Configフォルダを開く
         ------------------------------------*/
         showConfigFolder: async (event) => {
-          dataLogger.mainLog("#Show Config Folder");
+          const log = dataLogger.task();
+          log.mainLog("#Show Config Folder");
           shell.showItemInFolder(DIR_APP);
           return true;
         },
@@ -577,7 +607,8 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           全PetaBoard取得
         ------------------------------------*/
         showImageInFolder: async (event, petaImage) => {
-          dataLogger.mainLog("#Show Image In Folder");
+          const log = dataLogger.task();
+          log.mainLog("#Show Image In Folder");
           shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
@@ -585,19 +616,20 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           アップデート確認
         ------------------------------------*/
         checkUpdate: async (event) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Check Update");
+            log.mainLog("#Check Update");
             const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
-            dataLogger.mainLog("url:", url);
-            dataLogger.mainLog("currentVersion:", app.getVersion());
+            log.mainLog("url:", url);
+            log.mainLog("currentVersion:", app.getVersion());
             const packageJSON = (await axios.get(url, { responseType: "json" })).data;
-            dataLogger.mainLog("latestVersion:", packageJSON.version);
+            log.mainLog("latestVersion:", packageJSON.version);
             return {
               current: app.getVersion(),
               latest: packageJSON.version
             }
           } catch(e) {
-            dataLogger.mainError(e);
+            log.mainError(e);
           }
           return {
             current: app.getVersion(),
@@ -608,15 +640,16 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           設定保存
         ------------------------------------*/
         updateSettings: async (event, settings) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Update Settings");
+            log.mainLog("#Update Settings");
             dataSettings.data = settings;
             window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             await dataSettings.save();
-            dataLogger.mainLog("return:", dataSettings.data);
+            log.mainLog("return:", dataSettings.data);
             return true;
           } catch(e) {
-            dataLogger.mainLog(e);
+            log.mainLog(e);
             showError("M", 7, "Update Settings Error", String(e));
           }
           return false;
@@ -625,39 +658,44 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           設定取得
         ------------------------------------*/
         getSettings: async (event) => {
-          dataLogger.mainLog("#Get Settings");
-          dataLogger.mainLog("return:", dataSettings.data);
+          const log = dataLogger.task();
+          log.mainLog("#Get Settings");
+          log.mainLog("return:", dataSettings.data);
           return dataSettings.data;
         },
         /*------------------------------------
           ウインドウのフォーカス取得
         ------------------------------------*/
         getWindowIsFocused: async (event) => {
-          dataLogger.mainLog("#Get Window Is Focused");
+          const log = dataLogger.task();
+          log.mainLog("#Get Window Is Focused");
           const isFocued = window.isFocused();
-          dataLogger.mainLog("return:", isFocued);
+          log.mainLog("return:", isFocued);
           return isFocued;
         },
         /*------------------------------------
           ズームレベル変更
         ------------------------------------*/
         setZoomLevel: async (event, level) => {
-          dataLogger.mainLog("#Set Zoom Level");
-          dataLogger.mainLog("level:", level);
+          const log = dataLogger.task();
+          log.mainLog("#Set Zoom Level");
+          log.mainLog("level:", level);
           window.webContents.setZoomLevel(level);
         },
         /*------------------------------------
           最小化
         ------------------------------------*/
         windowMinimize: async (event) => {
-          dataLogger.mainLog("#Window Minimize");
+          const log = dataLogger.task();
+          log.mainLog("#Window Minimize");
           window.minimize();
         },
         /*------------------------------------
           最大化
         ------------------------------------*/
         windowMaximize: async (event) => {
-          dataLogger.mainLog("#Window Maximize");
+          const log = dataLogger.task();
+          log.mainLog("#Window Maximize");
           if (window.isMaximized()) {
             window.unmaximize();
             return;
@@ -668,24 +706,27 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           閉じる
         ------------------------------------*/
         windowClose: async (event) => {
-          dataLogger.mainLog("#Window Close");
+          const log = dataLogger.task();
+          log.mainLog("#Window Close");
           app.quit();
         },
         /*------------------------------------
           OS情報取得
         ------------------------------------*/
         getPlatform: async (event) => {
-          dataLogger.mainLog("#Get Platform");
-          dataLogger.mainLog("return:", process.platform);
+          const log = dataLogger.task();
+          log.mainLog("#Get Platform");
+          log.mainLog("return:", process.platform);
           return process.platform;
         },
         /*------------------------------------
           サムネイル再生成
         ------------------------------------*/
         regenerateThumbnails: async (event) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Regenerate Thumbnails");
-            dataLogger.mainLog("preset:", dataSettings.data.thumbnails);
+            log.mainLog("#Regenerate Thumbnails");
+            log.mainLog("preset:", dataSettings.data.thumbnails);
             emitMainEvent("regenerateThumbnailsBegin");
             const images = await dataPetaImages.find({});
             const generate = async (image: PetaImage, i: number) => {
@@ -700,7 +741,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
               image.placeholder = result.placeholder;
               image.file.thumbnail = `${image.file.original}.${result.extname}`;
               await updatePetaImage(image, UpdateMode.UPDATE);
-              dataLogger.mainLog(`thumbnail (${i + 1} / ${images.length})`);
+              log.mainLog(`thumbnail (${i + 1} / ${images.length})`);
               emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
             }
             await promiseSerial(generate, images).value;
@@ -713,12 +754,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImageフォルダを選ぶ
         ------------------------------------*/
         browsePetaImageDirectory: async (event) => {
-          dataLogger.mainLog("#Browse PetaImage Directory");
+          const log = dataLogger.task();
+          log.mainLog("#Browse PetaImage Directory");
           const file = await dialog.showOpenDialog(window, {
             properties: ["openDirectory"]
           });
           if (file.canceled) {
-            dataLogger.mainLog("canceled");
+            log.mainLog("canceled");
             return null;
           }
           const filePath = file.filePaths[0];
@@ -729,22 +771,23 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           if (Path.basename(path) != "PetaImage") {
             path = Path.resolve(path, "PetaImage");
           }
-          dataLogger.mainLog("return:", path);
+          log.mainLog("return:", path);
           return path;
         },
         /*------------------------------------
           PetaImageフォルダを変更
         ------------------------------------*/
         changePetaImageDirectory: async (event, path) => {
+          const log = dataLogger.task();
           try {
-            dataLogger.mainLog("#Change PetaImage Directory");
+            log.mainLog("#Change PetaImage Directory");
             path = Path.resolve(path);
             if (Path.resolve() == path) {
-              dataLogger.mainError("Invalid file path:", path);
+              log.mainError("Invalid file path:", path);
               return false;
             }
             if (DIR_APP == path) {
-              dataLogger.mainError("Invalid file path:", path);
+              log.mainError("Invalid file path:", path);
               return false;
             }
             path = file.initDirectory(true, path);
@@ -754,7 +797,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
             relaunch();
             return true;
           } catch(error) {
-            dataLogger.mainError(error);
+            log.mainError(error);
             return false;
           }
         },
@@ -762,15 +805,17 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           States
         ------------------------------------*/
         getStates: async (event) => {
-          dataLogger.mainLog("#Get States");
+          const log = dataLogger.task();
+          log.mainLog("#Get States");
           return dataStates.data;
         },
         /*------------------------------------
           選択中のボードのidを保存
         ------------------------------------*/
         setSelectedPetaBoard: async (event, petaBoardId: string) => {
-          dataLogger.mainLog("#Set Selected PetaBoard");
-          dataLogger.mainLog("id:", petaBoardId);
+          const log = dataLogger.task();
+          log.mainLog("#Set Selected PetaBoard");
+          log.mainLog("id:", petaBoardId);
           dataStates.data.selectedPetaBoardId = petaBoardId;
           dataStates.save();
           return;
@@ -789,7 +834,8 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
   function showError(category: "M" | "R", code: number, title: string, error: string) {
     try {
       if (dataLogger) {
-        dataLogger.mainLog("#Show Error", error);
+        const log = dataLogger.task();
+        log.mainLog("#Show Error", error);
       }
     } catch { }
     try {
@@ -835,22 +881,23 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     PetaImage更新
   ------------------------------------*/
   async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    dataLogger.mainLog("##Update PetaImage");
-    dataLogger.mainLog("mode:", mode);
-    dataLogger.mainLog("image:", minimId(petaImage.id));
+    const log = dataLogger.task();
+    log.mainLog("##Update PetaImage");
+    log.mainLog("mode:", mode);
+    log.mainLog("image:", minimId(petaImage.id));
     if (mode == UpdateMode.REMOVE) {
       await dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
-      dataLogger.mainLog("removed tags");
+      log.mainLog("removed tags");
       await dataPetaImages.remove({ id: petaImage.id });
-      dataLogger.mainLog("removed db");
+      log.mainLog("removed db");
       await file.rm(getImagePath(petaImage, ImageType.ORIGINAL)).catch((e) => {});
-      dataLogger.mainLog("removed file");
+      log.mainLog("removed file");
       await file.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
-      dataLogger.mainLog("removed thumbnail");
+      log.mainLog("removed thumbnail");
       return true;
     }
     await dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.UPSERT);
-    dataLogger.mainLog("updated");
+    log.mainLog("updated");
     // emitMainEvent("updatePetaImage", petaImage);
     return true;
   }
@@ -858,50 +905,53 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     PetaBoard更新
   ------------------------------------*/
   async function updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    dataLogger.mainLog("##Update PetaBoard");
-    dataLogger.mainLog("mode:", mode);
-    dataLogger.mainLog("board:", minimId(board.id));
+    const log = dataLogger.task();
+    log.mainLog("##Update PetaBoard");
+    log.mainLog("mode:", mode);
+    log.mainLog("board:", minimId(board.id));
     if (mode == UpdateMode.REMOVE) {
       await dataPetaBoards.remove({ id: board.id });
-      dataLogger.mainLog("removed");
+      log.mainLog("removed");
       return true;
     }
     await dataPetaBoards.update({ id: board.id }, board, mode == UpdateMode.UPSERT);
-    dataLogger.mainLog("updated");
+    log.mainLog("updated");
     return true;
   }
   /*------------------------------------
     PetaTag更新
   ------------------------------------*/
   async function updatePetaTag(tag: PetaTag, mode: UpdateMode) {
-    dataLogger.mainLog("##Update PetaTag");
-    dataLogger.mainLog("mode:", mode);
-    dataLogger.mainLog("tag:", minimId(tag.id));
+    const log = dataLogger.task();
+    log.mainLog("##Update PetaTag");
+    log.mainLog("mode:", mode);
+    log.mainLog("tag:", minimId(tag.id));
     if (mode == UpdateMode.REMOVE) {
       await dataPetaImagesPetaTags.remove({ petaTagId: tag.id });
       await dataPetaTags.remove({ id: tag.id });
-      dataLogger.mainLog("removed");
+      log.mainLog("removed");
       return true;
     }
     // tag.petaImages = Array.from(new Set(tag.petaImages));
     await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
-    dataLogger.mainLog("updated");
+    log.mainLog("updated");
     return true;
   }
   /*------------------------------------
     PetaImagePetaTag更新
   ------------------------------------*/
   async function updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
-    dataLogger.mainLog("##Update PetaImagePetaTag");
-    dataLogger.mainLog("mode:", mode);
-    dataLogger.mainLog("tag:", minimId(petaImagePetaTag.id));
+    const log = dataLogger.task();
+    log.mainLog("##Update PetaImagePetaTag");
+    log.mainLog("mode:", mode);
+    log.mainLog("tag:", minimId(petaImagePetaTag.id));
     if (mode == UpdateMode.REMOVE) {
       await dataPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
-      dataLogger.mainLog("removed");
+      log.mainLog("removed");
       return true;
     }
     await dataPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode == UpdateMode.UPSERT);
-    dataLogger.mainLog("updated");
+    log.mainLog("updated");
     return true;
   }
   /*------------------------------------
@@ -928,8 +978,9 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       cancelImportImages();
       cancelImportImages = undefined;
     }
-    dataLogger.mainLog("##Import Images From File Paths");
-    dataLogger.mainLog("###List Files", filePaths.length);
+    const log = dataLogger.task();
+    log.mainLog("##Import Images From File Paths");
+    log.mainLog("###List Files", filePaths.length);
     emitMainEvent("importImagesBegin");
     emitMainEvent("importImagesProgress", {
       progress: 0,
@@ -954,11 +1005,11 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       });
       return [];
     }
-    dataLogger.mainLog("complete", _filePaths.length);
+    log.mainLog("complete", _filePaths.length);
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
     const importImage = async (filePath: string, index: number) => {
-      dataLogger.mainLog("import:", index + 1, "/", _filePaths.length);
+      log.mainLog("import:", index + 1, "/", _filePaths.length);
       let result = ImportImageResult.SUCCESS;
       try {
         const data = await file.readFile(filePath);
@@ -973,9 +1024,9 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           result = ImportImageResult.EXISTS;
         }
         addedFileCount++;
-        dataLogger.mainLog("imported", name, result);
+        log.mainLog("imported", name, result);
       } catch (err) {
-        dataLogger.mainError(err);
+        log.mainError(err);
         result = ImportImageResult.ERROR;
       }
       emitMainEvent("importImagesProgress", {
@@ -992,7 +1043,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       //
     }
     cancelImportImages = undefined;
-    dataLogger.mainLog("return:", addedFileCount, "/", _filePaths.length);
+    log.mainLog("return:", addedFileCount, "/", _filePaths.length);
     emitMainEvent("importImagesComplete", {
       addedFileCount: addedFileCount,
       fileCount: _filePaths.length
@@ -1011,12 +1062,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       cancelImportImages = undefined;
     }
     emitMainEvent("importImagesBegin");
-    dataLogger.mainLog("##Import Images From Buffers");
-    dataLogger.mainLog("buffers:", buffers.length);
+    const log = dataLogger.task();
+    log.mainLog("##Import Images From Buffers");
+    log.mainLog("buffers:", buffers.length);
     let addedFileCount = 0;
     const petaImages: PetaImage[] = [];
     const importImage = async (buffer: Buffer, index: number) => {
-      dataLogger.mainLog("import:", index + 1, "/", buffers.length);
+      log.mainLog("import:", index + 1, "/", buffers.length);
       let result = ImportImageResult.SUCCESS;
       try {
         const addResult = await addImage({
@@ -1027,9 +1079,9 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           result = ImportImageResult.EXISTS;
         }
         addedFileCount++;
-        dataLogger.mainLog("imported", name, result);
+        log.mainLog("imported", name, result);
       } catch (err) {
-        dataLogger.mainError(err);
+        log.mainError(err);
         result = ImportImageResult.ERROR;
       }
       emitMainEvent("importImagesProgress", {
@@ -1042,7 +1094,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     cancelImportImages = result.cancel;
     await result.value;
     cancelImportImages = undefined;
-    dataLogger.mainLog("return:", addedFileCount, "/", buffers.length);
+    log.mainLog("return:", addedFileCount, "/", buffers.length);
     emitMainEvent("importImagesComplete", {
       addedFileCount: addedFileCount,
       fileCount: buffers.length
@@ -1195,7 +1247,8 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       }
       dataStates.data.windowIsMaximized = window.isMaximized();
       dataStates.save();
-      dataLogger.mainLog("#Save Window Size", dataStates.data.windowSize);
+      const log = dataLogger.task();
+      log.mainLog("#Save Window Size", dataStates.data.windowSize);
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false);

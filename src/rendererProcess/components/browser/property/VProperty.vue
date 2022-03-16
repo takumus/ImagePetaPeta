@@ -69,7 +69,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
-import { API, log } from "@/rendererProcess/api";
+import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";

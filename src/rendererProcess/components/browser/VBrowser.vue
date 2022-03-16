@@ -88,7 +88,7 @@ import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
-import { API, log } from "@/rendererProcess/api";
+import { API } from "@/rendererProcess/api";
 import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";

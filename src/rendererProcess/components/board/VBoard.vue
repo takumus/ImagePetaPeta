@@ -53,7 +53,7 @@ import { PetaBoard, PetaBoardTransform } from "@/commons/datas/petaBoard";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
-import { API, log } from "@/rendererProcess/api";
+import { API } from "@/rendererProcess/api";
 import * as PIXI from "pixi.js";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformer } from "@/rendererProcess/components/board/ppanels/PTransformer";
@@ -65,6 +65,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@pixi/gif';
 import { setCursor, setDefaultCursor } from "@/rendererProcess/utils/cursor";
+import { logChunk } from "@/rendererProcess/utils/logger";
 PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -550,6 +551,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load(): Promise<void> {
+    const log = logChunk().log;
     if (this.cancel) {
       log("vBoard", `canceling loading`);
       await this.cancel();
@@ -582,6 +584,7 @@ export default class VBoard extends Vue {
       return;
     }
     this.loading = true;
+    const log = logChunk().log;
     const load = async (petaPanel: PetaPanel, index: number) => {
       if (!this.board) {
         return;

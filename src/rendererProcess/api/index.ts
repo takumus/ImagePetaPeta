@@ -20,7 +20,3 @@ export const API = {
     return (window as any)[GLOBAL_API_NAME].off(id);
   }
 } as API;
-export const log = (...args: any) => {
-  console.log(...args);
-  API.send("log", ...args);
-}

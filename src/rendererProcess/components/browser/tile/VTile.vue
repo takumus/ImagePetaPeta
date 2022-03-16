@@ -77,10 +77,11 @@ import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
-import { API, log } from "@/rendererProcess/api";
+import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import TransparentBackground from "@/@assets/transparentBackground.png";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { logChunk } from "@/rendererProcess/utils/logger";
 @Options({
   components: {
   },
@@ -112,7 +113,7 @@ export default class VTile extends Vue {
           ctx.putImageData(imageData, 0, 0);
         }
       } catch(e) {
-        log("vTile", "blurhash error:", e);
+        logChunk().log("vTile", "blurhash error:", e);
       }
     }
     this.changeVisible();

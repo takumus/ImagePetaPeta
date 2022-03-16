@@ -66,7 +66,7 @@ import VInfo from "@/rendererProcess/components/info/VInfo.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { API, log } from "@/rendererProcess/api";
+import { API } from "@/rendererProcess/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/commons/datas/petaBoard";
@@ -78,6 +78,7 @@ import { isLatest } from "@/commons/utils/versionCheck";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { logChunk } from "@/rendererProcess/utils/logger";
 @Options({
   components: {
     VBrowser,
@@ -107,9 +108,9 @@ export default class Index extends Vue {
   title = "";
   async mounted() {
     window.onerror = (e) => {
-      log("vIndex", "window error:", e);
+      logChunk().log("vIndex", "window error:", e);
     }
-    log("vIndex", "INIT RENDERER!");
+    logChunk().log("vIndex", "INIT RENDERER!");
     API.on("importImagesComplete", () => {
       this.getPetaImages();
     });
@@ -221,7 +222,7 @@ export default class Index extends Vue {
     if (this.currentPetaBoard?.id == board.id) {
       return;
     }
-    log("vIndex", "PetaBoard Selected", board.name);
+    logChunk().log("vIndex", "PetaBoard Selected", board.name);
     API.send("setSelectedPetaBoard", board.id);
     this.currentPetaBoardId = board.id;
   }
@@ -254,7 +255,7 @@ export default class Index extends Vue {
       [board],
       UpdateMode.UPSERT
     );
-    log("vIndex", "PetaBoard Added", board.name);
+    logChunk().log("vIndex", "PetaBoard Added", board.name);
     await this.getPetaBoards();
     this.selectPetaBoard(board);
   }
