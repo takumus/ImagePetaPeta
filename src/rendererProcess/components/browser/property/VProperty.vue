@@ -116,25 +116,25 @@ export default class VProperty extends Vue {
     // タグを探す。なかったら作る。
     const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == name)?.petaTag || createPetaTag(name);
     // petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
-    await API.send("updatePetaTags", [petaTag], UpdateMode.UPSERT);
-    await API.send("updatePetaImagesPetaTags", this.petaImages.map((pi): PetaImagePetaTag => {
-      return {
-        id: pi.id + petaTag.id,
-        petaImageId: pi.id,
-        petaTagId: petaTag.id
-      }
-    }), UpdateMode.UPSERT);
-    this.fetchPetaTags();
+    await API.send(
+      "updatePetaTags",
+      [petaTag],
+      UpdateMode.UPSERT
+    );
+    await API.send(
+      "updatePetaImagesPetaTags",
+      this.petaImages.map((petaImage) => petaImage.id),
+      [petaTag.id],
+      UpdateMode.UPSERT
+    );
   }
   async removeTag(petaTag: PetaTag) {
-    await API.send("updatePetaImagesPetaTags", this.petaImages.map((petaImage): PetaImagePetaTag => {
-      return {
-        id: petaImage.id + petaTag.id,
-        petaImageId: petaImage.id,
-        petaTagId: petaTag.id
-      }
-    }), UpdateMode.REMOVE);
-    this.fetchPetaTags();
+    await API.send(
+      "updatePetaImagesPetaTags",
+      this.petaImages.map((petaImage) => petaImage.id),
+      [petaTag.id],
+      UpdateMode.REMOVE
+    );
   }
   clearSelection() {
     this.petaImages.forEach((pi) => {
@@ -159,6 +159,10 @@ export default class VProperty extends Vue {
   }
   sharedPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
+    if (this.noImage) {
+      this.sharedPetaTags = [];
+      return;
+    }
     const result = await API.send("getPetaTagIdsByPetaImageIds", this.petaImages.map((petaImage) => petaImage.id));
     this.sharedPetaTags = this.petaTagInfos.filter((pti) => result.find((id) => id == pti.petaTag.id)).map((pi) => pi.petaTag);
   }

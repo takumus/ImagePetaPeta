@@ -20,12 +20,11 @@ export interface MainFunctions {
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<PetaBoard[]>;
   updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
-  getPetaTags: () => Promise<PetaTag[]>;
   updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
   getPetaImageIdsByPetaTagIds: (petaTagIds?: string[]) => Promise<string[]>;
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
   getPetaTagInfos: () => Promise<PetaTagInfo[]>;
-  updatePetaImagesPetaTags: (tags: PetaImagePetaTag[], mode: UpdateMode) => Promise<boolean>;
+  updatePetaImagesPetaTags: (petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) => Promise<boolean>;
   log: (...args: any[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;

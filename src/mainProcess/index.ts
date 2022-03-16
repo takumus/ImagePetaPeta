@@ -390,20 +390,6 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           return false;
         },
         /*------------------------------------
-          全PetaTag取得
-        ------------------------------------*/
-        getPetaTags: async (event) => {
-          try {
-            dataLogger.mainLog("#Get PetaTags");
-            const tags = await dataPetaTags.find({});
-            dataLogger.mainLog("return:", tags.length);
-            return tags;
-          } catch (error) {
-            showError("M", 6, "Get PetaTags Error", String(error));
-          }
-          return [];
-        },
-        /*------------------------------------
           PetaTag 追加|更新|削除
         ------------------------------------*/
         updatePetaTags: async (event, tags, mode) => {
@@ -421,18 +407,41 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           }
           return false;
         },
+        updatePetaImagesPetaTags: async (event, petaImageIds, petaTagIds, mode) => {
+          try {
+            dataLogger.mainLog("#Update PetaImagesPetaTags");
+            await promiseSerial(async (petaImageId) => {
+              await promiseSerial(async (petaTagId) => {
+                await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
+              }, petaTagIds).value;
+            }, petaImageIds).value;
+            if (mode != UpdateMode.UPDATE) {
+              emitMainEvent("updatePetaTags");
+            }
+            dataLogger.mainLog("return:", true);
+            return true;
+          } catch(error) {
+            dataLogger.mainError(error);
+            showError("M", 6, "Update PetaImagesPetaTags Error", String(error));
+          }
+          return false;
+        },
         getPetaImageIdsByPetaTagIds: async (event, petaTagIds) => {
           try {
+            dataLogger.mainLog("#Get PetaImageIds By PetaTagIds");
+            console.time("getPetaImageIdsByPetaTagIds");
             // all
             if (!petaTagIds) {
               return (await dataPetaImages.find({})).map((pi) => pi.id);
             }
             // untagged
             if (petaTagIds.length == 0) {
-              const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => pipt.petaImageId)));
+              const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
+                return pipt.petaImageId;
+              })));
               return (await dataPetaImages.find({
                 id: {
-                  $nin: taggedIds.map((id) => id)
+                  $nin: taggedIds
                 }
               })).map((pi) => pi.id);
             }
@@ -444,36 +453,59 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
                 }
               })
             }));
-            const ids = Array.from(new Set(pipts.map((pipt) => pipt.petaImageId)));
-            return ids.filter((id) => pipts.filter((pipt) => pipt.petaImageId == id).length == petaTagIds.length);
+            const ids = Array.from(new Set(pipts.map((pipt) => {
+              return pipt.petaImageId;
+            })));
+            console.timeEnd("getPetaImageIdsByPetaTagIds");
+            return ids.filter((id) => {
+              return pipts.filter((pipt) => {
+                return pipt.petaImageId === id;
+              }).length == petaTagIds.length
+            });
           } catch(error) {
-            //
+            dataLogger.mainError(error);
+            showError("M", 6, "Get PetaImageIds By PetaTagIds Error", String(error));
           }
           return [];
         },
         getPetaTagIdsByPetaImageIds: async (event, petaImageIds) => {
           try {
+            dataLogger.mainLog("#Get PetaTagIds By PetaImageIds");
             // all
             if (petaImageIds.length == 0) {
-              return (await dataPetaImagesPetaTags.find({})).map((pipt) => pipt.petaTagId);
+              return (await dataPetaImagesPetaTags.find({})).map((pipt) => {
+                return pipt.petaTagId;
+              });
             }
             // filter by ids
-            const pipts = (await dataPetaImagesPetaTags.find({
-              $or: petaImageIds.map((id) => {
-                return {
-                  petaImageId: id
-                }
-              })
-            }));
-            const ids = Array.from(new Set(pipts.map((pipt) => pipt.petaTagId)));
-            return ids.filter((id) => pipts.filter((pipt) => pipt.petaTagId == id).length == petaImageIds.length);
+            console.time("getPetaImageIdsByPetaTagIds-1");
+            let pipts: PetaImagePetaTag[] = [];
+            await promiseSerial(async (petaImageId) => {
+              pipts.push(...(await dataPetaImagesPetaTags.find({ petaImageId })));
+            }, petaImageIds).value;
+            console.timeEnd("getPetaImageIdsByPetaTagIds-1");
+            console.time("getPetaImageIdsByPetaTagIds-2");
+            const ids = Array.from(new Set(pipts.map((pipt) => {
+              return pipt.petaTagId;
+            })));
+            console.timeEnd("getPetaImageIdsByPetaTagIds-2");
+            console.time("getPetaImageIdsByPetaTagIds-3");
+            const petaTagIds = ids.filter((id) => {
+              return pipts.filter((pipt) => {
+                return pipt.petaTagId == id;
+              }).length == petaImageIds.length;
+            });
+            console.timeEnd("getPetaImageIdsByPetaTagIds-3");
+            return petaTagIds;
           } catch(error) {
-            //
+            dataLogger.mainError(error);
+            showError("M", 6, "Get PetaTagIds By PetaImageIds Error", String(error));
           }
-          return[];
+          return [];
         },
         getPetaTagInfos: async () => {
           try {
+            dataLogger.mainLog("#Get PetaTagInfos");
             const petaTags = await dataPetaTags.find({});
             let values: PetaTagInfo[] = [];
             const result = promiseSerial(async (petaTag) => {
@@ -485,25 +517,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
               return info;
             }, petaTags);
             const values2 = await result.value;
+            dataLogger.mainLog("return:", values.length);
             return values;
           } catch (error) {
-            //
+            dataLogger.mainError(error);
+            showError("M", 6, "Get PetaTagInfos Error", String(error));
           }
           return [];
-        },
-        updatePetaImagesPetaTags: async (event, tags, mode) => {
-          try {
-            dataLogger.mainLog("#Update PetaTags");
-            await promiseSerial((tag) => updatePetaImagePetaTag(tag, mode), tags).value;
-            if (mode != UpdateMode.UPDATE) {
-              emitMainEvent("updatePetaTags");
-            }
-            dataLogger.mainLog("return:", true);
-            return true;
-          } catch(error) {
-            //
-          }
-          return false;
         },
         /*------------------------------------
           ログ
