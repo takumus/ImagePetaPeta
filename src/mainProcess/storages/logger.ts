@@ -15,7 +15,7 @@ export class Logger {
       this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n");
     }
   }
-  task() {
+  chunk() {
     const id = uuid().substring(0, 4);
     return {
       mainLog: (...args: any[]) => {

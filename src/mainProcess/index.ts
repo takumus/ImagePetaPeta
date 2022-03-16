@@ -126,13 +126,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     }
   }]);
   app.on("window-all-closed", () => {
-    dataLogger.task().mainLog("#Electron event: window-all-closed");
+    dataLogger.chunk().mainLog("#Electron event: window-all-closed");
     if (process.platform != "darwin") {
       app.quit();
     }
   });
   app.on("activate", async () => {
-    dataLogger.task().mainLog("#Electron event: activate");
+    dataLogger.chunk().mainLog("#Electron event: activate");
     if (BrowserWindow.getAllWindows().length === 0) {
       initWindow();
     }
@@ -178,11 +178,11 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
         petaImages[pi.id] = upgradePetaImage(pi);
       });
       if (await upgradePetaTag(dataPetaTags, petaImages)) {
-        dataLogger.task().mainLog("Upgrade Tags");
+        dataLogger.chunk().mainLog("Upgrade Tags");
         await promiseSerial((pi) => updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
       }
       if (await upgradePetaImagesPetaTags(dataPetaTags, dataPetaImagesPetaTags, petaImages)) {
-        dataLogger.task().mainLog("Upgrade PetaImagesPetaTags");
+        dataLogger.chunk().mainLog("Upgrade PetaImagesPetaTags");
       }
     } catch (error) {
       showError("M", 2, "Initialization Error", String(error));
@@ -218,7 +218,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           画像を開く
         ------------------------------------*/
         importImageFiles: async () => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Browse Image Files");
           const result = await dialog.showOpenDialog(window, {
             properties: ["openFile", "multiSelections"]
@@ -235,7 +235,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           画像を開く
         ------------------------------------*/
         importImageDirectories: async () => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Browse Image Directories");
           const result = await dialog.showOpenDialog(window, {
             properties: ["openDirectory"]
@@ -257,7 +257,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           URLからインポート
         ------------------------------------*/
         importImageFromURL: async (event, url) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Import Image From URL");
             let data: Buffer;
@@ -280,7 +280,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           ファイルからインポート
         ------------------------------------*/
         importImagesFromFilePaths: async (event, filePaths) =>{
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Import Images From File Paths");
             const images = (await importImagesFromFilePaths(filePaths)).map((image) => image.id);
@@ -294,7 +294,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           クリップボードからインポート
         ------------------------------------*/
         importImagesFromClipboard: async (event, buffers) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Import Images From Clipboard");
             return (await importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id);
@@ -316,7 +316,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           全PetaImage取得
         ------------------------------------*/
         getPetaImages: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Get PetaImages");
             const data = await dataPetaImages.find({});
@@ -336,7 +336,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImage 追加|更新|削除
         ------------------------------------*/
         updatePetaImages: async (event, datas, mode) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Update PetaImages");
           try {
             await promiseSerial((data) => updatePetaImage(data, mode), datas).value;
@@ -357,7 +357,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           全PetaBoard取得
         ------------------------------------*/
         getPetaBoards: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Get PetaBoards");
             const data = await dataPetaBoards.find({});
@@ -386,7 +386,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaBoard 追加|更新|削除
         ------------------------------------*/
         updatePetaBoards: async (event, boards, mode) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Update PetaBoards");
             await promiseSerial((board) => updatePetaBoard(board, mode), boards).value;
@@ -402,7 +402,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaTag 追加|更新|削除
         ------------------------------------*/
         updatePetaTags: async (event, tags, mode) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Update PetaTags");
             await promiseSerial((tag) => updatePetaTag(tag, mode), tags).value;
@@ -418,7 +418,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           return false;
         },
         updatePetaImagesPetaTags: async (event, petaImageIds, petaTagIds, mode) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Update PetaImagesPetaTags");
             await promiseSerial(async (petaImageId) => {
@@ -438,7 +438,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           return false;
         },
         getPetaImageIdsByPetaTagIds: async (event, petaTagIds) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Get PetaImageIds By PetaTagIds");
             // all
@@ -487,7 +487,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           return [];
         },
         getPetaTagIdsByPetaImageIds: async (event, petaImageIds) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Get PetaTagIds By PetaImageIds");
             // all
@@ -525,7 +525,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           return [];
         },
         getPetaTagInfos: async () => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Get PetaTagInfos");
             const petaTags = await dataPetaTags.find({});
@@ -558,7 +558,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           WebブラウザでURLを開く
         ------------------------------------*/
         openURL: async (event, url) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Open URL");
           log.mainLog("url:", url);
           shell.openExternal(url);
@@ -568,7 +568,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImageのファイルを開く
         ------------------------------------*/
         openImageFile: async (event, petaImage) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Open Image File");
           shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
         },
@@ -576,7 +576,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           アプリ情報
         ------------------------------------*/
         getAppInfo: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Get App Info");
           const info = {
             name: app.getName(),
@@ -589,7 +589,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           DBフォルダを開く
         ------------------------------------*/
         showDBFolder: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Show DB Folder");
           shell.showItemInFolder(DIR_ROOT);
           return true;
@@ -598,7 +598,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           Configフォルダを開く
         ------------------------------------*/
         showConfigFolder: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Show Config Folder");
           shell.showItemInFolder(DIR_APP);
           return true;
@@ -607,7 +607,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           全PetaBoard取得
         ------------------------------------*/
         showImageInFolder: async (event, petaImage) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Show Image In Folder");
           shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
@@ -616,7 +616,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           アップデート確認
         ------------------------------------*/
         checkUpdate: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Check Update");
             const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
@@ -640,7 +640,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           設定保存
         ------------------------------------*/
         updateSettings: async (event, settings) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Update Settings");
             dataSettings.data = settings;
@@ -658,7 +658,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           設定取得
         ------------------------------------*/
         getSettings: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Get Settings");
           log.mainLog("return:", dataSettings.data);
           return dataSettings.data;
@@ -667,7 +667,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           ウインドウのフォーカス取得
         ------------------------------------*/
         getWindowIsFocused: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Get Window Is Focused");
           const isFocued = window.isFocused();
           log.mainLog("return:", isFocued);
@@ -677,7 +677,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           ズームレベル変更
         ------------------------------------*/
         setZoomLevel: async (event, level) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Set Zoom Level");
           log.mainLog("level:", level);
           window.webContents.setZoomLevel(level);
@@ -686,7 +686,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           最小化
         ------------------------------------*/
         windowMinimize: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Window Minimize");
           window.minimize();
         },
@@ -694,7 +694,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           最大化
         ------------------------------------*/
         windowMaximize: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Window Maximize");
           if (window.isMaximized()) {
             window.unmaximize();
@@ -706,7 +706,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           閉じる
         ------------------------------------*/
         windowClose: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Window Close");
           app.quit();
         },
@@ -714,7 +714,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           OS情報取得
         ------------------------------------*/
         getPlatform: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Get Platform");
           log.mainLog("return:", process.platform);
           return process.platform;
@@ -723,7 +723,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           サムネイル再生成
         ------------------------------------*/
         regenerateThumbnails: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Regenerate Thumbnails");
             log.mainLog("preset:", dataSettings.data.thumbnails);
@@ -754,7 +754,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImageフォルダを選ぶ
         ------------------------------------*/
         browsePetaImageDirectory: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Browse PetaImage Directory");
           const file = await dialog.showOpenDialog(window, {
             properties: ["openDirectory"]
@@ -778,7 +778,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           PetaImageフォルダを変更
         ------------------------------------*/
         changePetaImageDirectory: async (event, path) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           try {
             log.mainLog("#Change PetaImage Directory");
             path = Path.resolve(path);
@@ -805,7 +805,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           States
         ------------------------------------*/
         getStates: async (event) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Get States");
           return dataStates.data;
         },
@@ -813,7 +813,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           選択中のボードのidを保存
         ------------------------------------*/
         setSelectedPetaBoard: async (event, petaBoardId: string) => {
-          const log = dataLogger.task();
+          const log = dataLogger.chunk();
           log.mainLog("#Set Selected PetaBoard");
           log.mainLog("id:", petaBoardId);
           dataStates.data.selectedPetaBoardId = petaBoardId;
@@ -834,7 +834,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
   function showError(category: "M" | "R", code: number, title: string, error: string) {
     try {
       if (dataLogger) {
-        const log = dataLogger.task();
+        const log = dataLogger.chunk();
         log.mainLog("#Show Error", error);
       }
     } catch { }
@@ -881,7 +881,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     PetaImage更新
   ------------------------------------*/
   async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    const log = dataLogger.task();
+    const log = dataLogger.chunk();
     log.mainLog("##Update PetaImage");
     log.mainLog("mode:", mode);
     log.mainLog("image:", minimId(petaImage.id));
@@ -905,7 +905,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     PetaBoard更新
   ------------------------------------*/
   async function updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    const log = dataLogger.task();
+    const log = dataLogger.chunk();
     log.mainLog("##Update PetaBoard");
     log.mainLog("mode:", mode);
     log.mainLog("board:", minimId(board.id));
@@ -922,7 +922,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     PetaTag更新
   ------------------------------------*/
   async function updatePetaTag(tag: PetaTag, mode: UpdateMode) {
-    const log = dataLogger.task();
+    const log = dataLogger.chunk();
     log.mainLog("##Update PetaTag");
     log.mainLog("mode:", mode);
     log.mainLog("tag:", minimId(tag.id));
@@ -941,7 +941,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
     PetaImagePetaTag更新
   ------------------------------------*/
   async function updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
-    const log = dataLogger.task();
+    const log = dataLogger.chunk();
     log.mainLog("##Update PetaImagePetaTag");
     log.mainLog("mode:", mode);
     log.mainLog("tag:", minimId(petaImagePetaTag.id));
@@ -978,7 +978,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       cancelImportImages();
       cancelImportImages = undefined;
     }
-    const log = dataLogger.task();
+    const log = dataLogger.chunk();
     log.mainLog("##Import Images From File Paths");
     log.mainLog("###List Files", filePaths.length);
     emitMainEvent("importImagesBegin");
@@ -1062,7 +1062,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       cancelImportImages = undefined;
     }
     emitMainEvent("importImagesBegin");
-    const log = dataLogger.task();
+    const log = dataLogger.chunk();
     log.mainLog("##Import Images From Buffers");
     log.mainLog("buffers:", buffers.length);
     let addedFileCount = 0;
@@ -1247,7 +1247,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
       }
       dataStates.data.windowIsMaximized = window.isMaximized();
       dataStates.save();
-      const log = dataLogger.task();
+      const log = dataLogger.chunk();
       log.mainLog("#Save Window Size", dataStates.data.windowSize);
     });
     window.addListener("blur", () => {
