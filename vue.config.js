@@ -68,7 +68,8 @@ module.exports = {
         nsis: {
           oneClick: false,
           perMachine: true,
-          allowToChangeInstallationDirectory: true
+          allowToChangeInstallationDirectory: true,
+          deleteAppDataOnUninstall: true
         },
         ...appxConfig
       }
