@@ -45,6 +45,7 @@ import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { UNTAGGED_ID } from "@/commons/defines";
 @Options({
   components: {
     VEditableLabel
@@ -98,6 +99,10 @@ export default class VTags extends Vue {
     if (!Keyboards.pressed("shift") || single) {
       this.selectedPetaTags.length = 0;
     }
+    const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
+    if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
+      this.selectedPetaTags.length = 0;
+    }
     if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
       this.selectedPetaTags.push(petaTag);
     }
@@ -108,27 +113,10 @@ export default class VTags extends Vue {
         petaTag: petaTagInfo.petaTag,
         count: petaTagInfo.count,
         selected: this.selectedPetaTags.includes(petaTagInfo.petaTag),
-        readonly: false
+        readonly: petaTagInfo.petaTag.id === UNTAGGED_ID
       };
-    })
-    browserTags.sort((a, b) => {
-      if (a.petaTag.name < b.petaTag.name) {
-        return -1;
-      } else {
-        return 1;
-      }
     });
-    return [{
-      petaTag: {
-        id: "untagged",
-        name: this.$t("browser.untagged"),
-        index: 0,
-        // petaImages: []
-      },
-      count: this.uncategorizedImages.length,
-      selected: this.selectedPetaTags.find((petaTag) => petaTag.id == "untagged") != undefined,
-      readonly: true
-    }, ...browserTags];
+    return browserTags;
   }
   get uncategorizedImages() {
     return this.petaImagesArray;

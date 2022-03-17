@@ -94,20 +94,16 @@ export default class VSearch extends Vue {
   }
   addSelectedTag(tagName: string) {
     const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == tagName)?.petaTag;
+    const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === "untagged");
+    if (untaggedId >= 0 || petaTag?.id === "untagged") {
+      this.selectedPetaTags.length = 0;
+    }
     if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
       this.selectedPetaTags.push(petaTag);
     }
     this.$nextTick(() => {
       this.searchInput.edit();
     });
-  }
-  selectPetaTag(petaTag?: PetaTag, single = false) {
-    if (!Keyboards.pressedOR("shift") || single) {
-      this.selectedPetaTags.length = 0;
-    }
-    if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
-      this.selectedPetaTags.push(petaTag);
-    }
   }
   complementTag(editableLabel: VEditableLabel) {
     this.$components.complement.open(editableLabel, this.complementItems);

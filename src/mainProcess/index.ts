@@ -8,7 +8,8 @@ import { encode as encodePlaceholder } from "blurhash";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import dateFormat from "dateformat";
-
+import { createI18n } from "vue-i18n";
+import languages from "@/commons/languages";
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
@@ -63,8 +64,11 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
   let dataPetaImagesPetaTags: DB<PetaImagePetaTag>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
-
   let cancelImportImages: (() => void) | undefined;
+  const i18n = createI18n({
+    locale: "ja",
+    messages: languages,
+  });
   //-------------------------------------------------------------------------------------------------//
   /*
     ファイルパスとDBの、検証・読み込み・作成
@@ -529,6 +533,14 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           try {
             log.mainLog("#Get PetaTagInfos");
             const petaTags = await dataPetaTags.find({});
+            const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
+              return pipt.petaImageId;
+            })));
+            const count = (await dataPetaImages.count({
+              id: {
+                $nin: taggedIds
+              }
+            }));
             let values: PetaTagInfo[] = [];
             const result = promiseSerial(async (petaTag) => {
               const info = {
@@ -540,6 +552,21 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
             }, petaTags);
             const values2 = await result.value;
             log.mainLog("return:", values.length);
+            values.sort((a, b) => {
+              if (a.petaTag.name < b.petaTag.name) {
+                return -1;
+              } else {
+                return 1;
+              }
+            });
+            values.unshift({
+              petaTag: {
+                index: 0,
+                id: "untagged",
+                name: i18n.global.t("browser.untagged")
+              },
+              count: count
+            })
             return values;
           } catch (error) {
             log.mainError(error);

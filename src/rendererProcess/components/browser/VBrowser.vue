@@ -362,21 +362,6 @@ export default class VBrowser extends Vue {
       return petaImage;
     }))).sort(this.sort);
   }
-  // get filteredPetaImages() {
-  //   if (this.selectedPetaTags.find((petaTag) => petaTag.id == "untagged")) {
-  //     return this.uncategorizedImages;
-  //   }
-  //   return this.petaImagesArray.filter((d) => {
-  //     let result = true;
-  //     // this.selectedPetaTags.forEach((k) => {
-  //     //   const petaTag = this.petaTags.find((petaTag) => petaTag.id == k.id);
-  //     //   if (petaTag && !petaTag.petaImages.includes(d.id)) {
-  //     //     result = false;
-  //     //   }
-  //     // });
-  //     return result;
-  //   });
-  // }
   get thumbnailsRowCount() {
     let c = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
     if (c < 1) {
