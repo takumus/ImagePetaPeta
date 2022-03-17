@@ -89,7 +89,7 @@ import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT } from "@/commons/defines";
+import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
@@ -351,7 +351,7 @@ export default class VBrowser extends Vue {
       this.filteredPetaImages = this.petaImagesArray;
       return;
     }
-    const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === "untagged")
+    const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === UNTAGGED_ID)
     const results = await API.send(
       "getPetaImageIdsByPetaTagIds",
       untagged ? [] : this.selectedPetaTags.map((petaTag) => petaTag.id)
