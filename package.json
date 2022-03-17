@@ -1,7 +1,7 @@
 {
   "name": "imagepetapeta-beta",
   "productName": "ImagePetaPeta-beta",
-  "version": "2.2.0-beta",
+  "version": "2.2.1-beta",
   "private": true,
   "author": "takumus",
   "description": "image viewer",
