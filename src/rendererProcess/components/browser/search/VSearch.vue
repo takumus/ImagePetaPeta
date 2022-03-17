@@ -43,6 +43,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { UNTAGGED_ID } from "@/commons/defines";
 @Options({
   components: {
     VEditableLabel
@@ -94,8 +95,8 @@ export default class VSearch extends Vue {
   }
   addSelectedTag(tagName: string) {
     const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == tagName)?.petaTag;
-    const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === "untagged");
-    if (untaggedId >= 0 || petaTag?.id === "untagged") {
+    const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
+    if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
       this.selectedPetaTags.length = 0;
     }
     if (petaTag && !this.selectedPetaTags.includes(petaTag)) {

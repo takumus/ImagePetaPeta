@@ -10,7 +10,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import dateFormat from "dateformat";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
@@ -562,7 +562,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
             values.unshift({
               petaTag: {
                 index: 0,
-                id: "untagged",
+                id: UNTAGGED_ID,
                 name: i18n.global.t("browser.untagged")
               },
               count: count
