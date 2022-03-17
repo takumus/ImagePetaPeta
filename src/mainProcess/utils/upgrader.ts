@@ -2,13 +2,13 @@ import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { defaultSettings, Settings } from "@/commons/datas/settings";
+import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import DB from "@/mainProcess/storages/db";
 import { v4 as uuid } from "uuid";
-
+const defaultSettings = getDefaultSettings();
 export function upgradePetaImage(petaImage: PetaImage) {
   // v0.2.0
   // if (petaImage.tags === undefined) {
