@@ -76,6 +76,11 @@ export default class VComplement extends Vue {
     this.keyboards.down(["escape"], () => {
       this.blur();
     });
+    setInterval(() => {
+      if (this.show) {
+        this.updatePosition();
+      }
+    }, 200);
   }
   normalizeIndex() {
     if (this.currentIndex < 0) {
@@ -144,34 +149,19 @@ export default class VComplement extends Vue {
     }
     this.currentIndex = -1;
     const value = this.target.tempText.trim();
-    if (value == "") {
-      this.filteredItems = [];
-      this.keyboards.unlock();
-      return;
-    }
     // -Fuzzy
     if (this.searcher) {
       this.filteredItems = this.searcher?.search(value);
     }
-    // -Takumu
-    // this.filteredItems = this.items.filter((item) => {
-    //   item = item.toLowerCase();
-    //   return item.indexOf(value) >= 0 && item != value;
-    // }).sort((a, b) => {
-    //   const ai = a.toLowerCase().indexOf(value);
-    //   const bi = b.toLowerCase().indexOf(value);
-    //   if (ai == bi) {
-    //     return a.length - b.length;
-    //   }
-    //   return ai - bi;
-    // });
     if (this.filteredItems.length == 0) {
       this.keyboards.unlock();
     } else {
-      this.keyboards.lock();
-      const rect = this.target.$el.getBoundingClientRect();
-      this.position.x = rect.x;
-      this.position.y = rect.y + rect.height;
+      if (value === "") {
+        this.keyboards.unlock();
+      } else {
+        this.keyboards.lock();
+      }
+      this.updatePosition();
     }
   }
   select(item?: string) {
@@ -181,6 +171,13 @@ export default class VComplement extends Vue {
       this.blur();
     }
     // }, 1);
+  }
+  updatePosition() {
+    if (this.target) {
+      const rect = this.target.$el.getBoundingClientRect();
+      this.position.x = rect.x;
+      this.position.y = rect.y + rect.height;
+    }
   }
 }
 </script>
