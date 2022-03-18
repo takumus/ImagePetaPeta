@@ -10,14 +10,12 @@ export class Keyboards {
     Keyboards.init();
     Keyboards.add(this);
   }
-  private keydown = (event: KeyboardEvent) => {
-    const key = event.key.toLowerCase();
+  private keydown = (key: string, event?: KeyboardEvent) => {
     if (this.enabled) {
       this.emit(key, true, event);
     }
   }
-  private keyup = (event: KeyboardEvent) => {
-    const key = event.key.toLowerCase();
+  private keyup = (key: string, event?: KeyboardEvent) => {
     if (this.enabled) {
       this.emit(key, false, event);
     }
@@ -48,7 +46,7 @@ export class Keyboards {
     this.down(keys, callback);
     this.up(keys, callback);
   }
-  private emit(key: string, pressed: boolean, event: KeyboardEvent) {
+  private emit(key: string, pressed: boolean, event?: KeyboardEvent) {
     (pressed ? this.downListeners : this.upListeners)[key]
     ?.forEach((callback) => {
       callback(pressed, event);
@@ -77,16 +75,28 @@ export class Keyboards {
     Keyboards.inited = true;
     window.addEventListener("keydown", (event) => {
       Keyboards.listeners.forEach((keyboards) => {
-        keyboards.keydown(event);
-        Keyboards.pressedKeys[event.key.toLowerCase()] = true;
+        const key = event.key.toLowerCase();
+        keyboards.keydown(key, event);
+        Keyboards.pressedKeys[key] = true;
       });
     });
     window.addEventListener("keyup", (event) => {
       Keyboards.listeners.forEach((keyboards) => {
-        keyboards.keyup(event);
-        Keyboards.pressedKeys[event.key.toLowerCase()] = false;
+        const key = event.key.toLowerCase();
+        keyboards.keyup(key, event);
+        Keyboards.pressedKeys[key] = false;
       });
     });
+    window.addEventListener("blur", () => {
+      Object.keys(Keyboards.pressedKeys).filter((key) => {
+        return Keyboards.pressedKeys[key];
+      }).forEach((key) => {
+        Keyboards.listeners.forEach((keyboards) => {
+          keyboards.keyup(key);
+        });
+        Keyboards.pressedKeys[key] = false;
+      });
+    })
   }
   static add(keyboards: Keyboards) {
     if (!Keyboards.listeners.has(keyboards)) {
@@ -116,4 +126,4 @@ export class Keyboards {
     return Keyboards.pressedKeys[key] ? true : false;
   }
 }
-type KeyboardsCallback = (pressed: boolean, event: KeyboardEvent) => void;
+type KeyboardsCallback = (pressed: boolean, event?: KeyboardEvent) => void;
