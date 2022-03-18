@@ -275,6 +275,7 @@ export default class VProperty extends Vue {
         &::before {
           width: 16px;
           display: inline-block;
+          line-height: 1.5em;
           content: "・";
         }
         &.add::before {

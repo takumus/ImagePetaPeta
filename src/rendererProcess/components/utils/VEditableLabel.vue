@@ -136,7 +136,7 @@ export default class VEditableLabel extends Vue {
   margin: 0px;
   display: inline-block;
   >.editable-label {
-    line-height: 1.0em;
+    line-height: 1.5em;
     font-size: 1.0em;
     text-align: left;
     padding: 0px;

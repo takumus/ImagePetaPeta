@@ -157,6 +157,7 @@ export default class VTags extends Vue {
       }
       &::before {
         content: "・";
+        line-height: 1.5em;
         width: 16px;
         display: inline-block;
         flex-shrink: 0;
