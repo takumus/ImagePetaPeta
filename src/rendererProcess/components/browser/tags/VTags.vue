@@ -81,6 +81,10 @@ export default class VTags extends Vue {
   async removeTag(petaTag: PetaTag) {
     if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
       await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
+      const index = this.selectedPetaTags.findIndex((pt) => pt == petaTag);
+      if (index >= 0) {
+        this.selectedPetaTags.splice(index, 1);
+      }
     }
   }
   async changeTag(petaTag: PetaTag, newName: string) {
@@ -112,17 +116,11 @@ export default class VTags extends Vue {
       return {
         petaTag: petaTagInfo.petaTag,
         count: petaTagInfo.count,
-        selected: this.selectedPetaTags.includes(petaTagInfo.petaTag),
+        selected: this.selectedPetaTags.find((spt) => spt.id === petaTagInfo.petaTag.id) !== undefined,
         readonly: petaTagInfo.petaTag.id === UNTAGGED_ID
       };
     });
     return browserTags;
-  }
-  get uncategorizedImages() {
-    return this.petaImagesArray;
-    // .filter((petaImage) => {
-    //   return getPetaTagsOfPetaImage(petaImage, this.petaTags).length == 0;
-    // });
   }
   get selectedAll() {
     return this.selectedPetaTags.length == 0;
