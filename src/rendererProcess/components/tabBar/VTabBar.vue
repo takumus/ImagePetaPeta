@@ -46,7 +46,7 @@
           >
             <span class="wrapper">
               <span class="label">
-                <VEditableLabel :label="'+'" :readonly="true"/>
+                <VEditableLabel :label="$texts.plus" :readonly="true"/>
               </span>
             </span>
           </span>

@@ -1,12 +1,14 @@
 import { reactive, App } from "vue";
 interface Texts {
   close: string;
+  plus: string
 }
 export function createPlugin(platform: NodeJS.Platform) {
   return {
     install(app: App) {
       app.config.globalProperties.$texts = {
-        close: "✕"
+        close: "✕",
+        plus: "＋"
       } as Texts;
     }
   }

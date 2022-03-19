@@ -17,7 +17,7 @@
     <span class="selectedTag last">
       <VEditableLabel
         :label="''"
-        :labelLook="'+       '"
+        :labelLook="$texts.plus + '       '"
         :clickToEdit="true"
         @change="addSelectedTag"
         @focus="complementTag"
