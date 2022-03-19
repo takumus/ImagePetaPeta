@@ -1,5 +1,6 @@
 # ImagePetaPeta
-<img src="./rawAssets/icon/icon.png" width="128px">
+<img src="./README/app01.png" width="256px">
+<img src="./README/app02.png" width="256px">  
 
 お絵かき屋さんのための、画像閲覧、管理ソフト。PureRefのような物です。
 ## ダウンロード
@@ -7,8 +8,8 @@
 <https://github.com/takumus/ImagePetaPeta/releases/tag/2.2.2-beta>
 ## インストール
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
-<img src="./README/1.png" width="256px">
-<img src="./README/2.png" width="256px">  
+<img src="./README/install01.png" width="256px">
+<img src="./README/install02.png" width="256px">  
 
 ## ご協力
 ベータ版ではバグの早期発見のためログファイルを保存しています。  
