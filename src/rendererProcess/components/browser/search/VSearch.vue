@@ -129,7 +129,6 @@ export default class VSearch extends Vue {
   border: solid 1.2px var(--border-color);
   outline: none;
   padding: 4px 4px 0px 0px;
-  font-weight: bold;
   font-size: 1.0em;
   width: 100%;
   word-break: break-all;

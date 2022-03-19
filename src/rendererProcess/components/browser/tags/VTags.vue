@@ -149,7 +149,6 @@ export default class VTags extends Vue {
       width: 100%;
       padding: 4px;
       list-style-type: none;
-      font-weight: bold;
       cursor: pointer;
       display: flex;
       &:hover * {

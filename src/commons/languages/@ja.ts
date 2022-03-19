@@ -70,7 +70,7 @@ const ja = {
       return `タグ"${ctx.list(0)}"はすでに存在します`
     },
     property: {
-      clickToAddTag: "クリックでタグ追加",
+      clickToAddTag: "タグ追加",
       tagName: "タグ名",
       selectedImage: (ctx: any) => {
         return `${ctx.list(0)}枚の画像を選択中`

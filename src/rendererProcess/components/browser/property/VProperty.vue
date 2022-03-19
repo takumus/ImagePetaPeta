@@ -266,7 +266,6 @@ export default class VProperty extends Vue {
       >li {
         list-style-type: none;
         padding: 4px;
-        font-weight: bold;
         cursor: pointer;
         display: flex;
         &:hover * {
