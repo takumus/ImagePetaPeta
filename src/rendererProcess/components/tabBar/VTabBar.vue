@@ -19,7 +19,12 @@
           }"
           v-show="uiVisible"
         >
-          <span class="draggable left">
+          <span
+            class="draggable left"
+            :class="{
+              mac: $systemInfo.platform == 'darwin'
+            }"
+          >
           </span>
           <span
             class="tab"
@@ -350,7 +355,7 @@ export default class VTabBar extends Vue {
             flex-grow: 0;
             width: calc(var(--tab-height) + var(--top-draggable-height));
             &.mac {
-              width: calc(var(--tab-height) + var(--top-draggable-height) + 100);
+              width: calc(var(--tab-height) + var(--top-draggable-height) + 30px);
             }
           }
         }
