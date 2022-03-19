@@ -13,6 +13,7 @@
       v-for="item, i in filteredItems"
       :key="item"
       @mousedown="select(item)"
+      @mousemove="moveSelectionAbsolute(i)"
       class="item"
       :class="{
         selected: i == currentIndex
@@ -56,18 +57,15 @@ export default class VComplement extends Vue {
     this.$components.complement = this;
     this.keyboards.down(["arrowup"], () => {
       if (!this.target) return;
-      this.currentIndex--;
-      this.moveSelection();
+      this.moveSelectionRelative(-1);
     });
     this.keyboards.down(["arrowdown"], () => {
       if (!this.target) return;
-      this.currentIndex++;
-      this.moveSelection();
+      this.moveSelectionRelative(1);
     });
     this.keyboards.down(["tab"], () => {
       if (!this.target) return;
-      this.currentIndex += Keyboards.pressed("shift") ? -1 : 1;
-      this.moveSelection();
+      this.moveSelectionRelative(Keyboards.pressed("shift") ? -1 : 1);
     });
     this.keyboards.down(["enter"], () => {
       if (!this.target) return;
@@ -97,7 +95,13 @@ export default class VComplement extends Vue {
   unmounted() {
     //
   }
-  moveSelection() {
+  moveSelectionAbsolute(index: number) {
+    this.currentIndex = index;
+    this.normalizeIndex();
+    this.moveCursorToLast();
+  }
+  moveSelectionRelative(index: number) {
+    this.currentIndex += index;
     this.normalizeIndex();
     this.moveCursorToLast();
   }
@@ -200,7 +204,7 @@ export default class VComplement extends Vue {
     // padding-left: 24px;
     font-size: 1em;
     cursor: pointer;
-    &:hover, &.selected {
+    &.selected {
       background-color: var(--contextmenu-item-hover-color);
     }
   }
