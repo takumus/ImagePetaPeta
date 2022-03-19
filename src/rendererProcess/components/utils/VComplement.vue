@@ -9,6 +9,9 @@
       zIndex: zIndex
     }"
   >
+    <li class="item" v-html="$texts.close">
+
+    </li>
     <li
       v-for="item, i in filteredItems"
       :key="item"

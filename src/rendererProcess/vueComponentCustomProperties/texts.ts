@@ -6,7 +6,7 @@ export function createPlugin(platform: NodeJS.Platform) {
   return {
     install(app: App) {
       app.config.globalProperties.$texts = {
-        close: platform == "win32" ? "&#xe8bb;" : "✕"
+        close: "✕"
       } as Texts;
     }
   }
