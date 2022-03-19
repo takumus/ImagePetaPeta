@@ -10,7 +10,7 @@ import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
-import { API } from "./api";
+import { API } from "@/rendererProcess/api";
 (async () => {
   const app = createApp(App);
   const appUse = async (plugin: Plugin) => await plugin.install!(app);
