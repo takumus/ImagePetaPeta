@@ -86,6 +86,7 @@ export default class VBoard extends Vue {
     for (let i = 0; i < 8; i++) {
       const cp = new PControlPoint();
       cp.rotate.interactive = false;
+      cp.index = i;
       if (i != 3 && i != 7) {
         if (i == 0 || i == 1 || i == 2) {
           cp.yPosition = -1;
