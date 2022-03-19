@@ -5,10 +5,12 @@ const systemInfo: {
 } = reactive({
   platform: "win32"
 });
-export default {
-  async install(app: App) {
-    app.config.globalProperties.$systemInfo = systemInfo;
-    systemInfo.platform = await API.send("getPlatform");
+export function createPlugin(platform: NodeJS.Platform) {
+  return {
+    async install(app: App) {
+      app.config.globalProperties.$systemInfo = systemInfo;
+      systemInfo.platform = platform;
+    }
   }
 }
 declare module '@vue/runtime-core' {

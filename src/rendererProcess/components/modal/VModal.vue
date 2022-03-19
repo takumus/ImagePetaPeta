@@ -19,7 +19,7 @@
       } : (center ? centerStyle : {})"
     >
       <div class="title" v-if="visibleCloseButton">
-        <span class="close" @click="close">{{$systemInfo.platform == "win32" ? "&#xe8bb;" : "×"}}</span>
+        <span class="close" @click="close" v-html="$texts.close"></span>
       </div>
       <div class="content">
         <slot></slot>
