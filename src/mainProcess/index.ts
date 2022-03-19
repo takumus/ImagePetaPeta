@@ -410,9 +410,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
           try {
             log.mainLog("#Update PetaTags");
             await promiseSerial((tag) => updatePetaTag(tag, mode), tags).value;
-            if (mode != UpdateMode.UPDATE) {
-              emitMainEvent("updatePetaTags");
-            }
+            emitMainEvent("updatePetaTags");
             log.mainLog("return:", true);
             return true;
           } catch (error) {
