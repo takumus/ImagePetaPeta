@@ -68,7 +68,6 @@ export default class VModal extends Vue {
   clickBackground = false;
   keyboards = new Keyboards();
   async mounted() {
-    // this.appInfo = await API.send("getAppInfo");
     this.background.addEventListener("mousedown", this.mousedown);
     this.background.addEventListener("mouseup", this.mouseup);
     this.keyboards.enabled = true;

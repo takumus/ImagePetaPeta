@@ -7,7 +7,7 @@
   >
     <article class="info-root">
       <p>
-        {{ appInfo.name }} {{ appInfo.version }}
+        {{ $appInfo.name }} {{ $appInfo.version }}
       </p>
       <button
         tabindex="-1"
@@ -45,7 +45,6 @@ import VModal from "@/rendererProcess/components/modal/VModal.vue";
 // Others
 import { LICENSES } from "@/@assets/licenses";
 import { API } from "@/rendererProcess/api";
-import { AppInfo } from "@/commons/datas/appInfo";
 @Options({
   components: {
     VModal
@@ -56,13 +55,8 @@ export default class VInfo extends Vue {
   info = 100;
   visible = false;
   version = "0.1.0";
-  appInfo: AppInfo = {
-    name: "",
-    version: ""
-  }
   async mounted() {
     this.$components.info = this;
-    this.appInfo = await API.send("getAppInfo");
   }
   get licenses() {
     return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n\n`).join('\n');

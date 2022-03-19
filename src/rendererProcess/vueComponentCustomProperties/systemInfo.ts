@@ -15,6 +15,6 @@ export function createPlugin(platform: NodeJS.Platform) {
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
-    $systemInfo: typeof systemInfo
+    $systemInfo: Readonly<typeof systemInfo>
   }
 }

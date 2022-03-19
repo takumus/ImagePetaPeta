@@ -132,8 +132,7 @@ export default class Index extends Vue {
       }
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
-    const info = await API.send("getAppInfo");
-    this.title = `${info.name} ${info.version}`;
+    this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     await this.getPetaImages();
     await this.getPetaBoards();

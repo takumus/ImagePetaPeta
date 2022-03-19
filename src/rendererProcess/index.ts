@@ -9,6 +9,7 @@ import GlobalDefines from "@/rendererProcess/vueComponentCustomProperties/define
 import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
+import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 import { API } from "@/rendererProcess/api";
 (async () => {
@@ -26,6 +27,7 @@ import { API } from "@/rendererProcess/api";
   appUse(GlobalComponents);
   appUse(GlobalSystemDarkMode);
   appUse(GlobalTexts.createPlugin(platform));
-  await appUse(GlobalSettings)
+  await appUse(GlobalSettings);
+  await appUse(GlobalAppInfo);
   app.mount("#app");
 })();
