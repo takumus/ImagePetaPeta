@@ -345,7 +345,6 @@ export default class VBrowser extends Vue {
   get selectedPetaImages() {
     return this.petaImagesArray.filter((pi) => pi._selected);
   }
-  uncategorizedImages: PetaImage[] = [];
   async fetchFilteredPetaImages() {
     if (this.selectedPetaTags.length == 0) {
       this.filteredPetaImages = this.petaImagesArray;
