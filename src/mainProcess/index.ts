@@ -118,7 +118,12 @@ import { MainLogger } from "./utils/mainLogger";
       エラー画面を出してアプリ終了
     */
     //-------------------------------------------------------------------------------------------------//
-    showError("M", 1, "Initialization Error", String(err));
+    showError({
+      category: "M",
+      code: 1,
+      title: "Initialization Error",
+      error: String(err)
+    });
     return;
   }
   //-------------------------------------------------------------------------------------------------//
@@ -195,7 +200,12 @@ import { MainLogger } from "./utils/mainLogger";
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
       }
     } catch (error) {
-      showError("M", 2, "Initialization Error", String(error));
+      showError({
+        category: "M",
+        code: 2,
+        title: "Initialization Error",
+        error: String(error)
+      });
       return;
     }
     const mainFunctions = getMainFunctions();
@@ -338,7 +348,12 @@ import { MainLogger } from "./utils/mainLogger";
             return petaImages;
           } catch(e) {
             log.error(e);
-            showError("M", 100, "Get PetaImages Error", String(e));
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaImages Error",
+              error: String(e)
+            });
           }
           return {};
         },
@@ -355,7 +370,12 @@ import { MainLogger } from "./utils/mainLogger";
             }
           } catch (err) {
             log.error(err);
-            showError("M", 200, "Update PetaImages Error", String(err));
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update PetaImages Error",
+              error: String(err)
+            });
           }
           if (mode != UpdateMode.UPDATE) {
             emitMainEvent("updatePetaImages");
@@ -388,7 +408,12 @@ import { MainLogger } from "./utils/mainLogger";
             }
           } catch(e) {
             log.error(e);
-            showError("M", 100, "Get PetaBoards Error", String(e));
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaBoards Error",
+              error: String(e)
+            });
           }
           return [];
         },
@@ -404,7 +429,12 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch(e) {
             log.error(e);
-            showError("M", 200, "Update PetaBoards Error", String(e));
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update PetaBoards Error",
+              error: String(e)
+            });
           }
           return false;
         },
@@ -421,7 +451,12 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch (error) {
             log.error(error);
-            showError("M", 200, "Update PetaTags Error", String(error));
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update PetaTags Error",
+              error: String(error)
+            });
           }
           return false;
         },
@@ -441,7 +476,12 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch(error) {
             log.error(error);
-            showError("M", 200, "Update PetaImagesPetaTags Error", String(error));
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update PetaImagesPetaTags Error",
+              error: String(error)
+            });
           }
           return false;
         },
@@ -490,7 +530,12 @@ import { MainLogger } from "./utils/mainLogger";
             return ids;
           } catch(error) {
             log.error(error);
-            showError("M", 100, "Get PetaImageIds By PetaTagIds Error", String(error));
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaImageIds By PetaTagIds Error",
+              error: String(error)
+            });
           }
           return [];
         },
@@ -528,7 +573,12 @@ import { MainLogger } from "./utils/mainLogger";
             return petaTagIds;
           } catch(error) {
             log.error(error);
-            showError("M", 100, "Get PetaTagIds By PetaImageIds Error", String(error));
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaTagIds By PetaImageIds Error",
+              error: String(error)
+            });
           }
           return [];
         },
@@ -574,7 +624,12 @@ import { MainLogger } from "./utils/mainLogger";
             return values;
           } catch (error) {
             log.error(error);
-            showError("M", 100, "Get PetaTagInfos Error", String(error));
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaTagInfos Error",
+              error: String(error)
+            });
           }
           return [];
         },
@@ -681,7 +736,12 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch(e) {
             log.log(e);
-            showError("M", 200, "Update Settings Error", String(e));
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update Settings Error",
+              error: String(e)
+            });
           }
           return false;
         },
@@ -778,7 +838,12 @@ import { MainLogger } from "./utils/mainLogger";
             await promiseSerial(generate, images).value;
             emitMainEvent("regenerateThumbnailsComplete");
           } catch (err) {
-            showError("M", 200, "Regenerate Thumbnails Error", String(err));
+            showError({
+              category: "M",
+              code: 200,
+              title: "Regenerate Thumbnails Error",
+              error: String(err)
+            });
           }
         },
         /*------------------------------------
@@ -862,12 +927,17 @@ import { MainLogger } from "./utils/mainLogger";
   /*------------------------------------
     エラー表示
   ------------------------------------*/
-  function showError(category: "M" | "R", code: number, title: string, error: string) {
+  function showError(error: {
+    category: "M" | "R",
+    code: number,
+    title: string,
+    error: string
+  }, quit = true) {
     try {
-      mainLogger.logChunk().log("#Show Error", `code:${code}\ntitle: ${title}\nmessage: ${error}`);
+      mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nmessage: ${error.error}`);
     } catch { }
     try {
-      if (window) {
+      if (window && quit) {
         window.loadURL("data:text/html;charset=utf-8,");
       }
     } catch { }
@@ -890,14 +960,16 @@ import { MainLogger } from "./utils/mainLogger";
         <style>pre { white-space: pre-wrap; } h1 { font-family: monospace; }</style>
         </head>
         <body>
-        <h1>${category}${noHtml(('000' + code).slice(-3))} ${noHtml(title)}</h1>
-        <pre>${noHtml(error)}</pre>
+        <h1>${error.category}${noHtml(('000' + error.code).slice(-3))} ${noHtml(error.title)}</h1>
+        <pre>${noHtml(error.error)}</pre>
         <pre>Log: ${noHtml(dataLogger?.getCurrentLogfilePath() || "logger is not ready")}</pre>
         </body>`
       );
       errorWindow.setAlwaysOnTop(true);
       errorWindow.on("close", () => {
-        app.exit();
+        if (quit) {
+          app.exit();
+        }
       });
     }
     if(app.isReady()) {
