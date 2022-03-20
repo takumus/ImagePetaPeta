@@ -51,7 +51,6 @@ import { MainLogger } from "./utils/mainLogger";
   let DIR_LOG: string;
   let DIR_IMAGES: string;
   let DIR_THUMBNAILS: string;
-  let FILE_LOG: string;
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
   let FILE_TAGS_DB: string;
@@ -59,7 +58,6 @@ import { MainLogger } from "./utils/mainLogger";
   let FILE_SETTINGS: string;
   let FILE_STATES: string;
   let dataLogger: Logger;
-  let mainLogger: MainLogger;
   let dataPetaImages: DB<PetaImage>;
   let dataPetaBoards: DB<PetaBoard>;
   let dataPetaTags: DB<PetaTag>;
@@ -71,12 +69,18 @@ import { MainLogger } from "./utils/mainLogger";
     locale: "ja",
     messages: languages,
   });
+  const mainLogger = new MainLogger();
   //-------------------------------------------------------------------------------------------------//
   /*
     ファイルパスとDBの、検証・読み込み・作成
   */
   //-------------------------------------------------------------------------------------------------//
   try {
+    // ログは最優先で初期化
+    DIR_LOG = file.initDirectory(false, app.getPath("logs"));
+    dataLogger = new Logger(DIR_LOG);
+    mainLogger.logger = dataLogger;
+    // その他の初期化
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
     dataSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
@@ -102,9 +106,6 @@ import { MainLogger } from "./utils/mainLogger";
     FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
     FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
     FILE_STATES = file.initFile(DIR_APP, "states.json");
-    DIR_LOG = file.initDirectory(false, app.getPath("logs"));
-    dataLogger = new Logger(DIR_LOG);
-    mainLogger = new MainLogger(dataLogger);
     dataPetaImages = new DB<PetaImage>(FILE_IMAGES_DB);
     dataPetaBoards = new DB<PetaBoard>(FILE_BOARDS_DB);
     dataPetaTags = new DB<PetaTag>(FILE_TAGS_DB);
@@ -151,6 +152,7 @@ import { MainLogger } from "./utils/mainLogger";
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
     mainLogger.logChunk().log(`\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`);
+    mainLogger.logChunk().log(`verison: ${app.getVersion()}`);
     //-------------------------------------------------------------------------------------------------//
     /*
       画像用URL作成
@@ -862,10 +864,7 @@ import { MainLogger } from "./utils/mainLogger";
   ------------------------------------*/
   function showError(category: "M" | "R", code: number, title: string, error: string) {
     try {
-      if (dataLogger) {
-        const log = mainLogger.logChunk();
-        log.log("#Show Error", error);
-      }
+      mainLogger.logChunk().log("#Show Error", `code:${code}\ntitle: ${title}\nmessage: ${error}`);
     } catch { }
     try {
       if (window) {
@@ -893,6 +892,7 @@ import { MainLogger } from "./utils/mainLogger";
         <body>
         <h1>${category}${noHtml(('000' + code).slice(-3))} ${noHtml(title)}</h1>
         <pre>${noHtml(error)}</pre>
+        <pre>Log: ${noHtml(dataLogger?.getCurrentLogfilePath() || "logger is not ready")}</pre>
         </body>`
       );
       errorWindow.setAlwaysOnTop(true);

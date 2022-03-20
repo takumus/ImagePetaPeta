@@ -1,33 +1,54 @@
 import { createWriteStream, WriteStream } from "fs";
 import * as Path from "path";
 import dateFormat from "dateformat";
-import { v4 as uuid } from "uuid";
 export class Logger {
-  logFile: WriteStream | undefined;
-  date = "";
+  private logFile: WriteStream | undefined;
+  private date = "";
   constructor(private path: string) {
   }
   log(from: LogFrom, id: string, ...args: any[]) {
-    this.open();
-    const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})`;
-    console.log(date, ...args);
-    if (this.logFile) {
-      this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n");
+    try {
+      this.open();
+      const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})`;
+      if (this.logFile) {
+        this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n", (error) => {
+          if (error) {
+            console.log("cannot write logfile", error);
+          }
+        });
+      }
+      console.log(date, ...args);
+    } catch(error) {
+      console.log("cannot write logfile", error);
     }
   }
   open() {
-    const date = dateFormat(new Date(), "yyyy-mm-dd");
-    if (this.date != date) {
-      this.close();
-      this.logFile = createWriteStream(Path.resolve(this.path, date + ".log"), { flags: "a" });
+    try {
+      const date = dateFormat(new Date(), "yyyy-mm-dd");
+      if (this.date != date) {
+        this.close();
+        this.logFile = createWriteStream(Path.resolve(this.path, date + ".log"), { flags: "a" });
+        this.logFile.on("error", (error) => {
+          console.log("cannot open logfile", error);
+        });
+      }
+      this.date = date;
+    } catch (error) {
+      console.log("cannot open logfile", error);
     }
-    this.date = date;
   }
   close() {
-    if (this.logFile) {
-      this.logFile.close();
-      this.logFile = undefined;
+    try {
+      if (this.logFile) {
+        this.logFile.close();
+      }
+    } catch (error) {
+      console.log("cannot close logfile", error);
     }
+    this.logFile = undefined;
+  }
+  getCurrentLogfilePath() {
+    return this.logFile?.path.toString();
   }
 }
 export enum LogFrom {
