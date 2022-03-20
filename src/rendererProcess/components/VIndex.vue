@@ -78,7 +78,8 @@ import { isLatest } from "@/commons/utils/versionCheck";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { logChunk } from "@/rendererProcess/utils/logger";
+import { logChunk } from "@/rendererProcess/utils/rendererLogger";
+import { minimId } from "@/commons/utils/utils";
 @Options({
   components: {
     VBrowser,
@@ -221,7 +222,7 @@ export default class Index extends Vue {
     if (this.currentPetaBoard?.id == board.id) {
       return;
     }
-    logChunk().log("vIndex", "PetaBoard Selected", board.name);
+    logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
     API.send("setSelectedPetaBoard", board.id);
     this.currentPetaBoardId = board.id;
   }
@@ -254,7 +255,7 @@ export default class Index extends Vue {
       [board],
       UpdateMode.UPSERT
     );
-    logChunk().log("vIndex", "PetaBoard Added", board.name);
+    logChunk().log("vIndex", "PetaBoard Added", minimId(board.id));
     await this.getPetaBoards();
     this.selectPetaBoard(board);
   }

@@ -9,21 +9,10 @@ export class Logger {
   }
   log(from: LogFrom, id: string, ...args: any[]) {
     this.open();
-    const date = `[${from}][${id}](${new Date().toLocaleString()})`;
+    const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})`;
     console.log(date, ...args);
     if (this.logFile) {
       this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n");
-    }
-  }
-  chunk() {
-    const id = uuid().substring(0, 4);
-    return {
-      mainLog: (...args: any[]) => {
-        this.log(LogFrom.MAIN, id, ...args);
-      },
-      mainError: (...errors: any[]) => {
-        this.log(LogFrom.MAIN, id, "Error:", ...errors);
-      }
     }
   }
   open() {

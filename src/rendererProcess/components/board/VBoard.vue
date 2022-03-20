@@ -65,7 +65,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@pixi/gif';
 import { setCursor, setDefaultCursor } from "@/rendererProcess/utils/cursor";
-import { logChunk } from "@/rendererProcess/utils/logger";
+import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -571,6 +571,7 @@ export default class VBoard extends Vue {
     this.pPanels = {};
     this.pTransformer.pPanels = this.pPanels;
     await this.loadAllOriginal();
+    log("vBoard", "load complete");
     this.orderPIXIRender();
     Object.values(this.pPanels).forEach((pPanel) => {
       if (!pPanel.petaPanel.gif.stopped) {

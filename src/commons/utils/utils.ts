@@ -2,7 +2,7 @@ export function minimId(id: string | null | undefined) {
   if (!id) {
     return "";
   }
-  return id.substring(0, 16);
+  return id.substring(0, 8);
 }
 
 export function noHtml(str: string | null | undefined){

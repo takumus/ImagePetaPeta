@@ -81,7 +81,7 @@ import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import TransparentBackground from "@/@assets/transparentBackground.png";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { logChunk } from "@/rendererProcess/utils/logger";
+import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 @Options({
   components: {
   },

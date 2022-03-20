@@ -5,6 +5,9 @@ export function logChunk() {
   return {
     log: (...args: any[]) => {
       API.send("log", id, ...args);
+    },
+    error: (...args: any[]) => {
+      API.send("log", id, "Error:", ...args);
     }
   }
 }
