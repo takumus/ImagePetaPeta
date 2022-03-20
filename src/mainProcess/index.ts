@@ -338,7 +338,7 @@ import { MainLogger } from "./utils/mainLogger";
             return petaImages;
           } catch(e) {
             log.error(e);
-            showError("M", 3, "Get PetaImages Error", String(e));
+            showError("M", 100, "Get PetaImages Error", String(e));
           }
           return {};
         },
@@ -355,7 +355,7 @@ import { MainLogger } from "./utils/mainLogger";
             }
           } catch (err) {
             log.error(err);
-            showError("M", 4, "Update PetaImages Error", String(err));
+            showError("M", 200, "Update PetaImages Error", String(err));
           }
           if (mode != UpdateMode.UPDATE) {
             emitMainEvent("updatePetaImages");
@@ -388,7 +388,7 @@ import { MainLogger } from "./utils/mainLogger";
             }
           } catch(e) {
             log.error(e);
-            showError("M", 5, "Get PetaBoards Error", String(e));
+            showError("M", 100, "Get PetaBoards Error", String(e));
           }
           return [];
         },
@@ -404,7 +404,7 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch(e) {
             log.error(e);
-            showError("M", 6, "Update PetaBoards Error", String(e));
+            showError("M", 200, "Update PetaBoards Error", String(e));
           }
           return false;
         },
@@ -421,7 +421,7 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch (error) {
             log.error(error);
-            showError("M", 6, "Update PetaTags Error", String(error));
+            showError("M", 200, "Update PetaTags Error", String(error));
           }
           return false;
         },
@@ -441,7 +441,7 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch(error) {
             log.error(error);
-            showError("M", 6, "Update PetaImagesPetaTags Error", String(error));
+            showError("M", 200, "Update PetaImagesPetaTags Error", String(error));
           }
           return false;
         },
@@ -490,7 +490,7 @@ import { MainLogger } from "./utils/mainLogger";
             return ids;
           } catch(error) {
             log.error(error);
-            showError("M", 6, "Get PetaImageIds By PetaTagIds Error", String(error));
+            showError("M", 100, "Get PetaImageIds By PetaTagIds Error", String(error));
           }
           return [];
         },
@@ -528,7 +528,7 @@ import { MainLogger } from "./utils/mainLogger";
             return petaTagIds;
           } catch(error) {
             log.error(error);
-            showError("M", 6, "Get PetaTagIds By PetaImageIds Error", String(error));
+            showError("M", 100, "Get PetaTagIds By PetaImageIds Error", String(error));
           }
           return [];
         },
@@ -574,7 +574,7 @@ import { MainLogger } from "./utils/mainLogger";
             return values;
           } catch (error) {
             log.error(error);
-            showError("M", 6, "Get PetaTagInfos Error", String(error));
+            showError("M", 100, "Get PetaTagInfos Error", String(error));
           }
           return [];
         },
@@ -681,7 +681,7 @@ import { MainLogger } from "./utils/mainLogger";
             return true;
           } catch(e) {
             log.log(e);
-            showError("M", 7, "Update Settings Error", String(e));
+            showError("M", 200, "Update Settings Error", String(e));
           }
           return false;
         },
@@ -778,7 +778,7 @@ import { MainLogger } from "./utils/mainLogger";
             await promiseSerial(generate, images).value;
             emitMainEvent("regenerateThumbnailsComplete");
           } catch (err) {
-            showError("M", 9, "Regenerate Thumbnails Error", String(err));
+            showError("M", 200, "Regenerate Thumbnails Error", String(err));
           }
         },
         /*------------------------------------
