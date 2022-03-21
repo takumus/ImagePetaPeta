@@ -122,7 +122,7 @@ import { MainLogger } from "./utils/mainLogger";
       category: "M",
       code: 1,
       title: "Initialization Error",
-      error: String(err)
+      message: String(err)
     });
     return;
   }
@@ -204,7 +204,7 @@ import { MainLogger } from "./utils/mainLogger";
         category: "M",
         code: 2,
         title: "Initialization Error",
-        error: String(error)
+        message: String(error)
       });
       return;
     }
@@ -352,7 +352,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 100,
               title: "Get PetaImages Error",
-              error: String(e)
+              message: String(e)
             });
           }
           return {};
@@ -374,7 +374,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 200,
               title: "Update PetaImages Error",
-              error: String(err)
+              message: String(err)
             });
           }
           if (mode != UpdateMode.UPDATE) {
@@ -412,7 +412,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 100,
               title: "Get PetaBoards Error",
-              error: String(e)
+              message: String(e)
             });
           }
           return [];
@@ -433,7 +433,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 200,
               title: "Update PetaBoards Error",
-              error: String(e)
+              message: String(e)
             });
           }
           return false;
@@ -455,7 +455,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 200,
               title: "Update PetaTags Error",
-              error: String(error)
+              message: String(error)
             });
           }
           return false;
@@ -480,7 +480,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 200,
               title: "Update PetaImagesPetaTags Error",
-              error: String(error)
+              message: String(error)
             });
           }
           return false;
@@ -534,7 +534,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 100,
               title: "Get PetaImageIds By PetaTagIds Error",
-              error: String(error)
+              message: String(error)
             });
           }
           return [];
@@ -577,7 +577,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 100,
               title: "Get PetaTagIds By PetaImageIds Error",
-              error: String(error)
+              message: String(error)
             });
           }
           return [];
@@ -628,7 +628,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 100,
               title: "Get PetaTagInfos Error",
-              error: String(error)
+              message: String(error)
             });
           }
           return [];
@@ -740,7 +740,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 200,
               title: "Update Settings Error",
-              error: String(e)
+              message: String(e)
             });
           }
           return false;
@@ -842,7 +842,7 @@ import { MainLogger } from "./utils/mainLogger";
               category: "M",
               code: 200,
               title: "Regenerate Thumbnails Error",
-              error: String(err)
+              message: String(err)
             });
           }
         },
@@ -931,10 +931,10 @@ import { MainLogger } from "./utils/mainLogger";
     category: "M" | "R",
     code: number,
     title: string,
-    error: string
+    message: string
   }, quit = true) {
     try {
-      mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nmessage: ${error.error}`);
+      mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
       if (window && quit) {
@@ -961,7 +961,8 @@ import { MainLogger } from "./utils/mainLogger";
         </head>
         <body>
         <h1>${error.category}${noHtml(('000' + error.code).slice(-3))} ${noHtml(error.title)}</h1>
-        <pre>${noHtml(error.error)}</pre>
+        <pre>Verison: ${app.getVersion()}</pre>
+        <pre>Message: ${noHtml(error.message)}</pre>
         <pre>Log: ${noHtml(dataLogger?.getCurrentLogfilePath() || "logger is not ready")}</pre>
         </body>`
       );
