@@ -10,7 +10,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import dateFormat from "dateformat";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, SUPPORT_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
@@ -964,11 +964,13 @@ import { MainLogger } from "./utils/mainLogger";
     function createWindow() {
       const errorWindow = new BrowserWindow({
         width: 512,
-        height: 256,
+        height: 512,
         frame: true,
         show: true,
         webPreferences: {
-          javascript: false
+          javascript: true,
+          nodeIntegration: true,
+          contextIsolation: false,
         }
       });
       errorWindow.menuBarVisible = false;
@@ -977,13 +979,14 @@ import { MainLogger } from "./utils/mainLogger";
         `data:text/html;charset=utf-8,
         <head>
         <title>${noHtml(app.getName())} Fatal Error</title>
-        <style>pre { white-space: pre-wrap; } h1 { font-family: monospace; }</style>
+        <style>pre { white-space: pre-wrap; } * { font-family: monospace; }</style>
         </head>
         <body>
-        <h1>${error.category}${noHtml(('000' + error.code).slice(-3))} ${noHtml(error.title)}</h1>
+        <h1>${noHtml(error.category)}${noHtml(('000' + error.code).slice(-3))} ${noHtml(error.title)}</h1>
         <pre>Verison: ${app.getVersion()}</pre>
         <pre>Message: ${noHtml(error.message)}</pre>
         <pre>Log: ${noHtml(dataLogger?.getCurrentLogfilePath() || "logger is not ready")}</pre>
+        <h2><a href="javascript:require('electron').shell.openExternal('${SUPPORT_URL}?usp=pp_url&entry.1300869761=%E3%83%90%E3%82%B0&entry.1709939184=${encodeURIComponent(app.getVersion())}');">SUPPORT</a></h2>
         </body>`
       );
       errorWindow.setAlwaysOnTop(true);
