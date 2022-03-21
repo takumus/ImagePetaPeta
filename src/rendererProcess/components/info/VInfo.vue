@@ -55,7 +55,6 @@ export default class VInfo extends Vue {
   rawProgress = 100;
   info = 100;
   visible = false;
-  version = "0.1.0";
   async mounted() {
     this.$components.info = this;
   }
@@ -66,7 +65,7 @@ export default class VInfo extends Vue {
     API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
   }
   gotoIssues() {
-    API.send("openURL", SUPPORT_URL);
+    API.send("openURL", `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(this.$appInfo.version)}`);
   }
   showDBFolder() {
     API.send("showDBFolder");
