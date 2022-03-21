@@ -145,6 +145,7 @@ export default class VComplement extends Vue {
     this.searcher = new FuzzySearch(items, undefined, {
       sort: true
     });
+    this.input();
   }
   blur() {
     this.show = false;
