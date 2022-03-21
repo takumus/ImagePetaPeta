@@ -14,12 +14,15 @@
 2. `yarn build`  
 3. `dist_electron`内に生成されたappファイルがアプリ本体です。
 ## ご協力
-ベータ版ではバグの早期発見のためログファイルを保存しています。  
-ログファイルの場所は、右上の**情報**ボタンより、**コンフィグフォルダ**を押していただき、**ImagePetaPeta-beta**フォルダの中の**logs**です。  
+まだ開発段階のアプリなので、多くのユーザーに最新版を使っていただき、新鮮なフィードバックを貰いたいと思っております。  
+そのため、アップデートの通知はオフにできないようになっています。  
+小さなアップデートは高頻度で配信されますが、大きなアップデートは多くて週に１度と考えています。  
+大きなアップデートのみの通知で良いという方は、設定→その他より「メジャーアップデートのみを通知」を有効にしてください。  
+よろしくお願いします。
 ## バグ発見！質問！または要望！
-<https://github.com/takumus/ImagePetaPeta/issues>  
-こちらより**New Issue**で投稿してください。  
-githubアカウントが無い場合は<https://github.com/takumus>のメールアドレスまで！
+<https://docs.google.com/forms/d/e/1FAIpQLSfMVEzYwdC09SrM6ipTtHyk_wTC1n08pB2eeZIVZifIRW7ojQ/viewform>  
+こちらのフォームからお願いします。  
+githubアカウントをお持ちの方は、IssuesでもOKです。
 # 開発者向け
 ## nodeとかのバージョン
 `./package.json`の最後の`volta`を御覧ください。
