@@ -45,6 +45,7 @@ import VModal from "@/rendererProcess/components/modal/VModal.vue";
 // Others
 import { LICENSES } from "@/@assets/licenses";
 import { API } from "@/rendererProcess/api";
+import { SUPPORT_URL } from "@/commons/defines";
 @Options({
   components: {
     VModal
@@ -65,7 +66,7 @@ export default class VInfo extends Vue {
     API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
   }
   gotoIssues() {
-    API.send("openURL", "https://github.com/takumus/ImagePetaPeta/issues");
+    API.send("openURL", SUPPORT_URL);
   }
   showDBFolder() {
     API.send("showDBFolder");
