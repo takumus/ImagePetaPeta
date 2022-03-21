@@ -187,6 +187,21 @@ import { MainLogger } from "./utils/mainLogger";
         fieldName: "id",
         unique: true
       });
+    } catch (error) {
+      showError({
+        category: "M",
+        code: 2,
+        title: "Initialization Error",
+        message: String(error)
+      });
+      return;
+    }
+    //-------------------------------------------------------------------------------------------------//
+    /*
+      データのマイグレーション
+    */
+    //-------------------------------------------------------------------------------------------------//
+    try {
       const petaImagesArray = await dataPetaImages.find({});
       const petaImages: PetaImages = {};
       petaImagesArray.forEach((pi) => {
@@ -202,12 +217,17 @@ import { MainLogger } from "./utils/mainLogger";
     } catch (error) {
       showError({
         category: "M",
-        code: 2,
-        title: "Initialization Error",
+        code: 3,
+        title: "Migration Error",
         message: String(error)
       });
       return;
     }
+    //-------------------------------------------------------------------------------------------------//
+    /*
+      ipcへ関数を登録
+    */
+    //-------------------------------------------------------------------------------------------------//
     const mainFunctions = getMainFunctions();
     Object.keys(mainFunctions).forEach((key) => {
       ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
