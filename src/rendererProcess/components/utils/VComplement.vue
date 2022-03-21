@@ -86,7 +86,7 @@ export default class VComplement extends Vue {
       if (this.show) {
         this.updatePosition();
       }
-    }, 200);
+    }, 100);
   }
   normalizeIndex() {
     if (this.currentIndex < 0) {
@@ -138,6 +138,7 @@ export default class VComplement extends Vue {
     this.input();
     this.keyboards.enabled = true;
     this.keyboards.lock();
+    this.updatePosition();
   }
   updateItems(items: string[]) {
     this.items = items;
@@ -175,8 +176,8 @@ export default class VComplement extends Vue {
     }
   }
   updatePosition() {
-    if (this.target) {
-      const rect = this.target.$el.getBoundingClientRect();
+    if (this.target && this.target.$el) {
+      const rect = (this.target.$el as HTMLElement).getBoundingClientRect();
       this.position.x = rect.x;
       this.position.y = rect.y + rect.height;
     }
