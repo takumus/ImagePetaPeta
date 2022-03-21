@@ -86,7 +86,7 @@ export default class VComplement extends Vue {
       if (this.show) {
         this.updatePosition();
       }
-    }, 100);
+    }, 50);
   }
   normalizeIndex() {
     if (this.currentIndex < 0) {
