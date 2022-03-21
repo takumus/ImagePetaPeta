@@ -3,14 +3,12 @@ export interface PetaTag {
   name: string,
   id: string,
   index: number,
-  // petaImages: string[]
 }
 
 export function createPetaTag(name: string): PetaTag {
   return {
     name: name,
     id: uuid(),
-    index: 0,
-    // petaImages: []
+    index: 0
   }
 }
