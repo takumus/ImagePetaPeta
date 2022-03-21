@@ -9,20 +9,20 @@
       zIndex: zIndex
     }"
   >
-    <li class="item" v-html="$texts.close">
-
-    </li>
     <li
       v-for="item, i in filteredItems"
       :key="item"
       @mousedown="select(item)"
       @mousemove="moveSelectionAbsolute(i)"
+      @mouseleave="moveSelectionAbsolute(-1)"
       class="item"
       :class="{
         selected: i == currentIndex
       }"
     >
       {{item}}
+    </li>
+    <li class="item close" v-html="$texts.close">
     </li>
   </ul>
 </template>
@@ -105,7 +105,7 @@ export default class VComplement extends Vue {
   }
   moveSelectionAbsolute(index: number) {
     this.currentIndex = index;
-    this.normalizeIndex();
+    // this.normalizeIndex();
     this.moveCursorToLast();
   }
   moveSelectionRelative(index: number) {
@@ -177,9 +177,17 @@ export default class VComplement extends Vue {
   }
   updatePosition() {
     if (this.target && this.target.$el) {
-      const rect = (this.target.$el as HTMLElement).getBoundingClientRect();
-      this.position.x = rect.x;
-      this.position.y = rect.y + rect.height;
+      const inputRect = (this.target.$el as HTMLElement).getBoundingClientRect();
+      this.position.x = inputRect.x;
+      this.position.y = inputRect.y + inputRect.height;
+
+      const rect = this.complement.getBoundingClientRect();
+      if (this.position.x + rect.width > document.body.clientWidth) {
+        this.position.x = document.body.clientWidth - rect.width;
+      }
+      if (this.position.y + rect.height > document.body.clientHeight) {
+        this.position.y = document.body.clientHeight - rect.height;
+      }
     }
   }
 }
@@ -196,15 +204,20 @@ export default class VComplement extends Vue {
   border-radius: var(--rounded);
   overflow: hidden;
   >.item {
-    white-space: nowrap;
+    word-break: break-all;
+    white-space: pre-wrap;
     list-style-type: none;
     min-width: 128px;
+    width: 256px;
     padding: 4px 24px;
     // padding-left: 24px;
     font-size: 1em;
     cursor: pointer;
-    &.selected {
+    &.selected, &.close:hover {
       background-color: var(--contextmenu-item-hover-color);
+    }
+    &.close {
+      text-align: center;
     }
   }
   >.separate {
