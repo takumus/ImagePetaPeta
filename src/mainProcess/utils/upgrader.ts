@@ -98,6 +98,9 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
     const anyPetaImage = (petaImage as any);
     await promiseSerial(async (tag) => {
       const petaTag = ((await petaTags.find({ name: tag }))[0] || createPetaTag(tag)) as any;
+      if (!petaTag.petaImages) {
+        petaTag.petaImages = [];
+      }
       petaTag.petaImages.push(petaImage.id);
       petaTag.petaImages = Array.from(new Set(petaTag.petaImages));
       await petaTags.update({ id: petaTag.id }, petaTag, true);
