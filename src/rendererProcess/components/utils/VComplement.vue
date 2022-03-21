@@ -72,10 +72,15 @@ export default class VComplement extends Vue {
     });
     this.keyboards.down(["enter"], () => {
       if (!this.target) return;
-      this.select(this.filteredItems[this.currentIndex]);
+      const item = this.filteredItems[this.currentIndex];
+      if (item) {
+        this.select(item);
+      }
     });
     this.keyboards.down(["escape"], () => {
-      this.blur();
+      this.$nextTick(() => {
+        this.blur();
+      });
     });
     setInterval(() => {
       if (this.show) {
@@ -132,6 +137,7 @@ export default class VComplement extends Vue {
     this.show = true;
     this.input();
     this.keyboards.enabled = true;
+    this.keyboards.lock();
   }
   updateItems(items: string[]) {
     this.items = items;
@@ -160,24 +166,13 @@ export default class VComplement extends Vue {
     if (this.searcher) {
       this.filteredItems = this.searcher?.search(value);
     }
-    if (this.filteredItems.length == 0) {
-      this.keyboards.unlock();
-    } else {
-      if (value === "") {
-        this.keyboards.unlock();
-      } else {
-        this.keyboards.lock();
-      }
-      this.updatePosition();
-    }
+    this.updatePosition();
   }
-  select(item?: string) {
-    // setTimeout(() => {
+  select(item: string) {
     if (this.target) {
-      this.target.tempText = item || this.target.tempText;
+      this.target.apply(item);
       this.blur();
     }
-    // }, 1);
   }
   updatePosition() {
     if (this.target) {

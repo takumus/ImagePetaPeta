@@ -59,10 +59,7 @@ export default class VSearch extends Vue {
   @Prop()
   selectedPetaTags: PetaTag[] = [];
   mounted() {
-    this.searchInput.keyboard.down(["backspace"], () => {
-      this.removeLastPetaTag();
-    });
-    this.searchInput.keyboard.down(["delete"], () => {
+    this.searchInput.keyboard.down(["backspace", "delete"], () => {
       this.removeLastPetaTag();
     });
   }

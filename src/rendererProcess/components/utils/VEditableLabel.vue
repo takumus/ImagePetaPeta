@@ -15,7 +15,7 @@
       ref="label"
       placeholder=""
       :contenteditable="editing"
-      @blur="apply"
+      @blur="cancel"
       @focus="focus($event)"
       @dblclick="edit(true)"
       @click="edit()"
@@ -63,11 +63,13 @@ export default class VEditableLabel extends Vue {
   editing = false;
   labelWidth = 0;
   labelHeight = 0;
-  keyboard = new Keyboards();
+  keyboard = new Keyboards(false);
   mounted() {
     this.changeLabel();
     this.keyboard.down(["enter"], () => {
-      this.apply();
+      setTimeout(() => {
+        this.apply();
+      }, 1);
     });
   }
   unmounted() {
@@ -96,7 +98,7 @@ export default class VEditableLabel extends Vue {
   preventLineBreak(e: KeyboardEvent) {
     e.preventDefault();
   }
-  apply() {
+  apply(text?: string) {
     if (!this.editing) {
       return;
     }
@@ -106,6 +108,9 @@ export default class VEditableLabel extends Vue {
       return;
     }
     setTimeout(() => {
+      if (text !== undefined) {
+        this.tempText = text;
+      }
       this.tempText = this.tempText.trim();
       if (!this.allowEmpty) {
         if (this.label == this.tempText || this.tempText == "") {
@@ -115,6 +120,16 @@ export default class VEditableLabel extends Vue {
       }
       this.$emit("change", this.tempText);
     }, 1);
+  }
+  cancel() {
+    if (!this.editing) {
+      return;
+    }
+    setTimeout(() => {
+      this.tempText = this.label;
+    }, 1);
+    this.editing = false;
+    this.keyboard.enabled = false;
   }
   input(event: InputEvent) {
     this.tempText = (event.target as HTMLElement).innerText;

@@ -3,7 +3,7 @@ export class Keyboards {
   private id = 0;
   private downListeners: { [key: string]: Set<KeyboardsCallback> };
   private upListeners: { [key: string]: Set<KeyboardsCallback> };
-  constructor() {
+  constructor(public lockable = true) {
     this.id = Keyboards.id ++;
     this.downListeners = {};
     this.upListeners = {};
@@ -59,7 +59,7 @@ export class Keyboards {
     }
   }
   public get enabled() {
-    return this._enabled && (Keyboards.locked < 0 || Keyboards.locked == this.id);
+    return this._enabled && (Keyboards.locked < 0 || Keyboards.locked == this.id || !this.lockable);
   }
 
   // statics
