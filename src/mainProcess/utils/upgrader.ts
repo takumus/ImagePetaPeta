@@ -70,8 +70,8 @@ export function upgradeSettings(settings: Settings) {
     settings.autoAddTag = defaultSettings.autoAddTag;
   }
   // v2.4.0
-  if (settings.notifyMinorUpdate === undefined) {
-    settings.notifyMinorUpdate = defaultSettings.notifyMinorUpdate;
+  if (settings.ignoreMinorUpdate === undefined) {
+    settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
   }
   return settings;
 }

@@ -135,8 +135,8 @@ const ja = {
     changePetaImageDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
     autoAddTag: "自動タグ追加",
     autoAddTagDescriptions: "インポート時、自動で日付のタグを追加します。",
-    notifyMinorUpdate: "マイナーアップデートを通知する",
-    notifyMinorUpdateDescriptions: "大きなアップデート以外の小さなアップデートも通知します。\nそのため、アップデートの頻度が高くなります。",
+    ignoreMinorUpdate: "マイナーアップデートの通知を無視する",
+    ignoreMinorUpdateDescriptions: "大きな重要なアップデート以外の、小さなアップデートを無視します。\nアップデートの頻度が多くて困っている人向けの設定です。",
     changePetaImageDirectoryDialog: (ctx: any) => {
       return `データの保存先を"${ctx.list(0)}"に変更しますか?\n"はい"を押すと再起動します。`
     },

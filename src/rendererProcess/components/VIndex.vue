@@ -146,7 +146,7 @@ export default class Index extends Vue {
   }
   checkUpdate() {
     API.send("checkUpdate").then(async (result) => {
-      if (!isLatest(result.current, result.latest)) {
+      if (!isLatest(result.current, result.latest, this.$settings.ignoreMinorUpdate)) {
         if (
           this.$systemInfo.platform == "win32"
           && await this.$components.dialog.show(

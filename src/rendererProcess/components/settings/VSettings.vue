@@ -180,12 +180,12 @@
           <label>
             <input
               type="checkbox"
-              :checked="$settings.notifyMinorUpdate"
-              @change="$settings.notifyMinorUpdate = Boolean($event.target.checked)"
+              :checked="$settings.ignoreMinorUpdate"
+              @change="$settings.ignoreMinorUpdate = Boolean($event.target.checked)"
             >
-            {{$t("settings.notifyMinorUpdate")}}
+            {{$t("settings.ignoreMinorUpdate")}}
           </label><br>
-          <p>{{$t("settings.notifyMinorUpdateDescriptions")}}</p>
+          <p>{{$t("settings.ignoreMinorUpdateDescriptions")}}</p>
           <label>
             <input
               type="checkbox"
