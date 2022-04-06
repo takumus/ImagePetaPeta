@@ -53,11 +53,11 @@ export function upgradeSettings(settings: Settings) {
     settings.tileSize = defaultSettings.tileSize;
   }
   if (settings.loadThumbnailsInOriginal === undefined) {
-    settings.loadThumbnailsInOriginal = false;
+    settings.loadThumbnailsInOriginal = defaultSettings.loadThumbnailsInOriginal;
   }
   // v1.6.0
   if (settings.showNsfwWithoutConfirm === undefined) {
-    settings.showNsfwWithoutConfirm = false;
+    settings.showNsfwWithoutConfirm = defaultSettings.showNsfwWithoutConfirm;
   }
   if (settings.petaImageDirectory === undefined) {
     settings.petaImageDirectory = {
@@ -67,7 +67,11 @@ export function upgradeSettings(settings: Settings) {
   }
   // v1.7.0
   if (settings.autoAddTag === undefined) {
-    settings.autoAddTag = true;
+    settings.autoAddTag = defaultSettings.autoAddTag;
+  }
+  // v2.4.0
+  if (settings.notifyMinorUpdate === undefined) {
+    settings.notifyMinorUpdate = defaultSettings.notifyMinorUpdate;
   }
   return settings;
 }

@@ -168,7 +168,7 @@
           Others
         -->
         <section v-show="currentTab == 'others'">
-          <label>
+          <!-- <label>
             <input
               type="checkbox"
               :checked="$settings.autoHideUI"
@@ -176,7 +176,16 @@
             >
             {{$t("settings.autoHideUI")}}
           </label><br>
-          <p>{{$t("settings.autoHideUIDescriptions")}}</p>
+          <p>{{$t("settings.autoHideUIDescriptions")}}</p> -->
+          <label>
+            <input
+              type="checkbox"
+              :checked="$settings.notifyMinorUpdate"
+              @change="$settings.notifyMinorUpdate = Boolean($event.target.checked)"
+            >
+            {{$t("settings.notifyMinorUpdate")}}
+          </label><br>
+          <p>{{$t("settings.notifyMinorUpdateDescriptions")}}</p>
           <label>
             <input
               type="checkbox"

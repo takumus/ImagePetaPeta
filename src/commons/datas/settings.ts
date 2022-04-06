@@ -23,6 +23,7 @@ const defaultSettings = {
     path: ""
   },
   autoAddTag: true,
+  notifyMinorUpdate: false
 }
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);
