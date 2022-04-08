@@ -22,7 +22,11 @@
     >
       {{item}}
     </li>
-    <li class="item close" v-html="$texts.close">
+    <li
+      class="item close"
+      v-html="$texts.close"
+      v-if="filteredItems.length > 0"
+    >
     </li>
   </ul>
 </template>
