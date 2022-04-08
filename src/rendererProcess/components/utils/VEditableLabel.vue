@@ -39,7 +39,8 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
   emits: [
     "change",
     "focus",
-    "input"
+    "input",
+    "delete"
   ]
 })
 export default class VEditableLabel extends Vue {
@@ -70,6 +71,11 @@ export default class VEditableLabel extends Vue {
       setTimeout(() => {
         this.apply();
       }, 1);
+    });
+    this.keyboard.down(["backspace", "delete"], () => {
+      if (this.tempText == "") {
+        this.$emit("delete", this);
+      }
     });
   }
   unmounted() {
