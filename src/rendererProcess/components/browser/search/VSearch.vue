@@ -12,6 +12,7 @@
         :allowEmpty="true"
         @focus="complementTag"
         @change="(value) => editSearchTag(tag, value)"
+        @delete="editSearchTag(tag, '')"
       />
     </span>
     <span class="selectedTag last">
@@ -21,6 +22,7 @@
         :clickToEdit="true"
         @change="addSelectedTag"
         @focus="complementTag"
+        @delete="removeLastPetaTag()"
         :growWidth="true"
         :noOutline="true"
         ref="searchInput"
@@ -44,6 +46,7 @@ import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
+import { blur } from "@/rendererProcess/utils/blur";
 @Options({
   components: {
     VEditableLabel
@@ -59,9 +62,7 @@ export default class VSearch extends Vue {
   @Prop()
   selectedPetaTags: PetaTag[] = [];
   mounted() {
-    this.searchInput.keyboard.down(["backspace", "delete"], () => {
-      this.removeLastPetaTag();
-    });
+    //
   }
   unmounted() {
     //
@@ -72,11 +73,11 @@ export default class VSearch extends Vue {
     }
   }
   removeLastPetaTag() {
-    if (this.searchInput.tempText == "") {
-      const last = this.selectedPetaTags[this.selectedPetaTags.length - 1];
-      if (last) {
-        this.editSearchTag(last, "");
-      }
+    const last = this.selectedPetaTags[this.selectedPetaTags.length - 1];
+    if (last) {
+      this.editSearchTag(last, "");
+    } else {
+      blur();
     }
   }
   editSearchTag(tag: PetaTag, value: string) {
