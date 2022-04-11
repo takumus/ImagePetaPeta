@@ -18,6 +18,7 @@ const sharp = require("sharp");
   await exportImage("./rawAssets/icon/icon.png", "./build/Square44x44Logo.png", 44);
   await exportImage("./rawAssets/icon/icon.png", "./build/Square150x150Logo.png", 150);
   await exportImage("./rawAssets/icon/icon.png", "./build/StoreLogo.png", 50);
+  await exportImage("./rawAssets/icon/icon.png", "./build/MacIcon.png", 512);
   console.log("generate icons complete");
 })();
 

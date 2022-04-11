@@ -1350,6 +1350,10 @@ import { MainLogger } from "./utils/mainLogger";
         nodeIntegration: false,
         contextIsolation: true,
         preload: Path.join(__dirname, "preload.js")
+      },
+      trafficLightPosition: {
+        x: 13,
+        y: 13
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {

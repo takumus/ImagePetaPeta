@@ -355,7 +355,7 @@ export default class VTabBar extends Vue {
             flex-grow: 0;
             width: calc(var(--tab-height) + var(--top-draggable-height));
             &.mac {
-              width: calc(var(--tab-height) + var(--top-draggable-height) + 30px);
+              width: calc(var(--tab-height) + var(--top-draggable-height) + 32px);
             }
           }
         }

@@ -63,7 +63,7 @@ module.exports = {
           target: ["nsis", ...(appxConfig ? ["appx"] : [])]
         },
         mac: {
-           icon: "icon/icon.png"
+           icon: "build/MacIcon.png"
         },
         nsis: {
           oneClick: false,
