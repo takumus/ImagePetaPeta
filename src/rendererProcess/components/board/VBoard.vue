@@ -622,7 +622,9 @@ export default class VBoard extends Vue {
     const pPanel = new PPanel(petaPanel);
     pPanel.showNsfw = this.$settings.showNsfwWithoutConfirm;
     pPanel.onUpdateGIF = () => {
-      this.orderPIXIRender();
+      if (!this.loading) {
+        this.orderPIXIRender();
+      }
     }
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
