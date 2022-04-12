@@ -19,17 +19,8 @@
           @click.right="rightClick(panelData, $event)"
           @click.left="leftClick(panelData, $event)"
         >
-          <div class="icon" @mousedown="startDrag(panelData, $event)">
-            ={{panelData.dragging}}
-          </div>
           <div class="icon">
             👁
-          </div>
-          <div class="icon">
-            <input type="checkbox" v-model="panelData.pPanel.selected" style="pointer-events: none">
-          </div>
-          <div class="icon">
-            🔒
           </div>
           <div
             :style="{
@@ -37,6 +28,15 @@
             }"
             class="image"
           >
+          </div>
+          <div class="icon">
+            <input type="checkbox" v-model="panelData.pPanel.selected" style="pointer-events: none">
+          </div>
+          <div class="icon">
+            🔒
+          </div>
+          <div class="icon" @mousedown="startDrag(panelData, $event)">
+            ={{panelData.dragging}}
           </div>
         </li>
       </ul>
@@ -100,6 +100,8 @@ export default class VLayer extends Vue {
       return;
     }
     panelElement.style.top = "0px";
+    this.clearSelectionAll(true);
+    panelData.pPanel.selected = true;
   }
   mousemove(event: MouseEvent) {
     // console.log(event.offsetY);
