@@ -1339,8 +1339,8 @@ import { MainLogger } from "./utils/mainLogger";
   ------------------------------------*/
   async function initWindow() {
     window = new BrowserWindow({
-      width: WINDOW_DEFAULT_WIDTH,
-      height: WINDOW_DEFAULT_HEIGHT,
+      width: dataStates.data.windowSize.width,
+      height: dataStates.data.windowSize.height,
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
       frame: false,
@@ -1365,7 +1365,6 @@ import { MainLogger } from "./utils/mainLogger";
       await window.loadURL("app://./index.html");
     }
     window.setMenuBarVisibility(false);
-    window.setSize(dataStates.data.windowSize.width, dataStates.data.windowSize.height);
     if (dataStates.data.windowIsMaximized) {
       window.maximize();
     }
