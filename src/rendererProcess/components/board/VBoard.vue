@@ -41,6 +41,8 @@
       :zIndex="1"
       :visible="true"
       :pPanelsArray="pPanelsArray"
+      @sortIndex="sortIndex"
+      @petaPanelMenu="petaPanelMenu"
     />
   </article>
 </template>
