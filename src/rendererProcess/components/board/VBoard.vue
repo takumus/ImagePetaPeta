@@ -31,12 +31,17 @@
       </span>
     </section>
     <VBoardLoading
-      :zIndex="1"
+      :zIndex="2"
       :loading="loading"
       :log="loadingLog"
       :progress="loadingProgress"
       ref="loadingModal"
     ></VBoardLoading>
+    <VLayer
+      :zIndex="1"
+      :visible="true"
+      :pPanelsArray="pPanelsArray"
+    />
   </article>
 </template>
 
@@ -47,6 +52,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
+import VLayer from "@/rendererProcess/components/layer/VLayer.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { PetaBoard, PetaBoardTransform } from "@/commons/datas/petaBoard";
@@ -70,7 +76,8 @@ PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
     VCrop,
-    VBoardLoading
+    VBoardLoading,
+    VLayer,
   },
   emits: [
     "change"
