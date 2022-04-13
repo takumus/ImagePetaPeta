@@ -13,7 +13,8 @@
           :key="panelData.id"
           :class="{
             dragging: draggingPanelId !== '',
-            me: draggingPanelId == panelData.id
+            me: draggingPanelId == panelData.id,
+            selected: panelData.pPanel.selected
           }"
           :ref="`panel-${panelData.id}`"
           @click.right="rightClick(panelData, $event)"
@@ -204,6 +205,9 @@ interface PanelData {
         background-color: var(--button-bg-color);
         display: flex;
         align-items: center;
+        &.selected {
+          background-color: var(--button-active-bg-color);
+        }
         &.dragging.me, &:hover {
           background-color: var(--button-hover-bg-color);
         }
