@@ -333,7 +333,7 @@ body, html {
     --font-color: #d3d3d3;
     --button-bg-color: #141414;
     --button-hover-bg-color: #272727;
-    --button-active-bg-color: #555555;
+    --button-active-bg-color: #3f3f3f;
     --tab-bg-color: #272727;
     --tab-selected-color: #141414;
     --tab-hovered-color: #202020;
