@@ -157,7 +157,9 @@ export default class VLayer extends Vue {
     this.updateDragCell(0, true);
   }
   rightClick(panelData: PPanel, event: MouseEvent) {
-    this.clearSelectionAll();
+    if (!panelData.selected) {
+      this.clearSelectionAll();
+    }
     panelData.selected = true;
     this.$emit("petaPanelMenu", panelData, vec2FromMouseEvent(event));
   }
