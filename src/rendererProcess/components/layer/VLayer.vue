@@ -6,40 +6,23 @@
       zIndex: zIndex
     }"
   >
-    <section class="layer">
+    <section class="layer" ref="layersParent">
       <ul ref="layers">
-        <li
-          v-for="panelData in panelDatas"
+        <VLayerCell
+          v-for="panelData in panelDatasWithId"
           :key="panelData.id"
-          :class="{
-            dragging: draggingPanelId !== '',
-            me: draggingPanelId == panelData.id,
-            selected: panelData.pPanel.selected
-          }"
-          :ref="`panel-${panelData.id}`"
-          @click.right="rightClick(panelData, $event)"
-          @click.left="leftClick(panelData, $event)"
-        >
-          <div class="icon">
-            👁
-          </div>
-          <div
-            :style="{
-              backgroundImage: `url(${panelData.imageURL})`
-            }"
-            class="image"
-          >
-          </div>
-          <div class="icon">
-            <input type="checkbox" v-model="panelData.pPanel.selected" style="pointer-events: none">
-          </div>
-          <div class="icon">
-            🔒
-          </div>
-          <div class="icon" @mousedown="startDrag(panelData, $event)">
-            ={{panelData.dragging}}
-          </div>
-        </li>
+          :ref="`panel-${panelData.panelData.petaPanel.id}`"
+          :layerCellData="panelData.panelData"
+          :currentDraggingId="draggingPanelId"
+          @startDrag="startDrag"
+          @click.right="rightClick(panelData.panelData, $event)"
+          @click.left="leftClick(panelData.panelData, $event)"
+        />
+        <VLayerCell
+          ref="cellDrag"
+          :layerCellData="draggingPanelData"
+          :drag="true"
+        />
       </ul>
     </section>
   </article>
@@ -49,18 +32,15 @@
 // Vue
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
+// Components
+import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
-import { v4 as uuid } from "uuid";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { PetaBoard } from "@/commons/datas/petaBoard";
-import { ImageType } from "@/commons/datas/imageType";
-import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { PetaPanel } from "@/commons/datas/petaPanel";
-import { PPanel } from "../board/ppanels/PPanel";
+import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 @Options({
   components: {
-    //
+    VLayerCell
   },
   emits: [
     "sortIndex",
@@ -76,73 +56,114 @@ export default class VLayer extends Vue {
   pPanelsArray!: PPanel[];
   @Ref()
   layers!: HTMLElement;
+  @Ref()
+  layersParent!: HTMLElement;
+  @Ref()
+  cellDrag!: VLayerCell;
   keyboards = new Keyboards();
   draggingPanelId = "";
-  startDragMouseY = 0;
+  draggingPanelData: PPanel | null = null;
+  autoScrollVY = 0;
+  mouseY = 0;
+  fixedHeight = 0;
   async mounted() {
     this.keyboards.enabled = true;
     this.keyboards.down(["escape"], this.pressEscape);
-    this.layers.addEventListener("mousemove", this.mousemove);
+    window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
+    setInterval(() => {
+      if (this.draggingPanelId !== "") {
+        this.layersParent.scrollTop += this.autoScrollVY;
+        this.updateDragCell(this.mouseY);
+        this.sort();
+      }
+    }, 1000 / 60);
   }
   unmounted() {
     this.keyboards.destroy();
-    this.layers.removeEventListener("mousemove", this.mousemove);
+    window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
   }
   pressEscape(pressed: boolean) {
     //
   }
-  startDrag(panelData: PanelData, event: MouseEvent) {
-    this.draggingPanelId = panelData.id;
-    this.startDragMouseY = event.clientY;
-    const panelElement = this.$refs[`panel-${this.draggingPanelId}`] as HTMLElement | undefined;
-    if (!panelElement) {
-      return;
-    }
-    panelElement.style.top = "0px";
+  startDrag(panelData: PPanel, event: MouseEvent) {
+    this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
+    this.fixedHeight = this.layers.getBoundingClientRect().height;
+    this.fixedHeight = this.fixedHeight < this.layersParent.getBoundingClientRect().height ? this.layersParent.getBoundingClientRect().height : this.fixedHeight;
+    this.layers.style.height = this.fixedHeight + "px";
+    this.layers.style.overflow = "hidden";
+    this.draggingPanelId = panelData.petaPanel.id;
+    this.draggingPanelData = panelData;
+    this.updateDragCell(this.mouseY);
     this.clearSelectionAll(true);
-    panelData.pPanel.selected = true;
+    panelData.selected = true;
+    this.sort();
   }
   mousemove(event: MouseEvent) {
-    // console.log(event.offsetY);
-    const panelElement = this.$refs[`panel-${this.draggingPanelId}`] as HTMLElement | undefined;
-    if (!panelElement) {
+    if (this.draggingPanelId == "") {
       return;
     }
-    panelElement.style.top = (event.clientY - this.startDragMouseY) + "px";
+    this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
+    this.updateDragCell(this.mouseY);
+    this.sort();
+    this.autoScroll(this.mouseY);
+  }
+  sort() {
     let changed = false;
-    [...this.panelDatas].sort((a, b) => {
-      const aE = this.$refs[`panel-${a.id}`] as HTMLElement | undefined;
-      const bE = this.$refs[`panel-${b.id}`] as HTMLElement | undefined;
-      if (!aE || !bE) {
-        return 0;
+    this.panelDatas.map((panelData) => {
+      const layerCell = panelData.petaPanel.id == this.draggingPanelId ? this.cellDrag : this.$refs[`panel-${panelData.petaPanel.id}`] as VLayerCell;
+      return {
+        layerCell,
+        y: layerCell.$el.getBoundingClientRect().y
       }
-      return bE.getBoundingClientRect().y - aE.getBoundingClientRect().y;
-    }).forEach((panelData, index) => {
-      if (panelData.pPanel.petaPanel.index != index) {
+    }).sort((a, b) => {
+      return b.y - a.y;
+    }).forEach((v, index) => {
+      if (!v.layerCell.layerCellData) {
+        return;
+      }
+      if (v.layerCell.layerCellData.petaPanel.index != index) {
         changed = true;
       }
-      panelData.pPanel.petaPanel.index = index;
+      v.layerCell.layerCellData.petaPanel.index = index;
     });
     if (changed) {
       this.$emit("sortIndex");
       console.log("changed");
-      this.startDragMouseY = event.clientY;
     }
-    panelElement.style.top = (event.clientY - this.startDragMouseY) + "px";
+  }
+  autoScroll(mouseY: number) {
+    const height = this.layersParent.getBoundingClientRect().height;
+    const autoScrollY = 20;
+    if (mouseY < autoScrollY) {
+      this.autoScrollVY = -(autoScrollY - mouseY);
+    } else if (mouseY > height - autoScrollY) {
+      this.autoScrollVY = (mouseY - (height - autoScrollY));
+    } else {
+      this.autoScrollVY = 0;
+    }
+  }
+  updateDragCell(y: number, absolute = false) {
+    const offset = this.cellDrag.$el.getBoundingClientRect().height / 2;
+    this.cellDrag.$el.style.top = `${absolute ? y : (y + this.layersParent.scrollTop - offset)}px`;
   }
   mouseup(event: MouseEvent) {
     this.draggingPanelId = "";
+    this.draggingPanelData = null;
+    this.autoScrollVY = 0;
+    this.layers.style.height = "unset";
+    this.layers.style.overflow = "unset";
+    this.updateDragCell(0, true);
   }
-  rightClick(panelData: PanelData, event: MouseEvent) {
+  rightClick(panelData: PPanel, event: MouseEvent) {
     this.clearSelectionAll();
-    panelData.pPanel.selected = true;
-    this.$emit("petaPanelMenu", panelData.pPanel, vec2FromMouseEvent(event));
+    panelData.selected = true;
+    this.$emit("petaPanelMenu", panelData, vec2FromMouseEvent(event));
   }
-  leftClick(panelData: PanelData, event: MouseEvent) {
+  leftClick(panelData: PPanel, event: MouseEvent) {
     this.clearSelectionAll();
-    panelData.pPanel.selected = true;
+    panelData.selected = true;
   }
   clearSelectionAll(force = false) {
     if (!Keyboards.pressed("shift") || force) {
@@ -151,25 +172,22 @@ export default class VLayer extends Vue {
       });
     }
   }
-  get panelDatas(): PanelData[] {
+  get panelDatas() {
     if (!this.pPanelsArray) {
       return [];
     }
-    return this.pPanelsArray.map((pPanel) => {
-      return {
-        pPanel,
-        id: pPanel.petaPanel.id,
-        imageURL: getImageURL(pPanel.petaPanel._petaImage, ImageType.THUMBNAIL)
-      }
-    }).sort((a, b) => {
-      return b.pPanel.petaPanel.index - a.pPanel.petaPanel.index;
+    return this.pPanelsArray.sort((a, b) => {
+      return b.petaPanel.index - a.petaPanel.index;
     });
   }
-}
-interface PanelData {
-  pPanel: PPanel,
-  id: string,
-  imageURL: string,
+  get panelDatasWithId() {
+    return this.panelDatas.map((pd, i) => {
+      return {
+        panelData: pd,
+        id: i
+      }
+    });
+  }
 }
 </script>
 
@@ -186,48 +204,14 @@ interface PanelData {
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
   margin: 16px;
   height: 50%;
-  >.content {
-    flex: 1;
-    overflow: hidden;
-  }
-  >.layer{
+  >.layer {
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
     height: 100%;
     >ul {
       margin: 0px;
       padding: 0px;
       position: relative;
-      >li {
-        cursor: pointer;
-        margin: 0px;
-        padding: 8px;
-        background-color: var(--button-bg-color);
-        display: flex;
-        align-items: center;
-        &.selected {
-          background-color: var(--button-active-bg-color);
-        }
-        &.dragging.me, &:hover {
-          background-color: var(--button-hover-bg-color);
-        }
-        &.dragging {
-          pointer-events: none;
-        }
-        &.dragging.me {
-          position: relative;
-        }
-        >.icon {
-          padding: 0px 8px;
-        }
-        >.image {
-          width: 32px;
-          height: 32px;
-          background: no-repeat;
-          background-position: center center;
-          background-size: contain;
-        }
-      }
     }
   }
 }
