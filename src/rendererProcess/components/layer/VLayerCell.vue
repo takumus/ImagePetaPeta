@@ -1,5 +1,5 @@
 <template>
-  <li class="layer-cell-root" :class="{ drag: drag, hide: hide }">
+  <li class="layer-cell-root" :class="{ drag: drag, hide: hide, selected: selected }">
     <div class="icon">
       👁
     </div>
@@ -12,7 +12,7 @@
     >
     </div>
     <div class="icon" v-if="layerCellData">
-      <input type="checkbox" v-model="layerCellData.selected" style="pointer-events: none">
+      <input type="checkbox" :checked="selected" style="pointer-events: none">
     </div>
     <div class="icon">
       🔒
@@ -59,6 +59,9 @@ export default class VLayerCell extends Vue {
   get url() {
     return getImageURL(this.layerCellData?.petaPanel._petaImage, ImageType.THUMBNAIL)
   }
+  get selected() {
+    return this.layerCellData?.selected;
+  }
   startDrag(layerCellData: PPanel, event: MouseEvent) {
     this.$emit("startDrag", layerCellData, event);
   }
@@ -74,10 +77,10 @@ export default class VLayerCell extends Vue {
   display: flex;
   align-items: center;
   &.selected {
-    background-color: var(--button-active-bg-color);
+    background-color: var(--button-hover-bg-color);
   }
   &.drag, &:hover {
-    background-color: var(--button-hover-bg-color);
+    background-color: var(--button-active-bg-color);
   }
   &.drag {
     position: absolute;
