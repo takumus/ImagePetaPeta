@@ -552,6 +552,7 @@ export default class VBoard extends Vue {
     this.panelsCenterWrapper.children.sort((a, b) => {
       return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
     });
+    this.orderPIXIRender();
   }
   getMaxIndex() {
     if (!this.board) {
