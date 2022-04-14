@@ -654,7 +654,7 @@ export default class VBoard extends Vue {
     if (!Keyboards.pressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
-      this.toFront(pPanel);
+      // this.toFront(pPanel);
       this.clearSelectionAll();
     }
     if (this.selectedPPanels.length <= 1) {
@@ -663,14 +663,14 @@ export default class VBoard extends Vue {
     }
     pPanel.selected = true;
     this.draggingPanels = true;
-    const maxIndex = this.getMaxIndex();
+    // const maxIndex = this.getMaxIndex();
     this.selectedPPanels.forEach((pPanel) => {
       const pos = new Vec2(e.data.global);
       pPanel.draggingOffset = new Vec2(pPanel.position).sub(this.panelsCenterWrapper.toLocal(pos));
       pPanel.dragging = true;
-      pPanel.petaPanel.index += maxIndex;
+      // pPanel.petaPanel.index += maxIndex;
     });
-    this.sortIndex();
+    // this.sortIndex();
   }
   setBackgroundBrightness(value: number) {
     this.backgroundFilter.brightness(value, false);
