@@ -208,7 +208,7 @@ export default class VLayer extends Vue {
   height: 50%;
   >.layer {
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
     >ul {
       margin: 0px;
