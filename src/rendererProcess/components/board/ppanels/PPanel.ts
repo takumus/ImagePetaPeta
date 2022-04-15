@@ -80,6 +80,8 @@ export class PPanel extends PIXI.Sprite {
       "petaPanel.position.x", this.petaPanel.position.x,
       "petaPanel.position.y", this.petaPanel.position.y,
       "petaPanel.rotation", this.petaPanel.rotation,
+      "petaPanel.visible", this.petaPanel.visible,
+      "petaPanel.locked", this.petaPanel.locked,
       "unselected", this.unselected,
       "selected", this.selected,
       "noImage", this.noImage,
@@ -87,6 +89,8 @@ export class PPanel extends PIXI.Sprite {
     )) {
       return;
     }
+    this.visible = this.petaPanel.visible;
+    this.interactive = this.petaPanel.visible && !this.petaPanel.locked;
     if (!this.image.texture) {
       // 何故か分からないけど、テクスチャがnullの時がある。なぜ。
       return;

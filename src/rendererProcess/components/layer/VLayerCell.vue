@@ -2,16 +2,24 @@
   <li class="layer-cell-root" :class="{ drag: drag, hide: hide, selected: selected }">
     <div
       class="icon eye"
+      :class="{
+        disabled: !visible
+      }"
       :style="{
         backgroundImage: `url(${eyeIcon})`
       }"
+      @click="layerCellData.petaPanel.visible = !layerCellData.petaPanel.visible"
     >
     </div>
     <div
       class="icon lock"
+      :class="{
+        disabled: !locked
+      }"
       :style="{
         backgroundImage: `url(${lockIcon})`
       }"
+      @click="layerCellData.petaPanel.locked = !layerCellData.petaPanel.locked"
     >
     </div>
     <div
@@ -74,6 +82,12 @@ export default class VLayerCell extends Vue {
   get lockIcon() {
     return LockIcon;
   }
+  get locked() {
+    return this.layerCellData?.petaPanel.locked;
+  }
+  get visible() {
+    return this.layerCellData?.petaPanel.visible;
+  }
   startDrag(layerCellData: PPanel, event: MouseEvent) {
     this.$emit("startDrag", layerCellData, event);
   }
@@ -115,6 +129,9 @@ export default class VLayerCell extends Vue {
     }
     &.lock {
       width: 11px;
+    }
+    &.disabled {
+      opacity: 0.3;
     }
   }
   >.image {

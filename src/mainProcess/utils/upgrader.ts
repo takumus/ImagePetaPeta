@@ -122,13 +122,20 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
   return upgraded;
 }
 
-// 1.8.0
 export function upgradePetaPanel(petaPanel: PetaPanel) {
+  // 1.8.0
   if (petaPanel.gif === undefined) {
     petaPanel.gif = {
       stopped: false,
       frame: 0
     }
+  }
+  // v2.5.0
+  if (petaPanel.visible === undefined) {
+    petaPanel.visible = true;
+  }
+  if (petaPanel.locked === undefined) {
+    petaPanel.locked = false;
   }
   return petaPanel;
 }

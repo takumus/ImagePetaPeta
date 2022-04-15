@@ -381,7 +381,7 @@ export default class VBoard extends Vue {
             rightBottom: pPanelCorners[2]!,
             leftBottom: pPanelCorners[3]!
           }
-        );
+        ) && pPanel.petaPanel.visible && !pPanel.petaPanel.locked;
       });
     }
     this.pPanelsArray.forEach((pp) => {
@@ -411,7 +411,7 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
-    this.pPanelsArray.filter((pPanel) => pPanel.selected).forEach((pPanel) => {
+    this.selectedPPanels.forEach((pPanel) => {
       this.removePPanel(pPanel);
     })
     this.board.petaPanels = this.pPanelsArray.map((pPanel) => pPanel.petaPanel);
@@ -706,7 +706,7 @@ export default class VBoard extends Vue {
     return Object.values(this.pPanels);
   }
   get selectedPPanels() {
-    return this.pPanelsArray.filter((pPanel) => pPanel.selected);
+    return this.pPanelsArray.filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
   }
   get unselectedPPanels() {
     return this.pPanelsArray.filter((pPanel) => !pPanel.selected);

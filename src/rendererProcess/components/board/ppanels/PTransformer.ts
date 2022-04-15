@@ -108,7 +108,7 @@ export class PTransformer extends PIXI.Container {
     return center.div(this.corners.length);
   }
   get selectedPPanels() {
-    return this.pPanelsArray.filter((pPanel) => pPanel.selected);
+    return this.pPanelsArray.filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
   }
   get pPanelsArray() {
     return Object.values(this.pPanels);

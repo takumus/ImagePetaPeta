@@ -20,6 +20,8 @@ export interface PetaPanel {
     stopped: boolean,
     frame: number
   }
+  visible: boolean,
+  locked: boolean,
   _petaImage?: PetaImage
 }
 export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
@@ -40,6 +42,8 @@ export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: num
       stopped: false,
       frame: 0
     },
+    visible: true,
+    locked: false,
     _petaImage: petaImage
   }
   return panel;
