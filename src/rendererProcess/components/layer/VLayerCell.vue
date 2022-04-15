@@ -1,14 +1,14 @@
 <template>
   <li class="layer-cell-root" :class="{ drag: drag, hide: hide, selected: selected }">
     <div
-      class="icon"
+      class="icon eye"
       :style="{
         backgroundImage: `url(${eyeIcon})`
       }"
     >
     </div>
     <div
-      class="icon"
+      class="icon lock"
       :style="{
         backgroundImage: `url(${lockIcon})`
       }"
@@ -110,6 +110,12 @@ export default class VLayerCell extends Vue {
     background: no-repeat;
     background-position: center center;
     background-size: contain;
+    &.eye {
+      width: 14px;
+    }
+    &.lock {
+      width: 11px;
+    }
   }
   >.image {
     width: 32px;
