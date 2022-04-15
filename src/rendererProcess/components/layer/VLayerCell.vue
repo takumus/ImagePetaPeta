@@ -1,7 +1,18 @@
 <template>
   <li class="layer-cell-root" :class="{ drag: drag, hide: hide, selected: selected }">
-    <div class="icon">
-      👁
+    <div
+      class="icon"
+      :style="{
+        backgroundImage: `url(${eyeIcon})`
+      }"
+    >
+    </div>
+    <div
+      class="icon"
+      :style="{
+        backgroundImage: `url(${lockIcon})`
+      }"
+    >
     </div>
     <div
       :v-if="url"
@@ -10,12 +21,6 @@
       }"
       class="image"
     >
-    </div>
-    <div class="icon">
-      <input type="checkbox" :checked="selected" style="pointer-events: none">
-    </div>
-    <div class="icon">
-      🔒
     </div>
     <div class="icon" @mousedown="startDrag(layerCellData, $event)">
       =
@@ -30,6 +35,8 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 import { PPanel } from "../board/ppanels/PPanel";
+import EyeIcon from "@/@assets/eye.png";
+import LockIcon from "@/@assets/locked.png";
 // Others
 @Options({
   components: {
@@ -61,6 +68,12 @@ export default class VLayerCell extends Vue {
   get selected() {
     return this.layerCellData?.selected;
   }
+  get eyeIcon() {
+    return EyeIcon;
+  }
+  get lockIcon() {
+    return LockIcon;
+  }
   startDrag(layerCellData: PPanel, event: MouseEvent) {
     this.$emit("startDrag", layerCellData, event);
   }
@@ -71,10 +84,11 @@ export default class VLayerCell extends Vue {
 .layer-cell-root {
   cursor: pointer;
   margin: 0px;
-  padding: 8px;
+  padding: 4px;
   background-color: var(--button-bg-color);
   display: flex;
   align-items: center;
+  height: 45px;
   &.selected {
     background-color: var(--button-hover-bg-color);
   }
@@ -90,11 +104,16 @@ export default class VLayerCell extends Vue {
     visibility: hidden;
   }
   >.icon {
-    padding: 0px 8px;
+    margin: 0px 8px;
+    width: 12px;
+    height: 100%;
+    background: no-repeat;
+    background-position: center center;
+    background-size: contain;
   }
   >.image {
     width: 32px;
-    height: 32px;
+    height: 100%;
     background: no-repeat;
     background-position: center center;
     background-size: contain;
