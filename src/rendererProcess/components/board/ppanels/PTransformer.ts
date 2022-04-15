@@ -87,12 +87,6 @@ export class PTransformer extends PIXI.Container {
     this.beginRotatingRotation = this.rotatingRotation;
     this.controlStatus = ControlStatus.PANEL_ROTATE;
   }
-  getPPanelFromObject(object: PIXI.DisplayObject) {
-    if (this.pPanelsArray.find((c) => c == object)) {
-      return object as PPanel;
-    }
-    return null;
-  }
   getRotatingCenter() {
     const center = new Vec2(0, 0);
     this.beginTransformCorners.forEach((c) => {
@@ -114,13 +108,7 @@ export class PTransformer extends PIXI.Container {
     return Object.values(this.pPanels);
   }
   mouseup(e: PIXI.InteractionEvent) {
-    // this.loadOriginal();
     this.controlStatus = ControlStatus.NONE;
-    if (e.data.button == MouseButton.LEFT) {
-      this.pPanelsArray.forEach((pPanel) => {
-        pPanel.dragging = false;
-      });
-    }
   }
   mousemove(e: PIXI.InteractionEvent) {
     this.click.move(e.data.global);
@@ -182,9 +170,6 @@ export class PTransformer extends PIXI.Container {
         );
       });
     }
-    this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
-      pPanel.petaPanel.position = new Vec2(pPanel.parent.toLocal(e.data.global)).add(pPanel.draggingOffset);
-    });
   }
   update() {
     if (this.controlStatus == ControlStatus.PANEL_ROTATE) {
