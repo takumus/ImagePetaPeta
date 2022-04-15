@@ -4,20 +4,20 @@
       👁
     </div>
     <div
-      v-if="layerCellData"
+      :v-if="url"
       :style="{
         backgroundImage: `url(${url})`
       }"
       class="image"
     >
     </div>
-    <div class="icon" v-if="layerCellData">
+    <div class="icon">
       <input type="checkbox" :checked="selected" style="pointer-events: none">
     </div>
     <div class="icon">
       🔒
     </div>
-    <div v-if="layerCellData" class="icon" @mousedown="startDrag(layerCellData, $event)">
+    <div class="icon" @mousedown="startDrag(layerCellData, $event)">
       =
     </div>
   </li>
@@ -48,7 +48,6 @@ export default class VLayerCell extends Vue {
   currentDraggingId!: string;
   async mounted() {
     //
-    console.log(this.layerCellData?.petaPanel.id);
   }
   unmounted() {
     //
@@ -57,7 +56,7 @@ export default class VLayerCell extends Vue {
     return this.currentDraggingId == this.layerCellData?.petaPanel.id;
   }
   get url() {
-    return getImageURL(this.layerCellData?.petaPanel._petaImage, ImageType.THUMBNAIL)
+    return this.layerCellData ? getImageURL(this.layerCellData.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
   }
   get selected() {
     return this.layerCellData?.selected;
