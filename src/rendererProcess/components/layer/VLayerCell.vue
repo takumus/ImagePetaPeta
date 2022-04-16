@@ -1,25 +1,34 @@
 <template>
-  <li class="layer-cell-root" :class="{ drag: drag, hide: hide, selected: selected }">
+  <li
+    class="layer-cell-root"
+    :class="{
+      drag: drag,
+      hide: hide,
+      selected: selected
+    }"
+    @mousedown.left="mousedown($event)"
+    @mousemove="mousemove($event)"
+  >
     <div
       class="icon eye"
+      ref="visibleIcon"
       :class="{
         disabled: !visible
       }"
       :style="{
-        backgroundImage: `url(${eyeIcon})`
+        backgroundImage: `url(${visibleIconImage})`
       }"
-      @click="layerCellData.petaPanel.visible = !layerCellData.petaPanel.visible"
     >
     </div>
     <div
       class="icon lock"
+      ref="lockedIcon"
       :class="{
         disabled: !locked
       }"
       :style="{
-        backgroundImage: `url(${lockIcon})`
+        backgroundImage: `url(${lockedIconImage})`
       }"
-      @click="layerCellData.petaPanel.locked = !layerCellData.petaPanel.locked"
     >
     </div>
     <div
@@ -30,9 +39,9 @@
       class="image"
     >
     </div>
-    <div class="icon" @mousedown="startDrag(layerCellData, $event)">
+    <!-- <div class="icon" @mousedown="startDrag(layerCellData, $event)">
       =
-    </div>
+    </div> -->
   </li>
 </template>
 
@@ -44,7 +53,9 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 import { PPanel } from "../board/ppanels/PPanel";
 import EyeIcon from "@/@assets/eye.png";
-import LockIcon from "@/@assets/locked.png";
+import LockedIcon from "@/@assets/locked.png";
+import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
+import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 // Others
 @Options({
   components: {
@@ -61,11 +72,17 @@ export default class VLayerCell extends Vue {
   drag = false;
   @Prop()
   currentDraggingId!: string;
+  @Ref()
+  visibleIcon!: HTMLElement;
+  @Ref()
+  lockedIcon!: HTMLElement;
+  click: ClickChecker = new ClickChecker();
+  mouseIsDown = false;
   async mounted() {
-    //
+    window.addEventListener("mouseup", this.mouseup);
   }
   unmounted() {
-    //
+    window.removeEventListener("mouseup", this.mouseup);
   }
   get hide() {
     return this.currentDraggingId == this.layerCellData?.petaPanel.id;
@@ -76,11 +93,11 @@ export default class VLayerCell extends Vue {
   get selected() {
     return this.layerCellData?.selected;
   }
-  get eyeIcon() {
+  get visibleIconImage() {
     return EyeIcon;
   }
-  get lockIcon() {
-    return LockIcon;
+  get lockedIconImage() {
+    return LockedIcon;
   }
   get locked() {
     return this.layerCellData?.petaPanel.locked;
@@ -88,8 +105,28 @@ export default class VLayerCell extends Vue {
   get visible() {
     return this.layerCellData?.petaPanel.visible;
   }
-  startDrag(layerCellData: PPanel, event: MouseEvent) {
-    this.$emit("startDrag", layerCellData, event);
+  mousedown(event: MouseEvent) {
+    this.click.down(vec2FromMouseEvent(event));
+    this.mouseIsDown = true;
+  }
+  mouseup(event: MouseEvent) {
+    this.mouseIsDown = false;
+    if (this.click.isClick && this.layerCellData) {
+      if (event.target == this.visibleIcon) {
+        this.layerCellData.petaPanel.visible = !this.layerCellData?.petaPanel.visible;
+      } else if (event.target == this.lockedIcon) {
+        this.layerCellData.petaPanel.locked = !this.layerCellData?.petaPanel.locked;
+      }
+    }
+  }
+  mousemove(event: MouseEvent) {
+    if (!this.mouseIsDown) {
+      return;
+    }
+    this.click.move(vec2FromMouseEvent(event));
+    if (!this.click.isClick) {
+      this.$emit("startDrag", this.layerCellData, event);
+    }
   }
 }
 </script>
@@ -118,25 +155,26 @@ export default class VLayerCell extends Vue {
     visibility: hidden;
   }
   >.icon {
-    margin: 0px 8px;
-    width: 12px;
+    padding: 0px 8px;
     height: 100%;
+    width: 24px;
     background: no-repeat;
     background-position: center center;
-    background-size: contain;
+    background-size: 12px;
     &.eye {
-      width: 14px;
+      background-size: 14px;
     }
     &.lock {
-      width: 11px;
+      background-size: 11px;
     }
     &.disabled {
       opacity: 0.3;
     }
   }
   >.image {
-    width: 32px;
+    min-width: 32px;
     height: 100%;
+    margin: 0px 8px;
     background: no-repeat;
     background-position: center center;
     background-size: contain;
