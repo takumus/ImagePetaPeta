@@ -7,7 +7,6 @@
       selected: selected
     }"
     @mousedown.left="mousedown($event)"
-    @mousemove="mousemove($event)"
   >
     <div
       class="icon eye"
@@ -80,9 +79,11 @@ export default class VLayerCell extends Vue {
   mouseIsDown = false;
   async mounted() {
     window.addEventListener("mouseup", this.mouseup);
+    window.addEventListener("mousemove", this.mousemove);
   }
   unmounted() {
     window.removeEventListener("mouseup", this.mouseup);
+    window.removeEventListener("mousemove", this.mousemove);
   }
   get hide() {
     return this.currentDraggingId == this.layerCellData?.petaPanel.id;
@@ -125,6 +126,7 @@ export default class VLayerCell extends Vue {
     }
     this.click.move(vec2FromMouseEvent(event));
     if (!this.click.isClick) {
+      this.mouseIsDown = false;
       this.$emit("startDrag", this.layerCellData, event);
     }
   }
