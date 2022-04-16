@@ -68,8 +68,8 @@ export default class VImageImporter extends Vue {
   canceled = false;
   mounted() {
     API.on("importImagesProgress", (e, params) => {
-      this.progress = Math.floor(params.progress * 100);
-      this.log = params.result + " -> " + params.file + "\n" + this.log;
+      this.progress = Math.floor(params.currentFileCount / params.allFileCount * 100);
+      this.addLog(`(${params.allFileCount}/${params.currentFileCount})` + this.$t(`imageImporter.importResults.${params.result}`) + ": " + params.file);
     });
     API.on("importImagesBegin", (e) => {
       this.progress = 0;
@@ -80,9 +80,10 @@ export default class VImageImporter extends Vue {
       Cursor.setCursor("wait");
     });
     API.on("importImagesComplete", (e, params) => {
+      this.addLog(this.$t(`imageImporter.logs.complete`, [params.fileCount, params.addedFileCount, params.fileCount - params.addedFileCount]));
       if (params.fileCount != params.addedFileCount) {
         this.hasErrors = true;
-        this.log = `Error!\n${params.addedFileCount}/${params.fileCount} files added.` + "\n" + this.log;
+        this.addLog(this.$t(`imageImporter.logs.failed`, [params.fileCount, params.fileCount - params.addedFileCount]));
       } else {
         setTimeout(() => {
           this.loading = false;
@@ -135,6 +136,9 @@ export default class VImageImporter extends Vue {
       const ids = await API.send("importImagesFromClipboard", buffers);
       this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition);
     });
+  }
+  addLog(value: string) {
+    this.log = value + "\n" + this.log;
   }
   ok() {
     this.hasErrors = false;

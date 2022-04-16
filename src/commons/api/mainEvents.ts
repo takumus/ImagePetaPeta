@@ -6,7 +6,7 @@ export interface MainEvents {
   updatePetaImage: (petaImage: PetaImage) => void;
   updatePetaTags: () => void;
   importImagesBegin: () => void;
-  importImagesProgress: (data: { progress: number, file: string, result: ImportImageResult }) => void;
+  importImagesProgress: (data: { allFileCount: number, currentFileCount: number, file: string, result: ImportImageResult }) => void;
   importImagesComplete: (data: { fileCount: number, addedFileCount: number }) => void;
   notifyUpdate: (current: string, latest: string) => void;
   windowFocused: (focused: boolean) => void;

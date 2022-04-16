@@ -146,7 +146,21 @@ const ja = {
   },
   imageImporter: {
     importing: "画像ファイルを読込中...",
-    cancel: "中止"
+    cancel: "中止",
+    importResults: {
+      success: "完了しました。",
+      exists: "重複が存在します。",
+      error: "不正な画像ファイルです。",
+      list: "展開済み。"
+    },
+    logs: {
+      complete: (ctx: any) => {
+        return `${ctx.list(0)}個中${ctx.list(1)}個のファイルのインポートに成功しました。`;
+      },
+      failed: (ctx: any) => {
+        return `${ctx.list(0)}個中${ctx.list(1)}個のファイルのインポートに失敗しました。`
+      }
+    }
   }
 };
 export default ja;
