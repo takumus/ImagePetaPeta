@@ -32,3 +32,5 @@ export const DB_COMPACTION_DELAY = 1000;
 export const ROTATION_BLOCK_INCREMENT = 45;
 export const UNTAGGED_ID = "id-untagged";
 export const SUPPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfMVEzYwdC09SrM6ipTtHyk_wTC1n08pB2eeZIVZifIRW7ojQ/viewform";
+export const PLACEHOLDER_SIZE = 32;
+export const PLACEHOLDER_COMPONENT = 4;

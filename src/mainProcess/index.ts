@@ -10,7 +10,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import dateFormat from "dateformat";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, SUPPORT_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, SUPPORT_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
@@ -1326,7 +1326,7 @@ import { MainLogger } from "./utils/mainLogger";
     }
     const placeholder = await new Promise<string>((res, rej) => {
       sharp(params.data)
-      .resize(32, Math.floor(result.height / result.width * 32))
+      .resize(PLACEHOLDER_SIZE, Math.floor(result.height / result.width * PLACEHOLDER_SIZE))
       .raw()
       .ensureAlpha()
       .toBuffer((err, buffer, { width, height }) => {
@@ -1334,7 +1334,7 @@ import { MainLogger } from "./utils/mainLogger";
           rej(err);
         }
         try {
-          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4));
+          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, PLACEHOLDER_COMPONENT, PLACEHOLDER_COMPONENT));
         } catch(e) {
           rej(e);
         }

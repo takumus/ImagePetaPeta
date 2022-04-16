@@ -82,6 +82,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import TransparentBackground from "@/@assets/transparentBackground.png";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
+import { PLACEHOLDER_SIZE } from "@/commons/defines";
 @Options({
   components: {
   },
@@ -103,8 +104,8 @@ export default class VTile extends Vue {
   mounted() {
     if (this.tile.petaImage.placeholder != "") {
       try {
-        const width = 32;
-        const height = Math.floor(this.tile.petaImage.height * 32);
+        const width = PLACEHOLDER_SIZE;
+        const height = Math.floor(this.tile.petaImage.height * PLACEHOLDER_SIZE);
         const pixels = decodePlaceholder(this.tile.petaImage.placeholder, width, height);
         this.canvas.width = width;
         this.canvas.height = height;
