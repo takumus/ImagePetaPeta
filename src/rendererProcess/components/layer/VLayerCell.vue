@@ -30,11 +30,11 @@
       }"
     >
     </div>
-    <div
+    <!-- <div
       class="name"
     >
      {{name}}
-    </div>
+    </div> -->
     <div
       :v-if="url"
       :style="{
