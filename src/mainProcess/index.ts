@@ -1139,10 +1139,9 @@ import { MainLogger } from "./utils/mainLogger";
       try {
         const data = await file.readFile(filePath);
         const name = Path.basename(filePath);
-        const extName = Path.extname(filePath).replace(/\./g, "");
         const fileDate = (await file.stat(filePath)).mtime;
         const addResult = await addImage({
-          data, name, extName, fileDate
+          data, name, fileDate
         });
         petaImages.push(addResult.petaImage);
         if (addResult.exists) {
@@ -1238,14 +1237,23 @@ import { MainLogger } from "./utils/mainLogger";
   /*------------------------------------
     PetaImage追加
   ------------------------------------*/
-  async function addImage(param: { data: Buffer, name: string, extName?: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
+  async function addImage(param: { data: Buffer, name: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await getPetaImage(id);
     if (exists) return {
       petaImage: upgradePetaImage(exists),
       exists: true
     };
-    const extName = param.extName || imageFormatToExtention((await sharp(param.data).metadata()).format);
+    const metadata = await sharp(param.data).metadata();
+    let extName: string | undefined | null = undefined;
+    if (metadata.orientation !== undefined) {
+      // jpegの角度情報があったら回転する。pngにする。
+      param.data = await sharp(param.data).rotate().png().toBuffer();
+      extName = "png";
+    } else {
+      // formatを拡張子にする。
+      extName = imageFormatToExtention(metadata.format);
+    }
     if (!extName) {
       throw new Error("invalid image file type");
     }
