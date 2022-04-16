@@ -31,6 +31,11 @@
     >
     </div>
     <div
+      class="name"
+    >
+     {{name}}
+    </div>
+    <div
       :v-if="url"
       :style="{
         backgroundImage: `url(${url})`
@@ -106,6 +111,9 @@ export default class VLayerCell extends Vue {
   get visible() {
     return this.pPanel?.petaPanel.visible;
   }
+  get name() {
+    return this.pPanel?.petaPanel._petaImage?.name || "";
+  }
   mousedown(event: MouseEvent) {
     this.click.down(vec2FromMouseEvent(event));
     this.mouseIsDown = true;
@@ -141,7 +149,7 @@ export default class VLayerCell extends Vue {
   background-color: var(--button-bg-color);
   display: flex;
   align-items: center;
-  height: 45px;
+  height: 64px;
   &.selected {
     background-color: var(--button-hover-bg-color);
   }
@@ -151,7 +159,6 @@ export default class VLayerCell extends Vue {
   &.drag {
     position: absolute;
     top: 0px;
-    // pointer-events: none;
   }
   &.hide {
     visibility: hidden;
@@ -177,9 +184,16 @@ export default class VLayerCell extends Vue {
     min-width: 32px;
     height: 100%;
     margin: 0px 8px;
+    flex: 1;
     background: no-repeat;
     background-position: center center;
     background-size: contain;
+  }
+  >.name {
+    flex: 1;
+    overflow: hidden;
+    max-height: 100%;
+    word-break: break-all;
   }
 }
 </style>

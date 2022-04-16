@@ -204,6 +204,8 @@ export default class VLayer extends Vue {
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
   margin: 16px;
   height: 50%;
+  width: 200px;
+  padding: 8px;
   >.layer {
     overflow-x: hidden;
     overflow-y: auto;
