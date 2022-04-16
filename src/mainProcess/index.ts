@@ -1326,15 +1326,15 @@ import { MainLogger } from "./utils/mainLogger";
     }
     const placeholder = await new Promise<string>((res, rej) => {
       sharp(params.data)
+      .resize(32, Math.floor(result.height / result.width * 32))
       .raw()
       .ensureAlpha()
-      .resize(8, 8, { fit: "inside" })
       .toBuffer((err, buffer, { width, height }) => {
         if (err) {
           rej(err);
         }
         try {
-          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 2, 2));
+          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 3, 3));
         } catch(e) {
           rej(e);
         }
