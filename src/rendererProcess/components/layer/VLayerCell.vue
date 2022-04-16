@@ -38,7 +38,7 @@
       class="image"
     >
     </div>
-    <!-- <div class="icon" @mousedown="startDrag(layerCellData, $event)">
+    <!-- <div class="icon" @mousedown="startDrag(pPanel, $event)">
       =
     </div> -->
   </li>
@@ -66,11 +66,11 @@ import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 })
 export default class VLayerCell extends Vue {
   @Prop()
-  layerCellData: PPanel | null = null;
+  pPanel: PPanel | null = null;
   @Prop()
   drag = false;
   @Prop()
-  currentDraggingId!: string;
+  draggingPPanel!: PPanel;
   @Ref()
   visibleIcon!: HTMLElement;
   @Ref()
@@ -86,13 +86,13 @@ export default class VLayerCell extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
   }
   get hide() {
-    return this.currentDraggingId == this.layerCellData?.petaPanel.id;
+    return this.draggingPPanel == this.pPanel;
   }
   get url() {
-    return this.layerCellData ? getImageURL(this.layerCellData.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
+    return this.pPanel ? getImageURL(this.pPanel.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
   }
   get selected() {
-    return this.layerCellData?.selected;
+    return this.pPanel?.selected;
   }
   get visibleIconImage() {
     return EyeIcon;
@@ -101,10 +101,10 @@ export default class VLayerCell extends Vue {
     return LockedIcon;
   }
   get locked() {
-    return this.layerCellData?.petaPanel.locked;
+    return this.pPanel?.petaPanel.locked;
   }
   get visible() {
-    return this.layerCellData?.petaPanel.visible;
+    return this.pPanel?.petaPanel.visible;
   }
   mousedown(event: MouseEvent) {
     this.click.down(vec2FromMouseEvent(event));
@@ -112,11 +112,11 @@ export default class VLayerCell extends Vue {
   }
   mouseup(event: MouseEvent) {
     this.mouseIsDown = false;
-    if (this.click.isClick && this.layerCellData) {
+    if (this.click.isClick && this.pPanel) {
       if (event.target == this.visibleIcon) {
-        this.layerCellData.petaPanel.visible = !this.layerCellData?.petaPanel.visible;
+        this.pPanel.petaPanel.visible = !this.pPanel?.petaPanel.visible;
       } else if (event.target == this.lockedIcon) {
-        this.layerCellData.petaPanel.locked = !this.layerCellData?.petaPanel.locked;
+        this.pPanel.petaPanel.locked = !this.pPanel?.petaPanel.locked;
       }
     }
   }
@@ -127,7 +127,7 @@ export default class VLayerCell extends Vue {
     this.click.move(vec2FromMouseEvent(event));
     if (!this.click.isClick) {
       this.mouseIsDown = false;
-      this.$emit("startDrag", this.layerCellData, event);
+      this.$emit("startDrag", this.pPanel, event);
     }
   }
 }

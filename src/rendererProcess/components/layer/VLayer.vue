@@ -9,18 +9,18 @@
     <section class="layer" ref="layersParent">
       <ul ref="layers">
         <VLayerCell
-          v-for="panelData in panelDatasWithId"
-          :key="panelData.id"
-          :ref="`panel-${panelData.panelData.petaPanel.id}`"
-          :layerCellData="panelData.panelData"
-          :currentDraggingId="draggingPanelId"
+          v-for="layerCellData in layerCellDatas"
+          :key="layerCellData.id"
+          :ref="`panel-${layerCellData.pPanel.petaPanel.id}`"
+          :pPanel="layerCellData.pPanel"
+          :draggingPPanel="draggingPPanel"
           @startDrag="startDrag"
-          @click.right="rightClick(panelData.panelData, $event)"
-          @click.left="leftClick(panelData.panelData, $event)"
+          @click.right="rightClick(layerCellData.pPanel, $event)"
+          @click.left="leftClick(layerCellData.pPanel, $event)"
         />
         <VLayerCell
           ref="cellDrag"
-          :layerCellData="draggingPanelData"
+          :pPanel="draggingPPanel"
           :drag="true"
         />
       </ul>
@@ -44,7 +44,8 @@ import { vec2FromMouseEvent } from "@/commons/utils/vec2";
   },
   emits: [
     "sortIndex",
-    "petaPanelMenu"
+    "petaPanelMenu",
+    "update"
   ]
 })
 export default class VLayer extends Vue {
@@ -61,8 +62,7 @@ export default class VLayer extends Vue {
   @Ref()
   cellDrag!: VLayerCell;
   keyboards = new Keyboards();
-  draggingPanelId = "";
-  draggingPanelData: PPanel | null = null;
+  draggingPPanel: PPanel | null = null;
   autoScrollVY = 0;
   mouseY = 0;
   fixedHeight = 0;
@@ -72,7 +72,7 @@ export default class VLayer extends Vue {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
     setInterval(() => {
-      if (this.draggingPanelId !== "") {
+      if (this.draggingPPanel) {
         this.layersParent.scrollTop += this.autoScrollVY;
         this.updateDragCell(this.mouseY);
         this.sort();
@@ -87,21 +87,21 @@ export default class VLayer extends Vue {
   pressEscape(pressed: boolean) {
     //
   }
-  startDrag(panelData: PPanel, event: MouseEvent) {
+  startDrag(pPanel: PPanel, event: MouseEvent) {
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
     this.fixedHeight = this.layers.getBoundingClientRect().height;
     this.fixedHeight = this.fixedHeight < this.layersParent.getBoundingClientRect().height ? this.layersParent.getBoundingClientRect().height : this.fixedHeight;
     this.layers.style.height = this.fixedHeight + "px";
     this.layers.style.overflow = "hidden";
-    this.draggingPanelId = panelData.petaPanel.id;
-    this.draggingPanelData = panelData;
+    this.draggingPPanel = pPanel;
     this.updateDragCell(this.mouseY);
     this.clearSelectionAll(true);
-    panelData.selected = true;
+    pPanel.selected = true;
     this.sort();
+    this.$emit("update");
   }
   mousemove(event: MouseEvent) {
-    if (this.draggingPanelId == "") {
+    if (!this.draggingPPanel) {
       return;
     }
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
@@ -111,8 +111,8 @@ export default class VLayer extends Vue {
   }
   sort() {
     let changed = false;
-    this.panelDatas.map((panelData) => {
-      const layerCell = panelData.petaPanel.id == this.draggingPanelId ? this.cellDrag : this.$refs[`panel-${panelData.petaPanel.id}`] as VLayerCell;
+    this.pPanels.map((pPanel) => {
+      const layerCell = pPanel == this.draggingPPanel ? this.cellDrag : this.$refs[`panel-${pPanel.petaPanel.id}`] as VLayerCell;
       return {
         layerCell,
         y: layerCell.$el.getBoundingClientRect().y
@@ -120,17 +120,16 @@ export default class VLayer extends Vue {
     }).sort((a, b) => {
       return b.y - a.y;
     }).forEach((v, index) => {
-      if (!v.layerCell.layerCellData) {
+      if (!v.layerCell.pPanel) {
         return;
       }
-      if (v.layerCell.layerCellData.petaPanel.index != index) {
+      if (v.layerCell.pPanel.petaPanel.index != index) {
         changed = true;
       }
-      v.layerCell.layerCellData.petaPanel.index = index;
+      v.layerCell.pPanel.petaPanel.index = index;
     });
     if (changed) {
       this.$emit("sortIndex");
-      console.log("changed");
     }
   }
   autoScroll(mouseY: number) {
@@ -149,23 +148,22 @@ export default class VLayer extends Vue {
     this.cellDrag.$el.style.top = `${absolute ? y : (y + this.layersParent.scrollTop - offset)}px`;
   }
   mouseup(event: MouseEvent) {
-    this.draggingPanelId = "";
-    this.draggingPanelData = null;
+    this.draggingPPanel = null;
     this.autoScrollVY = 0;
     this.layers.style.height = "unset";
     this.layers.style.overflow = "unset";
     this.updateDragCell(0, true);
   }
-  rightClick(panelData: PPanel, event: MouseEvent) {
-    if (!panelData.selected) {
+  rightClick(pPanel: PPanel, event: MouseEvent) {
+    if (!pPanel.selected) {
       this.clearSelectionAll();
     }
-    panelData.selected = true;
-    this.$emit("petaPanelMenu", panelData, vec2FromMouseEvent(event));
+    pPanel.selected = true;
+    this.$emit("petaPanelMenu", pPanel, vec2FromMouseEvent(event));
   }
-  leftClick(panelData: PPanel, event: MouseEvent) {
+  leftClick(pPanel: PPanel, event: MouseEvent) {
     this.clearSelectionAll();
-    panelData.selected = true;
+    pPanel.selected = true;
   }
   clearSelectionAll(force = false) {
     if (!Keyboards.pressed("shift") || force) {
@@ -174,7 +172,7 @@ export default class VLayer extends Vue {
       });
     }
   }
-  get panelDatas() {
+  get pPanels() {
     if (!this.pPanelsArray) {
       return [];
     }
@@ -182,10 +180,10 @@ export default class VLayer extends Vue {
       return b.petaPanel.index - a.petaPanel.index;
     });
   }
-  get panelDatasWithId() {
-    return this.panelDatas.map((pd, i) => {
+  get layerCellDatas() {
+    return this.pPanels.map((pPanel, i) => {
       return {
-        panelData: pd,
+        pPanel: pPanel,
         id: i
       }
     });

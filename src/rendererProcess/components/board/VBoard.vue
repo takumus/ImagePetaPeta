@@ -43,6 +43,7 @@
       :pPanelsArray="pPanelsArray"
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
+      @update="orderPIXIRender"
     />
   </article>
 </template>
