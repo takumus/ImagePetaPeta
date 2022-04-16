@@ -1107,11 +1107,11 @@ import { MainLogger } from "./utils/mainLogger";
     log.log("##Import Images From File Paths");
     log.log("###List Files", filePaths.length);
     emitMainEvent("importImagesBegin");
-    emitMainEvent("importImagesProgress", {
-      progress: 0,
-      file: filePaths.join("\n"),
-      result: ImportImageResult.LIST
-    });
+    // emitMainEvent("importImagesProgress", {
+    //   progress: 0,
+    //   file: filePaths.join("\n"),
+    //   result: ImportImageResult.LIST
+    // });
     const _filePaths: string[] = [];
     try {
       for (let i = 0; i < filePaths.length; i++) {
@@ -1146,15 +1146,17 @@ import { MainLogger } from "./utils/mainLogger";
         petaImages.push(addResult.petaImage);
         if (addResult.exists) {
           result = ImportImageResult.EXISTS;
+        } else {
+          addedFileCount++;
         }
-        addedFileCount++;
         log.log("imported", result);
       } catch (err) {
         log.error(err);
         result = ImportImageResult.ERROR;
       }
       emitMainEvent("importImagesProgress", {
-        progress: (index + 1) / _filePaths.length,
+        allFileCount: _filePaths.length,
+        currentFileCount: index + 1,
         file: filePath,
         result: result
       });
@@ -1201,15 +1203,17 @@ import { MainLogger } from "./utils/mainLogger";
         petaImages.push(addResult.petaImage);
         if (addResult.exists) {
           result = ImportImageResult.EXISTS;
+        } else {
+          addedFileCount++;
         }
-        addedFileCount++;
         log.log("imported", name, result);
       } catch (err) {
         log.error(err);
         result = ImportImageResult.ERROR;
       }
       emitMainEvent("importImagesProgress", {
-        progress: (index + 1) / buffers.length,
+        allFileCount: buffers.length,
+        currentFileCount: index + 1,
         file: name,
         result: result
       });
