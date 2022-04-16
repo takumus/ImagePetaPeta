@@ -1334,7 +1334,7 @@ import { MainLogger } from "./utils/mainLogger";
           rej(err);
         }
         try {
-          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 3, 3));
+          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, 4, 4));
         } catch(e) {
           rej(e);
         }
