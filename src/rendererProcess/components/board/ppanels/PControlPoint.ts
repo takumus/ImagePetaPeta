@@ -28,7 +28,7 @@ export class PControlPoint extends PIXI.Container {
         return;
       }
       mouseover = true;
-      Cursor.setCursor(Cursor.ROTATE_CURSOR);
+      Cursor.setCursor(Cursor.cursors.ROTATE_CURSOR);
     });
     this.rotate.on("mouseout", () => {
       if (sizing) {

@@ -48,7 +48,7 @@ import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
-import { setCursor, setDefaultCursor } from "@/rendererProcess/utils/cursor";
+import * as Cursor from "@/rendererProcess/utils/cursor";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 @Options({
   components: {
@@ -77,7 +77,7 @@ export default class VImageImporter extends Vue {
       this.hasErrors = false;
       this.log = "";
       this.canceled = false;
-      setCursor("wait");
+      Cursor.setCursor("wait");
     });
     API.on("importImagesComplete", (e, params) => {
       if (params.fileCount != params.addedFileCount) {
@@ -89,7 +89,7 @@ export default class VImageImporter extends Vue {
         }, 500);
       }
       this.canceled = true;
-      setDefaultCursor();
+      Cursor.setDefaultCursor();
     });
     document.addEventListener('drop', async (event) => {
       event.preventDefault();

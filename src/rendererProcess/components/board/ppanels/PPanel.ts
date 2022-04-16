@@ -39,7 +39,7 @@ export class PPanel extends PIXI.Sprite {
     this.coverLabel.anchor.set(0.5, 0.5);
     this.setPetaPanel(this.petaPanel);
     this.update();
-    this.cursor = "move";
+    // this.cursor = "move";
   }
   public setPetaPanel(petaPanel: PetaPanel) {
     this.petaPanel = petaPanel;

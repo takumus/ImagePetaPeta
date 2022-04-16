@@ -38,6 +38,7 @@
       ref="loadingModal"
     ></VBoardLoading>
     <VLayer
+      ref="layer"
       :zIndex="1"
       :visible="true"
       :pPanelsArray="pPanelsArray"
@@ -73,7 +74,7 @@ import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@pixi/gif';
-import { setCursor, setDefaultCursor } from "@/rendererProcess/utils/cursor";
+import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
@@ -95,6 +96,8 @@ export default class VBoard extends Vue {
   panelsBackground!: HTMLElement;
   @Ref("loadingModal")
   loadingModal!: VBoardLoading;
+  @Ref()
+  layer!: VLayer;
   loading = false;
   loadingLog = "";
   loadingProgress = 0;
@@ -574,7 +577,7 @@ export default class VBoard extends Vue {
       return;
     }
     log("vBoard", "load", minimId(this.board.id));
-    setCursor("wait");
+    Cursor.setCursor("wait");
     // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
@@ -589,7 +592,7 @@ export default class VBoard extends Vue {
         pPanel.playGIF();
       }
     });
-    setDefaultCursor();
+    Cursor.setDefaultCursor();
   }
   async loadAllOriginal() {
     if (!this.board) {
@@ -663,6 +666,7 @@ export default class VBoard extends Vue {
       this.clearSelectionAll();
     }
     pPanel.selected = true;
+    this.layer.scrollTo(pPanel);
     this.draggingPanels = true;
     // const maxIndex = this.getMaxIndex();
     this.selectedPPanels.forEach((pPanel) => {

@@ -87,6 +87,13 @@ export default class VLayer extends Vue {
   pressEscape(pressed: boolean) {
     //
   }
+  scrollTo(pPanel: PPanel) {
+    const layerCell = this.$refs[`panel-${pPanel.petaPanel.id}`] as VLayerCell | undefined;
+    if (!layerCell) {
+      return;
+    }
+    this.layersParent.scrollTop = layerCell.$el.getBoundingClientRect().y - this.layersParent.getBoundingClientRect().y + this.layersParent.scrollTop;
+  }
   startDrag(pPanel: PPanel, event: MouseEvent) {
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
     this.fixedHeight = this.layers.getBoundingClientRect().height;
@@ -204,7 +211,6 @@ export default class VLayer extends Vue {
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
   margin: 16px;
   height: 50%;
-  width: 200px;
   padding: 8px;
   >.layer {
     overflow-x: hidden;

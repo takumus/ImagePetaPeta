@@ -150,11 +150,12 @@ export default class VLayerCell extends Vue {
   display: flex;
   align-items: center;
   height: 64px;
+  width: 200px;
   &.selected {
-    background-color: var(--button-hover-bg-color);
+    background-color: var(--button-active-bg-color) !important;
   }
   &.drag, &:hover {
-    background-color: var(--button-active-bg-color);
+    background-color: var(--button-hover-bg-color);
   }
   &.drag {
     position: absolute;
