@@ -103,12 +103,14 @@ export default class VTile extends Vue {
   mounted() {
     if (this.tile.petaImage.placeholder != "") {
       try {
-        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, 8, 8);
-        this.canvas.width = 8;
-        this.canvas.height = 8;
+        const width = 32;
+        const height = Math.floor(this.tile.petaImage.height * 32);
+        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, width, height);
+        this.canvas.width = width;
+        this.canvas.height = height;
         const ctx = this.canvas.getContext("2d");
         if (ctx){ 
-          const imageData = ctx.createImageData(8, 8);
+          const imageData = ctx.createImageData(width, height);
           imageData.data.set(pixels);
           ctx.putImageData(imageData, 0, 0);
         }
