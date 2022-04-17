@@ -87,6 +87,7 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
+import { isBlurhashValid } from "blurhash";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
@@ -100,6 +101,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { getColors, getSimilarityScore } from "@/commons/utils/blurhashTools";
 @Options({
   components: {
     VTile,
@@ -139,6 +141,7 @@ export default class VBrowser extends Vue {
   keyboards = new Keyboards();
   selectedPetaTags: PetaTag[] = [];
   filteredPetaImages: PetaImage[] = [];
+  targetPetaImage: PetaImage | null = null;
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0]!.contentRect);
@@ -294,7 +297,19 @@ export default class VBrowser extends Vue {
         click: async () => {
           await API.send("openImageFile", thumb.petaImage);
         }
-      }
+      },
+      // {
+      //   label: this.$t("browser.petaImageMenu.similar"),
+      //   click: async () => {
+      //     this.targetPetaImage = thumb.petaImage;
+      //   }
+      // },
+      {
+        label: this.$t("browser.petaImageMenu.waifu2x"),
+        click: async () => {
+          await API.send("waifu2xConvert", thumb.petaImage);
+        }
+      },
     ], position);
   }
   open() {
@@ -340,14 +355,14 @@ export default class VBrowser extends Vue {
     this.restoreScrollPosition();
   }
   get petaImagesArray() {
-    return Object.values(this.petaImages).sort(this.sort);
+    return Object.values(this.petaImages);
   }
   get selectedPetaImages() {
     return this.petaImagesArray.filter((pi) => pi._selected);
   }
   async fetchFilteredPetaImages() {
     if (this.selectedPetaTags.length == 0) {
-      this.filteredPetaImages = this.petaImagesArray;
+      this.filteredPetaImages = [...this.petaImagesArray].sort(this.sort);
       return;
     }
     const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === UNTAGGED_ID)
@@ -386,7 +401,22 @@ export default class VBrowser extends Vue {
     for (let i = 0; i < this.thumbnailsRowCount; i++) {
       yList.push(0);
     }
-    const images = this.filteredPetaImages.map((p) => {
+    const images = this.filteredPetaImages
+    // .map((pi) => {
+    //   if (!this.targetPetaImage) {
+    //     return {
+    //       petaImage: pi,
+    //       score: 0
+    //     }
+    //   }
+    //   return {
+    //     petaImage: pi,
+    //     score: getSimilarityScore(this.targetPetaImage.placeholder, pi.placeholder)
+    //   }
+    // })
+    // .sort((a, b) => b.score - a.score)
+    // .map((p) => p.petaImage)
+    .map((p) => {
       let minY = Number.MAX_VALUE;
       let mvi = 0;
       yList.forEach((y, vi) => {

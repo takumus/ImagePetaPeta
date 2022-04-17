@@ -58,7 +58,8 @@ const ja = {
       remove: (ctx: any) => {
         return `${ctx.list(0)}枚の画像を削除`
       },
-      openImageFile: "画像ファイルの場所を開く"
+      openImageFile: "画像ファイルの場所を開く",
+      waifu2x: "waifu2xを使ってアップコンバートする"
     },
     removeImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像を削除しますか?`

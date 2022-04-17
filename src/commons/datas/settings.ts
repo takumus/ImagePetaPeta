@@ -24,7 +24,17 @@ const defaultSettings = {
   },
   autoAddTag: true,
   ignoreMinorUpdate: true,
-  visibleLayerPanel: true
+  visibleLayerPanel: true,
+  waifu2x: {
+    execFilePath: "",
+    parameters: [
+      "--input_path", "$$INPUT$$",
+      "-o", "$$OUTPUT$$",
+      "--noise_level", "1",
+      "--scale_width" ,"3840",
+      "--gpu", "0"
+    ],
+  }
 }
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);

@@ -33,6 +33,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { MainLogger } from "./utils/mainLogger";
+import { waifu2x } from "./utils/waifu2xCaffe";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -51,6 +52,7 @@ import { MainLogger } from "./utils/mainLogger";
   let DIR_LOG: string;
   let DIR_IMAGES: string;
   let DIR_THUMBNAILS: string;
+  let DIR_TEMP_IMAGES: string;
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
   let FILE_TAGS_DB: string;
@@ -82,6 +84,7 @@ import { MainLogger } from "./utils/mainLogger";
     mainLogger.logger = dataLogger;
     // その他の初期化
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
+    DIR_TEMP_IMAGES = file.initDirectory(false, app.getPath("temp"));
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
     dataSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
     if (dataSettings.data.petaImageDirectory.default) {
@@ -935,6 +938,33 @@ import { MainLogger } from "./utils/mainLogger";
           dataStates.data.selectedPetaBoardId = petaBoardId;
           dataStates.save();
           return;
+        },
+        waifu2xConvert: async (event, petaImage) => {
+          const inputFile = getImagePath(petaImage, ImageType.ORIGINAL);
+          const outputFile = `${Path.resolve(DIR_TEMP_IMAGES, petaImage.id)}.png`;
+          const execFilePath = dataSettings.data.waifu2x.execFilePath;
+          const parameters = dataSettings.data.waifu2x.parameters.map((param) => {
+            if (param === "$$INPUT$$") {
+              return inputFile;
+            }
+            if (param === "$$OUTPUT$$") {
+              return outputFile;
+            }
+            return param;
+          });
+          console.log(execFilePath, parameters);
+          const result = await waifu2x(
+            Path.resolve(execFilePath),
+            parameters,
+            (log) => {
+              console.log(log);
+            }
+          );
+          if (result) {
+            console.log("done!");
+            await importImagesFromFilePaths([outputFile]);
+          }
+          return false;
         }
       }
     }
@@ -1377,6 +1407,18 @@ import { MainLogger } from "./utils/mainLogger";
       await window.loadURL("app://./index.html");
     }
     window.setMenuBarVisibility(false);
+    // window.webContents.debugger.attach("1.1");
+    // console.log(window.webContents.debugger.isAttached(), window.webContents.debugger);
+    // window.webContents.debugger.on('detach', (event, reason) => {
+    //   console.log('Debugger detached due to : ', reason)
+    // })
+    // window.webContents.debugger.on("message", (event, method, params) => {
+    //   if (method == "Network.responseReceived") {
+    //     console.log(params.response);
+    //   }
+    //   console.log(method, params);
+    // })
+    // window.webContents.debugger.sendCommand('Network.enable');
     if (dataStates.data.windowIsMaximized) {
       window.maximize();
     }

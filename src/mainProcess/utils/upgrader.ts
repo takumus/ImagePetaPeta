@@ -9,6 +9,7 @@ import { States } from "@/commons/datas/states";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import DB from "@/mainProcess/storages/db";
+import deepcopy from "deepcopy";
 import { v4 as uuid } from "uuid";
 const defaultSettings = getDefaultSettings();
 export function upgradePetaImage(petaImage: PetaImage) {
@@ -76,6 +77,9 @@ export function upgradeSettings(settings: Settings) {
   // v2.5.0
   if (settings.visibleLayerPanel === undefined) {
     settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
+  }
+  if (settings.waifu2x === undefined) {
+    settings.waifu2x = deepcopy(defaultSettings.waifu2x);
   }
   return settings;
 }
