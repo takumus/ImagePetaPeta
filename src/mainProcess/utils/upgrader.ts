@@ -73,6 +73,10 @@ export function upgradeSettings(settings: Settings) {
   if (settings.ignoreMinorUpdate === undefined) {
     settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
   }
+  // v2.5.0
+  if (settings.visibleLayerPanel === undefined) {
+    settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
+  }
   return settings;
 }
 export function upgradeStates(states: States) {

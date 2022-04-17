@@ -23,7 +23,8 @@ const defaultSettings = {
     path: ""
   },
   autoAddTag: true,
-  ignoreMinorUpdate: true
+  ignoreMinorUpdate: true,
+  visibleLayerPanel: true
 }
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);
