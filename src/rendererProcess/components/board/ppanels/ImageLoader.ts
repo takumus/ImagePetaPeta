@@ -38,7 +38,7 @@ export function getImage(petaImage: PetaImage | undefined) {
     loader.add(imageURL);
     loader.onError.add((error) => {
       loader.resources[imageURL]?.texture?.destroy();
-      rej("cannot load texture" + error);
+      rej("could not load texture" + error);
     });
     loader.load((_, resources) => {
       const resource = resources[imageURL];
@@ -54,7 +54,7 @@ export function getImage(petaImage: PetaImage | undefined) {
         res({ texture });
         return;
       }
-      rej("cannot load texture");
+      rej("could not load texture");
     });
   });
 }

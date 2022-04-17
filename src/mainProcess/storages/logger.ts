@@ -13,13 +13,13 @@ export class Logger {
       if (this.logFile) {
         this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n", (error) => {
           if (error) {
-            console.log("cannot write logfile", error);
+            console.log("Could not write logfile", error);
           }
         });
       }
       console.log(date, ...args);
     } catch(error) {
-      console.log("cannot write logfile", error);
+      console.log("Could not write logfile", error);
     }
   }
   open() {
@@ -29,12 +29,12 @@ export class Logger {
         this.close();
         this.logFile = createWriteStream(Path.resolve(this.path, date + ".log"), { flags: "a" });
         this.logFile.on("error", (error) => {
-          console.log("cannot open logfile", error);
+          console.log("Could not open logfile", error);
         });
       }
       this.date = date;
     } catch (error) {
-      console.log("cannot open logfile", error);
+      console.log("Could not open logfile", error);
     }
   }
   close() {
@@ -43,7 +43,7 @@ export class Logger {
         this.logFile.close();
       }
     } catch (error) {
-      console.log("cannot close logfile", error);
+      console.log("Could not close logfile", error);
     }
     this.logFile = undefined;
   }
