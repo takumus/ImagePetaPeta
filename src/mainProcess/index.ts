@@ -939,7 +939,12 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           dataStates.save();
           return;
         },
+        /*------------------------------------
+          waifu2x
+        ------------------------------------*/
         waifu2xConvert: async (event, petaImage) => {
+          const log = mainLogger.logChunk();
+          log.log("#Waifu2x Convert");
           const inputFile = getImagePath(petaImage, ImageType.ORIGINAL);
           const outputFile = `${Path.resolve(DIR_TEMP_IMAGES, petaImage.id)}.png`;
           const execFilePath = dataSettings.data.waifu2x.execFilePath;
@@ -952,18 +957,21 @@ import { waifu2x } from "./utils/waifu2xCaffe";
             }
             return param;
           });
-          console.log(execFilePath, parameters);
+          log.log("execFilePath:", execFilePath);
+          log.log("parameters:", parameters);
           const result = await waifu2x(
             Path.resolve(execFilePath),
             parameters,
-            (log) => {
-              console.log(log);
+            (l) => {
+              log.log(l);
             }
           );
           if (result) {
-            console.log("done!");
+            log.log("return: true");
             await importImagesFromFilePaths([outputFile]);
+            return true;
           }
+          log.log("return: false");
           return false;
         }
       }

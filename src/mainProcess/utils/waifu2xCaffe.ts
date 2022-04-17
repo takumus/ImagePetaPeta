@@ -7,10 +7,10 @@ export function waifu2x(cliToolPath: string, args: string[], log: (value: string
       res(code === 0);
     });
     process.stdout.on("data", (chunk) => {
-      log(chunk);
+      log(chunk.toString());
     });
     process.stderr.on("data", (chunk) => {
-      log(chunk);
+      log(chunk.toString());
     });
     process.on("error", (error) => {
       log(error.message);
