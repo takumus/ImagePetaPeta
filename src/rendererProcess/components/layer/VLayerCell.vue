@@ -150,7 +150,7 @@ export default class VLayerCell extends Vue {
   display: flex;
   align-items: center;
   height: 64px;
-  width: 200px;
+  width: 100%;
   &.selected {
     background-color: var(--button-active-bg-color) !important;
   }
@@ -171,6 +171,7 @@ export default class VLayerCell extends Vue {
     background: no-repeat;
     background-position: center center;
     background-size: 12px;
+    filter: var(--icon-filter);
     &.eye {
       background-size: 14px;
     }
