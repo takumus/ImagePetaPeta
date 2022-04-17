@@ -23,6 +23,10 @@ export default class Config<T> {
     }
   }
   save() {
-    fs.writeFileSync(this.path, Buffer.from(JSON.stringify(this.data, null, 2)));
+    try {
+      fs.writeFileSync(this.path, Buffer.from(JSON.stringify(this.data, null, 2)));
+    } catch (error) {
+      throw "Could not save settings.json " + error;
+    }
   }
 }
