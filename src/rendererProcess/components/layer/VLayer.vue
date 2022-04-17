@@ -1,12 +1,26 @@
 <template>
   <article
     class="layer-root"
-    v-show="visible"
+    :class="{
+      hide: !$settings.visibleLayerPanel
+    }"
     :style=" {
       zIndex: zIndex
     }"
   >
-    <section class="layer" ref="layersParent">
+    <section
+      class="title"
+      @click.left="toggleVisible"
+      :style="{
+        backgroundImage: `url(${layerIconImage})`
+      }"
+    >
+    </section>
+    <section
+      class="layer"
+      ref="layersParent"
+      v-show="$settings.visibleLayerPanel"
+    >
       <ul ref="layers">
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
@@ -35,6 +49,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
+import LayerIcon from "@/@assets/layer.png";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
@@ -49,8 +64,6 @@ import { vec2FromMouseEvent } from "@/commons/utils/vec2";
   ]
 })
 export default class VLayer extends Vue {
-  @Prop()
-  visible = true;
   @Prop()
   zIndex = 0;
   @Prop()
@@ -179,6 +192,10 @@ export default class VLayer extends Vue {
       });
     }
   }
+  toggleVisible() {
+    //
+    this.$settings.visibleLayerPanel = !this.$settings.visibleLayerPanel;
+  }
   get pPanels() {
     if (!this.pPanelsArray) {
       return [];
@@ -195,6 +212,9 @@ export default class VLayer extends Vue {
       }
     });
   }
+  get layerIconImage() {
+    return LayerIcon;
+  }
 }
 </script>
 
@@ -209,13 +229,34 @@ export default class VLayer extends Vue {
   right: 0px;
   bottom: 0px;
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
-  margin: 16px;
-  height: 50%;
+  margin: 8px;
+  top: 63px;
   padding: 8px;
+  >.title {
+    display: block;
+    cursor: pointer;
+    text-align: center;
+    background: no-repeat;
+    background-position: center center;
+    background-size: 14px;
+    height: 14px;
+    min-width: 14px;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+    filter: var(--icon-filter);
+  }
+  &.hide {
+    top: unset;
+    >.title {
+      margin: 0px;
+    }
+  }
   >.layer {
+    display: block;
     overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
+    flex: 1;
     >ul {
       margin: 0px;
       padding: 0px;
