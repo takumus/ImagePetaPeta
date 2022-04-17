@@ -3,11 +3,15 @@ import fs from "fs";
 
 export default class Config<T> {
   data: T;
-  constructor(private path: string, private defaultData: T, upgrader?: (data: T) => T) {
+  constructor(private path: string, private defaultData: T, upgrader?: (data: T) => {changed: boolean, data: T}) {
     this.data = deepcopy(defaultData);
     this.load();
     if (upgrader) {
-      this.data = upgrader(this.data);
+      const result = upgrader(this.data);
+      this.data = result.data;
+      if (result.changed) {
+        this.save();
+      }
     }
   }
   load() {

@@ -35,12 +35,15 @@ export function upgradePetaImage(petaImage: PetaImage) {
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {
+  let changed = false;
   // v0.8.4
   if (settings.zoomSensitivity === undefined) {
     settings.zoomSensitivity = defaultSettings.zoomSensitivity;
+    changed = true;
   }
   if (settings.moveSensitivity === undefined) {
     settings.moveSensitivity = defaultSettings.moveSensitivity;
+    changed = true;
   }
   // v1.4.0
   if (settings.thumbnails === undefined) {
@@ -48,46 +51,63 @@ export function upgradeSettings(settings: Settings) {
       size: defaultSettings.thumbnails.size,
       quality: defaultSettings.thumbnails.quality
     }
+    changed = true;
   }
   // v1.5.0
   if (settings.tileSize === undefined) {
     settings.tileSize = defaultSettings.tileSize;
+    changed = true;
   }
   if (settings.loadThumbnailsInOriginal === undefined) {
     settings.loadThumbnailsInOriginal = defaultSettings.loadThumbnailsInOriginal;
+    changed = true;
   }
   // v1.6.0
   if (settings.showNsfwWithoutConfirm === undefined) {
     settings.showNsfwWithoutConfirm = defaultSettings.showNsfwWithoutConfirm;
+    changed = true;
   }
   if (settings.petaImageDirectory === undefined) {
     settings.petaImageDirectory = {
       default: defaultSettings.petaImageDirectory.default,
       path: defaultSettings.petaImageDirectory.path
     };
+    changed = true;
   }
   // v1.7.0
   if (settings.autoAddTag === undefined) {
     settings.autoAddTag = defaultSettings.autoAddTag;
+    changed = true;
   }
   // v2.4.0
   if (settings.ignoreMinorUpdate === undefined) {
     settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
+    changed = true;
   }
   // v2.5.0
   if (settings.visibleLayerPanel === undefined) {
     settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
+    changed = true;
   }
   if (settings.waifu2x === undefined) {
     settings.waifu2x = deepcopy(defaultSettings.waifu2x);
+    changed = true;
   }
-  return settings;
+  return {
+    data: settings,
+    changed
+  };
 }
 export function upgradeStates(states: States) {
+  let changed = false;
   if (states.selectedPetaBoardId === undefined) {
     states.selectedPetaBoardId = "";
+    changed = true;
   } 
-  return states;
+  return {
+    data: states,
+    changed
+  }
 }
 export function upgradePetaBoard(board: PetaBoard) {
   // v0.5.0
