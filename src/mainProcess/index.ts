@@ -967,8 +967,36 @@ import { waifu2x } from "./utils/waifu2xCaffe";
             }
           );
           if (result) {
+            const newPetaImages = await importImagesFromFilePaths([outputFile]);
+            if (newPetaImages.length < 1) {
+              log.log("return: false");
+              return false;
+            }
+            const newPetaImage = newPetaImages[0];
+            if (!newPetaImage) {
+              log.log("return: false");
+              return false;
+            }
+            newPetaImage.addDate = petaImage.addDate;
+            newPetaImage.fileDate = petaImage.fileDate;
+            newPetaImage.name = petaImage.name;
+            log.log("update new petaImage");
+            await updatePetaImage(newPetaImage, UpdateMode.UPDATE);
+            log.log("get tags");
+            const pipts = await dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
+            log.log("tags:", pipts.length);
+            await promiseSerial(async (pipt, index) => {
+              log.log("copy tag: (", index, "/", pipts.length, ")");
+              const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
+              await dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
+            }, pipts).value;
+            log.log(`add "before waifu2x" tag to old petaImage`);
+            const name = "before waifu2x";
+            const datePetaTag = (await dataPetaTags.find({name: name}))[0] || createPetaTag(name);
+            await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
+            await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
+            emitMainEvent("updatePetaTags");
             log.log("return: true");
-            await importImagesFromFilePaths([outputFile]);
             return true;
           }
           log.log("return: false");
