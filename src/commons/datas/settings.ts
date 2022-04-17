@@ -28,11 +28,10 @@ const defaultSettings = {
   waifu2x: {
     execFilePath: "",
     parameters: [
-      "--input_path", "$$INPUT$$",
+      "-i", "$$INPUT$$",
       "-o", "$$OUTPUT$$",
-      "--noise_level", "1",
-      "--scale_width" ,"3840",
-      "--gpu", "0"
+      "-n", "1",
+      "--scale_ratio", "2"
     ],
   }
 }

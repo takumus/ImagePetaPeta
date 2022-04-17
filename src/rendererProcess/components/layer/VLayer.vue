@@ -230,7 +230,7 @@ export default class VLayer extends Vue {
   bottom: 0px;
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
   margin: 8px;
-  top: 63px;
+  top: 50%;
   padding: 8px;
   >.title {
     display: block;
