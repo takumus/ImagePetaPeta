@@ -325,6 +325,7 @@ body, html {
     --window-buttons-close-hover: #ff0000;
     --contextmenu-item-color: #ffffff;
     --contextmenu-item-hover-color: #e9e9e9;
+    --icon-filter: brightness(0.7) invert(100%);
   }
   &.dark {
     --bg-color: #141414;
@@ -342,6 +343,7 @@ body, html {
     --window-buttons-close-hover: #ff0000;
     --contextmenu-item-color: #272727;
     --contextmenu-item-hover-color: #444444;
+    --icon-filter: unset;
   }
   background-color: var(--bg-color);
   color: var(--font-color);
