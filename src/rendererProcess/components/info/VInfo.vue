@@ -59,7 +59,7 @@ export default class VInfo extends Vue {
     this.$components.info = this;
   }
   get licenses() {
-    return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n\n`).join('\n');
+    return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n`).join('\n');
   }
   gotoGithub() {
     API.send("openURL", "https://github.com/takumus/ImagePetaPeta");

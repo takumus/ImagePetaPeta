@@ -7,16 +7,22 @@ const datas = {
 console.log("generate licenses");
 const newDatas = Object.keys(datas).map((name) => {
   const data = datas[name];
-  let licenses = data.licenses;
-  try {
-    licenses = fs.readFileSync(data.licenseFile).toString();
-  } catch {
-    console.error("failed to load licenses:", name);
-    console.log(data);
+  let licensesName = data.licenses;
+  let licensesText = "";
+  if (!data.customLicensesText) {
+    try {
+      licensesText = fs.readFileSync(data.licenseFile).toString();
+    } catch {
+      licensesText = "";
+      console.error("failed to load licenses:", name);
+    }
+  } else {
+    licensesText = data.customLicensesText;
+    licensesName = data.customLicensesName;
   }
   return {
-    name: name,
-    licenses: String(licenses)
+    name: `${name} (${licensesName})`,
+    licenses: licensesText
     .replace(/^\s+/g, "") //先頭のスペース削除
     .replace(/\r\n|\n|\r/g, "\n") // 改行コード統一
     .replace(/\n+/g, "\n") // 連続改行削除

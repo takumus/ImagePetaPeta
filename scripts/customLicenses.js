@@ -1,6 +1,7 @@
 module.exports = {
   "enchant.js": {
-    licenses: `Copyright (c) 2011-2012 UEI Corporation
+    customLicensesName: "MIT",
+    customLicensesText: `Copyright (c) 2011-2012 UEI Corporation
       Permission is hereby granted, free of charge, to any person obtaining a copy
       of this software and associated documentation files (the "Software"), to deal
       in the Software without restriction, including without limitation the rights
