@@ -9,6 +9,8 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import dateFormat from "dateformat";
 import { createI18n } from "vue-i18n";
+import AdmZip from "adm-zip";
+import { execFile, spawn } from "child_process";
 import languages from "@/commons/languages";
 import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, SUPPORT_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
@@ -52,7 +54,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
   let DIR_LOG: string;
   let DIR_IMAGES: string;
   let DIR_THUMBNAILS: string;
-  let DIR_TEMP_IMAGES: string;
+  let DIR_TEMP: string;
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
   let FILE_TAGS_DB: string;
@@ -84,7 +86,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
     mainLogger.logger = dataLogger;
     // その他の初期化
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
-    DIR_TEMP_IMAGES = file.initDirectory(false, app.getPath("temp"));
+    DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
     dataSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
     if (dataSettings.data.petaImageDirectory.default) {
@@ -946,7 +948,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           log.log("#Waifu2x Convert");
           const inputFile = getImagePath(petaImage, ImageType.ORIGINAL);
-          const outputFile = `${Path.resolve(DIR_TEMP_IMAGES, petaImage.id)}.png`;
+          const outputFile = `${Path.resolve(DIR_TEMP, petaImage.id)}.png`;
           const execFilePath = dataSettings.data.waifu2x.execFilePath;
           const parameters = dataSettings.data.waifu2x.parameters.map((param) => {
             if (param === "$$INPUT$$") {
@@ -1477,6 +1479,31 @@ import { waifu2x } from "./utils/waifu2xCaffe";
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
     return window;
   }
+  async function downloadAndExtractUpdata(version: string) {
+    const url = `https://github.com/takumus/ImagePetaPeta/releases/download/${version}/ImagePetaPeta-beta.Setup.${version}.zip`;
+    const result = await axios.get(url, {
+      responseType: "arraybuffer",
+      onDownloadProgress: (event) => {
+        console.log(event);
+      }
+    });
+    const zipFilePath = Path.resolve(DIR_TEMP, `${version}.zip`);
+    const setupFilePath = Path.resolve(DIR_TEMP, `${version}.exe`);
+    await file.writeFile(zipFilePath, result.data);
+    const zip = new AdmZip(zipFilePath);
+    const zipEntries = zip.getEntries();
+    const setupFile = zipEntries.find((entry) => entry.entryName === `ImagePetaPeta-beta Setup ${version}.exe`);
+    if (setupFile) {
+      setupFile.getDataAsync(async (data) => {
+        await file.writeFile(setupFilePath, data);
+        console.log("downloaded");
+        spawn("powershell", [
+          `start-process`, setupFilePath,
+          `-verb`, `runas`
+        ]);
+      });
+    }
+  }
   /*------------------------------------
     アプリ再起動
   ------------------------------------*/
@@ -1484,4 +1511,5 @@ import { waifu2x } from "./utils/waifu2xCaffe";
     app.relaunch();
     app.exit();
   }
+  // downloadAndExtractUpdata("2.5.0-beta");
 })();
