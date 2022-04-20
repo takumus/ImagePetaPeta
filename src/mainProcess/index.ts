@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, clipboard } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
 import * as Path from "path";
 import axios from "axios";
 import dataURIToBuffer from "data-uri-to-buffer";
@@ -6,30 +6,28 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import AdmZip from "adm-zip";
-import { execFile, spawn } from "child_process";
+import { spawn } from "child_process";
 import languages from "@/commons/languages";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, SUPPORT_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
 import Config from "@/mainProcess/storages/config";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
+import { PetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
-import { upgradePetaBoard, upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
+import { upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
 import { arrLast, minimId } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
-import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { PetaTag } from "@/commons/datas/petaTag";
+import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { MainLogger } from "./utils/mainLogger";
-import { waifu2x } from "./utils/waifu2xCaffe";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "./petaDatas";
 (() => {
@@ -121,7 +119,8 @@ import { PetaDatas } from "./petaDatas";
         dataSettings
       }, {
         DIR_IMAGES,
-        DIR_THUMBNAILS
+        DIR_THUMBNAILS,
+        DIR_TEMP
       }, 
       emitMainEvent,
       mainLogger
@@ -824,62 +823,9 @@ import { PetaDatas } from "./petaDatas";
         waifu2xConvert: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Waifu2x Convert");
-          const inputFile = petaDatas.getImagePath(petaImage, ImageType.ORIGINAL);
-          const outputFile = `${Path.resolve(DIR_TEMP, petaImage.id)}.png`;
-          const execFilePath = dataSettings.data.waifu2x.execFilePath;
-          const parameters = dataSettings.data.waifu2x.parameters.map((param) => {
-            if (param === "$$INPUT$$") {
-              return inputFile;
-            }
-            if (param === "$$OUTPUT$$") {
-              return outputFile;
-            }
-            return param;
-          });
-          log.log("execFilePath:", execFilePath);
-          log.log("parameters:", parameters);
-          const result = await waifu2x(
-            Path.resolve(execFilePath),
-            parameters,
-            (l) => {
-              log.log(l);
-            }
-          );
-          if (result) {
-            const newPetaImages = await petaDatas.importImagesFromFilePaths([outputFile]);
-            if (newPetaImages.length < 1) {
-              log.log("return: false");
-              return false;
-            }
-            const newPetaImage = newPetaImages[0];
-            if (!newPetaImage) {
-              log.log("return: false");
-              return false;
-            }
-            newPetaImage.addDate = petaImage.addDate;
-            newPetaImage.fileDate = petaImage.fileDate;
-            newPetaImage.name = petaImage.name;
-            log.log("update new petaImage");
-            await petaDatas.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
-            log.log("get tags");
-            const pipts = await dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
-            log.log("tags:", pipts.length);
-            await promiseSerial(async (pipt, index) => {
-              log.log("copy tag: (", index, "/", pipts.length, ")");
-              const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-              await dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
-            }, pipts).value;
-            log.log(`add "before waifu2x" tag to old petaImage`);
-            const name = "before waifu2x";
-            const datePetaTag = (await dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-            await petaDatas.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
-            await petaDatas.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
-            emitMainEvent("updatePetaTags");
-            log.log("return: true");
-            return true;
-          }
-          log.log("return: false");
-          return false;
+          const result = await petaDatas.waifu2x(petaImage);
+          log.log("return:", result);
+          return result;
         }
       }
     }

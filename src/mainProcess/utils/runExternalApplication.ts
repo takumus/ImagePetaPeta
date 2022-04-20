@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-export function waifu2x(cliToolPath: string, args: string[], log: (value: string) => void) {
+export function runExternalApplication(cliToolPath: string, args: string[], log: (value: string) => void) {
   return new Promise((res, rej) => {
     const process = spawn(cliToolPath, args);
     process.on("exit", (code) => {
