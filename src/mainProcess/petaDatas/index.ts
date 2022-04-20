@@ -5,7 +5,7 @@ import { minimId } from "@/commons/utils/utils";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import * as Path from "path";
 import * as file from "@/mainProcess/storages/file";
-import { PetaBoard } from "@/commons/datas/petaBoard";
+import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
@@ -17,11 +17,13 @@ import Config from "@/mainProcess/storages/config";
 import sharp from "sharp";
 import crypto from "crypto";
 import dateFormat from "dateformat";
-import { upgradePetaImage } from "@/mainProcess/utils/upgrader";
+import { upgradePetaBoard, upgradePetaImage } from "@/mainProcess/utils/upgrader";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
-import { PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
 import { encode as encodePlaceholder } from "blurhash";
-
+import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { createI18n, I18n } from "vue-i18n";
+import languages from "@/commons/languages";
 export class PetaDatas {
   cancelImportImages: (() => void) | undefined;
   constructor(
@@ -82,6 +84,137 @@ export class PetaDatas {
     log.log("updated");
     return true;
   }
+  async getPetaImageIdsByPetaTagIds(petaTagIds: string[] | undefined) {
+    const log = this.mainLogger.logChunk();
+    // all
+    if (!petaTagIds) {
+      log.log("type: all");
+      const ids = (await this.datas.dataPetaImages.find({})).map((pi) => pi.id);
+      log.log("return:", ids.length);
+      return ids;
+    }
+    // untagged
+    if (petaTagIds.length == 0) {
+      log.log("type: untagged");
+      const taggedIds = Array.from(new Set((await this.datas.dataPetaImagesPetaTags.find({})).map((pipt) => {
+        return pipt.petaImageId;
+      })));
+      const ids = (await this.datas.dataPetaImages.find({
+        id: {
+          $nin: taggedIds
+        }
+      })).map((pi) => pi.id);
+      return ids;
+    }
+    // filter by ids
+    log.log("type: filter");
+    const pipts = (await this.datas.dataPetaImagesPetaTags.find({
+      $or: petaTagIds.map((id) => {
+        return {
+          petaTagId: id
+        }
+      })
+    }));
+    const ids = Array.from(new Set(pipts.map((pipt) => {
+      return pipt.petaImageId;
+    }))).filter((id) => {
+      return pipts.filter((pipt) => {
+        return pipt.petaImageId === id;
+      }).length == petaTagIds.length
+    });
+    return ids;
+  }
+  async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
+    const log = this.mainLogger.logChunk();
+    // all
+    if (petaImageIds.length == 0) {
+      const ids = (await this.datas.dataPetaImagesPetaTags.find({})).map((pipt) => {
+        return pipt.petaTagId;
+      });
+      log.log("type: all");
+      log.log("return:", ids.length);
+      return ids;
+    }
+    log.log("type: filter");
+    // filter by ids
+    // const timerUUID = uuid().substring(0, 5);
+    // console.time("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
+    let pipts: PetaImagePetaTag[] = [];
+    await promiseSerial(async (petaImageId) => {
+      pipts.push(...(await this.datas.dataPetaImagesPetaTags.find({ petaImageId })));
+    }, petaImageIds).value;
+    // console.timeEnd("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
+    const ids = Array.from(new Set(pipts.map((pipt) => {
+      return pipt.petaTagId;
+    })));
+    const petaTagIds = ids.filter((id) => {
+      return pipts.filter((pipt) => {
+        return pipt.petaTagId == id;
+      }).length == petaImageIds.length;
+    });
+    return petaTagIds;
+  }
+  async getPetaTagInfos(untaggedName: string) {
+    const log = this.mainLogger.logChunk();
+    const petaTags = await this.datas.dataPetaTags.find({});
+    const taggedIds = Array.from(new Set((await this.datas.dataPetaImagesPetaTags.find({})).map((pipt) => {
+      return pipt.petaImageId;
+    })));
+    const count = (await this.datas.dataPetaImages.count({
+      id: {
+        $nin: taggedIds
+      }
+    }));
+    let values: PetaTagInfo[] = [];
+    const result = promiseSerial(async (petaTag) => {
+      const info = {
+        petaTag,
+        count: await this.datas.dataPetaImagesPetaTags.count({ petaTagId: petaTag.id })
+      } as PetaTagInfo;
+      values.push(info);
+      return info;
+    }, petaTags);
+    const values2 = await result.value;
+    log.log("return:", values.length);
+    values.sort((a, b) => {
+      if (a.petaTag.name < b.petaTag.name) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    values.unshift({
+      petaTag: {
+        index: 0,
+        id: UNTAGGED_ID,
+        name: untaggedName
+      },
+      count: count
+    });
+    return values;
+  }
+  async regenerateThumbnails() {
+    const log = this.mainLogger.logChunk();
+    this.emitMainEvent("regenerateThumbnailsBegin");
+    const images = await this.datas.dataPetaImages.find({});
+    const generate = async (image: PetaImage, i: number) => {
+      upgradePetaImage(image);
+      const data = await file.readFile(Path.resolve(this.paths.DIR_IMAGES, image.file.original));
+      const result = await this.generateThumbnail({
+        data,
+        outputFilePath: Path.resolve(this.paths.DIR_THUMBNAILS, image.file.original),
+        size: this.datas.dataSettings.data.thumbnails.size,
+        quality: this.datas.dataSettings.data.thumbnails.quality
+      });
+      image.placeholder = result.placeholder;
+      image.file.thumbnail = `${image.file.original}.${result.extname}`;
+      await this.updatePetaImage(image, UpdateMode.UPDATE);
+      log.log(`thumbnail (${i + 1} / ${images.length})`);
+      this.emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
+    }
+    await promiseSerial(generate, images).value;
+    this.emitMainEvent("regenerateThumbnailsComplete");
+  }
   /*------------------------------------
     PetaTag更新
   ------------------------------------*/
@@ -100,6 +233,16 @@ export class PetaDatas {
     await this.datas.dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
     log.log("updated");
     return true;
+  }
+  async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
+    await promiseSerial(async (petaImageId) => {
+      await promiseSerial(async (petaTagId) => {
+        await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
+      }, petaTagIds).value;
+    }, petaImageIds).value;
+    if (mode != UpdateMode.UPDATE) {
+      this.emitMainEvent("updatePetaTags");
+    }
   }
   /*------------------------------------
     PetaImagePetaTag更新
@@ -211,6 +354,23 @@ export class PetaDatas {
       this.emitMainEvent("updatePetaTags");
     }
     return petaImages;
+  }
+  async getPetaBoards() {
+    const log = this.mainLogger.logChunk();
+    const data = await this.datas.dataPetaBoards.find({});
+    data.forEach((board) => {
+      // バージョンアップ時のプロパティ更新
+      upgradePetaBoard(board);
+    })
+    if (data.length == 0) {
+      log.log("no boards");
+      const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, this.datas.dataSettings.data.darkMode);
+      await this.updatePetaBoard(board, UpdateMode.UPSERT);
+      data.push(board);
+      return data;
+    } else {
+      return data;
+    }
   }
   /*------------------------------------
     画像インポート(バッファー)

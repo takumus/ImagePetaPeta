@@ -424,22 +424,9 @@ import { PetaDatas } from "./petaDatas";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaBoards");
-            const data = await dataPetaBoards.find({});
-            data.forEach((board) => {
-              // バージョンアップ時のプロパティ更新
-              upgradePetaBoard(board);
-            })
-            if (data.length == 0) {
-              log.log("no boards");
-              const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, dataSettings.data.darkMode);
-              await petaDatas.updatePetaBoard(board, UpdateMode.UPSERT);
-              data.push(board);
-              log.log("return:", data.length);
-              return data;
-            } else {
-              log.log("return:", data.length);
-              return data;
-            }
+            const petaBoards = await petaDatas.getPetaBoards();
+            log.log("return:", petaBoards.length);
+            return petaBoards;
           } catch(e) {
             log.error(e);
             showError({
@@ -498,14 +485,7 @@ import { PetaDatas } from "./petaDatas";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
-            await promiseSerial(async (petaImageId) => {
-              await promiseSerial(async (petaTagId) => {
-                await petaDatas.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
-              }, petaTagIds).value;
-            }, petaImageIds).value;
-            if (mode != UpdateMode.UPDATE) {
-              emitMainEvent("updatePetaTags");
-            }
+            await petaDatas.updatePetaImagesPetaTags(petaImageIds, petaTagIds, mode);
             log.log("return:", true);
             return true;
           } catch(error) {
@@ -523,43 +503,7 @@ import { PetaDatas } from "./petaDatas";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImageIds By PetaTagIds");
-            // all
-            if (!petaTagIds) {
-              log.log("type: all");
-              const ids = (await dataPetaImages.find({})).map((pi) => pi.id);
-              log.log("return:", ids.length);
-              return ids;
-            }
-            // untagged
-            if (petaTagIds.length == 0) {
-              log.log("type: untagged");
-              const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
-                return pipt.petaImageId;
-              })));
-              const ids = (await dataPetaImages.find({
-                id: {
-                  $nin: taggedIds
-                }
-              })).map((pi) => pi.id);
-              log.log("return:", ids.length);
-              return ids;
-            }
-            // filter by ids
-            log.log("type: filter");
-            const pipts = (await dataPetaImagesPetaTags.find({
-              $or: petaTagIds.map((id) => {
-                return {
-                  petaTagId: id
-                }
-              })
-            }));
-            const ids = Array.from(new Set(pipts.map((pipt) => {
-              return pipt.petaImageId;
-            }))).filter((id) => {
-              return pipts.filter((pipt) => {
-                return pipt.petaImageId === id;
-              }).length == petaTagIds.length
-            });
+            const ids = await petaDatas.getPetaImageIdsByPetaTagIds(petaTagIds);
             log.log("return:", ids.length);
             return ids;
           } catch(error) {
@@ -577,33 +521,8 @@ import { PetaDatas } from "./petaDatas";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagIds By PetaImageIds");
-            // all
-            if (petaImageIds.length == 0) {
-              const ids = (await dataPetaImagesPetaTags.find({})).map((pipt) => {
-                return pipt.petaTagId;
-              });
-              log.log("type: all");
-              log.log("return:", ids.length);
-              return ids;
-            }
-            log.log("type: filter");
-            // filter by ids
-            // const timerUUID = uuid().substring(0, 5);
-            // console.time("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
-            let pipts: PetaImagePetaTag[] = [];
-            await promiseSerial(async (petaImageId) => {
-              pipts.push(...(await dataPetaImagesPetaTags.find({ petaImageId })));
-            }, petaImageIds).value;
-            // console.timeEnd("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
-            const ids = Array.from(new Set(pipts.map((pipt) => {
-              return pipt.petaTagId;
-            })));
-            const petaTagIds = ids.filter((id) => {
-              return pipts.filter((pipt) => {
-                return pipt.petaTagId == id;
-              }).length == petaImageIds.length;
-            });
-            log.log("return:", ids.length);
+            const petaTagIds = await petaDatas.getPetaTagIdsByPetaImageIds(petaImageIds);
+            log.log("return:", petaTagIds.length);
             return petaTagIds;
           } catch(error) {
             log.error(error);
@@ -620,42 +539,9 @@ import { PetaDatas } from "./petaDatas";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagInfos");
-            const petaTags = await dataPetaTags.find({});
-            const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
-              return pipt.petaImageId;
-            })));
-            const count = (await dataPetaImages.count({
-              id: {
-                $nin: taggedIds
-              }
-            }));
-            let values: PetaTagInfo[] = [];
-            const result = promiseSerial(async (petaTag) => {
-              const info = {
-                petaTag,
-                count: await dataPetaImagesPetaTags.count({ petaTagId: petaTag.id })
-              } as PetaTagInfo;
-              values.push(info);
-              return info;
-            }, petaTags);
-            const values2 = await result.value;
-            log.log("return:", values.length);
-            values.sort((a, b) => {
-              if (a.petaTag.name < b.petaTag.name) {
-                return -1;
-              } else {
-                return 1;
-              }
-            });
-            values.unshift({
-              petaTag: {
-                index: 0,
-                id: UNTAGGED_ID,
-                name: i18n.global.t("browser.untagged")
-              },
-              count: count
-            })
-            return values;
+            const petaTagInfos = await petaDatas.getPetaTagInfos(i18n.global.t("browser.untagged"));
+            log.log("return:", petaTagInfos.length);
+            return petaTagInfos;
           } catch (error) {
             log.error(error);
             showError({
@@ -852,25 +738,7 @@ import { PetaDatas } from "./petaDatas";
           try {
             log.log("#Regenerate Thumbnails");
             log.log("preset:", dataSettings.data.thumbnails);
-            emitMainEvent("regenerateThumbnailsBegin");
-            const images = await dataPetaImages.find({});
-            const generate = async (image: PetaImage, i: number) => {
-              upgradePetaImage(image);
-              const data = await file.readFile(Path.resolve(DIR_IMAGES, image.file.original));
-              const result = await petaDatas.generateThumbnail({
-                data,
-                outputFilePath: Path.resolve(DIR_THUMBNAILS, image.file.original),
-                size: dataSettings.data.thumbnails.size,
-                quality: dataSettings.data.thumbnails.quality
-              });
-              image.placeholder = result.placeholder;
-              image.file.thumbnail = `${image.file.original}.${result.extname}`;
-              await petaDatas.updatePetaImage(image, UpdateMode.UPDATE);
-              log.log(`thumbnail (${i + 1} / ${images.length})`);
-              emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
-            }
-            await promiseSerial(generate, images).value;
-            emitMainEvent("regenerateThumbnailsComplete");
+            await petaDatas.regenerateThumbnails();
           } catch (err) {
             showError({
               category: "M",
