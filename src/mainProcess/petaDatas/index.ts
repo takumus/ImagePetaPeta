@@ -43,9 +43,6 @@ export class PetaDatas {
   ) {
 
   }
-  /*------------------------------------
-    PetaImage更新
-  ------------------------------------*/
   async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaImage");
@@ -67,9 +64,6 @@ export class PetaDatas {
     // emitMainEvent("updatePetaImage", petaImage);
     return true;
   }
-  /*------------------------------------
-    PetaBoard更新
-  ------------------------------------*/
   async updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaBoard");
@@ -215,9 +209,6 @@ export class PetaDatas {
     await promiseSerial(generate, images).value;
     this.emitMainEvent("regenerateThumbnailsComplete");
   }
-  /*------------------------------------
-    PetaTag更新
-  ------------------------------------*/
   async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaTag");
@@ -244,9 +235,6 @@ export class PetaDatas {
       this.emitMainEvent("updatePetaTags");
     }
   }
-  /*------------------------------------
-    PetaImagePetaTag更新
-  ------------------------------------*/
   async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaImagePetaTag");
@@ -261,9 +249,6 @@ export class PetaDatas {
     log.log("updated");
     return true;
   }
-  /*------------------------------------
-    PetaImageからパスを取得
-  ------------------------------------*/
   getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
     if (thumbnail == ImageType.ORIGINAL) {
       return Path.resolve(this.paths.DIR_IMAGES, petaImage.file.original);
@@ -271,9 +256,6 @@ export class PetaDatas {
       return Path.resolve(this.paths.DIR_THUMBNAILS, petaImage.file.thumbnail);
     }
   }
-  /*------------------------------------
-    画像インポート(ファイルパス)
-  ------------------------------------*/
   async importImagesFromFilePaths(filePaths: string[]) {
     if (this.cancelImportImages) {
       this.cancelImportImages();
@@ -438,9 +420,6 @@ export class PetaDatas {
     });
     return petaImages;
   }
-  /*------------------------------------
-    画像インポート(バッファー)
-  ------------------------------------*/
   async importImagesFromBuffers(buffers: Buffer[], name: string) {
     if (this.cancelImportImages) {
       this.cancelImportImages();
@@ -491,15 +470,9 @@ export class PetaDatas {
     }
     return petaImages;
   }
-  /*------------------------------------
-    PetaImage取得
-  ------------------------------------*/
   async getPetaImage(id: string) {
     return (await this.datas.dataPetaImages.find({ id }))[0];
   }
-  /*------------------------------------
-    PetaImage追加
-  ------------------------------------*/
   async addImage(param: { data: Buffer, name: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await this.getPetaImage(id);
@@ -556,9 +529,6 @@ export class PetaDatas {
       exists: false
     };
   }
-  /*------------------------------------
-    サムネイル作成
-  ------------------------------------*/
   async generateThumbnail(params: {
     data: Buffer,
     outputFilePath: string,

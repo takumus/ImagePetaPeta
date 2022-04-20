@@ -258,19 +258,13 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
       IPCのメインプロセス側のAPI
     */
     //-------------------------------------------------------------------------------------------------//
-    function getMainFunctions():{
+    function getMainFunctions(): {
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>
     } {
       return {
-        /*------------------------------------
-          ウインドウを表示
-        ------------------------------------*/
         showMainWindow: async () => {
           window.show();
         },
-        /*------------------------------------
-          画像を開く
-        ------------------------------------*/
         importImageFiles: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
@@ -285,9 +279,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           petaDatas.importImagesFromFilePaths(result.filePaths);
           return result.filePaths.length;
         },
-        /*------------------------------------
-          画像を開く
-        ------------------------------------*/
         importImageDirectories: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
@@ -307,9 +298,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           petaDatas.importImagesFromFilePaths([filePath]);
           return filePath.length;
         },
-        /*------------------------------------
-          URLからインポート
-        ------------------------------------*/
         importImageFromURL: async (event, url) => {
           const log = mainLogger.logChunk();
           try {
@@ -330,9 +318,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return "";
         },
-        /*------------------------------------
-          ファイルからインポート
-        ------------------------------------*/
         importImagesFromFilePaths: async (event, filePaths) =>{
           const log = mainLogger.logChunk();
           try {
@@ -344,9 +329,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return [];
         },
-        /*------------------------------------
-          クリップボードからインポート
-        ------------------------------------*/
         importImagesFromClipboard: async (event, buffers) => {
           const log = mainLogger.logChunk();
           try {
@@ -357,17 +339,11 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return [];
         },
-        /*------------------------------------
-          インポートのキャンセル
-        ------------------------------------*/
         cancelImportImages: async () => {
           if (petaDatas.cancelImportImages) {
             petaDatas.cancelImportImages();
           }
         },
-        /*------------------------------------
-          全PetaImage取得
-        ------------------------------------*/
         getPetaImages: async (event) => {
           const log = mainLogger.logChunk();
           try {
@@ -386,9 +362,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return {};
         },
-        /*------------------------------------
-          PetaImage 追加|更新|削除
-        ------------------------------------*/
         updatePetaImages: async (event, datas, mode) => {
           const log = mainLogger.logChunk();
           log.log("#Update PetaImages");
@@ -412,9 +385,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           log.log("return:", true);
           return true;
         },
-        /*------------------------------------
-          全PetaBoard取得
-        ------------------------------------*/
         getPetaBoards: async (event) => {
           const log = mainLogger.logChunk();
           try {
@@ -433,9 +403,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return [];
         },
-        /*------------------------------------
-          PetaBoard 追加|更新|削除
-        ------------------------------------*/
         updatePetaBoards: async (event, boards, mode) => {
           const log = mainLogger.logChunk();
           try {
@@ -454,9 +421,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return false;
         },
-        /*------------------------------------
-          PetaTag 追加|更新|削除
-        ------------------------------------*/
         updatePetaTags: async (event, tags, mode) => {
           const log = mainLogger.logChunk();
           try {
@@ -548,16 +512,10 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return [];
         },
-        /*------------------------------------
-          ログ
-        ------------------------------------*/
         log: async (event, id: string, ...args: any) => {
           dataLogger.log(LogFrom.RENDERER, id, ...args);
           return true;
         },
-        /*------------------------------------
-          WebブラウザでURLを開く
-        ------------------------------------*/
         openURL: async (event, url) => {
           const log = mainLogger.logChunk();
           log.log("#Open URL");
@@ -565,17 +523,11 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           shell.openExternal(url);
           return true;
         },
-        /*------------------------------------
-          PetaImageのファイルを開く
-        ------------------------------------*/
         openImageFile: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Open Image File");
           shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
         },
-        /*------------------------------------
-          アプリ情報
-        ------------------------------------*/
         getAppInfo: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get App Info");
@@ -586,36 +538,24 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           log.log("return:", info);
           return info;
         },
-        /*------------------------------------
-          DBフォルダを開く
-        ------------------------------------*/
         showDBFolder: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Show DB Folder");
           shell.showItemInFolder(DIR_ROOT);
           return true;
         },
-        /*------------------------------------
-          Configフォルダを開く
-        ------------------------------------*/
         showConfigFolder: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Show Config Folder");
           shell.showItemInFolder(DIR_APP);
           return true;
         },
-        /*------------------------------------
-          全PetaBoard取得
-        ------------------------------------*/
         showImageInFolder: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Show Image In Folder");
           shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
-        /*------------------------------------
-          アップデート確認
-        ------------------------------------*/
         checkUpdate: async (event) => {
           const log = mainLogger.logChunk();
           try {
@@ -637,9 +577,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
             latest: app.getVersion()
           };
         },
-        /*------------------------------------
-          設定保存
-        ------------------------------------*/
         updateSettings: async (event, settings) => {
           const log = mainLogger.logChunk();
           try {
@@ -660,18 +597,12 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           return false;
         },
-        /*------------------------------------
-          設定取得
-        ------------------------------------*/
         getSettings: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Settings");
           log.log("return:", dataSettings.data);
           return dataSettings.data;
         },
-        /*------------------------------------
-          ウインドウのフォーカス取得
-        ------------------------------------*/
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
@@ -679,26 +610,17 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           log.log("return:", isFocued);
           return isFocued;
         },
-        /*------------------------------------
-          ズームレベル変更
-        ------------------------------------*/
         setZoomLevel: async (event, level) => {
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
           window.webContents.setZoomLevel(level);
         },
-        /*------------------------------------
-          最小化
-        ------------------------------------*/
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
           window.minimize();
         },
-        /*------------------------------------
-          最大化
-        ------------------------------------*/
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
@@ -708,26 +630,17 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           }
           window.maximize();
         },
-        /*------------------------------------
-          閉じる
-        ------------------------------------*/
         windowClose: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
           app.quit();
         },
-        /*------------------------------------
-          OS情報取得
-        ------------------------------------*/
         getPlatform: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Platform");
           log.log("return:", process.platform);
           return process.platform;
         },
-        /*------------------------------------
-          サムネイル再生成
-        ------------------------------------*/
         regenerateThumbnails: async (event) => {
           const log = mainLogger.logChunk();
           try {
@@ -743,9 +656,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
             });
           }
         },
-        /*------------------------------------
-          PetaImageフォルダを選ぶ
-        ------------------------------------*/
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
@@ -767,9 +677,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           log.log("return:", path);
           return path;
         },
-        /*------------------------------------
-          PetaImageフォルダを変更
-        ------------------------------------*/
         changePetaImageDirectory: async (event, path) => {
           const log = mainLogger.logChunk();
           try {
@@ -794,17 +701,11 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
             return false;
           }
         },
-        /*------------------------------------
-          States
-        ------------------------------------*/
         getStates: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get States");
           return dataStates.data;
         },
-        /*------------------------------------
-          選択中のボードのidを保存
-        ------------------------------------*/
         setSelectedPetaBoard: async (event, petaBoardId: string) => {
           const log = mainLogger.logChunk();
           log.log("#Set Selected PetaBoard");
@@ -813,9 +714,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           dataStates.save();
           return;
         },
-        /*------------------------------------
-          waifu2x
-        ------------------------------------*/
         waifu2xConvert: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Waifu2x Convert");
@@ -831,9 +729,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
     色々な関数
   */
   //-------------------------------------------------------------------------------------------------//
-  /*------------------------------------
-    エラー表示
-  ------------------------------------*/
   function showError(error: ErrorWindowParameters, quit = true) {
     try {
       mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
@@ -845,15 +740,9 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
     } catch { }
     showErrorWindow(error, quit);
   }
-  /*------------------------------------
-    レンダラへipcで送信
-  ------------------------------------*/
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
     window.webContents.send(key, ...args);
   }
-  /*------------------------------------
-    メインウインドウ初期化
-  ------------------------------------*/
   async function initWindow() {
     window = new BrowserWindow({
       width: dataStates.data.windowSize.width,
@@ -941,9 +830,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
       });
     }
   }
-  /*------------------------------------
-    アプリ再起動
-  ------------------------------------*/
   function relaunch() {
     app.relaunch();
     app.exit();
