@@ -1,41 +1,35 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, clipboard } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
 import * as Path from "path";
 import axios from "axios";
-import sharp from "sharp";
-import crypto from "crypto";
 import dataURIToBuffer from "data-uri-to-buffer";
-import { encode as encodePlaceholder } from "blurhash";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import dateFormat from "dateformat";
 import { createI18n } from "vue-i18n";
 import AdmZip from "adm-zip";
-import { execFile, spawn } from "child_process";
+import { spawn } from "child_process";
 import languages from "@/commons/languages";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, SUPPORT_URL, UNTAGGED_ID, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
-import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
 import Config from "@/mainProcess/storages/config";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
-import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
+import { PetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
-import { upgradePetaBoard, upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
-import { arrLast, minimId, noHtml } from "@/commons/utils/utils";
+import { upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
+import { arrLast, minimId } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
-import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { PetaTag } from "@/commons/datas/petaTag";
+import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { MainLogger } from "./utils/mainLogger";
-import { waifu2x } from "./utils/waifu2xCaffe";
+import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
+import { PetaDatas } from "./petaDatas";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -68,7 +62,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
   let dataPetaImagesPetaTags: DB<PetaImagePetaTag>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
-  let cancelImportImages: (() => void) | undefined;
+  let petaDatas: PetaDatas;
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
@@ -116,6 +110,21 @@ import { waifu2x } from "./utils/waifu2xCaffe";
     dataPetaTags = new DB<PetaTag>(FILE_TAGS_DB);
     dataPetaImagesPetaTags = new DB<PetaImagePetaTag>(FILE_IMAGES_TAGS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
+    petaDatas = new PetaDatas(
+      {
+        dataPetaBoards,
+        dataPetaImages,
+        dataPetaImagesPetaTags,
+        dataPetaTags,
+        dataSettings
+      }, {
+        DIR_IMAGES,
+        DIR_THUMBNAILS,
+        DIR_TEMP
+      }, 
+      emitMainEvent,
+      mainLogger
+    );
   } catch (err) {
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -214,7 +223,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
       });
       if (await upgradePetaTag(dataPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
-        await promiseSerial((pi) => updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
+        await promiseSerial((pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
       }
       if (await upgradePetaImagesPetaTags(dataPetaTags, dataPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
@@ -273,7 +282,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
             return 0;
           }
           log.log("return:", result.filePaths.length);
-          importImagesFromFilePaths(result.filePaths);
+          petaDatas.importImagesFromFilePaths(result.filePaths);
           return result.filePaths.length;
         },
         /*------------------------------------
@@ -295,7 +304,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
             return 0;
           }
           // log.log("return:", files.length);
-          importImagesFromFilePaths([filePath]);
+          petaDatas.importImagesFromFilePaths([filePath]);
           return filePath.length;
         },
         /*------------------------------------
@@ -315,7 +324,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
               log.log("normal url:", url);
               data = (await axios.get(url, { responseType: "arraybuffer" })).data;
             }
-            return (await importImagesFromBuffers([data], "download"))[0]?.id || "";
+            return (await petaDatas.importImagesFromBuffers([data], "download"))[0]?.id || "";
           } catch (err) {
             log.error(err);
           }
@@ -328,7 +337,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Import Images From File Paths");
-            const images = (await importImagesFromFilePaths(filePaths)).map((image) => image.id);
+            const images = (await petaDatas.importImagesFromFilePaths(filePaths)).map((image) => image.id);
             return images;
           } catch(e) {
             log.error(e);
@@ -342,7 +351,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Import Images From Clipboard");
-            return (await importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id);
+            return (await petaDatas.importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id);
           } catch (error) {
             log.error(error);
           }
@@ -352,9 +361,8 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           インポートのキャンセル
         ------------------------------------*/
         cancelImportImages: async () => {
-          if (cancelImportImages) {
-            cancelImportImages();
-            cancelImportImages = undefined;
+          if (petaDatas.cancelImportImages) {
+            petaDatas.cancelImportImages();
           }
         },
         /*------------------------------------
@@ -364,12 +372,8 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImages");
-            const data = await dataPetaImages.find({});
-            const petaImages: PetaImages = {};
-            data.forEach((pi) => {
-              petaImages[pi.id] = upgradePetaImage(pi);
-            });
-            log.log("return:", data.length);
+            const petaImages = await petaDatas.getPetaImages();
+            log.log("return:", petaImages.length);
             return petaImages;
           } catch(e) {
             log.error(e);
@@ -389,7 +393,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           log.log("#Update PetaImages");
           try {
-            await promiseSerial((data) => updatePetaImage(data, mode), datas).value;
+            await promiseSerial((data) => petaDatas.updatePetaImage(data, mode), datas).value;
             if (mode == UpdateMode.REMOVE) {
               emitMainEvent("updatePetaTags");
             }
@@ -415,22 +419,9 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaBoards");
-            const data = await dataPetaBoards.find({});
-            data.forEach((board) => {
-              // バージョンアップ時のプロパティ更新
-              upgradePetaBoard(board);
-            })
-            if (data.length == 0) {
-              log.log("no boards");
-              const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, dataSettings.data.darkMode);
-              await updatePetaBoard(board, UpdateMode.UPSERT);
-              data.push(board);
-              log.log("return:", data.length);
-              return data;
-            } else {
-              log.log("return:", data.length);
-              return data;
-            }
+            const petaBoards = await petaDatas.getPetaBoards();
+            log.log("return:", petaBoards.length);
+            return petaBoards;
           } catch(e) {
             log.error(e);
             showError({
@@ -449,7 +440,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaBoards");
-            await promiseSerial((board) => updatePetaBoard(board, mode), boards).value;
+            await promiseSerial((board) => petaDatas.updatePetaBoard(board, mode), boards).value;
             log.log("return:", true);
             return true;
           } catch(e) {
@@ -470,7 +461,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaTags");
-            await promiseSerial((tag) => updatePetaTag(tag, mode), tags).value;
+            await promiseSerial((tag) => petaDatas.updatePetaTag(tag, mode), tags).value;
             emitMainEvent("updatePetaTags");
             log.log("return:", true);
             return true;
@@ -489,14 +480,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
-            await promiseSerial(async (petaImageId) => {
-              await promiseSerial(async (petaTagId) => {
-                await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
-              }, petaTagIds).value;
-            }, petaImageIds).value;
-            if (mode != UpdateMode.UPDATE) {
-              emitMainEvent("updatePetaTags");
-            }
+            await petaDatas.updatePetaImagesPetaTags(petaImageIds, petaTagIds, mode);
             log.log("return:", true);
             return true;
           } catch(error) {
@@ -514,43 +498,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImageIds By PetaTagIds");
-            // all
-            if (!petaTagIds) {
-              log.log("type: all");
-              const ids = (await dataPetaImages.find({})).map((pi) => pi.id);
-              log.log("return:", ids.length);
-              return ids;
-            }
-            // untagged
-            if (petaTagIds.length == 0) {
-              log.log("type: untagged");
-              const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
-                return pipt.petaImageId;
-              })));
-              const ids = (await dataPetaImages.find({
-                id: {
-                  $nin: taggedIds
-                }
-              })).map((pi) => pi.id);
-              log.log("return:", ids.length);
-              return ids;
-            }
-            // filter by ids
-            log.log("type: filter");
-            const pipts = (await dataPetaImagesPetaTags.find({
-              $or: petaTagIds.map((id) => {
-                return {
-                  petaTagId: id
-                }
-              })
-            }));
-            const ids = Array.from(new Set(pipts.map((pipt) => {
-              return pipt.petaImageId;
-            }))).filter((id) => {
-              return pipts.filter((pipt) => {
-                return pipt.petaImageId === id;
-              }).length == petaTagIds.length
-            });
+            const ids = await petaDatas.getPetaImageIdsByPetaTagIds(petaTagIds);
             log.log("return:", ids.length);
             return ids;
           } catch(error) {
@@ -568,33 +516,8 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagIds By PetaImageIds");
-            // all
-            if (petaImageIds.length == 0) {
-              const ids = (await dataPetaImagesPetaTags.find({})).map((pipt) => {
-                return pipt.petaTagId;
-              });
-              log.log("type: all");
-              log.log("return:", ids.length);
-              return ids;
-            }
-            log.log("type: filter");
-            // filter by ids
-            // const timerUUID = uuid().substring(0, 5);
-            // console.time("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
-            let pipts: PetaImagePetaTag[] = [];
-            await promiseSerial(async (petaImageId) => {
-              pipts.push(...(await dataPetaImagesPetaTags.find({ petaImageId })));
-            }, petaImageIds).value;
-            // console.timeEnd("getPetaImageIdsByPetaTagIds-find:" + timerUUID);
-            const ids = Array.from(new Set(pipts.map((pipt) => {
-              return pipt.petaTagId;
-            })));
-            const petaTagIds = ids.filter((id) => {
-              return pipts.filter((pipt) => {
-                return pipt.petaTagId == id;
-              }).length == petaImageIds.length;
-            });
-            log.log("return:", ids.length);
+            const petaTagIds = await petaDatas.getPetaTagIdsByPetaImageIds(petaImageIds);
+            log.log("return:", petaTagIds.length);
             return petaTagIds;
           } catch(error) {
             log.error(error);
@@ -611,42 +534,9 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagInfos");
-            const petaTags = await dataPetaTags.find({});
-            const taggedIds = Array.from(new Set((await dataPetaImagesPetaTags.find({})).map((pipt) => {
-              return pipt.petaImageId;
-            })));
-            const count = (await dataPetaImages.count({
-              id: {
-                $nin: taggedIds
-              }
-            }));
-            let values: PetaTagInfo[] = [];
-            const result = promiseSerial(async (petaTag) => {
-              const info = {
-                petaTag,
-                count: await dataPetaImagesPetaTags.count({ petaTagId: petaTag.id })
-              } as PetaTagInfo;
-              values.push(info);
-              return info;
-            }, petaTags);
-            const values2 = await result.value;
-            log.log("return:", values.length);
-            values.sort((a, b) => {
-              if (a.petaTag.name < b.petaTag.name) {
-                return -1;
-              } else {
-                return 1;
-              }
-            });
-            values.unshift({
-              petaTag: {
-                index: 0,
-                id: UNTAGGED_ID,
-                name: i18n.global.t("browser.untagged")
-              },
-              count: count
-            })
-            return values;
+            const petaTagInfos = await petaDatas.getPetaTagInfos(i18n.global.t("browser.untagged"));
+            log.log("return:", petaTagInfos.length);
+            return petaTagInfos;
           } catch (error) {
             log.error(error);
             showError({
@@ -681,7 +571,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
         openImageFile: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Open Image File");
-          shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
+          shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
         },
         /*------------------------------------
           アプリ情報
@@ -720,7 +610,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
         showImageInFolder: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Show Image In Folder");
-          shell.showItemInFolder(getImagePath(petaImage, ImageType.ORIGINAL));
+          shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
         /*------------------------------------
@@ -843,25 +733,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
           try {
             log.log("#Regenerate Thumbnails");
             log.log("preset:", dataSettings.data.thumbnails);
-            emitMainEvent("regenerateThumbnailsBegin");
-            const images = await dataPetaImages.find({});
-            const generate = async (image: PetaImage, i: number) => {
-              upgradePetaImage(image);
-              const data = await file.readFile(Path.resolve(DIR_IMAGES, image.file.original));
-              const result = await generateThumbnail({
-                data,
-                outputFilePath: Path.resolve(DIR_THUMBNAILS, image.file.original),
-                size: dataSettings.data.thumbnails.size,
-                quality: dataSettings.data.thumbnails.quality
-              });
-              image.placeholder = result.placeholder;
-              image.file.thumbnail = `${image.file.original}.${result.extname}`;
-              await updatePetaImage(image, UpdateMode.UPDATE);
-              log.log(`thumbnail (${i + 1} / ${images.length})`);
-              emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
-            }
-            await promiseSerial(generate, images).value;
-            emitMainEvent("regenerateThumbnailsComplete");
+            await petaDatas.regenerateThumbnails();
           } catch (err) {
             showError({
               category: "M",
@@ -947,62 +819,9 @@ import { waifu2x } from "./utils/waifu2xCaffe";
         waifu2xConvert: async (event, petaImage) => {
           const log = mainLogger.logChunk();
           log.log("#Waifu2x Convert");
-          const inputFile = getImagePath(petaImage, ImageType.ORIGINAL);
-          const outputFile = `${Path.resolve(DIR_TEMP, petaImage.id)}.png`;
-          const execFilePath = dataSettings.data.waifu2x.execFilePath;
-          const parameters = dataSettings.data.waifu2x.parameters.map((param) => {
-            if (param === "$$INPUT$$") {
-              return inputFile;
-            }
-            if (param === "$$OUTPUT$$") {
-              return outputFile;
-            }
-            return param;
-          });
-          log.log("execFilePath:", execFilePath);
-          log.log("parameters:", parameters);
-          const result = await waifu2x(
-            Path.resolve(execFilePath),
-            parameters,
-            (l) => {
-              log.log(l);
-            }
-          );
-          if (result) {
-            const newPetaImages = await importImagesFromFilePaths([outputFile]);
-            if (newPetaImages.length < 1) {
-              log.log("return: false");
-              return false;
-            }
-            const newPetaImage = newPetaImages[0];
-            if (!newPetaImage) {
-              log.log("return: false");
-              return false;
-            }
-            newPetaImage.addDate = petaImage.addDate;
-            newPetaImage.fileDate = petaImage.fileDate;
-            newPetaImage.name = petaImage.name;
-            log.log("update new petaImage");
-            await updatePetaImage(newPetaImage, UpdateMode.UPDATE);
-            log.log("get tags");
-            const pipts = await dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
-            log.log("tags:", pipts.length);
-            await promiseSerial(async (pipt, index) => {
-              log.log("copy tag: (", index, "/", pipts.length, ")");
-              const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-              await dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
-            }, pipts).value;
-            log.log(`add "before waifu2x" tag to old petaImage`);
-            const name = "before waifu2x";
-            const datePetaTag = (await dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-            await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
-            await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
-            emitMainEvent("updatePetaTags");
-            log.log("return: true");
-            return true;
-          }
-          log.log("return: false");
-          return false;
+          const result = await petaDatas.waifu2x(petaImage);
+          log.log("return:", result);
+          return result;
         }
       }
     }
@@ -1015,12 +834,7 @@ import { waifu2x } from "./utils/waifu2xCaffe";
   /*------------------------------------
     エラー表示
   ------------------------------------*/
-  function showError(error: {
-    category: "M" | "R",
-    code: number,
-    title: string,
-    message: string
-  }, quit = true) {
+  function showError(error: ErrorWindowParameters, quit = true) {
     try {
       mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
@@ -1029,390 +843,13 @@ import { waifu2x } from "./utils/waifu2xCaffe";
         window.loadURL("data:text/html;charset=utf-8,");
       }
     } catch { }
-    function createWindow() {
-      const errorWindow = new BrowserWindow({
-        width: 512,
-        height: 512,
-        frame: true,
-        show: true,
-        webPreferences: {
-          javascript: true,
-          nodeIntegration: true,
-          contextIsolation: false,
-        }
-      });
-      errorWindow.menuBarVisible = false;
-      errorWindow.center();
-      errorWindow.loadURL(
-        `data:text/html;charset=utf-8,
-        <head>
-        <title>${noHtml(app.getName())} Fatal Error</title>
-        <style>pre { white-space: pre-wrap; } * { font-family: monospace; }</style>
-        </head>
-        <body>
-        <h1>${noHtml(error.category)}${noHtml(('000' + error.code).slice(-3))} ${noHtml(error.title)}</h1>
-        <pre>Verison: ${app.getVersion()}</pre>
-        <pre>Message: ${noHtml(error.message)}</pre>
-        <pre>Log: ${noHtml(dataLogger?.getCurrentLogfilePath() || "logger is not ready")}</pre>
-        <h2><a href="javascript:require('electron').shell.openExternal('${SUPPORT_URL}?usp=pp_url&entry.1300869761=%E3%83%90%E3%82%B0&entry.1709939184=${encodeURIComponent(app.getVersion())}');">SUPPORT</a></h2>
-        </body>`
-      );
-      errorWindow.setAlwaysOnTop(true);
-      errorWindow.on("close", () => {
-        if (quit) {
-          app.exit();
-        }
-      });
-    }
-    if(app.isReady()) {
-      createWindow();
-    } else {
-      app.on("ready", createWindow);
-    }
-  }
-  /*------------------------------------
-    PetaImage更新
-  ------------------------------------*/
-  async function updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    const log = mainLogger.logChunk();
-    log.log("##Update PetaImage");
-    log.log("mode:", mode);
-    log.log("image:", minimId(petaImage.id));
-    if (mode == UpdateMode.REMOVE) {
-      await dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
-      log.log("removed tags");
-      await dataPetaImages.remove({ id: petaImage.id });
-      log.log("removed db");
-      await file.rm(getImagePath(petaImage, ImageType.ORIGINAL)).catch((e) => {});
-      log.log("removed file");
-      await file.rm(getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
-      log.log("removed thumbnail");
-      return true;
-    }
-    await dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.UPSERT);
-    log.log("updated");
-    // emitMainEvent("updatePetaImage", petaImage);
-    return true;
-  }
-  /*------------------------------------
-    PetaBoard更新
-  ------------------------------------*/
-  async function updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
-    const log = mainLogger.logChunk();
-    log.log("##Update PetaBoard");
-    log.log("mode:", mode);
-    log.log("board:", minimId(board.id));
-    if (mode == UpdateMode.REMOVE) {
-      await dataPetaBoards.remove({ id: board.id });
-      log.log("removed");
-      return true;
-    }
-    await dataPetaBoards.update({ id: board.id }, board, mode == UpdateMode.UPSERT);
-    log.log("updated");
-    return true;
-  }
-  /*------------------------------------
-    PetaTag更新
-  ------------------------------------*/
-  async function updatePetaTag(tag: PetaTag, mode: UpdateMode) {
-    const log = mainLogger.logChunk();
-    log.log("##Update PetaTag");
-    log.log("mode:", mode);
-    log.log("tag:", minimId(tag.id));
-    if (mode == UpdateMode.REMOVE) {
-      await dataPetaImagesPetaTags.remove({ petaTagId: tag.id });
-      await dataPetaTags.remove({ id: tag.id });
-      log.log("removed");
-      return true;
-    }
-    // tag.petaImages = Array.from(new Set(tag.petaImages));
-    await dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
-    log.log("updated");
-    return true;
-  }
-  /*------------------------------------
-    PetaImagePetaTag更新
-  ------------------------------------*/
-  async function updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
-    const log = mainLogger.logChunk();
-    log.log("##Update PetaImagePetaTag");
-    log.log("mode:", mode);
-    log.log("tag:", minimId(petaImagePetaTag.id));
-    if (mode == UpdateMode.REMOVE) {
-      await dataPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
-      log.log("removed");
-      return true;
-    }
-    await dataPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode == UpdateMode.UPSERT);
-    log.log("updated");
-    return true;
-  }
-  /*------------------------------------
-    PetaImageからパスを取得
-  ------------------------------------*/
-  function getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
-    if (thumbnail == ImageType.ORIGINAL) {
-      return Path.resolve(DIR_IMAGES, petaImage.file.original);
-    } else {
-      return Path.resolve(DIR_THUMBNAILS, petaImage.file.thumbnail);
-    }
+    showErrorWindow(error, quit);
   }
   /*------------------------------------
     レンダラへipcで送信
   ------------------------------------*/
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
     window.webContents.send(key, ...args);
-  }
-  /*------------------------------------
-    画像インポート(ファイルパス)
-  ------------------------------------*/
-  async function importImagesFromFilePaths(filePaths: string[]) {
-    if (cancelImportImages) {
-      cancelImportImages();
-      cancelImportImages = undefined;
-    }
-    const log = mainLogger.logChunk();
-    log.log("##Import Images From File Paths");
-    log.log("###List Files", filePaths.length);
-    emitMainEvent("importImagesBegin");
-    // emitMainEvent("importImagesProgress", {
-    //   progress: 0,
-    //   file: filePaths.join("\n"),
-    //   result: ImportImageResult.LIST
-    // });
-    const _filePaths: string[] = [];
-    try {
-      for (let i = 0; i < filePaths.length; i++) {
-        const filePath = filePaths[i];
-        if (!filePath) continue;
-        const readDirResult = file.readDirRecursive(filePath, (filePaths) => {
-          // console.log(filePaths);
-        });
-        cancelImportImages = readDirResult.cancel;
-        _filePaths.push(...(await readDirResult.files));
-      }
-    } catch (error) {
-      emitMainEvent("importImagesComplete", {
-        addedFileCount: 0,
-        fileCount: filePaths.length
-      });
-      return [];
-    }
-    log.log("complete", _filePaths.length);
-    let addedFileCount = 0;
-    const petaImages: PetaImage[] = [];
-    const importImage = async (filePath: string, index: number) => {
-      log.log("import:", index + 1, "/", _filePaths.length);
-      let result = ImportImageResult.SUCCESS;
-      try {
-        const data = await file.readFile(filePath);
-        const name = Path.basename(filePath);
-        const fileDate = (await file.stat(filePath)).mtime;
-        const addResult = await addImage({
-          data, name, fileDate
-        });
-        petaImages.push(addResult.petaImage);
-        if (addResult.exists) {
-          result = ImportImageResult.EXISTS;
-        } else {
-          addedFileCount++;
-        }
-        log.log("imported", result);
-      } catch (err) {
-        log.error(err);
-        result = ImportImageResult.ERROR;
-      }
-      emitMainEvent("importImagesProgress", {
-        allFileCount: _filePaths.length,
-        currentFileCount: index + 1,
-        file: filePath,
-        result: result
-      });
-    }
-    const result = promiseSerial(importImage, _filePaths);
-    cancelImportImages = result.cancel;
-    try {
-      await result.value;
-    } catch (err) {
-      //
-    }
-    cancelImportImages = undefined;
-    log.log("return:", addedFileCount, "/", _filePaths.length);
-    emitMainEvent("importImagesComplete", {
-      addedFileCount: addedFileCount,
-      fileCount: _filePaths.length
-    });
-    if (dataSettings.data.autoAddTag) {
-      emitMainEvent("updatePetaTags");
-    }
-    return petaImages;
-  }
-  /*------------------------------------
-    画像インポート(バッファー)
-  ------------------------------------*/
-  async function importImagesFromBuffers(buffers: Buffer[], name: string) {
-    if (cancelImportImages) {
-      cancelImportImages();
-      cancelImportImages = undefined;
-    }
-    emitMainEvent("importImagesBegin");
-    const log = mainLogger.logChunk();
-    log.log("##Import Images From Buffers");
-    log.log("buffers:", buffers.length);
-    let addedFileCount = 0;
-    const petaImages: PetaImage[] = [];
-    const importImage = async (buffer: Buffer, index: number) => {
-      log.log("import:", index + 1, "/", buffers.length);
-      let result = ImportImageResult.SUCCESS;
-      try {
-        const addResult = await addImage({
-          data: buffer, name
-        });
-        petaImages.push(addResult.petaImage);
-        if (addResult.exists) {
-          result = ImportImageResult.EXISTS;
-        } else {
-          addedFileCount++;
-        }
-        log.log("imported", name, result);
-      } catch (err) {
-        log.error(err);
-        result = ImportImageResult.ERROR;
-      }
-      emitMainEvent("importImagesProgress", {
-        allFileCount: buffers.length,
-        currentFileCount: index + 1,
-        file: name,
-        result: result
-      });
-    }
-    const result =  promiseSerial(importImage, buffers);
-    cancelImportImages = result.cancel;
-    await result.value;
-    cancelImportImages = undefined;
-    log.log("return:", addedFileCount, "/", buffers.length);
-    emitMainEvent("importImagesComplete", {
-      addedFileCount: addedFileCount,
-      fileCount: buffers.length
-    });
-    if (dataSettings.data.autoAddTag) {
-      emitMainEvent("updatePetaTags");
-    }
-    return petaImages;
-  }
-  /*------------------------------------
-    PetaImage取得
-  ------------------------------------*/
-  async function getPetaImage(id: string) {
-    return (await dataPetaImages.find({ id }))[0];
-  }
-  /*------------------------------------
-    PetaImage追加
-  ------------------------------------*/
-  async function addImage(param: { data: Buffer, name: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
-    const id = crypto.createHash("sha256").update(param.data).digest("hex");
-    const exists = await getPetaImage(id);
-    if (exists) return {
-      petaImage: upgradePetaImage(exists),
-      exists: true
-    };
-    const metadata = await sharp(param.data).metadata();
-    let extName: string | undefined | null = undefined;
-    if (metadata.orientation !== undefined) {
-      // jpegの角度情報があったら回転する。pngにする。
-      param.data = await sharp(param.data).rotate().png().toBuffer();
-      extName = "png";
-    } else {
-      // formatを拡張子にする。
-      extName = imageFormatToExtention(metadata.format);
-    }
-    if (!extName) {
-      throw new Error("invalid image file type");
-    }
-    const addDate = param.addDate || new Date();
-    const fileDate = param.fileDate || new Date();
-    const originalFileName = `${id}.${extName}`;
-    const thumbnail = await generateThumbnail({
-      data: param.data,
-      outputFilePath: Path.resolve(DIR_THUMBNAILS, originalFileName),
-      size: dataSettings.data.thumbnails.size,
-      quality: dataSettings.data.thumbnails.quality
-    });
-    const petaImage: PetaImage = {
-      file: {
-        original: originalFileName,
-        thumbnail: `${originalFileName}.${thumbnail.extname}`
-      },
-      name: param.name,
-      fileDate: fileDate.getTime(),
-      addDate: addDate.getTime(),
-      width: 1,
-      height: thumbnail.sharp.height / thumbnail.sharp.width,
-      placeholder: thumbnail.placeholder,
-      id: id,
-      nsfw: false
-    }
-    if (dataSettings.data.autoAddTag) {
-      const name = dateFormat(addDate, "yyyy-mm-dd");
-      const datePetaTag = (await dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-      await updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
-      await updatePetaTag(datePetaTag, UpdateMode.UPSERT);
-    }
-    await file.writeFile(Path.resolve(DIR_IMAGES, originalFileName), param.data);
-    await dataPetaImages.update({ id: petaImage.id }, petaImage, true);
-    return {
-      petaImage: petaImage,
-      exists: false
-    };
-  }
-  /*------------------------------------
-    サムネイル作成
-  ------------------------------------*/
-  async function generateThumbnail(params: {
-    data: Buffer,
-    outputFilePath: string,
-    size: number,
-    quality: number
-  }) {
-    let result: sharp.OutputInfo;
-    const extname = params.outputFilePath.split(".").pop();
-    let isGIF = extname == "gif";
-    if (isGIF) {
-      result = await sharp(params.data)
-      .resize(params.size)
-      .webp({ quality: params.quality })
-      .toFile(params.outputFilePath + ".gif");
-      await file.writeFile(
-        params.outputFilePath + ".gif",
-        params.data
-      );
-    } else {
-      result = await sharp(params.data)
-      .resize(params.size)
-      .webp({ quality: params.quality })
-      .toFile(params.outputFilePath + ".webp");
-    }
-    const placeholder = await new Promise<string>((res, rej) => {
-      sharp(params.data)
-      .resize(PLACEHOLDER_SIZE, Math.floor(result.height / result.width * PLACEHOLDER_SIZE))
-      .raw()
-      .ensureAlpha()
-      .toBuffer((err, buffer, { width, height }) => {
-        if (err) {
-          rej(err);
-        }
-        try {
-          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, PLACEHOLDER_COMPONENT, PLACEHOLDER_COMPONENT));
-        } catch(e) {
-          rej(e);
-        }
-      });
-    })
-    return {
-      sharp: result,
-      placeholder,
-      extname: isGIF ? "gif" : "webp"
-    };
   }
   /*------------------------------------
     メインウインドウ初期化
