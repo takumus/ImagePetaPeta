@@ -21,14 +21,16 @@
         <canvas
           ref="canvas"
           class="placeholder"
+          :width="this.placeholderSize.width"
+          :height="this.placeholderSize.height"
           :class="{
-            loaded: !loading
+            loaded: !loadingImage
           }"
         ></canvas>
         <img
           draggable="false"
           :src="imageURL"
-          v-show="!loading"
+          v-show="!loadingImage"
           loading="lazy"
           @load="loaded"
           class="image"
@@ -48,7 +50,7 @@
         </span>
         <span
           class="tags"
-          v-if="myPetaTags.length == 0"
+          v-if="myPetaTags.length == 0 && !loadingTags"
         >
           {{$t("browser.untagged")}}
         </span>
@@ -99,19 +101,18 @@ export default class VTile extends Vue {
   canvas!: HTMLCanvasElement;
   imageURL = "";
   pressing = false;
-  loading = true;
+  loadingImage = true;
+  loadingTags = true;
   click: ClickChecker = new ClickChecker();
   mounted() {
     if (this.tile.petaImage.placeholder != "") {
       try {
-        const width = PLACEHOLDER_SIZE;
-        const height = Math.floor(this.tile.petaImage.height * PLACEHOLDER_SIZE);
-        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, width, height);
-        this.canvas.width = width;
-        this.canvas.height = height;
+        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, this.placeholderSize.width, this.placeholderSize.height);
+        // this.canvas.width = width;
+        // this.canvas.height = height;
         const ctx = this.canvas.getContext("2d");
         if (ctx){ 
-          const imageData = ctx.createImageData(width, height);
+          const imageData = ctx.createImageData(this.placeholderSize.width, this.placeholderSize.height);
           imageData.data.set(pixels);
           ctx.putImageData(imageData, 0, 0);
         }
@@ -120,11 +121,17 @@ export default class VTile extends Vue {
       }
     }
     this.changeVisible();
-    this.fetchPetaTags();
+  }
+  get placeholderSize() {
+    return {
+      width: 8,
+      height: Math.floor(this.tile.petaImage.height * 8)
+    }
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
+    window.clearTimeout(this.loadFullsizedTimeoutHandler);
   }
   mousedown(event: MouseEvent) {
     this.click.down(new Vec2(event.clientX, event.clientY));
@@ -167,7 +174,7 @@ export default class VTile extends Vue {
     }
   }
   loaded() {
-    this.loading = false;
+    this.loadingImage = false;
   }
   get showNsfw() {
     return this.tile.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
@@ -178,22 +185,31 @@ export default class VTile extends Vue {
     this.myPetaTags = this.petaTagInfos
     .filter((petaTagInfo) => result.find((id) => id == petaTagInfo.petaTag.id))
     .map((pti) => pti.petaTag);
+    this.loadingTags = false;
   }
   get transparentBackground() {
     return TransparentBackground;
   }
   @Watch("original")
   changeOriginal() {
-    if (this.original) {
-      this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
-    } else {
-      this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
-    }
+    this.changeVisible();
   }
+  loadFullsizedTimeoutHandler = -1;
   @Watch("tile.visible")
-  changeVisible() {
+  async changeVisible() {
     if (this.tile.visible) {
-      this.changeOriginal();
+      await new Promise((res, rej) => {
+        setTimeout(res, Math.random() * 100);
+      });
+      this.fetchPetaTags();
+      this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
+      if (this.original) {
+        this.loadFullsizedTimeoutHandler = window.setTimeout(() => {
+          this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
+        }, 1000);
+      }
+    } else {
+      window.clearTimeout(this.loadFullsizedTimeoutHandler);
     }
   }
   @Watch("petaTagInfos")
@@ -259,6 +275,7 @@ export default class VTile extends Vue {
         height: 100%;
         opacity: 1;
         transition: opacity 200ms ease-in-out;
+        // filter: blur(20%);
         &.loaded {
           opacity: 0;
         }

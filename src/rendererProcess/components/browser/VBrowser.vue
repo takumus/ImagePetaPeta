@@ -183,7 +183,7 @@ export default class VBrowser extends Vue {
   }
   updateScrollArea(event?: Event) {
     const preVisibleOffset = this.scrollAreaHeight * 2;
-    const visibleOffset = this.scrollAreaHeight * 0.5;
+    const visibleOffset = this.scrollAreaHeight * 0.3;
     this.areaMinY = this.thumbnails.scrollTop - visibleOffset;
     this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + visibleOffset;
     this.areaPreVisibleMinY = this.thumbnails.scrollTop - preVisibleOffset;
