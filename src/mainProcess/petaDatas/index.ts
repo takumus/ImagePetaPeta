@@ -1,6 +1,6 @@
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { ImageType } from "@/commons/datas/imageType";
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { minimId } from "@/commons/utils/utils";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import * as Path from "path";
@@ -431,6 +431,14 @@ export class PetaDatas {
       return true;
     }
     return false;
+  }
+  async getPetaImages() {
+    const data = await this.datas.dataPetaImages.find({});
+    const petaImages: PetaImages = {};
+    data.forEach((pi) => {
+      petaImages[pi.id] = upgradePetaImage(pi);
+    });
+    return petaImages;
   }
   /*------------------------------------
     画像インポート(バッファー)

@@ -372,12 +372,8 @@ import { PetaDatas } from "./petaDatas";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImages");
-            const data = await dataPetaImages.find({});
-            const petaImages: PetaImages = {};
-            data.forEach((pi) => {
-              petaImages[pi.id] = upgradePetaImage(pi);
-            });
-            log.log("return:", data.length);
+            const petaImages = await petaDatas.getPetaImages();
+            log.log("return:", petaImages.length);
             return petaImages;
           } catch(e) {
             log.error(e);
