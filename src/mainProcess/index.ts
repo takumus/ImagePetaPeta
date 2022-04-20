@@ -27,9 +27,9 @@ import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { MainLogger } from "./utils/mainLogger";
+import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
-import { PetaDatas } from "./petaDatas";
+import { PetaDatas } from "@/mainProcess/petaDatas";
 (() => {
   /*------------------------------------
     シングルインスタンス化

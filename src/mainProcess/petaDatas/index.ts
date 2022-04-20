@@ -22,9 +22,7 @@ import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtenti
 import { DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
 import { encode as encodePlaceholder } from "blurhash";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { createI18n, I18n } from "vue-i18n";
-import languages from "@/commons/languages";
-import { runExternalApplication } from "../utils/runExternalApplication";
+import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
 export class PetaDatas {
   cancelImportImages: (() => void) | undefined;
   constructor(
