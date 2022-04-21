@@ -170,6 +170,7 @@ const ja = {
         begin: "開始",
         progress: "更新中",
         complete: "完了",
+        failed: "失敗"
       }
     },
     listingFiles: {
@@ -177,7 +178,8 @@ const ja = {
       logs: {
         begin: "開始",
         progress: "取得中",
-        complete: "完了"
+        complete: "完了",
+        failed: "失敗"
       }
     },
     importingFiles: {
@@ -206,6 +208,14 @@ const ja = {
         failed: "失敗"
       }
     },
-  }
+  } as {[key: string]: {
+    name: string,
+    logs: {
+      begin: string | ((ctx: any) => void),
+      progress: string | ((ctx: any) => void),
+      complete: string | ((ctx: any) => void),
+      failed: string | ((ctx: any) => void)
+    }
+  }}
 };
 export default ja;
