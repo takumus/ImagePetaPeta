@@ -23,6 +23,7 @@ import { DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_I
 import { encode as encodePlaceholder } from "blurhash";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
+import { TaskStatus } from "@/commons/api/interfaces/task";
 export class PetaDatas {
   cancelImportImages: (() => void) | undefined;
   constructor(
@@ -226,11 +227,38 @@ export class PetaDatas {
     return true;
   }
   async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
-    await promiseSerial(async (petaImageId) => {
-      await promiseSerial(async (petaTagId) => {
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.updateDatas",
+      progress: {
+        all: petaImageIds.length * petaTagIds.length,
+        current: 0,
+      },
+      status: TaskStatus.BEGIN,
+      log: []
+    });
+    await promiseSerial(async (petaImageId, iIndex) => {
+      await promiseSerial(async (petaTagId, tIndex) => {
         await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
+        this.emitMainEvent("taskStatus", {
+          i18nKey: "tasks.updateDatas",
+          progress: {
+            all: petaImageIds.length * petaTagIds.length,
+            current: iIndex * petaTagIds.length + tIndex + 1,
+          },
+          status: TaskStatus.PROGRESS,
+          log: [petaTagId, petaImageId]
+        });
       }, petaTagIds).value;
     }, petaImageIds).value;
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.updateDatas",
+      progress: {
+        all: petaImageIds.length * petaTagIds.length,
+        current: petaImageIds.length * petaTagIds.length,
+      },
+      status: TaskStatus.COMPLETE,
+      log: []
+    });
     if (mode != UpdateMode.UPDATE) {
       this.emitMainEvent("updatePetaTags");
     }
@@ -264,8 +292,16 @@ export class PetaDatas {
     const log = this.mainLogger.logChunk();
     log.log("##Import Images From File Paths");
     log.log("###List Files", filePaths.length);
-    this.emitMainEvent("importImagesBegin");
-    // emitMainEvent("importImagesProgress", {
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.listingFiles",
+      progress: {
+        all: -1,
+        current: -1,
+      },
+      status: TaskStatus.BEGIN,
+      log: []
+    });
+    // emitMainEvent("taskProgress", {
     //   progress: 0,
     //   file: filePaths.join("\n"),
     //   result: ImportImageResult.LIST
@@ -282,9 +318,14 @@ export class PetaDatas {
         _filePaths.push(...(await readDirResult.files));
       }
     } catch (error) {
-      this.emitMainEvent("importImagesComplete", {
-        addedFileCount: 0,
-        fileCount: filePaths.length
+      this.emitMainEvent("taskStatus", {
+        i18nKey: "tasks.listingFiles",
+        progress: {
+          all: -1,
+          current: -1,
+        },
+        status: TaskStatus.FAILED,
+        log: ["tasks.listingFiles.logs.failed"]
       });
       return [];
     }
@@ -312,11 +353,14 @@ export class PetaDatas {
         log.error(err);
         result = ImportImageResult.ERROR;
       }
-      this.emitMainEvent("importImagesProgress", {
-        allFileCount: _filePaths.length,
-        currentFileCount: index + 1,
-        file: filePath,
-        result: result
+      this.emitMainEvent("taskStatus", {
+        i18nKey: "tasks.importingFiles",
+        progress: {
+          all: _filePaths.length,
+          current: index + 1,
+        },
+        log: [result, filePath],
+        status: TaskStatus.PROGRESS
       });
     }
     const result = promiseSerial(importImage, _filePaths);
@@ -328,13 +372,19 @@ export class PetaDatas {
     }
     this.cancelImportImages = undefined;
     log.log("return:", addedFileCount, "/", _filePaths.length);
-    this.emitMainEvent("importImagesComplete", {
-      addedFileCount: addedFileCount,
-      fileCount: _filePaths.length
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.importingFiles",
+      progress: {
+        current: addedFileCount,
+        all: _filePaths.length,
+      },
+      log: [addedFileCount.toString(), _filePaths.length.toString()],
+      status: addedFileCount == _filePaths.length ? TaskStatus.COMPLETE : TaskStatus.FAILED
     });
     if (this.datas.dataSettings.data.autoAddTag) {
       this.emitMainEvent("updatePetaTags");
     }
+    this.emitMainEvent("updatePetaImages");
     return petaImages;
   }
   async getPetaBoards() {
@@ -368,6 +418,15 @@ export class PetaDatas {
       }
       return param;
     });
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.upconverting",
+      progress: {
+        all: 1,
+        current: 1,
+      },
+      log: [JSON.stringify(parameters, null, 2)],
+      status: TaskStatus.BEGIN
+    });
     log.log("execFilePath:", execFilePath);
     log.log("parameters:", parameters);
     const result = await runExternalApplication(
@@ -375,6 +434,15 @@ export class PetaDatas {
       parameters,
       (l) => {
         log.log(l);
+        this.emitMainEvent("taskStatus", {
+          i18nKey: "tasks.upconverting",
+          progress: {
+            all: 1,
+            current: 1,
+          },
+          log: [l],
+          status: TaskStatus.PROGRESS
+        });
       }
     );
     if (result) {
@@ -408,8 +476,26 @@ export class PetaDatas {
       await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
       this.emitMainEvent("updatePetaTags");
       log.log("return: true");
+      this.emitMainEvent("taskStatus", {
+        i18nKey: "tasks.upconverting",
+        progress: {
+          all: 1,
+          current: 1,
+        },
+        log: [],
+        status: TaskStatus.COMPLETE
+      });
       return true;
     }
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.upconverting",
+      progress: {
+        all: 1,
+        current: 1,
+      },
+      log: [],
+      status: TaskStatus.FAILED
+    });
     return false;
   }
   async getPetaImages() {
@@ -425,7 +511,15 @@ export class PetaDatas {
       this.cancelImportImages();
       this.cancelImportImages = undefined;
     }
-    this.emitMainEvent("importImagesBegin");
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.importingFiles",
+      progress: {
+        all: buffers.length,
+        current: 0,
+      },
+      log: [],
+      status: TaskStatus.BEGIN
+    });
     const log = this.mainLogger.logChunk();
     log.log("##Import Images From Buffers");
     log.log("buffers:", buffers.length);
@@ -449,11 +543,14 @@ export class PetaDatas {
         log.error(err);
         result = ImportImageResult.ERROR;
       }
-      this.emitMainEvent("importImagesProgress", {
-        allFileCount: buffers.length,
-        currentFileCount: index + 1,
-        file: name,
-        result: result
+      this.emitMainEvent("taskStatus", {
+        i18nKey: "tasks.importingFiles",
+        progress: {
+          all: buffers.length,
+          current: index + 1,
+        },
+        log: [result, name],
+        status: TaskStatus.PROGRESS
       });
     }
     const result =  promiseSerial(importImage, buffers);
@@ -461,13 +558,19 @@ export class PetaDatas {
     await result.value;
     this.cancelImportImages = undefined;
     log.log("return:", addedFileCount, "/", buffers.length);
-    this.emitMainEvent("importImagesComplete", {
-      addedFileCount: addedFileCount,
-      fileCount: buffers.length
+    this.emitMainEvent("taskStatus", {
+      i18nKey: "tasks.importingFiles",
+      progress: {
+        all: buffers.length,
+        current: addedFileCount,
+      },
+      log: [addedFileCount.toString(), buffers.length.toString()],
+      status: addedFileCount == buffers.length ? TaskStatus.COMPLETE : TaskStatus.FAILED
     });
     if (this.datas.dataSettings.data.autoAddTag) {
       this.emitMainEvent("updatePetaTags");
     }
+    this.emitMainEvent("updatePetaImages");
     return petaImages;
   }
   async getPetaImage(id: string) {

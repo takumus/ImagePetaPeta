@@ -5,8 +5,8 @@
     :visibleCloseButton="false"
   >
     <article class="image-importer-root">
-      <p>
-        {{$t("imageImporter.importing")}}{{Math.floor(progress)}}%
+      <p v-if="name !== ''">
+        {{$t(name)}}({{Math.floor(progress)}}%)
       </p>
       <!-- <section class="bar">
         <div
@@ -50,6 +50,7 @@ import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { TaskStatus } from "@/commons/api/interfaces/task";
 @Options({
   components: {
     VModal,
@@ -66,31 +67,40 @@ export default class VImageImporter extends Vue {
   log = "";
   currentMousePosition = new Vec2();
   canceled = false;
+  name = "";
+  closeWindowHandler = -1;
   mounted() {
-    API.on("importImagesProgress", (e, params) => {
-      this.progress = Math.floor(params.currentFileCount / params.allFileCount * 100);
-      this.addLog(`(${params.allFileCount}/${params.currentFileCount})` + this.$t(`imageImporter.importResults.${params.result}`) + ": " + params.file);
-    });
-    API.on("importImagesBegin", (e) => {
-      this.progress = 0;
-      this.loading = true;
+    API.on("taskStatus", (e, task) => {
+      window.clearTimeout(this.closeWindowHandler);
+      this.name = task.i18nKey + ".name";
       this.hasErrors = false;
-      this.log = "";
+      this.loading = true;
+      this.progress = Math.floor(task.progress.current / task.progress.all * 100);
       this.canceled = false;
-      Cursor.setCursor("wait");
-    });
-    API.on("importImagesComplete", (e, params) => {
-      this.addLog(this.$t(`imageImporter.logs.complete`, [params.fileCount, params.addedFileCount, params.fileCount - params.addedFileCount]));
-      if (params.fileCount != params.addedFileCount) {
-        this.hasErrors = true;
-        this.addLog(this.$t(`imageImporter.logs.failed`, [params.fileCount, params.fileCount - params.addedFileCount]));
-      } else {
-        setTimeout(() => {
-          this.loading = false;
-        }, 500);
+      const i18nKey = `${task.i18nKey}.logs.${task.status}`;
+      const localized = this.$t(i18nKey, task.log);
+      if (localized.indexOf("undefined") >= 0) {
+        console.warn(i18nKey, "にundefinedが含まれています。怪しい。");
+        console.warn(localized);
       }
-      this.canceled = true;
-      Cursor.setDefaultCursor();
+      if (task.status == TaskStatus.BEGIN) {
+        this.log = "";
+      }
+      this.addLog(`[${task.status}]${task.status == TaskStatus.PROGRESS ? `(${task.progress.current}/${task.progress.all})` : ""}:${localized}`);
+      Cursor.setCursor("wait");
+      if (task.status == TaskStatus.COMPLETE || task.status == TaskStatus.FAILED) {
+        if (task.status == TaskStatus.COMPLETE) {
+          this.closeWindowHandler = window.setTimeout(() => {
+            this.loading = false;
+          }, 200);
+        }
+        if (task.status == TaskStatus.FAILED) {
+          this.hasErrors = true;
+        }
+        this.progress = 100;
+        Cursor.setDefaultCursor();
+        this.canceled = true;
+      }
     });
     document.addEventListener('drop', async (event) => {
       event.preventDefault();

@@ -162,6 +162,50 @@ const ja = {
         return `${ctx.list(0)}個中${ctx.list(1)}個のファイルのインポートに失敗しました。`
       }
     }
+  },
+  tasks: {
+    updateDatas: {
+      name: "データを更新しています。",
+      logs: {
+        begin: "開始",
+        progress: "更新中",
+        complete: "完了",
+      }
+    },
+    listingFiles: {
+      name: "一覧を取得しています。",
+      logs: {
+        begin: "開始",
+        progress: "取得中",
+        complete: "完了"
+      }
+    },
+    importingFiles: {
+      name: "ファイルをインポートしています。",
+      logs: {
+        begin: "開始",
+        progress: (ctx: any) => {
+          return `${ctx.list(0) == "error" ? "エラー" : ctx.list(0) == "exists" ? "重複" : "追加"}:${ctx.list(1)}`
+        },
+        complete: (ctx: any) => {
+          return `${ctx.list(1)}件中${ctx.list(0)}件のインポートに成功しました。`
+        },
+        failed: (ctx: any) => {
+          return `${ctx.list(1)}件中${ctx.list(0)}件のインポートに成功しました。`
+        }
+      }
+    },
+    upconverting: {
+      name: "waifu2xで変換しています。",
+      logs: {
+        begin: "開始",
+        progress: (ctx: any) => {
+          return ctx.list(0)
+        },
+        complete: "完了",
+        failed: "失敗"
+      }
+    },
   }
 };
 export default ja;

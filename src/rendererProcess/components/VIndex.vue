@@ -112,9 +112,6 @@ export default class Index extends Vue {
       logChunk().log("vIndex", "window error:", e);
     }
     logChunk().log("vIndex", "INIT RENDERER!");
-    API.on("importImagesComplete", () => {
-      this.getPetaImages();
-    });
     API.on("updatePetaImages", (e) => {
       this.getPetaImages();
     });

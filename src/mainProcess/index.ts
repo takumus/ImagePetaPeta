@@ -30,6 +30,7 @@ import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "@/mainProcess/petaDatas";
+import { TaskStatus } from "@/commons/api/interfaces/task";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -365,8 +366,29 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
         updatePetaImages: async (event, datas, mode) => {
           const log = mainLogger.logChunk();
           log.log("#Update PetaImages");
+          emitMainEvent("taskStatus", {
+            i18nKey: "tasks.updateDatas",
+            progress: {
+              all: datas.length,
+              current: 0,
+            },
+            log: [],
+            status: TaskStatus.BEGIN
+          });
           try {
-            await promiseSerial((data) => petaDatas.updatePetaImage(data, mode), datas).value;
+            const update = async (data: PetaImage, index: number) => {
+              await petaDatas.updatePetaImage(data, mode);
+              emitMainEvent("taskStatus", {
+                i18nKey: "tasks.updateDatas",
+                progress: {
+                  all: datas.length,
+                  current: index + 1,
+                },
+                log: [data.id],
+                status: TaskStatus.PROGRESS
+              });
+            }
+            await promiseSerial(update, datas).value;
             if (mode == UpdateMode.REMOVE) {
               emitMainEvent("updatePetaTags");
             }
@@ -382,6 +404,15 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
           if (mode != UpdateMode.UPDATE) {
             emitMainEvent("updatePetaImages");
           }
+          emitMainEvent("taskStatus", {
+            i18nKey: "tasks.updateDatas",
+            progress: {
+              all: datas.length,
+              current: datas.length,
+            },
+            log: [],
+            status: TaskStatus.COMPLETE
+          });
           log.log("return:", true);
           return true;
         },

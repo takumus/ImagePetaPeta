@@ -1,13 +1,12 @@
 import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import { PetaImage } from "@/commons/datas/petaImage";
+import { Task } from "./interfaces/task";
 
 export interface MainEvents {
   updatePetaImages: () => void;
   updatePetaImage: (petaImage: PetaImage) => void;
   updatePetaTags: () => void;
-  importImagesBegin: () => void;
-  importImagesProgress: (data: { allFileCount: number, currentFileCount: number, file: string, result: ImportImageResult }) => void;
-  importImagesComplete: (data: { fileCount: number, addedFileCount: number }) => void;
+  taskStatus: (task: Task) => void;
   notifyUpdate: (current: string, latest: string) => void;
   windowFocused: (focused: boolean) => void;
   regenerateThumbnailsProgress: (done: number, count: number) => void;
