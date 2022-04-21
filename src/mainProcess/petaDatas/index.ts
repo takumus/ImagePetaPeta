@@ -298,7 +298,7 @@ export class PetaDatas {
         const data = await file.readFile(filePath);
         const name = Path.basename(filePath);
         const fileDate = (await file.stat(filePath)).mtime;
-        const addResult = await this.addImage({
+        const addResult = await this.importImage({
           data, name, fileDate
         });
         petaImages.push(addResult.petaImage);
@@ -435,11 +435,11 @@ export class PetaDatas {
       log.log("import:", index + 1, "/", buffers.length);
       let result = ImportImageResult.SUCCESS;
       try {
-        const addResult = await this.addImage({
+        const importResult = await this.importImage({
           data: buffer, name
         });
-        petaImages.push(addResult.petaImage);
-        if (addResult.exists) {
+        petaImages.push(importResult.petaImage);
+        if (importResult.exists) {
           result = ImportImageResult.EXISTS;
         } else {
           addedFileCount++;
@@ -473,7 +473,7 @@ export class PetaDatas {
   async getPetaImage(id: string) {
     return (await this.datas.dataPetaImages.find({ id }))[0];
   }
-  async addImage(param: { data: Buffer, name: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
+  async importImage(param: { data: Buffer, name: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await this.getPetaImage(id);
     if (exists) return {
