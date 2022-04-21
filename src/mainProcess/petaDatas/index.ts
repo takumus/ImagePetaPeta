@@ -229,10 +229,6 @@ export class PetaDatas {
   async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.updateDatas",
-      progress: {
-        all: petaImageIds.length * petaTagIds.length,
-        current: 0,
-      },
       status: TaskStatus.BEGIN,
       log: []
     });
@@ -252,10 +248,6 @@ export class PetaDatas {
     }, petaImageIds).value;
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.updateDatas",
-      progress: {
-        all: petaImageIds.length * petaTagIds.length,
-        current: petaImageIds.length * petaTagIds.length,
-      },
       status: TaskStatus.COMPLETE,
       log: []
     });
@@ -294,10 +286,6 @@ export class PetaDatas {
     log.log("###List Files", filePaths.length);
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.listingFiles",
-      progress: {
-        all: -1,
-        current: -1,
-      },
       status: TaskStatus.BEGIN,
       log: []
     });
@@ -320,10 +308,6 @@ export class PetaDatas {
     } catch (error) {
       this.emitMainEvent("taskStatus", {
         i18nKey: "tasks.listingFiles",
-        progress: {
-          all: -1,
-          current: -1,
-        },
         status: TaskStatus.FAILED,
         log: ["tasks.listingFiles.logs.failed"]
       });
@@ -374,10 +358,6 @@ export class PetaDatas {
     log.log("return:", addedFileCount, "/", _filePaths.length);
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.importingFiles",
-      progress: {
-        current: addedFileCount,
-        all: _filePaths.length,
-      },
       log: [addedFileCount.toString(), _filePaths.length.toString()],
       status: addedFileCount == _filePaths.length ? TaskStatus.COMPLETE : TaskStatus.FAILED
     });
@@ -420,10 +400,6 @@ export class PetaDatas {
     });
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.upconverting",
-      progress: {
-        all: 1,
-        current: 1,
-      },
       log: [JSON.stringify(parameters, null, 2)],
       status: TaskStatus.BEGIN
     });
@@ -478,10 +454,6 @@ export class PetaDatas {
       log.log("return: true");
       this.emitMainEvent("taskStatus", {
         i18nKey: "tasks.upconverting",
-        progress: {
-          all: 1,
-          current: 1,
-        },
         log: [],
         status: TaskStatus.COMPLETE
       });
@@ -489,10 +461,6 @@ export class PetaDatas {
     }
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.upconverting",
-      progress: {
-        all: 1,
-        current: 1,
-      },
       log: [],
       status: TaskStatus.FAILED
     });
@@ -513,10 +481,6 @@ export class PetaDatas {
     }
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.importingFiles",
-      progress: {
-        all: buffers.length,
-        current: 0,
-      },
       log: [],
       status: TaskStatus.BEGIN
     });
@@ -560,10 +524,6 @@ export class PetaDatas {
     log.log("return:", addedFileCount, "/", buffers.length);
     this.emitMainEvent("taskStatus", {
       i18nKey: "tasks.importingFiles",
-      progress: {
-        all: buffers.length,
-        current: addedFileCount,
-      },
       log: [addedFileCount.toString(), buffers.length.toString()],
       status: addedFileCount == buffers.length ? TaskStatus.COMPLETE : TaskStatus.FAILED
     });

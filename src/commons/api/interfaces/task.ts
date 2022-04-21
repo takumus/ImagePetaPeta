@@ -1,6 +1,6 @@
 export interface Task {
   i18nKey: string,
-  progress: {
+  progress?: {
     current: number
     all: number
   }

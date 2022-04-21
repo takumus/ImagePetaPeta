@@ -368,10 +368,6 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
           log.log("#Update PetaImages");
           emitMainEvent("taskStatus", {
             i18nKey: "tasks.updateDatas",
-            progress: {
-              all: datas.length,
-              current: 0,
-            },
             log: [],
             status: TaskStatus.BEGIN
           });
@@ -406,10 +402,6 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
           }
           emitMainEvent("taskStatus", {
             i18nKey: "tasks.updateDatas",
-            progress: {
-              all: datas.length,
-              current: datas.length,
-            },
             log: [],
             status: TaskStatus.COMPLETE
           });

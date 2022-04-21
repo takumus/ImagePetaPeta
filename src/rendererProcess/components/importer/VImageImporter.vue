@@ -75,7 +75,7 @@ export default class VImageImporter extends Vue {
       this.name = task.i18nKey + ".name";
       this.hasErrors = false;
       this.loading = true;
-      this.progress = Math.floor(task.progress.current / task.progress.all * 100);
+      this.progress = task.progress ? Math.floor(task.progress.current / task.progress.all * 100) : 0;
       this.canceled = false;
       const i18nKey = `${task.i18nKey}.logs.${task.status}`;
       const localized = this.$t(i18nKey, task.log);
@@ -86,7 +86,9 @@ export default class VImageImporter extends Vue {
       if (task.status == TaskStatus.BEGIN) {
         this.log = "";
       }
-      this.addLog(`[${task.status}]${task.status == TaskStatus.PROGRESS ? `(${task.progress.current}/${task.progress.all})` : ""}:${localized}`);
+      this.addLog(`[${task.status}]${
+        task.status == TaskStatus.PROGRESS && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
+      }:${localized}`);
       Cursor.setCursor("wait");
       if (task.status == TaskStatus.COMPLETE || task.status == TaskStatus.FAILED) {
         if (task.status == TaskStatus.COMPLETE) {
