@@ -23,7 +23,7 @@ export default class DB<T> {
           res(true);
         }
       });
-      this.nedb.persistence.stopAutocompaction();
+      this.nedb.stopAutocompaction();
     })
   }
   orderCompaction() {
@@ -32,7 +32,7 @@ export default class DB<T> {
   }
   compaction = () => {
     if (this.nedb && this.loaded) {
-      this.nedb.persistence.compactDatafile();
+      this.nedb.compactDatafile();
     }
   }
   find(query: Partial<T> | any = {}): Promise<T[]> {
