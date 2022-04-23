@@ -81,7 +81,6 @@ import { ImageType } from "@/commons/datas/imageType";
 import { decode as decodePlaceholder } from "blurhash";
 import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
-import TransparentBackground from "@/@assets/transparentBackground.png";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE } from "@/commons/defines";
@@ -189,9 +188,6 @@ export default class VTile extends Vue {
     .filter((petaTagInfo) => result.find((id) => id == petaTagInfo.petaTag.id))
     .map((pti) => pti.petaTag);
     this.loadingTags = false;
-  }
-  get transparentBackground() {
-    return TransparentBackground;
   }
   @Watch("original")
   changeOriginal() {

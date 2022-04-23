@@ -11,9 +11,6 @@
     <section
       class="title"
       @click.left="toggleVisible"
-      :style="{
-        backgroundImage: `url(${layerIconImage})`
-      }"
     >
     </section>
     <section
@@ -49,7 +46,6 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
-import LayerIcon from "@/@assets/layer.png";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
@@ -212,9 +208,6 @@ export default class VLayer extends Vue {
       }
     });
   }
-  get layerIconImage() {
-    return LayerIcon;
-  }
 }
 </script>
 
@@ -239,6 +232,7 @@ export default class VLayer extends Vue {
     background: no-repeat;
     background-position: center center;
     background-size: 14px;
+    background-image: url("~@/@assets/layer.png");
     height: 14px;
     min-width: 14px;
     flex-shrink: 0;

@@ -14,9 +14,6 @@
       :class="{
         disabled: !visible
       }"
-      :style="{
-        backgroundImage: `url(${visibleIconImage})`
-      }"
     >
     </div>
     <div
@@ -24,9 +21,6 @@
       ref="lockedIcon"
       :class="{
         disabled: !locked
-      }"
-      :style="{
-        backgroundImage: `url(${lockedIconImage})`
       }"
     >
     </div>
@@ -56,8 +50,6 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 import { PPanel } from "../board/ppanels/PPanel";
-import EyeIcon from "@/@assets/eye.png";
-import LockedIcon from "@/@assets/locked.png";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 // Others
@@ -98,12 +90,6 @@ export default class VLayerCell extends Vue {
   }
   get selected() {
     return this.pPanel?.selected;
-  }
-  get visibleIconImage() {
-    return EyeIcon;
-  }
-  get lockedIconImage() {
-    return LockedIcon;
   }
   get locked() {
     return this.pPanel?.petaPanel.locked;
@@ -174,9 +160,11 @@ export default class VLayerCell extends Vue {
     filter: var(--icon-filter);
     &.eye {
       background-size: 14px;
+      background-image: url("~@/@assets/eye.png");
     }
     &.lock {
       background-size: 11px;
+      background-image: url("~@/@assets/locked.png");
     }
     &.disabled {
       opacity: 0.3;
