@@ -77,7 +77,7 @@ export default class VSearch extends Vue {
     if (last) {
       this.editSearchTag(last, "");
     } else {
-      blur();
+      // blur();
     }
   }
   editSearchTag(tag: PetaTag, value: string) {
