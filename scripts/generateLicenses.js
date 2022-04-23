@@ -5,6 +5,7 @@ const datas = {
   ...customLicenses
 };
 console.log("generate licenses");
+const licensesCounts = {};
 const newDatas = Object.keys(datas).map((name) => {
   const data = datas[name];
   let licensesName = data.licenses;
@@ -14,11 +15,16 @@ const newDatas = Object.keys(datas).map((name) => {
       licensesText = fs.readFileSync(data.licenseFile).toString();
     } catch {
       licensesText = "";
-      console.error("failed to load licenses:", name);
+      // console.error("failed to load licenses:", name);
     }
   } else {
     licensesText = data.customLicensesText;
     licensesName = data.customLicensesName;
+  }
+  if (licensesCounts[licensesName] !== undefined) {
+    licensesCounts[licensesName]++;
+  } else {
+    licensesCounts[licensesName] = 1;
   }
   return {
     name: `${name} (${licensesName})`,
@@ -32,4 +38,5 @@ const newDatas = Object.keys(datas).map((name) => {
 });
 fs.rmSync("./licenses.json");
 fs.writeFileSync("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(newDatas, null, 2)}`);
+console.log(Object.keys(licensesCounts).map((key) => `- ${key}: ${licensesCounts[key]}`).join("\n"));
 console.log("generate licenses complete");
