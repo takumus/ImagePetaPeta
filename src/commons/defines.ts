@@ -34,3 +34,5 @@ export const UNTAGGED_ID = "id-untagged";
 export const SUPPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfMVEzYwdC09SrM6ipTtHyk_wTC1n08pB2eeZIVZifIRW7ojQ/viewform";
 export const PLACEHOLDER_SIZE = 32;
 export const PLACEHOLDER_COMPONENT = 4;
+export const BROWSER_LOAD_ORIGINAL_DELAY = 1000;
+export const BROWSER_FETCH_TAGS_DELAY = 100;

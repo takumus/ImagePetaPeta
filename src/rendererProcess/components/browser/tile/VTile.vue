@@ -84,7 +84,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import TransparentBackground from "@/@assets/transparentBackground.png";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
-import { PLACEHOLDER_SIZE } from "@/commons/defines";
+import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE } from "@/commons/defines";
 @Options({
   components: {
   },
@@ -104,6 +104,8 @@ export default class VTile extends Vue {
   loadingImage = true;
   loadingTags = true;
   click: ClickChecker = new ClickChecker();
+  loadOriginalTimeoutHandler = -1;
+  fetchTagsTimeoutHandler = -1;
   mounted() {
     if (this.tile.petaImage.placeholder != "") {
       try {
@@ -131,7 +133,8 @@ export default class VTile extends Vue {
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
-    window.clearTimeout(this.loadFullsizedTimeoutHandler);
+    window.clearTimeout(this.loadOriginalTimeoutHandler);
+    window.clearTimeout(this.fetchTagsTimeoutHandler);
   }
   mousedown(event: MouseEvent) {
     this.click.down(new Vec2(event.clientX, event.clientY));
@@ -194,22 +197,21 @@ export default class VTile extends Vue {
   changeOriginal() {
     this.changeVisible();
   }
-  loadFullsizedTimeoutHandler = -1;
   @Watch("tile.visible")
   async changeVisible() {
     if (this.tile.visible) {
-      await new Promise((res, rej) => {
-        setTimeout(res, Math.random() * 100);
-      });
-      this.fetchPetaTags();
+      this.fetchTagsTimeoutHandler = window.setTimeout(() => {
+        this.fetchPetaTags();
+      }, Math.random() * BROWSER_FETCH_TAGS_DELAY)
       this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
       if (this.original) {
-        this.loadFullsizedTimeoutHandler = window.setTimeout(() => {
+        this.loadOriginalTimeoutHandler = window.setTimeout(() => {
           this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
-        }, 1000);
+        }, BROWSER_LOAD_ORIGINAL_DELAY);
       }
     } else {
-      window.clearTimeout(this.loadFullsizedTimeoutHandler);
+      window.clearTimeout(this.fetchTagsTimeoutHandler);
+      window.clearTimeout(this.loadOriginalTimeoutHandler);
     }
   }
   @Watch("petaTagInfos")
