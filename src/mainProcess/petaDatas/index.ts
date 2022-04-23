@@ -405,9 +405,12 @@ export class PetaDatas {
     });
     log.log("execFilePath:", execFilePath);
     log.log("parameters:", parameters);
+    const encoding: BufferEncoding = process.platform == "win32" ? "utf16le" : "utf8";
+    log.log("encoding:", encoding);
     const result = await runExternalApplication(
       Path.resolve(execFilePath),
       parameters,
+      encoding,
       (l) => {
         log.log(l);
         this.emitMainEvent("taskStatus", {
