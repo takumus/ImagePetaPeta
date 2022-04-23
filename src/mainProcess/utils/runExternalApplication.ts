@@ -1,20 +1,24 @@
 import { spawn } from "child_process";
 export function runExternalApplication(cliToolPath: string, args: string[], log: (value: string) => void) {
-  return new Promise((res, rej) => {
-    const process = spawn(cliToolPath, args);
-    process.on("exit", (code) => {
+  return new Promise((res: (value: boolean) => void, rej: (error: Error) => void) => {
+    const childProcess = spawn(cliToolPath, args);
+    if (process.platform == "win32") {
+      childProcess.stdout.setEncoding("utf16le");
+      childProcess.stderr.setEncoding("utf16le");
+    }
+    childProcess.on("exit", (code) => {
       log(`exit code: ${code}`);
       res(code === 0);
     });
-    process.stdout.on("data", (chunk) => {
+    childProcess.stdout.on("data", (chunk: Buffer) => {
       log(chunk.toString());
     });
-    process.stderr.on("data", (chunk) => {
+    childProcess.stderr.on("data", (chunk: Buffer) => {
       log(chunk.toString());
     });
-    process.on("error", (error) => {
+    childProcess.on("error", (error) => {
       log(error.message);
-      res(false);
+      rej(error);
     });
   })
 }
