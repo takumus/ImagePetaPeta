@@ -141,6 +141,7 @@ export default class VBoard extends Vue {
     });
     this.pixi.view.addEventListener("dblclick", this.resetTransform);
     this.pixi.view.addEventListener("mousewheel", this.wheel as any);
+    this.pixi.view.addEventListener("mousedown", this.preventWheelClick);
     this.pixi.stage.on("pointerdown", this.mousedown);
     this.pixi.stage.on("pointerup", this.mouseup);
     this.pixi.stage.on("pointerupoutside", this.mouseup);
@@ -179,6 +180,7 @@ export default class VBoard extends Vue {
   unmounted() {
     this.pixi.view.removeEventListener("dblclick", this.resetTransform);
     this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
+    this.pixi.view.removeEventListener("mousedown", this.preventWheelClick);
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
     this.panelsBackground.removeChild(this.pixi.view);
@@ -200,12 +202,17 @@ export default class VBoard extends Vue {
     this.updateRect();
     this.orderPIXIRender();
   }
+  preventWheelClick(event: MouseEvent) {
+    if (event.button == MouseButton.MIDDLE) {
+      event.preventDefault();
+    }
+  }
   mousedown(e: PIXI.InteractionEvent) {
     if (!this.board) {
       return;
     }
     this.click.down(e.data.global);
-    if (e.data.button == MouseButton.RIGHT) {
+    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE) {
       this.mouseRightPressing = true;
       this.dragging = true;
       this.dragOffset
@@ -232,9 +239,9 @@ export default class VBoard extends Vue {
     return null;
   }
   mouseup(e: PIXI.InteractionEvent) {
-    if (e.data.button == MouseButton.RIGHT) {
+    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE) {
       this.mouseRightPressing = false;
-      if (this.click.isClick) {
+      if (this.click.isClick && e.data.button == MouseButton.RIGHT) {
         const pPanel = this.getPPanelFromObject(e.target);
         if (pPanel) {
           this.pointerdownPPanel(pPanel, e);
