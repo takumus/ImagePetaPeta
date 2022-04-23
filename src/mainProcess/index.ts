@@ -502,9 +502,9 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
         getPetaTagIdsByPetaImageIds: async (event, petaImageIds) => {
           const log = mainLogger.logChunk();
           try {
-            log.log("#Get PetaTagIds By PetaImageIds");
+            // log.log("#Get PetaTagIds By PetaImageIds");
             const petaTagIds = await petaDatas.getPetaTagIdsByPetaImageIds(petaImageIds);
-            log.log("return:", petaTagIds.length);
+            // log.log("return:", petaTagIds.length);
             return petaTagIds;
           } catch(error) {
             log.error(error);
