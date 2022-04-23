@@ -142,19 +142,19 @@
           tabindex="-1"
           @click="$components.browser.open()"
         >
-          {{$t("home.openBrowserButton")}}
+          <span class="browser"></span>
         </button>
         <button
           tabindex="-1"
           @click="$api.send('importImageFiles')"
         >
-          {{$t("home.importImagesFromFilesButton")}}
+          <span class="import-file"></span>
         </button>
         <button
           tabindex="-1"
           @click="$api.send('importImageDirectories')"
         >
-          {{$t("home.importImagesFromDirectoriesButton")}}
+          <span class="import-folder"></span>
         </button>
       </article>
       <article class="shared-buttons right">
@@ -162,13 +162,13 @@
           tabindex="-1"
           @click="$components.info.open"
         >
-        {{$t("home.infoButton")}}
+          <span class="info"></span>
         </button>
         <button
           tabindex="-1"
           @click="$components.settings.open"
         >
-        {{$t("home.settingsButton")}}
+          <span class="settings"></span>
         </button>
       </article>
     </section>
@@ -473,10 +473,34 @@ export default class VTabBar extends Vue {
     position: relative;
     border-bottom: solid 1px var(--bg-color);
     button {
-      min-width: 0px;
-      padding: 0px 6px;
+      min-width: 24px;
+      padding: 0px;
       height: 100%;
       margin: 0px;
+      span {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-size: 14px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        filter: var(--icon-filter);
+        &.browser {
+          background-image: url("~@/@assets/browser.png");
+        }
+        &.import-file {
+          background-image: url("~@/@assets/importFile.png");
+        }
+        &.import-folder {
+          background-image: url("~@/@assets/importFolder.png");
+        }
+        &.settings {
+          background-image: url("~@/@assets/settings.png");
+        }
+        &.info {
+          background-image: url("~@/@assets/info.png");
+        }
+      }
     }
     >.shared-buttons {
       position: absolute;

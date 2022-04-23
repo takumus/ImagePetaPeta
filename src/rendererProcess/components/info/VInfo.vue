@@ -30,6 +30,12 @@
         @click="showConfigFolder">
         {{$t("info.configFolderButton")}}
       </button>
+      <p>{{$t("info.assets")}}</p>
+      <button
+        tabindex="-1"
+        @click="gotoIcons8">
+        Icons8.com
+      </button>
       <p>{{$t("info.licenses")}}</p>
       <pre>{{ licenses }}</pre>
     </article>
@@ -66,6 +72,9 @@ export default class VInfo extends Vue {
   }
   gotoIssues() {
     API.send("openURL", `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(this.$appInfo.version)}`);
+  }
+  gotoIcons8() {
+    API.send("openURL", "https://icons8.com/");
   }
   showDBFolder() {
     API.send("showDBFolder");

@@ -101,7 +101,8 @@ const ja = {
     issuesButton: "バグ/要望",
     dbFolderButton: "データベースフォルダ",
     configFolderButton: "コンフィグフォルダ",
-    licenses: "ライセンス情報"
+    licenses: "使用しているライブラリ情報",
+    assets: "使用しているアセット情報"
   },
   settings: {
     settings: "設定",
