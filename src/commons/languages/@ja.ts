@@ -73,6 +73,7 @@ const ja = {
     property: {
       clickToAddTag: "タグ追加",
       tagName: "タグ名",
+      fetchingTags: "タグ取得中...",
       selectedImage: (ctx: any) => {
         return `${ctx.list(0)}枚の画像を選択中`
       },

@@ -25,7 +25,7 @@
     </section>
     <section v-show="!noImage" class="tags">
       <p>{{$t("browser.property.tags")}}</p>
-      <ul>
+      <ul v-if="!fetchingTags">
         <li v-for="tag in sharedPetaTags" :key="tag.id">
           <VEditableLabel
             :label="tag.name"
@@ -44,6 +44,11 @@
             @change="(name) => addTag(name)"
             @focus="complementTag"
           />
+        </li>
+      </ul>
+      <ul v-else>
+        <li>
+          {{$t("browser.property.fetchingTags")}}
         </li>
       </ul>
     </section>
@@ -98,6 +103,7 @@ export default class VProperty extends Vue {
   previewWidth = 0;
   previewHeight = 0;
   previewsResizer?: ResizeObserver;
+  fetchingTags = true;
   mounted() {
     this.previewsResizer = new ResizeObserver((entries) => {
       this.resizePreviews(entries[0]!.contentRect);
@@ -159,12 +165,15 @@ export default class VProperty extends Vue {
   }
   sharedPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
+    this.fetchingTags = true;
     if (this.noImage) {
       this.sharedPetaTags = [];
+      this.fetchingTags = false;
       return;
     }
     const result = await API.send("getPetaTagIdsByPetaImageIds", this.petaImages.map((petaImage) => petaImage.id));
     this.sharedPetaTags = this.petaTagInfos.filter((pti) => result.find((id) => id == pti.petaTag.id)).map((pi) => pi.petaTag);
+    this.fetchingTags = false;
   }
   get propertyThumbnails(): PropertyThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
