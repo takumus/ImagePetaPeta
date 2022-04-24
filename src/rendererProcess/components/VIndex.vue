@@ -38,7 +38,7 @@
       <VImageImporter
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />
-      <VTask />
+      <VTasks />
     </section>
     <VDialog
       :zIndex="6"
@@ -60,7 +60,7 @@ import { Ref, Watch } from "vue-property-decorator";
 import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
-import VTask from "@/rendererProcess/components/task/VTask.vue";
+import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTabBar from "@/rendererProcess/components/tabBar/VTabBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
@@ -87,7 +87,7 @@ import { minimId } from "@/commons/utils/utils";
     VBrowser,
     VBoard,
     VImageImporter,
-    VTask,
+    VTasks,
     VTabBar,
     VContextMenu,
     VComplement,
