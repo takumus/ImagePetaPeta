@@ -1,15 +1,24 @@
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import { v4 as uuid } from "uuid";
 const tasks: {[id: string]: TaskHandler} = {};
-let emitStatusCallback: (taskId: string, status: TaskStatus) => void;
+let emitStatusCallback: ((taskId: string, status: TaskStatus) => void) | undefined;
 export async function spawn<T, K>(name: string, exec: (handler: TaskHandler, params: T) => Promise<K>, params: T) {
   const id = uuid();
+  let done = false;
   const handler: TaskHandler = {
     name,
     isCanceled: false,
     id,
     emitStatus: (status) => {
-      emitStatusCallback(id, status);
+      if (done) {
+        return;
+      }
+      if (emitStatusCallback) {
+        emitStatusCallback(id, status);
+      }
+      if (status.status == "failed" || status.status == "complete") {
+        done = true;
+      }
     }
   }
   addTask(handler);
