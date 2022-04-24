@@ -24,8 +24,8 @@ import { encode as encodePlaceholder } from "blurhash";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
 import { TaskStatus } from "@/commons/api/interfaces/task";
+import * as Tasks from "@/mainProcess/tasks/task";
 export class PetaDatas {
-  cancelImportImages: (() => void) | undefined;
   constructor(
     private datas: {
       dataPetaImages: DB<PetaImage>,
@@ -216,33 +216,35 @@ export class PetaDatas {
     return true;
   }
   async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.updateDatas",
-      status: TaskStatus.BEGIN,
-      log: []
-    });
-    await promiseSerial(async (petaImageId, iIndex) => {
-      await promiseSerial(async (petaTagId, tIndex) => {
-        await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
-        this.emitMainEvent("taskStatus", {
-          i18nKey: "tasks.updateDatas",
-          progress: {
-            all: petaImageIds.length * petaTagIds.length,
-            current: iIndex * petaTagIds.length + tIndex + 1,
-          },
-          status: TaskStatus.PROGRESS,
-          log: [petaTagId, petaImageId]
-        });
-      }, petaTagIds).value;
-    }, petaImageIds).value;
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.updateDatas",
-      status: TaskStatus.COMPLETE,
-      log: []
-    });
-    if (mode != UpdateMode.UPDATE) {
-      this.emitMainEvent("updatePetaTags");
-    }
+    return Tasks.spawn("UpdatePetaImagesPetaTags", async (handler) => {
+      handler.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        status: "begin",
+        log: []
+      });
+      await promiseSerial(async (petaImageId, iIndex) => {
+        await promiseSerial(async (petaTagId, tIndex) => {
+          await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
+          handler.emitStatus({
+            i18nKey: "tasks.updateDatas",
+            progress: {
+              all: petaImageIds.length * petaTagIds.length,
+              current: iIndex * petaTagIds.length + tIndex + 1,
+            },
+            status: "progress",
+            log: [petaTagId, petaImageId]
+          });
+        }, petaTagIds).value;
+      }, petaImageIds).value;
+      handler.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        status: "complete",
+        log: []
+      });
+      if (mode != UpdateMode.UPDATE) {
+        this.emitMainEvent("updatePetaTags");
+      }
+    }, {});
   }
   async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
@@ -266,95 +268,95 @@ export class PetaDatas {
     }
   }
   async importImagesFromFilePaths(filePaths: string[]) {
-    if (this.cancelImportImages) {
-      this.cancelImportImages();
-      this.cancelImportImages = undefined;
-    }
-    const log = this.mainLogger.logChunk();
-    log.log("##Import Images From File Paths");
-    log.log("###List Files", filePaths.length);
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.listingFiles",
-      status: TaskStatus.BEGIN,
-      log: []
-    });
-    // emitMainEvent("taskProgress", {
-    //   progress: 0,
-    //   file: filePaths.join("\n"),
-    //   result: ImportImageResult.LIST
-    // });
-    const _filePaths: string[] = [];
-    try {
-      for (let i = 0; i < filePaths.length; i++) {
-        const filePath = filePaths[i];
-        if (!filePath) continue;
-        const readDirResult = file.readDirRecursive(filePath, (filePaths) => {
-          // console.log(filePaths);
-        });
-        this.cancelImportImages = readDirResult.cancel;
-        _filePaths.push(...(await readDirResult.files));
-      }
-    } catch (error) {
-      this.emitMainEvent("taskStatus", {
+    return Tasks.spawn("ImportImagesFromFilePaths", async (handler) => {
+      const log = this.mainLogger.logChunk();
+      log.log("##Import Images From File Paths");
+      log.log("###List Files", filePaths.length);
+      handler.emitStatus({
         i18nKey: "tasks.listingFiles",
-        status: TaskStatus.FAILED,
-        log: ["tasks.listingFiles.logs.failed"]
+        status: "begin",
+        log: [],
+        cancelable: true
       });
-      return [];
-    }
-    log.log("complete", _filePaths.length);
-    let addedFileCount = 0;
-    const petaImages: PetaImage[] = [];
-    const importImage = async (filePath: string, index: number) => {
-      log.log("import:", index + 1, "/", _filePaths.length);
-      let result = ImportImageResult.SUCCESS;
+      // emitMainEvent("taskProgress", {
+      //   progress: 0,
+      //   file: filePaths.join("\n"),
+      //   result: ImportImageResult.LIST
+      // });
+      const _filePaths: string[] = [];
       try {
-        const data = await file.readFile(filePath);
-        const name = Path.basename(filePath);
-        const fileDate = (await file.stat(filePath)).mtime;
-        const addResult = await this.importImage({
-          data, name, fileDate
-        });
-        petaImages.push(addResult.petaImage);
-        if (addResult.exists) {
-          result = ImportImageResult.EXISTS;
-        } else {
-          addedFileCount++;
+        for (let i = 0; i < filePaths.length; i++) {
+          const filePath = filePaths[i];
+          if (!filePath) continue;
+          const readDirResult = file.readDirRecursive(filePath, (filePaths) => {
+            // console.log(filePaths);
+          });
+          handler.onCancel = readDirResult.cancel;
+          _filePaths.push(...(await readDirResult.files));
         }
-        log.log("imported", result);
-      } catch (err) {
-        log.error(err);
-        result = ImportImageResult.ERROR;
+      } catch (error) {
+        handler.emitStatus({
+          i18nKey: "tasks.listingFiles",
+          status: "failed",
+          log: ["tasks.listingFiles.logs.failed"],
+          cancelable: true
+        });
+        return [];
       }
-      this.emitMainEvent("taskStatus", {
+      log.log("complete", _filePaths.length);
+      let addedFileCount = 0;
+      const petaImages: PetaImage[] = [];
+      const importImage = async (filePath: string, index: number) => {
+        log.log("import:", index + 1, "/", _filePaths.length);
+        let result = ImportImageResult.SUCCESS;
+        try {
+          const data = await file.readFile(filePath);
+          const name = Path.basename(filePath);
+          const fileDate = (await file.stat(filePath)).mtime;
+          const addResult = await this.importImage({
+            data, name, fileDate
+          });
+          petaImages.push(addResult.petaImage);
+          if (addResult.exists) {
+            result = ImportImageResult.EXISTS;
+          } else {
+            addedFileCount++;
+          }
+          log.log("imported", result);
+        } catch (err) {
+          log.error(err);
+          result = ImportImageResult.ERROR;
+        }
+        handler.emitStatus({
+          i18nKey: "tasks.importingFiles",
+          progress: {
+            all: _filePaths.length,
+            current: index + 1,
+          },
+          log: [result, filePath],
+          status: "progress",
+          cancelable: true
+        });
+      }
+      const result = promiseSerial(importImage, _filePaths);
+      handler.onCancel = result.cancel;
+      try {
+        await result.value;
+      } catch (err) {
+        //
+      }
+      log.log("return:", addedFileCount, "/", _filePaths.length);
+      handler.emitStatus({
         i18nKey: "tasks.importingFiles",
-        progress: {
-          all: _filePaths.length,
-          current: index + 1,
-        },
-        log: [result, filePath],
-        status: TaskStatus.PROGRESS
+        log: [addedFileCount.toString(), _filePaths.length.toString()],
+        status: addedFileCount == _filePaths.length ? "complete" : "failed"
       });
-    }
-    const result = promiseSerial(importImage, _filePaths);
-    this.cancelImportImages = result.cancel;
-    try {
-      await result.value;
-    } catch (err) {
-      //
-    }
-    this.cancelImportImages = undefined;
-    log.log("return:", addedFileCount, "/", _filePaths.length);
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.importingFiles",
-      log: [addedFileCount.toString(), _filePaths.length.toString()],
-      status: addedFileCount == _filePaths.length ? TaskStatus.COMPLETE : TaskStatus.FAILED
-    });
-    if (this.datas.dataSettings.data.autoAddTag) {
-      this.emitMainEvent("updatePetaTags");
-    }
-    this.emitMainEvent("updatePetaImages");
-    return petaImages;
+      if (this.datas.dataSettings.data.autoAddTag) {
+        this.emitMainEvent("updatePetaTags");
+      }
+      this.emitMainEvent("updatePetaImages");
+      return petaImages;
+    }, {});
   }
   async getPetaBoards() {
     const log = this.mainLogger.logChunk();
@@ -374,89 +376,96 @@ export class PetaDatas {
     }
   }
   async waifu2x(petaImage: PetaImage) {
-    const log = this.mainLogger.logChunk();
-    const inputFile = this.getImagePath(petaImage, ImageType.ORIGINAL);
-    const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
-    const execFilePath = this.datas.dataSettings.data.waifu2x.execFilePath;
-    const parameters = this.datas.dataSettings.data.waifu2x.parameters.map((param) => {
-      if (param === "$$INPUT$$") {
-        return inputFile;
-      }
-      if (param === "$$OUTPUT$$") {
-        return outputFile;
-      }
-      return param;
-    });
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.upconverting",
-      log: [JSON.stringify(parameters, null, 2)],
-      status: TaskStatus.BEGIN
-    });
-    log.log("execFilePath:", execFilePath);
-    log.log("parameters:", parameters);
-    const encoding: BufferEncoding = process.platform == "win32" ? "utf16le" : "utf8";
-    log.log("encoding:", encoding);
-    const result = await runExternalApplication(
-      Path.resolve(execFilePath),
-      parameters,
-      encoding,
-      (l) => {
-        log.log(l);
-        this.emitMainEvent("taskStatus", {
+    return Tasks.spawn("waifu2x", async (handler) => {
+      const log = this.mainLogger.logChunk();
+      const inputFile = this.getImagePath(petaImage, ImageType.ORIGINAL);
+      const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
+      const execFilePath = this.datas.dataSettings.data.waifu2x.execFilePath;
+      const parameters = this.datas.dataSettings.data.waifu2x.parameters.map((param) => {
+        if (param === "$$INPUT$$") {
+          return inputFile;
+        }
+        if (param === "$$OUTPUT$$") {
+          return outputFile;
+        }
+        return param;
+      });
+      handler.emitStatus({
+        i18nKey: "tasks.upconverting",
+        log: [JSON.stringify(parameters, null, 2)],
+        status: "begin",
+        cancelable: true
+      });
+      log.log("execFilePath:", execFilePath);
+      log.log("parameters:", parameters);
+      const encoding: BufferEncoding = process.platform == "win32" ? "utf16le" : "utf8";
+      log.log("encoding:", encoding);
+      const childProcess = runExternalApplication(
+        Path.resolve(execFilePath),
+        parameters,
+        encoding,
+        (l) => {
+          log.log(l);
+          handler.emitStatus({
+            i18nKey: "tasks.upconverting",
+            progress: {
+              all: 1,
+              current: 1,
+            },
+            log: [l],
+            status: "progress",
+            cancelable: true
+          });
+        }
+      );
+      handler.onCancel = childProcess.kill;
+      const result = await childProcess.promise;
+      handler.onCancel = undefined;
+      if (result) {
+        const newPetaImages = await this.importImagesFromFilePaths([outputFile]);
+        if (newPetaImages.length < 1) {
+          log.log("return: false");
+          return false;
+        }
+        const newPetaImage = newPetaImages[0];
+        if (!newPetaImage) {
+          log.log("return: false");
+          return false;
+        }
+        newPetaImage.addDate = petaImage.addDate;
+        newPetaImage.fileDate = petaImage.fileDate;
+        newPetaImage.name = petaImage.name;
+        log.log("update new petaImage");
+        await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
+        log.log("get tags");
+        const pipts = await this.datas.dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
+        log.log("tags:", pipts.length);
+        await promiseSerial(async (pipt, index) => {
+          log.log("copy tag: (", index, "/", pipts.length, ")");
+          const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
+          await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
+        }, pipts).value;
+        log.log(`add "before waifu2x" tag to old petaImage`);
+        const name = "before waifu2x";
+        const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
+        await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
+        await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
+        this.emitMainEvent("updatePetaTags");
+        log.log("return: true");
+        handler.emitStatus({
           i18nKey: "tasks.upconverting",
-          progress: {
-            all: 1,
-            current: 1,
-          },
-          log: [l],
-          status: TaskStatus.PROGRESS
+          log: [],
+          status: "complete"
         });
+        return true;
       }
-    );
-    if (result) {
-      const newPetaImages = await this.importImagesFromFilePaths([outputFile]);
-      if (newPetaImages.length < 1) {
-        log.log("return: false");
-        return false;
-      }
-      const newPetaImage = newPetaImages[0];
-      if (!newPetaImage) {
-        log.log("return: false");
-        return false;
-      }
-      newPetaImage.addDate = petaImage.addDate;
-      newPetaImage.fileDate = petaImage.fileDate;
-      newPetaImage.name = petaImage.name;
-      log.log("update new petaImage");
-      await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
-      log.log("get tags");
-      const pipts = await this.datas.dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
-      log.log("tags:", pipts.length);
-      await promiseSerial(async (pipt, index) => {
-        log.log("copy tag: (", index, "/", pipts.length, ")");
-        const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-        await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
-      }, pipts).value;
-      log.log(`add "before waifu2x" tag to old petaImage`);
-      const name = "before waifu2x";
-      const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-      await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
-      await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
-      this.emitMainEvent("updatePetaTags");
-      log.log("return: true");
-      this.emitMainEvent("taskStatus", {
+      handler.emitStatus({
         i18nKey: "tasks.upconverting",
         log: [],
-        status: TaskStatus.COMPLETE
+        status: "failed"
       });
-      return true;
-    }
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.upconverting",
-      log: [],
-      status: TaskStatus.FAILED
-    });
-    return false;
+      return false;
+    }, {});
   }
   async getPetaImages() {
     const data = await this.datas.dataPetaImages.find({});
@@ -467,63 +476,60 @@ export class PetaDatas {
     return petaImages;
   }
   async importImagesFromBuffers(buffers: Buffer[], name: string) {
-    if (this.cancelImportImages) {
-      this.cancelImportImages();
-      this.cancelImportImages = undefined;
-    }
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.importingFiles",
-      log: [],
-      status: TaskStatus.BEGIN
-    });
-    const log = this.mainLogger.logChunk();
-    log.log("##Import Images From Buffers");
-    log.log("buffers:", buffers.length);
-    let addedFileCount = 0;
-    const petaImages: PetaImage[] = [];
-    const importImage = async (buffer: Buffer, index: number) => {
-      log.log("import:", index + 1, "/", buffers.length);
-      let result = ImportImageResult.SUCCESS;
-      try {
-        const importResult = await this.importImage({
-          data: buffer, name
-        });
-        petaImages.push(importResult.petaImage);
-        if (importResult.exists) {
-          result = ImportImageResult.EXISTS;
-        } else {
-          addedFileCount++;
-        }
-        log.log("imported", name, result);
-      } catch (err) {
-        log.error(err);
-        result = ImportImageResult.ERROR;
-      }
-      this.emitMainEvent("taskStatus", {
+    return Tasks.spawn("ImportImagesFromBuffers", async (handler) => {
+      handler.emitStatus({
         i18nKey: "tasks.importingFiles",
-        progress: {
-          all: buffers.length,
-          current: index + 1,
-        },
-        log: [result, name],
-        status: TaskStatus.PROGRESS
+        log: [],
+        status: "begin"
       });
-    }
-    const result =  promiseSerial(importImage, buffers);
-    this.cancelImportImages = result.cancel;
-    await result.value;
-    this.cancelImportImages = undefined;
-    log.log("return:", addedFileCount, "/", buffers.length);
-    this.emitMainEvent("taskStatus", {
-      i18nKey: "tasks.importingFiles",
-      log: [addedFileCount.toString(), buffers.length.toString()],
-      status: addedFileCount == buffers.length ? TaskStatus.COMPLETE : TaskStatus.FAILED
-    });
-    if (this.datas.dataSettings.data.autoAddTag) {
-      this.emitMainEvent("updatePetaTags");
-    }
-    this.emitMainEvent("updatePetaImages");
-    return petaImages;
+      const log = this.mainLogger.logChunk();
+      log.log("##Import Images From Buffers");
+      log.log("buffers:", buffers.length);
+      let addedFileCount = 0;
+      const petaImages: PetaImage[] = [];
+      const importImage = async (buffer: Buffer, index: number) => {
+        log.log("import:", index + 1, "/", buffers.length);
+        let result = ImportImageResult.SUCCESS;
+        try {
+          const importResult = await this.importImage({
+            data: buffer, name
+          });
+          petaImages.push(importResult.petaImage);
+          if (importResult.exists) {
+            result = ImportImageResult.EXISTS;
+          } else {
+            addedFileCount++;
+          }
+          log.log("imported", name, result);
+        } catch (err) {
+          log.error(err);
+          result = ImportImageResult.ERROR;
+        }
+        handler.emitStatus({
+          i18nKey: "tasks.importingFiles",
+          progress: {
+            all: buffers.length,
+            current: index + 1,
+          },
+          log: [result, name],
+          status: "progress"
+        });
+      }
+      const result =  promiseSerial(importImage, buffers);
+      handler.onCancel = result.cancel;
+      await result.value;
+      log.log("return:", addedFileCount, "/", buffers.length);
+      handler.emitStatus({
+        i18nKey: "tasks.importingFiles",
+        log: [addedFileCount.toString(), buffers.length.toString()],
+        status: addedFileCount == buffers.length ? "complete" : "failed"
+      });
+      if (this.datas.dataSettings.data.autoAddTag) {
+        this.emitMainEvent("updatePetaTags");
+      }
+      this.emitMainEvent("updatePetaImages");
+      return petaImages;
+    }, {});
   }
   async getPetaImage(id: string) {
     return (await this.datas.dataPetaImages.find({ id }))[0];

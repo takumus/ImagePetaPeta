@@ -31,6 +31,7 @@ import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import { TaskStatus } from "@/commons/api/interfaces/task";
+import * as Tasks from "@/mainProcess/tasks/task";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -111,6 +112,9 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
     dataPetaTags = new DB<PetaTag>(FILE_TAGS_DB);
     dataPetaImagesPetaTags = new DB<PetaImagePetaTag>(FILE_IMAGES_TAGS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
+    Tasks.onEmitStatus((id, status) => {
+      emitMainEvent("taskStatus", id, status);
+    });
     petaDatas = new PetaDatas(
       {
         dataPetaBoards,
@@ -340,9 +344,17 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
           }
           return [];
         },
-        cancelImportImages: async () => {
-          if (petaDatas.cancelImportImages) {
-            petaDatas.cancelImportImages();
+        cancelTasks: async (event, ids) => {
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Cancel Tasks");
+            ids.forEach((id) => {
+              const name = Tasks.getTask(id)?.name;
+              log.log(`task: ${name}-${id}`);
+              Tasks.cancel(id);
+            });
+          } catch (error) {
+            log.error(error);
           }
         },
         getPetaImages: async (event) => {
@@ -364,49 +376,51 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
           return {};
         },
         updatePetaImages: async (event, datas, mode) => {
-          const log = mainLogger.logChunk();
-          log.log("#Update PetaImages");
-          emitMainEvent("taskStatus", {
-            i18nKey: "tasks.updateDatas",
-            log: [],
-            status: TaskStatus.BEGIN
-          });
-          try {
-            const update = async (data: PetaImage, index: number) => {
-              await petaDatas.updatePetaImage(data, mode);
-              emitMainEvent("taskStatus", {
-                i18nKey: "tasks.updateDatas",
-                progress: {
-                  all: datas.length,
-                  current: index + 1,
-                },
-                log: [data.id],
-                status: TaskStatus.PROGRESS
+          return Tasks.spawn("UpdatePetaImages", async (handler) => {
+            const log = mainLogger.logChunk();
+            log.log("#Update PetaImages");
+            handler.emitStatus({
+              i18nKey: "tasks.updateDatas",
+              log: [],
+              status: "begin"
+            });
+            try {
+              const update = async (data: PetaImage, index: number) => {
+                await petaDatas.updatePetaImage(data, mode);
+                handler.emitStatus({
+                  i18nKey: "tasks.updateDatas",
+                  progress: {
+                    all: datas.length,
+                    current: index + 1,
+                  },
+                  log: [data.id],
+                  status: "progress"
+                });
+              }
+              await promiseSerial(update, datas).value;
+              if (mode == UpdateMode.REMOVE) {
+                emitMainEvent("updatePetaTags");
+              }
+            } catch (err) {
+              log.error(err);
+              showError({
+                category: "M",
+                code: 200,
+                title: "Update PetaImages Error",
+                message: String(err)
               });
             }
-            await promiseSerial(update, datas).value;
-            if (mode == UpdateMode.REMOVE) {
-              emitMainEvent("updatePetaTags");
+            if (mode != UpdateMode.UPDATE) {
+              emitMainEvent("updatePetaImages");
             }
-          } catch (err) {
-            log.error(err);
-            showError({
-              category: "M",
-              code: 200,
-              title: "Update PetaImages Error",
-              message: String(err)
+            handler.emitStatus({
+              i18nKey: "tasks.updateDatas",
+              log: [],
+              status: "complete"
             });
-          }
-          if (mode != UpdateMode.UPDATE) {
-            emitMainEvent("updatePetaImages");
-          }
-          emitMainEvent("taskStatus", {
-            i18nKey: "tasks.updateDatas",
-            log: [],
-            status: TaskStatus.COMPLETE
-          });
-          log.log("return:", true);
-          return true;
+            log.log("return:", true);
+            return true;
+          }, {});
         },
         getPetaBoards: async (event) => {
           const log = mainLogger.logChunk();

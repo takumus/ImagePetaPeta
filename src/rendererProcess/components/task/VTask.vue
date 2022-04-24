@@ -14,7 +14,7 @@
         <button
           tabindex="-1"
           @click="cancel"
-          v-if="!canceled">
+          v-if="cancelable">
           {{$t("imageImporter.cancel")}}
         </button>
         <button
@@ -41,7 +41,7 @@ import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
-import { TaskStatus } from "@/commons/api/interfaces/task";
+import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 @Options({
   components: {
     VModal,
@@ -53,19 +53,21 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
 })
 export default class VTask extends Vue {
   progress = 100;
-  status = TaskStatus.COMPLETE;
+  status: TaskStatusCode = "complete";
+  currentTaskId = "";
   visible = false;
   log = "";
   currentMousePosition = new Vec2();
-  canceled = false;
+  cancelable = false;
   name = "";
   closeWindowHandler = -1;
   mounted() {
-    API.on("taskStatus", (e, task) => {
+    API.on("taskStatus", (e, id, task) => {
+      this.currentTaskId = id;
       window.clearTimeout(this.closeWindowHandler);
       this.name = task.i18nKey + ".name";
       this.progress = task.progress ? Math.floor(task.progress.current / task.progress.all * 100) : 0;
-      this.canceled = false;
+      this.cancelable = task.cancelable === true;
       this.status = task.status;
       this.visible = true;
       const i18nKey = `${task.i18nKey}.logs.${task.status}`;
@@ -74,22 +76,22 @@ export default class VTask extends Vue {
         console.warn(i18nKey, "にundefinedが含まれています。怪しい。");
         console.warn(localized);
       }
-      if (task.status == TaskStatus.BEGIN) {
+      if (task.status == "begin") {
         this.log = "";
       }
       this.addLog(`[${task.status}]${
-        task.status == TaskStatus.PROGRESS && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
+        task.status == "progress" && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
       }:${localized}`);
       Cursor.setCursor("wait");
-      if (task.status == TaskStatus.COMPLETE || task.status == TaskStatus.FAILED) {
-        if (task.status == TaskStatus.COMPLETE) {
+      if (task.status == "complete" || task.status == "failed") {
+        if (task.status == "complete") {
           this.closeWindowHandler = window.setTimeout(() => {
             this.visible = false;
           }, 200);
         }
         this.progress = 100;
         Cursor.setDefaultCursor();
-        this.canceled = true;
+        this.cancelable = false;
       }
     });
   }
@@ -100,10 +102,10 @@ export default class VTask extends Vue {
     this.visible = false;
   }
   get failed() {
-    return this.status == TaskStatus.FAILED;
+    return this.status == "failed";
   }
   cancel() {
-    API.send("cancelImportImages");
+    API.send("cancelTasks", [this.currentTaskId]);
   }
 }
 </script>

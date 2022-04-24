@@ -15,7 +15,7 @@ export interface MainFunctions {
   importImageFromURL: (url: string) => Promise<string>;
   importImagesFromFilePaths: (filePaths: string[]) => Promise<string[]>;
   importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
-  cancelImportImages: () => Promise<void>;
+  cancelTasks: (ids: string[]) => Promise<void>;
   getPetaImages: () => Promise<PetaImages>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<PetaBoard[]>;

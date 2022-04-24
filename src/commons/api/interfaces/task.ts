@@ -1,15 +1,11 @@
-export interface Task {
+export interface TaskStatus {
   i18nKey: string,
   progress?: {
     current: number
     all: number
   }
   log: string[],
-  status: TaskStatus
+  status: TaskStatusCode,
+  cancelable?: boolean
 }
-export enum TaskStatus {
-  COMPLETE = "complete",
-  FAILED = "failed",
-  PROGRESS = "progress",
-  BEGIN = "begin"
-}
+export type TaskStatusCode = "complete" | "failed" | "progress" | "begin";
