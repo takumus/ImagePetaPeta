@@ -4,8 +4,9 @@ export class MainLogger {
   constructor(public logger?: Logger) {
     //
   }
-  logChunk() {
-    const id = uuid().substring(0, 4);
+  logChunk(label?: string) {
+    const uid = uuid().substring(0, 4);
+    const id = label ? `${label}(${uid})` : uid;
     return {
       log: (...args: any[]) => {
         this.logger?.log(LogFrom.MAIN, id, ...args);

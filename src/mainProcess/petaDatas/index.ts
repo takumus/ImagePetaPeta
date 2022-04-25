@@ -65,6 +65,39 @@ export class PetaDatas {
     // emitMainEvent("updatePetaImage", petaImage);
     return true;
   }
+  async updatePetaImages(datas: PetaImage[], mode: UpdateMode) {
+    return Tasks.spawn("UpdatePetaImages", async (handler) => {
+      handler.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        log: [],
+        status: "begin"
+      });
+      const update = async (data: PetaImage, index: number) => {
+        await this.updatePetaImage(data, mode);
+        handler.emitStatus({
+          i18nKey: "tasks.updateDatas",
+          progress: {
+            all: datas.length,
+            current: index + 1,
+          },
+          log: [data.id],
+          status: "progress"
+        });
+      }
+      await promiseSerial(update, datas).value;
+      if (mode == UpdateMode.REMOVE) {
+        this.emitMainEvent("updatePetaTags");
+      }
+      if (mode != UpdateMode.UPDATE) {
+        this.emitMainEvent("updatePetaImages");
+      }
+      handler.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        log: [],
+        status: "complete"
+      });
+    }, {});
+  }
   async updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaBoard");

@@ -379,28 +379,8 @@ import * as Tasks from "@/mainProcess/tasks/task";
           return Tasks.spawn("UpdatePetaImages", async (handler) => {
             const log = mainLogger.logChunk();
             log.log("#Update PetaImages");
-            handler.emitStatus({
-              i18nKey: "tasks.updateDatas",
-              log: [],
-              status: "begin"
-            });
             try {
-              const update = async (data: PetaImage, index: number) => {
-                await petaDatas.updatePetaImage(data, mode);
-                handler.emitStatus({
-                  i18nKey: "tasks.updateDatas",
-                  progress: {
-                    all: datas.length,
-                    current: index + 1,
-                  },
-                  log: [data.id],
-                  status: "progress"
-                });
-              }
-              await promiseSerial(update, datas).value;
-              if (mode == UpdateMode.REMOVE) {
-                emitMainEvent("updatePetaTags");
-              }
+              await petaDatas.updatePetaImages(datas, mode);
             } catch (err) {
               log.error(err);
               showError({
@@ -410,14 +390,6 @@ import * as Tasks from "@/mainProcess/tasks/task";
                 message: String(err)
               });
             }
-            if (mode != UpdateMode.UPDATE) {
-              emitMainEvent("updatePetaImages");
-            }
-            handler.emitStatus({
-              i18nKey: "tasks.updateDatas",
-              log: [],
-              status: "complete"
-            });
             log.log("return:", true);
             return true;
           }, {});
