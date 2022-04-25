@@ -307,7 +307,7 @@ export default class VBrowser extends Vue {
       {
         label: this.$t("browser.petaImageMenu.waifu2x"),
         click: async () => {
-          await API.send("waifu2xConvert", thumb.petaImage);
+          await API.send("waifu2xConvert", this.selectedPetaImages);
         }
       },
     ], position);

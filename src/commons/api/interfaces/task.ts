@@ -4,7 +4,7 @@ export interface TaskStatus {
     current: number
     all: number
   }
-  log: string[],
+  log?: string[],
   status: TaskStatusCode,
   cancelable?: boolean
 }

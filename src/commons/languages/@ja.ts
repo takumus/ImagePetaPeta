@@ -187,9 +187,11 @@ const ja = {
     upconverting: {
       name: "waifu2xで変換しています。",
       logs: {
-        begin: "開始",
+        begin: (ctx: any) => {
+          return `${ctx.list(0)}枚の画像を変換します。`;
+        },
         progress: (ctx: any) => {
-          return ctx.list(0)
+          return `waifu2xログ: ${ctx.list(0)}`;
         },
         complete: "完了",
         failed: "失敗"

@@ -408,96 +408,101 @@ export class PetaDatas {
       return data;
     }
   }
-  async waifu2x(petaImage: PetaImage) {
+  async waifu2x(petaImages: PetaImage[]) {
     return Tasks.spawn("waifu2x", async (handler) => {
       const log = this.mainLogger.logChunk();
-      const inputFile = this.getImagePath(petaImage, ImageType.ORIGINAL);
-      const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
-      const execFilePath = this.datas.dataSettings.data.waifu2x.execFilePath;
-      const parameters = this.datas.dataSettings.data.waifu2x.parameters.map((param) => {
-        if (param === "$$INPUT$$") {
-          return inputFile;
-        }
-        if (param === "$$OUTPUT$$") {
-          return outputFile;
-        }
-        return param;
-      });
+      const execFilePath = Path.resolve(this.datas.dataSettings.data.waifu2x.execFilePath);
+      let success = true;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
-        log: [JSON.stringify(parameters, null, 2)],
+        log: [petaImages.length.toString()],
         status: "begin",
         cancelable: true
       });
       log.log("execFilePath:", execFilePath);
-      log.log("parameters:", parameters);
-      const encoding: BufferEncoding = process.platform == "win32" ? "utf16le" : "utf8";
-      log.log("encoding:", encoding);
-      const childProcess = runExternalApplication(
-        Path.resolve(execFilePath),
-        parameters,
-        encoding,
-        (l) => {
-          log.log(l);
-          handler.emitStatus({
-            i18nKey: "tasks.upconverting",
-            progress: {
-              all: 1,
-              current: 1,
-            },
-            log: [l],
-            status: "progress",
-            cancelable: true
-          });
-        }
-      );
-      handler.onCancel = childProcess.kill;
-      const result = await childProcess.promise;
-      handler.onCancel = undefined;
-      if (result) {
-        const newPetaImages = await this.importImagesFromFilePaths([outputFile]);
-        if (newPetaImages.length < 1) {
-          log.log("return: false");
-          return false;
-        }
-        const newPetaImage = newPetaImages[0];
-        if (!newPetaImage) {
-          log.log("return: false");
-          return false;
-        }
-        newPetaImage.addDate = petaImage.addDate;
-        newPetaImage.fileDate = petaImage.fileDate;
-        newPetaImage.name = petaImage.name;
-        log.log("update new petaImage");
-        await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
-        log.log("get tags");
-        const pipts = await this.datas.dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
-        log.log("tags:", pipts.length);
-        await promiseSerial(async (pipt, index) => {
-          log.log("copy tag: (", index, "/", pipts.length, ")");
-          const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-          await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
-        }, pipts).value;
-        log.log(`add "before waifu2x" tag to old petaImage`);
-        const name = "before waifu2x";
-        const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-        await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
-        await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
-        this.emitMainEvent("updatePetaTags");
-        log.log("return: true");
+      await promiseSerial(async (petaImage, index) => {
+        const inputFile = this.getImagePath(petaImage, ImageType.ORIGINAL);
+        const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
+        const parameters = this.datas.dataSettings.data.waifu2x.parameters.map((param) => {
+          if (param === "$$INPUT$$") {
+            return inputFile;
+          }
+          if (param === "$$OUTPUT$$") {
+            return outputFile;
+          }
+          return param;
+        });
+        const childProcess = runExternalApplication(
+          execFilePath,
+          parameters,
+          process.platform == "win32" ? "utf16le" : "utf8",
+          (l) => {
+            log.log(l);
+            handler.emitStatus({
+              i18nKey: "tasks.upconverting",
+              progress: {
+                all: petaImages.length,
+                current: index + 1
+              },
+              log: [l],
+              status: "progress",
+              cancelable: true
+            });
+          }
+        );
+        handler.onCancel = childProcess.kill;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",
-          log: [],
-          status: "complete"
+          progress: {
+            all: petaImages.length,
+            current: index + 1
+          },
+          log: [[execFilePath, ...parameters].join(" ")],
+          status: "progress",
+          cancelable: true
         });
-        return true;
-      }
+        const result = await childProcess.promise;
+        handler.onCancel = undefined;
+        if (result) {
+          const newPetaImages = await this.importImagesFromFilePaths([outputFile]);
+          if (newPetaImages.length < 1) {
+            log.log("return: false");
+            return false;
+          }
+          const newPetaImage = newPetaImages[0];
+          if (!newPetaImage) {
+            log.log("return: false");
+            return false;
+          }
+          newPetaImage.addDate = petaImage.addDate;
+          newPetaImage.fileDate = petaImage.fileDate;
+          newPetaImage.name = petaImage.name;
+          log.log("update new petaImage");
+          await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
+          log.log("get tags");
+          const pipts = await this.datas.dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
+          log.log("tags:", pipts.length);
+          await promiseSerial(async (pipt, index) => {
+            log.log("copy tag: (", index, "/", pipts.length, ")");
+            const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
+            await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
+          }, pipts).value;
+          log.log(`add "before waifu2x" tag to old petaImage`);
+          const name = "before waifu2x";
+          const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
+          await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
+          await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
+          this.emitMainEvent("updatePetaTags");
+        } else {
+          success = false;
+        }
+      }, petaImages).value;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
         log: [],
-        status: "failed"
+        status: success ? "complete" : "failed"
       });
-      return false;
+      return success;
     }, {});
   }
   async getPetaImages() {

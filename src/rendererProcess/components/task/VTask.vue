@@ -58,7 +58,7 @@ export default class VTasks extends Vue {
     this.cancelable = task.cancelable === true;
     this.status = task.status;
     const i18nKey = `${task.i18nKey}.logs.${task.status}`;
-    const localized = this.$t(i18nKey, task.log);
+    const localized = this.$t(i18nKey, task.log || []);
     if (localized.indexOf("undefined") >= 0) {
       console.warn(i18nKey, "にundefinedが含まれています。怪しい。");
       console.warn(localized);

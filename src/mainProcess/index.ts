@@ -723,10 +723,10 @@ import * as Tasks from "@/mainProcess/tasks/task";
           dataStates.save();
           return;
         },
-        waifu2xConvert: async (event, petaImage) => {
+        waifu2xConvert: async (event, petaImages) => {
           const log = mainLogger.logChunk();
           log.log("#Waifu2x Convert");
-          const result = await petaDatas.waifu2x(petaImage);
+          const result = await petaDatas.waifu2x(petaImages);
           log.log("return:", result);
           return result;
         }
