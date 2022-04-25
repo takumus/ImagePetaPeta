@@ -472,36 +472,6 @@ export default class VTabBar extends Vue {
     box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
     position: relative;
     border-bottom: solid 1px var(--bg-color);
-    button {
-      min-width: 24px;
-      padding: 0px;
-      height: 100%;
-      margin: 0px;
-      span {
-        display: block;
-        width: 100%;
-        height: 100%;
-        background-size: 14px;
-        background-repeat: no-repeat;
-        background-position: center center;
-        filter: var(--icon-filter);
-        &.browser {
-          background-image: url("~@/@assets/browser.png");
-        }
-        &.import-file {
-          background-image: url("~@/@assets/importFile.png");
-        }
-        &.import-folder {
-          background-image: url("~@/@assets/importFolder.png");
-        }
-        &.settings {
-          background-image: url("~@/@assets/settings.png");
-        }
-        &.info {
-          background-image: url("~@/@assets/info.png");
-        }
-      }
-    }
     >.shared-buttons {
       position: absolute;
       top: 0px;
@@ -521,6 +491,39 @@ export default class VTabBar extends Vue {
         right: 0px;
         button {
           margin-left: 4px;
+        }
+      }
+      &.left ,&.right {
+        >button {
+          min-width: 24px;
+          padding: 0px;
+          height: 100%;
+          margin: 0px;
+          border: none;
+          span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-size: 14px;
+            background-repeat: no-repeat;
+            background-position: center center;
+            filter: var(--icon-filter);
+            &.browser {
+              background-image: url("~@/@assets/browser.png");
+            }
+            &.import-file {
+              background-image: url("~@/@assets/importFile.png");
+            }
+            &.import-folder {
+              background-image: url("~@/@assets/importFolder.png");
+            }
+            &.settings {
+              background-image: url("~@/@assets/settings.png");
+            }
+            &.info {
+              background-image: url("~@/@assets/info.png");
+            }
+          }
         }
       }
     }
@@ -544,6 +547,10 @@ export default class VTabBar extends Vue {
         border: none;
       }
       >button {
+        min-width: 24px;
+        padding: 0px;
+        height: 100%;
+        margin: 0px;
         min-width: 50px;
         margin-right: 4px;
         &.color {
