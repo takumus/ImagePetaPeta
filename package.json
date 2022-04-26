@@ -1,7 +1,7 @@
 {
   "name": "imagepetapeta-beta",
   "productName": "ImagePetaPeta-beta",
-  "version": "2.5.5-beta",
+  "version": "2.5.6-beta",
   "binary-sha256-win": "da33a086faf6bf140c7042f0d8c2f25062d34a4241321245fceec39d420202d8",
   "binary-sha256-mac": "",
   "private": true,
