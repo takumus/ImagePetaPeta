@@ -4,7 +4,7 @@
 ## インストール
 ### Windows
 下記よりzipファイルをダウンロードしてインストールしてください。  
-<https://github.com/takumus/ImagePetaPeta/releases/tag/2.5.1-beta>  
+<https://github.com/takumus/ImagePetaPeta/releases/tag/2.5.2-beta>  
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
 <img src="./README/install01.png" width="256px">
 <img src="./README/install02.png" width="256px">
