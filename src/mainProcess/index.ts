@@ -845,19 +845,19 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
     } catch (error) {
       log.error(error);
     }
-    const url = `https://github.com/takumus/ImagePetaPeta/releases/download/${remote.version}/ImagePetaPeta-beta.Setup.${remote.version}.exe`;
-    log.log("download binary:", url);
-    // バイナリをダウンロード
-    const result = await axios.get(
-      url,
-      {
-        responseType: "arraybuffer",
-        onDownloadProgress: (event) => {
-          // console.log(event);
-        }
-      }
-    );
     try {
+      const url = `https://github.com/takumus/ImagePetaPeta/releases/download/${remote.version}/ImagePetaPeta-beta.Setup.${remote.version}.exe`;
+      log.log("download binary:", url);
+      // バイナリをダウンロード
+      const result = await axios.get(
+        url,
+        {
+          responseType: "arraybuffer",
+          onDownloadProgress: (event) => {
+            // console.log(event);
+          }
+        }
+      );
       log.log("binary downloaded:", url);
       // 保存
       await file.writeFile(updateInstallerFilePath, result.data);
