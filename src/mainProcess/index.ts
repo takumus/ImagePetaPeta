@@ -8,7 +8,7 @@ import { createI18n } from "vue-i18n";
 import AdmZip from "adm-zip";
 import { spawn } from "child_process";
 import languages from "@/commons/languages";
-import { PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { DOWNLOAD_URL, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -32,6 +32,7 @@ import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/err
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import * as Tasks from "@/mainProcess/tasks/task";
+import { isLatest } from "@/commons/utils/versionCheck";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -51,6 +52,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
   let DIR_IMAGES: string;
   let DIR_THUMBNAILS: string;
   let DIR_TEMP: string;
+  let DIR_DOWNLOAD: string;
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
   let FILE_TAGS_DB: string;
@@ -65,6 +67,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
   let petaDatas: PetaDatas;
+  let updateInstallerFilePath: string;
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
@@ -84,6 +87,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
     DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
+    DIR_DOWNLOAD = file.initDirectory(false, app.getPath("downloads"));
     dataSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
     if (dataSettings.data.petaImageDirectory.default) {
       DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
@@ -353,9 +357,11 @@ import * as Tasks from "@/mainProcess/tasks/task";
               log.log(`task: ${name}-${id}`);
               Tasks.cancel(id);
             });
+            return;
           } catch (error) {
             log.error(error);
           }
+          return;
         },
         getPetaImages: async (event) => {
           const log = mainLogger.logChunk();
@@ -381,6 +387,8 @@ import * as Tasks from "@/mainProcess/tasks/task";
             log.log("#Update PetaImages");
             try {
               await petaDatas.updatePetaImages(datas, mode);
+              log.log("return:", true);
+              return true;
             } catch (err) {
               log.error(err);
               showError({
@@ -390,8 +398,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
                 message: String(err)
               });
             }
-            log.log("return:", true);
-            return true;
+            return false;
           }, {});
         },
         getPetaBoards: async (event) => {
@@ -592,11 +599,11 @@ import * as Tasks from "@/mainProcess/tasks/task";
             log.log("#Update Settings");
             dataSettings.data = settings;
             window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
-            await dataSettings.save();
+            dataSettings.save();
             log.log("return:", dataSettings.data);
             return true;
           } catch(e) {
-            log.log(e);
+            log.error(e);
             showError({
               category: "M",
               code: 200,
@@ -656,7 +663,9 @@ import * as Tasks from "@/mainProcess/tasks/task";
             log.log("#Regenerate Thumbnails");
             log.log("preset:", dataSettings.data.thumbnails);
             await petaDatas.regenerateThumbnails();
+            return;
           } catch (err) {
+            log.error(err);
             showError({
               category: "M",
               code: 200,
@@ -664,6 +673,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
               message: String(err)
             });
           }
+          return;
         },
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
@@ -707,8 +717,8 @@ import * as Tasks from "@/mainProcess/tasks/task";
             return true;
           } catch(error) {
             log.error(error);
-            return false;
           }
+          return false;
         },
         getStates: async (event) => {
           const log = mainLogger.logChunk();
@@ -717,18 +727,40 @@ import * as Tasks from "@/mainProcess/tasks/task";
         },
         setSelectedPetaBoard: async (event, petaBoardId: string) => {
           const log = mainLogger.logChunk();
-          log.log("#Set Selected PetaBoard");
-          log.log("id:", minimId(petaBoardId));
-          dataStates.data.selectedPetaBoardId = petaBoardId;
-          dataStates.save();
+          try {
+            log.log("#Set Selected PetaBoard");
+            log.log("id:", minimId(petaBoardId));
+            dataStates.data.selectedPetaBoardId = petaBoardId;
+            dataStates.save();
+          } catch (error) {
+            log.error(error);
+          }
           return;
         },
         waifu2xConvert: async (event, petaImages) => {
           const log = mainLogger.logChunk();
-          log.log("#Waifu2x Convert");
-          const result = await petaDatas.waifu2x(petaImages);
-          log.log("return:", result);
-          return result;
+          try {
+            log.log("#Waifu2x Convert");
+            const result = await petaDatas.waifu2x(petaImages);
+            log.log("return:", result);
+            return result;
+          } catch (error) {
+            log.error(error);
+          }
+          return false;
+        },
+        installUpdate: async (event) => {
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Install Update");
+            log.log("path:", updateInstallerFilePath);
+            file.initFile(updateInstallerFilePath);
+            shell.openPath(updateInstallerFilePath);
+            return true;
+          } catch (error) {
+            log.error(error);
+          }
+          return false;
         }
       }
     }
@@ -822,26 +854,51 @@ import * as Tasks from "@/mainProcess/tasks/task";
         console.log(event);
       }
     });
-    const zipFilePath = Path.resolve(DIR_TEMP, `${version}.zip`);
-    const setupFilePath = Path.resolve(DIR_TEMP, `${version}.exe`);
-    await file.writeFile(zipFilePath, result.data);
-    const zip = new AdmZip(zipFilePath);
+    // const zipFilePath = Path.resolve(DIR_DOWNLOAD, `${version}.zip`);
+    const setupFilePath = Path.resolve(DIR_DOWNLOAD, `${version}.exe`);
+    // await file.writeFile(zipFilePath, result.data);
+    const zip = new AdmZip(result.data);
     const zipEntries = zip.getEntries();
-    const setupFile = zipEntries.find((entry) => entry.entryName === `ImagePetaPeta-beta Setup ${version}.exe`);
+    const setupFile = zipEntries.find((entry) => entry.entryName.split(".").pop() === "exe");
     if (setupFile) {
       setupFile.getDataAsync(async (data) => {
         await file.writeFile(setupFilePath, data);
-        console.log("downloaded");
-        spawn("powershell", [
-          `start-process`, setupFilePath,
-          `-verb`, `runas`
-        ]);
+        updateInstallerFilePath = setupFilePath;
+        emitMainEvent("notifyUpdate", app.getVersion(), version);
+        // console.log("downloaded");
+        // shell.openPath(setupFilePath);
       });
+    }
+  }
+  async function getLatestVersion() {
+    const log = mainLogger.logChunk();
+    try {
+      const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
+      const packageJSON = (await axios.get(url, { responseType: "json" })).data;
+      return {
+        current: app.getVersion(),
+        latest: packageJSON.version
+      }
+    } catch(e) {
+      log.error(e);
+    }
+    return {
+      current: app.getVersion(),
+      latest: app.getVersion()
+    };
+  }
+  async function checkUpdate() {
+    const versions = await getLatestVersion();
+    const needToUpdate = !isLatest(versions.current, versions.latest, dataSettings.data.ignoreMinorUpdate);
+    console.log(versions, needToUpdate);
+    if (needToUpdate) {
+      downloadAndExtractUpdata(versions.latest);
     }
   }
   function relaunch() {
     app.relaunch();
     app.exit();
   }
+  checkUpdate();
   // downloadAndExtractUpdata("2.5.0-beta");
 })();

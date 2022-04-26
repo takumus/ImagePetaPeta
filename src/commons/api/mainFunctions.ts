@@ -47,4 +47,5 @@ export interface MainFunctions {
   changePetaImageDirectory: (path: string) => Promise<boolean>;
   setSelectedPetaBoard: (petaBoardId: string) => Promise<void>;
   waifu2xConvert: (petaImages: PetaImage[]) => Promise<boolean>;
+  installUpdate: () => Promise<boolean>;
 }
