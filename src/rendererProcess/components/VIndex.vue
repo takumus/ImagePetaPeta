@@ -125,14 +125,15 @@ export default class Index extends Vue {
       // log("vIndex", "on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
-    API.on("notifyUpdate", async (event, current, latest) => {
-      if (
-        this.$systemInfo.platform == "win32"
-        && await this.$components.dialog.show(
-          this.$t("utils.updateDialog", [current, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
-        ) == 0
-      ) {
+    API.on("notifyUpdate", async (event, latest, downloaded) => {
+      if (downloaded && await this.$components.dialog.show(
+        this.$t("utils.installUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
+      ) == 0) {
         await API.send("installUpdate");
+        API.send("openURL", `${DOWNLOAD_URL}${latest}`);
+      } else if (!downloaded && await this.$components.dialog.show(
+        this.$t("utils.downloadUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
+      ) == 0) {
         API.send("openURL", `${DOWNLOAD_URL}${latest}`);
       }
     });

@@ -890,16 +890,19 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
     }
   }
   async function checkUpdate() {
+    if (process.platform != "win32") {
+      return;
+    }
     const log = mainLogger.logChunk();
     log.log("$Check Update");
     const remote: RemoteBinaryInfo = await getLatestVersion();
     const needToUpdate = !isLatest(app.getVersion(), remote.version, dataSettings.data.ignoreMinorUpdate);
     log.log(remote, needToUpdate);
     if (needToUpdate) {
-      log.log("this version is latest");
-      await prepareUpdate(remote);
-    } else {
       log.log("this version is old");
+      prepareUpdate(remote);
+    } else {
+      log.log("this version is latest");
     }
     setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
