@@ -8,7 +8,7 @@ import { createI18n } from "vue-i18n";
 import AdmZip from "adm-zip";
 import { spawn } from "child_process";
 import languages from "@/commons/languages";
-import { DOWNLOAD_URL, PACKAGE_JSON_URL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { DOWNLOAD_URL, PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -30,9 +30,10 @@ import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "@/mainProcess/petaDatas";
-import { TaskStatus } from "@/commons/api/interfaces/task";
+import crypto from "crypto";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { isLatest } from "@/commons/utils/versionCheck";
+import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -272,7 +273,7 @@ import { isLatest } from "@/commons/utils/versionCheck";
     } {
       return {
         showMainWindow: async () => {
-          window.show();
+          checkUpdate();
         },
         importImageFiles: async () => {
           const log = mainLogger.logChunk();
@@ -572,27 +573,6 @@ import { isLatest } from "@/commons/utils/versionCheck";
           shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
-        checkUpdate: async (event) => {
-          const log = mainLogger.logChunk();
-          try {
-            log.log("#Check Update");
-            const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
-            log.log("url:", url);
-            log.log("currentVersion:", app.getVersion());
-            const packageJSON = (await axios.get(url, { responseType: "json" })).data;
-            log.log("latestVersion:", packageJSON.version);
-            return {
-              current: app.getVersion(),
-              latest: packageJSON.version
-            }
-          } catch(e) {
-            log.error(e);
-          }
-          return {
-            current: app.getVersion(),
-            latest: app.getVersion()
-          };
-        },
         updateSettings: async (event, settings) => {
           const log = mainLogger.logChunk();
           try {
@@ -754,7 +734,6 @@ import { isLatest } from "@/commons/utils/versionCheck";
           try {
             log.log("#Install Update");
             log.log("path:", updateInstallerFilePath);
-            file.initFile(updateInstallerFilePath);
             shell.openPath(updateInstallerFilePath);
             return true;
           } catch (error) {
@@ -846,59 +825,86 @@ import { isLatest } from "@/commons/utils/versionCheck";
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
     return window;
   }
-  async function downloadAndExtractUpdata(version: string) {
-    const url = `https://github.com/takumus/ImagePetaPeta/releases/download/${version}/ImagePetaPeta-beta.Setup.${version}.zip`;
-    const result = await axios.get(url, {
-      responseType: "arraybuffer",
-      onDownloadProgress: (event) => {
-        console.log(event);
+  async function prepareUpdate(remote: RemoteBinaryInfo) {
+    updateInstallerFilePath = Path.resolve(DIR_DOWNLOAD, `ImagePetaPeta-${remote.version}.exe`);
+    const log = mainLogger.logChunk();
+    try {
+      log.log("check downloaded binary", updateInstallerFilePath);
+      // すでにバイナリが存在したらハッシュチェック。
+      const sha256 = crypto.createHash("sha256").update(await file.readFile(updateInstallerFilePath)).digest("hex");
+      if (sha256 == remote.sha256.win) {
+        log.log("notify (donwload success)");
+        // ハッシュが一致したらインストール確認通知
+        emitMainEvent("notifyUpdate", remote.version, true);
+        return;
+      } else {
+        log.log("notify (download failed)");
+        emitMainEvent("notifyUpdate", remote.version, false);
+        return;
       }
-    });
-    // const zipFilePath = Path.resolve(DIR_DOWNLOAD, `${version}.zip`);
-    const setupFilePath = Path.resolve(DIR_DOWNLOAD, `${version}.exe`);
-    // await file.writeFile(zipFilePath, result.data);
-    const zip = new AdmZip(result.data);
-    const zipEntries = zip.getEntries();
-    const setupFile = zipEntries.find((entry) => entry.entryName.split(".").pop() === "exe");
-    if (setupFile) {
-      setupFile.getDataAsync(async (data) => {
-        await file.writeFile(setupFilePath, data);
-        updateInstallerFilePath = setupFilePath;
-        emitMainEvent("notifyUpdate", app.getVersion(), version);
-        // console.log("downloaded");
-        // shell.openPath(setupFilePath);
-      });
+    } catch (error) {
+      log.error(error);
+    }
+    const url = `https://github.com/takumus/ImagePetaPeta/releases/download/${remote.version}/ImagePetaPeta-beta.Setup.${remote.version}.exe`;
+    log.log("download binary:", url);
+    // バイナリをダウンロード
+    const result = await axios.get(
+      url,
+      {
+        responseType: "arraybuffer",
+        onDownloadProgress: (event) => {
+          // console.log(event);
+        }
+      }
+    );
+    try {
+      log.log("binary downloaded:", url);
+      // 保存
+      await file.writeFile(updateInstallerFilePath, result.data);
+      prepareUpdate(remote);
+    } catch (error) {
+      log.error(error);
     }
   }
-  async function getLatestVersion() {
+  async function getLatestVersion(): Promise<RemoteBinaryInfo> {
     const log = mainLogger.logChunk();
     try {
       const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
       const packageJSON = (await axios.get(url, { responseType: "json" })).data;
       return {
-        current: app.getVersion(),
-        latest: packageJSON.version
+        version: packageJSON.version,
+        sha256: {
+          win: packageJSON["binary-sha256-win"],
+          mac: packageJSON["binary-sha256-mac"],
+        }
       }
     } catch(e) {
       log.error(e);
     }
     return {
-      current: app.getVersion(),
-      latest: app.getVersion()
-    };
+      version: app.getVersion(),
+      sha256: {
+        win: "",
+        mac: "",
+      }
+    }
   }
   async function checkUpdate() {
-    const versions = await getLatestVersion();
-    const needToUpdate = !isLatest(versions.current, versions.latest, dataSettings.data.ignoreMinorUpdate);
-    console.log(versions, needToUpdate);
+    const log = mainLogger.logChunk();
+    log.log("$Check Update");
+    const remote: RemoteBinaryInfo = await getLatestVersion();
+    const needToUpdate = !isLatest(app.getVersion(), remote.version, dataSettings.data.ignoreMinorUpdate);
+    log.log(remote, needToUpdate);
     if (needToUpdate) {
-      downloadAndExtractUpdata(versions.latest);
+      log.log("this version is latest");
+      await prepareUpdate(remote);
+    } else {
+      log.log("this version is old");
     }
+    setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
   function relaunch() {
     app.relaunch();
     app.exit();
   }
-  checkUpdate();
-  // downloadAndExtractUpdata("2.5.0-beta");
 })();

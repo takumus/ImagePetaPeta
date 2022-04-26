@@ -33,7 +33,6 @@ export interface MainFunctions {
   showDBFolder: () => Promise<boolean>;
   showConfigFolder: () => Promise<boolean>;
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
-  checkUpdate: () => Promise<{ current: string, latest: string }>;
   updateSettings: (settings: Settings) => Promise<boolean>;
   getSettings: () => Promise<Settings>;
   getWindowIsFocused: () => Promise<boolean>;

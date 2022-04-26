@@ -7,7 +7,7 @@ export interface MainEvents {
   updatePetaImage: (petaImage: PetaImage) => void;
   updatePetaTags: () => void;
   taskStatus: (id: string, task: TaskStatus) => void;
-  notifyUpdate: (current: string, latest: string) => void;
+  notifyUpdate: (latest: string, downloaded: boolean) => void;
   windowFocused: (focused: boolean) => void;
   regenerateThumbnailsProgress: (done: number, count: number) => void;
   regenerateThumbnailsBegin: () => void;

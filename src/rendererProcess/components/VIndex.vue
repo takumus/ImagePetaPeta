@@ -125,6 +125,17 @@ export default class Index extends Vue {
       // log("vIndex", "on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
     });
+    API.on("notifyUpdate", async (event, current, latest) => {
+      if (
+        this.$systemInfo.platform == "win32"
+        && await this.$components.dialog.show(
+          this.$t("utils.updateDialog", [current, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
+        ) == 0
+      ) {
+        await API.send("installUpdate");
+        API.send("openURL", `${DOWNLOAD_URL}${latest}`);
+      }
+    });
     API.on("windowFocused", (e, focused) => {
       this.windowIsFocused = focused;
       if (!focused) {
@@ -141,23 +152,6 @@ export default class Index extends Vue {
     await this.restoreBoard();
     this.$nextTick(() => {
       API.send("showMainWindow");
-    });
-    this.checkUpdate();
-  }
-  checkUpdate() {
-    API.send("checkUpdate").then(async (result) => {
-      if (!isLatest(result.current, result.latest, this.$settings.ignoreMinorUpdate)) {
-        if (
-          this.$systemInfo.platform == "win32"
-          && await this.$components.dialog.show(
-            this.$t("utils.updateDialog", [result.current, result.latest]), [this.$t("shared.yes"), this.$t("shared.no")]
-          ) == 0
-        ) {
-          API.send("openURL", `${DOWNLOAD_URL}${result.latest}`);
-        }
-      } else {
-        setTimeout(this.checkUpdate, UPDATE_CHECK_INTERVAL);
-      }
     });
   }
   async restoreBoard() {
