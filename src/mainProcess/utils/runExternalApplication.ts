@@ -26,7 +26,7 @@ export function runExternalApplication(
       });
       childProcess.on("error", (error) => {
         log(error.message);
-        rej(error);
+        res(false);
       });
     }),
     kill: () => {
