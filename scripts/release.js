@@ -13,6 +13,6 @@ const hashAdded = fs.readFileSync("./package.json")
 .toString()
 .replace(
   /"binary-sha256-win": ".*"/, 
-  `"binary-sha256-win": "${crypto.createHash("sha256").update(fs.readFileSync(`./dist_electron/ImagePetaPeta-beta ${packageJSON.version}.exe`)).digest("hex")}"`
+  `"binary-sha256-win": "${crypto.createHash("sha256").update(fs.readFileSync(`./dist_electron/ImagePetaPeta-beta Setup ${packageJSON.version}.exe`)).digest("hex")}"`
 )
 fs.writeFileSync("./package.json", hashAdded);
