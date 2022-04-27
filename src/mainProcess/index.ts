@@ -793,6 +793,18 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
         y: 13
       }
     });
+    window.setThumbarButtons([
+      {
+        tooltip: 'button1',
+        icon: nativeImage.createFromPath(Path.resolve(__dirname, "../@assets/eye.png")),
+        click () { console.log('button1 clicked') }
+      }, {
+        tooltip: 'button2',
+        icon: nativeImage.createFromPath(Path.resolve(__dirname, "../@assets/eye.png")),
+        flags: ['enabled', 'dismissonclick'],
+        click () { console.log('button2 clicked.') }
+      }
+    ])
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       await window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
       if (!process.env.IS_TEST) {
