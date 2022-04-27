@@ -32,7 +32,9 @@ export default class DB<T> {
   }
   compaction = () => {
     if (this.nedb && this.loaded) {
-      this.nedb.compactDatafile();
+      this.nedb.compactDatafileAsync().catch((error) => {
+        this.orderCompaction();
+      })
     }
   }
   find(query: Partial<T> | any = {}): Promise<T[]> {
