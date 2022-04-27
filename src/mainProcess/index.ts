@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, Tray, Menu } from "electron";
 import * as Path from "path";
 import axios from "axios";
 import dataURIToBuffer from "data-uri-to-buffer";
@@ -34,6 +34,7 @@ import crypto from "crypto";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { isLatest } from "@/commons/utils/versionCheck";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
+import AppIcon from "@/@assets/icon.png";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -191,6 +192,15 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
   */
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
+    console.log(__dirname);
+    const tray = new Tray(nativeImage.createFromDataURL(AppIcon));
+    tray.setToolTip(app.getName());
+    tray.setContextMenu(Menu.buildFromTemplate([
+      { label: 'Item1', type: 'radio' },
+      { label: 'Item2', type: 'radio' },
+      { label: 'Item3', type: 'radio', checked: true },
+      { label: 'Item4', type: 'radio' }
+    ]));
     mainLogger.logChunk().log(`\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`);
     mainLogger.logChunk().log(`verison: ${app.getVersion()}`);
     //-------------------------------------------------------------------------------------------------//
