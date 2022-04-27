@@ -17,39 +17,42 @@ try {
   console.error(`Cannot build appx. '${files.appxConfig}' is not found.`);
 }
 module.exports = {
-  chainWebpack: config => {
-    config
-      .entry("app")
-      .clear();
-    config
-      .entry("app")
-      .add(files.main.entry);
-    config.plugin('html')
-      .tap((args) => {
-        args[0].template = files.main.template
-        return args;
-      })
-    config.module
-      .rule("vue")
-      .use("vue-loader")
-      .tap(options => {
-        options.hotReload = false
-        return options
-      });
-    config.module
-      .rule("images")
-      .test(/\.(png)(\?.*)?$/)
-      .use("url-loader")
-      // .options({
-      //   limit: 8192,
-      //   name: `assets/[name].[hash].[ext]`
-      // });
-  },
   productionSourceMap: false,
   pluginOptions: {
     electronBuilder: {
       preload: files.renderer.preload,
       mainProcessFile: files.renderer.main,
+      chainWebpackMainProcess: (config) => {
+        //
+      },
+      chainWebpackRendererProcess: (config) => {
+        config
+          .entry("app")
+          .clear();
+        config
+          .entry("app")
+          .add(files.main.entry);
+        config.plugin('html')
+          .tap((args) => {
+            args[0].template = files.main.template
+            return args;
+          })
+        config.module
+          .rule("vue")
+          .use("vue-loader")
+          .tap(options => {
+            options.hotReload = false
+            return options
+          });
+        config.module
+          .rule("images")
+          .test(/\.(png)(\?.*)?$/)
+          .use("url-loader")
+          // .options({
+          //   limit: 8192,
+          //   name: `assets/[name].[hash].[ext]`
+          // });
+      },
       builderOptions: {
         appId: "io.takumus." + packageJSON.name,
         productName: packageJSON.productName,
