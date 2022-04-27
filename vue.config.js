@@ -23,7 +23,11 @@ module.exports = {
       preload: files.renderer.preload,
       mainProcessFile: files.renderer.main,
       chainWebpackMainProcess: (config) => {
-        //
+        config.module
+          .rule('images')
+          .test(/\.(png)(\?.*)?$/)
+          .use('url-loader')
+          .loader('url-loader')
       },
       chainWebpackRendererProcess: (config) => {
         config
@@ -48,6 +52,7 @@ module.exports = {
           .rule("images")
           .test(/\.(png)(\?.*)?$/)
           .use("url-loader")
+          .loader('url-loader')
           // .options({
           //   limit: 8192,
           //   name: `assets/[name].[hash].[ext]`
