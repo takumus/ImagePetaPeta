@@ -1,8 +1,8 @@
 {
   "name": "imagepetapeta-beta",
   "productName": "ImagePetaPeta-beta",
-  "version": "2.5.6-beta",
-  "binary-sha256-win": "c1ec0d6d0203b8ee7c8b241f7afe7f030253551906d596eb0af76ffb9175b72a",
+  "version": "2.5.8-beta",
+  "binary-sha256-win": "e36f1b44044eca9187fce742912507f9efcb15a615fc422f05628666234dde5d",
   "binary-sha256-mac": "",
   "private": true,
   "author": "takumus",
