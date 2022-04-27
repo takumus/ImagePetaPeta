@@ -4,7 +4,6 @@
     ref="boardRoot"
     v-show="board"
     :style="{
-      backgroundColor: fillColor,
       zIndex: zIndex
     }"
   >
@@ -76,6 +75,7 @@ import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@pixi/gif';
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
+import { Rectangle } from "pixi.js";
 PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -137,7 +137,8 @@ export default class VBoard extends Vue {
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
-      antialias: true
+      antialias: true,
+      backgroundAlpha: 0
     });
     this.pixi.view.addEventListener("dblclick", this.resetTransform);
     this.pixi.view.addEventListener("mousewheel", this.wheel as any);
@@ -318,6 +319,7 @@ export default class VBoard extends Vue {
     this.crossLine.moveTo(0, -this.stageRect.y);
     this.crossLine.lineTo(0, this.stageRect.y);
     this.backgroundSprite.clear();
+    this.backgroundSprite.hitArea = new Rectangle(0, 0, this.stageRect.x, this.stageRect.y);
     this.backgroundSprite.beginFill(Number(this.board.background.fillColor.replace("#", "0x")));
     this.backgroundSprite.drawRect(0, 0, this.stageRect.x, this.stageRect.y);
   }
@@ -728,12 +730,6 @@ export default class VBoard extends Vue {
       return 100;
     }
     return Math.floor(this.board.transform.scale * 100);
-  }
-  get fillColor() {
-    if (!this.board) {
-      return "#ff0000";
-    }
-    return this.board.background.fillColor;
   }
   @Watch("$settings.showNsfwWithoutConfirm")
   changeShowNsfwWithoutConfirm() {
