@@ -1,12 +1,18 @@
 import { DB_COMPACTION_DELAY } from "@/commons/defines";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { EventEmitter } from "events";
+import TypedEmitter from "typed-emitter";
 import Nedb from "@seald-io/nedb";
-
-export default class DB<T> {
+type MessageEvents = {
+  compactionError: (error: any) => void;
+  beginCompaction: () => void;
+  doneCompaction: () => void;
+}
+export default class DB<T> extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   nedb: Nedb<T> | null = null;
   loaded = false;
   execCompationIntervalId!: NodeJS.Timeout;
-  constructor(private path: string) {
+  constructor(public name: string, private path: string) {
+    super();
   }
   init() {
     this.loaded = false;
@@ -32,7 +38,11 @@ export default class DB<T> {
   }
   compaction = () => {
     if (this.nedb && this.loaded) {
-      this.nedb.compactDatafileAsync().catch((error) => {
+      this.emit("beginCompaction");
+      this.nedb.compactDatafileAsync().then(() => {
+        this.emit("doneCompaction");
+      }).catch((error) => {
+        this.emit("compactionError", error);
         this.orderCompaction();
       })
     }

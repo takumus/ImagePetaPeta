@@ -112,11 +112,22 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
     FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
     FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
     FILE_STATES = file.initFile(DIR_APP, "states.json");
-    dataPetaImages = new DB<PetaImage>(FILE_IMAGES_DB);
-    dataPetaBoards = new DB<PetaBoard>(FILE_BOARDS_DB);
-    dataPetaTags = new DB<PetaTag>(FILE_TAGS_DB);
-    dataPetaImagesPetaTags = new DB<PetaImagePetaTag>(FILE_IMAGES_TAGS_DB);
+    dataPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
+    dataPetaBoards = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
+    dataPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
+    dataPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
+    [dataPetaImages, dataPetaBoards, dataPetaTags, dataPetaImagesPetaTags].forEach((db) => {
+      db.on("beginCompaction", () => {
+        mainLogger.logChunk().log(`begin compaction(${db.name})`);
+      });
+      db.on("doneCompaction", () => {
+        mainLogger.logChunk().log(`done compaction(${db.name})`);
+      });
+      db.on("compactionError", (error) => {
+        mainLogger.logChunk().error(`compaction error(${db.name})`, error);
+      })
+    })
     Tasks.onEmitStatus((id, status) => {
       emitMainEvent("taskStatus", id, status);
     });
