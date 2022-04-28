@@ -1,19 +1,19 @@
 <template>
-  <article class="task-root">
+  <v-task-root>
     <p v-if="name !== ''">
       {{$t(name)}}({{Math.floor(progress)}}%)
     </p>
     <VProgressBar :progress="progress"></VProgressBar>
     <pre class="log">{{log}}</pre>
-    <section class="confirms">
+    <v-cancel>
       <button
         tabindex="-1"
         @click="cancel"
         v-if="cancelable">
         {{$t("imageImporter.cancel")}}
       </button>
-    </section>
-  </article>
+    </v-cancel>
+  </v-task-root>
 </template>
 
 <script lang="ts">
@@ -86,8 +86,9 @@ export default class VTasks extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.task-root {
+v-task-root {
   text-align: center;
+  display: block;
   .log {
     text-align: left;
     overflow: hidden;
