@@ -1,6 +1,5 @@
 <template>
-  <article
-    class="layer-root"
+  <v-layer-root
     :class="{
       hide: !$settings.visibleLayerPanel
     }"
@@ -8,15 +7,13 @@
       zIndex: zIndex
     }"
   >
-    <section
-      class="title"
+    <v-header
       @click.left="toggleVisible"
     >
-    </section>
-    <section
-      class="layer"
-      ref="layersParent"
+    </v-header>
+    <v-layers
       v-show="$settings.visibleLayerPanel"
+      ref="layersParent"
     >
       <ul ref="layers">
         <VLayerCell
@@ -35,8 +32,8 @@
           :drag="true"
         />
       </ul>
-    </section>
-  </article>
+    </v-layers>
+  </v-layer-root>
 </template>
 
 <script lang="ts">
@@ -212,7 +209,7 @@ export default class VLayer extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.layer-root {
+v-layer-root {
   background-color: var(--bg-color);
   border-radius: var(--rounded);
   overflow: hidden;
@@ -225,7 +222,7 @@ export default class VLayer extends Vue {
   margin: 8px;
   top: 50%;
   padding: 8px;
-  >.title {
+  >v-header {
     display: block;
     cursor: pointer;
     text-align: center;
@@ -245,7 +242,7 @@ export default class VLayer extends Vue {
       margin: 0px;
     }
   }
-  >.layer {
+  >v-layers {
     display: block;
     overflow-x: hidden;
     overflow-y: auto;
