@@ -18,6 +18,10 @@
           >
           </span>
           <slot></slot>
+          <span
+            class="draggable-right"
+          >
+          </span>
         </div>
       </section>
       <section
@@ -114,6 +118,10 @@ export default class VTitleBar extends Vue {
           &.mac {
             width: calc(var(--tab-height) + var(--top-draggable-height) + 32px);
           }
+        }
+        >.draggable-right {
+          flex-grow: 1;
+          -webkit-app-region: drag;
         }
       }
     }

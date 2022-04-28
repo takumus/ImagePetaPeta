@@ -4,9 +4,6 @@
   >
     <section
       class="tabs"
-      :class="{
-        mac: isMac
-      }"
       v-show="uiVisible"
     >
       <span
@@ -38,8 +35,6 @@
           </span>
         </span>
       </span>
-      <span class="draggable">
-      </span>
       <span
         class="tab selected drag"
         ref="draggingTab"
@@ -53,82 +48,6 @@
         </span>
       </span>
     </section>
-    <!-- <section class="tab-bottom" v-show="uiVisible">
-      <article v-if="board" class="board-parameters">
-        <button
-          tabindex="-1"
-          @click="board.transform.scale = 1"
-        >
-          {{Math.floor(board.transform.scale * 100)}}%
-        </button>
-        <button
-          class="color"
-          tabindex="-1"
-          :style="{
-            backgroundColor: board.background.fillColor
-          }"
-          @click="$refs['inputFillColor'].click()"
-        >
-          &nbsp;
-        </button>
-        <input
-          type="color"
-          v-model="board.background.fillColor"
-          tabindex="-1"
-          ref="inputFillColor"
-        >
-        <button
-          class="color"
-          tabindex="-1"
-          :style="{
-            backgroundColor: board.background.lineColor
-          }"
-          @click="$refs['inputLineColor'].click()"
-        >
-          &nbsp;
-        </button>
-        <input
-          type="color"
-          v-model="board.background.lineColor"
-          tabindex="-1"
-          ref="inputLineColor"
-        >
-      </article>
-      <article class="shared-buttons left">
-        <button
-          tabindex="-1"
-          @click="$components.browser.open()"
-        >
-          <span class="browser"></span>
-        </button>
-        <button
-          tabindex="-1"
-          @click="$api.send('importImageFiles')"
-        >
-          <span class="import-file"></span>
-        </button>
-        <button
-          tabindex="-1"
-          @click="$api.send('importImageDirectories')"
-        >
-          <span class="import-folder"></span>
-        </button>
-      </article>
-      <article class="shared-buttons right">
-        <button
-          tabindex="-1"
-          @click="$components.info.open"
-        >
-          <span class="info"></span>
-        </button>
-        <button
-          tabindex="-1"
-          @click="$components.settings.open"
-        >
-          <span class="settings"></span>
-        </button>
-      </article>
-    </section> -->
   </article>
 </template>
 
@@ -278,24 +197,12 @@ export default class VTabBar extends Vue {
   --top-draggable-height: 10px;
   top: 0px;
   left: 0px;
-  width: 100%;
   background-color: var(--tab-bg-color);
   >.tabs {
     width: 100%;
     color: var(--font-color);
     height: var(--tab-height);
     display: flex;
-    >.draggable {
-      -webkit-app-region: drag;
-      flex-grow: 1;
-      &.left {
-        flex-grow: 0;
-        width: calc(var(--tab-height) + var(--top-draggable-height));
-        &.mac {
-          width: calc(var(--tab-height) + var(--top-draggable-height) + 32px);
-        }
-      }
-    }
     >.tab {
       display: block;
       margin: 0px;
