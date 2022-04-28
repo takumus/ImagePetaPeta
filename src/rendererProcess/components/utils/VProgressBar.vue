@@ -1,13 +1,12 @@
 <template>
-  <article class="progress-bar-root">
-    <div
-      class="fill"
+  <v-progress-bar-root>
+    <v-bar
       :style="{
         width: `${progress}%`
       }"
     >
-    </div>
-  </article>
+    </v-bar>
+  </v-progress-bar-root>
 </template>
 
 <script lang="ts">
@@ -29,14 +28,14 @@ export default class VProgressBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.progress-bar-root {
+v-progress-bar-root {
   background-color: var(--font-color);
   width: 100%;
   height: 16px;
   overflow: hidden;
   border-radius: var(--rounded);
   padding: 2px;
-  .fill {
+  >v-bar {
     width: 50%;
     height: 100%;
     border-radius: var(--rounded);
