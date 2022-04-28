@@ -1,6 +1,5 @@
 <template>
-  <article
-    class="root"
+  <v-root
     :class="{
       dark: darkMode
     }"
@@ -11,7 +10,7 @@
       ref="vPetaBoard"
       @change="changePetaBoard"
     />
-    <section class="top">
+    <v-top>
       <VTitleBar>
         <VTabBar
           :uiVisible="uiVisible"
@@ -27,9 +26,8 @@
         />
       </VTitleBar>
       <VBoardProperty :board="currentPetaBoard" />
-    </section>
-    <section
-      class="modals"
+    </v-top>
+    <v-modals
       v-show="this.$components.modal.modalIds.length > 0"
     >
       <VBrowser
@@ -43,7 +41,7 @@
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />
       <VTasks />
-    </section>
+    </v-modals>
     <VDialog
       :zIndex="6"
     ></VDialog>
@@ -53,7 +51,7 @@
     <VComplement
       :zIndex="5"
     />
-  </article>
+  </v-root>
 </template>
 
 <script lang="ts">
@@ -82,9 +80,7 @@ import { PetaPanel, createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
 import { Vec2 } from "@/commons/utils/vec2";
-import { isLatest } from "@/commons/utils/versionCheck";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
-import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
@@ -310,7 +306,7 @@ body, html {
     Meiryo,
     sans-serif;
 }
-.root {
+v-root {
   --rounded: 8px;
   & {
     --bg-color: #ffffff;
@@ -393,15 +389,7 @@ body, html {
       // box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.5);
     }
   }
-  >.menu {
-    position: fixed;
-    z-index: 4;
-    bottom: 0px;
-    left: 0px;
-    text-align: right;
-    padding: 8px;
-  }
-  >.modals {
+  >v-modals {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -409,7 +397,7 @@ body, html {
     left: 0px;
     z-index: 2;
   }
-  >.top {
+  >v-top {
     position: fixed;
     top: 0px;
     left: 0px;
