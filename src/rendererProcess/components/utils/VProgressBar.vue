@@ -35,11 +35,13 @@ v-progress-bar-root {
   overflow: hidden;
   border-radius: var(--rounded);
   padding: 2px;
+  display: block;
   >v-bar {
     width: 50%;
     height: 100%;
     border-radius: var(--rounded);
     background-color: var(--bg-color);
+    display: block;
   }
 }
 </style>
