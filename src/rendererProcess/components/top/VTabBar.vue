@@ -1,9 +1,6 @@
 <template>
   <article
     class="tab-root"
-    :style="{
-      zIndex: zIndex
-    }"
   >
     <section
       class="tabs"
