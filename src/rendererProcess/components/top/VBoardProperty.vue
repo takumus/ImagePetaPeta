@@ -110,10 +110,10 @@ export default class VBoardProperty extends Vue {
 .board-property-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
-  top: 0px;
-  left: 0px;
   width: 100%;
   background-color: var(--tab-bg-color);
+  position: absolute;
+  z-index: 2;
   >.tab-bottom {
     width: 100%;
     background-color: var(--tab-selected-color);

@@ -167,8 +167,6 @@ export default class VTabBar extends Vue {
   @Prop()
   title = "";
   @Prop()
-  zIndex = 0;
-  @Prop()
   currentPetaBoardId = "";
   @Ref("draggingTab")
   draggingTab!: HTMLElement;

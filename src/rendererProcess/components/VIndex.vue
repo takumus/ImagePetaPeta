@@ -12,7 +12,7 @@
       @change="changePetaBoard"
     />
     <section class="top">
-      <VTitleBar :zIndex="3">
+      <VTitleBar>
         <VTabBar
           :uiVisible="uiVisible"
           :boards="sortedPetaBoards"
@@ -26,7 +26,7 @@
           ref="vTabBar"
         />
       </VTitleBar>
-      <VBoardProperty :board="currentPetaBoard"/>
+      <VBoardProperty :board="currentPetaBoard" />
     </section>
     <section
       class="modals"
@@ -65,9 +65,9 @@ import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
-import VTabBar from "@/rendererProcess/components/tabBar/VTabBar.vue";
-import VTitleBar from "@/rendererProcess/components/tabBar/VTitleBar.vue";
-import VBoardProperty from "@/rendererProcess/components/boardProperty/VBoardProperty.vue";
+import VTabBar from "@/rendererProcess/components/top/VTabBar.vue";
+import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
+import VBoardProperty from "@/rendererProcess/components/top/VBoardProperty.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VInfo from "@/rendererProcess/components/info/VInfo.vue";

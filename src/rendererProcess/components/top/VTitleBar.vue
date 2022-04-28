@@ -1,9 +1,6 @@
 <template>
   <article
     class="titlebar-root"
-    :style="{
-      zIndex: zIndex
-    }"
   >
     <section
       class="titlebar"
@@ -62,8 +59,6 @@ import { API } from "@/rendererProcess/api";
   ]
 })
 export default class VTitleBar extends Vue {
-  @Prop()
-  zIndex!: number;
   mounted() {
     //
   }
