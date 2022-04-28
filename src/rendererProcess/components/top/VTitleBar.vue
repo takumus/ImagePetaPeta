@@ -1,52 +1,45 @@
 <template>
-  <article
-    class="titlebar-root"
-  >
-    <section
-      class="titlebar"
-    >
-      <section class="titlebar-and-tab">
-        <section class="draggable">
-          <!-- {{title}} -->
-        </section>
-        <div class="bottom">
-          <span
-            class="draggable-left"
-            :class="{
-              mac: $systemInfo.platform == 'darwin'
-            }"
-          >
-          </span>
-          <slot></slot>
-          <span
-            class="draggable-right"
-          >
-          </span>
-        </div>
-      </section>
-      <section
-        class="window-buttons"
-        v-if="!isMac"
-      >
-        <span
-          @click="minimizeWindow"
-          class="window-button"
+  <v-titlebar-root>
+    <v-content>
+      <v-top>
+        <!-- {{title}} -->
+      </v-top>
+      <v-bottom>
+        <v-draggable
+          class="left"
+          :class="{
+            mac: $systemInfo.platform == 'darwin'
+          }"
         >
-          <span class="icon">&#xe921;</span>
-        </span>
-        <span
-          @click="maximizeWindow"
-          class="window-button">
-            <span class="icon">&#xe922;</span>
-          </span>
-        <span
-          @click="closeWindow"
-          class="window-button close">
-            <span class="icon">&#xe8bb;</span>
-          </span>
-      </section>
-    </section>
-  </article>
+        </v-draggable>
+        <slot></slot>
+        <v-draggable
+          class="right"
+        >
+        </v-draggable>
+      </v-bottom>
+    </v-content>
+    <v-window-buttons
+      v-if="!isMac"
+    >
+      <v-window-button
+        @click="minimizeWindow"
+      >
+        <v-icon>&#xe921;</v-icon>
+      </v-window-button>
+      <v-window-button
+        @click="maximizeWindow"
+      >
+        <v-icon>&#xe922;</v-icon>
+      </v-window-button>
+      <v-window-button
+        class="close"
+        @click="closeWindow"
+      >
+        <v-icon>&#xe8bb;</v-icon>
+      </v-window-button>
+    </v-window-buttons>
+  </v-titlebar-root>
 </template>
 
 <script lang="ts">
@@ -85,63 +78,58 @@ export default class VTitleBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.titlebar-root {
+v-titlebar-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
-  // position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  >.titlebar {
-    width: 100%;
-    background-color: var(--tab-bg-color);
-    min-height: var(--tab-height);
+  background-color: var(--tab-bg-color);
+  min-height: var(--tab-height);
+  display: flex;
+  >v-content {
+    flex-grow: 1;
+    overflow: hidden;
     display: flex;
-    >.titlebar-and-tab {
+    flex-direction: column;
+    >v-top {
       flex-grow: 1;
-      overflow: hidden;
+      -webkit-app-region: drag;
+      display: block;
+      height: var(--top-draggable-height);
+    }
+    >v-bottom {
       display: flex;
-      flex-direction: column;
-      >.draggable {
-        flex-grow: 1;
+      flex-direction: row;
+      >v-draggable {
         -webkit-app-region: drag;
-        display: block;
-        height: var(--top-draggable-height);
-      }
-      >.bottom {
-        display: flex;
-        flex-direction: row;
-        >.draggable-left {
+        &.left {
           flex-grow: 0;
-          -webkit-app-region: drag;
           width: calc(var(--tab-height) + var(--top-draggable-height));
           &.mac {
             width: calc(var(--tab-height) + var(--top-draggable-height) + 32px);
           }
         }
-        >.draggable-right {
+        &.right {
           flex-grow: 1;
           -webkit-app-region: drag;
         }
       }
     }
-    >.window-buttons {
+  }
+  v-window-buttons {
+    display: flex;
+    >v-window-button {
       display: flex;
-      >.window-button {
-        display: flex;
-        padding: 0px 16px;
-        align-items: center;
-        >.icon {
-          display: inline-block;
-          font-size: 6px;
-          font-family: Segoe MDL2 Assets;
-        }
-        &:hover {
-          background-color: var(--window-buttons-hover);
-          &.close {
-            color: #ffffff;
-            background-color: var(--window-buttons-close-hover);
-          }
+      padding: 0px 16px;
+      align-items: center;
+      >v-icon {
+        display: inline-block;
+        font-size: 6px;
+        font-family: Segoe MDL2 Assets;
+      }
+      &:hover {
+        background-color: var(--window-buttons-hover);
+        &.close {
+          color: #ffffff;
+          background-color: var(--window-buttons-close-hover);
         }
       }
     }
