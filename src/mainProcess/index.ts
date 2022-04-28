@@ -70,6 +70,7 @@ import AppIcon from "@/@assets/icon.png";
   let dataStates: Config<States>;
   let petaDatas: PetaDatas;
   let updateInstallerFilePath: string;
+  let checkUpdateTimeoutHandler: NodeJS.Timeout;
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
@@ -911,6 +912,9 @@ import AppIcon from "@/@assets/icon.png";
     }
   }
   async function checkUpdate() {
+    if (checkUpdateTimeoutHandler) {
+      clearTimeout(checkUpdateTimeoutHandler);
+    }
     if (process.platform != "win32") {
       return;
     }
@@ -925,7 +929,7 @@ import AppIcon from "@/@assets/icon.png";
     } else {
       log.log("this version is latest");
     }
-    setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
+    checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
   function relaunch() {
     app.relaunch();
