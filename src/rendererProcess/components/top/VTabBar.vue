@@ -1,54 +1,46 @@
 <template>
-  <article
-    class="tab-root"
-  >
-    <section
-      class="tabs"
-      v-show="uiVisible"
+  <v-tab-root v-show="uiVisible">
+    <v-tab
+      :class="{ selected: b == board }"
+      :style="{ opacity: b == board && dragging ? 0 : 1 }"
+      v-for="(b, index) in boards"
+      @mousedown="mousedown($event, b, index, $target)"
+      @contextmenu="menu($event, b)"
+      :key="b.id"
+      :ref="`tab-${b.id}`"
     >
-      <span
-        class="tab"
-        :class="{ selected: b == board }"
-        :style="{ opacity: b == board && dragging ? 0 : 1 }"
-        v-for="(b, index) in boards"
-        @mousedown="mousedown($event, b, index, $target)"
-        @contextmenu="menu($event, b)"
-        :key="b.id"
-        :ref="`tab-${b.id}`"
-      >
-        <span class="wrapper">
-          <span class="label">
-            <VEditableLabel
-              @change="(v) => changePetaBoardName(b, v)"
-              :label="b.name"
-            />
-          </span>
-        </span>
-      </span>
-      <span
-        class="tab add"
-        @click="addPetaBoard()"
-      >
-        <span class="wrapper">
-          <span class="label">
-            <VEditableLabel :label="$texts.plus" :readonly="true"/>
-          </span>
-        </span>
-      </span>
-      <span
-        class="tab selected drag"
-        ref="draggingTab"
-        :style="{ display: dragging ? 'block' : 'none' }"
-        v-show="dragging"
-      >
-        <span class="wrapper">
-          <span class="label">
-            <VEditableLabel :label="board.name" v-if="board" />
-          </span>
-        </span>
-      </span>
-    </section>
-  </article>
+      <v-label-wrapper>
+        <v-label>
+          <VEditableLabel
+            @change="(v) => changePetaBoardName(b, v)"
+            :label="b.name"
+          />
+        </v-label>
+      </v-label-wrapper>
+    </v-tab>
+    <v-tab
+      class="add"
+      @click="addPetaBoard()"
+    >
+      <v-label-wrapper>
+        <v-label>
+          <VEditableLabel :label="$texts.plus" :readonly="true"/>
+        </v-label>
+      </v-label-wrapper>
+    </v-tab>
+    <v-tab
+      class="selected drag"
+      ref="draggingTab"
+      :style="{ display: dragging ? 'block' : 'none' }"
+      v-show="dragging"
+    >
+      <v-label-wrapper>
+        <v-label>
+          <VEditableLabel :label="board.name" v-if="board" />
+        </v-label>
+      </v-label-wrapper>
+    </v-tab>
+  </v-tab-root>
 </template>
 
 <script lang="ts">
@@ -192,195 +184,193 @@ export default class VTabBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.tab-root {
+v-tab-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   top: 0px;
   left: 0px;
   background-color: var(--tab-bg-color);
-  >.tabs {
-    width: 100%;
-    color: var(--font-color);
-    height: var(--tab-height);
-    display: flex;
-    >.tab {
-      display: block;
-      margin: 0px;
-      // border-right: solid 1px var(--tab-border-color);
-      // border-left: solid 1px;
-      margin-right: -1px;
-      flex-shrink: 1;
-      cursor: pointer;
-      overflow: hidden;
-      position: relative;
-      border-radius: var(--rounded);
-      z-index: 1;
-      &.drag {
-        position: absolute;
-        pointer-events: none;
-        border-left: solid 1px var(--tab-border-color);
+  width: 100%;
+  color: var(--font-color);
+  height: var(--tab-height);
+  display: flex;
+  >v-tab {
+    display: block;
+    margin: 0px;
+    // border-right: solid 1px var(--tab-border-color);
+    // border-left: solid 1px;
+    margin-right: -1px;
+    flex-shrink: 1;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    border-radius: var(--rounded);
+    z-index: 1;
+    &.drag {
+      position: absolute;
+      pointer-events: none;
+      border-left: solid 1px var(--tab-border-color);
+    }
+    &.add {
+      min-width: 16px;
+      border-right: none;
+      flex-shrink: 0;
+      v-label-wrapper v-label {
+        padding: 0px 8px;
       }
-      &.add {
-        min-width: 16px;
-        border-right: none;
-        flex-shrink: 0;
-        .wrapper .label {
-          padding: 0px 8px;
-        }
-      }
-      &.selected {
-        z-index: 2;
-        border-radius: var(--rounded) var(--rounded) 0px 0px;
-        overflow: visible;
+    }
+    &.selected {
+      z-index: 2;
+      border-radius: var(--rounded) var(--rounded) 0px 0px;
+      overflow: visible;
+      background-color: var(--tab-selected-color);
+      flex-shrink: 0;
+      border: none;
+      &:hover {
         background-color: var(--tab-selected-color);
-        flex-shrink: 0;
-        border: none;
-        &:hover {
-          background-color: var(--tab-selected-color);
-        }
-        &::before, &::after {
-          content: '';
-          display: inline-block;
-          position: absolute;
-          bottom: 0;
-          left: calc(var(--rounded) * -1);
-          width: var(--rounded);
-          height: var(--rounded);
-          border-radius: 0 0 100% 0;
-          box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-selected-color);
-        }
-        &::after {
-          left: unset;
-          right: calc(var(--rounded) * -1);
-          transform: scaleX(-1);
-        }
       }
-      &:hover:not(.selected) {
-        background-color: var(--tab-hovered-color);
-        overflow: visible;
-        flex-shrink: 0;
-        &::before, &::after {
-          content: '';
-          display: inline-block;
-          position: absolute;
-          bottom: 0;
-          left: calc(var(--rounded) * -1);
-          width: var(--rounded);
-          height: var(--rounded);
-          border-radius: 0 0 100% 0;
-          box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-hovered-color);
-        }
-        &::after {
-          left: unset;
-          right: calc(var(--rounded) * -1);
-          transform: scaleX(-1);
-        }
+      &::before, &::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: 0;
+        left: calc(var(--rounded) * -1);
+        width: var(--rounded);
+        height: var(--rounded);
+        border-radius: 0 0 100% 0;
+        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-selected-color);
       }
-      >.wrapper {
-        display: flex;
-        align-items: center;
-        height: 100%;
-        >.label {
-          padding: 0px 8px;
-          flex-shrink: 1;
-        }
+      &::after {
+        left: unset;
+        right: calc(var(--rounded) * -1);
+        transform: scaleX(-1);
+      }
+    }
+    &:hover:not(.selected) {
+      background-color: var(--tab-hovered-color);
+      overflow: visible;
+      flex-shrink: 0;
+      &::before, &::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: 0;
+        left: calc(var(--rounded) * -1);
+        width: var(--rounded);
+        height: var(--rounded);
+        border-radius: 0 0 100% 0;
+        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-hovered-color);
+      }
+      &::after {
+        left: unset;
+        right: calc(var(--rounded) * -1);
+        transform: scaleX(-1);
+      }
+    }
+    >v-label-wrapper {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      >v-label {
+        padding: 0px 8px;
+        flex-shrink: 1;
       }
     }
   }
-  >.tab-bottom {
-    width: 100%;
-    background-color: var(--tab-selected-color);
-    height: 30px;
-    box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
-    position: relative;
-    border-bottom: solid 1px var(--bg-color);
-    >.shared-buttons {
-      position: absolute;
-      top: 0px;
-      height: 100%;
-      padding: 4px;
-      display: flex;
-      flex-shrink: 1;
-      text-align: left;
-      justify-content: flex-end;
-      &.left {
-        left: 0px;
-        button {
-          margin-right: 4px;
-        }
-      }
-      &.right {
-        right: 0px;
-        button {
-          margin-left: 4px;
-        }
-      }
-      &.left ,&.right {
-        >button {
-          min-width: 24px;
-          padding: 0px;
-          height: 100%;
-          margin: 0px;
-          border: none;
-          span {
-            display: block;
-            width: 100%;
-            height: 100%;
-            background-size: 14px;
-            background-repeat: no-repeat;
-            background-position: center center;
-            filter: var(--icon-filter);
-            &.browser {
-              background-image: url("~@/@assets/browser.png");
-            }
-            &.import-file {
-              background-image: url("~@/@assets/importFile.png");
-            }
-            &.import-folder {
-              background-image: url("~@/@assets/importFolder.png");
-            }
-            &.settings {
-              background-image: url("~@/@assets/settings.png");
-            }
-            &.info {
-              background-image: url("~@/@assets/info.png");
-            }
-          }
-        }
+}
+>.tab-bottom {
+  width: 100%;
+  background-color: var(--tab-selected-color);
+  height: 30px;
+  box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
+  position: relative;
+  border-bottom: solid 1px var(--bg-color);
+  >.shared-buttons {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    padding: 4px;
+    display: flex;
+    flex-shrink: 1;
+    text-align: left;
+    justify-content: flex-end;
+    &.left {
+      left: 0px;
+      button {
+        margin-right: 4px;
       }
     }
-    >.board-parameters {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      height: 100%;
-      width: 100%;
-      padding: 4px;
-      padding-left: 6px;
-      text-align: center;
-      >input {
-        display: inline-block;
-        width: 0px;
-        height: 0px;
-        overflow: hidden;
-        position: relative;
-        margin: 0px;
-        padding: 0px;
-        border: none;
+    &.right {
+      right: 0px;
+      button {
+        margin-left: 4px;
       }
+    }
+    &.left ,&.right {
       >button {
         min-width: 24px;
         padding: 0px;
         height: 100%;
         margin: 0px;
-        min-width: 50px;
-        margin-right: 4px;
-        &.color {
-          border-radius: 100px;
-          width: auto;
-          min-width: 0px;
-          aspect-ratio: 1;
+        border: none;
+        span {
+          display: block;
+          width: 100%;
+          height: 100%;
+          background-size: 14px;
+          background-repeat: no-repeat;
+          background-position: center center;
+          filter: var(--icon-filter);
+          &.browser {
+            background-image: url("~@/@assets/browser.png");
+          }
+          &.import-file {
+            background-image: url("~@/@assets/importFile.png");
+          }
+          &.import-folder {
+            background-image: url("~@/@assets/importFolder.png");
+          }
+          &.settings {
+            background-image: url("~@/@assets/settings.png");
+          }
+          &.info {
+            background-image: url("~@/@assets/info.png");
+          }
         }
+      }
+    }
+  }
+  >.board-parameters {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    padding: 4px;
+    padding-left: 6px;
+    text-align: center;
+    >input {
+      display: inline-block;
+      width: 0px;
+      height: 0px;
+      overflow: hidden;
+      position: relative;
+      margin: 0px;
+      padding: 0px;
+      border: none;
+    }
+    >button {
+      min-width: 24px;
+      padding: 0px;
+      height: 100%;
+      margin: 0px;
+      min-width: 50px;
+      margin-right: 4px;
+      &.color {
+        border-radius: 100px;
+        width: auto;
+        min-width: 0px;
+        aspect-ratio: 1;
       }
     }
   }
