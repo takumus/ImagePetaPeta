@@ -190,7 +190,6 @@ v-tab-root {
   top: 0px;
   left: 0px;
   background-color: var(--tab-bg-color);
-  width: 100%;
   color: var(--font-color);
   height: var(--tab-height);
   display: flex;

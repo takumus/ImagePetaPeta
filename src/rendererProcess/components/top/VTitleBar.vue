@@ -100,6 +100,7 @@ v-titlebar-root {
       flex-direction: row;
       >v-draggable {
         -webkit-app-region: drag;
+        display: block;
         &.left {
           flex-grow: 0;
           width: calc(var(--tab-height) + var(--top-draggable-height));
