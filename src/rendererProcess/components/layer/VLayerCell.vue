@@ -8,38 +8,34 @@
     }"
     @mousedown.left="mousedown($event)"
   >
-    <div
-      class="icon eye"
+    <v-icon
+      class="eye"
       ref="visibleIcon"
       :class="{
         disabled: !visible
       }"
     >
-    </div>
-    <div
-      class="icon lock"
+    </v-icon>
+    <v-icon
+      class="lock"
       ref="lockedIcon"
       :class="{
         disabled: !locked
       }"
     >
-    </div>
+    </v-icon>
     <!-- <div
       class="name"
     >
      {{name}}
     </div> -->
-    <div
+    <v-thumb
       :v-if="url"
       :style="{
         backgroundImage: `url(${url})`
       }"
-      class="image"
     >
-    </div>
-    <!-- <div class="icon" @mousedown="startDrag(pPanel, $event)">
-      =
-    </div> -->
+    </v-thumb>
   </li>
 </template>
 
@@ -150,13 +146,14 @@ export default class VLayerCell extends Vue {
   &.hide {
     visibility: hidden;
   }
-  >.icon {
+  >v-icon {
     padding: 0px 8px;
     height: 100%;
     width: 24px;
     background: no-repeat;
     background-position: center center;
     background-size: 12px;
+    display: block;
     filter: var(--icon-filter);
     &.eye {
       background-size: 14px;
@@ -170,7 +167,7 @@ export default class VLayerCell extends Vue {
       opacity: 0.3;
     }
   }
-  >.image {
+  >v-thumb {
     min-width: 32px;
     height: 100%;
     margin: 0px 8px;
@@ -178,6 +175,7 @@ export default class VLayerCell extends Vue {
     background: no-repeat;
     background-position: center center;
     background-size: contain;
+    display: block;
   }
   >.name {
     flex: 1;
