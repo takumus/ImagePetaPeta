@@ -1,19 +1,16 @@
 <template>
-  <article
-    class="dialog-root"
+  <v-dialog-root
     v-show="visible"
     :style=" {
       zIndex: zIndex
     }"
   >
-    <div
-      class="modal"
-    >
-      <div class="content">
+    <v-modal>
+      <v-content>
         <p>
           {{label}}
         </p>
-        <div>
+        <v-buttons>
           <button
             v-for="(item, index) in items"
             :key="item"
@@ -22,10 +19,10 @@
           >
             {{item}}
           </button>
-        </div>
-      </div>
-    </div>
-  </article>
+        </v-buttons>
+      </v-content>
+    </v-modal>
+  </v-dialog-root>
 </template>
 
 <script lang="ts">
@@ -69,7 +66,7 @@ export default class VModal extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.dialog-root {
+v-dialog-root {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -78,10 +75,11 @@ export default class VModal extends Vue {
   background-color: var(--modal-bg-color);
   color: var(--font-color);
   overflow: hidden;
+  display: block;
   &.no-background {
     background-color: transparent;
   }
-  >.modal {
+  >v-modal {
     background-color: var(--bg-color);
     padding: 16px;
     border-radius: var(--rounded);
@@ -92,26 +90,17 @@ export default class VModal extends Vue {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    >.title {
-      text-align: right;
-      >.close {
-        font-family: Segoe MDL2 Assets,
-          "Helvetica Neue",
-          Arial,
-          "Hiragino Kaku Gothic ProN",
-          "Hiragino Sans",
-          Meiryo,
-          sans-serif;
-        cursor: pointer;
-      }
-    }
-    >.content {
+    >v-content {
       flex: 1;
       overflow: hidden;
       text-align: center;
+      display: block;
       >p {
         text-align: center;
         white-space: pre;
+      }
+      >v-buttons {
+        display: block;
       }
     }
   }
