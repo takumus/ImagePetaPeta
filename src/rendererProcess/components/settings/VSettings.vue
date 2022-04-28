@@ -8,7 +8,7 @@
     :visibleCloseButton="true"
     @close="close"
   >
-    <article class="settings-root">
+    <v-settings-root>
       <p>{{$t("settings.settings")}}</p>
       <ul>
         <li
@@ -22,11 +22,11 @@
           {{$t("settings." + tab)}}
         </li>
       </ul>
-      <article class="content">
+      <v-contents>
         <!--
           General
         -->
-        <section v-show="currentTab == 'general'">
+        <v-content v-show="currentTab == 'general'">
           <label>
             <input
               type="checkbox"
@@ -64,11 +64,11 @@
             {{$t("settings.autoAddTag")}}
           </label>
           <p>{{$t("settings.autoAddTagDescriptions")}}</p>
-        </section>
+        </v-content>
         <!--
           Control
         -->
-        <section v-show="currentTab == 'control'">
+        <v-content v-show="currentTab == 'control'">
           <label>
             {{$t("settings.zoomSensitivity")}}:
           </label>
@@ -87,11 +87,11 @@
             @change="$settings.moveSensitivity = Number($event.target.value)"
           >
           <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
-        </section>
+        </v-content>
         <!--
           Browser
         -->
-        <section v-show="currentTab == 'browser'">
+        <v-content v-show="currentTab == 'browser'">
           <label>
             {{$t("settings.thumbnailsSize")}}:
           </label>
@@ -144,11 +144,11 @@
             {{$t("settings.loadThumbnailsInOriginal")}}
           </label>
           <p>{{$t("settings.loadThumbnailsInOriginalDescriptions")}}</p>
-        </section>
+        </v-content>
         <!--
           Datas
         -->
-        <section v-show="currentTab == 'datas'">
+        <v-content v-show="currentTab == 'datas'">
           <button
             @click="browsePetaImageDirectory"
           >
@@ -163,11 +163,11 @@
             {{$t("settings.changePetaImageDirectoryButton")}}
           </button>
           <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
-        </section>
+        </v-content>
         <!--
           Others
         -->
-        <section v-show="currentTab == 'others'">
+        <v-content v-show="currentTab == 'others'">
           <!-- <label>
             <input
               type="checkbox"
@@ -204,9 +204,9 @@
             {{$t("settings.showFPS")}}
           </label><br>
           <p>{{$t("settings.showFPSDescriptions")}}</p>
-        </section>
-      </article>
-    </article>
+        </v-content>
+      </v-contents>
+    </v-settings-root>
   </VModal>
 </template>
 
@@ -292,8 +292,9 @@ export default class VSettings extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.settings-root {
+v-settings-root {
   text-align: center;
+  display: block;
   >ul {
     list-style-type: none;
     padding: 0px;
@@ -306,13 +307,15 @@ export default class VSettings extends Vue {
       }
     }
   }
-  >.content {
+  >v-contents {
     // color: #333333;
     height: 190px;
     overflow-y: scroll;
     overflow-x: hidden;
-    >section {
+    display: block;
+    >v-content {
       text-align: left;
+      display: block;
       >p {
         font-size: 0.8em;
         margin-left: 16px;
