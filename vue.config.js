@@ -18,6 +18,18 @@ try {
 }
 module.exports = {
   productionSourceMap: false,
+  chainWebpack: config => {
+    config.module
+      .rule("vue")
+      .use("vue-loader")
+      .tap((options) => ({
+        ...options,
+        hotReload: false,
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith("v-")
+        }
+      }));
+  },
   pluginOptions: {
     electronBuilder: {
       preload: files.renderer.preload,
@@ -40,19 +52,12 @@ module.exports = {
           .tap((args) => {
             args[0].template = files.main.template
             return args;
-          })
-        config.module
-          .rule("vue")
-          .use("vue-loader")
-          .tap(options => {
-            options.hotReload = false
-            return options
           });
         config.module
           .rule("images")
           .test(/\.(png)(\?.*)?$/)
           .use("url-loader")
-          .loader('url-loader')
+          .loader('url-loader');
           // .options({
           //   limit: 8192,
           //   name: `assets/[name].[hash].[ext]`
