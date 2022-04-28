@@ -1,6 +1,5 @@
 <template>
-  <article
-    class="modal-root"
+  <v-modal-root
     :class="{
       'no-background': noBackground
     }"
@@ -11,21 +10,20 @@
     }"
     ref="background"
   >
-    <div
-      class="modal"
+    <v-modal
       :style="childStyle ? {
         ...childStyle,
         ...(center ? centerStyle : {})
       } : (center ? centerStyle : {})"
     >
-      <div class="title" v-if="visibleCloseButton">
-        <span class="close" @click="close" v-html="$texts.close"></span>
-      </div>
-      <div class="content">
+      <v-buttons v-if="visibleCloseButton">
+        <v-button @click="close" v-html="$texts.close"></v-button>
+      </v-buttons>
+      <v-content>
         <slot></slot>
-      </div>
-    </div>
-  </article>
+      </v-content>
+    </v-modal>
+  </v-modal-root>
 </template>
 
 <script lang="ts">
@@ -121,7 +119,7 @@ export default class VModal extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.modal-root {
+v-modal-root {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -130,10 +128,11 @@ export default class VModal extends Vue {
   background-color: var(--modal-bg-color);
   color: var(--font-color);
   overflow: hidden;
+  display: block;
   &.no-background {
     background-color: transparent;
   }
-  >.modal {
+  >v-modal {
     width: 600px;
     background-color: var(--bg-color);
     padding: 16px;
@@ -141,9 +140,10 @@ export default class VModal extends Vue {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    >.title {
+    >v-buttons {
       text-align: right;
-      >.close {
+      display: block;
+      >v-button {
         font-family: Segoe MDL2 Assets,
           "Helvetica Neue",
           Arial,
@@ -154,9 +154,10 @@ export default class VModal extends Vue {
         cursor: pointer;
       }
     }
-    >.content {
+    >v-content {
       flex: 1;
       overflow: hidden;
+      display: block;
     }
   }
 }
