@@ -1,84 +1,80 @@
 <template>
-  <article
-    class="board-property-root"
-  >
-    <section class="tab-bottom">
-      <article v-if="board" class="board-parameters">
-        <button
-          tabindex="-1"
-          @click="board.transform.scale = 1"
-        >
-          {{Math.floor(board.transform.scale * 100)}}%
-        </button>
-        <button
-          class="color"
-          tabindex="-1"
-          :style="{
-            backgroundColor: board.background.fillColor
-          }"
-          @click="$refs['inputFillColor'].click()"
-        >
-          &nbsp;
-        </button>
-        <input
-          type="color"
-          v-model="board.background.fillColor"
-          tabindex="-1"
-          ref="inputFillColor"
-        >
-        <button
-          class="color"
-          tabindex="-1"
-          :style="{
-            backgroundColor: board.background.lineColor
-          }"
-          @click="$refs['inputLineColor'].click()"
-        >
-          &nbsp;
-        </button>
-        <input
-          type="color"
-          v-model="board.background.lineColor"
-          tabindex="-1"
-          ref="inputLineColor"
-        >
-      </article>
-      <article class="shared-buttons left">
-        <button
-          tabindex="-1"
-          @click="$components.browser.open()"
-        >
-          <span class="browser"></span>
-        </button>
-        <button
-          tabindex="-1"
-          @click="$api.send('importImageFiles')"
-        >
-          <span class="import-file"></span>
-        </button>
-        <button
-          tabindex="-1"
-          @click="$api.send('importImageDirectories')"
-        >
-          <span class="import-folder"></span>
-        </button>
-      </article>
-      <article class="shared-buttons right">
-        <button
-          tabindex="-1"
-          @click="$components.info.open"
-        >
-          <span class="info"></span>
-        </button>
-        <button
-          tabindex="-1"
-          @click="$components.settings.open"
-        >
-          <span class="settings"></span>
-        </button>
-      </article>
-    </section>
-  </article>
+  <v-board-property-root>
+    <v-property v-if="board">
+      <button
+        tabindex="-1"
+        @click="board.transform.scale = 1"
+      >
+        {{Math.floor(board.transform.scale * 100)}}%
+      </button>
+      <button
+        class="color"
+        tabindex="-1"
+        :style="{
+          backgroundColor: board.background.fillColor
+        }"
+        @click="$refs['inputFillColor'].click()"
+      >
+        &nbsp;
+      </button>
+      <input
+        type="color"
+        v-model="board.background.fillColor"
+        tabindex="-1"
+        ref="inputFillColor"
+      >
+      <button
+        class="color"
+        tabindex="-1"
+        :style="{
+          backgroundColor: board.background.lineColor
+        }"
+        @click="$refs['inputLineColor'].click()"
+      >
+        &nbsp;
+      </button>
+      <input
+        type="color"
+        v-model="board.background.lineColor"
+        tabindex="-1"
+        ref="inputLineColor"
+      >
+    </v-property>
+    <v-shared class="left">
+      <button
+        tabindex="-1"
+        @click="$components.browser.open()"
+      >
+        <v-icon class="browser"></v-icon>
+      </button>
+      <button
+        tabindex="-1"
+        @click="$api.send('importImageFiles')"
+      >
+        <v-icon class="import-file"></v-icon>
+      </button>
+      <button
+        tabindex="-1"
+        @click="$api.send('importImageDirectories')"
+      >
+        <v-icon class="import-folder"></v-icon>
+      </button>
+    </v-shared>
+    <v-shared class=" right">
+      <button
+        tabindex="-1"
+        @click="$components.info.open"
+      >
+        <v-icon class="info"></v-icon>
+      </button>
+      <button
+        tabindex="-1"
+        @click="$components.settings.open"
+      >
+        <v-icon class="settings"></v-icon>
+      </button>
+    </v-shared>
+  </v-board-property-root>
 </template>
 
 <script lang="ts">
@@ -107,21 +103,17 @@ export default class VBoardProperty extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.board-property-root {
+v-board-property-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   width: 100%;
-  background-color: var(--tab-bg-color);
   position: absolute;
   z-index: 2;
-  >.tab-bottom {
-    width: 100%;
     background-color: var(--tab-selected-color);
     height: 30px;
     box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
-    position: relative;
     border-bottom: solid 1px var(--bg-color);
-    >.shared-buttons {
+    >v-shared {
       position: absolute;
       top: 0px;
       height: 100%;
@@ -142,14 +134,14 @@ export default class VBoardProperty extends Vue {
           margin-left: 4px;
         }
       }
-      &.left ,&.right {
+      &.left, &.right {
         >button {
           min-width: 24px;
           padding: 0px;
           height: 100%;
           margin: 0px;
           border: none;
-          span {
+          v-icon {
             display: block;
             width: 100%;
             height: 100%;
@@ -176,7 +168,7 @@ export default class VBoardProperty extends Vue {
         }
       }
     }
-    >.board-parameters {
+    >v-property {
       position: absolute;
       top: 0px;
       left: 0px;
@@ -210,6 +202,5 @@ export default class VBoardProperty extends Vue {
         }
       }
     }
-  }
 }
 </style>
