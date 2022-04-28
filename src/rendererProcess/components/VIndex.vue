@@ -11,19 +11,23 @@
       ref="vPetaBoard"
       @change="changePetaBoard"
     />
-    <VTabBar
-      :zIndex="3"
-      :uiVisible="uiVisible"
-      :boards="sortedPetaBoards"
-      :title="title"
-      :currentPetaBoardId="currentPetaBoardId"
-      @remove="removePetaBoard"
-      @add="addPetaBoard"
-      @select="selectPetaBoard"
-      @sort="changePetaBoards"
-      @change="changePetaBoard"
-      ref="vTabBar"
-    />
+    <section class="top">
+      <VTitleBar :zIndex="3">
+        <VTabBar
+          :uiVisible="uiVisible"
+          :boards="sortedPetaBoards"
+          :title="title"
+          :currentPetaBoardId="currentPetaBoardId"
+          @remove="removePetaBoard"
+          @add="addPetaBoard"
+          @select="selectPetaBoard"
+          @sort="changePetaBoards"
+          @change="changePetaBoard"
+          ref="vTabBar"
+        />
+      </VTitleBar>
+      <VBoardProperty :board="currentPetaBoard"/>
+    </section>
     <section
       class="modals"
       v-show="this.$components.modal.modalIds.length > 0"
@@ -62,6 +66,8 @@ import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTabBar from "@/rendererProcess/components/tabBar/VTabBar.vue";
+import VTitleBar from "@/rendererProcess/components/tabBar/VTitleBar.vue";
+import VBoardProperty from "@/rendererProcess/components/boardProperty/VBoardProperty.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VInfo from "@/rendererProcess/components/info/VInfo.vue";
@@ -89,6 +95,8 @@ import { minimId } from "@/commons/utils/utils";
     VImageImporter,
     VTasks,
     VTabBar,
+    VBoardProperty,
+    VTitleBar,
     VContextMenu,
     VComplement,
     VInfo,
@@ -400,6 +408,13 @@ body, html {
     top: 0px;
     left: 0px;
     z-index: 2;
+  }
+  >.top {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index: 3;
   }
 }
 </style>
