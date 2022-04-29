@@ -765,7 +765,7 @@ import sharp from "sharp";
           }
           return false;
         },
-        startDrag: async (event, petaImages, iconSize) => {
+        startDrag: async (event, petaImages, iconSize, iconData) => {
           const first = petaImages[0];
           if (!first) {
             return;
@@ -776,6 +776,7 @@ import sharp from "sharp";
             .png()
             .toBuffer()
           );
+          // const icon = nativeImage.createFromDataURL(iconData);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
           event.sender.startDrag({

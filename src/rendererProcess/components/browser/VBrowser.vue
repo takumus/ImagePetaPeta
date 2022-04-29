@@ -67,6 +67,9 @@
           :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
         >
       </v-right>
+      <!-- <v-canvas-test>
+        <canvas width="128" height="128" ref="testCanvas"></canvas>
+      </v-canvas-test> -->
     </v-browser-root>
   </VModal>
 </template>
@@ -98,6 +101,8 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { getColors, getSimilarityScore } from "@/commons/utils/blurhashTools";
+import { getImageURL } from "@/rendererProcess/utils/imageURL";
+import { ImageType } from "@/commons/datas/imageType";
 @Options({
   components: {
     VTile,
@@ -122,6 +127,8 @@ export default class VBrowser extends Vue {
   thumbnails!: HTMLDivElement;
   @Ref("thumbsWrapper")
   thumbsWrapper!: HTMLDivElement;
+  @Ref()
+  testCanvas!: HTMLCanvasElement;
   thumbnailsWidth = 0;
   areaMaxY = 0;
   areaMinY = 0;
@@ -234,8 +241,46 @@ export default class VBrowser extends Vue {
       this.clearSelectionAllImages();
     }
     const petaImages = petaImage._selected ? [] : [petaImage];
-    petaImages.push(...this.selectedPetaImages)
-    API.send("startDrag", petaImages, 128);
+    petaImages.push(...this.selectedPetaImages);
+    // console.log(petaImages);
+    // const ctx = this.testCanvas.getContext("2d");
+    // const image = new Image();
+    // image.src = getImageURL(petaImage, ImageType.THUMBNAIL);
+    // image.onload = () => {
+    //   if (!ctx) {
+    //     return;
+    //   }
+    //   const ts = 128;
+    //   let w = 0;
+    //   let h = 0;
+    //   if (petaImage.width > petaImage.height) {
+    //     w = ts;
+    //     h = petaImage.height * ts;
+    //   } else {
+    //     h = ts;
+    //     w = ts / petaImage.height;
+    //   }
+    //   ctx.clearRect(0, 0, ts, ts);
+    //   ctx.drawImage(image, 0, 0, w, h);
+    //   ctx.font = `24px "Helvetica Neue",
+    //   Arial,
+    //   "Hiragino Kaku Gothic ProN",
+    //   "Hiragino Sans",
+    //   Meiryo,
+    //   sans-serif`;
+    //   ctx.fillStyle = 'white';
+    //   ctx.beginPath();
+    //   ctx.ellipse(12, 12, 12, 12, 0, 0, 360);
+    //   ctx.fill();
+    //   ctx.fillStyle = '#333333';
+    //   ctx.textBaseline = 'middle';
+    //   ctx.textAlign = "center";
+    //   ctx.fillText(petaImages.length.toString(), 12, 12);
+    //   console.log(this.testCanvas.toDataURL("image/png"));
+    //   API.send("startDrag", petaImages, 128, this.testCanvas.toDataURL("image/png"));
+    //   this.close();
+    // }
+    API.send("startDrag", petaImages, 128, "");
     this.close();
   }
   selectThumbnail(thumb: Tile, force = false) {
@@ -529,6 +574,12 @@ v-browser-root {
     padding: 8px;
     display: flex;
     flex-direction: column;
+  }
+  >v-canvas-test {
+    position: fixed;
+    bottom: 100px;
+    left: 100px;
+    background-color: #ff0000;
   }
 }
 </style>
