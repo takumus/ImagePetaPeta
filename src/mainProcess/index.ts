@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, Tray, Menu } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, Tray, Menu, screen } from "electron";
 import * as Path from "path";
 import axios from "axios";
 import dataURIToBuffer from "data-uri-to-buffer";
@@ -49,7 +49,8 @@ import sharp from "sharp";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  let window: BrowserWindow;
+  let mainWindow: BrowserWindow;
+  let dragPreviewWindow: BrowserWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
   let DIR_LOG: string;
@@ -187,7 +188,7 @@ import sharp from "sharp";
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
     if (BrowserWindow.getAllWindows().length === 0) {
-      initWindow();
+      mainWindow = initWindow();
     }
   });
   //-------------------------------------------------------------------------------------------------//
@@ -287,7 +288,18 @@ import sharp from "sharp";
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    initWindow();
+    mainWindow = initWindow();
+    dragPreviewWindow = initWindow2();
+    setInterval(() => {
+      const point = screen.getCursorScreenPoint();
+      dragPreviewWindow.setBounds({
+          width: 256,
+          height: 256,
+          x: point.x,
+          y: point.y
+      });
+      dragPreviewWindow.moveTop();
+    }, 0);
     //-------------------------------------------------------------------------------------------------//
     /*
       IPCのメインプロセス側のAPI
@@ -303,7 +315,7 @@ import sharp from "sharp";
         importImageFiles: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          const result = await dialog.showOpenDialog(window, {
+          const result = await dialog.showOpenDialog(mainWindow, {
             properties: ["openFile", "multiSelections"]
           });
           if (result.canceled) {
@@ -317,7 +329,7 @@ import sharp from "sharp";
         importImageDirectories: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
-          const result = await dialog.showOpenDialog(window, {
+          const result = await dialog.showOpenDialog(mainWindow, {
             properties: ["openDirectory"]
           });
           if (result.canceled) {
@@ -603,7 +615,7 @@ import sharp from "sharp";
           try {
             log.log("#Update Settings");
             dataSettings.data = settings;
-            window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            mainWindow.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             dataSettings.save();
             log.log("return:", dataSettings.data);
             return true;
@@ -627,7 +639,7 @@ import sharp from "sharp";
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = window.isFocused();
+          const isFocued = mainWindow.isFocused();
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -635,21 +647,21 @@ import sharp from "sharp";
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
-          window.webContents.setZoomLevel(level);
+          mainWindow.webContents.setZoomLevel(level);
         },
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          window.minimize();
+          mainWindow.minimize();
         },
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          if (window.isMaximized()) {
-            window.unmaximize();
+          if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
             return;
           }
-          window.maximize();
+          mainWindow.maximize();
         },
         windowClose: async (event) => {
           const log = mainLogger.logChunk();
@@ -683,7 +695,7 @@ import sharp from "sharp";
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          const file = await dialog.showOpenDialog(window, {
+          const file = await dialog.showOpenDialog(mainWindow, {
             properties: ["openDirectory"]
           });
           if (file.canceled) {
@@ -778,6 +790,7 @@ import sharp from "sharp";
           //   .toBuffer()
           // );
           // const icon = nativeImage.createFromDataURL(iconData);
+          dragPreviewWindow.loadFile(Path.resolve(DIR_THUMBNAILS, first.file.thumbnail));
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
           event.sender.startDrag({
@@ -792,6 +805,7 @@ import sharp from "sharp";
           }
           const ids = [...dropFromBrowserPetaImageIds];
           dropFromBrowserPetaImageIds = undefined;
+          dragPreviewWindow.loadURL(Transparent);
           return ids;
         }
       }
@@ -807,17 +821,17 @@ import sharp from "sharp";
       mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
-      if (window && quit) {
-        window.loadURL("data:text/html;charset=utf-8,");
+      if (mainWindow && quit) {
+        mainWindow.loadURL("data:text/html;charset=utf-8,");
       }
     } catch { }
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    window.webContents.send(key, ...args);
+    mainWindow.webContents.send(key, ...args);
   }
-  async function initWindow() {
-    window = new BrowserWindow({
+  function initWindow() {
+    const window = new BrowserWindow({
       width: dataStates.data.windowSize.width,
       height: dataStates.data.windowSize.height,
       minWidth: WINDOW_MIN_WIDTH,
@@ -836,12 +850,12 @@ import sharp from "sharp";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      await window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
       if (!process.env.IS_TEST) {
         window.webContents.openDevTools({ mode: "detach" });
       }
     } else {
-      await window.loadURL("app://./index.html");
+      window.loadURL("app://./index.html");
     }
     window.setMenuBarVisibility(false);
     // window.webContents.debugger.attach("1.1");
@@ -876,6 +890,42 @@ import sharp from "sharp";
       emitMainEvent("windowFocused", true);
     });
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+    return window;
+  }
+  function initWindow2() {
+    const window = new BrowserWindow({
+      width: 256,
+      height: 256,
+      maxHeight: 256,
+      maxWidth: 256,
+      minHeight: 256,
+      minWidth: 256,
+      resizable: false,
+      frame: false,
+      show: true,
+      alwaysOnTop: true,
+      transparent: true,
+      focusable: false,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: Path.join(__dirname, "preload.js"),
+      },
+    });
+    window.setIgnoreMouseEvents(true);
+    window.setMenuBarVisibility(false);
+    if (dataStates.data.windowIsMaximized) {
+      window.maximize();
+    }
+    window.on("close", () => {
+      //
+    });
+    window.addListener("blur", () => {
+      //
+    });
+    window.addListener("focus", () => {
+      //
+    });
     return window;
   }
   async function prepareUpdate(remote: RemoteBinaryInfo) {
