@@ -35,6 +35,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
 import { isLatest } from "@/commons/utils/versionCheck";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import AppIcon from "@/@assets/icon.png";
+import Transparent from "@/@assets/transparent.png";
 import sharp from "sharp";
 (() => {
   /*------------------------------------
@@ -770,19 +771,19 @@ import sharp from "sharp";
           if (!first) {
             return;
           }
-          const icon = nativeImage.createFromBuffer(
-            await sharp(Path.resolve(DIR_THUMBNAILS, first.file.thumbnail))
-            .resize(Math.floor(iconSize))
-            .png()
-            .toBuffer()
-          );
+          // const icon = nativeImage.createFromBuffer(
+          //   await sharp(Path.resolve(DIR_THUMBNAILS, first.file.thumbnail))
+          //   .resize(Math.floor(iconSize))
+          //   .png()
+          //   .toBuffer()
+          // );
           // const icon = nativeImage.createFromDataURL(iconData);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
           event.sender.startDrag({
             file: files[0]!,
             files: files,
-            icon: nativeImage.createFromDataURL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="),
+            icon: nativeImage.createFromDataURL(Transparent),
           });
         },
         getDropFromBrowserPetaImageIds: async () => {
