@@ -52,7 +52,7 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
   */
   //-------------------------------------------------------------------------------------------------//
   let mainWindow: BrowserWindow;
-  let dragPreviewWindow: BrowserWindow;
+  let dragPreviewWindow: BrowserWindow | undefined;
   const dragPreviewWindowSize = new Vec2();
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -200,15 +200,15 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
   */
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
-    console.log(__dirname);
-    const tray = new Tray(nativeImage.createFromDataURL(AppIcon));
-    tray.setToolTip(app.getName());
-    tray.setContextMenu(Menu.buildFromTemplate([
-      { label: 'Item1', type: 'radio' },
-      { label: 'Item2', type: 'radio' },
-      { label: 'Item3', type: 'radio', checked: true },
-      { label: 'Item4', type: 'radio' }
-    ]));
+    // console.log(__dirname);
+    // const tray = new Tray(nativeImage.createFromDataURL(AppIcon));
+    // tray.setToolTip(app.getName());
+    // tray.setContextMenu(Menu.buildFromTemplate([
+    //   { label: 'Item1', type: 'radio' },
+    //   { label: 'Item2', type: 'radio' },
+    //   { label: 'Item3', type: 'radio', checked: true },
+    //   { label: 'Item4', type: 'radio' }
+    // ]));
     mainLogger.logChunk().log(`\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`);
     mainLogger.logChunk().log(`verison: ${app.getVersion()}`);
     //-------------------------------------------------------------------------------------------------//
@@ -292,8 +292,13 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
     mainWindow = initWindow();
-    dragPreviewWindow = initWindow2();
+    if (process.platform != "darwin") {
+      dragPreviewWindow = initWindow2();
+    }
     setInterval(() => {
+      if (!dragPreviewWindow) {
+        return;
+      }
       try {
         if (!mainWindow.isFocused()) {
           dragPreviewWindow.setOpacity(0);
@@ -794,25 +799,20 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
           if (!first) {
             return;
           }
-          // const icon = nativeImage.createFromBuffer(
-          //   await sharp(Path.resolve(DIR_THUMBNAILS, first.file.thumbnail))
-          //   .resize(Math.floor(iconSize))
-          //   .png()
-          //   .toBuffer()
-          // );
-          // const icon = nativeImage.createFromDataURL(iconData);
-          dragPreviewWindow.loadURL(
-            `data:text/html;charset=utf-8,
-            <head>
-            <style>html, body { margin: 0px; padding: 0px; background-color: transparent; } img { width: 100%; height: 100%; }</style>
-            </head>
-            <body>
-            <img src="${getImageURL(first, ImageType.THUMBNAIL)}">
-            </body>`
-          );
-          dragPreviewWindow.setOpacity(0.8);
-          dragPreviewWindowSize.x = iconSize;
-          dragPreviewWindowSize.y = first.height * iconSize;
+          if (dragPreviewWindow) {
+            dragPreviewWindow.loadURL(
+              `data:text/html;charset=utf-8,
+              <head>
+              <style>html, body { margin: 0px; padding: 0px; background-color: transparent; } img { width: 100%; height: 100%; }</style>
+              </head>
+              <body>
+              <img src="${getImageURL(first, ImageType.THUMBNAIL)}">
+              </body>`
+            );
+            dragPreviewWindow.setOpacity(0.8);
+            dragPreviewWindowSize.x = iconSize;
+            dragPreviewWindowSize.y = first.height * iconSize;
+          }
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
           event.sender.startDrag({
@@ -827,13 +827,15 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
           }
           const ids = [...dropFromBrowserPetaImageIds];
           dropFromBrowserPetaImageIds = undefined;
-          dragPreviewWindow.loadURL(`data:text/html;charset=utf-8,
-          <head>
-          <style>html, body { background-color: transparent; }</style>
-          </head>
-          <body>
-          </body>`);
-          dragPreviewWindow.setOpacity(0);
+          if (dragPreviewWindow) {
+            dragPreviewWindow.loadURL(`data:text/html;charset=utf-8,
+            <head>
+            <style>html, body { background-color: transparent; }</style>
+            </head>
+            <body>
+            </body>`);
+            dragPreviewWindow.setOpacity(0);
+          }
           return ids;
         }
       }
@@ -910,6 +912,7 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
       dataStates.save();
       const log = mainLogger.logChunk();
       log.log("#Save Window Size", dataStates.data.windowSize);
+      app.quit();
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false);
