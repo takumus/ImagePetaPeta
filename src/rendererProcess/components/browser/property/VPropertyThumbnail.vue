@@ -1,6 +1,5 @@
 <template>
-  <article
-    class="property-thumbnail-root"
+  <v-property-thumbnail-root
     :style="{
       top: propertyThumbnail.position.y + 'px',
       left: propertyThumbnail.position.x + 'px',
@@ -8,14 +7,14 @@
       height: this.propertyThumbnail.height + 'px'
     }"
   >
-    <div class="wrapper">
+    <v-image-wrapper>
       <img
         draggable="false"
         :src="imageURL"
         v-if="loaded"
       >
-    </div>
-  </article>
+    </v-image-wrapper>
+  </v-property-thumbnail-root>
 </template>
 
 <script lang="ts">
@@ -44,10 +43,10 @@ export default class VPropertyThumbnail extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.property-thumbnail-root {
+v-property-thumbnail-root {
   display: block;
   position: absolute;
-  >.wrapper {
+  >v-image-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -55,6 +54,7 @@ export default class VPropertyThumbnail extends Vue {
     border-radius: var(--rounded);
     background-repeat: repeat;
     background-image: url("~@/@assets/transparentBackground.png");
+    display: block;
     >img {
       display: block;
       width: 100%;
