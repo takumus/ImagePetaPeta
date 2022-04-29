@@ -1,34 +1,31 @@
 <template>
-  <article
-    class="board-root"
+  <v-board-root
     ref="boardRoot"
     v-show="board"
     :style="{
       zIndex: zIndex
     }"
   >
-    <section
+    <v-pixi-container
       ref="panelsBackground"
       class="panels-wrapper"
     >
-    </section>
-    <section
-      class="crop"
+    </v-pixi-container>
+    <v-crop
       v-if="cropping"
     >
       <VCrop
         :petaPanel="croppingPetaPanel"
         @update="updateCrop"
       />
-    </section>
-    <section class="info">
-      <span
-        class="zoom"
+    </v-crop>
+    <v-info>
+      <v-fps
         v-show="$settings.showFPS"
       >
         {{fps}}fps
-      </span>
-    </section>
+      </v-fps>
+    </v-info>
     <VBoardLoading
       :zIndex="2"
       :loading="loading"
@@ -45,7 +42,7 @@
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
     />
-  </article>
+  </v-board-root>
 </template>
 
 <script lang="ts">
@@ -760,37 +757,40 @@ export default class VBoard extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.board-root {
+v-board-root {
   position: absolute;
   top: 0px;
   left: 0px;
   width: 100%;
   height: 100%;
-  >.panels-wrapper {
+  display: block;
+  >v-pixi-container {
     position: absolute;
     top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
     z-index: 1;
+    display: block;
   }
-  >.crop {
+  >v-crop {
     position: absolute;
     z-index: 3;
     top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
+    display: block;
   }
-  >.info {
+  >v-info {
     position: absolute;
     z-index: 2;
     bottom: 0px;
-    right: 0px;
+    left: 0px;
     padding: 8px;
     height: 40px;
     display: flex;
-    >.zoom {
+    >v-fps {
       display: block;
       padding: 4px;
       border-radius: var(--rounded);
@@ -799,16 +799,6 @@ export default class VBoard extends Vue {
       height: 100%;
       width: 50px;
       text-align: center;
-      margin-left: 8px;
-    }
-    >input {
-      display: block;
-      margin-left: 8px;
-      border-radius: var(--rounded);
-      border: solid 1px var(--border-color);
-      height: 100%;
-      width: 50px;
-      background-color: var(--bg-color);
     }
   }
 }
