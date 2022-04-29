@@ -4,13 +4,13 @@
     :center="true"
     :zIndex="zIndex"
   >
-    <article class="board-loading-root">
+    <v-board-loading-root>
       <p>
         {{$t("boards.loading")}}{{Math.floor(progress)}}%
       </p>
       <VProgressBar :progress="progress"></VProgressBar>
       <pre class="log">{{log}}</pre>
-    </article>
+    </v-board-loading-root>
   </VModal>
 </template>
 
@@ -43,9 +43,9 @@ export default class VBoardLoading extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.board-loading-root {
+v-board-loading-root {
   text-align: center;
-  .log {
+  >.log {
     text-align: left;
     overflow: hidden;
     word-break: break-all;
@@ -55,7 +55,7 @@ export default class VBoardLoading extends Vue {
     overflow-x: hidden;
     font-size: 0.8em;
   }
-  p {
+  >p {
     white-space: nowrap;
   }
 }
