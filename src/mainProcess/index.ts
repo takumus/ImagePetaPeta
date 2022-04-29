@@ -37,6 +37,8 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import AppIcon from "@/@assets/icon.png";
 import Transparent from "@/@assets/transparent.png";
 import sharp from "sharp";
+import { Vec2 } from "@/commons/utils/vec2";
+import { getImageURL } from "@/rendererProcess/utils/imageURL";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -51,6 +53,7 @@ import sharp from "sharp";
   //-------------------------------------------------------------------------------------------------//
   let mainWindow: BrowserWindow;
   let dragPreviewWindow: BrowserWindow;
+  const dragPreviewWindowSize = new Vec2();
   let DIR_ROOT: string;
   let DIR_APP: string;
   let DIR_LOG: string;
@@ -291,14 +294,22 @@ import sharp from "sharp";
     mainWindow = initWindow();
     dragPreviewWindow = initWindow2();
     setInterval(() => {
-      const point = screen.getCursorScreenPoint();
-      dragPreviewWindow.setBounds({
-          width: 256,
-          height: 256,
-          x: point.x,
-          y: point.y
-      });
-      dragPreviewWindow.moveTop();
+      try {
+        if (!mainWindow.isFocused()) {
+          dragPreviewWindow.setOpacity(0);
+          return;
+        }
+        const point = screen.getCursorScreenPoint();
+        dragPreviewWindow.setBounds({
+            width: Math.floor(dragPreviewWindowSize.x),
+            height: Math.floor(dragPreviewWindowSize.y),
+            x: Math.floor(point.x - dragPreviewWindowSize.x / 2),
+            y: Math.floor(point.y - dragPreviewWindowSize.y / 2)
+        });
+        dragPreviewWindow.moveTop();
+      } catch (error) {
+        
+      }
     }, 0);
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -790,7 +801,18 @@ import sharp from "sharp";
           //   .toBuffer()
           // );
           // const icon = nativeImage.createFromDataURL(iconData);
-          dragPreviewWindow.loadFile(Path.resolve(DIR_THUMBNAILS, first.file.thumbnail));
+          dragPreviewWindow.loadURL(
+            `data:text/html;charset=utf-8,
+            <head>
+            <style>html, body { margin: 0px; padding: 0px; background-color: transparent; } img { width: 100%; height: 100%; }</style>
+            </head>
+            <body>
+            <img src="${getImageURL(first, ImageType.THUMBNAIL)}">
+            </body>`
+          );
+          dragPreviewWindow.setOpacity(0.8);
+          dragPreviewWindowSize.x = iconSize;
+          dragPreviewWindowSize.y = first.height * iconSize;
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
           event.sender.startDrag({
@@ -805,7 +827,13 @@ import sharp from "sharp";
           }
           const ids = [...dropFromBrowserPetaImageIds];
           dropFromBrowserPetaImageIds = undefined;
-          dragPreviewWindow.loadURL(Transparent);
+          dragPreviewWindow.loadURL(`data:text/html;charset=utf-8,
+          <head>
+          <style>html, body { background-color: transparent; }</style>
+          </head>
+          <body>
+          </body>`);
+          dragPreviewWindow.setOpacity(0);
           return ids;
         }
       }
@@ -896,10 +924,6 @@ import sharp from "sharp";
     const window = new BrowserWindow({
       width: 256,
       height: 256,
-      maxHeight: 256,
-      maxWidth: 256,
-      minHeight: 256,
-      minWidth: 256,
       resizable: false,
       frame: false,
       show: true,
@@ -914,18 +938,7 @@ import sharp from "sharp";
     });
     window.setIgnoreMouseEvents(true);
     window.setMenuBarVisibility(false);
-    if (dataStates.data.windowIsMaximized) {
-      window.maximize();
-    }
-    window.on("close", () => {
-      //
-    });
-    window.addListener("blur", () => {
-      //
-    });
-    window.addListener("focus", () => {
-      //
-    });
+    window.setOpacity(0);
     return window;
   }
   async function prepareUpdate(remote: RemoteBinaryInfo) {
