@@ -1,23 +1,21 @@
 <template>
-  <article
-    class="thumbnail-root"
+  <v-tile-root
     :style="{
       transform: `translate(${tile.position.x + 'px'}, ${tile.position.y + 'px'})`,
       width: tile.width + 'px',
       height: tile.height + 'px'
     }"
   >
-    <div class="wrapper">
-      <div
-        class="img"
+    <v-tile-wrapper>
+      <v-images
         @mousedown="mousedown($event)"
         :class="{
           'selected-image': tile.petaImage._selected
         }"
       >
-        <div class="nsfw" v-if="showNsfw">
+        <v-nsfw v-if="showNsfw">
           NSFW
-        </div>
+        </v-nsfw>
         <canvas
           ref="canvas"
           class="placeholder"
@@ -33,38 +31,34 @@
           v-show="!loadingImage"
           loading="lazy"
           @load="loaded"
-          class="image"
         >
-        <section
+        <v-background
           class="transparent-background"
         >
-        </section>
-      </div>
-      <div class="info">
-        <span
-          class="tags"
+        </v-background>
+      </v-images>
+      <v-tags>
+        <v-tag
           v-for="petaTag in myPetaTags"
           :key="petaTag.id"
         >
           {{petaTag.name}}
-        </span>
-        <span
-          class="tags"
+        </v-tag>
+        <v-tag
           v-if="myPetaTags.length == 0 && !loadingTags"
         >
           {{$t("browser.untagged")}}
-        </span>
-      </div>
-      <div
-        class="selected"
+        </v-tag>
+      </v-tags>
+      <v-selected
         v-show="tile.petaImage._selected"
       >
-        <div class="checkbox">
+        <v-icon>
           ✔
-        </div>
-      </div>
-    </div>
-  </article>
+        </v-icon>
+      </v-selected>
+    </v-tile-wrapper>
+  </v-tile-root>
 </template>
 
 <script lang="ts">
@@ -218,19 +212,20 @@ export default class VTile extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.thumbnail-root {
+v-tile-root {
   display: block;
   position: absolute;
   padding-right: 8px;
   padding-top: 8px;
-  >.wrapper {
+  >v-tile-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
     transition: box-shadow 100ms ease-in-out;
-    >.img {
+    display: block;
+    >v-images {
       display: block;
       width: 100%;
       height: 100%;
@@ -243,7 +238,7 @@ export default class VTile extends Vue {
         border-radius: var(--rounded);
         padding: 2px;
       }
-      >.image {
+      >img {
         z-index: 1;
         position: absolute;
         top: 0px;
@@ -252,7 +247,7 @@ export default class VTile extends Vue {
         width: 100%;
         height: 100%;
       }
-      >.transparent-background {
+      >v-background {
         z-index: 0;
         position: absolute;
         top: 0px;
@@ -278,7 +273,7 @@ export default class VTile extends Vue {
           opacity: 0;
         }
       }
-      >.nsfw {
+      >v-nsfw {
         z-index: 2;
         position: relative;
         top: 0px;
@@ -292,15 +287,16 @@ export default class VTile extends Vue {
         align-items: center;
         color: #666666;
         font-weight: bold;
+        display: block;
       }
     }
     &:hover {
       box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
-      >.img {
-        filter: brightness(1);
+      v-images {
+        filter: brightness(1.0);
       }
     }
-    >.info {
+    >v-tags {
       width: 100%;
       position: absolute;
       bottom: 0px;
@@ -308,16 +304,18 @@ export default class VTile extends Vue {
       overflow-wrap: break-word;
       padding: 8px;
       line-height: 1.2em;
-      >.tags {
+      display: block;
+      >v-tag {
         background-color: rgba($color: (#000000), $alpha: 0.5);
         color: #ffffff;
         padding: 2px;
         border-radius: var(--rounded);
         margin-right: 4px;
         font-size: 0.8em;
+        display: inline;
       }
     }
-    >.selected {
+    >v-selected {
       position: absolute;
       bottom: 0px;
       right: 0px;
@@ -327,7 +325,8 @@ export default class VTile extends Vue {
       height: 100%;
       // background-color: rgba($color: #ffffff, $alpha: 0.4);
       border: solid 4px var(--font-color);
-      >.checkbox {
+      display: block;
+      >v-icon {
         border-radius: var(--rounded) 0px 0px 0px;
         background-color: var(--font-color);
         color: var(--bg-color);
@@ -337,6 +336,7 @@ export default class VTile extends Vue {
         margin-bottom: -2px;
         bottom: 0px;
         right: 0px;
+        display: block;
       }
     }
   }
