@@ -9,6 +9,8 @@
     <v-tile-wrapper>
       <v-images
         @mousedown="mousedown($event)"
+        @dragstart="dragstart($event)"
+        draggable="true"
         :class="{
           'selected-image': tile.petaImage._selected
         }"
@@ -81,7 +83,7 @@ import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE
 @Options({
   components: {
   },
-  emits: ["select", "add", "menu"]
+  emits: ["select", "menu", "drag"]
 })
 export default class VTile extends Vue {
   @Prop()
@@ -129,6 +131,10 @@ export default class VTile extends Vue {
     window.clearTimeout(this.loadOriginalTimeoutHandler);
     window.clearTimeout(this.fetchTagsTimeoutHandler);
   }
+  dragstart(event: MouseEvent) {
+    event.preventDefault();
+    this.$emit("drag", this.tile.petaImage);
+  }
   mousedown(event: MouseEvent) {
     this.click.down(new Vec2(event.clientX, event.clientY));
     window.addEventListener("mousemove", this.mousemove);
@@ -139,18 +145,19 @@ export default class VTile extends Vue {
         break;
       }
     }
+    // API.send("startDrag", this.tile.petaImage);
   }
   mousemove(event: MouseEvent) {
     if (!this.pressing) return;
     this.click.move(new Vec2(event.clientX, event.clientY));
     if (!this.click.isClick) {
-      const img = (event as Event).target as HTMLElement;
-      const elementRect = img.getBoundingClientRect();
-      const position = new Vec2(
-        elementRect.x + elementRect.width / 2,
-        elementRect.y + elementRect.height / 2
-      );
-      this.$emit("add", this.tile, vec2FromMouseEvent(event), position);
+      // const img = (event as Event).target as HTMLElement;
+      // const elementRect = img.getBoundingClientRect();
+      // const position = new Vec2(
+      //   elementRect.x + elementRect.width / 2,
+      //   elementRect.y + elementRect.height / 2
+      // );
+      // this.$emit("add", this.tile, vec2FromMouseEvent(event), position);
       this.pressing = false;
     }
   }

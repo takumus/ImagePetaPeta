@@ -35,6 +35,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
 import { isLatest } from "@/commons/utils/versionCheck";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import AppIcon from "@/@assets/icon.png";
+import sharp from "sharp";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -71,6 +72,7 @@ import AppIcon from "@/@assets/icon.png";
   let petaDatas: PetaDatas;
   let updateInstallerFilePath: string;
   let checkUpdateTimeoutHandler: NodeJS.Timeout;
+  let dropFromBrowserPetaImageIds: string[] | undefined = undefined;
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
@@ -762,6 +764,33 @@ import AppIcon from "@/@assets/icon.png";
             log.error(error);
           }
           return false;
+        },
+        startDrag: async (event, petaImages, iconSize) => {
+          const first = petaImages[0];
+          if (!first) {
+            return;
+          }
+          const icon = nativeImage.createFromBuffer(
+            await sharp(Path.resolve(DIR_THUMBNAILS, first.file.thumbnail))
+            .resize(Math.floor(iconSize))
+            .png()
+            .toBuffer()
+          );
+          dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
+          const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
+          event.sender.startDrag({
+            file: files[0]!,
+            files: files,
+            icon: icon,
+          });
+        },
+        getDropFromBrowserPetaImageIds: async () => {
+          if (!dropFromBrowserPetaImageIds) {
+            return undefined;
+          }
+          const ids = [...dropFromBrowserPetaImageIds];
+          dropFromBrowserPetaImageIds = undefined;
+          return ids;
         }
       }
     }

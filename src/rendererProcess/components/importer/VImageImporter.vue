@@ -28,6 +28,7 @@ export default class VImageImporter extends Vue {
       if (event.dataTransfer) {
         const url = getURLFromImgTag(event.dataTransfer.getData('text/html'));
         let ids: string[] = [];
+        let fromBrowser = false;
         if (url != "") {
           ids = [await API.send("importImageFromURL", url)];
         } else if (event.dataTransfer.files.length > 0) {
@@ -35,11 +36,15 @@ export default class VImageImporter extends Vue {
           for (const file of event.dataTransfer.files) {
             filePaths.push(file.path);
           }
-          ids = await API.send("importImagesFromFilePaths", filePaths);
+          const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
+          if (dropFromBrowserPetaImageIds) {
+            ids = dropFromBrowserPetaImageIds;
+            fromBrowser = true;
+          } else {
+            ids = await API.send("importImagesFromFilePaths", filePaths);
+          }
         }
-        // if (ids.length == 1) {
-        this.$emit("addPanelByDragAndDrop", ids, vec2FromMouseEvent(event));
-        // }
+        this.$emit("addPanelByDragAndDrop", ids, vec2FromMouseEvent(event), fromBrowser);
       }
     });
     document.addEventListener('dragover', (e) => {
@@ -64,7 +69,7 @@ export default class VImageImporter extends Vue {
       }
       await promiseSerial(readBuffer, [...items]).value;
       const ids = await API.send("importImagesFromClipboard", buffers);
-      this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition);
+      this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition, false);
     });
   }
 }

@@ -169,6 +169,32 @@ export default class Index extends Vue {
   }
   async getPetaImages() {
     this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
+    this.addOrderedPetaPanels();
+  }
+  async getPetaBoards() {
+    this.boards = await API.send("getPetaBoards");
+    dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
+    this.boards.forEach((board) => {
+      if (!this.boardUpdaters[board.id]) {
+        this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
+        this.boardUpdaters[board.id]!.initData(petaBoardsToDBPetaBoards(board));
+        this.boardUpdaters[board.id]!.onUpdate((board) => {
+          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
+        });
+      }
+    });
+  }
+  async getPetaTagInfos() {
+    this.petaTagInfos = await API.send("getPetaTagInfos");
+  }
+  addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
+    this.orderedAddPanelIds = ids;
+    this.orderedAddPanelDragEvent = mouse;
+    if (fromBrowser) {
+      this.addOrderedPetaPanels();
+    }
+  }
+  addOrderedPetaPanels() {
     let offsetIndex = 0;
     this.orderedAddPanelIds.forEach((id, i) => {
       const petaImage = this.petaImages[id];
@@ -188,26 +214,6 @@ export default class Index extends Vue {
     if (this.currentPetaBoard) {
       this.vPetaBoard.load();
     }
-  }
-  async getPetaBoards() {
-    this.boards = await API.send("getPetaBoards");
-    dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
-    this.boards.forEach((board) => {
-      if (!this.boardUpdaters[board.id]) {
-        this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id]!.initData(petaBoardsToDBPetaBoards(board));
-        this.boardUpdaters[board.id]!.onUpdate((board) => {
-          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
-        });
-      }
-    });
-  }
-  async getPetaTagInfos() {
-    this.petaTagInfos = await API.send("getPetaTagInfos");
-  }
-  addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
-    this.orderedAddPanelIds = ids;
-    this.orderedAddPanelDragEvent = mouse;
   }
   addPanel(petaPanel: PetaPanel, offsetIndex: number) {
     if (!this.currentPetaBoard) return;

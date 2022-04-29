@@ -43,9 +43,9 @@
                 :tile="data"
                 :original="original"
                 :petaTagInfos="petaTagInfos"
-                @add="addPanel"
                 @select="selectThumbnail"
                 @menu="petaImageMenu"
+                @drag="drag"
               />
             </v-tiles-content>
           </v-tiles>
@@ -197,36 +197,45 @@ export default class VBrowser extends Vue {
   resizeImages(rect: DOMRectReadOnly) {
     this.thumbnailsWidth = rect.width;
   }
-  async addPanel(thumb: Tile, worldPosition: Vec2, thumbnailPosition: Vec2) {
-    if (!Keyboards.pressedOR("shift", "control", "meta") && !thumb.petaImage._selected) {
+  // async addPanel(thumb: Tile, worldPosition: Vec2, thumbnailPosition: Vec2) {
+  //   if (!Keyboards.pressedOR("shift", "control", "meta") && !thumb.petaImage._selected) {
+  //     this.clearSelectionAllImages();
+  //   }
+  //   // 複数同時追加
+  //   const thumbnails = thumb.petaImage._selected ? [] : [thumb.petaImage];
+  //   thumbnails.push(...this.selectedPetaImages)
+  //   thumbnails.reverse();
+  //   if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
+  //     if (await this.$components.dialog.show(this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+  //       return;
+  //     }
+  //   }
+  //   thumb.petaImage._selected = true;
+  //   thumbnails.forEach((pi, i) => {
+  //     const panel = createPetaPanel(
+  //       pi,
+  //       worldPosition.clone(),
+  //       this.actualThumbnailSize
+  //     );
+  //     this.$emit(
+  //       "addPanel",
+  //       panel,
+  //       i
+  //     );
+  //     pi._selected = false;
+  //   });
+  //   this.selectedPetaImages.forEach((pi) => {
+  //     pi._selected = false;
+  //   });
+  //   this.close();
+  // }
+  drag(petaImage: PetaImage) {
+    if (!Keyboards.pressedOR("shift", "control", "meta") && !petaImage._selected) {
       this.clearSelectionAllImages();
     }
-    // 複数同時追加
-    const thumbnails = thumb.petaImage._selected ? [] : [thumb.petaImage];
-    thumbnails.push(...this.selectedPetaImages)
-    thumbnails.reverse();
-    if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
-      if (await this.$components.dialog.show(this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
-        return;
-      }
-    }
-    thumb.petaImage._selected = true;
-    thumbnails.forEach((pi, i) => {
-      const panel = createPetaPanel(
-        pi,
-        worldPosition.clone(),
-        this.actualThumbnailSize
-      );
-      this.$emit(
-        "addPanel",
-        panel,
-        i
-      );
-      pi._selected = false;
-    });
-    this.selectedPetaImages.forEach((pi) => {
-      pi._selected = false;
-    });
+    const petaImages = petaImage._selected ? [] : [petaImage];
+    petaImages.push(...this.selectedPetaImages)
+    API.send("startDrag", petaImages, 128);
     this.close();
   }
   selectThumbnail(thumb: Tile, force = false) {

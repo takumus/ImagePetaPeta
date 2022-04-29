@@ -504,20 +504,20 @@ export default class VBoard extends Vue {
     if (offsetIndex == 0) {
       this.clearSelectionAll();
     }
-    this.loadOriginal(petaPanel);
+    // this.loadOriginal(petaPanel);
     const offset = new Vec2(20, 20).mult(offsetIndex);
-    const pPanel = this.pPanels[petaPanel.id];
-    if (!pPanel) {
-      return;
-    }
+    // const pPanel = this.pPanels[petaPanel.id];
+    // if (!pPanel) {
+    //   return;
+    // }
     petaPanel.width *= 1 / this.board.transform.scale;
     petaPanel.height *= 1 / this.board.transform.scale;
     petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-    pPanel.draggingOffset = offset.mult(1 / this.board.transform.scale);
-    pPanel.dragging = true;
-    pPanel.selected = true;
+    // pPanel.draggingOffset = offset.mult(1 / this.board.transform.scale);
+    // pPanel.dragging = true;
+    // pPanel.selected = true;
     this.draggingPanels = true;
-    this.toFront(pPanel);
+    // this.toFront(pPanel);
   }
   beginCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;

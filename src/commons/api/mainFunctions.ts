@@ -47,4 +47,6 @@ export interface MainFunctions {
   setSelectedPetaBoard: (petaBoardId: string) => Promise<void>;
   waifu2xConvert: (petaImages: PetaImage[]) => Promise<boolean>;
   installUpdate: () => Promise<boolean>;
+  startDrag: (petaImages: PetaImage[], iconSize: number) => Promise<void>;
+  getDropFromBrowserPetaImageIds: () => Promise<string[] | undefined>;
 }
