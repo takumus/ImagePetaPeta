@@ -1,31 +1,31 @@
 <template>
-  <v-board-root
+  <t-board-root
     ref="boardRoot"
     v-show="board"
     :style="{
       zIndex: zIndex
     }"
   >
-    <v-pixi-container
+    <t-pixi-container
       ref="panelsBackground"
       class="panels-wrapper"
     >
-    </v-pixi-container>
-    <v-crop
+    </t-pixi-container>
+    <t-crop
       v-if="cropping"
     >
       <VCrop
         :petaPanel="croppingPetaPanel"
         @update="updateCrop"
       />
-    </v-crop>
-    <v-info>
-      <v-fps
+    </t-crop>
+    <t-info>
+      <t-fps
         v-show="$settings.showFPS"
       >
         {{fps}}fps
-      </v-fps>
-    </v-info>
+      </t-fps>
+    </t-info>
     <VBoardLoading
       :zIndex="2"
       :loading="loading"
@@ -42,7 +42,7 @@
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
     />
-  </v-board-root>
+  </t-board-root>
 </template>
 
 <script lang="ts">
@@ -757,14 +757,14 @@ export default class VBoard extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-board-root {
+t-board-root {
   position: absolute;
   top: 0px;
   left: 0px;
   width: 100%;
   height: 100%;
   display: block;
-  >v-pixi-container {
+  >t-pixi-container {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -773,7 +773,7 @@ v-board-root {
     z-index: 1;
     display: block;
   }
-  >v-crop {
+  >t-crop {
     position: absolute;
     z-index: 3;
     top: 0px;
@@ -782,7 +782,7 @@ v-board-root {
     height: 100%;
     display: block;
   }
-  >v-info {
+  >t-info {
     position: absolute;
     z-index: 2;
     bottom: 0px;
@@ -790,7 +790,7 @@ v-board-root {
     padding: 8px;
     height: 40px;
     display: flex;
-    >v-fps {
+    >t-fps {
       display: block;
       padding: 4px;
       border-radius: var(--rounded);

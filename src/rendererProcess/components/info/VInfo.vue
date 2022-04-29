@@ -5,7 +5,7 @@
     :visibleCloseButton="true"
     @close="close"
   >
-    <v-info-root>
+    <t-info-root>
       <p>
         {{ $appInfo.name }} {{ $appInfo.version }}
       </p>
@@ -38,7 +38,7 @@
       </button>
       <p>{{$t("info.licenses")}}</p>
       <pre>{{ licenses }}</pre>
-    </v-info-root>
+    </t-info-root>
   </VModal>
 </template>
 
@@ -95,7 +95,7 @@ export default class VInfo extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-info-root {
+t-info-root {
   text-align: center;
   display: block;
   // color: #333333;

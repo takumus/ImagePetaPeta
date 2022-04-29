@@ -1,6 +1,6 @@
 <template>
-  <v-board-property-root>
-    <v-property v-if="board">
+  <t-board-property-root>
+    <t-property v-if="board">
       <button
         tabindex="-1"
         @click="board.transform.scale = 1"
@@ -39,42 +39,42 @@
         tabindex="-1"
         ref="inputLineColor"
       >
-    </v-property>
-    <v-shared class="left">
+    </t-property>
+    <t-shared class="left">
       <button
         tabindex="-1"
         @click="$components.browser.open()"
       >
-        <v-icon class="browser"></v-icon>
+        <t-icon class="browser"></t-icon>
       </button>
       <button
         tabindex="-1"
         @click="$api.send('importImageFiles')"
       >
-        <v-icon class="import-file"></v-icon>
+        <t-icon class="import-file"></t-icon>
       </button>
       <button
         tabindex="-1"
         @click="$api.send('importImageDirectories')"
       >
-        <v-icon class="import-folder"></v-icon>
+        <t-icon class="import-folder"></t-icon>
       </button>
-    </v-shared>
-    <v-shared class=" right">
+    </t-shared>
+    <t-shared class=" right">
       <button
         tabindex="-1"
         @click="$components.info.open"
       >
-        <v-icon class="info"></v-icon>
+        <t-icon class="info"></t-icon>
       </button>
       <button
         tabindex="-1"
         @click="$components.settings.open"
       >
-        <v-icon class="settings"></v-icon>
+        <t-icon class="settings"></t-icon>
       </button>
-    </v-shared>
-  </v-board-property-root>
+    </t-shared>
+  </t-board-property-root>
 </template>
 
 <script lang="ts">
@@ -103,7 +103,7 @@ export default class VBoardProperty extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-board-property-root {
+t-board-property-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   width: 100%;
@@ -114,7 +114,7 @@ v-board-property-root {
   box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
   border-bottom: solid 1px var(--bg-color);
   display: block;
-  >v-shared {
+  >t-shared {
     position: absolute;
     top: 0px;
     height: 100%;
@@ -142,7 +142,7 @@ v-board-property-root {
         height: 100%;
         margin: 0px;
         border: none;
-        v-icon {
+        >t-icon {
           display: block;
           width: 100%;
           height: 100%;
@@ -169,7 +169,7 @@ v-board-property-root {
       }
     }
   }
-  >v-property {
+  >t-property {
     position: absolute;
     top: 0px;
     left: 0px;

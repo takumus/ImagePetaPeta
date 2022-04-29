@@ -1,45 +1,45 @@
 <template>
-  <v-titlebar-root>
-    <v-content>
-      <v-top>
+  <t-titlebar-root>
+    <t-content>
+      <t-top>
         <!-- {{title}} -->
-      </v-top>
-      <v-bottom>
-        <v-draggable
+      </t-top>
+      <t-bottom>
+        <t-draggable
           class="left"
           :class="{
             mac: $systemInfo.platform == 'darwin'
           }"
         >
-        </v-draggable>
+        </t-draggable>
         <slot></slot>
-        <v-draggable
+        <t-draggable
           class="right"
         >
-        </v-draggable>
-      </v-bottom>
-    </v-content>
-    <v-window-buttons
+        </t-draggable>
+      </t-bottom>
+    </t-content>
+    <t-window-buttons
       v-if="!isMac"
     >
-      <v-window-button
+      <t-window-button
         @click="minimizeWindow"
       >
-        <v-icon>&#xe921;</v-icon>
-      </v-window-button>
-      <v-window-button
+        <t-icon>&#xe921;</t-icon>
+      </t-window-button>
+      <t-window-button
         @click="maximizeWindow"
       >
-        <v-icon>&#xe922;</v-icon>
-      </v-window-button>
-      <v-window-button
+        <t-icon>&#xe922;</t-icon>
+      </t-window-button>
+      <t-window-button
         class="close"
         @click="closeWindow"
       >
-        <v-icon>&#xe8bb;</v-icon>
-      </v-window-button>
-    </v-window-buttons>
-  </v-titlebar-root>
+        <t-icon>&#xe8bb;</t-icon>
+      </t-window-button>
+    </t-window-buttons>
+  </t-titlebar-root>
 </template>
 
 <script lang="ts">
@@ -78,27 +78,27 @@ export default class VTitleBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-titlebar-root {
+t-titlebar-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   background-color: var(--tab-bg-color);
   min-height: var(--tab-height);
   display: flex;
-  >v-content {
+  >t-content {
     flex-grow: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    >v-top {
+    >t-top {
       flex-grow: 1;
       -webkit-app-region: drag;
       display: block;
       height: var(--top-draggable-height);
     }
-    >v-bottom {
+    >t-bottom {
       display: flex;
       flex-direction: row;
-      >v-draggable {
+      >t-draggable {
         -webkit-app-region: drag;
         display: block;
         &.left {
@@ -115,13 +115,13 @@ v-titlebar-root {
       }
     }
   }
-  v-window-buttons {
+  >t-window-buttons {
     display: flex;
-    >v-window-button {
+    >t-window-button {
       display: flex;
       padding: 0px 16px;
       align-items: center;
-      >v-icon {
+      >t-icon {
         display: inline-block;
         font-size: 6px;
         font-family: Segoe MDL2 Assets;

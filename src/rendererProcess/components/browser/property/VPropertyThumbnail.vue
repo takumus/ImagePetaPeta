@@ -1,5 +1,5 @@
 <template>
-  <v-property-thumbnail-root
+  <t-property-thumbnail-root
     :style="{
       top: propertyThumbnail.position.y + 'px',
       left: propertyThumbnail.position.x + 'px',
@@ -7,14 +7,14 @@
       height: this.propertyThumbnail.height + 'px'
     }"
   >
-    <v-image-wrapper>
+    <t-image-wrapper>
       <img
         draggable="false"
         :src="imageURL"
         v-if="loaded"
       >
-    </v-image-wrapper>
-  </v-property-thumbnail-root>
+    </t-image-wrapper>
+  </t-property-thumbnail-root>
 </template>
 
 <script lang="ts">
@@ -43,10 +43,10 @@ export default class VPropertyThumbnail extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-property-thumbnail-root {
+t-property-thumbnail-root {
   display: block;
   position: absolute;
-  >v-image-wrapper {
+  >t-image-wrapper {
     position: relative;
     width: 100%;
     height: 100%;

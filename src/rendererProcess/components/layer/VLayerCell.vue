@@ -8,34 +8,34 @@
     }"
     @mousedown.left="mousedown($event)"
   >
-    <v-icon
+    <t-icon
       class="eye"
       ref="visibleIcon"
       :class="{
         disabled: !visible
       }"
     >
-    </v-icon>
-    <v-icon
+    </t-icon>
+    <t-icon
       class="lock"
       ref="lockedIcon"
       :class="{
         disabled: !locked
       }"
     >
-    </v-icon>
+    </t-icon>
     <!-- <div
       class="name"
     >
      {{name}}
     </div> -->
-    <v-thumb
+    <t-thumb
       :v-if="url"
       :style="{
         backgroundImage: `url(${url})`
       }"
     >
-    </v-thumb>
+    </t-thumb>
   </li>
 </template>
 
@@ -146,7 +146,7 @@ export default class VLayerCell extends Vue {
   &.hide {
     visibility: hidden;
   }
-  >v-icon {
+  >t-icon {
     padding: 0px 8px;
     height: 100%;
     width: 24px;
@@ -167,7 +167,7 @@ export default class VLayerCell extends Vue {
       opacity: 0.3;
     }
   }
-  >v-thumb {
+  >t-thumb {
     min-width: 32px;
     height: 100%;
     margin: 0px 8px;

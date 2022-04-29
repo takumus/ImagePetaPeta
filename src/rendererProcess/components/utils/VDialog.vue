@@ -1,16 +1,16 @@
 <template>
-  <v-dialog-root
+  <t-dialog-root
     v-show="visible"
     :style=" {
       zIndex: zIndex
     }"
   >
-    <v-modal>
-      <v-content>
+    <t-modal>
+      <t-content>
         <p>
           {{label}}
         </p>
-        <v-buttons>
+        <t-buttons>
           <button
             v-for="(item, index) in items"
             :key="item"
@@ -19,10 +19,10 @@
           >
             {{item}}
           </button>
-        </v-buttons>
-      </v-content>
-    </v-modal>
-  </v-dialog-root>
+        </t-buttons>
+      </t-content>
+    </t-modal>
+  </t-dialog-root>
 </template>
 
 <script lang="ts">
@@ -66,7 +66,7 @@ export default class VModal extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-dialog-root {
+t-dialog-root {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -79,7 +79,7 @@ v-dialog-root {
   &.no-background {
     background-color: transparent;
   }
-  >v-modal {
+  >t-modal {
     background-color: var(--bg-color);
     padding: 16px;
     border-radius: var(--rounded);
@@ -90,7 +90,7 @@ v-dialog-root {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    >v-content {
+    >t-content {
       flex: 1;
       overflow: hidden;
       text-align: center;
@@ -99,7 +99,7 @@ v-dialog-root {
         text-align: center;
         white-space: pre;
       }
-      >v-buttons {
+      >t-buttons {
         display: block;
       }
     }

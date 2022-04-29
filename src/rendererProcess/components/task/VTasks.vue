@@ -4,22 +4,22 @@
     :center="true"
     :visibleCloseButton="false"
   >
-    <v-tasks-root>
-      <v-tasks>
+    <t-tasks-root>
+      <t-tasks>
         <VTask
           v-for="t in taskStatusArray"
           :key="t.id"
           :taskId="t.id"
           :taskStatus="t.status"
         />
-      </v-tasks>
+      </t-tasks>
       <button
         tabindex="-1"
         @click="close"
         v-if="closable">
         {{$t("shared.closeButton")}}
       </button>
-    </v-tasks-root>
+    </t-tasks-root>
   </VModal>
 </template>
 
@@ -77,10 +77,10 @@ export default class VTasks extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-tasks-root {
+t-tasks-root {
   text-align: center;
   display: block;
-  >v-tasks {
+  >t-tasks {
     width: 100%;
     max-height: 512px;
     overflow-x: hidden;

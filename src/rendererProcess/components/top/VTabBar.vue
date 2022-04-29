@@ -1,6 +1,6 @@
 <template>
-  <v-tab-root v-show="uiVisible">
-    <v-tab
+  <t-tab-root v-show="uiVisible">
+    <t-tab
       :class="{ selected: b == board }"
       :style="{ opacity: b == board && dragging ? 0 : 1 }"
       v-for="(b, index) in boards"
@@ -9,38 +9,38 @@
       :key="b.id"
       :ref="`tab-${b.id}`"
     >
-      <v-label-wrapper>
-        <v-label>
+      <t-label-wrapper>
+        <t-label>
           <VEditableLabel
             @change="(v) => changePetaBoardName(b, v)"
             :label="b.name"
           />
-        </v-label>
-      </v-label-wrapper>
-    </v-tab>
-    <v-tab
+        </t-label>
+      </t-label-wrapper>
+    </t-tab>
+    <t-tab
       class="add"
       @click="addPetaBoard()"
     >
-      <v-label-wrapper>
-        <v-label>
+      <t-label-wrapper>
+        <t-label>
           <VEditableLabel :label="$texts.plus" :readonly="true"/>
-        </v-label>
-      </v-label-wrapper>
-    </v-tab>
-    <v-tab
+        </t-label>
+      </t-label-wrapper>
+    </t-tab>
+    <t-tab
       class="selected drag"
       ref="draggingTab"
       :style="{ display: dragging ? 'block' : 'none' }"
       v-show="dragging"
     >
-      <v-label-wrapper>
-        <v-label>
+      <t-label-wrapper>
+        <t-label>
           <VEditableLabel :label="board.name" v-if="board" />
-        </v-label>
-      </v-label-wrapper>
-    </v-tab>
-  </v-tab-root>
+        </t-label>
+      </t-label-wrapper>
+    </t-tab>
+  </t-tab-root>
 </template>
 
 <script lang="ts">
@@ -184,7 +184,7 @@ export default class VTabBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-tab-root {
+t-tab-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   top: 0px;
@@ -193,7 +193,7 @@ v-tab-root {
   color: var(--font-color);
   height: var(--tab-height);
   display: flex;
-  >v-tab {
+  >t-tab {
     display: block;
     margin: 0px;
     // border-right: solid 1px var(--tab-border-color);
@@ -266,11 +266,11 @@ v-tab-root {
         transform: scaleX(-1);
       }
     }
-    >v-label-wrapper {
+    >t-label-wrapper {
       display: flex;
       align-items: center;
       height: 100%;
-      >v-label {
+      >t-label {
         padding: 0px 8px;
         flex-shrink: 1;
       }

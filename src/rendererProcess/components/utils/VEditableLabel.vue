@@ -1,11 +1,11 @@
 <template>
-  <v-editable-label-root
+  <t-editable-label-root
     :style="{
       width: growWidth ? '100%' : 'unset'
     }"
     :class="{ editing: editing }"
   >
-    <v-editable-label
+    <t-editable-label
       :class="{
         'no-outline': noOutline
       }"
@@ -22,8 +22,8 @@
       @keydown.tab="preventLineBreak"
       lock-keyboard
     >
-    </v-editable-label>
-  </v-editable-label-root>
+    </t-editable-label>
+  </t-editable-label-root>
 </template>
 
 <script lang="ts">
@@ -150,11 +150,11 @@ export default class VEditableLabel extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-editable-label-root {
+t-editable-label-root {
   padding: 0px;
   margin: 0px;
   display: inline-block;
-  >v-editable-label {
+  >t-editable-label {
     line-height: 1.5em;
     font-size: 1.0em;
     text-align: left;

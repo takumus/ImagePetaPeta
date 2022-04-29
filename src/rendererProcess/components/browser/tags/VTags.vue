@@ -1,5 +1,5 @@
 <template>
-  <v-tags-root>
+  <t-tags-root>
     <ul>
       <li
         @click="selectPetaTag()"
@@ -25,7 +25,7 @@
         />
       </li>
     </ul>
-  </v-tags-root>
+  </t-tags-root>
 </template>
 
 <script lang="ts">
@@ -129,7 +129,7 @@ export default class VTags extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-tags-root {
+t-tags-root {
   flex-direction: column;
   text-align: center;
   white-space: nowrap;

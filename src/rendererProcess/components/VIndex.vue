@@ -1,5 +1,5 @@
 <template>
-  <v-root
+  <t-root
     :class="{
       dark: darkMode
     }"
@@ -10,7 +10,7 @@
       ref="vPetaBoard"
       @change="changePetaBoard"
     />
-    <v-top>
+    <t-top>
       <VTitleBar>
         <VTabBar
           :uiVisible="uiVisible"
@@ -26,8 +26,8 @@
         />
       </VTitleBar>
       <VBoardProperty :board="currentPetaBoard" />
-    </v-top>
-    <v-modals
+    </t-top>
+    <t-modals
       v-show="this.$components.modal.modalIds.length > 0"
     >
       <VBrowser
@@ -41,7 +41,7 @@
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />
       <VTasks />
-    </v-modals>
+    </t-modals>
     <VDialog
       :zIndex="6"
     ></VDialog>
@@ -51,7 +51,7 @@
     <VComplement
       :zIndex="5"
     />
-  </v-root>
+  </t-root>
 </template>
 
 <script lang="ts">
@@ -312,7 +312,7 @@ body, html {
     Meiryo,
     sans-serif;
 }
-v-root {
+t-root {
   --rounded: 8px;
   & {
     --bg-color: #ffffff;
@@ -395,7 +395,7 @@ v-root {
       // box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.5);
     }
   }
-  >v-modals {
+  >t-modals {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -403,7 +403,7 @@ v-root {
     left: 0px;
     z-index: 2;
   }
-  >v-top {
+  >t-top {
     position: fixed;
     top: 0px;
     left: 0px;

@@ -1,5 +1,5 @@
 <template>
-  <v-modal-root
+  <t-modal-root
     :class="{
       'no-background': noBackground
     }"
@@ -10,20 +10,20 @@
     }"
     ref="background"
   >
-    <v-modal
+    <t-modal
       :style="childStyle ? {
         ...childStyle,
         ...(center ? centerStyle : {})
       } : (center ? centerStyle : {})"
     >
-      <v-buttons v-if="visibleCloseButton">
-        <v-button @click="close" v-html="$texts.close"></v-button>
-      </v-buttons>
-      <v-content>
+      <t-buttons v-if="visibleCloseButton">
+        <t-button @click="close" v-html="$texts.close"></t-button>
+      </t-buttons>
+      <t-content>
         <slot></slot>
-      </v-content>
-    </v-modal>
-  </v-modal-root>
+      </t-content>
+    </t-modal>
+  </t-modal-root>
 </template>
 
 <script lang="ts">
@@ -119,7 +119,7 @@ export default class VModal extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-modal-root {
+t-modal-root {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -132,7 +132,7 @@ v-modal-root {
   &.no-background {
     background-color: transparent;
   }
-  >v-modal {
+  >t-modal {
     width: 600px;
     background-color: var(--bg-color);
     padding: 16px;
@@ -140,10 +140,10 @@ v-modal-root {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    >v-buttons {
+    >t-buttons {
       text-align: right;
       display: block;
-      >v-button {
+      >t-button {
         font-family: Segoe MDL2 Assets,
           "Helvetica Neue",
           Arial,
@@ -154,7 +154,7 @@ v-modal-root {
         cursor: pointer;
       }
     }
-    >v-content {
+    >t-content {
       flex: 1;
       overflow: hidden;
       display: block;

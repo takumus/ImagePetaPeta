@@ -12,28 +12,28 @@
     @state="onModalState"
     @close="close"
   >
-    <v-browser-root>
-      <v-left>
+    <t-browser-root>
+      <t-left>
         <VTags
           :petaImagesArray="petaImagesArray"
           :petaTagInfos="petaTagInfos"
           :selectedPetaTags="selectedPetaTags"
         />
-      </v-left>
-      <v-center>
-        <v-header>
-          <v-search>
+      </t-left>
+      <t-center>
+        <t-header>
+          <t-search>
             <VSearch
               :petaTagInfos="petaTagInfos"
               :selectedPetaTags="selectedPetaTags"
             />
-          </v-search>
-        </v-header>
-        <v-content>
-          <v-tiles
+          </t-search>
+        </t-header>
+        <t-content>
+          <t-tiles
             ref="thumbnails"
           >
-            <v-tiles-content
+            <t-tiles-content
               ref="thumbsWrapper"
               :style="{height: scrollHeight + 8 + 'px'}"
             >
@@ -47,11 +47,11 @@
                 @menu="petaImageMenu"
                 @drag="drag"
               />
-            </v-tiles-content>
-          </v-tiles>
-        </v-content>
-      </v-center>
-      <v-right>
+            </t-tiles-content>
+          </t-tiles>
+        </t-content>
+      </t-center>
+      <t-right>
         <VProperty
           :petaImages="selectedPetaImages"
           :petaTagInfos="petaTagInfos"
@@ -66,11 +66,11 @@
           :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
           :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
         >
-      </v-right>
-      <!-- <v-canvas-test>
+      </t-right>
+      <!-- <t-canvas-test>
         <canvas width="128" height="128" ref="testCanvas"></canvas>
-      </v-canvas-test> -->
-    </v-browser-root>
+      </t-canvas-test> -->
+    </t-browser-root>
   </VModal>
 </template>
 
@@ -517,7 +517,7 @@ export default class VBrowser extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-browser-root {
+t-browser-root {
   width: 100%;
   height: 100%;
   display: flex;
@@ -526,56 +526,56 @@ v-browser-root {
   // display: flex;
   // flex: 1;
   overflow: hidden;
-  >v-left {
+  >t-left {
     padding: 8px;
     width: 20%;
     max-width: 180px;
     display: block;
   }
-  >v-center {
+  >t-center {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
     padding: 8px;
-    >v-header {
+    >t-header {
       width: 100%;
       padding-bottom: 8px;
       display: block;
-      >v-search {
+      >t-search {
         display: block;
         max-width: 512px;
         margin: 0 auto;
       }
     }
-    >v-content {
+    >t-content {
       width: 100%;
       height: 100%;
       position: relative;
       flex: 1;
       overflow: hidden;
       display: block;
-      >v-tiles {
+      >t-tiles {
         width: 100%;
         height: 100%;
         position: relative;
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
-        >v-tiles-content {
+        >t-tiles-content {
           display: block;
         }
       }
     }
   }
-  >v-right {
+  >t-right {
     width: 20%;
     max-width: 180px;
     padding: 8px;
     display: flex;
     flex-direction: column;
   }
-  >v-canvas-test {
+  >t-canvas-test {
     position: fixed;
     bottom: 100px;
     left: 100px;

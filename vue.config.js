@@ -19,6 +19,28 @@ try {
 module.exports = {
   productionSourceMap: false,
   chainWebpack: config => {
+    config
+      .entry("app")
+      .clear();
+    config
+      .entry("app")
+      .add(files.main.entry);
+    config.plugin('html')
+      .tap((args) => {
+        args[0].template = files.main.template
+        return args;
+      })
+    config.module
+      .rule("vue")
+      .use("vue-loader")
+      .tap(options => {
+        options.hotReload = false
+        return options
+      });
+    config.module
+      .rule("images")
+      .test(/\.(png)(\?.*)?$/)
+      .use("url-loader")
     config.module
       .rule("vue")
       .use("vue-loader")
@@ -26,7 +48,7 @@ module.exports = {
         ...options,
         hotReload: false,
         compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith("v-")
+          isCustomElement: (tag) => tag.startsWith("t-")
         }
       }));
   },
@@ -40,28 +62,6 @@ module.exports = {
           .test(/\.(png)(\?.*)?$/)
           .use('url-loader')
           .loader('url-loader')
-      },
-      chainWebpackRendererProcess: (config) => {
-        config
-          .entry("app")
-          .clear();
-        config
-          .entry("app")
-          .add(files.main.entry);
-        config.plugin('html')
-          .tap((args) => {
-            args[0].template = files.main.template
-            return args;
-          });
-        config.module
-          .rule("images")
-          .test(/\.(png)(\?.*)?$/)
-          .use("url-loader")
-          .loader('url-loader');
-          // .options({
-          //   limit: 8192,
-          //   name: `assets/[name].[hash].[ext]`
-          // });
       },
       builderOptions: {
         appId: "io.takumus." + packageJSON.name,

@@ -1,6 +1,6 @@
 <template>
-  <v-search-root>
-    <v-tag
+  <t-search-root>
+    <t-tag
       v-for="tag in selectedPetaTags"
       :key="tag.id"
     >
@@ -13,8 +13,8 @@
         @change="(value) => editSearchTag(tag, value)"
         @delete="editSearchTag(tag, '')"
       />
-    </v-tag>
-    <v-tag class="last">
+    </t-tag>
+    <t-tag class="last">
       <VEditableLabel
         :label="''"
         :labelLook="$texts.plus + '       '"
@@ -26,8 +26,8 @@
         :noOutline="true"
         ref="searchInput"
       />
-    </v-tag>
-  </v-search-root>
+    </t-tag>
+  </t-search-root>
 </template>
 
 <script lang="ts">
@@ -121,7 +121,7 @@ export default class VSearch extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-search-root {
+t-search-root {
   border-radius: var(--rounded);
   border: solid 1.2px var(--border-color);
   outline: none;
@@ -137,7 +137,7 @@ v-search-root {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  >v-tag {
+  >t-tag {
     display: inline-block;
     margin: 0px 0px 4px 4px;
     border-radius: var(--rounded);

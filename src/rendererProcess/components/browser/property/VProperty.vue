@@ -1,6 +1,6 @@
 <template>
-  <v-property-root>
-    <v-previews
+  <t-property-root>
+    <t-previews
       ref="previews"
       v-show="!noImage"
     >
@@ -9,9 +9,9 @@
         :key="data.petaImage.id"
         :propertyThumbnail="data"
       />
-    </v-previews>
+    </t-previews>
     <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
-    <v-buttons
+    <t-buttons
       v-show="!noImage"
     >
       <button
@@ -20,8 +20,8 @@
       >
         {{$t("browser.property.clearSelectionButton")}}
       </button>
-    </v-buttons>
-    <v-tags v-show="!noImage">
+    </t-buttons>
+    <t-tags v-show="!noImage">
       <p>{{$t("browser.property.tags")}}</p>
       <ul v-if="!fetchingTags">
         <li v-for="tag in sharedPetaTags" :key="tag.id">
@@ -49,7 +49,7 @@
           {{$t("browser.property.fetchingTags")}}
         </li>
       </ul>
-    </v-tags>
+    </t-tags>
     <section v-show="!noImage">
       <label>
         <input
@@ -61,7 +61,7 @@
           NSFW
         </label>
     </section>
-  </v-property-root>
+  </t-property-root>
 </template>
 
 <script lang="ts">
@@ -242,7 +242,7 @@ export default class VProperty extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-property-root {
+t-property-root {
   width: 100%;
   height: 100%;
   // color: #333333;
@@ -250,18 +250,18 @@ v-property-root {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  >v-previews {
+  >t-previews {
     position: relative;
     width: 100%;
     height: 30%;
     overflow: hidden;
     display: block;
   }
-  >v-buttons {
+  >t-buttons {
     text-align: center;
     display: block;
   }
-  >v-tags {
+  >t-tags {
     flex-grow: 1;
     display: flex;
     flex-direction: column;

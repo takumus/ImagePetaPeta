@@ -1,13 +1,13 @@
 <template>
-  <v-tile-root
+  <t-tile-root
     :style="{
       transform: `translate(${tile.position.x + 'px'}, ${tile.position.y + 'px'})`,
       width: tile.width + 'px',
       height: tile.height + 'px'
     }"
   >
-    <v-tile-wrapper>
-      <v-images
+    <t-tile-wrapper>
+      <t-images
         @mousedown="mousedown($event)"
         @dragstart="dragstart($event)"
         draggable="true"
@@ -15,9 +15,9 @@
           'selected-image': tile.petaImage._selected
         }"
       >
-        <v-nsfw v-if="showNsfw">
+        <t-nsfw v-if="showNsfw">
           NSFW
-        </v-nsfw>
+        </t-nsfw>
         <canvas
           ref="canvas"
           class="placeholder"
@@ -34,33 +34,33 @@
           loading="lazy"
           @load="loaded"
         >
-        <v-background
+        <t-background
           class="transparent-background"
         >
-        </v-background>
-      </v-images>
-      <v-tags>
-        <v-tag
+        </t-background>
+      </t-images>
+      <t-tags>
+        <t-tag
           v-for="petaTag in myPetaTags"
           :key="petaTag.id"
         >
           {{petaTag.name}}
-        </v-tag>
-        <v-tag
+        </t-tag>
+        <t-tag
           v-if="myPetaTags.length == 0 && !loadingTags"
         >
           {{$t("browser.untagged")}}
-        </v-tag>
-      </v-tags>
-      <v-selected
+        </t-tag>
+      </t-tags>
+      <t-selected
         v-show="tile.petaImage._selected"
       >
-        <v-icon>
+        <t-icon>
           ✔
-        </v-icon>
-      </v-selected>
-    </v-tile-wrapper>
-  </v-tile-root>
+        </t-icon>
+      </t-selected>
+    </t-tile-wrapper>
+  </t-tile-root>
 </template>
 
 <script lang="ts">
@@ -219,12 +219,12 @@ export default class VTile extends Vue {
 </script>
 
 <style lang="scss" scoped>
-v-tile-root {
+t-tile-root {
   display: block;
   position: absolute;
   padding-right: 8px;
   padding-top: 8px;
-  >v-tile-wrapper {
+  >t-tile-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -232,7 +232,7 @@ v-tile-root {
     border-radius: var(--rounded);
     transition: box-shadow 100ms ease-in-out;
     display: block;
-    >v-images {
+    >t-images {
       display: block;
       width: 100%;
       height: 100%;
@@ -254,7 +254,7 @@ v-tile-root {
         width: 100%;
         height: 100%;
       }
-      >v-background {
+      >t-background {
         z-index: 0;
         position: absolute;
         top: 0px;
@@ -280,7 +280,7 @@ v-tile-root {
           opacity: 0;
         }
       }
-      >v-nsfw {
+      >t-nsfw {
         z-index: 2;
         position: relative;
         top: 0px;
@@ -303,7 +303,7 @@ v-tile-root {
         filter: brightness(1.0);
       }
     }
-    >v-tags {
+    >t-tags {
       width: 100%;
       position: absolute;
       bottom: 0px;
@@ -312,7 +312,7 @@ v-tile-root {
       padding: 8px;
       line-height: 1.2em;
       display: block;
-      >v-tag {
+      >t-tag {
         background-color: rgba($color: (#000000), $alpha: 0.5);
         color: #ffffff;
         padding: 2px;
@@ -322,7 +322,7 @@ v-tile-root {
         display: inline;
       }
     }
-    >v-selected {
+    >t-selected {
       position: absolute;
       bottom: 0px;
       right: 0px;
@@ -333,7 +333,7 @@ v-tile-root {
       // background-color: rgba($color: #ffffff, $alpha: 0.4);
       border: solid 4px var(--font-color);
       display: block;
-      >v-icon {
+      >t-icon {
         border-radius: var(--rounded) 0px 0px 0px;
         background-color: var(--font-color);
         color: var(--bg-color);
