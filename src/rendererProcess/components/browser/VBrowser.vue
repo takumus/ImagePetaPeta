@@ -12,66 +12,62 @@
     @state="onModalState"
     @close="close"
   >
-    <article class="browser-root">
-      <section class="top">
-        <section class="tags">
-          <VTags
-            :petaImagesArray="petaImagesArray"
-            :petaTagInfos="petaTagInfos"
-            :selectedPetaTags="selectedPetaTags"
-          />
-        </section>
-        <section class="center">
-          <section class="header">
-            <section class="input">
-              <VSearch
-                :petaTagInfos="petaTagInfos"
-                :selectedPetaTags="selectedPetaTags"
-              />
-            </section>
-          </section>
-          <section class="thumbnails-wrapper">
-            <section
-              class="thumbnails"
-              ref="thumbnails"
-            >
-              <div
-                class="thumbs-wrapper"
-                ref="thumbsWrapper"
-                :style="{height: scrollHeight + 8 + 'px'}"
-              >
-                <VTile
-                  v-for="(data) in visibleTiles"
-                  :key="data.petaImage.id"
-                  :tile="data"
-                  :original="original"
-                  :petaTagInfos="petaTagInfos"
-                  @add="addPanel"
-                  @select="selectThumbnail"
-                  @menu="petaImageMenu"
-                />
-              </div>
-            </section>
-          </section>
-        </section>
-        <section class="property">
-          <VProperty
-            :petaImages="selectedPetaImages"
-            :petaTagInfos="petaTagInfos"
-            @selectTag="(tag) => selectedPetaTags = [tag]"
-          />
-          <input
-            type="range"
-            v-model="thumbnailsSize"
-            tabindex="-1"
-            @change="$settings.tileSize = Number($event.target.value)"
-            :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
-            :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
-            :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
+    <v-browser-root>
+      <v-left>
+        <VTags
+          :petaImagesArray="petaImagesArray"
+          :petaTagInfos="petaTagInfos"
+          :selectedPetaTags="selectedPetaTags"
+        />
+      </v-left>
+      <v-center>
+        <v-header>
+          <v-search>
+            <VSearch
+              :petaTagInfos="petaTagInfos"
+              :selectedPetaTags="selectedPetaTags"
+            />
+          </v-search>
+        </v-header>
+        <v-content>
+          <v-tiles
+            ref="thumbnails"
           >
-        </section>
-      </section>
-    </article>
+            <v-tiles-content
+              ref="thumbsWrapper"
+              :style="{height: scrollHeight + 8 + 'px'}"
+            >
+              <VTile
+                v-for="(data) in visibleTiles"
+                :key="data.petaImage.id"
+                :tile="data"
+                :original="original"
+                :petaTagInfos="petaTagInfos"
+                @add="addPanel"
+                @select="selectThumbnail"
+                @menu="petaImageMenu"
+              />
+            </v-tiles-content>
+          </v-tiles>
+        </v-content>
+      </v-center>
+      <v-right>
+        <VProperty
+          :petaImages="selectedPetaImages"
+          :petaTagInfos="petaTagInfos"
+          @selectTag="(tag) => selectedPetaTags = [tag]"
+        />
+        <input
+          type="range"
+          v-model="thumbnailsSize"
+          tabindex="-1"
+          @change="$settings.tileSize = Number($event.target.value)"
+          :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
+          :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
+          :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
+        >
+      </v-right>
+    </v-browser-root>
   </VModal>
 </template>
 
@@ -467,58 +463,63 @@ export default class VBrowser extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.browser-root {
+v-browser-root {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   // color: #333333;
-  >.top {
+  // display: flex;
+  // flex: 1;
+  overflow: hidden;
+  >v-left {
+    padding: 8px;
+    width: 20%;
+    max-width: 180px;
+    display: block;
+  }
+  >v-center {
     display: flex;
-    flex: 1;
-    overflow: hidden;
-    >.tags {
-      padding: 8px;
-      width: 20%;
-      max-width: 180px;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    >v-header {
+      width: 100%;
+      padding-bottom: 8px;
+      display: block;
+      >v-search {
+        display: block;
+        max-width: 512px;
+        margin: 0 auto;
+      }
     }
-    >.center {
-      display: flex;
-      flex-direction: column;
+    >v-content {
       width: 100%;
       height: 100%;
-      padding: 8px;
-      >.header {
-        width: 100%;
-        padding-bottom: 8px;
-        >.input {
-          display: block;
-          max-width: 512px;
-          margin: 0 auto;
-        }
-      }
-      >.thumbnails-wrapper {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      display: block;
+      >v-tiles {
         width: 100%;
         height: 100%;
         position: relative;
-        flex: 1;
-        overflow: hidden;
-        >.thumbnails {
-          width: 100%;
-          height: 100%;
-          position: relative;
-          overflow-y: scroll;
-          overflow-x: hidden;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        display: block;
+        >v-tiles-content {
+          display: block;
         }
       }
     }
-    >.property {
-      width: 20%;
-      max-width: 180px;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-    }
+  }
+  >v-right {
+    width: 20%;
+    max-width: 180px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>
