@@ -220,8 +220,16 @@ v-layer-root {
   bottom: 0px;
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
   margin: 8px;
-  top: 50%;
   padding: 8px;
+  top: 50%;
+  width: 128px;
+  &.hide {
+    top: unset;
+    width: unset;
+    >v-header {
+      margin: 0px;
+    }
+  }
   >v-header {
     display: block;
     cursor: pointer;
@@ -235,12 +243,6 @@ v-layer-root {
     flex-shrink: 0;
     margin-bottom: 8px;
     filter: var(--icon-filter);
-  }
-  &.hide {
-    top: unset;
-    >.title {
-      margin: 0px;
-    }
   }
   >v-layers {
     display: block;
