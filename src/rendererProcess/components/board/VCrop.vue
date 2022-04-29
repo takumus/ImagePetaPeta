@@ -1,17 +1,14 @@
 <template>
-  <article
-    class="crop-root"
+  <v-crop-root
     ref="cropRoot"
     v-show="loaded"
   >
-    <section
-      class="buttons"
-    >
+    <v-buttons>
       <button @click="updateCrop">{{$t("boards.crop.apply")}}</button>
       <button @click="resetCrop">{{$t("boards.crop.reset")}}</button>
       <button @click="cancelCrop">{{$t("boards.crop.cancel")}}</button>
-    </section>
-  </article>
+    </v-buttons>
+  </v-crop-root>
 </template>
 
 <script lang="ts">
@@ -362,7 +359,7 @@ export default class VBoard extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.crop-root {
+v-crop-root {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -370,7 +367,8 @@ export default class VBoard extends Vue {
   height: 100%;
   background-repeat: repeat;
   background-image: url("~@/@assets/transparentBackground.png");
-  >.buttons {
+  display: block;
+  >v-buttons {
     display: block;
     position: absolute;
     transform: translateX(-50%);
