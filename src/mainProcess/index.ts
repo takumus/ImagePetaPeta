@@ -782,7 +782,7 @@ import sharp from "sharp";
           event.sender.startDrag({
             file: files[0]!,
             files: files,
-            icon: icon,
+            icon: nativeImage.createFromDataURL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="),
           });
         },
         getDropFromBrowserPetaImageIds: async () => {
