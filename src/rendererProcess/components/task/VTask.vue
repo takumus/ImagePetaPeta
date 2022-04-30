@@ -24,7 +24,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 @Options({

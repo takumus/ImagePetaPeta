@@ -2,7 +2,6 @@ import * as PIXI from "pixi.js";
 import { Vec2 } from "@/commons/utils/vec2";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { PSelection } from "@/rendererProcess/components/board/ppanels/PSelection";
 import { PControlPoint } from "@/rendererProcess/components/board/ppanels/PControlPoint";

@@ -42,10 +42,8 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
-import { blur } from "@/rendererProcess/utils/blur";
 @Options({
   components: {
     VEditableLabel

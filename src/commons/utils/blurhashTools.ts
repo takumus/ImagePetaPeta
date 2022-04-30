@@ -1,4 +1,3 @@
-// https://github.com/woltapp/blurhash
 export function getSimilarityScore(hash1: string, hash2: string) {
   try {
     const cs1 = getColors(hash1);
@@ -32,6 +31,7 @@ export function getSimilarityScore(hash1: string, hash2: string) {
     return 0;
   }
 }
+// https://github.com/woltapp/blurhash
 export function getColors(hash: string) {
   const sizeFlag = decode83(hash[0]!);
   const numY = Math.floor(sizeFlag / 9) + 1;

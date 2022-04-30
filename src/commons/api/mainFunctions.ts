@@ -5,7 +5,6 @@ import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 
 export interface MainFunctions {

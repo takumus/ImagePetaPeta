@@ -80,7 +80,6 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 @Options({
   components: {

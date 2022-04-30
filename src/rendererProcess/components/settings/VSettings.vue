@@ -92,38 +92,6 @@
           Browser
         -->
         <t-content v-show="currentTab == 'browser'">
-          <!-- <label>
-            {{$t("settings.thumbnailsSize")}}:
-          </label>
-          <select
-            :value="$settings.thumbnails.size"
-            @change="$settings.thumbnails.size = Number($event.target.value)"
-            :disabled="!regenerateMetadatasCompleted"
-          >
-            <option
-              :value="size"
-              v-for="size in $defines.BROWSER_THUMBNAIL_SIZE"
-              :key="size"
-            >
-              {{size}}
-            </option>
-          </select>px, 
-          <label>
-            {{$t("settings.thumbnailsQuality")}}:
-          </label>
-          <select
-            :value="$settings.thumbnails.quality"
-            @change="$settings.thumbnails.quality = Number($event.target.value)"
-            :disabled="!regenerateMetadatasCompleted"
-          >
-            <option
-              :value="quality"
-              v-for="quality in $defines.BROWSER_THUMBNAIL_QUALITY"
-              :key="quality"
-            >
-              {{quality}}
-            </option>
-          </select> -->
           <button
             @click="regenerateMetadatas"
           >
@@ -168,15 +136,6 @@
           Others
         -->
         <t-content v-show="currentTab == 'others'">
-          <!-- <label>
-            <input
-              type="checkbox"
-              :checked="$settings.autoHideUI"
-              @change="$settings.autoHideUI = Boolean($event.target.checked)"
-            >
-            {{$t("settings.autoHideUI")}}
-          </label><br>
-          <p>{{$t("settings.autoHideUIDescriptions")}}</p> -->
           <label>
             <input
               type="checkbox"

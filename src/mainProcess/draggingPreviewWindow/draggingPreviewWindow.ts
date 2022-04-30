@@ -1,6 +1,5 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
-import { Vec2 } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { BrowserWindow, screen } from "electron";
 import * as Path from "path";

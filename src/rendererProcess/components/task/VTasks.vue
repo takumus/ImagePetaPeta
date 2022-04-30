@@ -33,7 +33,7 @@ import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 import VTask from "@/rendererProcess/components/task/VTask.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
+import { TaskStatus } from "@/commons/api/interfaces/task";
 @Options({
   components: {
     VModal,

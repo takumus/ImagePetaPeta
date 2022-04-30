@@ -18,8 +18,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
-import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
+import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Loader as PIXILoader } from '@pixi/loaders';

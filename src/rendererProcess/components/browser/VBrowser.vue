@@ -67,9 +67,6 @@
           :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
         >
       </t-right>
-      <!-- <t-canvas-test>
-        <canvas width="128" height="128" ref="testCanvas"></canvas>
-      </t-canvas-test> -->
     </t-browser-root>
   </VModal>
 </template>
@@ -87,13 +84,12 @@ import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { isBlurhashValid } from "blurhash";
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { BOARD_MAX_PETAPANEL_ADD_COUNT, BROWSER_THUMBNAIL_SIZE, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
+import { BROWSER_THUMBNAIL_SIZE, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
-import { createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
@@ -101,8 +97,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { getColors, getSimilarityScore } from "@/commons/utils/blurhashTools";
-import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { ImageType } from "@/commons/datas/imageType";
 @Options({
   components: {
     VTile,
@@ -204,82 +198,12 @@ export default class VBrowser extends Vue {
   resizeImages(rect: DOMRectReadOnly) {
     this.thumbnailsWidth = rect.width;
   }
-  // async addPanel(thumb: Tile, worldPosition: Vec2, thumbnailPosition: Vec2) {
-  //   if (!Keyboards.pressedOR("shift", "control", "meta") && !thumb.petaImage._selected) {
-  //     this.clearSelectionAllImages();
-  //   }
-  //   // 複数同時追加
-  //   const thumbnails = thumb.petaImage._selected ? [] : [thumb.petaImage];
-  //   thumbnails.push(...this.selectedPetaImages)
-  //   thumbnails.reverse();
-  //   if (thumbnails.length > BOARD_MAX_PETAPANEL_ADD_COUNT) {
-  //     if (await this.$components.dialog.show(this.$t("boards.addManyImageDialog", [thumbnails.length]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
-  //       return;
-  //     }
-  //   }
-  //   thumb.petaImage._selected = true;
-  //   thumbnails.forEach((pi, i) => {
-  //     const panel = createPetaPanel(
-  //       pi,
-  //       worldPosition.clone(),
-  //       this.actualThumbnailSize
-  //     );
-  //     this.$emit(
-  //       "addPanel",
-  //       panel,
-  //       i
-  //     );
-  //     pi._selected = false;
-  //   });
-  //   this.selectedPetaImages.forEach((pi) => {
-  //     pi._selected = false;
-  //   });
-  //   this.close();
-  // }
   drag(petaImage: PetaImage) {
     if (!Keyboards.pressedOR("shift", "control", "meta") && !petaImage._selected) {
       this.clearSelectionAllImages();
     }
     const petaImages = petaImage._selected ? [] : [petaImage];
     petaImages.push(...this.selectedPetaImages);
-    // console.log(petaImages);
-    // const ctx = this.testCanvas.getContext("2d");
-    // const image = new Image();
-    // image.src = getImageURL(petaImage, ImageType.THUMBNAIL);
-    // image.onload = () => {
-    //   if (!ctx) {
-    //     return;
-    //   }
-    //   const ts = 128;
-    //   let w = 0;
-    //   let h = 0;
-    //   if (petaImage.width > petaImage.height) {
-    //     w = ts;
-    //     h = petaImage.height * ts;
-    //   } else {
-    //     h = ts;
-    //     w = ts / petaImage.height;
-    //   }
-    //   ctx.clearRect(0, 0, ts, ts);
-    //   ctx.drawImage(image, 0, 0, w, h);
-    //   ctx.font = `24px "Helvetica Neue",
-    //   Arial,
-    //   "Hiragino Kaku Gothic ProN",
-    //   "Hiragino Sans",
-    //   Meiryo,
-    //   sans-serif`;
-    //   ctx.fillStyle = 'white';
-    //   ctx.beginPath();
-    //   ctx.ellipse(12, 12, 12, 12, 0, 0, 360);
-    //   ctx.fill();
-    //   ctx.fillStyle = '#333333';
-    //   ctx.textBaseline = 'middle';
-    //   ctx.textAlign = "center";
-    //   ctx.fillText(petaImages.length.toString(), 12, 12);
-    //   console.log(this.testCanvas.toDataURL("image/png"));
-    //   API.send("startDrag", petaImages, 128, this.testCanvas.toDataURL("image/png"));
-    //   this.close();
-    // }
     API.send("startDrag", petaImages, 128, "");
     this.close();
   }

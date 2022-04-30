@@ -37,7 +37,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 
 // Others
-import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";

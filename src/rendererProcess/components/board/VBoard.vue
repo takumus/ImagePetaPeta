@@ -55,11 +55,10 @@ import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue"
 import VLayer from "@/rendererProcess/components/layer/VLayer.vue";
 // Others
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
-import { PetaBoard, PetaBoardTransform } from "@/commons/datas/petaBoard";
+import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
-import { API } from "@/rendererProcess/api";
 import * as PIXI from "pixi.js";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformer } from "@/rendererProcess/components/board/ppanels/PTransformer";

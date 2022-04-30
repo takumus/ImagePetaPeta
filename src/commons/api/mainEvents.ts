@@ -1,4 +1,3 @@
-import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { TaskStatus } from "./interfaces/task";
 

@@ -5,10 +5,8 @@ import dataURIToBuffer from "data-uri-to-buffer";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
-import AdmZip from "adm-zip";
-import { spawn } from "child_process";
 import languages from "@/commons/languages";
-import { DOWNLOAD_URL, PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -34,11 +32,7 @@ import crypto from "crypto";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { isLatest } from "@/commons/utils/versionCheck";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
-import AppIcon from "@/@assets/icon.png";
 import Transparent from "@/@assets/transparent.png";
-import sharp from "sharp";
-import { Vec2 } from "@/commons/utils/vec2";
-import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
 (() => {
   /*------------------------------------
