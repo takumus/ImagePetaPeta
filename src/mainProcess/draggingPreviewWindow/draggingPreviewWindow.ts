@@ -34,7 +34,7 @@ export class DraggingPreviewWindow {
       frame: false,
       show: true,
       alwaysOnTop: true,
-      transparent: true,
+      opacity: 0,
       focusable: false,
       closable: false,
       minimizable: false,
