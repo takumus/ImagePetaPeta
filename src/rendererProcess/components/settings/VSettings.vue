@@ -127,14 +127,14 @@
           <button
             @click="regenerateMetadatas"
           >
-            {{$t("settings.thumbnailsRegenerateButton")}}
+            {{$t("settings.regenerateMetadatasButton")}}
           </button>
           <label
             v-show="!regenerateMetadatasCompleted"
           >
             {{regenerateMetadatasDone}}/{{regenerateMetadatasCount}}
           </label>
-          <p>{{$t("settings.thumbnailsDescriptions")}}</p>
+          <p>{{$t("settings.regenerateMetadatasDescriptions")}}</p>
           <label>
             <input
               type="checkbox"
