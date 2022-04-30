@@ -5,10 +5,10 @@ export interface PetaTag {
   index: number,
 }
 
-export function createPetaTag(name: string): PetaTag {
+export function createPetaTag(name: string, id?: string): PetaTag {
   return {
     name: name,
-    id: uuid(),
+    id: id || uuid(),
     index: 0
   }
 }
