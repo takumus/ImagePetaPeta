@@ -299,7 +299,7 @@ t-tile-root {
     }
     &:hover {
       box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
-      v-images {
+      >t-images {
         filter: brightness(1.0);
       }
     }

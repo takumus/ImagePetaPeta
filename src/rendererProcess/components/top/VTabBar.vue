@@ -214,7 +214,7 @@ t-tab-root {
       min-width: 16px;
       border-right: none;
       flex-shrink: 0;
-      v-label-wrapper v-label {
+      >t-label-wrapper t-label {
         padding: 0px 8px;
       }
     }
