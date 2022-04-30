@@ -39,6 +39,7 @@ import Transparent from "@/@assets/transparent.png";
 import sharp from "sharp";
 import { Vec2 } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
+import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -52,7 +53,7 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
   */
   //-------------------------------------------------------------------------------------------------//
   let mainWindow: BrowserWindow;
-  let dragPreviewWindow: BrowserWindow | undefined;
+  let draggingPreviewWindow: DraggingPreviewWindow;
   const dragPreviewWindowSize = new Vec2();
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -182,12 +183,6 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
       standard: true
     }
   }]);
-  app.on("window-all-closed", () => {
-    mainLogger.logChunk().log("#Electron event: window-all-closed");
-    if (process.platform != "darwin") {
-      app.quit();
-    }
-  });
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -293,29 +288,8 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
     createProtocol("app");
     mainWindow = initWindow();
     if (process.platform != "darwin") {
-      dragPreviewWindow = initWindow2();
+      draggingPreviewWindow = new DraggingPreviewWindow();
     }
-    setInterval(() => {
-      if (!dragPreviewWindow) {
-        return;
-      }
-      try {
-        if (!mainWindow.isFocused()) {
-          dragPreviewWindow.setOpacity(0);
-          return;
-        }
-        const point = screen.getCursorScreenPoint();
-        dragPreviewWindow.setBounds({
-            width: Math.floor(dragPreviewWindowSize.x),
-            height: Math.floor(dragPreviewWindowSize.y),
-            x: Math.floor(point.x - dragPreviewWindowSize.x / 2),
-            y: Math.floor(point.y - dragPreviewWindowSize.y / 2)
-        });
-        dragPreviewWindow.moveTop();
-      } catch (error) {
-        
-      }
-    }, 0);
     //-------------------------------------------------------------------------------------------------//
     /*
       IPCのメインプロセス側のAPI
@@ -799,20 +773,9 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
           if (!first) {
             return;
           }
-          if (dragPreviewWindow) {
-            dragPreviewWindow.loadURL(
-              `data:text/html;charset=utf-8,
-              <head>
-              <style>html, body { margin: 0px; padding: 0px; background-color: transparent; } img { width: 100%; height: 100%; }</style>
-              </head>
-              <body>
-              <img src="${getImageURL(first, ImageType.THUMBNAIL)}">
-              </body>`
-            );
-            dragPreviewWindow.setOpacity(0.8);
-            dragPreviewWindowSize.x = iconSize;
-            dragPreviewWindowSize.y = first.height * iconSize;
-          }
+          draggingPreviewWindow.setPetaImages(petaImages);
+          draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
+          draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
           event.sender.startDrag({
@@ -827,15 +790,8 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
           }
           const ids = [...dropFromBrowserPetaImageIds];
           dropFromBrowserPetaImageIds = undefined;
-          if (dragPreviewWindow) {
-            dragPreviewWindow.loadURL(`data:text/html;charset=utf-8,
-            <head>
-            <style>html, body { background-color: transparent; }</style>
-            </head>
-            <body>
-            </body>`);
-            dragPreviewWindow.setOpacity(0);
-          }
+          draggingPreviewWindow.clearImages();
+          draggingPreviewWindow.setVisible(false);
           return ids;
         }
       }
@@ -921,27 +877,6 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
       emitMainEvent("windowFocused", true);
     });
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
-    return window;
-  }
-  function initWindow2() {
-    const window = new BrowserWindow({
-      width: 256,
-      height: 256,
-      resizable: false,
-      frame: false,
-      show: true,
-      alwaysOnTop: true,
-      transparent: true,
-      focusable: false,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        preload: Path.join(__dirname, "preload.js"),
-      },
-    });
-    window.setIgnoreMouseEvents(true);
-    window.setMenuBarVisibility(false);
-    window.setOpacity(0);
     return window;
   }
   async function prepareUpdate(remote: RemoteBinaryInfo) {
