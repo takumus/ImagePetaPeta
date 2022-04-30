@@ -92,13 +92,13 @@
           Browser
         -->
         <t-content v-show="currentTab == 'browser'">
-          <label>
+          <!-- <label>
             {{$t("settings.thumbnailsSize")}}:
           </label>
           <select
             :value="$settings.thumbnails.size"
             @change="$settings.thumbnails.size = Number($event.target.value)"
-            :disabled="!regenerateThumbnailsCompleted"
+            :disabled="!regenerateMetadatasCompleted"
           >
             <option
               :value="size"
@@ -114,7 +114,7 @@
           <select
             :value="$settings.thumbnails.quality"
             @change="$settings.thumbnails.quality = Number($event.target.value)"
-            :disabled="!regenerateThumbnailsCompleted"
+            :disabled="!regenerateMetadatasCompleted"
           >
             <option
               :value="quality"
@@ -123,16 +123,16 @@
             >
               {{quality}}
             </option>
-          </select>
+          </select> -->
           <button
-            @click="regenerateThumbnails"
+            @click="regenerateMetadatas"
           >
             {{$t("settings.thumbnailsRegenerateButton")}}
           </button>
           <label
-            v-show="!regenerateThumbnailsCompleted"
+            v-show="!regenerateMetadatasCompleted"
           >
-            {{regenerateThumbnailsDone}}/{{regenerateThumbnailsCount}}
+            {{regenerateMetadatasDone}}/{{regenerateMetadatasCount}}
           </label>
           <p>{{$t("settings.thumbnailsDescriptions")}}</p>
           <label>
@@ -227,23 +227,23 @@ import { API } from "@/rendererProcess/api";
 })
 export default class VSettings extends Vue {
   visible = false;
-  regenerateThumbnailsCompleted = true;
-  regenerateThumbnailsDone = 0;
-  regenerateThumbnailsCount = 0;
+  regenerateMetadatasCompleted = true;
+  regenerateMetadatasDone = 0;
+  regenerateMetadatasCount = 0;
   tabs = ["general", "control", "browser", "datas", "others"];
   currentTab = "general";
   tempPetaImageDirectory = "";
   async mounted() {
     this.$components.settings = this;
-    API.on("regenerateThumbnailsProgress", (_, done, count) => {
-      this.regenerateThumbnailsDone = done;
-      this.regenerateThumbnailsCount = count;
+    API.on("regenerateMetadatasProgress", (_, done, count) => {
+      this.regenerateMetadatasDone = done;
+      this.regenerateMetadatasCount = count;
     });
-    API.on("regenerateThumbnailsBegin", (_) => {
-      this.regenerateThumbnailsCompleted = false;
+    API.on("regenerateMetadatasBegin", (_) => {
+      this.regenerateMetadatasCompleted = false;
     });
-    API.on("regenerateThumbnailsComplete", (_) => {
-      this.regenerateThumbnailsCompleted = true;
+    API.on("regenerateMetadatasComplete", (_) => {
+      this.regenerateMetadatasCompleted = true;
     });
   }
   open() {
@@ -260,8 +260,8 @@ export default class VSettings extends Vue {
   save() {
     API.send("updateSettings", this.$settings);
   }
-  regenerateThumbnails() {
-    API.send("regenerateThumbnails");
+  regenerateMetadatas() {
+    API.send("regenerateMetadatas");
   }
   async browsePetaImageDirectory() {
     const path = await API.send("browsePetaImageDirectory");

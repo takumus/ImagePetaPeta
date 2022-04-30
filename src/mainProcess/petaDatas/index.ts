@@ -19,7 +19,7 @@ import crypto from "crypto";
 import dateFormat from "dateformat";
 import { upgradePetaBoard, upgradePetaImage } from "@/mainProcess/utils/upgrader";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
-import { DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
 import { encode as encodePlaceholder } from "blurhash";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
@@ -210,9 +210,9 @@ export class PetaDatas {
     });
     return values;
   }
-  async regenerateThumbnails() {
+  async regenerateMetadatas() {
     const log = this.mainLogger.logChunk();
-    this.emitMainEvent("regenerateThumbnailsBegin");
+    this.emitMainEvent("regenerateMetadatasBegin");
     const images = await this.datas.dataPetaImages.find({});
     const generate = async (image: PetaImage, i: number) => {
       upgradePetaImage(image);
@@ -220,17 +220,17 @@ export class PetaDatas {
       const result = await this.generateThumbnail({
         data,
         outputFilePath: Path.resolve(this.paths.DIR_THUMBNAILS, image.file.original),
-        size: this.datas.dataSettings.data.thumbnails.size,
-        quality: this.datas.dataSettings.data.thumbnails.quality
+        size: BROWSER_THUMBNAIL_SIZE,
+        quality: BROWSER_THUMBNAIL_QUALITY
       });
       image.placeholder = result.placeholder;
       image.file.thumbnail = `${image.file.original}.${result.extname}`;
       await this.updatePetaImage(image, UpdateMode.UPDATE);
       log.log(`thumbnail (${i + 1} / ${images.length})`);
-      this.emitMainEvent("regenerateThumbnailsProgress", i + 1, images.length);
+      this.emitMainEvent("regenerateMetadatasProgress", i + 1, images.length);
     }
     await promiseSerial(generate, images).value;
-    this.emitMainEvent("regenerateThumbnailsComplete");
+    this.emitMainEvent("regenerateMetadatasComplete");
   }
   async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
@@ -598,8 +598,8 @@ export class PetaDatas {
     const thumbnail = await this.generateThumbnail({
       data: param.data,
       outputFilePath: Path.resolve(this.paths.DIR_THUMBNAILS, originalFileName),
-      size: this.datas.dataSettings.data.thumbnails.size,
-      quality: this.datas.dataSettings.data.thumbnails.quality
+      size: BROWSER_THUMBNAIL_SIZE,
+      quality: BROWSER_THUMBNAIL_QUALITY
     });
     const petaImage: PetaImage = {
       file: {

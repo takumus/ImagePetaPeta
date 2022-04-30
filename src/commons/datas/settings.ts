@@ -1,6 +1,4 @@
-import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 import deepcopy from "deepcopy";
-
 const defaultSettings = {
   lowMemoryMode: false,
   darkMode: false,
@@ -11,10 +9,6 @@ const defaultSettings = {
   zoomSensitivity: 100,
   moveSensitivity: 100,
   autoHideUI: false,
-  thumbnails: {
-    size: BROWSER_THUMBNAIL_SIZE[0],
-    quality: BROWSER_THUMBNAIL_QUALITY[1]
-  },
   tileSize: 128,
   loadThumbnailsInOriginal: false,
   showNsfwWithoutConfirm: false,

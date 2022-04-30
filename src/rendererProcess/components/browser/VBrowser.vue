@@ -89,7 +89,7 @@ import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 import { isBlurhashValid } from "blurhash";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { BOARD_MAX_PETAPANEL_ADD_COUNT, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
+import { BOARD_MAX_PETAPANEL_ADD_COUNT, BROWSER_THUMBNAIL_SIZE, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
@@ -501,7 +501,7 @@ export default class VBrowser extends Vue {
     return tiles;
   }
   get original() {
-    return this.$settings.loadThumbnailsInOriginal && this.actualThumbnailSize > this.$settings.thumbnails.size;
+    return this.$settings.loadThumbnailsInOriginal && this.actualThumbnailSize > BROWSER_THUMBNAIL_SIZE;
   }
   keyA() {
     if (isKeyboardLocked()) {

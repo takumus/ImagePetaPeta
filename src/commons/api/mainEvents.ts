@@ -9,7 +9,7 @@ export interface MainEvents {
   taskStatus: (id: string, task: TaskStatus) => void;
   notifyUpdate: (latest: string, downloaded: boolean) => void;
   windowFocused: (focused: boolean) => void;
-  regenerateThumbnailsProgress: (done: number, count: number) => void;
-  regenerateThumbnailsBegin: () => void;
-  regenerateThumbnailsComplete: () => void;
+  regenerateMetadatasProgress: (done: number, count: number) => void;
+  regenerateMetadatasBegin: () => void;
+  regenerateMetadatasComplete: () => void;
 }

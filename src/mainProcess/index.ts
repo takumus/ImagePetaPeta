@@ -663,12 +663,11 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           log.log("return:", process.platform);
           return process.platform;
         },
-        regenerateThumbnails: async (event) => {
+        regenerateMetadatas: async (event) => {
           const log = mainLogger.logChunk();
           try {
             log.log("#Regenerate Thumbnails");
-            log.log("preset:", dataSettings.data.thumbnails);
-            await petaDatas.regenerateThumbnails();
+            await petaDatas.regenerateMetadatas();
             return;
           } catch (err) {
             log.error(err);

@@ -41,7 +41,7 @@ export interface MainFunctions {
   windowMinimize: () => Promise<void>;
   windowClose: () => Promise<void>;
   getPlatform: () => Promise<NodeJS.Platform>;
-  regenerateThumbnails: () => Promise<void>;
+  regenerateMetadatas: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
   setSelectedPetaBoard: (petaBoardId: string) => Promise<void>;
