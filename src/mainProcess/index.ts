@@ -867,7 +867,9 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
       dataStates.save();
       const log = mainLogger.logChunk();
       log.log("#Save Window Size", dataStates.data.windowSize);
-      app.quit();
+      if (process.platform !== "darwin") {
+        draggingPreviewWindow.destroy();
+      }
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false);

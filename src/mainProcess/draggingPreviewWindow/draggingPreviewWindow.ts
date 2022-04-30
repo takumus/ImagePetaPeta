@@ -27,13 +27,7 @@ export class DraggingPreviewWindow {
     this.move(point.x, point.y);
   }
   createWindow() {
-    try {
-      if (this.draggingPreviewWindow) {
-        this.draggingPreviewWindow.destroy();
-      }
-    } catch (error) {
-      //
-    }
+    this.destroy();
     this.draggingPreviewWindow = new BrowserWindow({
       width: this.width,
       height: this.height,
@@ -120,6 +114,13 @@ export class DraggingPreviewWindow {
         </body>`
       );
     } catch(error) {
+      //
+    }
+  }
+  destroy() {
+    try {
+      this.draggingPreviewWindow?.destroy();
+    } catch (error) {
       //
     }
   }
