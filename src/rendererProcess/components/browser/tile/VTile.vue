@@ -294,7 +294,6 @@ t-tile-root {
         align-items: center;
         color: #666666;
         font-weight: bold;
-        display: block;
       }
     }
     &:hover {
