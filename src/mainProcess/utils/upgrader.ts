@@ -45,14 +45,6 @@ export function upgradeSettings(settings: Settings) {
     settings.moveSensitivity = defaultSettings.moveSensitivity;
     changed = true;
   }
-  // v1.4.0
-  if (settings.thumbnails === undefined) {
-    settings.thumbnails = {
-      size: defaultSettings.thumbnails.size,
-      quality: defaultSettings.thumbnails.quality
-    }
-    changed = true;
-  }
   // v1.5.0
   if (settings.tileSize === undefined) {
     settings.tileSize = defaultSettings.tileSize;
