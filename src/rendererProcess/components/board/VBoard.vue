@@ -134,7 +134,7 @@ export default class VBoard extends Vue {
   mounted() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
-      antialias: true,
+      antialias: false,
       backgroundAlpha: 0
     });
     this.pixi.view.addEventListener("dblclick", this.resetTransform);
