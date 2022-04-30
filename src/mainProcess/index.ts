@@ -54,7 +54,6 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
   //-------------------------------------------------------------------------------------------------//
   let mainWindow: BrowserWindow;
   let draggingPreviewWindow: DraggingPreviewWindow;
-  const dragPreviewWindowSize = new Vec2();
   let DIR_ROOT: string;
   let DIR_APP: string;
   let DIR_LOG: string;
@@ -872,6 +871,8 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false);
+      draggingPreviewWindow.setVisible(false);
+      dropFromBrowserPetaImageIds = undefined;
     });
     window.addListener("focus", () => {
       emitMainEvent("windowFocused", true);
