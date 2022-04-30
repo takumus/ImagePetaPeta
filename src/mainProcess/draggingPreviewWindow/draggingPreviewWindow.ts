@@ -1,12 +1,15 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
+import { Vec2 } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { BrowserWindow, screen } from "electron";
 import * as Path from "path";
+import { valueChecker } from "@/commons/utils/valueChecker";
 export class DraggingPreviewWindow {
   private draggingPreviewWindow: BrowserWindow | undefined;
   private visible = false;
   private followCursorTimeoutHandler: NodeJS.Timeout | undefined;
+  private isSameAll = valueChecker().isSameAll;
   constructor(private width = 256, private height = 256) {
     this.createWindow();
   }
@@ -14,17 +17,14 @@ export class DraggingPreviewWindow {
     return this.draggingPreviewWindow;
   }
   private followCursor = () => {
-    this.unfollowCursor();
-    if (this.visible) {
-      const point = screen.getCursorScreenPoint();
-      this.move(point.x, point.y);
+    const point = screen.getCursorScreenPoint();
+    if (this.isSameAll(
+      "position.x", point.x,
+      "position.y", point.y
+    )) {
+      return;
     }
-    this.followCursorTimeoutHandler = setTimeout(this.followCursor, 0);
-  }
-  private unfollowCursor() {
-    if (this.followCursorTimeoutHandler) {
-      clearTimeout(this.followCursorTimeoutHandler);
-    }
+    this.move(point.x, point.y);
   }
   createWindow() {
     try {
@@ -59,11 +59,13 @@ export class DraggingPreviewWindow {
     this.draggingPreviewWindow.setOpacity(0);
   }
   setVisible(value: boolean) {
-    if (value) {
-      this.followCursor();
-    } else {
-      this.unfollowCursor();
+    if (this.followCursorTimeoutHandler) {
+      clearInterval(this.followCursorTimeoutHandler);
     }
+    if (value) {
+      this.followCursorTimeoutHandler = setInterval(this.followCursor, 0);
+    }
+    console.log("follow", value);
     try {
       this.draggingPreviewWindow?.setOpacity(value ? 0.7 : 0);
       this.draggingPreviewWindow?.moveTop();
