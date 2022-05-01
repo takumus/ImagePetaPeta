@@ -8,6 +8,8 @@
     }"
   >
     <t-image-wrapper>
+      <t-nsfw v-if="showNsfw">
+      </t-nsfw>
       <img
         draggable="false"
         :src="imageURL"
@@ -39,6 +41,9 @@ export default class VPropertyThumbnail extends Vue {
   get loaded() {
     return this.imageURL != "";
   }
+  get showNsfw() {
+    return this.propertyThumbnail.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
+  }
 }
 </script>
 
@@ -59,6 +64,23 @@ t-property-thumbnail-root {
       display: block;
       width: 100%;
       height: 100%;
+      position: relative;
+      z-index: 1;
+      top: 0px;
+      left: 0px;
+    }
+    >t-nsfw {
+      z-index: 2;
+      position: relative;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background-size: 32px;
+      background-position: center;
+      background-repeat: repeat;
+      background-image: url("~@/@assets/nsfwBackground.png");
     }
   }
 }

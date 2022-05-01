@@ -4,6 +4,7 @@ import * as PIXI from "pixi.js";
 import { AnimatedGIF } from '@pixi/gif';
 import { getImage } from "./ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
+import NSFWImage from "@/@assets/nsfwBackground.png";
 export class PPanel extends PIXI.Sprite {
   public selected = false;
   public unselected = false;
@@ -16,13 +17,8 @@ export class PPanel extends PIXI.Sprite {
   public onUpdateGIF: ((frame: number) => void) | undefined;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
-  private cover = new PIXI.Graphics();
-  private coverLabel = new PIXI.Text("?", {
-    fontFamily: window.getComputedStyle(document.body).getPropertyValue("font-family"),
-    fontWeight: "bold",
-    fill: 0x666666,
-    fontSize: 64
-  });
+  private cover = new PIXI.Sprite();
+  private nsfw?: PIXI.TilingSprite;
   private isSameAll = valueChecker().isSameAll;
   private defaultHeight = 0;
   public showNsfw = false;
@@ -31,14 +27,17 @@ export class PPanel extends PIXI.Sprite {
     this.anchor.set(0.5, 0.5);
     this.imageWrapper.mask = this.masker;
     this.imageWrapper.addChild(this.image);
-    this.addChild(this.imageWrapper, this.masker, this.cover, this.coverLabel, this.selection);
+    this.addChild(this.imageWrapper, this.masker, this.cover, this.selection);
     this.interactive = true;
     this.cover.visible = false;
-    this.coverLabel.visible = false;
-    this.coverLabel.anchor.set(0.5, 0.5);
     this.setPetaPanel(this.petaPanel);
     this.update();
     // this.cursor = "move";
+    (async () => {
+      this.nsfw = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NSFWImage), 100, 100);
+      this.nsfw.tileScale.set(0.5, 0.5);
+      this.cover.addChild(this.nsfw);
+    })();
   }
   public setPetaPanel(petaPanel: PetaPanel) {
     this.petaPanel = petaPanel;
@@ -147,31 +146,17 @@ export class PPanel extends PIXI.Sprite {
           panelHeight
         );
       }
-      if (this.noImage) {
-        this.coverLabel.text = "?";
-      } else if (this.petaPanel._petaImage?.nsfw && !this.showNsfw) {
-        this.coverLabel.text = "NSFW";
-      }
       if (this.noImage || (this.petaPanel._petaImage?.nsfw && !this.showNsfw)) {
-        this.cover.visible = this.coverLabel.visible = true;
-        this.cover.clear();
-        this.cover.beginFill(0xffffff, 1);
-        this.cover.drawRect(
-          -panelWidth / 2,
-          -panelHeight / 2,
-          panelWidth,
-          panelHeight
-        );
-        this.coverLabel.scale.set(1, 1);
-        const scale = 0.3;
-        // 縦横比で縦横どちらを基準にするか決める。
-        if (this.coverLabel.width / this.coverLabel.height > this.petaPanel.width / this.petaPanel.height) {
-          this.coverLabel.scale.set((this.petaPanel.width * scale) / this.coverLabel.width);
-        } else {
-          this.coverLabel.scale.set((this.petaPanel.height * scale) / this.coverLabel.height);
+        this.cover.visible = true;
+        if (this.nsfw) {
+          this.nsfw.x = -panelWidth / 2;
+          this.nsfw.y = -panelHeight / 2;
+          this.nsfw.width = panelWidth;
+          this.nsfw.height = panelHeight;
+          this.nsfw.tilePosition.set(panelWidth / 2, panelHeight / 2);
         }
       } else {
-        this.cover.visible = this.coverLabel.visible = false;
+        this.cover.visible = false;
       }
       this.x = this.petaPanel.position.x;
       this.y = this.petaPanel.position.y;

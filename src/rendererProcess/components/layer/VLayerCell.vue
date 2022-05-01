@@ -35,6 +35,7 @@
         backgroundImage: `url(${url})`
       }"
     >
+      <t-nsfw v-if="showNsfw"></t-nsfw>
     </t-thumb>
   </li>
 </template>
@@ -95,6 +96,9 @@ export default class VLayerCell extends Vue {
   }
   get name() {
     return this.pPanel?.petaPanel._petaImage?.name || "";
+  }
+  get showNsfw() {
+    return this.pPanel?.petaPanel._petaImage?.nsfw && !this.$settings.showNsfwWithoutConfirm;
   }
   mousedown(event: MouseEvent) {
     this.click.down(vec2FromMouseEvent(event));
@@ -176,6 +180,15 @@ export default class VLayerCell extends Vue {
     background-position: center center;
     background-size: contain;
     display: block;
+    >t-nsfw {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background-size: 24px;
+      background-position: center;
+      background-repeat: repeat;
+      background-image: url("~@/@assets/nsfwBackground.png");
+    }
   }
   >.name {
     flex: 1;

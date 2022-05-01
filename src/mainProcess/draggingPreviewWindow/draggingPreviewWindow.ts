@@ -4,6 +4,7 @@ import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { BrowserWindow, screen } from "electron";
 import * as Path from "path";
 import { valueChecker } from "@/commons/utils/valueChecker";
+import NSFWImage from "@/@assets/nsfwBackground.png";
 export class DraggingPreviewWindow {
   private draggingPreviewWindow: BrowserWindow | undefined;
   private visible = false;
@@ -83,19 +84,38 @@ export class DraggingPreviewWindow {
       //
     }
   }
-  setPetaImages(petaImages: PetaImage[]) {
+  setPetaImages(petaImages: PetaImage[], showNsfw: boolean) {
     try {
       const first = petaImages[0];
       if (!first) {
         return;
       }
+      const element = first.nsfw && !showNsfw ? 
+      `<t-nsfw style="background-image: url(${NSFWImage})"></t-nsfw>`:
+      `<img src="${getImageURL(first, ImageType.THUMBNAIL)}">`;
       this.draggingPreviewWindow?.loadURL(
         `data:text/html;charset=utf-8,
         <head>
-        <style>html, body { margin: 0px; padding: 0px; background-color: transparent; } img { width: 100%; height: 100%; }</style>
+        <style>
+        html, body {
+          margin: 0px; padding: 0px; background-color: transparent;
+        }
+        img {
+          width: 100%; height: 100%;
+        }
+        t-nsfw {
+          width: 100%;
+          height: 100%;
+          display: block;
+          background-size: 32px;
+          background-position: center;
+          background-repeat: repeat;
+          background-image: url("~@/@assets/nsfwBackground.png");
+        }
+        </style>
         </head>
         <body>
-        <img src="${getImageURL(first, ImageType.THUMBNAIL)}">
+        ${element}
         </body>`
       );
     } catch(error) {

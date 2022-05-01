@@ -16,7 +16,6 @@
         }"
       >
         <t-nsfw v-if="showNsfw">
-          NSFW
         </t-nsfw>
         <canvas
           ref="canvas"
@@ -34,9 +33,7 @@
           loading="lazy"
           @load="loaded"
         >
-        <t-background
-          class="transparent-background"
-        >
+        <t-background>
         </t-background>
       </t-images>
       <t-tags>
@@ -287,13 +284,11 @@ t-tile-root {
         left: 0px;
         width: 100%;
         height: 100%;
-        background-color: #ffffff;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: #666666;
-        font-weight: bold;
+        display: block;
+        background-size: 32px;
+        background-position: center;
+        background-repeat: repeat;
+        background-image: url("~@/@assets/nsfwBackground.png");
       }
     }
     &:hover {
