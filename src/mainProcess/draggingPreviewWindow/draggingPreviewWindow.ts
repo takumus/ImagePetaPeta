@@ -59,7 +59,6 @@ export class DraggingPreviewWindow {
     if (value) {
       this.followCursorTimeoutHandler = setInterval(this.followCursor, 0);
     }
-    console.log("follow", value);
     try {
       this.draggingPreviewWindow?.setOpacity(value ? 0.7 : 0);
       this.draggingPreviewWindow?.moveTop();
