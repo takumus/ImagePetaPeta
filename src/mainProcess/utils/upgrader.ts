@@ -54,8 +54,8 @@ export function upgradeSettings(settings: Settings) {
     changed = true;
   }
   // v1.6.0
-  if (settings.showNsfwWithoutConfirm === undefined) {
-    settings.showNsfwWithoutConfirm = defaultSettings.showNsfwWithoutConfirm;
+  if (settings.alwaysShowNSFW === undefined) {
+    settings.alwaysShowNSFW = defaultSettings.alwaysShowNSFW;
     changed = true;
   }
   if (settings.petaImageDirectory === undefined) {

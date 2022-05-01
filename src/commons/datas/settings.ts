@@ -11,7 +11,7 @@ const defaultSettings = {
   autoHideUI: false,
   tileSize: 128,
   loadThumbnailsInOriginal: false,
-  showNsfwWithoutConfirm: false,
+  alwaysShowNSFW: false,
   petaImageDirectory: {
     default: true,
     path: ""

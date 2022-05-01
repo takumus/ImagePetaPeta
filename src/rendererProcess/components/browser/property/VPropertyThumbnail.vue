@@ -8,7 +8,7 @@
     }"
   >
     <t-image-wrapper>
-      <t-nsfw v-if="showNsfw">
+      <t-nsfw v-if="showNSFW">
       </t-nsfw>
       <img
         draggable="false"
@@ -41,8 +41,8 @@ export default class VPropertyThumbnail extends Vue {
   get loaded() {
     return this.imageURL != "";
   }
-  get showNsfw() {
-    return this.propertyThumbnail.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
+  get showNSFW() {
+    return this.propertyThumbnail.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
   }
 }
 </script>

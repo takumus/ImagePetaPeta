@@ -22,8 +22,10 @@ export class PPanel extends PIXI.Sprite {
   private nsfwTile?: PIXI.TilingSprite;
   private noImageTile?: PIXI.TilingSprite;
   private isSameAll = valueChecker().isSameAll;
+  private isSameAll2 = valueChecker().isSameAll;
   private defaultHeight = 0;
-  public showNsfw = false;
+  private zoomScale = 1;
+  public showNSFW = false;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -36,9 +38,9 @@ export class PPanel extends PIXI.Sprite {
     this.update();
     (async () => {
       this.nsfwTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NSFWImage), 100, 100);
+      this.nsfwTile.visible = false;
       this.noImageTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NOIMAGEImage), 100, 100);
-      this.nsfwTile.tileScale.set(0.5, 0.5);
-      this.noImageTile.tileScale.set(0.5, 0.5);
+      this.setZoomScale(this.zoomScale);
       this.cover.addChild(this.noImageTile, this.nsfwTile);
     })();
   }
@@ -73,10 +75,22 @@ export class PPanel extends PIXI.Sprite {
       this.noImage = false;
     }
   }
+  public setZoomScale(scale: number) {
+    if (this.isSameAll2(
+      "scale", scale,
+      "nsfwTile", this.nsfwTile,
+      "noImageTile", this.noImageTile
+    )) {
+      return;
+    }
+    this.zoomScale = scale;
+    this.nsfwTile?.tileScale.set(0.5 * (1 / this.zoomScale));
+    this.noImageTile?.tileScale.set(0.5 * (1 / this.zoomScale));
+  }
   public update() {
     try {
       // 前回の描画時と値に変更があるかチェック
-      const showNSFW = (this.petaPanel._petaImage?.nsfw && !this.showNsfw) ? true : false;
+      const showNSFW = (this.petaPanel._petaImage?.nsfw && !this.showNSFW) ? true : false;
       if (this.isSameAll(
         "petaPanel.width", this.petaPanel.width,
         "petaPanel.height", this.petaPanel.height,

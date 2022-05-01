@@ -148,12 +148,12 @@
           <label>
             <input
               type="checkbox"
-              :checked="$settings.showNsfwWithoutConfirm"
-              @change="$settings.showNsfwWithoutConfirm = Boolean($event.target.checked)"
+              :checked="$settings.alwaysShowNSFW"
+              @change="$settings.alwaysShowNSFW = Boolean($event.target.checked)"
             >
-            {{$t("settings.showNsfwWithoutConfirm")}}
+            {{$t("settings.alwaysShowNSFW")}}
           </label><br>
-          <p>{{$t("settings.showNsfwWithoutConfirmDescriptions")}}</p>
+          <p>{{$t("settings.alwaysShowNSFWDescriptions")}}</p>
           <label>
             <input
               type="checkbox"

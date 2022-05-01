@@ -56,7 +56,7 @@
           type="checkbox"
           tabindex="-1"
           :checked="nsfw"
-          @change="changeNsfw(Boolean($event.target.checked))"
+          @change="changeNSFW(Boolean($event.target.checked))"
         >
           NSFW
         </label>
@@ -223,7 +223,7 @@ export default class VProperty extends Vue {
     }
     return "not-same";
   }
-  changeNsfw(value: boolean) {
+  changeNSFW(value: boolean) {
     this.petaImages.forEach((pi, i) => {
       pi.nsfw = value;
     });

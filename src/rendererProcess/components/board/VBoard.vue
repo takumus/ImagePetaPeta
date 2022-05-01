@@ -304,6 +304,14 @@ export default class VBoard extends Vue {
     }
     this.orderPIXIRender();
   }
+  updateScale() {
+    if (this.board) {
+      const scale = this.board.transform.scale;
+      this.pPanelsArray.forEach((pp) => {
+        pp.setZoomScale(scale);
+      });
+    }
+  }
   updateRect() {
     if (!this.board) {
       return;
@@ -639,7 +647,8 @@ export default class VBoard extends Vue {
       return false;
     }
     const pPanel = new PPanel(petaPanel);
-    pPanel.showNsfw = this.$settings.showNsfwWithoutConfirm;
+    pPanel.setZoomScale(this.board?.transform.scale || 1);
+    pPanel.showNSFW = this.$settings.alwaysShowNSFW;
     pPanel.onUpdateGIF = () => {
       if (!this.loading) {
         this.orderPIXIRender();
@@ -727,10 +736,10 @@ export default class VBoard extends Vue {
     }
     return Math.floor(this.board.transform.scale * 100);
   }
-  @Watch("$settings.showNsfwWithoutConfirm")
-  changeShowNsfwWithoutConfirm() {
+  @Watch("$settings.alwaysShowNSFW")
+  changeShowNSFWWithoutConfirm() {
     this.pPanelsArray.forEach((pp) => {
-      pp.showNsfw = this.$settings.showNsfwWithoutConfirm;
+      pp.showNSFW = this.$settings.alwaysShowNSFW;
     });
   }
   @Watch("board.petaPanels", { deep: true })
@@ -740,6 +749,7 @@ export default class VBoard extends Vue {
   @Watch("board.transform", { deep: true })
   changeBoardTransform() {
     this.updateRect();
+    this.updateScale();
     this.$emit("change", this.board);
   }
   @Watch("board.background", { deep: true })

@@ -765,7 +765,7 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           if (!first) {
             return;
           }
-          draggingPreviewWindow.setPetaImages(petaImages, dataSettings.data.showNsfwWithoutConfirm);
+          draggingPreviewWindow.setPetaImages(petaImages, dataSettings.data.alwaysShowNSFW);
           draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);

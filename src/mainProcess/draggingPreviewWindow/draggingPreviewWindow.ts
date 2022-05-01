@@ -84,13 +84,13 @@ export class DraggingPreviewWindow {
       //
     }
   }
-  setPetaImages(petaImages: PetaImage[], showNsfw: boolean) {
+  setPetaImages(petaImages: PetaImage[], showNSFW: boolean) {
     try {
       const first = petaImages[0];
       if (!first) {
         return;
       }
-      const element = first.nsfw && !showNsfw ? 
+      const element = first.nsfw && !showNSFW ? 
       `<t-nsfw style="background-image: url(${NSFWImage})"></t-nsfw>`:
       `<img src="${getImageURL(first, ImageType.THUMBNAIL)}">`;
       this.draggingPreviewWindow?.loadURL(

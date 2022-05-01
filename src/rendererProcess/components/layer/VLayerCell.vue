@@ -35,7 +35,7 @@
         backgroundImage: `url(${url})`
       }"
     >
-      <t-nsfw v-if="showNsfw"></t-nsfw>
+      <t-nsfw v-if="showNSFW"></t-nsfw>
     </t-thumb>
   </li>
 </template>
@@ -97,8 +97,8 @@ export default class VLayerCell extends Vue {
   get name() {
     return this.pPanel?.petaPanel._petaImage?.name || "";
   }
-  get showNsfw() {
-    return this.pPanel?.petaPanel._petaImage?.nsfw && !this.$settings.showNsfwWithoutConfirm;
+  get showNSFW() {
+    return this.pPanel?.petaPanel._petaImage?.nsfw && !this.$settings.alwaysShowNSFW;
   }
   mousedown(event: MouseEvent) {
     this.click.down(vec2FromMouseEvent(event));

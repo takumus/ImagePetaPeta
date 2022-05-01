@@ -15,7 +15,7 @@
           'selected-image': tile.petaImage._selected
         }"
       >
-        <t-nsfw v-if="showNsfw">
+        <t-nsfw v-if="showNSFW">
         </t-nsfw>
         <canvas
           ref="canvas"
@@ -176,8 +176,8 @@ export default class VTile extends Vue {
   loaded() {
     this.loadingImage = false;
   }
-  get showNsfw() {
-    return this.tile.petaImage.nsfw && !this.$settings.showNsfwWithoutConfirm;
+  get showNSFW() {
+    return this.tile.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
   }
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
