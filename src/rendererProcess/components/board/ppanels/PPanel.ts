@@ -5,6 +5,7 @@ import { AnimatedGIF } from '@pixi/gif';
 import { getImage } from "./ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
+import NOIMAGEImage from "@/@assets/noImageBackground.png";
 export class PPanel extends PIXI.Sprite {
   public selected = false;
   public unselected = false;
@@ -18,7 +19,8 @@ export class PPanel extends PIXI.Sprite {
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private cover = new PIXI.Sprite();
-  private nsfw?: PIXI.TilingSprite;
+  private nsfwTile?: PIXI.TilingSprite;
+  private noImageTile?: PIXI.TilingSprite;
   private isSameAll = valueChecker().isSameAll;
   private defaultHeight = 0;
   public showNsfw = false;
@@ -32,11 +34,12 @@ export class PPanel extends PIXI.Sprite {
     this.cover.visible = false;
     this.setPetaPanel(this.petaPanel);
     this.update();
-    // this.cursor = "move";
     (async () => {
-      this.nsfw = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NSFWImage), 100, 100);
-      this.nsfw.tileScale.set(0.5, 0.5);
-      this.cover.addChild(this.nsfw);
+      this.nsfwTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NSFWImage), 100, 100);
+      this.noImageTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NOIMAGEImage), 100, 100);
+      this.nsfwTile.tileScale.set(0.5, 0.5);
+      this.noImageTile.tileScale.set(0.5, 0.5);
+      this.cover.addChild(this.noImageTile, this.nsfwTile);
     })();
   }
   public setPetaPanel(petaPanel: PetaPanel) {
@@ -73,6 +76,7 @@ export class PPanel extends PIXI.Sprite {
   public update() {
     try {
       // 前回の描画時と値に変更があるかチェック
+      const showNSFW = (this.petaPanel._petaImage?.nsfw && !this.showNsfw) ? true : false;
       if (this.isSameAll(
         "petaPanel.width", this.petaPanel.width,
         "petaPanel.height", this.petaPanel.height,
@@ -88,7 +92,9 @@ export class PPanel extends PIXI.Sprite {
         "unselected", this.unselected,
         "selected", this.selected,
         "noImage", this.noImage,
-        "nsfw", this.petaPanel._petaImage?.nsfw && !this.showNsfw
+        "nsfw", showNSFW,
+        "nsfwTile", this.nsfwTile,
+        "noImageTile", this.noImageTile
       )) {
         return;
       }
@@ -146,14 +152,23 @@ export class PPanel extends PIXI.Sprite {
           panelHeight
         );
       }
-      if (this.noImage || (this.petaPanel._petaImage?.nsfw && !this.showNsfw)) {
+      if (this.noImage || showNSFW) {
         this.cover.visible = true;
-        if (this.nsfw) {
-          this.nsfw.x = -panelWidth / 2;
-          this.nsfw.y = -panelHeight / 2;
-          this.nsfw.width = panelWidth;
-          this.nsfw.height = panelHeight;
-          this.nsfw.tilePosition.set(panelWidth / 2, panelHeight / 2);
+        if (this.nsfwTile) {
+          this.nsfwTile.x = -panelWidth / 2;
+          this.nsfwTile.y = -panelHeight / 2;
+          this.nsfwTile.width = panelWidth;
+          this.nsfwTile.height = panelHeight;
+          this.nsfwTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
+          this.nsfwTile.visible = showNSFW ? true : false;
+        }
+        if (this.noImageTile) {
+          this.noImageTile.x = -panelWidth / 2;
+          this.noImageTile.y = -panelHeight / 2;
+          this.noImageTile.width = panelWidth;
+          this.noImageTile.height = panelHeight;
+          this.noImageTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
+          this.noImageTile.visible = this.noImage;
         }
       } else {
         this.cover.visible = false;
