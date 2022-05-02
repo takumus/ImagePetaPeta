@@ -4,7 +4,7 @@ import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/pe
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
-import { States } from "@/commons/datas/states";
+import { defaultStates, States } from "@/commons/datas/states";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import DB from "@/mainProcess/storages/db";
@@ -44,11 +44,11 @@ export function upgradeSettings(settings: Settings) {
     settings.moveSensitivity = defaultSettings.moveSensitivity;
     changed = true;
   }
-  // v1.5.0
-  if (settings.tileSize === undefined) {
-    settings.tileSize = defaultSettings.tileSize;
-    changed = true;
-  }
+  // // v1.5.0
+  // if (settings.tileSize === undefined) {
+  //   settings.tileSize = defaultSettings.tileSize;
+  //   changed = true;
+  // }
   if (settings.loadThumbnailsInOriginal === undefined) {
     settings.loadThumbnailsInOriginal = defaultSettings.loadThumbnailsInOriginal;
     changed = true;
@@ -95,6 +95,10 @@ export function upgradeStates(states: States) {
     states.selectedPetaBoardId = "";
     changed = true;
   } 
+  // 2.6.0
+  if (states.browserTileSize === undefined) {
+    states.browserTileSize = defaultStates.browserTileSize;
+  }
   return {
     data: states,
     changed

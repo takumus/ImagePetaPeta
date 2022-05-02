@@ -9,7 +9,6 @@ const defaultSettings = {
   zoomSensitivity: 100,
   moveSensitivity: 100,
   autoHideUI: false,
-  tileSize: 128,
   loadThumbnailsInOriginal: false,
   alwaysShowNSFW: false,
   petaImageDirectory: {
