@@ -775,6 +775,10 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
             files: files,
             icon: nativeImage.createFromDataURL(Transparent),
           });
+          draggingPreviewWindow.setVisible(false);
+          setTimeout(() => {
+            dropFromBrowserPetaImageIds = undefined;
+          }, 100);
         },
         getDropFromBrowserPetaImageIds: async () => {
           if (!dropFromBrowserPetaImageIds) {
@@ -879,8 +883,6 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false);
-      draggingPreviewWindow.setVisible(false);
-      dropFromBrowserPetaImageIds = undefined;
     });
     window.addListener("focus", () => {
       emitMainEvent("windowFocused", true);
