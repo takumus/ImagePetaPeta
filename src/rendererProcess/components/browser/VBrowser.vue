@@ -97,6 +97,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { getColors, getSimilarityScore } from "@/commons/utils/blurhashTools";
+import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
     VTile,
@@ -296,7 +297,7 @@ export default class VBrowser extends Vue {
     this.visible = false;
   }
   updateTileSize(value: number) {
-    API.send("updateState", "browserTileSize", value);
+    API.send("updateState", StateSet("browserTileSize", value));
   }
   sort(a: PetaImage, b: PetaImage) {
     switch(this.sortMode) {

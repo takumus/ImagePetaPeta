@@ -786,12 +786,12 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           draggingPreviewWindow.setVisible(false);
           return ids;
         },
-        updateState: async (event, key, value) => {
+        updateState: async (event, stateSet) => {
           const log = mainLogger.logChunk();
           log.log("#UpadteState");
           try {
-            log.log(key, value);
-            (dataStates.data as any)[key] = value;
+            log.log(stateSet);
+            (dataStates.data as any)[stateSet.key] = stateSet.value;
             dataStates.save();
             return true;
           } catch (error) {

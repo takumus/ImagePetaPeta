@@ -6,4 +6,14 @@ export const defaultStates = {
   selectedPetaBoardId: "",
   browserTileSize: 128
 }
+export interface StateSet {
+  key: string,
+  value: any,
+}
+export function StateSet<U extends keyof States>(key: U, value: States[U]): StateSet {
+  return {
+    key,
+    value
+  }
+}
 export type States = typeof defaultStates;
