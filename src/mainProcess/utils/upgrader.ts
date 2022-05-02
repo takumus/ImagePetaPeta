@@ -12,7 +12,7 @@ import deepcopy from "deepcopy";
 import { v4 as uuid } from "uuid";
 const defaultSettings = getDefaultSettings();
 export function upgradePetaImage(petaImage: PetaImage) {
-  // v0.2.0
+  // v0.2.0 (move to PetaImagePetaTag)
   // if (petaImage.tags === undefined) {
   //   petaImage.tags = [];
   // }
@@ -44,7 +44,7 @@ export function upgradeSettings(settings: Settings) {
     settings.moveSensitivity = defaultSettings.moveSensitivity;
     changed = true;
   }
-  // // v1.5.0
+  // // v1.5.0 (move to states v2.6.0)
   // if (settings.tileSize === undefined) {
   //   settings.tileSize = defaultSettings.tileSize;
   //   changed = true;
@@ -75,11 +75,11 @@ export function upgradeSettings(settings: Settings) {
     settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
     changed = true;
   }
-  // v2.5.0
-  if (settings.visibleLayerPanel === undefined) {
-    settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
-    changed = true;
-  }
+  // v2.5.0 (move to states v2.6.0)
+  // if (settings.visibleLayerPanel === undefined) {
+  //   settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
+  //   changed = true;
+  // }
   if (settings.waifu2x === undefined) {
     settings.waifu2x = deepcopy(defaultSettings.waifu2x);
     changed = true;
@@ -98,6 +98,12 @@ export function upgradeStates(states: States) {
   // 2.6.0
   if (states.browserTileSize === undefined) {
     states.browserTileSize = defaultStates.browserTileSize;
+    changed = true;
+  }
+  // 2.6.0
+  if (states.visibleLayerPanel === undefined) {
+    states.visibleLayerPanel = defaultStates.visibleLayerPanel;
+    changed = true;
   }
   return {
     data: states,

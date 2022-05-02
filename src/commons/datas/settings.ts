@@ -17,7 +17,6 @@ const defaultSettings = {
   },
   autoAddTag: true,
   ignoreMinorUpdate: true,
-  visibleLayerPanel: true,
   waifu2x: {
     execFilePath: "",
     parameters: [

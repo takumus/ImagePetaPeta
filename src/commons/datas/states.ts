@@ -4,7 +4,8 @@ export const defaultStates = {
   windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT },
   windowIsMaximized: false,
   selectedPetaBoardId: "",
-  browserTileSize: 128
+  browserTileSize: 128,
+  visibleLayerPanel: true,
 }
 export interface StateSet {
   key: string,

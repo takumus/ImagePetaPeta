@@ -1,7 +1,7 @@
 <template>
   <t-layer-root
     :class="{
-      hide: !$settings.visibleLayerPanel
+      hide: !$states.visibleLayerPanel
     }"
     :style=" {
       zIndex: zIndex
@@ -12,7 +12,7 @@
     >
     </t-header>
     <t-layers
-      v-show="$settings.visibleLayerPanel"
+      v-show="$states.visibleLayerPanel"
       ref="layersParent"
     >
       <ul ref="layers">
@@ -46,6 +46,8 @@ import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { API } from "@/rendererProcess/api";
+import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
     VLayerCell
@@ -187,7 +189,8 @@ export default class VLayer extends Vue {
   }
   toggleVisible() {
     //
-    this.$settings.visibleLayerPanel = !this.$settings.visibleLayerPanel;
+    this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
+    API.send("updateState", StateSet("visibleLayerPanel", this.$states.visibleLayerPanel));
   }
   get pPanels() {
     if (!this.pPanelsArray) {
