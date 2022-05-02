@@ -61,7 +61,7 @@
           type="range"
           v-model="thumbnailsSize"
           tabindex="-1"
-          @change="$settings.tileSize = Number($event.target.value)"
+          @change="updateTileSize(Number($event.target.value))"
           :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
           :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
           :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
@@ -151,7 +151,7 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer.observe(this.thumbnails);
 
     this.$components.browser = this;
-    this.thumbnailsSize = this.$settings.tileSize;
+    this.thumbnailsSize = this.$states.browserTileSize;
     this.keyboards.down(["a"], this.keyA);
   }
   unmounted() {
@@ -294,6 +294,9 @@ export default class VBrowser extends Vue {
   }
   close() {
     this.visible = false;
+  }
+  updateTileSize(value: number) {
+    API.send("updateState", "browserTileSize", value);
   }
   sort(a: PetaImage, b: PetaImage) {
     switch(this.sortMode) {

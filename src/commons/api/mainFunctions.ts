@@ -29,6 +29,7 @@ export interface MainFunctions {
   openImageFile: (petaImage: PetaImage) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;
   getStates: () => Promise<States>;
+  updateState: <U extends keyof States>(key: U, value: States[U]) => Promise<boolean>;
   showDBFolder: () => Promise<boolean>;
   showConfigFolder: () => Promise<boolean>;
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;

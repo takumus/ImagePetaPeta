@@ -785,6 +785,19 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           draggingPreviewWindow.clearImages();
           draggingPreviewWindow.setVisible(false);
           return ids;
+        },
+        updateState: async (event, key, value) => {
+          const log = mainLogger.logChunk();
+          log.log("#UpadteState");
+          try {
+            log.log(key, value);
+            (dataStates.data as any)[key] = value;
+            dataStates.save();
+            return true;
+          } catch (error) {
+            log.error(error);
+          }
+          return false;
         }
       }
     }
