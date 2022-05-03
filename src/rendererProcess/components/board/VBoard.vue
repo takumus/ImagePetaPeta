@@ -107,7 +107,6 @@ export default class VBoard extends Vue {
   centerWrapper = new PIXI.Container();
   panelsCenterWrapper = new PIXI.Container();
   backgroundSprite = new PIXI.Graphics();
-  backgroundFilter = new PIXI.filters.ColorMatrixFilter();
   selectingBackground = new PIXI.Graphics();
   crossLine = new PIXI.Graphics();
   pPanels: {[key: string]: PPanel} = {};
@@ -156,7 +155,6 @@ export default class VBoard extends Vue {
     this.rootContainer.addChild(this.pTransformer);
     this.rootContainer.addChild(this.selectionGraphics);
     this.panelsBackground.appendChild(this.pixi.view);
-    this.backgroundSprite.filters = [this.backgroundFilter];
     this.pixi.stage.interactive = true;
     this.pixi.ticker.stop();
     this.resizer = new ResizeObserver((entries) => {
@@ -412,7 +410,7 @@ export default class VBoard extends Vue {
       });
     }
     this.pPanelsArray.forEach((pPanel) => {
-      pPanel.update();
+      pPanel.orderRender();
     });
     this.pTransformer.update();
   }
@@ -511,20 +509,13 @@ export default class VBoard extends Vue {
     if (offsetIndex == 0) {
       this.clearSelectionAll();
     }
-    // this.loadOriginal(petaPanel);
     const offset = new Vec2(20, 20).mult(offsetIndex);
-    // const pPanel = this.pPanels[petaPanel.id];
-    // if (!pPanel) {
-    //   return;
-    // }
     petaPanel.width *= 1 / this.board.transform.scale;
     petaPanel.height *= 1 / this.board.transform.scale;
     petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-    // pPanel.draggingOffset = offset.mult(1 / this.board.transform.scale);
-    // pPanel.dragging = true;
-    // pPanel.selected = true;
     this.draggingPanels = true;
-    // this.toFront(pPanel);
+    const maxIndex = this.getMaxIndex();
+    petaPanel.index = maxIndex + 1;
   }
   beginCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
@@ -551,11 +542,6 @@ export default class VBoard extends Vue {
         p.selected = false;
       });
     }
-  }
-  toFront(pPanel: PPanel) {
-    const maxIndex = this.getMaxIndex();
-    pPanel.petaPanel.index = maxIndex + 1;
-    this.sortIndex();
   }
   sortIndex() {
     if (!this.board) {
@@ -595,8 +581,7 @@ export default class VBoard extends Vue {
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
     });
-    this.pPanels = {};
-    this.pTransformer.pPanels = this.pPanels;
+    this.pTransformer.pPanels = this.pPanels = {};
     await this.loadAllOriginal();
     log("vBoard", "load complete");
     this.orderPIXIRender();
@@ -656,9 +641,17 @@ export default class VBoard extends Vue {
     }
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
-    await pPanel.load();
-    pPanel.update();
-    this.orderPIXIRender();
+    pPanel.load().then(() => {
+      pPanel.orderRender();
+      this.pixi.renderer.plugins.prepare.upload(pPanel, () => {
+        this.orderPIXIRender();
+      });
+    })
+    await new Promise<void>((res, rej) => {
+      setTimeout(() => {
+        res();
+      }, 0);
+    })
     return pPanel;
   }
   clearCache() {
@@ -672,7 +665,6 @@ export default class VBoard extends Vue {
     if (!Keyboards.pressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
-      // this.toFront(pPanel);
       this.clearSelectionAll();
     }
     if (this.selectedPPanels.length <= 1) {
@@ -682,17 +674,11 @@ export default class VBoard extends Vue {
     pPanel.selected = true;
     this.layer.scrollTo(pPanel);
     this.draggingPanels = true;
-    // const maxIndex = this.getMaxIndex();
     this.selectedPPanels.forEach((pPanel) => {
       const pos = new Vec2(e.data.global);
       pPanel.draggingOffset = new Vec2(pPanel.position).sub(this.panelsCenterWrapper.toLocal(pos));
       pPanel.dragging = true;
-      // pPanel.petaPanel.index += maxIndex;
     });
-    // this.sortIndex();
-  }
-  setBackgroundBrightness(value: number) {
-    this.backgroundFilter.brightness(value, false);
   }
   orderPIXIRender() {
     this.renderOrdered = true;

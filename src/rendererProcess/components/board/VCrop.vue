@@ -214,7 +214,7 @@ export default class VBoard extends Vue {
     this.pPanel.petaPanel.height = this.height;
     this.selectionContainer.x = -this.pPanel.petaPanel.width / 2;
     this.selectionContainer.y = -this.pPanel.petaPanel.height / 2;
-    this.pPanel.update();
+    this.pPanel.orderRender();
     this.corners.forEach((corner, i) => {
       this.sevenCorners[i]?.setTo(corner);
     });
