@@ -202,6 +202,16 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
   } catch (error) {
     //
   }
+  // 2.6.0
+  try {
+    await promiseSerial(async (pipt) => {
+      if (pipt.id.length > 64) {
+        await petaImagesPetaTags.update(pipt, createPetaPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId));
+      }
+    }, (await petaImagesPetaTags.find({}))).value;
+  } catch (error) {
+    //
+  }
   return changed;
 }
 

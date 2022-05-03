@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { PetaImage } from "./petaImage";
 import { PetaTag } from "./petaTag";
+import crypto from "crypto";
 export interface PetaImagePetaTag {
   id: string,
   petaImageId: string,
@@ -9,7 +10,7 @@ export interface PetaImagePetaTag {
 
 export function createPetaPetaImagePetaTag(petaImageId: string, petaTagId: string): PetaImagePetaTag {
   return {
-    id: petaImageId + petaTagId,
+    id: crypto.createHash("sha256").update(petaImageId + petaTagId, "utf-8").digest("hex"),
     petaImageId,
     petaTagId
   }
