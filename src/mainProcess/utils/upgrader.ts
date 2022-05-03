@@ -1,6 +1,6 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
@@ -182,7 +182,7 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
         if (!petaImages[petaImageId]) {
           return;
         }
-        const pipt = createPetaPetaImagePetaTag(petaImageId, petaTag.id);
+        const pipt = createPetaImagePetaTag(petaImageId, petaTag.id);
         await petaImagesPetaTags.update(
           { id: pipt.id },
           pipt,
@@ -206,7 +206,7 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
   try {
     await promiseSerial(async (pipt) => {
       if (pipt.id.length > 64) {
-        await petaImagesPetaTags.update(pipt, createPetaPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId));
+        await petaImagesPetaTags.update(pipt, createPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId));
       }
     }, (await petaImagesPetaTags.find({}))).value;
   } catch (error) {

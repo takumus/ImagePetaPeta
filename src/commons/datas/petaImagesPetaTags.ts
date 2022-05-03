@@ -8,7 +8,7 @@ export interface PetaImagePetaTag {
   petaTagId: string
 }
 
-export function createPetaPetaImagePetaTag(petaImageId: string, petaTagId: string): PetaImagePetaTag {
+export function createPetaImagePetaTag(petaImageId: string, petaTagId: string): PetaImagePetaTag {
   return {
     id: crypto.createHash("sha256").update(petaImageId + petaTagId, "utf-8").digest("hex"),
     petaImageId,

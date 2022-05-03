@@ -7,7 +7,7 @@ import * as Path from "path";
 import * as file from "@/mainProcess/storages/file";
 import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { createPetaPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
@@ -257,7 +257,7 @@ export class PetaDatas {
       });
       await promiseSerial(async (petaImageId, iIndex) => {
         await promiseSerial(async (petaTagId, tIndex) => {
-          await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImageId, petaTagId), mode);
+          await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImageId, petaTagId), mode);
           handler.emitStatus({
             i18nKey: "tasks.updateDatas",
             progress: {
@@ -484,13 +484,13 @@ export class PetaDatas {
           log.log("tags:", pipts.length);
           await promiseSerial(async (pipt, index) => {
             log.log("copy tag: (", index, "/", pipts.length, ")");
-            const newPIPT = createPetaPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
+            const newPIPT = createPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
             await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
           }, pipts).value;
           log.log(`add "before waifu2x" tag to old petaImage`);
           const name = "before waifu2x";
           const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-          await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
+          await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
           await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
           this.emitMainEvent("updatePetaTags");
         } else {
@@ -618,7 +618,7 @@ export class PetaDatas {
     if (this.datas.dataSettings.data.autoAddTag) {
       const name = dateFormat(addDate, "yyyy-mm-dd");
       const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
-      await this.updatePetaImagePetaTag(createPetaPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
+      await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
       await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
     await file.writeFile(Path.resolve(this.paths.DIR_IMAGES, originalFileName), param.data);
