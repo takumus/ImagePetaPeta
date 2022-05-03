@@ -978,13 +978,4 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
     app.relaunch();
     app.exit();
   }
-  chokidar.watch(
-    [FILE_BOARDS_DB, FILE_IMAGES_DB, FILE_IMAGES_TAGS_DB, FILE_TAGS_DB],
-    {
-      ignoreInitial: true
-    }
-  ).on('all', (event, path) => {
-    console.log(event, path);
-  });
 })();
-import chokidar from "chokidar";

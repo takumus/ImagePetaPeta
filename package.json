@@ -32,7 +32,6 @@
     "adm-zip": "^0.5.9",
     "axios": "^0.21.4",
     "blurhash": "^1.1.4",
-    "chokidar": "^3.5.3",
     "core-js": "^3.6.5",
     "data-uri-to-buffer": "^3.0.1",
     "dateformat": "^5.0.3",
