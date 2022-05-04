@@ -102,7 +102,7 @@ export default class VBoard extends Vue {
   dragOffset = new Vec2();
   click = new ClickChecker();
   resizer?: ResizeObserver;
-  pixi!: PIXI.Application;
+  pixi?: PIXI.Application;
   rootContainer = new PIXI.Container();
   centerWrapper = new PIXI.Container();
   panelsCenterWrapper = new PIXI.Container();
@@ -127,12 +127,36 @@ export default class VBoard extends Vue {
   mousePosition = new Vec2();
   frame = 0;
   fps = 0;
-  keyboards = new Keyboards();
+  keyboards?: Keyboards;
   cancel: (() => Promise<Promise<void>[]>) | undefined;
+  resolution = -1;
+  resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
   mounted() {
+    setTimeout(() => {
+      this.constructIfResolutionChanged();
+    }, 200);
+    this.resolutionMatchMedia.addEventListener("change", this.constructIfResolutionChanged);
+    setInterval(() => {
+      this.fps = this.frame;
+      this.frame = 0;
+    }, 1000);
+  }
+  unmounted() {
+    this.destruct();
+    this.resolutionMatchMedia.removeEventListener("change", this.constructIfResolutionChanged);
+  }
+  constructIfResolutionChanged() {
+    if (this.resolution != window.devicePixelRatio) {
+      this.destruct();
+      this.construct();
+      this.resolution = window.devicePixelRatio;
+      console.log("construct");
+    }
+  }
+  construct() {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
-      antialias: false,
+      antialias: true,
       backgroundAlpha: 0
     });
     this.pixi.view.addEventListener("dblclick", this.resetTransform);
@@ -161,35 +185,35 @@ export default class VBoard extends Vue {
       this.resize(entries[0]!.contentRect);
     });
     this.resizer.observe(this.panelsBackground);
-    setInterval(() => {
-      this.fps = this.frame;
-      this.frame = 0;
-    }, 1000);
     this.renderPIXI();
+    this.keyboards = new Keyboards();
     this.keyboards.enabled = true;
     this.keyboards.down(["delete"], this.keyDelete);
     this.keyboards.down(["backspace"], this.keyBackspace);
     this.keyboards.change(["shift"], this.keyShift);
     PIXI.Ticker.shared.add(this.updateAnimatedGIF);
   }
-  unmounted() {
-    this.pixi.view.removeEventListener("dblclick", this.resetTransform);
-    this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
-    this.pixi.view.removeEventListener("mousedown", this.preventWheelClick);
+  destruct() {
+    if (this.pixi) {
+      this.pixi.view.removeEventListener("dblclick", this.resetTransform);
+      this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
+      this.pixi.view.removeEventListener("mousedown", this.preventWheelClick);
+      this.pixi.destroy(true);
+    }
     this.resizer?.unobserve(this.panelsBackground);
     this.resizer?.disconnect();
-    this.panelsBackground.removeChild(this.pixi.view);
-    this.pixi.destroy();
-    this.keyboards.destroy();
+    this.keyboards?.destroy();
     PIXI.Ticker.shared.remove(this.updateAnimatedGIF);
     cancelAnimationFrame(this.requestAnimationFrameHandle);
   }
   resize(rect: DOMRectReadOnly) {
     this.stageRect.x = rect.width;
     this.stageRect.y = rect.height;
-    this.pixi.renderer.resize(rect.width, rect.height);
-    this.pixi.view.style.width = rect.width + "px";
-    this.pixi.view.style.height = rect.height + "px";
+    if (this.pixi) {
+      this.pixi.renderer.resize(rect.width, rect.height);
+      this.pixi.view.style.width = rect.width + "px";
+      this.pixi.view.style.height = rect.height + "px";
+    }
     // this.panelsCenterWrapper.x = rect.width / 2;
     // this.panelsCenterWrapper.y = rect.height / 2 ;
     this.centerWrapper.x = rect.width / 2;
@@ -520,12 +544,16 @@ export default class VBoard extends Vue {
   beginCrop(petaPanel: PetaPanel) {
     this.croppingPetaPanel = petaPanel;
     this.cropping = true;
-    this.keyboards.enabled = false;
+    if (this.keyboards) {
+      this.keyboards.enabled = false;
+    }
   }
   endCrop() {
     this.croppingPetaPanel = null;
     this.cropping = false;
-    this.keyboards.enabled = true;
+    if (this.keyboards) {
+      this.keyboards.enabled = true;
+    }
   }
   updateCrop(petaPanel: PetaPanel) {
     this.endCrop();
@@ -643,7 +671,7 @@ export default class VBoard extends Vue {
     this.panelsCenterWrapper.addChild(pPanel);
     pPanel.load().then(() => {
       pPanel.orderRender();
-      this.pixi.renderer.plugins.prepare.upload(pPanel, () => {
+      this.pixi?.renderer.plugins.prepare.upload(pPanel, () => {
         this.orderPIXIRender();
       });
     })
@@ -686,7 +714,7 @@ export default class VBoard extends Vue {
   renderPIXI() {
     if (this.renderOrdered) {
       this.animate();
-      this.pixi.render();
+      this.pixi?.render();
       this.renderOrdered = false;
     }
     this.requestAnimationFrameHandle = requestAnimationFrame(this.renderPIXI);
