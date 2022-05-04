@@ -178,10 +178,13 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
-    if (BrowserWindow.getAllWindows().length === 0) {
+    if (BrowserWindow.getAllWindows().length < 2) {
       mainWindow = initWindow();
     }
   });
+  app.on("before-quit", () => {
+    draggingPreviewWindow.destroy();
+  })
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready
@@ -275,14 +278,12 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
     });
     //-------------------------------------------------------------------------------------------------//
     /*
-      メインウインドウを初期化
+      メインウインドウ・プレビューウインドウを初期化
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
     mainWindow = initWindow();
-    if (process.platform != "darwin") {
-      draggingPreviewWindow = new DraggingPreviewWindow();
-    }
+    draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
       IPCのメインプロセス側のAPI
