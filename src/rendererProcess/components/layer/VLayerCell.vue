@@ -9,7 +9,7 @@
     @mousedown.left="mousedown($event)"
   >
     <t-icon
-      class="eye"
+      class="visible"
       ref="visibleIcon"
       :class="{
         disabled: !visible
@@ -159,9 +159,9 @@ export default class VLayerCell extends Vue {
     background-size: 12px;
     display: block;
     filter: var(--icon-filter);
-    &.eye {
+    &.visible {
       background-size: 14px;
-      background-image: url("~@/@assets/eye.png");
+      background-image: url("~@/@assets/visible.png");
     }
     &.lock {
       background-size: 11px;
