@@ -1,6 +1,3 @@
-import { v4 as uuid } from "uuid";
-import { PetaImage } from "./petaImage";
-import { PetaTag } from "./petaTag";
 import crypto from "crypto";
 export interface PetaImagePetaTag {
   id: string,
