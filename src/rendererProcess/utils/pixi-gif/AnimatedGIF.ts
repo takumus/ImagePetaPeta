@@ -262,7 +262,7 @@ class AnimatedGIF extends Sprite
     canvas.width = frames[0]!.imageData.width;
     canvas.height = frames[0]!.imageData.height;
 
-    super(Texture.from(canvas, { scaleMode }));
+    this.texture = Texture.from(canvas, { scaleMode });
 
     this.duration = frames[frames.length - 1]!.end;
     this._frames = frames;
