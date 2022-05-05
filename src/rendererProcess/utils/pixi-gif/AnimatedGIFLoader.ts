@@ -45,7 +45,7 @@ const AnimatedGIFLoader: ILoaderPlugin = {
   {
     if (resource.extension === GIF_EXTENSION)
     {
-      AnimatedGIF.fromBuffer(resource.data).then((data) => {
+      AnimatedGIF.fromBuffer(resource.data, undefined).then((data) => {
         resource.animation = data;
         next();
       }).catch((error) => {

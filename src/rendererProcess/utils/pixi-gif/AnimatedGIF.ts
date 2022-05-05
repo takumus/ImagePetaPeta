@@ -5,6 +5,7 @@ import { SCALE_MODES } from '@pixi/constants';
 import { Ticker, UPDATE_PRIORITY } from '@pixi/ticker';
 import { parseGIF, decompressFrames, ParsedFrame } from 'gifuct-js';
 import DecompressWorker from "./decompress.worker";
+import { DecompressWorkerData } from './decompressWorkerData';
 /**
  * Frame object.
  */
@@ -159,28 +160,13 @@ class AnimatedGIF extends Sprite
    * @param options - Options to use.
    * @returns
    */
-  static async fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>, useWorker?: boolean): Promise<AnimatedGIF>
+  static async fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>): Promise<AnimatedGIF>
   {
     if (!buffer || buffer.byteLength === 0)
     {
       throw new Error('Invalid buffer');
     }
 
-    const gif = parseGIF(buffer);
-    console.log("begin decompress");
-    const gifFrames = await new Promise<ParsedFrame[]>((res, rej) => {
-      if (useWorker) {
-        const w = new (DecompressWorker as any)() as Worker;
-        w.postMessage(gif)
-        w.addEventListener('message', (e) => {
-          res(e.data);
-          w.terminate()
-        });
-      } else {
-        res(decompressFrames(gif, true));
-      }
-    })
-    console.log("end decompress");
     const frames: FrameObject[] = [];
 
     // Temporary canvases required for compositing frames
@@ -189,45 +175,57 @@ class AnimatedGIF extends Sprite
     const patchCanvas = document.createElement('canvas');
     const patchContext = patchCanvas.getContext('2d')!;
 
-    canvas.width = gifFrames[0]!.dims.width;
-    canvas.height = gifFrames[0]!.dims.height;
-
     let time = 0;
 
     // Some GIFs have a non-zero frame delay, so we need to calculate the fallback
     const { fps } = Object.assign({}, AnimatedGIF.defaultOptions, options);
     const defaultDelay = 1000 / fps;
-    console.log("begin createCanvas");
     // Precompute each frame and store as ImageData
-    for (let i = 0; i < gifFrames.length; i++)
-    {
-      console.log(`${i}/${gifFrames.length} createCanvas`);
-      // Some GIF's omit the disposalType, so let's assume clear if missing
-      const { disposalType = 2, delay = defaultDelay, patch, dims: { width, height, left, top } } = gifFrames[i]!;
+    console.log("GIF(worker): begin parse");
+    let first = true;
+    await new Promise<void>((res, rej) => {
+      const w = new (DecompressWorker as any)() as Worker;
+      w.postMessage(buffer);
+      w.addEventListener('message', (e) => {
+        const data = e.data as DecompressWorkerData;
+        if (first) {
+          canvas.width = data.parsedFrame.dims.width;
+          canvas.height = data.parsedFrame.dims.height;
+          first = false;
+        }
+        // Some GIF's omit the disposalType, so let's assume clear if missing
+        const { disposalType = 2, delay = defaultDelay, patch, dims: { width, height, left, top } } = data.parsedFrame;
 
-      patchCanvas.width = width;
-      patchCanvas.height = height;
-      patchContext.clearRect(0, 0, width, height);
-      const patchData = patchContext.createImageData(width, height);
+        patchCanvas.width = width;
+        patchCanvas.height = height;
+        patchContext.clearRect(0, 0, width, height);
+        const patchData = patchContext.createImageData(width, height);
 
-      patchData.data.set(patch);
-      patchContext.putImageData(patchData, 0, 0);
+        patchData.data.set(patch);
+        patchContext.putImageData(patchData, 0, 0);
 
-      context.drawImage(patchCanvas, left, top);
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        context.drawImage(patchCanvas, left, top);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-      if (disposalType === 2)
-      {
-        context.clearRect(0, 0, width, height);
-      }
-
-      frames.push({
-        start: time,
-        end: time + delay,
-        imageData,
+        if (disposalType === 2)
+        {
+          context.clearRect(0, 0, width, height);
+        }
+        console.log(`GIF(worker): parsed (${data.index + 1}/${data.length})`);
+        frames.push({
+          start: time,
+          end: time + delay,
+          imageData,
+        });
+        time += delay;
+        if (data.isLast) {
+          w.terminate();
+          console.log("GIF(worker): killed");
+          res();
+        }
       });
-      time += delay;
-    }
+    })
+    console.log("GIF(worker): end parse");
 
     // clear the canvases
     canvas.width = canvas.height = 0;
