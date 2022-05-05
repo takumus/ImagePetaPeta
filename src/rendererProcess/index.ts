@@ -1,10 +1,10 @@
 import { createApp, Plugin } from "vue";
 import { createI18n } from "vue-i18n";
-import { Loader as PIXILoader } from '@pixi/loaders';
+// import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import languages from "@/commons/languages";
 import App from "@/rendererProcess/components/VIndex.vue";
-import { App as _App, reactive } from "vue";
+import { App as _App } from "vue";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalStates from "@/rendererProcess/vueComponentCustomProperties/states";
 import * as GlobalSystemInfo from "@/rendererProcess/vueComponentCustomProperties/systemInfo";
@@ -16,7 +16,7 @@ import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInf
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 import { API } from "@/rendererProcess/api";
 (async () => {
-  PIXILoader.registerPlugin(AnimatedGIFLoader);
+  AnimatedGIFLoader.add?.();
   const app = createApp(App);
   const appUse = async (plugin: Plugin) => await plugin.install!(app);
   const i18n = createI18n({

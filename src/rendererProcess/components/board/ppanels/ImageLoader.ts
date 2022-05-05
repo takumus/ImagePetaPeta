@@ -2,7 +2,8 @@ import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import * as PIXI from "pixi.js";
-import { AnimatedGIF } from '@/rendererProcess/utils/pixi-gif';
+import { AnimatedGIF, AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
+import { ILoaderMiddleware } from "pixi.js";
 let animatedGIFCache: {[key: string]: AnimatedGIF} = {};
 export function clearAnimatedGIF() {
   Object.values(animatedGIFCache).forEach((cache) => {
@@ -35,7 +36,8 @@ export function getImage(petaImage: PetaImage | undefined) {
       res({ texture });
       return;
     }
-    const loader = new PIXI.Loader();
+    const loader = new PIXI.Loader(undefined);
+    loader.use(AnimatedGIFLoader.use as ILoaderMiddleware);
     loader.add(imageURL);
     loader.onError.add((error) => {
       loader.resources[imageURL]?.texture?.destroy();
