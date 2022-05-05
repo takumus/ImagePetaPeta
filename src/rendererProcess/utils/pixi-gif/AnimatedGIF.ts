@@ -230,7 +230,7 @@ class AnimatedGIF extends Sprite
     // clear the canvases
     canvas.width = canvas.height = 0;
     patchCanvas.width = patchCanvas.height = 0;
-
+    console.log(frames)
     return new AnimatedGIF(frames, options);
   }
 
