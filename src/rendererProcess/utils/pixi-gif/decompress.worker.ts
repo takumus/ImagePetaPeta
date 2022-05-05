@@ -1,4 +1,4 @@
-import { parseGIF, decompressFrames, decompressFrame, Frame } from 'gifuct-js';
+import { parseGIF, decompressFrame, Frame } from 'gifuct-js';
 import { DecompressWorkerData } from './decompressWorkerData';
 const w: Worker = self as any;
 
