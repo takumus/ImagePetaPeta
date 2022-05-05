@@ -21,13 +21,10 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { Loader as PIXILoader } from '@pixi/loaders';
-import { AnimatedGIFLoader } from '@pixi/gif';
 import { createPetaPanel, PetaPanel } from "@/commons/datas/petaPanel";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PSelection } from "@/rendererProcess/components/board/ppanels/PSelection";
 import { PControlPoint } from "@/rendererProcess/components/board/ppanels/PControlPoint";
-PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
   },

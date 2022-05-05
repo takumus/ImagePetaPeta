@@ -1,7 +1,7 @@
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
-import { AnimatedGIF } from '@pixi/gif';
+import { AnimatedGIF } from '@/rendererProcess/utils/pixi-gif';
 import { getImage } from "./ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
@@ -174,6 +174,7 @@ export class PPanel extends PIXI.Sprite {
           this.nsfwTile.width = panelWidth;
           this.nsfwTile.height = panelHeight;
           this.nsfwTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
+          this.nsfwTile
           this.nsfwTile.visible = showNSFW ? true : false;
         }
         if (this.noImageTile) {

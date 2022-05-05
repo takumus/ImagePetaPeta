@@ -68,11 +68,11 @@ import { minimId } from "@/commons/utils/utils";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Loader as PIXILoader } from '@pixi/loaders';
-import { AnimatedGIFLoader } from '@pixi/gif';
+import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
-PIXILoader.registerPlugin(AnimatedGIFLoader);
+// PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
     VCrop,
@@ -154,6 +154,7 @@ export default class VBoard extends Vue {
     }
   }
   construct() {
+    PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.OFF;
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
       antialias: true,

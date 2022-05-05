@@ -51,6 +51,20 @@ module.exports = {
           isCustomElement: (tag) => tag.startsWith("t-")
         }
       }));
+    config.module
+      .rule("worker")
+      .test(/\.worker\.ts$/)
+      .use("worker-loader")
+      .loader("worker-loader")
+    config.module
+      .rule('ts')
+      .exclude
+      .add(/\.worker\.ts$/)
+    config.module
+      .rule("worker")
+      .test(/\.worker\.ts$/)
+      .use("ts-loader")
+      .loader("ts-loader")
   },
   pluginOptions: {
     electronBuilder: {
