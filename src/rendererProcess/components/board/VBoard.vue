@@ -595,6 +595,9 @@ export default class VBoard extends Vue {
   }
   async load(): Promise<void> {
     const log = logChunk().log;
+    this.endCrop();
+    Cursor.setCursor("wait");
+    this.loading = true;
     if (this.cancel) {
       log("vBoard", `canceling loading`);
       this.pPanelsArray.forEach((pPanel) => {
@@ -604,47 +607,30 @@ export default class VBoard extends Vue {
       log("vBoard", `canceled loading`);
       return this.load();
     }
-    this.endCrop();
     if (!this.board) {
       return;
     }
     log("vBoard", "load", minimId(this.board.id));
-    Cursor.setCursor("wait");
-    // this.clearCache();
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
     });
     this.pTransformer.pPanels = this.pPanels = {};
-    await this.loadAllOriginal();
-    log("vBoard", "load complete");
-    this.orderPIXIRender();
-    Object.values(this.pPanels).forEach((pPanel) => {
-      if (!pPanel.petaPanel.gif.stopped) {
-        pPanel.playGIF();
-      }
-    });
-    Cursor.setDefaultCursor();
-  }
-  async loadAllOriginal() {
     if (!this.board) {
       return;
     }
-    this.loading = true;
-    const log = logChunk().log;
     const load = async (petaPanel: PetaPanel, index: number) => {
       if (!this.board) {
         return;
       }
       const progress =  `${index + 1}/${this.board.petaPanels.length}`;
-      await this.loadOriginal(petaPanel).then((result) => {
-        if (result) {
-          log("vBoard", `loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
-          this.loadingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
-        }
-      }).catch((err) => {
-        log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, err);
+      try {
+        await this.createPPanel(petaPanel);
+        log("vBoard", `loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
+        this.loadingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
+      } catch (error) {
+        log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, error);
         this.loadingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
-      });
+      }
       this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
       this.orderPIXIRender();
     }
@@ -659,10 +645,18 @@ export default class VBoard extends Vue {
     this.loadingProgress = 0;
     this.loadingLog = "";
     this.cancel = undefined;
+    log("vBoard", "load complete");
+    this.orderPIXIRender();
+    Object.values(this.pPanels).forEach((pPanel) => {
+      if (!pPanel.petaPanel.gif.stopped) {
+        pPanel.playGIF();
+      }
+    });
+    Cursor.setDefaultCursor();
   }
-  async loadOriginal(petaPanel: PetaPanel) {
+  async createPPanel(petaPanel: PetaPanel) {
     if (this.pPanels[petaPanel.id]) {
-      return false;
+      return petaPanel;
     }
     const pPanel = new PPanel(petaPanel);
     pPanel.setZoomScale(this.board?.transform.scale || 1);
@@ -674,6 +668,7 @@ export default class VBoard extends Vue {
     }
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
+    pPanel.orderRender();
     await pPanel.load();
     pPanel.orderRender();
     return pPanel;
