@@ -607,10 +607,6 @@ export default class VBoard extends Vue {
       log("vBoard", `canceled loading`);
       return this.load();
     }
-    if (!this.board) {
-      return;
-    }
-    log("vBoard", "load", minimId(this.board.id));
     this.pPanelsArray.forEach((pPanel) => {
       this.removePPanel(pPanel);
     });
@@ -618,6 +614,7 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
+    log("vBoard", "load", minimId(this.board.id));
     const load = async (petaPanel: PetaPanel, index: number) => {
       if (!this.board) {
         return;
