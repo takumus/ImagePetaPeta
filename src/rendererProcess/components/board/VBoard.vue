@@ -150,10 +150,10 @@ export default class VBoard extends Vue {
       this.destruct();
       this.construct();
       this.resolution = window.devicePixelRatio;
-      console.log("construct");
     }
   }
   construct() {
+    logChunk().log("construct PIXI");
     PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.OFF;
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
@@ -196,6 +196,7 @@ export default class VBoard extends Vue {
   }
   destruct() {
     if (this.pixi) {
+      logChunk().log("destruct PIXI");
       this.pixi.view.removeEventListener("dblclick", this.resetTransform);
       this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
       this.pixi.view.removeEventListener("mousedown", this.preventWheelClick);
