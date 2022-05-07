@@ -670,6 +670,9 @@ export default class VBoard extends Vue {
     this.panelsCenterWrapper.addChild(pPanel);
     pPanel.orderRender();
     await pPanel.load();
+    await new Promise((res, rej) => {
+      setTimeout(res, 10);
+    });
     pPanel.orderRender();
     return pPanel;
   }
