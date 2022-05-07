@@ -6,6 +6,7 @@ export const defaultStates = {
   selectedPetaBoardId: "",
   browserTileSize: 128,
   visibleLayerPanel: true,
+  loadedPetaBoardId: ""
 }
 export interface StateSet {
   key: string,

@@ -105,6 +105,11 @@ export function upgradeStates(states: States) {
     states.visibleLayerPanel = defaultStates.visibleLayerPanel;
     changed = true;
   }
+  // 2.6.0
+  if (states.loadedPetaBoardId === undefined) {
+    states.loadedPetaBoardId = states.selectedPetaBoardId;
+    changed = true;
+  }
   return {
     data: states,
     changed

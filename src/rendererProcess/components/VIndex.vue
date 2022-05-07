@@ -84,6 +84,7 @@ import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplica
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
+import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
     VBrowser,
@@ -114,6 +115,7 @@ export default class Index extends Vue {
   windowIsFocused = true;
   currentPetaBoardId = "";
   title = "";
+  errorPetaBoardId = "";
   async mounted() {
     window.onerror = (e) => {
       logChunk().log("vIndex", "window error:", e);
@@ -160,8 +162,9 @@ export default class Index extends Vue {
     });
   }
   async restoreBoard() {
-    const id = (await API.send("getStates")).selectedPetaBoardId;
-    const lastBoard = this.boards.find((board) => board.id == id);
+    const states = await API.send("getStates");
+    this.errorPetaBoardId = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
+    const lastBoard = this.boards.find((board) => board.id == states.selectedPetaBoardId);
     this.selectPetaBoard(lastBoard);
     if (!lastBoard) {
       this.selectPetaBoard(this.boards[0]);
@@ -220,7 +223,7 @@ export default class Index extends Vue {
     this.currentPetaBoard.petaPanels.push(petaPanel);
     this.vPetaBoard.addPanel(petaPanel, offsetIndex);
   }
-  selectPetaBoard(board: PetaBoard | undefined) {
+  async selectPetaBoard(board: PetaBoard | undefined) {
     if (!board) {
       return;
     }
@@ -228,7 +231,14 @@ export default class Index extends Vue {
       return;
     }
     logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
-    API.send("setSelectedPetaBoard", board.id);
+    API.send("updateState", StateSet("selectedPetaBoardId", board.id));
+    if (this.errorPetaBoardId == board.id) {
+      if (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+        return;
+      } else {
+        this.errorPetaBoardId = "";
+      }
+    }
     this.currentPetaBoardId = board.id;
   }
   savePetaBoard(board: PetaBoard, immidiately: boolean) {
@@ -264,7 +274,10 @@ export default class Index extends Vue {
     await this.getPetaBoards();
     this.selectPetaBoard(board);
   }
-  get currentPetaBoard() {
+  get currentPetaBoard(): PetaBoard | undefined {
+    if (this.errorPetaBoardId == this.currentPetaBoardId) {
+      return undefined;
+    }
     return this.boards.find((board) => board.id == this.currentPetaBoardId);
   }
   get sortedPetaBoards() {

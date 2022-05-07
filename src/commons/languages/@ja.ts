@@ -24,6 +24,9 @@ const ja = {
     removeDialog: (ctx: any) => {
       return `ボード"${ctx.list(0)}"を削除しますか?`
     },
+    selectErrorBoardDialog: (ctx: any) => {
+      return `前回、ボード"${ctx.list(0)}"をロード中にアプリが終了しました。\n読み込みますか?`
+    },
     menu: {
       openBrowser: "ブラウザを開く",
       resetPosition: "位置をリセット"

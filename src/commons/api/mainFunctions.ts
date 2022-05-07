@@ -44,7 +44,6 @@ export interface MainFunctions {
   regenerateMetadatas: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
-  setSelectedPetaBoard: (petaBoardId: string) => Promise<void>;
   waifu2xConvert: (petaImages: PetaImage[]) => Promise<boolean>;
   installUpdate: () => Promise<boolean>;
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;

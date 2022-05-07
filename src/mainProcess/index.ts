@@ -725,18 +725,6 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           log.log("#Get States");
           return dataStates.data;
         },
-        setSelectedPetaBoard: async (event, petaBoardId: string) => {
-          const log = mainLogger.logChunk();
-          try {
-            log.log("#Set Selected PetaBoard");
-            log.log("id:", minimId(petaBoardId));
-            dataStates.data.selectedPetaBoardId = petaBoardId;
-            dataStates.save();
-          } catch (error) {
-            log.error(error);
-          }
-          return;
-        },
         waifu2xConvert: async (event, petaImages) => {
           const log = mainLogger.logChunk();
           try {
@@ -795,7 +783,7 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           const log = mainLogger.logChunk();
           log.log("#UpadteState");
           try {
-            log.log(stateSet);
+            log.log(stateSet.key, "=", stateSet.value);
             (dataStates.data as any)[stateSet.key] = stateSet.value;
             dataStates.save();
             return true;
