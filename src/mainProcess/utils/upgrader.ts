@@ -144,10 +144,10 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
       await petaTags.update({ id: anyPetaTag.id }, anyPetaTag, true);
       upgraded = true;
     },
-    (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).value;
+    (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).promise;
     anyPetaImage["tags"] = undefined;
   }
-  await promiseSerial(addTags, petaImagesArr).value;
+  await promiseSerial(addTags, petaImagesArr).promise;
   return upgraded;
 }
 
@@ -189,7 +189,7 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
           true
         );
         changed = true;
-      }, petaImageIds).value;
+      }, petaImageIds).promise;
       // remove petaImages property
       (petaTag as any).petaImages = undefined;
       // update
@@ -198,7 +198,7 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
         petaTag,
         false
       );
-    }, (await petaTags.find({}))).value;
+    }, (await petaTags.find({}))).promise;
   } catch (error) {
     //
   }
@@ -208,7 +208,7 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
       if (pipt.id.length > 64) {
         await petaImagesPetaTags.update(pipt, createPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId));
       }
-    }, (await petaImagesPetaTags.find({}))).value;
+    }, (await petaImagesPetaTags.find({}))).promise;
   } catch (error) {
     //
   }

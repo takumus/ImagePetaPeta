@@ -128,7 +128,7 @@ export default class VBoard extends Vue {
   frame = 0;
   fps = 0;
   keyboards?: Keyboards;
-  cancel: (() => Promise<Promise<void>[]>) | undefined;
+  cancel: (() => Promise<void[]>) | undefined;
   resolution = -1;
   resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
   mounted() {
@@ -650,7 +650,7 @@ export default class VBoard extends Vue {
     const result = promiseSerial(load, [...this.board.petaPanels]);
     this.cancel = result.cancel;
     try {
-      await result.value;
+      await result.promise;
     } catch (error) {
       log("vBoard", "load error:", error);
     }

@@ -84,7 +84,7 @@ export class PetaDatas {
           status: "progress"
         });
       }
-      await promiseSerial(update, datas).value;
+      await promiseSerial(update, datas).promise;
       if (mode == UpdateMode.REMOVE) {
         this.emitMainEvent("updatePetaTags");
       }
@@ -157,7 +157,7 @@ export class PetaDatas {
     let pipts: PetaImagePetaTag[] = [];
     // await promiseSerial(async (petaImageId) => {
     //   pipts.push(...(await this.datas.dataPetaImagesPetaTags.find({ petaImageId })));
-    // }, petaImageIds).value;
+    // }, petaImageIds).promise;
     await Promise.all(petaImageIds.map(async (petaImageId) => {
       pipts.push(...(await this.datas.dataPetaImagesPetaTags.find({ petaImageId })));
     }));
@@ -191,7 +191,7 @@ export class PetaDatas {
       values.push(info);
       return info;
     }, petaTags);
-    const values2 = await result.value;
+    const values2 = await result.promise;
     log.log("return:", values.length);
     values.sort((a, b) => {
       if (a.petaTag.name < b.petaTag.name) {
@@ -229,7 +229,7 @@ export class PetaDatas {
       log.log(`thumbnail (${i + 1} / ${images.length})`);
       this.emitMainEvent("regenerateMetadatasProgress", i + 1, images.length);
     }
-    await promiseSerial(generate, images).value;
+    await promiseSerial(generate, images).promise;
     this.emitMainEvent("regenerateMetadatasComplete");
   }
   async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
@@ -267,8 +267,8 @@ export class PetaDatas {
             status: "progress",
             log: [petaTagId, petaImageId]
           });
-        }, petaTagIds).value;
-      }, petaImageIds).value;
+        }, petaTagIds).promise;
+      }, petaImageIds).promise;
       handler.emitStatus({
         i18nKey: "tasks.updateDatas",
         status: "complete",
@@ -374,7 +374,7 @@ export class PetaDatas {
       const result = promiseSerial(importImage, _filePaths);
       handler.onCancel = result.cancel;
       try {
-        await result.value;
+        await result.promise;
       } catch (err) {
         //
       }
@@ -486,7 +486,7 @@ export class PetaDatas {
             log.log("copy tag: (", index, "/", pipts.length, ")");
             const newPIPT = createPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
             await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
-          }, pipts).value;
+          }, pipts).promise;
           log.log(`add "before waifu2x" tag to old petaImage`);
           const name = "before waifu2x";
           const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
@@ -496,7 +496,7 @@ export class PetaDatas {
         } else {
           success = false;
         }
-      }, petaImages).value;
+      }, petaImages).promise;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
         log: [],
@@ -555,7 +555,7 @@ export class PetaDatas {
       }
       const result =  promiseSerial(importImage, buffers);
       handler.onCancel = result.cancel;
-      await result.value;
+      await result.promise;
       log.log("return:", addedFileCount, "/", buffers.length);
       handler.emitStatus({
         i18nKey: "tasks.importingFiles",

@@ -67,7 +67,7 @@ export default class VImageImporter extends Vue {
         }
         buffers.push(Buffer.from(data));
       }
-      await promiseSerial(readBuffer, [...items]).value;
+      await promiseSerial(readBuffer, [...items]).promise;
       const ids = await API.send("importImagesFromClipboard", buffers);
       this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition, false);
     });
