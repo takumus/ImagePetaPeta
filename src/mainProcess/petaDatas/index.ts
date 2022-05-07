@@ -182,25 +182,22 @@ export class PetaDatas {
         $nin: taggedIds
       }
     }));
-    let values: PetaTagInfo[] = [];
-    const result = promiseSerial(async (petaTag) => {
+    const petaTagInfos = await promiseSerial(async (petaTag) => {
       const info = {
         petaTag,
         count: await this.datas.dataPetaImagesPetaTags.count({ petaTagId: petaTag.id })
       } as PetaTagInfo;
-      values.push(info);
       return info;
-    }, petaTags);
-    const values2 = await result.promise;
-    log.log("return:", values.length);
-    values.sort((a, b) => {
+    }, petaTags).promise;
+    log.log("return:", petaTagInfos.length);
+    petaTagInfos.sort((a, b) => {
       if (a.petaTag.name < b.petaTag.name) {
         return -1;
       } else {
         return 1;
       }
     });
-    values.unshift({
+    petaTagInfos.unshift({
       petaTag: {
         index: 0,
         id: UNTAGGED_ID,
@@ -208,7 +205,7 @@ export class PetaDatas {
       },
       count: count
     });
-    return values;
+    return petaTagInfos;
   }
   async regenerateMetadatas() {
     const log = this.mainLogger.logChunk();
