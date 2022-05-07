@@ -25,7 +25,7 @@ export class PPanel extends PIXI.Sprite {
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
   private zoomScale = 1;
-  public cancelLoading = () => { return; }
+  private _cancelLoading? = () => { return; }
   public showNSFW = false;
   constructor(public petaPanel: PetaPanel) {
     super();
@@ -52,7 +52,7 @@ export class PPanel extends PIXI.Sprite {
   public async load() {
     this.noImage = true;
     const result = getImage(this.petaPanel._petaImage);
-    this.cancelLoading = result.cancel;
+    this._cancelLoading = result.cancel;
     const image = await result.promise;
     if (this.gif) {
       this.imageWrapper.removeChild(this.gif);
@@ -207,6 +207,10 @@ export class PPanel extends PIXI.Sprite {
       new Vec2(w / 2 + offset, h / 2 + offset),
       new Vec2(-w / 2 - offset, h / 2 + offset)
     ];
+  }
+  public cancelLoading() {
+    this._cancelLoading?.();
+    this._cancelLoading = undefined;
   }
   public destroy() {
     this.image.destroy();

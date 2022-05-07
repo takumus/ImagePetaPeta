@@ -181,7 +181,7 @@ class AnimatedGIF extends Sprite
     const { fps } = Object.assign({}, AnimatedGIF.defaultOptions, options);
     const defaultDelay = 1000 / fps;
     // Precompute each frame and store as ImageData
-    console.log("GIF(worker): begin parse");
+    console.log("GIF(worker): begin converting");
     let first = true;
     let cancel = () => {
       //
@@ -218,7 +218,7 @@ class AnimatedGIF extends Sprite
         {
           context.clearRect(0, 0, width, height);
         }
-        console.log(`GIF(worker): parsed (${data.index + 1}/${data.length})`);
+        console.log(`GIF(worker): converting (${data.index + 1}/${data.length})`);
         frames.push({
           start: time,
           end: time + delay,
@@ -227,8 +227,7 @@ class AnimatedGIF extends Sprite
         time += delay;
         if (data.isLast) {
           worker.terminate();
-          console.log("GIF(worker): killed");
-          console.log("GIF(worker): end parse");
+          console.log("GIF(worker): complete converting");
           canvas.width = canvas.height = 0;
           patchCanvas.width = patchCanvas.height = 0;
           res(new AnimatedGIF(frames, options));
@@ -238,6 +237,7 @@ class AnimatedGIF extends Sprite
     return {
       promise,
       cancel: () => {
+        console.log("GIF(worker): cancel converting");
         worker.terminate();
         cancel();
       }
