@@ -253,7 +253,7 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
       });
       if (await upgradePetaTag(dataPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
-        await promiseSerial((pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).value;
+        await promiseSerial((pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).promise;
       }
       if (await upgradePetaImagesPetaTags(dataPetaTags, dataPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
@@ -445,7 +445,7 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaBoards");
-            await promiseSerial((board) => petaDatas.updatePetaBoard(board, mode), boards).value;
+            await promiseSerial((board) => petaDatas.updatePetaBoard(board, mode), boards).promise;
             log.log("return:", true);
             return true;
           } catch(e) {
@@ -463,7 +463,7 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaTags");
-            await promiseSerial((tag) => petaDatas.updatePetaTag(tag, mode), tags).value;
+            await promiseSerial((tag) => petaDatas.updatePetaTag(tag, mode), tags).promise;
             emitMainEvent("updatePetaTags");
             log.log("return:", true);
             return true;
