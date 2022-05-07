@@ -52,7 +52,6 @@ const AnimatedGIFLoader: ILoaderPlugin = {
         next();
       })
       return;
-      // resource.animation = AnimatedGIF.fromBuffer(resource.data);
     }
     next();
   }

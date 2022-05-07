@@ -22,6 +22,9 @@ export function getImage(petaImage: PetaImage | undefined) {
   let cancelAnimatedGIFLoader = () => {
     //
   }
+  let cancelResourcesLoader = (reason: string) => {
+    //
+  }
   const loader = new PIXI.Loader(undefined);
   loader.use(async (resource, next) => {
     if (resource.extension === "gif") {
@@ -38,6 +41,7 @@ export function getImage(petaImage: PetaImage | undefined) {
     next();
   });
   const promise = new Promise<ImageLoaderResult>((res, rej) => {
+    cancelResourcesLoader = rej;
     if (!petaImage) {
       rej("petaImage is undefined");
       return;
@@ -79,6 +83,9 @@ export function getImage(petaImage: PetaImage | undefined) {
     promise,
     cancel: () => {
       cancelAnimatedGIFLoader();
+      cancelResourcesLoader("canceled");
+      loader.reset();
+      loader.destroy();
     }
   }
 }

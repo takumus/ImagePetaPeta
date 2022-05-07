@@ -596,6 +596,9 @@ export default class VBoard extends Vue {
     const log = logChunk().log;
     if (this.cancel) {
       log("vBoard", `canceling loading`);
+      this.pPanelsArray.forEach((pPanel) => {
+        pPanel.cancelLoading();
+      });
       await this.cancel();
       log("vBoard", `canceled loading`);
       return this.load();
@@ -670,17 +673,8 @@ export default class VBoard extends Vue {
     }
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
-    pPanel.load().then(() => {
-      pPanel.orderRender();
-      this.pixi?.renderer.plugins.prepare.upload(pPanel, () => {
-        this.orderPIXIRender();
-      });
-    })
-    await new Promise<void>((res, rej) => {
-      setTimeout(() => {
-        res();
-      }, 0);
-    })
+    await pPanel.load();
+    pPanel.orderRender();
     return pPanel;
   }
   clearCache() {
