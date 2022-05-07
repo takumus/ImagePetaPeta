@@ -669,11 +669,13 @@ export default class VBoard extends Vue {
     this.pPanels[petaPanel.id] = pPanel;
     this.panelsCenterWrapper.addChild(pPanel);
     pPanel.orderRender();
+    this.orderPIXIRender();
     await pPanel.load();
-    await new Promise((res, rej) => {
-      setTimeout(res, 10);
-    });
     pPanel.orderRender();
+    this.orderPIXIRender();
+    await new Promise((res, rej) => {
+      setTimeout(res);
+    });
     return pPanel;
   }
   clearCache() {
