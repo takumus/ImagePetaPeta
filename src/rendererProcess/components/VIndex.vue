@@ -232,6 +232,7 @@ export default class Index extends Vue {
     }
     logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
     API.send("updateState", StateSet("selectedPetaBoardId", board.id));
+    API.send("updateState", StateSet("loadedPetaBoardId", ""));
     if (this.errorPetaBoardId == board.id) {
       if (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
