@@ -25,6 +25,7 @@ export class PPanel extends PIXI.Sprite {
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
   private zoomScale = 1;
+  private cancelLoad = () => { return; }
   public showNSFW = false;
   constructor(public petaPanel: PetaPanel) {
     super();
@@ -50,15 +51,17 @@ export class PPanel extends PIXI.Sprite {
   }
   public async load() {
     this.noImage = true;
-    const result = await getImage(this.petaPanel._petaImage);
+    const result = getImage(this.petaPanel._petaImage);
+    this.cancelLoad = result.cancel;
+    const image = await result.promise;
     if (this.gif) {
       this.imageWrapper.removeChild(this.gif);
       this.gif.onFrameChange = undefined;
       this.gif.destroy();
       this.gif = undefined;
     }
-    if (result.animatedGIF) {
-      this.gif = result.animatedGIF;
+    if (image.animatedGIF) {
+      this.gif = image.animatedGIF;
       this.gif.onFrameChange = this.onUpdateGIF;
       this.imageWrapper.addChild(this.gif);
       if (this.petaPanel.gif.stopped) {
@@ -66,9 +69,9 @@ export class PPanel extends PIXI.Sprite {
         this.gif.currentFrame = this.petaPanel.gif.frame;
       }
       this.noImage = false;
-    } else if (result.texture) {
+    } else if (image.texture) {
       try {
-        this.image.texture = result.texture;
+        this.image.texture = image.texture;
       } catch (error) {
         // console.log(error);
       }
@@ -208,6 +211,7 @@ export class PPanel extends PIXI.Sprite {
   public destroy() {
     this.image.destroy();
     this.gif?.destroy();
+    this.cancelLoad();
     super.destroy();
   }
   public get isGIF() {

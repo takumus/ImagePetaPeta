@@ -19,8 +19,25 @@ export function getAnimatedGIF(key: string) {
   return animatedGIFCache[key];
 }
 export function getImage(petaImage: PetaImage | undefined) {
-  console.log("load image")
-  return new Promise<ImageLoaderResult>((res, rej) => {
+  let cancelAnimatedGIFLoader = () => {
+    //
+  }
+  const loader = new PIXI.Loader(undefined);
+  loader.use(async (resource, next) => {
+    if (resource.extension === "gif") {
+      const result = AnimatedGIF.fromBuffer(resource.data, undefined);
+      cancelAnimatedGIFLoader = result.cancel;
+      result.promise.then((data) => {
+        resource.animation = data;
+        next();
+      }).catch((error) => {
+        next();
+      })
+      return;
+    }
+    next();
+  });
+  const promise = new Promise<ImageLoaderResult>((res, rej) => {
     if (!petaImage) {
       rej("petaImage is undefined");
       return;
@@ -36,8 +53,6 @@ export function getImage(petaImage: PetaImage | undefined) {
       res({ texture });
       return;
     }
-    const loader = new PIXI.Loader(undefined);
-    loader.use(AnimatedGIFLoader.use as ILoaderMiddleware);
     loader.add(imageURL);
     loader.onError.add((error) => {
       loader.resources[imageURL]?.texture?.destroy();
@@ -60,6 +75,12 @@ export function getImage(petaImage: PetaImage | undefined) {
       rej("could not load texture");
     });
   });
+  return {
+    promise,
+    cancel: () => {
+      cancelAnimatedGIFLoader();
+    }
+  }
 }
 export interface ImageLoaderResult {
   texture?: PIXI.Texture,

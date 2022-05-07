@@ -160,7 +160,7 @@ class AnimatedGIF extends Sprite
    * @param options - Options to use.
    * @returns
    */
-  static async fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>): Promise<AnimatedGIF>
+  static fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>)
   {
     if (!buffer || buffer.byteLength === 0)
     {
@@ -183,10 +183,17 @@ class AnimatedGIF extends Sprite
     // Precompute each frame and store as ImageData
     console.log("GIF(worker): begin parse");
     let first = true;
-    await new Promise<void>((res, rej) => {
-      const w = new (DecompressWorker as any)() as Worker;
-      w.postMessage(buffer);
-      w.addEventListener('message', (e) => {
+    let cancel = () => {
+      //
+    }
+    const worker = new (DecompressWorker as any)() as Worker;
+    const promise = new Promise<AnimatedGIF>((res, rej) => {
+      cancel = rej;
+      worker.postMessage(buffer);
+      worker.addEventListener("error", (e) => {
+        rej(e.message);
+      });
+      worker.addEventListener('message', (e) => {
         const data = e.data as DecompressWorkerData;
         if (first) {
           canvas.width = data.parsedFrame.dims.width;
@@ -219,18 +226,22 @@ class AnimatedGIF extends Sprite
         });
         time += delay;
         if (data.isLast) {
-          w.terminate();
+          worker.terminate();
           console.log("GIF(worker): killed");
-          res();
+          console.log("GIF(worker): end parse");
+          canvas.width = canvas.height = 0;
+          patchCanvas.width = patchCanvas.height = 0;
+          res(new AnimatedGIF(frames, options));
         }
       });
     })
-    console.log("GIF(worker): end parse");
-
-    // clear the canvases
-    canvas.width = canvas.height = 0;
-    patchCanvas.width = patchCanvas.height = 0;
-    return new AnimatedGIF(frames, options);
+    return {
+      promise,
+      cancel: () => {
+        worker.terminate();
+        cancel();
+      }
+    }
   }
 
   /**
