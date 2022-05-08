@@ -947,6 +947,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       await file.writeFile(updateInstallerFilePath, result.data);
       prepareUpdate(remote);
     } catch (error) {
+      emitMainEvent("notifyUpdate", remote.version, false);
       log.error(error);
     }
   }
