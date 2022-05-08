@@ -26,25 +26,26 @@ export default class VImageImporter extends Vue {
       event.preventDefault();
       event.stopPropagation();
       if (event.dataTransfer) {
-        const url = getURLFromImgTag(event.dataTransfer.getData('text/html'));
-        let ids: string[] = [];
-        let fromBrowser = false;
-        if (url != "") {
-          ids = [await API.send("importImageFromURL", url)];
-        } else if (event.dataTransfer.files.length > 0) {
-          const filePaths: string[] = [];
-          for (const file of event.dataTransfer.files) {
-            filePaths.push(file.path);
-          }
-          const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
-          if (dropFromBrowserPetaImageIds) {
-            ids = dropFromBrowserPetaImageIds;
-            fromBrowser = true;
-          } else {
-            ids = await API.send("importImagesFromFilePaths", filePaths);
-          }
+        console.log(event.dataTransfer);
+        const htmls = [event.dataTransfer.getData('text/html')];
+        const fileList: File[] = [];
+        for (const file of event.dataTransfer.files) {
+          fileList.push(file);
         }
-        this.$emit("addPanelByDragAndDrop", ids, vec2FromMouseEvent(event), fromBrowser);
+        const filePaths = fileList.map((file) => file.path).filter((path) => {
+          return path.length > 0;
+        });
+        // 空文字のpathsだったらarraybufferを読む。
+        const arrayBuffers = filePaths.length > 0 ? [] : await promiseSerial(async (file) => {
+          return file.arrayBuffer();
+        }, fileList).promise;
+        const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
+        if (dropFromBrowserPetaImageIds) {
+          this.$emit("addPanelByDragAndDrop", dropFromBrowserPetaImageIds, vec2FromMouseEvent(event), true);
+          return;
+        }
+        const ids = await API.send("importImagesByDragAndDrop", htmls, arrayBuffers, filePaths);
+        this.$emit("addPanelByDragAndDrop", ids, vec2FromMouseEvent(event), false);
       }
     });
     document.addEventListener('dragover', (e) => {

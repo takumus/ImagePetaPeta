@@ -34,6 +34,7 @@ import { isLatest } from "@/commons/utils/versionCheck";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
 import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
+import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -328,37 +329,6 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
           // log.log("return:", files.length);
           petaDatas.importImagesFromFilePaths([filePath]);
           return filePath.length;
-        },
-        importImageFromURL: async (event, url) => {
-          const log = mainLogger.logChunk();
-          try {
-            log.log("#Import Image From URL");
-            let data: Buffer;
-            if (url.trim().indexOf("http") != 0) {
-              // dataURIだったら
-              log.log("data uri");
-              data = dataURIToBuffer(url);
-            } else {
-              // 普通のurlだったら
-              log.log("normal url:", url);
-              data = (await axios.get(url, { responseType: "arraybuffer" })).data;
-            }
-            return (await petaDatas.importImagesFromBuffers([data], "download"))[0]?.id || "";
-          } catch (err) {
-            log.error(err);
-          }
-          return "";
-        },
-        importImagesFromFilePaths: async (event, filePaths) =>{
-          const log = mainLogger.logChunk();
-          try {
-            log.log("#Import Images From File Paths");
-            const images = (await petaDatas.importImagesFromFilePaths(filePaths)).map((image) => image.id);
-            return images;
-          } catch(e) {
-            log.error(e);
-          }
-          return [];
         },
         importImagesFromClipboard: async (event, buffers) => {
           const log = mainLogger.logChunk();
@@ -791,6 +761,66 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
             log.error(error);
           }
           return false;
+        },
+        importImagesByDragAndDrop: async (event, htmls, arrayBuffers, filePaths) => {
+          const log = mainLogger.logChunk();
+          log.log("#ImportImagesByDragAndDrop");
+          log.log(htmls.length, arrayBuffers.length, filePaths.length);
+          let petaImages: PetaImage[] = [];
+          try {
+            log.log("trying to download:", htmls);
+            const buffers = await promiseSerial(
+              async (url) => {
+                let data: Buffer;
+                if (url.trim().indexOf("data:") == 0) {
+                  // dataURIだったら
+                  data = dataURIToBuffer(url);
+                } else {
+                  // 普通のurlだったら
+                  data = (await axios.get(url, { responseType: "arraybuffer" })).data;
+                }
+                return data;
+              },
+              htmls.map((html) => {
+                return getURLFromImgTag(html);
+              })
+            ).promise;
+            if (buffers.length > 0) {
+              petaImages = await petaDatas.importImagesFromBuffers(
+                buffers,
+                "download"
+              );
+              log.log("result:", petaImages.length);
+            }
+          } catch (error) {
+            log.error(error);
+          }
+          try {
+            if (petaImages.length == 0) {
+              if (arrayBuffers.length > 0) {
+                log.log("trying to read ArrayBuffer:", arrayBuffers.length);
+                petaImages = await petaDatas.importImagesFromBuffers(
+                  arrayBuffers.map((ab) => {
+                    return Buffer.from(ab);
+                  }),
+                  "noname"
+                );
+                log.log("result:", petaImages.length);
+              }
+            }
+          } catch (error) {
+            log.error(error);
+          }
+          try {
+            if (petaImages.length == 0) {
+              log.log("trying to read filePath:", filePaths.length);
+              petaImages = await petaDatas.importImagesFromFilePaths(filePaths);
+              log.log("result:", petaImages.length);
+            }
+          } catch (error) {
+            log.error(error);
+          }
+          return petaImages.map((petaImage) => petaImage.id);
         }
       }
     }
