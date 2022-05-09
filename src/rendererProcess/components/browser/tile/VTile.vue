@@ -49,6 +49,18 @@
           {{$t("browser.untagged")}}
         </t-tag>
       </t-tags>
+      <t-palette>
+        <t-color-background>
+          <t-color
+            v-for="color in palette"
+            :key="color.id"
+            :style="{
+              backgroundColor: color.color
+            }"
+          >
+          </t-color>
+        </t-color-background>
+      </t-palette>
       <t-selected
         v-show="tile.petaImage._selected"
       >
@@ -77,6 +89,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE } from "@/commons/defines";
+import { PetaImagePalette } from "@/commons/datas/petaImage";
 @Options({
   components: {
   },
@@ -178,6 +191,15 @@ export default class VTile extends Vue {
   }
   get showNSFW() {
     return this.tile.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
+  }
+  get palette() {
+    return Object.keys(this.tile.petaImage.palette).map((key) => {
+      const color = this.tile.petaImage.palette[key as keyof PetaImagePalette];
+      return {
+        color: `rgb(${color.r}, ${color.g}, ${color.b})`,
+        id: key
+      };
+    });
   }
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
@@ -296,6 +318,9 @@ t-tile-root {
       >t-images {
         filter: brightness(1.0);
       }
+      >t-palette {
+        visibility: visible;
+      }
     }
     >t-tags {
       width: 100%;
@@ -314,6 +339,27 @@ t-tile-root {
         margin-right: 4px;
         font-size: 0.8em;
         display: inline;
+      }
+    }
+    >t-palette {
+      position: absolute;
+      visibility: hidden;
+      top: 0px;
+      pointer-events: none;
+      padding: 8px;
+      display: block;
+      >t-color-background {
+        display: block;
+        overflow-wrap: break-word;
+        background-color: rgba($color: (#000000), $alpha: 0.5);
+        border-radius: var(--rounded);
+        >t-color {
+          width: 8px;
+          height: 8px;
+          margin: 0px 4px;
+          display: inline-block;
+          border-radius: 10px;
+        }
       }
     }
     >t-selected {

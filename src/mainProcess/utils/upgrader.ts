@@ -31,6 +31,17 @@ export function upgradePetaImage(petaImage: PetaImage) {
       thumbnail: (petaImage as any).fileName + ".webp"
     }
   }
+  // v2.6.0
+  if (petaImage.palette === undefined) {
+    petaImage.palette = {
+      vibrant: { r: 255, g: 255, b: 255 },
+      darkVibrant: { r: 255, g: 255, b: 255 },
+      lightVibrant: { r: 255, g: 255, b: 255 },
+      muted: { r: 255, g: 255, b: 255 },
+      darkMuted: { r: 255, g: 255, b: 255 },
+      lightMuted: { r: 255, g: 255, b: 255 }
+    }
+  }
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {

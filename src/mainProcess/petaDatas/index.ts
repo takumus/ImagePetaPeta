@@ -222,6 +222,7 @@ export class PetaDatas {
         quality: BROWSER_THUMBNAIL_QUALITY
       });
       image.placeholder = result.placeholder;
+      image.palette = result.palette;
       image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
       await this.updatePetaImage(image, UpdateMode.UPDATE);
       log.log(`thumbnail (${i + 1} / ${images.length})`);
@@ -610,6 +611,7 @@ export class PetaDatas {
       width: 1,
       height: petaMetaData.original.height / petaMetaData.original.width,
       placeholder: petaMetaData.placeholder,
+      palette: petaMetaData.palette,
       id: id,
       nsfw: false
     }
