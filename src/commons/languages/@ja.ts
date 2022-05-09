@@ -25,7 +25,7 @@ const ja = {
       return `ボード"${ctx.list(0)}"を削除しますか?`
     },
     selectErrorBoardDialog: (ctx: any) => {
-      return `前回、ボード"${ctx.list(0)}"をロード中にアプリが終了しました。\n読み込みますか?`
+      return `前回、ボード"${ctx.list(0)}"をロード中にアプリが終了されました。\nもう一度読み込みますか?`
     },
     menu: {
       openBrowser: "ブラウザを開く",
@@ -92,7 +92,7 @@ const ja = {
       clearSelectionDialog: "選択解除しますか?",
       tags: "タグ一覧"
     },
-    untagged: "タグ未設定",
+    untagged: "未分類",
     all: "すべて"
   },
   tab: {

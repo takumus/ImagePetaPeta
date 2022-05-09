@@ -25,6 +25,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import * as Tasks from "@/mainProcess/tasks/task";
+import { generateMetadata } from "../utils/generateMetadata";
 export class PetaDatas {
   constructor(
     private datas: {
@@ -221,7 +222,7 @@ export class PetaDatas {
         quality: BROWSER_THUMBNAIL_QUALITY
       });
       image.placeholder = result.placeholder;
-      image.file.thumbnail = `${image.file.original}.${result.extname}`;
+      image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
       await this.updatePetaImage(image, UpdateMode.UPDATE);
       log.log(`thumbnail (${i + 1} / ${images.length})`);
       this.emitMainEvent("regenerateMetadatasProgress", i + 1, images.length);
@@ -586,13 +587,13 @@ export class PetaDatas {
       // formatを拡張子にする。
       extName = imageFormatToExtention(metadata.format);
     }
-    if (!extName) {
+    if (extName === undefined) {
       throw new Error("invalid image file type");
     }
     const addDate = param.addDate || new Date();
     const fileDate = param.fileDate || new Date();
     const originalFileName = `${id}.${extName}`;
-    const thumbnail = await this.generateThumbnail({
+    const petaMetaData = await this.generateThumbnail({
       data: param.data,
       outputFilePath: Path.resolve(this.paths.DIR_THUMBNAILS, originalFileName),
       size: BROWSER_THUMBNAIL_SIZE,
@@ -601,14 +602,14 @@ export class PetaDatas {
     const petaImage: PetaImage = {
       file: {
         original: originalFileName,
-        thumbnail: `${originalFileName}.${thumbnail.extname}`
+        thumbnail: `${originalFileName}.${petaMetaData.thumbnail.format}`
       },
       name: param.name,
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
       width: 1,
-      height: thumbnail.sharp.height / thumbnail.sharp.width,
-      placeholder: thumbnail.placeholder,
+      height: petaMetaData.original.height / petaMetaData.original.width,
+      placeholder: petaMetaData.placeholder,
       id: id,
       nsfw: false
     }
@@ -631,44 +632,6 @@ export class PetaDatas {
     size: number,
     quality: number
   }) {
-    let result: sharp.OutputInfo;
-    const extname = params.outputFilePath.split(".").pop();
-    let isGIF = extname == "gif";
-    if (isGIF) {
-      result = await sharp(params.data)
-      .resize(params.size)
-      .webp({ quality: params.quality })
-      .toFile(params.outputFilePath + ".gif");
-      await file.writeFile(
-        params.outputFilePath + ".gif",
-        params.data
-      );
-    } else {
-      result = await sharp(params.data)
-      .resize(params.size)
-      .webp({ quality: params.quality })
-      .toFile(params.outputFilePath + ".webp");
-    }
-    const placeholder = await new Promise<string>((res, rej) => {
-      sharp(params.data)
-      .resize(PLACEHOLDER_SIZE, Math.floor(result.height / result.width * PLACEHOLDER_SIZE))
-      .raw()
-      .ensureAlpha()
-      .toBuffer((err, buffer, { width, height }) => {
-        if (err) {
-          rej(err);
-        }
-        try {
-          res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, PLACEHOLDER_COMPONENT, PLACEHOLDER_COMPONENT));
-        } catch(e) {
-          rej(e);
-        }
-      });
-    })
-    return {
-      sharp: result,
-      placeholder,
-      extname: isGIF ? "gif" : "webp"
-    };
+    return generateMetadata(params);
   }
 }

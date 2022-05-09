@@ -768,7 +768,9 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           log.log(htmls.length, arrayBuffers.length, filePaths.length);
           let petaImages: PetaImage[] = [];
           try {
-            log.log("trying to download:", htmls);
+            log.log("trying to download:", htmls, htmls.map((html) => {
+              return getURLFromImgTag(html);
+            }));
             const buffers = await promiseSerial(
               async (url) => {
                 let data: Buffer;
@@ -864,10 +866,11 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-      if (!process.env.IS_TEST) {
-        window.webContents.openDevTools({ mode: "detach" });
-      }
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string).then(() => {
+        if (!process.env.IS_TEST) {
+          window.webContents.openDevTools({ mode: "detach" });
+        }
+      })
     } else {
       window.loadURL("app://./index.html");
     }
