@@ -5,7 +5,7 @@ export function promiseSerial<T, K>(cb: (data: T, index: number) => Promise<K>, 
     return cb(value, index);
   }));
   return {
-    promise: (result.value as any) as Promise<K[]>,
+    promise: result.value,
     cancel: (result.cancel as any) as () => Promise<K[]>
   }
 }
