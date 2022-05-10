@@ -215,7 +215,7 @@ export class PetaDatas {
     const generate = async (image: PetaImage, i: number) => {
       upgradePetaImage(image);
       const data = await file.readFile(Path.resolve(this.paths.DIR_IMAGES, image.file.original));
-      const result = await this.generateThumbnail({
+      const result = await generateMetadata({
         data,
         outputFilePath: Path.resolve(this.paths.DIR_THUMBNAILS, image.file.original),
         size: BROWSER_THUMBNAIL_SIZE,
@@ -594,7 +594,7 @@ export class PetaDatas {
     const addDate = param.addDate || new Date();
     const fileDate = param.fileDate || new Date();
     const originalFileName = `${id}.${extName}`;
-    const petaMetaData = await this.generateThumbnail({
+    const petaMetaData = await generateMetadata({
       data: param.data,
       outputFilePath: Path.resolve(this.paths.DIR_THUMBNAILS, originalFileName),
       size: BROWSER_THUMBNAIL_SIZE,
@@ -627,13 +627,5 @@ export class PetaDatas {
       petaImage: petaImage,
       exists: false
     };
-  }
-  async generateThumbnail(params: {
-    data: Buffer,
-    outputFilePath: string,
-    size: number,
-    quality: number
-  }) {
-    return generateMetadata(params);
   }
 }
