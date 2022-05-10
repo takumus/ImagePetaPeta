@@ -61,8 +61,7 @@ export async function generateMetadata(params: {
       quality: 1
     }
   ).getPalette();
-  palette.DarkMuted
-  return {
+  const data = {
     thumbnail: {
       width: thumbWidth,
       height: thumbHeight,
@@ -83,18 +82,25 @@ export async function generateMetadata(params: {
     } as PetaImagePalette,
     placeholder
   };
+  const sumPopulation = Object.values(data.palette).map((v: PetaColor) => v.population).reduce((p, c) => p + c, 0);
+  Object.values(data.palette).forEach((pc: PetaColor) => {
+    pc.population /= sumPopulation;
+  });
+  return data;
 }
 function swatchToPetaColor(swatch: Swatch | null): PetaColor {
   if (!swatch) {
     return {
       r: 255,
       g: 255,
-      b: 255
+      b: 255,
+      population: 0,
     }
   }
   return {
     r: swatch.r,
     g: swatch.g,
-    b: swatch.b
+    b: swatch.b,
+    population: swatch.population
   }
 }

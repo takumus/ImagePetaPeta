@@ -1,5 +1,6 @@
 export interface PetaColor {
   r: number,
   g: number,
-  b: number
+  b: number,
+  population: number
 }

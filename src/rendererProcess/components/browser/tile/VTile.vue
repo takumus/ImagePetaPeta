@@ -55,7 +55,8 @@
             v-for="color in palette"
             :key="color.id"
             :style="{
-              backgroundColor: color.color
+              backgroundColor: color.color,
+              flex: 1//Math.floor(color.population * 70 + 30)
             }"
           >
           </t-color>
@@ -197,9 +198,13 @@ export default class VTile extends Vue {
       const color = this.tile.petaImage.palette[key as keyof PetaImagePalette];
       return {
         color: `rgb(${color.r}, ${color.g}, ${color.b})`,
+        population: color.population,
         id: key
       };
-    });
+    })
+    // .sort((a, b) => {
+    //   return b.population - a.population;
+    // });
   }
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
@@ -249,7 +254,7 @@ t-tile-root {
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
-    transition: box-shadow 100ms ease-in-out;
+    // transition: box-shadow 100ms ease-in-out;
     display: block;
     >t-images {
       display: block;
@@ -257,7 +262,7 @@ t-tile-root {
       height: 100%;
       cursor: pointer;
       filter: brightness(0.7);
-      transition: filter 100ms ease-in-out;
+      // transition: filter 100ms ease-in-out;
       // background-color: #ffffff;
       &.selected-image {
         filter: brightness(1.0);
@@ -348,17 +353,22 @@ t-tile-root {
       pointer-events: none;
       padding: 8px;
       display: block;
+      width: 100%;
       >t-color-background {
-        display: block;
-        overflow-wrap: break-word;
-        background-color: rgba($color: (#000000), $alpha: 0.5);
+        display: flex;
+        // background-color: rgba($color: (#000000), $alpha: 0.5);
         border-radius: var(--rounded);
+        height: 8px;
+        width: 100%;
+        overflow: hidden;
+        // border: solid 4px rgba($color: #000000, $alpha: 0.5);
+        box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.4);
         >t-color {
-          width: 8px;
-          height: 8px;
-          margin: 0px 4px;
-          display: inline-block;
-          border-radius: 10px;
+          // width: 8px;
+          height: 100%;
+          // margin: 0px 4px;
+          display: block;
+          // border-radius: 10px;
         }
       }
     }

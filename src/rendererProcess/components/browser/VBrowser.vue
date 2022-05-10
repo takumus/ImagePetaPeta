@@ -96,7 +96,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { getColors, getSimilarityScore } from "@/commons/utils/blurhashTools";
+import { getColors, getSimilarityScore, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
 import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
@@ -389,7 +389,7 @@ export default class VBrowser extends Vue {
     //   }
     //   return {
     //     petaImage: pi,
-    //     score: getSimilarityScore(this.targetPetaImage.placeholder, pi.placeholder)
+    //     score: getSimilarityScore2(this.targetPetaImage.palette, pi.palette)
     //   }
     // })
     // .sort((a, b) => b.score - a.score)

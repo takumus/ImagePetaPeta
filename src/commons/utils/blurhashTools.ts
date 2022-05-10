@@ -1,28 +1,18 @@
+import { rgbDiff } from "@vibrant/color/lib/converter";
+import { PetaColor } from "../datas/petaColor";
+import { PetaImage, PetaImagePalette } from "../datas/petaImage";
 export function getSimilarityScore(hash1: string, hash2: string) {
   try {
     const cs1 = getColors(hash1);
     const cs2 = getColors(hash2);
     let diff1 = 0;
-    let diff2 = 0;
     // 色の類似
     cs1.forEach((c1, i) => {
       const c2 = cs2[i]!;
-      for (let n = 0; n < 3; n++) {
-        diff1 += Math.pow(c1[n]! - c2[n]!, 2);
-      }
-    });
-    // 色の差の類似
-    cs1.forEach((c1, i) => {
-      const c2 = cs2[i]!;
-      for (let n = 0; n < 3; n++) {
-        const c1d = c1[n]! < c1[(n + 1) % 3]!;
-        const c2d = c2[n]! < c2[(n + 1) % 3]!;
-        diff2 += c1d != c2d ? 1 : 0;
-      }
+      diff1 += rgbDiff(c1, c2);
     });
     const sim1 = 1 - diff1 / (255 * 255 * 3 * cs1.length);
-    const sim2 = 1 - diff2 / (3 * cs1.length);
-    const score = sim1 * sim2;
+    const score = sim1;
     if (isNaN(score)) {
       return 0;
     }
@@ -30,6 +20,38 @@ export function getSimilarityScore(hash1: string, hash2: string) {
   } catch {
     return 0;
   }
+}
+export function getSimilarityScore2(palette1: PetaImagePalette, palette2: PetaImagePalette) {
+  try {
+    let diff1 = 0;
+    // let diff2 = 0;
+    // Object.keys(palette1).forEach((key, i) => {
+    //   const p1 = palette1[key as keyof PetaImagePalette];
+    //   const p2 = palette2[key as keyof PetaImagePalette];
+    //   diff1 += getDiff(p1, p2) * (Math.abs(p1.population - p2.population));
+    // });
+    // diff1 += getDiff(palette1.lightVibrant, palette2.vibrant);
+    // diff1 += getDiff(palette1.muted, palette2.muted);
+    const colors1 = getColorsSortOnPopulation(palette1);
+    const colors2 = getColorsSortOnPopulation(palette2);
+    colors1.forEach((_, i) => {
+      diff1 += getDiff(colors1[i]!, colors2[i]!) * Math.pow(6 - i, 2);
+    })
+    return -(diff1);
+  } catch {
+    return 0;
+  }
+}
+function getColorsSortOnPopulation(palette: PetaImagePalette): PetaColor[] {
+  return Object.values(palette).sort((a: PetaColor, b: PetaColor) => {
+    return b.population - a.population;
+  });
+}
+function getDiff(color1: PetaColor, color2: PetaColor) {
+  return rgbDiff(
+    [color1.r, color1.g, color1.b],
+    [color2.r, color2.g, color2.b]
+  );
 }
 // https://github.com/woltapp/blurhash
 export function getColors(hash: string) {
