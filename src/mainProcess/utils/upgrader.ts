@@ -33,14 +33,7 @@ export function upgradePetaImage(petaImage: PetaImage) {
   }
   // v2.6.0
   if (petaImage.palette === undefined) {
-    petaImage.palette = {
-      vibrant: { r: 255, g: 255, b: 255, population: 0 },
-      darkVibrant: { r: 255, g: 255, b: 255, population: 0 },
-      lightVibrant: { r: 255, g: 255, b: 255, population: 0 },
-      muted: { r: 255, g: 255, b: 255, population: 0 },
-      darkMuted: { r: 255, g: 255, b: 255, population: 0 },
-      lightMuted: { r: 255, g: 255, b: 255, population: 0 },
-    }
+    petaImage.palette = [];
   }
   return petaImage;
 }

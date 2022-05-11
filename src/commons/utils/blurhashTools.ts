@@ -1,6 +1,6 @@
 import { rgbDiff } from "@vibrant/color/lib/converter";
 import { PetaColor } from "../datas/petaColor";
-import { PetaImage, PetaImagePalette } from "../datas/petaImage";
+import { PetaImage } from "../datas/petaImage";
 export function getSimilarityScore(hash1: string, hash2: string) {
   try {
     const cs1 = getColors(hash1);
@@ -21,32 +21,32 @@ export function getSimilarityScore(hash1: string, hash2: string) {
     return 0;
   }
 }
-export function getSimilarityScore2(palette1: PetaImagePalette, palette2: PetaImagePalette) {
-  try {
-    let diff1 = 0;
-    // let diff2 = 0;
-    // Object.keys(palette1).forEach((key, i) => {
-    //   const p1 = palette1[key as keyof PetaImagePalette];
-    //   const p2 = palette2[key as keyof PetaImagePalette];
-    //   diff1 += getDiff(p1, p2) * (Math.abs(p1.population - p2.population));
-    // });
-    // diff1 += getDiff(palette1.lightVibrant, palette2.vibrant);
-    // diff1 += getDiff(palette1.muted, palette2.muted);
-    const colors1 = getColorsSortOnPopulation(palette1);
-    const colors2 = getColorsSortOnPopulation(palette2);
-    colors1.forEach((_, i) => {
-      diff1 += getDiff(colors1[i]!, colors2[i]!) * Math.pow(6 - i, 2);
-    })
-    return -(diff1);
-  } catch {
-    return 0;
-  }
-}
-function getColorsSortOnPopulation(palette: PetaImagePalette): PetaColor[] {
-  return Object.values(palette).sort((a: PetaColor, b: PetaColor) => {
-    return b.population - a.population;
-  });
-}
+// export function getSimilarityScore2(palette1: PetaImagePalette, palette2: PetaImagePalette) {
+//   try {
+//     let diff1 = 0;
+//     // let diff2 = 0;
+//     // Object.keys(palette1).forEach((key, i) => {
+//     //   const p1 = palette1[key as keyof PetaImagePalette];
+//     //   const p2 = palette2[key as keyof PetaImagePalette];
+//     //   diff1 += getDiff(p1, p2) * (Math.abs(p1.population - p2.population));
+//     // });
+//     // diff1 += getDiff(palette1.lightVibrant, palette2.vibrant);
+//     // diff1 += getDiff(palette1.muted, palette2.muted);
+//     const colors1 = getColorsSortOnPopulation(palette1);
+//     const colors2 = getColorsSortOnPopulation(palette2);
+//     colors1.forEach((_, i) => {
+//       diff1 += getDiff(colors1[i]!, colors2[i]!) * Math.pow(6 - i, 2);
+//     })
+//     return -(diff1);
+//   } catch {
+//     return 0;
+//   }
+// }
+// function getColorsSortOnPopulation(palette: PetaImagePalette): PetaColor[] {
+//   return Object.values(palette).sort((a: PetaColor, b: PetaColor) => {
+//     return b.population - a.population;
+//   });
+// }
 function getDiff(color1: PetaColor, color2: PetaColor) {
   return rgbDiff(
     [color1.r, color1.g, color1.b],

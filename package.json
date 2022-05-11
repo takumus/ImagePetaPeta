@@ -41,6 +41,7 @@
     "gifuct-js": "^2.1.2",
     "node-vibrant": "^3.2.1-alpha.1",
     "pixi.js": "^6.3.0",
+    "quantize": "^1.0.2",
     "sharp": "^0.29.0",
     "uuid": "^8.3.2",
     "vue": "^3.0.0",

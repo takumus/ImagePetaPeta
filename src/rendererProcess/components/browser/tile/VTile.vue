@@ -90,7 +90,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE } from "@/commons/defines";
-import { PetaImagePalette } from "@/commons/datas/petaImage";
 @Options({
   components: {
   },
@@ -194,12 +193,11 @@ export default class VTile extends Vue {
     return this.tile.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
   }
   get palette() {
-    return Object.keys(this.tile.petaImage.palette).map((key) => {
-      const color = this.tile.petaImage.palette[key as keyof PetaImagePalette];
+    return this.tile.petaImage.palette.map((color, i) => {
       return {
         color: `rgb(${color.r}, ${color.g}, ${color.b})`,
         population: color.population,
-        id: key
+        id: i
       };
     })
     // .sort((a, b) => {

@@ -1,13 +1,5 @@
 import deepcopy from "deepcopy";
 import { PetaColor } from "./petaColor";
-export interface PetaImagePalette {
-  vibrant: PetaColor,
-  muted: PetaColor,
-  darkVibrant: PetaColor,
-  darkMuted: PetaColor,
-  lightVibrant: PetaColor,
-  lightMuted: PetaColor
-}
 export interface PetaImage {
   file: {
     original: string
@@ -20,7 +12,7 @@ export interface PetaImage {
   height: number,
   id: string,
   placeholder: string,
-  palette: PetaImagePalette,
+  palette: PetaColor[],
   nsfw: boolean,
   _selected?: boolean
 }
