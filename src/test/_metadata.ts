@@ -37,22 +37,20 @@ import { PetaColor } from "@/commons/datas/petaColor";
         text-align: center;
       }
       span {
-        letter-spacing: -0.1em;
-        display: inline-block;
-        height: 12px;
+        letter-spacing: -0.03em;
       }
       </style>
       </head>
       <body>
       ${
         palettes.map(
-          (p) => `<img src="${p.path}" width="256"><br>Compressed<br>[`
+          (p) => `<img src="${p.path}" width="256"><br>Compressed<div>[`
             + p.palette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
-            ).join("") + "]<br>All<br>["
+            ).join("") + "]</div>All<div>["
             + p.allPalette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + "]<br><br>"
+            ).join("") + "]</div><br>"
         ).join("")
       }
       </body>
