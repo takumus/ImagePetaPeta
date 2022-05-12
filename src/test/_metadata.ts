@@ -29,18 +29,30 @@ import { PetaColor } from "@/commons/datas/petaColor";
   await file.writeFile(
     "./test_output/metadata_color.html",
     Buffer.from(
-      `
-      <html>
-      <body style="font-family: consolas">
+      `<html>
+      <head>
+      <style>
+      body {
+        font-family: consolas;
+        text-align: center;
+      }
+      span {
+        letter-spacing: -0.1em;
+        display: inline-block;
+        height: 12px;
+      }
+      </style>
+      </head>
+      <body>
       ${
         palettes.map(
-          (p) => `<img src="${p.path}" width="128"><br>marged: [`
+          (p) => `<img src="${p.path}" width="256"><br>Compressed<br>[`
             + p.palette.map(
-              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + "]<br>___all: ["
+              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
+            ).join("") + "]<br>All<br>["
             + p.allPalette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + "]<br>"
+            ).join("") + "]<br><br>"
         ).join("")
       }
       </body>
