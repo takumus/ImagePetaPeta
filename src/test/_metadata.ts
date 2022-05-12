@@ -44,13 +44,13 @@ import { PetaColor } from "@/commons/datas/petaColor";
       <body>
       ${
         palettes.map(
-          (p) => `<img src="${p.path}" width="256"><br>Compressed<div>[`
+          (p) => `<img src="${p.path}" width="256"><br>Compressed(${p.palette.length})<div>[`
             + p.palette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
-            ).join("") + "]</div>All<div>["
+            ).join("") + `]</div>All(${p.allPalette.length})<div>[`
             + p.allPalette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + "]</div><br>"
+            ).join("") + `]</div><br>`
         ).join("")
       }
       </body>
