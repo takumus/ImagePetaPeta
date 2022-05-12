@@ -35,26 +35,28 @@ import { PetaColor } from "@/commons/datas/petaColor";
       body {
         font-family: consolas;
         text-align: center;
+        background-color: #333333;
+        color: #ffffff;
+        font-weight: bold;
       }
       span {
         letter-spacing: -0.03em;
+        font-size: 0.9em;
       }
       </style>
       </head>
       <body>
-      ${
-        palettes.map(
-          (p) => `<img src="${p.path}" width="256"><br>Compressed(${p.palette.length})<div>[`
-          + p.palette.map(
-            (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
-          ).join("")
-          + `]</div>All(${p.allPalette.length})<div>[`
-          + p.allPalette.map(
-            (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-          ).join("")
-          + `]</div><br>`
+      ${palettes.map(
+        (p) => `<img src="${p.path}" width="256"><br>Compressed(${p.palette.length})<div>[`
+        + p.palette.map(
+          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
         ).join("")
-      }
+        + `]</div>All(${p.allPalette.length})<div>[`
+        + p.allPalette.map(
+          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
+        ).join("")
+        + `]</div><br>`
+      ).join("")}
       </body>
       </html>`,
       "utf-8"

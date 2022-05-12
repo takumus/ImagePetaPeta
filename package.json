@@ -21,7 +21,7 @@
     "prebuild": "rimraf ./dist_electron && yarn audit --groups dependencies && yarn generate-assets",
     "generate-assets": "yarn generate-licenses && yarn generate-icons && yarn generate-cursors",
     "release": "yarn build && node ./scripts/addBinaryHash.js && node ./scripts/commitAndAddTag.js",
-    "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/index"
+    "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test"
   },
   "main": "background.js",
   "dependencies": {
