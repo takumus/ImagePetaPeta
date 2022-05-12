@@ -3,9 +3,9 @@ import { encode as encodePlaceholder } from "blurhash";
 import sharp from "sharp";
 import * as file from "@/mainProcess/storages/file";
 import Vibrant from "node-vibrant";
-import { Swatch } from "@vibrant/color";
+import { Swatch, Palette } from "@vibrant/color";
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgbDiff } from "@vibrant/color/lib/converter";
+import { rgbDiff, rgbToHsl } from "@vibrant/color/lib/converter";
 const quantize = require('quantize');
 export async function generateMetadata(params: {
     data: Buffer,
@@ -20,71 +20,84 @@ export async function generateMetadata(params: {
   if (originalWidth === undefined || originalHeight === undefined || format === undefined) {
     throw "invalid image data";
   }
-  const thumbWidth = Math.floor(params.size);
-  const thumbHeight = Math.floor(originalHeight / originalWidth * params.size);
   const resizedData = await sharp(params.data)
   .resize(params.size)
   .webp({ quality: params.quality })
-  .toBuffer();
-  if (format === "gif") {
-    await file.writeFile(
-      params.outputFilePath + ".gif",
-      params.data
-    );
-  } else {
-    await file.writeFile(
-      params.outputFilePath + ".webp",
-      resizedData
-    );
-  }
-  const placeholder = await new Promise<string>((res, rej) => {
-    sharp(resizedData)
-    .resize(PLACEHOLDER_SIZE)
-    .raw()
-    .ensureAlpha()
-    .toBuffer((err, buffer, { width, height }) => {
-      if (err) {
-        rej(err);
-        return;
-      }
-      try {
-        res(encodePlaceholder(new Uint8ClampedArray(buffer), width, height, PLACEHOLDER_COMPONENT, PLACEHOLDER_COMPONENT));
-      } catch(e) {
-        rej(e);
-      }
-    });
-  });
-  const mainPalette = await new Vibrant(
-    await sharp(resizedData)
-    .ensureAlpha()
-    .png()
-    .toBuffer(),
-    {
-      quality: 1
-    }
-  ).getPalette();
-  const raw = await sharp(resizedData)
-  .ensureAlpha()
-  .raw()
   .toBuffer({ resolveWithObject: true });
-  const subPalette: any[] = getPalette(raw.data, raw.info.width, raw.info.height, 8, 1);
-  const margedPalette = subPalette.map((color: any): PetaColor => {
-    return {
-      r: color[0],
-      g: color[1],
-      b: color[2],
-      population: 1
-    }
-  });
-  Object.values(mainPalette).map((s) => {
-    const index = margedPalette.findIndex((mpc) => {
-      return getDiff(swatchToPetaColor(s), mpc) < 15;
+  const thumbWidth = resizedData.info.width;
+  const thumbHeight = resizedData.info.height;
+  const [_, placeholder, mainPalette, subPalette] = await Promise.all([
+    (async () => {
+      if (format === "gif") {
+        await file.writeFile(
+          params.outputFilePath + ".gif",
+          params.data
+        );
+      } else {
+        await file.writeFile(
+          params.outputFilePath + ".webp",
+          resizedData.data
+        );
+      }
+      return format;
+    })(),
+    (async () => {
+      const placeholderBuffer = await sharp(resizedData.data)
+      .resize(PLACEHOLDER_SIZE)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+      return encodePlaceholder(
+        placeholderBuffer.data as any as Uint8ClampedArray,
+        placeholderBuffer.info.width,
+        placeholderBuffer.info.height,
+        PLACEHOLDER_COMPONENT, PLACEHOLDER_COMPONENT
+      );
+    })(),
+    (async () => {
+      return await new Vibrant(
+        await sharp(resizedData.data)
+        .png()
+        .toBuffer(),
+        { quality: 1 }
+      ).getPalette();
+    })(),
+    (async () => {
+      const raw = await sharp(resizedData.data)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+      return getSubPalette(
+        raw.data,
+        raw.info.width,
+        raw.info.height,
+        19,
+        1
+      ) || [];
+    })()
+  ]);
+  // 合成パレット
+  const mergedPalette: PetaColor[] = [];
+  // 特徴パレット
+  mergedPalette.push(...Object.values(mainPalette).map((s) => swatchToPetaColor(s)));
+  // 全体パレット
+  mergedPalette.push(...subPalette);
+  if (mergedPalette.length > 0) {
+    // 鮮やか順に
+    mergedPalette.sort((a, b) => {
+      return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
     });
-    if (index >= 0) {
-      margedPalette.splice(index, 1);
+    // cie94色差で色削除
+    for (let i = 0; i < mergedPalette.length; i++) {
+      for (let ii = i + 1; ii < mergedPalette.length; ii++) {
+        const cieDiff = getDiff(mergedPalette[i]!, mergedPalette[ii]!);
+        if ((cieDiff < 20 && mergedPalette[ii]!.population == 0) || cieDiff < 15) {
+          mergedPalette.splice(ii, 1);
+          ii--;
+        }
+      }
     }
-  });
-  margedPalette.unshift(...Object.values(mainPalette).map((s) => swatchToPetaColor(s)));
+  }
   const data = {
     thumbnail: {
       width: thumbWidth,
@@ -96,7 +109,9 @@ export async function generateMetadata(params: {
       height: originalHeight,
       format
     },
-    palette: margedPalette,
+    palette: mergedPalette,
+    mainPalette: [],
+    subPalette: [...Object.values(mainPalette).map((s) => swatchToPetaColor(s)), ...subPalette],
     placeholder
   };
   return data;
@@ -118,36 +133,38 @@ function swatchToPetaColor(swatch: Swatch | null): PetaColor {
   }
 }
 
-function createPixelArray(imgData: any, pixelCount: number, quality: number) {
-  const pixels = imgData;
-  const pixelArray = [];
-
-  for (let i = 0, offset, r, g, b, a; i < pixelCount; i = i + quality) {
-      offset = i * 4;
-      r = pixels[offset + 0];
-      g = pixels[offset + 1];
-      b = pixels[offset + 2];
-      a = pixels[offset + 3];
-
-      // If pixel is mostly opaque and not white
-      if (typeof a === 'undefined' || a >= 125) {
-          if (!(r > 250 && g > 250 && b > 250)) {
-              pixelArray.push([r, g, b]);
-          }
+function createPixels(buffer: Buffer, pixelCount: number, quality: number) {
+  const pixels: [number, number, number][] = [];
+  for (let i = 0; i < pixelCount; i += quality) {
+    const offset = i * 4;
+    const r = buffer[offset + 0]!;
+    const g = buffer[offset + 1]!;
+    const b = buffer[offset + 2]!;
+    const a = buffer[offset + 3]!;
+    if (a === undefined || a >= 125) {
+      if (!(r > 250 && g > 250 && b > 250)) {
+        pixels.push([r, g, b]);
       }
+    }
   }
-  return pixelArray;
+  return pixels;
 }
-function getPalette(buffer: Buffer, width: number, height: number, colorCount = 10, quality = 10) {
+function getSubPalette(buffer: Buffer, width: number, height: number, colorCount = 6, quality = 1): PetaColor[] {
   colorCount = Math.max(colorCount, 2);
   colorCount = Math.min(colorCount, 20);
   quality = Math.max(colorCount, 1);
   const pixelCount = width * height;
-  const pixelArray = createPixelArray(buffer, pixelCount, quality);
-
-  const cmap = quantize(pixelArray, colorCount);
-  const palette = cmap? cmap.palette() : null;
-  return palette;
+  const pixels = createPixels(buffer, pixelCount, quality);
+  const cmap = quantize(pixels, colorCount)
+  const palette = cmap ? cmap.palette() as [number, number, number][] : undefined;
+  return palette?.map((color) => {
+    return {
+      r: color[0],
+      g: color[1],
+      b: color[2],
+      population: 0
+    }
+  }) || [];
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
   return rgbDiff(
