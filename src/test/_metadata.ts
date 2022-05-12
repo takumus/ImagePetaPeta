@@ -45,12 +45,14 @@ import { PetaColor } from "@/commons/datas/petaColor";
       ${
         palettes.map(
           (p) => `<img src="${p.path}" width="256"><br>Compressed(${p.palette.length})<div>[`
-            + p.palette.map(
-              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
-            ).join("") + `]</div>All(${p.allPalette.length})<div>[`
-            + p.allPalette.map(
-              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + `]</div><br>`
+          + p.palette.map(
+            (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
+          ).join("")
+          + `]</div>All(${p.allPalette.length})<div>[`
+          + p.allPalette.map(
+            (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
+          ).join("")
+          + `]</div><br>`
         ).join("")
       }
       </body>
