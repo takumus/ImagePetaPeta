@@ -7,6 +7,7 @@ import { Swatch } from "@vibrant/color";
 import { PetaColor } from "@/commons/datas/petaColor";
 import { rgbDiff } from "@vibrant/color/lib/converter";
 const quantize = require('quantize');
+// const ATCQ = require('atcq');
 export async function generateMetadata(params: {
     data: Buffer,
     outputFilePath: string,
@@ -162,6 +163,23 @@ function getSubPalette(buffer: Buffer, width: number, height: number, colorCount
     }
   }) || [];
 }
+// function getSubPalette2(buffer: Buffer, width: number, height: number, colorCount = 20, quality = 1): PetaColor[] {
+//   const pixelCount = width * height;
+//   const pixels = createPixels(buffer, pixelCount, quality);
+//   // const cmap = quantize(pixels, colorCount)
+//   // const palette = cmap ? cmap.palette() as [number, number, number][] : undefined;
+//   const palette = ATCQ.quantizeSync(pixels, {
+//     maxColors: 32
+//   });
+//   return palette?.map((color: any) => {
+//     return {
+//       r: color[0],
+//       g: color[1],
+//       b: color[2],
+//       population: 0
+//     }
+//   }) || [];
+// }
 function getDiff(color1: PetaColor, color2: PetaColor) {
   return rgbDiff(
     [color1.r, color1.g, color1.b],

@@ -31,6 +31,7 @@
     "@types/fuzzy-search": "^2.1.2",
     "@xmldom/xmldom": "^0.8.2",
     "adm-zip": "^0.5.9",
+    "atcq": "^1.0.6",
     "axios": "^0.21.4",
     "blurhash": "^1.1.4",
     "core-js": "^3.6.5",

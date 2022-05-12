@@ -34,13 +34,13 @@ import { PetaColor } from "@/commons/datas/petaColor";
       <body style="font-family: consolas">
       ${
         palettes.map(
-          (p) => `<img src="${p.path}" width="128"><br>marged:`
+          (p) => `<img src="${p.path}" width="128"><br>marged: [`
             + p.palette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + "<br>all:"
+            ).join("") + "]<br>___all: ["
             + p.allPalette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
-            ).join("") + "<br>"
+            ).join("") + "]<br>"
         ).join("")
       }
       </body>
