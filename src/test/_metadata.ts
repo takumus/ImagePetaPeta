@@ -6,7 +6,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
 (async () => {
   const files = await file.readdir("./src/test/sample_images");
   console.time("time");
-  const palettes: { palette: PetaColor[], mainPalette: PetaColor[], subPalette: PetaColor[], path: string }[] = [];
+  const palettes: { palette: PetaColor[], allPalette: PetaColor[], path: string }[] = [];
   await promiseSerial(async (f) => {
     const label = f.substring(0, 10);
     console.time(label);
@@ -19,8 +19,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
     });
     palettes.push({
       palette: metadata.palette,
-      mainPalette: metadata.mainPalette,
-      subPalette: metadata.subPalette,
+      allPalette: metadata.allPalette,
       path: "../src/test/sample_images/" + f
     });
     console.timeEnd(label);
@@ -32,15 +31,15 @@ import { PetaColor } from "@/commons/datas/petaColor";
     Buffer.from(
       `
       <html>
-      <body>
+      <body style="font-family: consolas">
       ${
         palettes.map(
-          (p) => `<img src="${p.path}" width="128"><br>`
+          (p) => `<img src="${p.path}" width="128"><br>marged:`
             + p.palette.map(
-              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">■</span>`
-            ).join("") + "<br>"
-            + p.subPalette.map(
-              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">■</span>`
+              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
+            ).join("") + "<br>all:"
+            + p.allPalette.map(
+              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
             ).join("") + "<br>"
         ).join("")
       }

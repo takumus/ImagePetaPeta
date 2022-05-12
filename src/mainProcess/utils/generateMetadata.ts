@@ -82,11 +82,13 @@ export async function generateMetadata(params: {
   mergedPalette.push(...Object.values(mainPalette).map((s) => swatchToPetaColor(s)));
   // 全体パレット
   mergedPalette.push(...subPalette);
+  const allPalette: PetaColor[] = [];
   if (mergedPalette.length > 0) {
     // 鮮やか順に
     mergedPalette.sort((a, b) => {
       return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
     });
+    allPalette.push(...mergedPalette);
     // cie94色差で色削除
     for (let i = 0; i < mergedPalette.length; i++) {
       for (let ii = i + 1; ii < mergedPalette.length; ii++) {
@@ -110,8 +112,7 @@ export async function generateMetadata(params: {
       format
     },
     palette: mergedPalette,
-    mainPalette: [],
-    subPalette: [...Object.values(mainPalette).map((s) => swatchToPetaColor(s)), ...subPalette],
+    allPalette: allPalette,
     placeholder
   };
   return data;
@@ -142,9 +143,7 @@ function createPixels(buffer: Buffer, pixelCount: number, quality: number) {
     const b = buffer[offset + 2]!;
     const a = buffer[offset + 3]!;
     if (a === undefined || a >= 125) {
-      if (!(r > 250 && g > 250 && b > 250)) {
-        pixels.push([r, g, b]);
-      }
+      pixels.push([r, g, b]);
     }
   }
   return pixels;
