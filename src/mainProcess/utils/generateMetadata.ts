@@ -7,7 +7,6 @@ import { Swatch } from "@vibrant/color";
 import { PetaColor } from "@/commons/datas/petaColor";
 import { rgbDiff } from "@vibrant/color/lib/converter";
 const quantize = require('quantize');
-// const ATCQ = require('atcq');
 export async function generateMetadata(params: {
     data: Buffer,
     outputFilePath: string,
