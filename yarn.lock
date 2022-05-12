@@ -16,10 +16,10 @@
     event-pubsub "4.3.0"
     js-message "1.0.7"
 
-"@araki-packages/promise-serial@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@araki-packages/promise-serial/-/promise-serial-2.0.1.tgz#043d6fbcd4339f3a3857cab843c4973679fee0c5"
-  integrity sha512-wjxLcrEw0mCMvJpSMZXHDkWodVJvJO3/u6Wbr/KVziwYYfldsJxECX35ctQ7PncoyAkhNlIASAA7SNbKeUopkA==
+"@araki-packages/promise-serial@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@araki-packages/promise-serial/-/promise-serial-2.0.2.tgz#5e13a83a201e1f02a23d95a2cdfd20a9d0722d3d"
+  integrity sha512-8V26r8DKp4jKO5LjdgkWsz0EY8NjCmxj/+a85hw5tleA1b0qxFJ+uRljfXw7UDbptR5YtW28Xjn8DBXTIGdAPQ==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.14.5", "@babel/code-frame@^7.15.8", "@babel/code-frame@^7.8.3":
   version "7.15.8"
