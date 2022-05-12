@@ -8,7 +8,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
   console.time("time");
   const palettes: { palette: PetaColor[], mainPalette: PetaColor[], subPalette: PetaColor[], path: string }[] = [];
   await promiseSerial(async (f) => {
-    const label = f.substring(0, 4);
+    const label = f.substring(0, 10);
     console.time(label);
     const data = await file.readFile("./src/test/sample_images/" + f);
     const metadata = await generateMetadata({
@@ -37,9 +37,6 @@ import { PetaColor } from "@/commons/datas/petaColor";
         palettes.map(
           (p) => `<img src="${p.path}" width="128"><br>`
             + p.palette.map(
-              (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">■</span>`
-            ).join("") + "<br>"
-            + p.mainPalette.map(
               (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">■</span>`
             ).join("") + "<br>"
             + p.subPalette.map(

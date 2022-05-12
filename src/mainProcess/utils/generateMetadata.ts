@@ -3,9 +3,9 @@ import { encode as encodePlaceholder } from "blurhash";
 import sharp from "sharp";
 import * as file from "@/mainProcess/storages/file";
 import Vibrant from "node-vibrant";
-import { Swatch, Palette } from "@vibrant/color";
+import { Swatch } from "@vibrant/color";
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgbDiff, rgbToHsl } from "@vibrant/color/lib/converter";
+import { rgbDiff } from "@vibrant/color/lib/converter";
 const quantize = require('quantize');
 export async function generateMetadata(params: {
     data: Buffer,
@@ -71,7 +71,7 @@ export async function generateMetadata(params: {
         raw.data,
         raw.info.width,
         raw.info.height,
-        19,
+        20,
         1
       ) || [];
     })()
@@ -149,10 +149,7 @@ function createPixels(buffer: Buffer, pixelCount: number, quality: number) {
   }
   return pixels;
 }
-function getSubPalette(buffer: Buffer, width: number, height: number, colorCount = 6, quality = 1): PetaColor[] {
-  colorCount = Math.max(colorCount, 2);
-  colorCount = Math.min(colorCount, 20);
-  quality = Math.max(colorCount, 1);
+function getSubPalette(buffer: Buffer, width: number, height: number, colorCount = 20, quality = 1): PetaColor[] {
   const pixelCount = width * height;
   const pixels = createPixels(buffer, pixelCount, quality);
   const cmap = quantize(pixels, colorCount)
