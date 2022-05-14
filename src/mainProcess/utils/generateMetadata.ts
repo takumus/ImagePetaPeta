@@ -1,8 +1,6 @@
 import { PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE } from "@/commons/defines";
-import { encode as encodePlaceholder } from "blurhash";
 import sharp from "sharp";
 import * as file from "@/mainProcess/storages/file";
-import Vibrant from "node-vibrant";
 import { Swatch } from "@vibrant/color";
 import { PetaColor } from "@/commons/datas/petaColor";
 import { rgbDiff, rgbToHsl } from "@vibrant/color/lib/converter";
@@ -12,18 +10,22 @@ export async function generateMetadata(params: {
     outputFilePath: string,
     size: number,
     quality: number
-  }) {
+}) {
+  console.time(" mtd");
   const metadata = await sharp(params.data).metadata();
+  console.timeEnd(" mtd");
   const originalWidth = metadata.width;
   const originalHeight = metadata.height;
   const format = metadata.format;
   if (originalWidth === undefined || originalHeight === undefined || format === undefined) {
     throw "invalid image data";
   }
+  console.time(" rsz");
   const resizedData = await sharp(params.data)
   .resize(params.size)
   .webp({ quality: params.quality })
   .toBuffer({ resolveWithObject: true });
+  console.timeEnd(" rsz");
   const thumbWidth = resizedData.info.width;
   const thumbHeight = resizedData.info.height;
   const [_, palette] = await Promise.all([
@@ -42,13 +44,13 @@ export async function generateMetadata(params: {
       return format;
     })(),
     (async () => {
-      console.time(" sharp");
+      console.time(" srp");
       const raw = await sharp(resizedData.data)
       .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
-      console.timeEnd(" sharp");
-      console.time(" palette");
+      console.timeEnd(" srp");
+      console.time(" plt");
       const palette = getSubPalette(
         {
           buffer: raw.data,
@@ -59,12 +61,12 @@ export async function generateMetadata(params: {
           fixColorCIEDiff: 10
         }
       ) || [];
-      console.timeEnd(" palette");
+      console.timeEnd(" plt");
       return palette;
     })()
   ]);
   const allPalette: PetaColor[] = [];
-  console.time(" merge palette");
+  console.time(" mpt");
   palette.sort((a, b) => {
     return b.population - a.population;
   });
@@ -95,7 +97,7 @@ export async function generateMetadata(params: {
     palette.length = 0;
     palette.push(...newMergedPalette);
   }
-  console.timeEnd(" merge palette");
+  console.timeEnd(" mpt");
   const data = {
     thumbnail: {
       width: thumbWidth,
