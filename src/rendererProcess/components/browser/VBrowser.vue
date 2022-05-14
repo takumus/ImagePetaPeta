@@ -83,7 +83,6 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
-import { isBlurhashValid } from "blurhash";
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import { BROWSER_THUMBNAIL_SIZE, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
@@ -96,7 +95,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { getColors, getSimilarityScore } from "@/commons/utils/blurhashTools";
+import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
 import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {

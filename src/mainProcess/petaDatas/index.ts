@@ -20,7 +20,6 @@ import dateFormat from "dateformat";
 import { upgradePetaBoard, upgradePetaImage } from "@/mainProcess/utils/upgrader";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
 import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
-import { encode as encodePlaceholder } from "blurhash";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
 import { TaskStatus } from "@/commons/api/interfaces/task";

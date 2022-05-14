@@ -8,21 +8,25 @@ import { PetaColor } from "@/commons/datas/petaColor";
   console.time("time");
   const palettes: { palette: PetaColor[], allPalette: PetaColor[], path: string }[] = [];
   await promiseSerial(async (f) => {
-    const label = f.substring(0, 10);
-    console.time(label);
-    const data = await file.readFile("./src/test/sample_images/" + f);
-    const metadata = await generateMetadata({
-      data,
-      outputFilePath: "./test_output/metadata_tile_" + f,
-      size: BROWSER_THUMBNAIL_SIZE,
-      quality: BROWSER_THUMBNAIL_QUALITY
-    });
-    palettes.push({
-      palette: metadata.palette,
-      allPalette: metadata.allPalette,
-      path: "../src/test/sample_images/" + f
-    });
-    console.timeEnd(label);
+    try {
+      const label = f.substring(0, 10);
+      console.time(label);
+      const data = await file.readFile("./src/test/sample_images/" + f);
+      const metadata = await generateMetadata({
+        data,
+        outputFilePath: "./test_output/metadata_tile_" + f,
+        size: BROWSER_THUMBNAIL_SIZE,
+        quality: BROWSER_THUMBNAIL_QUALITY
+      });
+      palettes.push({
+        palette: metadata.palette,
+        allPalette: metadata.allPalette,
+        path: "./metadata_tile_" + f + ".webp"
+      });
+      console.timeEnd(label);
+    } catch (error) {
+      //
+    }
   }, files).promise;
   console.timeEnd("time");
   console.log("output:", "./test_output/metadata_color.html");
@@ -38,6 +42,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
         background-color: #333333;
         color: #ffffff;
         font-weight: bold;
+        word-break: break-all;
       }
       span {
         letter-spacing: -0.03em;
@@ -47,15 +52,15 @@ import { PetaColor } from "@/commons/datas/petaColor";
       </head>
       <body>
       ${palettes.map(
-        (p) => `<img src="${p.path}" width="256"><br>Compressed(${p.palette.length})<div>[`
+        (p) => `<img src="${p.path}" width="256"><br><br>Compressed(${p.palette.length})<div>[`
         + p.palette.map(
-          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span>`
+          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`
         ).join("")
-        + `]</div>All(${p.allPalette.length})<div>[`
+        + `]</div><br>All(${p.allPalette.length})<div>[`
         + p.allPalette.map(
           (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
         ).join("")
-        + `]</div><br>`
+        + `]</div><br><br>`
       ).join("")}
       </body>
       </html>`,

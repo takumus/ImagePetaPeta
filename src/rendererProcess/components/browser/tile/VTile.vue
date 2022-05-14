@@ -17,19 +17,20 @@
       >
         <t-nsfw v-if="showNSFW">
         </t-nsfw>
-        <canvas
-          ref="canvas"
+        <t-placeholder
           class="placeholder"
-          :width="this.placeholderSize.width"
-          :height="this.placeholderSize.height"
           :class="{
             loaded: !loadingImage
           }"
-        ></canvas>
+          :style="{
+            backgroundColor: placeholderColor
+          }"
+        ></t-placeholder>
         <img
           draggable="false"
           :src="imageURL"
           v-show="!loadingImage"
+          decoding="async"
           loading="lazy"
           @load="loaded"
         >
@@ -84,7 +85,6 @@ import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
-import { decode as decodePlaceholder } from "blurhash";
 import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
@@ -102,8 +102,8 @@ export default class VTile extends Vue {
   original = false;
   @Prop()
   petaTagInfos!: PetaTagInfo[];
-  @Ref("canvas")
-  canvas!: HTMLCanvasElement;
+  // @Ref("canvas")
+  // canvas!: HTMLCanvasElement;
   imageURL = "";
   pressing = false;
   loadingImage = true;
@@ -112,21 +112,21 @@ export default class VTile extends Vue {
   loadOriginalTimeoutHandler = -1;
   fetchTagsTimeoutHandler = -1;
   mounted() {
-    if (this.tile.petaImage.placeholder != "") {
-      try {
-        const pixels = decodePlaceholder(this.tile.petaImage.placeholder, this.placeholderSize.width, this.placeholderSize.height);
-        // this.canvas.width = width;
-        // this.canvas.height = height;
-        const ctx = this.canvas.getContext("2d");
-        if (ctx){ 
-          const imageData = ctx.createImageData(this.placeholderSize.width, this.placeholderSize.height);
-          imageData.data.set(pixels);
-          ctx.putImageData(imageData, 0, 0);
-        }
-      } catch(e) {
-        logChunk().log("vTile", "blurhash error:", e);
-      }
-    }
+    // if (this.tile.petaImage.placeholder != "") {
+    //   try {
+    //     const pixels = decodePlaceholder(this.tile.petaImage.placeholder, this.placeholderSize.width, this.placeholderSize.height);
+    //     // this.canvas.width = width;
+    //     // this.canvas.height = height;
+    //     const ctx = this.canvas.getContext("2d");
+    //     if (ctx){ 
+    //       const imageData = ctx.createImageData(this.placeholderSize.width, this.placeholderSize.height);
+    //       imageData.data.set(pixels);
+    //       ctx.putImageData(imageData, 0, 0);
+    //     }
+    //   } catch(e) {
+    //     logChunk().log("vTile", "blurhash error:", e);
+    //   }
+    // }
     this.changeVisible();
   }
   get placeholderSize() {
@@ -204,6 +204,13 @@ export default class VTile extends Vue {
     //   return b.population - a.population;
     // });
   }
+  get placeholderColor() {
+    const petaColor = this.tile.petaImage.palette[0];
+    if (petaColor) {
+      return `rgb(${petaColor.r}, ${petaColor.g}, ${petaColor.b})`;
+    }
+    return "#ffffff";
+  }
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
     const result = await API.send("getPetaTagIdsByPetaImageIds", [this.tile.petaImage.id]);
@@ -218,19 +225,18 @@ export default class VTile extends Vue {
   }
   @Watch("tile.visible")
   async changeVisible() {
+    window.clearTimeout(this.fetchTagsTimeoutHandler);
+    window.clearTimeout(this.loadOriginalTimeoutHandler);
     if (this.tile.visible) {
       this.fetchTagsTimeoutHandler = window.setTimeout(() => {
         this.fetchPetaTags();
-      }, Math.random() * BROWSER_FETCH_TAGS_DELAY)
+      }, Math.random() * BROWSER_FETCH_TAGS_DELAY);
       this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
       if (this.original) {
         this.loadOriginalTimeoutHandler = window.setTimeout(() => {
           this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
         }, BROWSER_LOAD_ORIGINAL_DELAY);
       }
-    } else {
-      window.clearTimeout(this.fetchTagsTimeoutHandler);
-      window.clearTimeout(this.loadOriginalTimeoutHandler);
     }
   }
   @Watch("petaTagInfos")
@@ -287,7 +293,7 @@ t-tile-root {
         background-repeat: repeat;
         background-image: url("~@/@assets/transparentBackground.png");
       }
-      >.placeholder {
+      >t-placeholder {
         position: relative;
         z-index: 2;
         top: 0px;
@@ -297,7 +303,7 @@ t-tile-root {
         height: 100%;
         opacity: 1;
         transition: opacity 200ms ease-in-out;
-        // filter: blur(20%);
+        background-color: #ffffff;
         &.loaded {
           opacity: 0;
         }

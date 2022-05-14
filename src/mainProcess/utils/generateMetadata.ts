@@ -5,8 +5,8 @@ import * as file from "@/mainProcess/storages/file";
 import Vibrant from "node-vibrant";
 import { Swatch } from "@vibrant/color";
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgbDiff } from "@vibrant/color/lib/converter";
-const quantize = require('quantize');
+import { rgbDiff, rgbToHsl } from "@vibrant/color/lib/converter";
+import quantize from 'quantize';
 export async function generateMetadata(params: {
     data: Buffer,
     outputFilePath: string,
@@ -26,7 +26,7 @@ export async function generateMetadata(params: {
   .toBuffer({ resolveWithObject: true });
   const thumbWidth = resizedData.info.width;
   const thumbHeight = resizedData.info.height;
-  const [_, placeholder, mainPalette, subPalette] = await Promise.all([
+  const [_, palette] = await Promise.all([
     (async () => {
       if (format === "gif") {
         await file.writeFile(
@@ -42,64 +42,60 @@ export async function generateMetadata(params: {
       return format;
     })(),
     (async () => {
-      const placeholderBuffer = await sharp(resizedData.data)
-      .resize(PLACEHOLDER_SIZE)
-      .ensureAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-      return encodePlaceholder(
-        placeholderBuffer.data as any as Uint8ClampedArray,
-        placeholderBuffer.info.width,
-        placeholderBuffer.info.height,
-        PLACEHOLDER_COMPONENT, PLACEHOLDER_COMPONENT
-      );
-    })(),
-    (async () => {
-      return await new Vibrant(
-        await sharp(resizedData.data)
-        .png()
-        .toBuffer(),
-        { quality: 1 }
-      ).getPalette();
-    })(),
-    (async () => {
+      console.time(" sharp");
       const raw = await sharp(resizedData.data)
       .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
-      return getSubPalette(
-        raw.data,
-        raw.info.width,
-        raw.info.height,
-        20,
-        1
+      console.timeEnd(" sharp");
+      console.time(" palette");
+      const palette = getSubPalette(
+        {
+          buffer: raw.data,
+          width: raw.info.width,
+          height: raw.info.height,
+          sample: 1000,
+          mergeCIEDiff: 5,
+          fixColorCIEDiff: 10
+        }
       ) || [];
+      console.timeEnd(" palette");
+      return palette;
     })()
   ]);
-  // 合成パレット
-  const mergedPalette: PetaColor[] = [];
-  // 特徴パレット
-  mergedPalette.push(...Object.values(mainPalette).map((s) => swatchToPetaColor(s)));
-  // 全体パレット
-  mergedPalette.push(...subPalette);
   const allPalette: PetaColor[] = [];
-  if (mergedPalette.length > 0) {
-    // 鮮やか順に
-    mergedPalette.sort((a, b) => {
-      return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
-    });
-    allPalette.push(...mergedPalette);
-    // cie94色差で色削除
-    for (let i = 0; i < mergedPalette.length; i++) {
-      for (let ii = i + 1; ii < mergedPalette.length; ii++) {
-        const cieDiff = getDiff(mergedPalette[i]!, mergedPalette[ii]!);
-        if ((cieDiff < 20 && mergedPalette[ii]!.population == 0) || cieDiff < 15) {
-          mergedPalette.splice(ii, 1);
-          ii--;
-        }
+  console.time(" merge palette");
+  palette.sort((a, b) => {
+    return b.population - a.population;
+  });
+  allPalette.push(...palette);
+  // cie94色差で色削除
+  for (let i = 0; i < palette.length; i++) {
+    for (let ii = i + 1; ii < palette.length; ii++) {
+      const cieDiff = getDiff(palette[i]!, palette[ii]!);
+      if (cieDiff < 10) {
+        palette[i]!.population += palette[ii]!.population;
+        palette.splice(ii, 1);
+        ii--;
       }
     }
   }
+  if (palette.length >= 6) {
+    const newMergedPalette: PetaColor[] = [];
+    // 人口の多い色3つ。
+    newMergedPalette.push(...palette.splice(0, 5));
+    // 鮮やか順に
+    palette.sort((a, b) => {
+      return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
+    });
+    newMergedPalette.push(...palette.splice(0, 3));
+    newMergedPalette.sort((a, b) => {
+      return b.population - a.population;
+    });
+    palette.length = 0;
+    palette.push(...newMergedPalette);
+  }
+  console.timeEnd(" merge palette");
   const data = {
     thumbnail: {
       width: thumbWidth,
@@ -111,9 +107,9 @@ export async function generateMetadata(params: {
       height: originalHeight,
       format
     },
-    palette: mergedPalette,
+    palette: palette,
     allPalette: allPalette,
-    placeholder
+    placeholder: ""
   };
   return data;
 }
@@ -134,9 +130,9 @@ function swatchToPetaColor(swatch: Swatch | null): PetaColor {
   }
 }
 
-function createPixels(buffer: Buffer, pixelCount: number, quality: number) {
+function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
-  for (let i = 0; i < pixelCount; i += quality) {
+  for (let i = 0; i < pixelCount; i += 1) {
     const offset = i * 4;
     const r = buffer[offset + 0]!;
     const g = buffer[offset + 1]!;
@@ -148,19 +144,71 @@ function createPixels(buffer: Buffer, pixelCount: number, quality: number) {
   }
   return pixels;
 }
-function getSubPalette(buffer: Buffer, width: number, height: number, colorCount = 20, quality = 1): PetaColor[] {
-  const pixelCount = width * height;
-  const pixels = createPixels(buffer, pixelCount, quality);
-  const cmap = quantize(pixels, colorCount)
-  const palette = cmap ? cmap.palette() as [number, number, number][] : undefined;
-  return palette?.map((color) => {
+function getSubPalette(
+  imageData: {
+    buffer: Buffer,
+    width: number,
+    height: number, 
+    sample: number,
+    mergeCIEDiff: number,
+    fixColorCIEDiff: number
+  }
+): PetaColor[] {
+  const pixelCount = imageData.width * imageData.height;
+  const pixels = createPixels(imageData.buffer, imageData.width * imageData.height);
+  const qPalette = quantize(pixels, 64).palette();
+  const colors = qPalette.map((color) => {
     return {
       r: color[0],
       g: color[1],
       b: color[2],
       population: 0
     }
-  }) || [];
+  });
+  for (let i = 0; i < colors.length; i++) {
+    for (let ii = i + 1; ii < colors.length; ii++) {
+      const cieDiff = getDiff(colors[i]!, colors[ii]!);
+      if (cieDiff < imageData.mergeCIEDiff) {
+        colors.splice(ii, 1);
+        ii--;
+      }
+    }
+  }
+  let resolution = Math.floor(pixelCount / imageData.sample);
+  if (resolution < 1) {
+    resolution = 1;
+  }
+  colors.map((color) => {
+    const similars: {[key: string]: { count: number, color: [number, number, number] }} = {};
+    for (let i = 0; i < pixels.length; i += resolution) {
+      const rc = pixels[i]!;
+      const cieDiff = rgbDiff(
+        rc,
+        [color.r, color.g, color.b]
+      );
+      if (cieDiff < imageData.fixColorCIEDiff) {
+        color.population++;
+        const key = rc[0] + "," + rc[1] + "," + rc[2];
+        if (similars[key] === undefined) {
+          similars[key] = {
+            count: 1,
+            color: rc
+          };
+        } else {
+          similars[key]!.count++;
+        }
+      }
+    }
+    const similar = Object.values(similars).sort((a, b) => {
+      return b.count - a.count;
+    })[0];
+    if (similar !== undefined) {
+      color.r = similar.color[0];
+      color.g = similar.color[1];
+      color.b = similar.color[2];
+    }
+  });
+  return colors;
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
   return rgbDiff(
