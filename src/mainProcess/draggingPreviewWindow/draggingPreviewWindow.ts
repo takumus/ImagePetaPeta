@@ -35,7 +35,7 @@ export class DraggingPreviewWindow {
       frame: false,
       show: true,
       alwaysOnTop: true,
-      opacity: 0,
+      opacity: 0.7,
       focusable: false,
       closable: false,
       minimizable: false,
@@ -50,7 +50,7 @@ export class DraggingPreviewWindow {
     });
     this.draggingPreviewWindow.setIgnoreMouseEvents(true);
     this.draggingPreviewWindow.setMenuBarVisibility(false);
-    this.draggingPreviewWindow.setOpacity(0);
+    // this.draggingPreviewWindow.setOpacity(0);
     this.followCursor();
     this.draggingPreviewWindow.on("show", () => {
       this.followCursor();
@@ -64,7 +64,7 @@ export class DraggingPreviewWindow {
       this.followCursorTimeoutHandler = setInterval(this.followCursor, 0);
     }
     try {
-      this.draggingPreviewWindow?.setOpacity(value ? 0.7 : 0);
+      // this.draggingPreviewWindow?.setOpacity(value ? 0.7 : 0);
       this.draggingPreviewWindow?.moveTop();
       this.visible = value;
     } catch(error) {
@@ -142,6 +142,7 @@ export class DraggingPreviewWindow {
   destroy() {
     try {
       this.draggingPreviewWindow?.destroy();
+      this.draggingPreviewWindow = undefined;
     } catch (error) {
       //
     }

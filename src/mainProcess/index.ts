@@ -179,13 +179,19 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
-    if (BrowserWindow.getAllWindows().length < 2) {
+    if (BrowserWindow.getAllWindows().length == 0) {
       mainWindow = initWindow();
     }
   });
-  app.on("before-quit", () => {
+  app.on("before-quit", (event) => {
+    console.log("before-quit")
     draggingPreviewWindow.destroy();
-  })
+  });
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
+    }
+  });
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready
@@ -736,6 +742,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
             icon: nativeImage.createFromDataURL(Transparent),
           });
           draggingPreviewWindow.setVisible(false);
+          draggingPreviewWindow.destroy();
           setTimeout(() => {
             dropFromBrowserPetaImageIds = undefined;
           }, 100);
@@ -748,6 +755,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           dropFromBrowserPetaImageIds = undefined;
           draggingPreviewWindow.clearImages();
           draggingPreviewWindow.setVisible(false);
+          draggingPreviewWindow.destroy();
           return ids;
         },
         updateState: async (event, stateSet) => {
