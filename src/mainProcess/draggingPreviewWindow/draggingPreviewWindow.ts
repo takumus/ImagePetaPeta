@@ -11,7 +11,7 @@ export class DraggingPreviewWindow {
   private followCursorTimeoutHandler: NodeJS.Timeout | undefined;
   private isSameAll = valueChecker().isSameAll;
   constructor(private width = 256, private height = 256) {
-    this.createWindow();
+    // this.createWindow();
   }
   get window() {
     return this.draggingPreviewWindow;
@@ -51,6 +51,10 @@ export class DraggingPreviewWindow {
     this.draggingPreviewWindow.setIgnoreMouseEvents(true);
     this.draggingPreviewWindow.setMenuBarVisibility(false);
     this.draggingPreviewWindow.setOpacity(0);
+    this.followCursor();
+    this.draggingPreviewWindow.on("show", () => {
+      this.followCursor();
+    })
   }
   setVisible(value: boolean) {
     if (this.followCursorTimeoutHandler) {

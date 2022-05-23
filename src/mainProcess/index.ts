@@ -724,6 +724,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           if (!first) {
             return;
           }
+          draggingPreviewWindow.createWindow();
           draggingPreviewWindow.setPetaImages(petaImages, dataSettings.data.alwaysShowNSFW);
           draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
           draggingPreviewWindow.setVisible(true);
