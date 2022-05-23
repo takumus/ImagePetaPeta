@@ -224,6 +224,8 @@ export default class VBoard extends Vue {
     this.centerWrapper.y = rect.height / 2;
     this.updateRect();
     this.orderPIXIRender();
+    this.renderPIXI();
+    this.orderPIXIRender();
   }
   preventWheelClick(event: MouseEvent) {
     if (event.button == MouseButton.MIDDLE) {
