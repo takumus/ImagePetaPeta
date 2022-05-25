@@ -21,6 +21,25 @@
         {{$t("browser.property.clearSelectionButton")}}
       </button>
     </t-buttons>
+    <t-infos v-if="singlePetaImageInfo">
+      <p>情報</p>
+      名前: {{singlePetaImageInfo.name}}<br>
+      変更日: {{singlePetaImageInfo.fileDate}}<br>
+      追加日: {{singlePetaImageInfo.addDate}}<br>
+       <t-palette>
+        <t-color-background>
+          <t-color
+            v-for="color in singlePetaImageInfo.palette"
+            :key="color.id"
+            :style="{
+              backgroundColor: color.color,
+              flex: 1//Math.floor(color.population * 70 + 30)
+            }"
+          >
+          </t-color>
+        </t-color-background>
+      </t-palette>
+    </t-infos>
     <t-tags v-show="!noImage">
       <p>{{$t("browser.property.tags")}}</p>
       <ul v-if="!fetchingTags">
@@ -81,6 +100,7 @@ import { PropertyThumbnail } from "@/rendererProcess/components/browser/property
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import dateFormat from "dateformat";
 @Options({
   components: {
     VEditableLabel,
@@ -210,6 +230,24 @@ export default class VProperty extends Vue {
     });
     return thumbnails;
   }
+  get singlePetaImageInfo() {
+    if (this.petaImages.length == 1) {
+      const petaImage = this.petaImages[0]!;
+      return {
+        name: petaImage.name,
+        fileDate: dateFormat(petaImage.fileDate, "yyyy/mm/dd hh:MM:ss"),
+        addDate: dateFormat(petaImage.addDate, "yyyy/mm/dd hh:MM:ss"),
+        palette: petaImage.palette.map((color, i) => {
+          return {
+            color: `rgb(${color.r}, ${color.g}, ${color.b})`,
+            population: color.population,
+            id: i
+          };
+        })
+      }
+    }
+    return undefined;
+  }
   get noImage() {
     return this.petaImages.length == 0;
   }
@@ -267,6 +305,33 @@ t-property-root {
     text-align: center;
     display: block;
   }
+  >t-infos {
+    display: block;
+    word-break: break-all;
+    >t-palette {
+      pointer-events: none;
+      padding: 8px;
+      display: block;
+      width: 100%;
+      >t-color-background {
+        display: flex;
+        // background-color: rgba($color: (#000000), $alpha: 0.5);
+        border-radius: var(--rounded);
+        height: 8px;
+        width: 100%;
+        overflow: hidden;
+        // border: solid 4px rgba($color: #000000, $alpha: 0.5);
+        box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.4);
+        >t-color {
+          // width: 8px;
+          height: 100%;
+          // margin: 0px 4px;
+          display: block;
+          // border-radius: 10px;
+        }
+      }
+    }
+  }
   >t-tags {
     flex-grow: 1;
     display: flex;
@@ -275,6 +340,7 @@ t-property-root {
     ul {
       white-space: nowrap;
       padding: 0px;
+      margin: 0px;
       flex-grow: 1;
       overflow-y: scroll;
       overflow-x: hidden;
@@ -301,6 +367,7 @@ t-property-root {
   p {
     text-align: center;
     font-size: 1.0em;
+    margin: 4px 0px;
   }
 }
 </style>
