@@ -46,6 +46,7 @@
                 @select="selectThumbnail"
                 @menu="petaImageMenu"
                 @drag="drag"
+                @dblclick="openDetail"
               />
             </t-tiles-content>
           </t-tiles>
@@ -284,6 +285,9 @@ export default class VBrowser extends Vue {
         }
       },
     ], position);
+  }
+  openDetail(petaImage: PetaImage) {
+    console.log(petaImage);
   }
   open() {
     this.visible = false;

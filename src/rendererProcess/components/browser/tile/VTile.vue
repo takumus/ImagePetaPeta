@@ -10,6 +10,7 @@
       <t-images
         @mousedown="mousedown($event)"
         @dragstart="dragstart($event)"
+        @dblclick="dblclick($event)"
         draggable="true"
         :class="{
           'selected-image': tile.petaImage._selected
@@ -93,7 +94,7 @@ import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE
 @Options({
   components: {
   },
-  emits: ["select", "menu", "drag"]
+  emits: ["select", "menu", "drag", "dblclick"]
 })
 export default class VTile extends Vue {
   @Prop()
@@ -102,8 +103,6 @@ export default class VTile extends Vue {
   original = false;
   @Prop()
   petaTagInfos!: PetaTagInfo[];
-  // @Ref("canvas")
-  // canvas!: HTMLCanvasElement;
   imageURL = "";
   pressing = false;
   loadingImage = true;
@@ -112,28 +111,7 @@ export default class VTile extends Vue {
   loadOriginalTimeoutHandler = -1;
   fetchTagsTimeoutHandler = -1;
   mounted() {
-    // if (this.tile.petaImage.placeholder != "") {
-    //   try {
-    //     const pixels = decodePlaceholder(this.tile.petaImage.placeholder, this.placeholderSize.width, this.placeholderSize.height);
-    //     // this.canvas.width = width;
-    //     // this.canvas.height = height;
-    //     const ctx = this.canvas.getContext("2d");
-    //     if (ctx){ 
-    //       const imageData = ctx.createImageData(this.placeholderSize.width, this.placeholderSize.height);
-    //       imageData.data.set(pixels);
-    //       ctx.putImageData(imageData, 0, 0);
-    //     }
-    //   } catch(e) {
-    //     logChunk().log("vTile", "blurhash error:", e);
-    //   }
-    // }
     this.changeVisible();
-  }
-  get placeholderSize() {
-    return {
-      width: 8,
-      height: Math.floor(this.tile.petaImage.height * 8)
-    }
   }
   unmounted() {
     window.removeEventListener("mousemove", this.mousemove);
@@ -185,6 +163,9 @@ export default class VTile extends Vue {
           break;
       }
     }
+  }
+  dblclick(event: MouseEvent) {
+    this.$emit("dblclick", this.tile.petaImage);
   }
   loaded() {
     this.loadingImage = false;
