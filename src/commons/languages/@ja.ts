@@ -90,7 +90,13 @@ const ja = {
       },
       clearSelectionButton: "選択解除",
       clearSelectionDialog: "選択解除しますか?",
-      tags: "タグ一覧"
+      tags: "タグ一覧",
+      infos: {
+        label: "情報",
+        addDate: "追加日",
+        fileDate: "変更日",
+        name: "名前"
+      }
     },
     untagged: "未分類",
     all: "すべて"

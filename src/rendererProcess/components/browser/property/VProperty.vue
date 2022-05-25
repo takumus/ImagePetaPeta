@@ -22,10 +22,10 @@
       </button>
     </t-buttons>
     <t-infos v-if="singlePetaImageInfo">
-      <p>情報</p>
-      名前: {{singlePetaImageInfo.name}}<br>
-      変更日: {{singlePetaImageInfo.fileDate}}<br>
-      追加日: {{singlePetaImageInfo.addDate}}<br>
+      <p>{{$t("browser.property.infos.label")}}</p>
+      {{$t("browser.property.infos.name")}}: {{singlePetaImageInfo.name}}<br>
+      {{$t("browser.property.infos.fileDate")}}: {{singlePetaImageInfo.fileDate}}<br>
+      {{$t("browser.property.infos.addDate")}}: {{singlePetaImageInfo.addDate}}<br>
        <t-palette>
         <t-color-background>
           <t-color
