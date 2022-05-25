@@ -184,7 +184,6 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     }
   });
   app.on("before-quit", (event) => {
-    console.log("before-quit")
     draggingPreviewWindow.destroy();
   });
   app.on("window-all-closed", () => {

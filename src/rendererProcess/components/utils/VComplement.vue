@@ -6,6 +6,7 @@
     :style="{
       top: position.y + 'px',
       left: position.x + 'px',
+      height: height,
       zIndex: zIndex
     }"
   >
@@ -60,6 +61,7 @@ export default class VComplement extends Vue {
   currentIndex = 0;
   keyboards: Keyboards = new Keyboards();
   searcher?: FuzzySearch<string>;
+  height = "unset";
   mounted() {
     this.$components.complement = this;
     this.keyboards.down(["arrowup"], () => {
@@ -185,13 +187,14 @@ export default class VComplement extends Vue {
       const inputRect = (this.target.$el as HTMLElement).getBoundingClientRect();
       this.position.x = inputRect.x;
       this.position.y = inputRect.y + inputRect.height;
-
+      this.height = "unset";
       const rect = this.complement.getBoundingClientRect();
-      if (this.position.x + rect.width > document.body.clientWidth) {
-        this.position.x = document.body.clientWidth - rect.width;
+      if (this.position.x + rect.width > document.body.clientWidth - 9) {
+        this.position.x = document.body.clientWidth - rect.width - 8;
       }
-      if (this.position.y + rect.height > document.body.clientHeight) {
-        this.position.y = document.body.clientHeight - rect.height;
+      if (this.position.y + rect.height > document.body.clientHeight - 9) {
+        // this.position.y = document.body.clientHeight - rect.height;
+        this.height = `${document.body.clientHeight - this.position.y - 8}px`;
       }
     }
   }
@@ -207,7 +210,8 @@ export default class VComplement extends Vue {
   box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
   color: var(--font-color);
   border-radius: var(--rounded);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   >.item {
     word-break: break-all;
     white-space: pre-wrap;

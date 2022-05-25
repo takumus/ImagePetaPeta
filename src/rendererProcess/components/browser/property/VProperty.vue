@@ -36,7 +36,7 @@
         </li>
         <li class="add">
           <VEditableLabel
-            :label="$t('browser.property.tagName')"
+            :label="''"
             :labelLook="$t('browser.property.clickToAddTag')"
             :clickToEdit="true"
             @change="(name) => addTag(name)"
