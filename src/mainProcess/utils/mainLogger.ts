@@ -13,7 +13,8 @@ export class MainLogger {
       },
       error: (...args: any[]) => {
         this.logger?.log(LogFrom.MAIN, id, "Error:", ...args);
-      }
+      },
+      uid
     }
   }
 }
