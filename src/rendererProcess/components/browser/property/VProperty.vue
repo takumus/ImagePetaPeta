@@ -74,7 +74,7 @@ import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VP
 // Others
 import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
-import { MAX_PREVIEW_COUNT } from "@/commons/defines";
+import { MAX_PREVIEW_COUNT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
@@ -117,13 +117,16 @@ export default class VProperty extends Vue {
   }
   async addTag(name: string) {
     // タグを探す。なかったら作る。
-    const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == name)?.petaTag || createPetaTag(name);
-    // petaTag.petaImages.push(...this.petaImages.map((pi) => pi.id));
-    await API.send(
-      "updatePetaTags",
-      [petaTag],
-      UpdateMode.UPSERT
-    );
+    let petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == name)?.petaTag;
+    // リクエスト2回飛ばさない
+    if (!petaTag) {
+      petaTag = createPetaTag(name);
+      await API.send(
+        "updatePetaTags",
+        [petaTag],
+        UpdateMode.UPSERT
+      );
+    }
     await API.send(
       "updatePetaImagesPetaTags",
       this.petaImages.map((petaImage) => petaImage.id),
@@ -145,7 +148,11 @@ export default class VProperty extends Vue {
     })
   }
   complementTag(editableLabel: VEditableLabel) {
-    this.$components.complement.open(editableLabel, this.petaTagInfos.map((pti) => pti.petaTag.name));
+    this.$components.complement.open(editableLabel, this.petaTagInfos.filter((pti) => {
+      return pti.petaTag.id !== UNTAGGED_ID;
+    }).map((pti) => {
+      return pti.petaTag.name;
+    }));
   }
   tagMenu(event: MouseEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
