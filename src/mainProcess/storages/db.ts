@@ -48,66 +48,32 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
     }
   }
   find(query: Partial<T> | any = {}): Promise<T[]> {
-    return new Promise((res, rej) => {
-      if (!this.nedb || !this.loaded) {
-        rej("DB is not initialized");
-        return;
-      }
-      this.nedb.find(query).exec(async (err, data) => {
-        if (err) {
-          rej(err);
-          return;
-        }
-        res(data);
-      });
-    });
+    if (!this.nedb || !this.loaded) {
+      throw new Error("DB is not initialized");
+    }
+    return this.nedb.findAsync(query).execAsync();
   }
   count(query: Partial<T> | any = {}): Promise<number> {
-    return new Promise((res, rej) => {
-      if (!this.nedb || !this.loaded) {
-        rej("DB is not initialized");
-        return;
-      }
-      this.nedb.count(query).exec(async (err, data) => {
-        if (err) {
-          rej(err);
-          return;
-        }
-        res(data);
-      });
-    });
+    if (!this.nedb || !this.loaded) {
+      throw new Error("DB is not initialized");
+    }
+    return this.nedb.countAsync(query).execAsync();
   }
-  remove(query: Partial<T>): Promise<number> {
-    return new Promise((res, rej) => {
-      if (!this.nedb || !this.loaded) {
-        rej("DB is not initialized");
-        return;
-      }
-      this.nedb.remove(query, { multi: true }, (err, n) => {
-        if (err) {
-          rej(err);
-          return;
-        }
-        this.orderCompaction();
-        res(n);
-      });
-    });
+  async remove(query: Partial<T>): Promise<number> {
+    if (!this.nedb || !this.loaded) {
+      throw new Error("DB is not initialized");
+    }
+    const result = await this.nedb.removeAsync(query, { multi: true });
+    this.orderCompaction();
+    return result;
   }
-  update(query: Partial<T>, data: T, upsert: boolean = false): Promise<boolean> {
-    return new Promise((res, rej) => {
-      if (!this.nedb || !this.loaded) {
-        rej("DB is not initialized");
-        return;
-      }
-      this.nedb.update(query, data, { upsert }, (err) => {
-        if (err) {
-          rej(err);
-          return;
-        }
-        this.orderCompaction();
-        res(true);
-      });
-    });
+  async update(query: Partial<T>, data: T, upsert: boolean = false) {
+    if (!this.nedb || !this.loaded) {
+      throw new Error("DB is not initialized");
+    }
+    const result = await this.nedb.updateAsync(query, data, { upsert });
+    this.orderCompaction();
+    return result;
   }
   ensureIndex(ensureIndexOptions: Nedb.EnsureIndexOptions) {
     return new Promise((res) => {
