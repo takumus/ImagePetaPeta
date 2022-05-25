@@ -212,15 +212,14 @@ export default class VBrowser extends Vue {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedTile = thumb;
     }
-    // 全選択解除するが、選択サムネイルは状態を保持する。
-    const prevSelection = thumb.petaImage._selected;
-    if (!Keyboards.pressedOR("control", "meta")) {
+    if (Keyboards.pressedOR("control", "meta")) {
+      // 選択サムネイルを反転
+      thumb.petaImage._selected = !thumb.petaImage._selected || force;
+    } else {
       // コントロールキーが押されていなければ選択をリセット
       this.clearSelectionAllImages();
+      thumb.petaImage._selected = true;
     }
-    thumb.petaImage._selected = prevSelection;
-    // 選択サムネイルを反転
-    thumb.petaImage._selected = !thumb.petaImage._selected || force;
     if (this.firstSelectedTile && Keyboards.pressed("shift")) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
