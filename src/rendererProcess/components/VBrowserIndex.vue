@@ -273,6 +273,7 @@ t-root {
     >t-browser {
       display: block;
       overflow: hidden;
+      padding: 8px;
       background-color: var(--bg-color);
       flex: 1;
     }
