@@ -47,7 +47,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  let mainWindow: BrowserWindow;
+  let mainWindow: BrowserWindow | undefined;
   let browserWindow: BrowserWindow | undefined;
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
@@ -180,7 +180,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
-    if (BrowserWindow.getAllWindows().length == 0) {
+    if (mainWindow?.isDestroyed() || mainWindow === undefined) {
       mainWindow = initWindow();
     }
   });
@@ -307,35 +307,43 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         importImageFiles: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          const result = await dialog.showOpenDialog(mainWindow, {
-            properties: ["openFile", "multiSelections"]
-          });
-          if (result.canceled) {
-            log.log("canceled");
-            return 0;
+          if (mainWindow) {
+            const result = await dialog.showOpenDialog(mainWindow, {
+              properties: ["openFile", "multiSelections"]
+            });
+            if (result.canceled) {
+              log.log("canceled");
+              return 0;
+            }
+            log.log("return:", result.filePaths.length);
+            petaDatas.importImagesFromFilePaths(result.filePaths);
+            return result.filePaths.length;
           }
-          log.log("return:", result.filePaths.length);
-          petaDatas.importImagesFromFilePaths(result.filePaths);
-          return result.filePaths.length;
+          log.log("window is not ready");
+          return 0;
         },
         importImageDirectories: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
-          const result = await dialog.showOpenDialog(mainWindow, {
-            properties: ["openDirectory"]
-          });
-          if (result.canceled) {
-            log.log("canceled");
-            return 0;
+          if (mainWindow) {
+            const result = await dialog.showOpenDialog(mainWindow, {
+              properties: ["openDirectory"]
+            });
+            if (result.canceled) {
+              log.log("canceled");
+              return 0;
+            }
+            const filePath = result.filePaths[0];
+            if (!filePath) {
+              log.error("filePath is empty");
+              return 0;
+            }
+            // log.log("return:", files.length);
+            petaDatas.importImagesFromFilePaths([filePath]);
+            return filePath.length;
           }
-          const filePath = result.filePaths[0];
-          if (!filePath) {
-            log.error("filePath is empty");
-            return 0;
-          }
-          // log.log("return:", files.length);
-          petaDatas.importImagesFromFilePaths([filePath]);
-          return filePath.length;
+          log.log("window is not ready");
+          return 0;
         },
         importImagesFromClipboard: async (event, buffers) => {
           const log = mainLogger.logChunk();
@@ -576,7 +584,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           try {
             log.log("#Update Settings");
             dataSettings.data = settings;
-            mainWindow.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            mainWindow?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             dataSettings.save();
             log.log("return:", dataSettings.data);
             return true;
@@ -600,7 +608,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = mainWindow.isFocused();
+          const isFocued = mainWindow?.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -608,21 +616,21 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
-          mainWindow.webContents.setZoomLevel(level);
+          mainWindow?.webContents.setZoomLevel(level);
         },
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          mainWindow.minimize();
+          mainWindow?.minimize();
         },
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize();
+          if (mainWindow?.isMaximized()) {
+            mainWindow?.unmaximize();
             return;
           }
-          mainWindow.maximize();
+          mainWindow?.maximize();
         },
         windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
@@ -657,23 +665,26 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          const file = await dialog.showOpenDialog(mainWindow, {
-            properties: ["openDirectory"]
-          });
-          if (file.canceled) {
-            log.log("canceled");
-            return null;
+          if (browserWindow) {
+            const file = await dialog.showOpenDialog(browserWindow, {
+              properties: ["openDirectory"]
+            });
+            if (file.canceled) {
+              log.log("canceled");
+              return null;
+            }
+            const filePath = file.filePaths[0];
+            if (!filePath) {
+              return null;
+            }
+            let path = Path.resolve(filePath);
+            if (Path.basename(path) != "PetaImage") {
+              path = Path.resolve(path, "PetaImage");
+            }
+            log.log("return:", path);
+            return path;
           }
-          const filePath = file.filePaths[0];
-          if (!filePath) {
-            return null;
-          }
-          let path = Path.resolve(filePath);
-          if (Path.basename(path) != "PetaImage") {
-            path = Path.resolve(path, "PetaImage");
-          }
-          log.log("return:", path);
-          return path;
+          return "";
         },
         changePetaImageDirectory: async (event, path) => {
           const log = mainLogger.logChunk();
@@ -863,9 +874,11 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    mainWindow.webContents.send(key, ...args);
-    if (!browserWindow?.isDestroyed()) {
-      browserWindow?.webContents.send(key, ...args);
+    if (mainWindow !== undefined && mainWindow.isDestroyed()) {
+      mainWindow.webContents.send(key, ...args);
+    }
+    if (browserWindow !== undefined && browserWindow.isDestroyed()) {
+      browserWindow.webContents.send(key, ...args);
     }
   }
   function initBrowserWindow() {
