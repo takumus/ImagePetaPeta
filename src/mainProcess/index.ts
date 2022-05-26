@@ -621,21 +621,22 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          mainWindow?.minimize();
+          getWindowFromEvent(event)?.minimize();
         },
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          if (mainWindow?.isMaximized()) {
-            mainWindow?.unmaximize();
+          const window = getWindowFromEvent(event);
+          if (window?.isMaximized()) {
+            window?.unmaximize();
             return;
           }
-          mainWindow?.maximize();
+          window?.maximize();
         },
         windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          if (quit) {
+          if (getWindowFromEvent(event) === mainWindow) {
             app.quit();
           }
         },
@@ -874,10 +875,10 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    if (mainWindow !== undefined && mainWindow.isDestroyed()) {
+    if (mainWindow !== undefined && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send(key, ...args);
     }
-    if (browserWindow !== undefined && browserWindow.isDestroyed()) {
+    if (browserWindow !== undefined && !browserWindow.isDestroyed()) {
       browserWindow.webContents.send(key, ...args);
     }
   }
@@ -1085,6 +1086,14 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       log.log("this version is latest");
     }
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
+  }
+  function getWindowFromEvent(event: IpcMainInvokeEvent) {
+    if (mainWindow?.id === event.sender.id) {
+      return mainWindow;
+    } else if (browserWindow?.id === event.sender.id) {
+      return browserWindow;
+    }
+    return undefined;
   }
   function relaunch() {
     app.relaunch();
