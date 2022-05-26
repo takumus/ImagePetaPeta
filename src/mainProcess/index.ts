@@ -47,8 +47,8 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  let mainWindow: BrowserWindow | undefined;
-  let browserWindow: BrowserWindow | undefined;
+  let mainWindow: BrowserWindow | undefined = undefined;
+  let browserWindow: BrowserWindow | undefined = undefined;
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
