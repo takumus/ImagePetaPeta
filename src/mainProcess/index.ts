@@ -47,7 +47,8 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  let mainWindow: BrowserWindow;
+  let mainWindow: BrowserWindow | undefined = undefined;
+  let browserWindow: BrowserWindow | undefined = undefined;
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -179,7 +180,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
-    if (BrowserWindow.getAllWindows().length == 0) {
+    if (mainWindow?.isDestroyed() || mainWindow === undefined) {
       mainWindow = initWindow();
     }
   });
@@ -289,6 +290,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
     mainWindow = initWindow();
+    // browserWindow = initBrowserWindow();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -305,35 +307,43 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         importImageFiles: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          const result = await dialog.showOpenDialog(mainWindow, {
-            properties: ["openFile", "multiSelections"]
-          });
-          if (result.canceled) {
-            log.log("canceled");
-            return 0;
+          if (mainWindow) {
+            const result = await dialog.showOpenDialog(mainWindow, {
+              properties: ["openFile", "multiSelections"]
+            });
+            if (result.canceled) {
+              log.log("canceled");
+              return 0;
+            }
+            log.log("return:", result.filePaths.length);
+            petaDatas.importImagesFromFilePaths(result.filePaths);
+            return result.filePaths.length;
           }
-          log.log("return:", result.filePaths.length);
-          petaDatas.importImagesFromFilePaths(result.filePaths);
-          return result.filePaths.length;
+          log.log("window is not ready");
+          return 0;
         },
         importImageDirectories: async () => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
-          const result = await dialog.showOpenDialog(mainWindow, {
-            properties: ["openDirectory"]
-          });
-          if (result.canceled) {
-            log.log("canceled");
-            return 0;
+          if (mainWindow) {
+            const result = await dialog.showOpenDialog(mainWindow, {
+              properties: ["openDirectory"]
+            });
+            if (result.canceled) {
+              log.log("canceled");
+              return 0;
+            }
+            const filePath = result.filePaths[0];
+            if (!filePath) {
+              log.error("filePath is empty");
+              return 0;
+            }
+            // log.log("return:", files.length);
+            petaDatas.importImagesFromFilePaths([filePath]);
+            return filePath.length;
           }
-          const filePath = result.filePaths[0];
-          if (!filePath) {
-            log.error("filePath is empty");
-            return 0;
-          }
-          // log.log("return:", files.length);
-          petaDatas.importImagesFromFilePaths([filePath]);
-          return filePath.length;
+          log.log("window is not ready");
+          return 0;
         },
         importImagesFromClipboard: async (event, buffers) => {
           const log = mainLogger.logChunk();
@@ -574,8 +584,9 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           try {
             log.log("#Update Settings");
             dataSettings.data = settings;
-            mainWindow.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            mainWindow?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             dataSettings.save();
+            emitMainEvent("updateSettings", settings);
             log.log("return:", dataSettings.data);
             return true;
           } catch(e) {
@@ -598,7 +609,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = mainWindow.isFocused();
+          const isFocued = mainWindow?.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -606,26 +617,32 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
-          mainWindow.webContents.setZoomLevel(level);
+          mainWindow?.webContents.setZoomLevel(level);
         },
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          mainWindow.minimize();
+          getWindowFromEvent(event)?.minimize();
         },
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize();
+          const window = getWindowFromEvent(event);
+          if (window?.isMaximized()) {
+            window?.unmaximize();
             return;
           }
-          mainWindow.maximize();
+          window?.maximize();
         },
-        windowClose: async (event) => {
+        windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          app.quit();
+          const window = getWindowFromEvent(event);
+          if (window === mainWindow) {
+            app.quit();
+          } else {
+            window?.close();
+          }
         },
         getPlatform: async (event) => {
           const log = mainLogger.logChunk();
@@ -653,23 +670,26 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          const file = await dialog.showOpenDialog(mainWindow, {
-            properties: ["openDirectory"]
-          });
-          if (file.canceled) {
-            log.log("canceled");
-            return null;
+          if (browserWindow) {
+            const file = await dialog.showOpenDialog(browserWindow, {
+              properties: ["openDirectory"]
+            });
+            if (file.canceled) {
+              log.log("canceled");
+              return null;
+            }
+            const filePath = file.filePaths[0];
+            if (!filePath) {
+              return null;
+            }
+            let path = Path.resolve(filePath);
+            if (Path.basename(path) != "PetaImage") {
+              path = Path.resolve(path, "PetaImage");
+            }
+            log.log("return:", path);
+            return path;
           }
-          const filePath = file.filePaths[0];
-          if (!filePath) {
-            return null;
-          }
-          let path = Path.resolve(filePath);
-          if (Path.basename(path) != "PetaImage") {
-            path = Path.resolve(path, "PetaImage");
-          }
-          log.log("return:", path);
-          return path;
+          return "";
         },
         changePetaImageDirectory: async (event, path) => {
           const log = mainLogger.logChunk();
@@ -831,6 +851,13 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
             log.error(error);
           }
           return petaImages.map((petaImage) => petaImage.id);
+        },
+        openBrowser: async () => {
+          if (browserWindow?.isDestroyed() || browserWindow === undefined) {
+            browserWindow = initBrowserWindow();
+          } else {
+            browserWindow?.moveTop();
+          }
         }
       }
     }
@@ -852,7 +879,66 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    mainWindow.webContents.send(key, ...args);
+    if (mainWindow !== undefined && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send(key, ...args);
+    }
+    if (browserWindow !== undefined && !browserWindow.isDestroyed()) {
+      browserWindow.webContents.send(key, ...args);
+    }
+  }
+  function initBrowserWindow() {
+    const window = new BrowserWindow({
+      width: 1000,
+      height: 1000,
+      minWidth: WINDOW_MIN_WIDTH,
+      minHeight: WINDOW_MIN_HEIGHT,
+      frame: false,
+      titleBarStyle: "hiddenInset",
+      show: true,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: Path.join(__dirname, "preload.js")
+      },
+      trafficLightPosition: {
+        x: 8,
+        y: 8
+      }
+    });
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string + "?browser").then(() => {
+        if (!process.env.IS_TEST) {
+          window.webContents.openDevTools({ mode: "detach" });
+        }
+      })
+    } else {
+      window.loadURL("app://./index.html" + "?browser");
+    }
+    window.setMenuBarVisibility(false);
+    // if (dataStates.data.windowIsMaximized) {
+    //   window.maximize();
+    // }
+    window.on("close", () => {
+      // if (!window.isMaximized()) {
+      //   dataStates.data.windowSize.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+      //   dataStates.data.windowSize.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+      // }
+      // dataStates.data.windowIsMaximized = window.isMaximized();
+      // dataStates.save();
+      // const log = mainLogger.logChunk();
+      // log.log("#Save Window Size", dataStates.data.windowSize);
+      // if (process.platform !== "darwin") {
+      //   draggingPreviewWindow.destroy();
+      // }
+    });
+    // window.addListener("blur", () => {
+    //   emitMainEvent("windowFocused", false);
+    // });
+    // window.addListener("focus", () => {
+    //   emitMainEvent("windowFocused", true);
+    // });
+    // window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+    return window;
   }
   function initWindow() {
     const window = new BrowserWindow({
@@ -1004,6 +1090,14 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       log.log("this version is latest");
     }
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
+  }
+  function getWindowFromEvent(event: IpcMainInvokeEvent) {
+    if (mainWindow?.webContents.mainFrame === event.sender.mainFrame) {
+      return mainWindow;
+    } else if (browserWindow?.webContents.mainFrame === event.sender.mainFrame) {
+      return browserWindow;
+    }
+    return undefined;
   }
   function relaunch() {
     app.relaunch();

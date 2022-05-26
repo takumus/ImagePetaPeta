@@ -159,15 +159,6 @@ export default class VTabBar extends Vue {
     board.name = name;
     this.$emit("change", board);
   }
-  minimizeWindow() {
-    API.send("windowMinimize");
-  }
-  maximizeWindow() {
-    API.send("windowMaximize");
-  }
-  closeWindow() {
-    API.send("windowClose");
-  }
   async removePetaBoard(board: PetaBoard) {
     this.$emit("remove", board);
   }

@@ -1,75 +1,61 @@
 <template>
-  <VModal
-    :visible="visible"
-    :parentStyle="{
-      padding: '74px'
-    }"
-    :childStyle="{
-      width: '100%',
-      height: '100%'
-    }"
-    :visibleCloseButton="true"
-    @state="onModalState"
-    @close="close"
-  >
-    <t-browser-root>
-      <t-left>
-        <VTags
-          :petaImagesArray="petaImagesArray"
-          :petaTagInfos="petaTagInfos"
-          :selectedPetaTags="selectedPetaTags"
-        />
-      </t-left>
-      <t-center>
-        <t-header>
-          <t-search>
-            <VSearch
-              :petaTagInfos="petaTagInfos"
-              :selectedPetaTags="selectedPetaTags"
-            />
-          </t-search>
-        </t-header>
-        <t-content>
-          <t-tiles
-            ref="thumbnails"
-          >
-            <t-tiles-content
-              ref="thumbsWrapper"
-              :style="{height: scrollHeight + 8 + 'px'}"
-            >
-              <VTile
-                v-for="(data) in visibleTiles"
-                :key="data.petaImage.id"
-                :tile="data"
-                :original="original"
-                :petaTagInfos="petaTagInfos"
-                @select="selectThumbnail"
-                @menu="petaImageMenu"
-                @drag="drag"
-                @dblclick="openDetail"
-              />
-            </t-tiles-content>
-          </t-tiles>
-        </t-content>
-      </t-center>
-      <t-right>
-        <VProperty
-          :petaImages="selectedPetaImages"
-          :petaTagInfos="petaTagInfos"
-          @selectTag="(tag) => selectedPetaTags = [tag]"
-        />
-        <input
-          type="range"
-          v-model="thumbnailsSize"
-          tabindex="-1"
-          @change="updateTileSize(Number($event.target.value))"
-          :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
-          :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
-          :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
+  <t-browser-root>
+    <t-left>
+      <VTags
+        :petaImagesArray="petaImagesArray"
+        :petaTagInfos="petaTagInfos"
+        :selectedPetaTags="selectedPetaTags"
+      />
+    </t-left>
+    <t-center>
+      <t-header>
+        <t-search>
+          <VSearch
+            :petaTagInfos="petaTagInfos"
+            :selectedPetaTags="selectedPetaTags"
+          />
+        </t-search>
+      </t-header>
+      <t-content>
+        <t-tiles
+          ref="thumbnails"
         >
-      </t-right>
-    </t-browser-root>
-  </VModal>
+          <t-tiles-content
+            ref="thumbsWrapper"
+            :style="{height: scrollHeight + 8 + 'px'}"
+          >
+            <VTile
+              v-for="(data) in visibleTiles"
+              :key="data.petaImage.id"
+              :tile="data"
+              :original="original"
+              :petaTagInfos="petaTagInfos"
+              @select="selectThumbnail"
+              @menu="petaImageMenu"
+              @drag="drag"
+              @dblclick="openDetail"
+            />
+          </t-tiles-content>
+        </t-tiles>
+      </t-content>
+    </t-center>
+    <t-right>
+      <VProperty
+        :petaImages="selectedPetaImages"
+        :petaTagInfos="petaTagInfos"
+        @selectTag="(tag) => selectedPetaTags = [tag]"
+      />
+      <input
+        type="range"
+        v-model="thumbnailsSize"
+        tabindex="-1"
+        @change="updateTileSize(Number($event.target.value))"
+        :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
+        :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
+        :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
+      >
+    </t-right>
+  </t-browser-root>
 </template>
 
 <script lang="ts">

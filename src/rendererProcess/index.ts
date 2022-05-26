@@ -4,6 +4,7 @@ import { createI18n } from "vue-i18n";
 import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import languages from "@/commons/languages";
 import App from "@/rendererProcess/components/VIndex.vue";
+import BrowserIndex from "@/rendererProcess/components/VBrowserIndex.vue";
 import { App as _App } from "vue";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalStates from "@/rendererProcess/vueComponentCustomProperties/states";
@@ -17,7 +18,9 @@ import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/tex
 import { API } from "@/rendererProcess/api";
 (async () => {
   AnimatedGIFLoader.add?.();
-  const app = createApp(App);
+  const isBrowser = location.search.includes("?browser");
+  console.log(isBrowser ? "BROWSER" : "MAIN");
+  const app = isBrowser ? createApp(BrowserIndex) : createApp(App);
   const appUse = async (plugin: Plugin) => await plugin.install!(app);
   const i18n = createI18n({
     locale: "ja",
