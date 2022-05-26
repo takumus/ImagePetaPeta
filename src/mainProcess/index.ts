@@ -960,13 +960,13 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string + "?main").then(() => {
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string).then(() => {
         if (!process.env.IS_TEST) {
           window.webContents.openDevTools({ mode: "detach" });
         }
       })
     } else {
-      window.loadURL("app://./index.html" + "?main");
+      window.loadURL("app://./index.html");
     }
     window.setMenuBarVisibility(false);
     // window.webContents.debugger.attach("1.1");

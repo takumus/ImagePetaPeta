@@ -16,9 +16,10 @@ import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/tex
 import { API } from "@/rendererProcess/api";
 (async () => {
   AnimatedGIFLoader.add?.();
-  const entry = await getVueEntry(location.search.replace(/\?/g, ""));
-  console.log("ENTRY:", entry.id);
-  const appUse = async (plugin: Plugin) => await plugin.install!(entry.app);
+  const isBrowser = location.search.includes("?browser");
+  console.log(isBrowser ? "BROWSER" : "MAIN");
+  const app = isBrowser ? createApp((await import("@/rendererProcess/components/VBrowserIndex.vue")).default) : createApp((await import("@/rendererProcess/components/VIndex.vue")).default);
+  const appUse = async (plugin: Plugin) => await plugin.install!(app);
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
@@ -34,21 +35,5 @@ import { API } from "@/rendererProcess/api";
   await appUse(GlobalSettings);
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
-  entry.app.mount("#app");
+  app.mount("#app");
 })();
-async function getVueEntry(id: string) {
-  let app: _App;
-  switch(id) {
-    case "browser":
-      app = createApp((await import("@/rendererProcess/components/VBrowserIndex.vue")).default);
-      break;
-    case "main":
-    default:
-      app = createApp((await import("@/rendererProcess/components/VIndex.vue")).default);
-      break;
-  }
-  return {
-    app,
-    id
-  };
-}
