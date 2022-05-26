@@ -636,8 +636,11 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          if (getWindowFromEvent(event) === mainWindow) {
+          const window = getWindowFromEvent(event);
+          if (window === mainWindow) {
             app.quit();
+          } else {
+            window?.close();
           }
         },
         getPlatform: async (event) => {
@@ -911,9 +914,9 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       window.loadURL("app://./index.html" + "?browser");
     }
     window.setMenuBarVisibility(false);
-    if (dataStates.data.windowIsMaximized) {
-      window.maximize();
-    }
+    // if (dataStates.data.windowIsMaximized) {
+    //   window.maximize();
+    // }
     window.on("close", () => {
       // if (!window.isMaximized()) {
       //   dataStates.data.windowSize.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
@@ -1088,7 +1091,6 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
   function getWindowFromEvent(event: IpcMainInvokeEvent) {
-    console.log(mainWindow?.id, browserWindow?.id, event.sender.id);
     if (mainWindow?.webContents.mainFrame === event.sender.mainFrame) {
       return mainWindow;
     } else if (browserWindow?.webContents.mainFrame === event.sender.mainFrame) {
