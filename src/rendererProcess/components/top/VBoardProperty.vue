@@ -43,7 +43,7 @@
     <t-shared class="left">
       <button
         tabindex="-1"
-        @click="$components.browser.open()"
+        @click="openBrowser"
       >
         <t-icon class="browser"></t-icon>
       </button>
@@ -84,6 +84,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 // Others
 import { PetaBoard } from "@/commons/datas/petaBoard";
+import { API } from "@/rendererProcess/api";
 @Options({
   components: {
   },
@@ -98,6 +99,9 @@ export default class VBoardProperty extends Vue {
   }
   unmounted() {
     //
+  }
+  openBrowser() {
+    API.send("openBrowser");
   }
 }
 </script>

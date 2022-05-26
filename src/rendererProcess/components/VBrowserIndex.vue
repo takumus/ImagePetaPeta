@@ -4,42 +4,25 @@
       dark: darkMode
     }"
   >
-    <VBoard
-      :zIndex="1"
-      :board="currentPetaBoard"
-      ref="vPetaBoard"
-      @change="changePetaBoard"
-    />
-    <t-top>
-      <VTitleBar>
-        <VTabBar
-          :uiVisible="uiVisible"
-          :boards="sortedPetaBoards"
-          :title="title"
-          :currentPetaBoardId="currentPetaBoardId"
-          @remove="removePetaBoard"
-          @add="addPetaBoard"
-          @select="selectPetaBoard"
-          @sort="changePetaBoards"
-          @change="changePetaBoard"
-          ref="vTabBar"
+    <t-content>
+      <t-top>
+        <VTitleBar>
+          <span>WOWOW</span>
+        </VTitleBar>
+      </t-top>
+      <t-browser>
+        <VBrowser
+          :petaImages="petaImages"
+          :petaTagInfos="petaTagInfos"
         />
-      </VTitleBar>
-      <VBoardProperty :board="currentPetaBoard" />
-    </t-top>
+      </t-browser>
+    </t-content>
     <t-modals
       v-show="this.$components.modal.modalIds.length > 0"
     >
-      <!-- <VBrowser
-        :petaImages="petaImages"
-        :petaTagInfos="petaTagInfos"
-        @addPanel="addPanel"
-      /> -->
       <VInfo />
       <VSettings />
-      <VImageImporter
-        @addPanelByDragAndDrop="addPanelByDragAndDrop"
-      />
+      <VImageImporter />
       <VTasks />
     </t-modals>
     <VDialog
@@ -60,7 +43,6 @@ import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
 // Components
 import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
-import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTabBar from "@/rendererProcess/components/top/VTabBar.vue";
@@ -88,7 +70,6 @@ import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
     VBrowser,
-    VBoard,
     VImageImporter,
     VTasks,
     VTabBar,
@@ -101,21 +82,11 @@ import { StateSet } from "@/commons/datas/states";
     VDialog
   },
 })
-export default class Index extends Vue {
-  @Ref("vPetaBoard")
-  vPetaBoard!: VBoard;
-  @Ref("vTabBar")
-  vTabBar!: VTabBar;
+export default class BrowserIndex extends Vue {
   petaImages: PetaImages = {};
-  boards: PetaBoard[] = [];
   petaTagInfos: PetaTagInfo[] = [];
-  orderedAddPanelIds: string[] = [];
-  orderedAddPanelDragEvent = new Vec2();
-  boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
   windowIsFocused = true;
-  currentPetaBoardId = "";
   title = "";
-  errorPetaBoardId = "";
   async mounted() {
     window.onerror = (e) => {
       logChunk().log("vIndex", "window error:", e);
@@ -146,143 +117,24 @@ export default class Index extends Vue {
     API.on("windowFocused", (e, focused) => {
       this.windowIsFocused = focused;
       if (!focused) {
-        this.vPetaBoard.clearSelectionAll(true);
-        this.vPetaBoard.orderPIXIRender();
+        //
       }
     });
     this.windowIsFocused = await API.send("getWindowIsFocused");
     this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     await this.getPetaImages();
-    await this.getPetaBoards();
     await this.getPetaTagInfos();
-    await this.restoreBoard();
     this.$nextTick(() => {
       API.send("showMainWindow");
     });
   }
-  async restoreBoard() {
-    const states = await API.send("getStates");
-    this.errorPetaBoardId = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
-    const lastBoard = this.boards.find((board) => board.id == states.selectedPetaBoardId);
-    this.selectPetaBoard(lastBoard);
-    if (!lastBoard) {
-      this.selectPetaBoard(this.boards[0]);
-    }
-  }
   async getPetaImages() {
     this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-    this.addOrderedPetaPanels();
-  }
-  async getPetaBoards() {
-    this.boards = await API.send("getPetaBoards");
-    dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
-    this.boards.forEach((board) => {
-      if (!this.boardUpdaters[board.id]) {
-        this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id]!.initData(petaBoardsToDBPetaBoards(board));
-        this.boardUpdaters[board.id]!.onUpdate((board) => {
-          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
-        });
-      }
-    });
+    // this.addOrderedPetaPanels();
   }
   async getPetaTagInfos() {
     this.petaTagInfos = await API.send("getPetaTagInfos");
-  }
-  addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
-    this.orderedAddPanelIds = ids;
-    this.orderedAddPanelDragEvent = mouse;
-    if (fromBrowser) {
-      this.addOrderedPetaPanels();
-    }
-  }
-  addOrderedPetaPanels() {
-    let offsetIndex = 0;
-    this.orderedAddPanelIds.forEach((id, i) => {
-      const petaImage = this.petaImages[id];
-      if (!petaImage) return;
-      if (!this.orderedAddPanelDragEvent) return;
-      const panel = createPetaPanel(
-        petaImage,
-        this.orderedAddPanelDragEvent.clone().add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
-        DEFAULT_IMAGE_SIZE,
-        petaImage.height * DEFAULT_IMAGE_SIZE
-      );
-      // if (!this.$components.browser.visible) {
-        this.addPanel(panel, offsetIndex++);
-      // }
-    });
-    this.orderedAddPanelIds = [];
-    if (this.currentPetaBoard) {
-      this.vPetaBoard.load();
-    }
-  }
-  addPanel(petaPanel: PetaPanel, offsetIndex: number) {
-    if (!this.currentPetaBoard) return;
-    this.currentPetaBoard.petaPanels.push(petaPanel);
-    this.vPetaBoard.addPanel(petaPanel, offsetIndex);
-  }
-  async selectPetaBoard(board: PetaBoard | undefined) {
-    if (!board) {
-      return;
-    }
-    if (this.currentPetaBoard?.id == board.id) {
-      return;
-    }
-    logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
-    API.send("updateState", StateSet("selectedPetaBoardId", board.id));
-    API.send("updateState", StateSet("loadedPetaBoardId", ""));
-    if (this.errorPetaBoardId == board.id) {
-      if (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
-        return;
-      } else {
-        this.errorPetaBoardId = "";
-      }
-    }
-    this.currentPetaBoardId = board.id;
-  }
-  savePetaBoard(board: PetaBoard, immidiately: boolean) {
-    this.boardUpdaters[board.id]!.order(petaBoardsToDBPetaBoards(board));
-    if (immidiately) {
-      this.boardUpdaters[board.id]!.forceUpdate();
-    }
-  }
-  async removePetaBoard(board: PetaBoard) {
-    if (await this.$components.dialog.show(this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
-      return;
-    }
-    this.boardUpdaters[board.id]!.forceUpdate();
-    const leftBoardId = this.boards[this.boards.findIndex((b) => b.id == board.id) - 1]?.id;
-    await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
-    await this.getPetaBoards();
-    const leftBoard = this.boards.find((board) => board.id == leftBoardId);
-    if (leftBoard) {
-      this.selectPetaBoard(leftBoard);
-    } else {
-      this.selectPetaBoard(this.boards[0]);
-    }
-  }
-  async addPetaBoard() {
-    const name = getNameAvoidDuplication(DEFAULT_BOARD_NAME, this.boards.map((b) => b.name));
-    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.darkMode);
-    await API.send(
-      "updatePetaBoards",
-      [board],
-      UpdateMode.UPSERT
-    );
-    logChunk().log("vIndex", "PetaBoard Added", minimId(board.id));
-    await this.getPetaBoards();
-    this.selectPetaBoard(board);
-  }
-  get currentPetaBoard(): PetaBoard | undefined {
-    if (this.errorPetaBoardId == this.currentPetaBoardId) {
-      return undefined;
-    }
-    return this.boards.find((board) => board.id == this.currentPetaBoardId);
-  }
-  get sortedPetaBoards() {
-    return this.boards.sort((a, b) => a.index - b.index);
   }
   get darkMode() {
     if (this.$settings.autoDarkMode) {
@@ -292,17 +144,6 @@ export default class Index extends Vue {
   }
   get uiVisible() {
     return this.$settings.autoHideUI ? this.windowIsFocused : true;
-  }
-  changePetaBoard(board: PetaBoard) {
-    if (!board) {
-      return;
-    }
-    this.savePetaBoard(board, false);
-  }
-  changePetaBoards() {
-    this.boards.forEach((board) => {
-      this.savePetaBoard(board, true);
-    });
   }
 }
 </script>
@@ -417,12 +258,25 @@ t-root {
     left: 0px;
     z-index: 2;
   }
-  >t-top {
+  >t-content {
     position: fixed;
     top: 0px;
     left: 0px;
+    display: flex;
+    height: 100%;
     width: 100%;
-    z-index: 3;
+    flex-direction: column;
+    >t-top {
+      display: block;
+      width: 100%;
+      overflow: hidden;
+    }
+    >t-browser {
+      display: block;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      flex: 1;
+    }
   }
 }
 </style>

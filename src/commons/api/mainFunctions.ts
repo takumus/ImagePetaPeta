@@ -47,4 +47,5 @@ export interface MainFunctions {
   installUpdate: () => Promise<boolean>;
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
   getDropFromBrowserPetaImageIds: () => Promise<string[] | undefined>;
+  openBrowser: () => Promise<void>;
 }

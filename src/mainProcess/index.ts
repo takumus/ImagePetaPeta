@@ -48,6 +48,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
   */
   //-------------------------------------------------------------------------------------------------//
   let mainWindow: BrowserWindow;
+  let browserWindow: BrowserWindow | undefined;
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -289,6 +290,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
     mainWindow = initWindow();
+    // browserWindow = initBrowserWindow();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -831,6 +833,13 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
             log.error(error);
           }
           return petaImages.map((petaImage) => petaImage.id);
+        },
+        openBrowser: async () => {
+          if (browserWindow?.isDestroyed() || browserWindow === undefined) {
+            browserWindow = initBrowserWindow();
+          } else {
+            browserWindow?.moveTop();
+          }
         }
       }
     }
@@ -853,6 +862,63 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
     mainWindow.webContents.send(key, ...args);
+    if (!browserWindow?.isDestroyed()) {
+      browserWindow?.webContents.send(key, ...args);
+    }
+  }
+  function initBrowserWindow() {
+    const window = new BrowserWindow({
+      width: 1000,
+      height: 1000,
+      minWidth: WINDOW_MIN_WIDTH,
+      minHeight: WINDOW_MIN_HEIGHT,
+      frame: false,
+      titleBarStyle: "hiddenInset",
+      show: true,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: Path.join(__dirname, "preload.js")
+      },
+      trafficLightPosition: {
+        x: 13,
+        y: 13
+      }
+    });
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string + "?browser").then(() => {
+        if (!process.env.IS_TEST) {
+          window.webContents.openDevTools({ mode: "detach" });
+        }
+      })
+    } else {
+      window.loadURL("app://./index.html" + "?browser");
+    }
+    window.setMenuBarVisibility(false);
+    if (dataStates.data.windowIsMaximized) {
+      window.maximize();
+    }
+    window.on("close", () => {
+      // if (!window.isMaximized()) {
+      //   dataStates.data.windowSize.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+      //   dataStates.data.windowSize.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+      // }
+      // dataStates.data.windowIsMaximized = window.isMaximized();
+      // dataStates.save();
+      // const log = mainLogger.logChunk();
+      // log.log("#Save Window Size", dataStates.data.windowSize);
+      // if (process.platform !== "darwin") {
+      //   draggingPreviewWindow.destroy();
+      // }
+    });
+    // window.addListener("blur", () => {
+    //   emitMainEvent("windowFocused", false);
+    // });
+    // window.addListener("focus", () => {
+    //   emitMainEvent("windowFocused", true);
+    // });
+    // window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+    return window;
   }
   function initWindow() {
     const window = new BrowserWindow({
