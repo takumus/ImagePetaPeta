@@ -178,6 +178,7 @@ import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/rendererProcess/api";
+import { Settings } from "@/commons/datas/settings";
 @Options({
   components: {
     VModal,
@@ -214,10 +215,6 @@ export default class VSettings extends Vue {
   }
   close() {
     this.visible = false;
-  }
-  @Watch("$settings", { deep: true })
-  save() {
-    API.send("updateSettings", this.$settings);
   }
   regenerateMetadatas() {
     API.send("regenerateMetadatas");

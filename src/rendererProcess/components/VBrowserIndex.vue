@@ -7,7 +7,6 @@
     <t-content>
       <t-top>
         <VTitleBar :isBrowser="true">
-          <span>WOWOW</span>
         </VTitleBar>
       </t-top>
       <t-browser>

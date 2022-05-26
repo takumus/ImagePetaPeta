@@ -586,6 +586,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
             dataSettings.data = settings;
             mainWindow?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             dataSettings.save();
+            emitMainEvent("updateSettings", settings);
             log.log("return:", dataSettings.data);
             return true;
           } catch(e) {
@@ -900,8 +901,8 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         preload: Path.join(__dirname, "preload.js")
       },
       trafficLightPosition: {
-        x: 13,
-        y: 13
+        x: 8,
+        y: 8
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
