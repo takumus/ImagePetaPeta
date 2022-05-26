@@ -144,7 +144,6 @@ t-tags-root {
     overflow-x: hidden;
     flex: 1;
     margin: 0px;
-    margin-top: 12px;
     >li {
       width: 100%;
       padding: 4px;

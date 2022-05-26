@@ -445,7 +445,7 @@ t-browser-root {
   >t-left {
     padding: 8px;
     width: 20%;
-    max-width: 180px;
+    min-width: 180px;
     display: block;
   }
   >t-center {
@@ -486,7 +486,7 @@ t-browser-root {
   }
   >t-right {
     width: 20%;
-    max-width: 180px;
+    min-width: 180px;
     padding: 8px;
     display: flex;
     flex-direction: column;
