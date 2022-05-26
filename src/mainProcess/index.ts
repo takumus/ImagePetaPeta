@@ -624,10 +624,12 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           }
           mainWindow.maximize();
         },
-        windowClose: async (event) => {
+        windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          app.quit();
+          if (quit) {
+            app.quit();
+          }
         },
         getPlatform: async (event) => {
           const log = mainLogger.logChunk();

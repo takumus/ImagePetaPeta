@@ -38,7 +38,7 @@ export interface MainFunctions {
   setZoomLevel: (level: number) => Promise<void>;
   windowMaximize: () => Promise<void>;
   windowMinimize: () => Promise<void>;
-  windowClose: () => Promise<void>;
+  windowClose: (quit: boolean) => Promise<void>;
   getPlatform: () => Promise<NodeJS.Platform>;
   regenerateMetadatas: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;

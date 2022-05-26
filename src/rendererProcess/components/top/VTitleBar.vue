@@ -56,6 +56,8 @@ import { API } from "@/rendererProcess/api";
   ]
 })
 export default class VTitleBar extends Vue {
+  @Prop()
+  isBrowser = false;
   mounted() {
     //
   }
@@ -69,7 +71,7 @@ export default class VTitleBar extends Vue {
     API.send("windowMaximize");
   }
   closeWindow() {
-    API.send("windowClose");
+    API.send("windowClose", !this.isBrowser);
   }
   get isMac() {
     return this.$systemInfo.platform == "darwin";
