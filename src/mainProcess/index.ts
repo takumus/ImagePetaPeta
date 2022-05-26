@@ -1088,9 +1088,10 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
   function getWindowFromEvent(event: IpcMainInvokeEvent) {
-    if (mainWindow?.id === event.sender.id) {
+    console.log(mainWindow?.id, browserWindow?.id, event.sender.id);
+    if (mainWindow?.webContents.mainFrame === event.sender.mainFrame) {
       return mainWindow;
-    } else if (browserWindow?.id === event.sender.id) {
+    } else if (browserWindow?.webContents.mainFrame === event.sender.mainFrame) {
       return browserWindow;
     }
     return undefined;
