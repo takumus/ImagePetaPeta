@@ -315,6 +315,14 @@ t-root {
     width: 100%;
     z-index: 3;
   }
+  >t-modals {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+  }
 }
 </style>
 <style lang="scss">
