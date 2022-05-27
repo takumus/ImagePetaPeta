@@ -182,7 +182,7 @@ import { WindowType } from "@/commons/datas/windowType";
   app.on("activate", async () => {
     mainLogger.logChunk().log("#Electron event: activate");
     if (mainWindow?.isDestroyed() || mainWindow === undefined) {
-      mainWindow = initWindow();
+      mainWindow = initMainWindow();
     }
   });
   app.on("before-quit", (event) => {
@@ -290,7 +290,7 @@ import { WindowType } from "@/commons/datas/windowType";
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    mainWindow = initWindow();
+    mainWindow = initMainWindow();
     // browserWindow = initBrowserWindow();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
@@ -941,7 +941,7 @@ import { WindowType } from "@/commons/datas/windowType";
     });
     return window;
   }
-  function initWindow() {
+  function initMainWindow() {
     const window = new BrowserWindow({
       width: dataStates.data.mainWindow.width,
       height: dataStates.data.mainWindow.height,
