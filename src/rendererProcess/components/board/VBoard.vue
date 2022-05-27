@@ -654,7 +654,8 @@ export default class VBoard extends Vue {
       }
     });
     Cursor.setDefaultCursor();
-    API.send("updateState", StateSet("loadedPetaBoardId", this.board.id));
+    // API.send("updateState", StateSet("loadedPetaBoardId", this.board.id));
+    this.$states.loadedPetaBoardId = this.board.id;
   }
   async createPPanel(petaPanel: PetaPanel) {
     if (this.pPanels[petaPanel.id]) {

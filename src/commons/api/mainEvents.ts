@@ -1,5 +1,6 @@
 import { PetaImage } from "@/commons/datas/petaImage";
 import { Settings } from "../datas/settings";
+import { States } from "../datas/states";
 import { TaskStatus } from "./interfaces/task";
 
 export interface MainEvents {
@@ -13,4 +14,5 @@ export interface MainEvents {
   regenerateMetadatasBegin: () => void;
   regenerateMetadatasComplete: () => void;
   updateSettings: (settings: Settings) => void;
+  updateStates: (states: States) => void;
 }

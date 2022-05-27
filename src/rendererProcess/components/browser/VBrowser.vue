@@ -285,7 +285,8 @@ export default class VBrowser extends Vue {
     this.visible = false;
   }
   updateTileSize(value: number) {
-    API.send("updateState", StateSet("browserTileSize", value));
+    // API.send("updateState", StateSet("browserTileSize", value));
+    this.$states.browserTileSize = value;
   }
   sort(a: PetaImage, b: PetaImage) {
     switch(this.sortMode) {

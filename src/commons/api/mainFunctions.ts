@@ -29,6 +29,7 @@ export interface MainFunctions {
   getAppInfo: () => Promise<AppInfo>;
   getStates: () => Promise<States>;
   updateState: (stateSet: StateSet) => Promise<boolean>;
+  updateStates: (states: States) => Promise<boolean>;
   showDBFolder: () => Promise<boolean>;
   showConfigFolder: () => Promise<boolean>;
   showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;

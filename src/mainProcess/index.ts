@@ -790,6 +790,20 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           }
           return false;
         },
+        updateStates: async (event, states) => {
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Update States");
+            dataStates.data = states;
+            dataStates.save();
+            emitMainEvent("updateStates", states);
+            log.log("return:", dataStates.data);
+            return true;
+          } catch(e) {
+            log.error(e);
+          }
+          return false;
+        },
         importImagesByDragAndDrop: async (event, htmls, arrayBuffers, filePaths) => {
           const log = mainLogger.logChunk();
           log.log("#ImportImagesByDragAndDrop");

@@ -188,9 +188,8 @@ export default class VLayer extends Vue {
     }
   }
   toggleVisible() {
-    //
     this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
-    API.send("updateState", StateSet("visibleLayerPanel", this.$states.visibleLayerPanel));
+    // API.send("updateState", StateSet("visibleLayerPanel", this.$states.visibleLayerPanel));
   }
   get pPanels() {
     if (!this.pPanelsArray) {
