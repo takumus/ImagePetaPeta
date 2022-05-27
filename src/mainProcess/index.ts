@@ -907,7 +907,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string + "?browser").then(() => {
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "?browser").then(() => {
         if (!process.env.IS_TEST) {
           window.webContents.openDevTools({ mode: "detach" });
         }
@@ -949,13 +949,13 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string).then(() => {
+      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "?main").then(() => {
         if (!process.env.IS_TEST) {
           window.webContents.openDevTools({ mode: "detach" });
         }
       })
     } else {
-      window.loadURL("app://./index.html");
+      window.loadURL("app://./index.html" + "?main");
     }
     window.setMenuBarVisibility(false);
     // window.webContents.debugger.attach("1.1");
