@@ -199,15 +199,6 @@ import { WindowType } from "@/commons/datas/windowType";
   */
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
-    // console.log(__dirname);
-    // const tray = new Tray(nativeImage.createFromDataURL(AppIcon));
-    // tray.setToolTip(app.getName());
-    // tray.setContextMenu(Menu.buildFromTemplate([
-    //   { label: 'Item1', type: 'radio' },
-    //   { label: 'Item2', type: 'radio' },
-    //   { label: 'Item3', type: 'radio', checked: true },
-    //   { label: 'Item4', type: 'radio' }
-    // ]));
     mainLogger.logChunk().log(`\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`);
     mainLogger.logChunk().log(`verison: ${app.getVersion()}`);
     //-------------------------------------------------------------------------------------------------//
