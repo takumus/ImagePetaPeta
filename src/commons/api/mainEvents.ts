@@ -1,6 +1,7 @@
 import { PetaImage } from "@/commons/datas/petaImage";
 import { Settings } from "../datas/settings";
 import { States } from "../datas/states";
+import { WindowType } from "../datas/windowType";
 import { TaskStatus } from "./interfaces/task";
 
 export interface MainEvents {
@@ -9,7 +10,7 @@ export interface MainEvents {
   updatePetaTags: () => void;
   taskStatus: (id: string, task: TaskStatus) => void;
   notifyUpdate: (latest: string, downloaded: boolean) => void;
-  windowFocused: (focused: boolean) => void;
+  windowFocused: (focused: boolean, windowType: WindowType) => void;
   regenerateMetadatasProgress: (done: number, count: number) => void;
   regenerateMetadatasBegin: () => void;
   regenerateMetadatasComplete: () => void;

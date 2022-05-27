@@ -14,6 +14,8 @@ import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
+import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProperties/windowIsFocused";
+
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
@@ -38,6 +40,7 @@ import { API } from "@/rendererProcess/api";
   await appUse(GlobalSettings);
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
+  await appUse(GlobalWindowIsFocused.createPlugin());
   app.mount("#app");
   const keyboard = new Keyboards();
   keyboard.down(["d"], () => {

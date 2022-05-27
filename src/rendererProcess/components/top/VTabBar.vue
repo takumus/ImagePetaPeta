@@ -1,5 +1,5 @@
 <template>
-  <t-tab-root v-show="uiVisible">
+  <t-tab-root>
     <t-tab
       :class="{ selected: b == board }"
       :style="{ opacity: b == board && dragging ? 0 : 1 }"
@@ -70,8 +70,6 @@ import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 export default class VTabBar extends Vue {
   @Prop()
   boards!: PetaBoard[];
-  @Prop()
-  uiVisible = true;
   @Prop()
   title = "";
   @Prop()

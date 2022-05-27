@@ -35,6 +35,7 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
 import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
+import { WindowType } from "@/commons/datas/windowType";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -609,7 +610,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = mainWindow?.isFocused() ? true : false;
+          const isFocued = getWindowFromEvent(event)?.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -912,13 +913,13 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "?browser").then(() => {
+      window.loadURL(getEntryURL(process.env.WEBPACK_DEV_SERVER_URL, WindowType.BROWSER)).then(() => {
         if (!process.env.IS_TEST) {
           window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {
-      window.loadURL("app://./index.html" + "?browser");
+      window.loadURL(getEntryURL("app://./index.html", WindowType.BROWSER));
     }
     window.setMenuBarVisibility(false);
     if (dataStates.data.browserWindow.maximized) {
@@ -931,6 +932,12 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
       dataStates.data.browserWindow.maximized = window.isMaximized();
       dataStates.save();
+    });
+    window.addListener("blur", () => {
+      emitMainEvent("windowFocused", false, WindowType.BROWSER);
+    });
+    window.addListener("focus", () => {
+      emitMainEvent("windowFocused", true, WindowType.BROWSER);
     });
     return window;
   }
@@ -954,13 +961,13 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "?main").then(() => {
+      window.loadURL(getEntryURL(process.env.WEBPACK_DEV_SERVER_URL, WindowType.MAIN)).then(() => {
         if (!process.env.IS_TEST) {
           window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {
-      window.loadURL("app://./index.html" + "?main");
+      window.loadURL(getEntryURL("app://./index.html", WindowType.MAIN));
     }
     window.setMenuBarVisibility(false);
     // window.webContents.debugger.attach("1.1");
@@ -990,10 +997,10 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       }
     });
     window.addListener("blur", () => {
-      emitMainEvent("windowFocused", false);
+      emitMainEvent("windowFocused", false, WindowType.MAIN);
     });
     window.addListener("focus", () => {
-      emitMainEvent("windowFocused", true);
+      emitMainEvent("windowFocused", true, WindowType.MAIN);
     });
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
     return window;
@@ -1090,6 +1097,9 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       return browserWindow;
     }
     return undefined;
+  }
+  function getEntryURL(baseURL: string, windowType: WindowType) {
+    return baseURL + "?" + windowType;
   }
   function relaunch() {
     app.relaunch();

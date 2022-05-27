@@ -13,7 +13,6 @@
     <t-top>
       <VTitleBar>
         <VTabBar
-          :uiVisible="uiVisible"
           :boards="sortedPetaBoards"
           :title="title"
           :currentPetaBoardId="currentPetaBoardId"
@@ -115,7 +114,6 @@ export default class MainIndex extends Vue {
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
-  windowIsFocused = true;
   currentPetaBoardId = "";
   title = "";
   errorPetaBoardId = "";
@@ -146,14 +144,6 @@ export default class MainIndex extends Vue {
         API.send("openURL", `${DOWNLOAD_URL}${latest}`);
       }
     });
-    API.on("windowFocused", (e, focused) => {
-      this.windowIsFocused = focused;
-      if (!focused) {
-        this.vPetaBoard.clearSelectionAll(true);
-        this.vPetaBoard.orderPIXIRender();
-      }
-    });
-    this.windowIsFocused = await API.send("getWindowIsFocused");
     this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     await this.getPetaImages();
@@ -293,9 +283,6 @@ export default class MainIndex extends Vue {
     }
     return this.$settings.darkMode;
   }
-  get uiVisible() {
-    return this.$settings.autoHideUI ? this.windowIsFocused : true;
-  }
   changePetaBoard(board: PetaBoard) {
     if (!board) {
       return;
@@ -306,6 +293,14 @@ export default class MainIndex extends Vue {
     this.boards.forEach((board) => {
       this.savePetaBoard(board, true);
     });
+  }
+  @Watch("$windowIsFocused.value")
+  changeWindowIsFocused() {
+    // console.log(this.$windowIsFocused.value);
+    if (!this.$windowIsFocused.value) {
+      this.vPetaBoard.clearSelectionAll(true);
+      this.vPetaBoard.orderPIXIRender();
+    }
   }
 }
 </script>
