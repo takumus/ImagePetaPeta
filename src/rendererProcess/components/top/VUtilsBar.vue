@@ -3,7 +3,7 @@
     <t-property>
       <slot></slot>
     </t-property>
-    <t-shared class="left">
+    <t-shared class="left" v-if="$windowIsFocused.value">
       <button
         tabindex="-1"
         @click="openBrowser"
@@ -23,7 +23,7 @@
         <t-icon class="import-folder"></t-icon>
       </button>
     </t-shared>
-    <t-shared class=" right">
+    <t-shared class=" right" v-if="$windowIsFocused.value">
       <button
         tabindex="-1"
         @click="$components.info.open"
