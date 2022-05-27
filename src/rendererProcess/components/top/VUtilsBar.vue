@@ -68,11 +68,9 @@ export default class VUtilsBar extends Vue {
 
 <style lang="scss" scoped>
 t-utils-bar-root {
-  --tab-height: 24px;
   --top-draggable-height: 10px;
   width: 100%;
-  position: absolute;
-  z-index: 2;
+  position: relative;
   background-color: var(--tab-selected-color);
   height: 30px;
   box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);

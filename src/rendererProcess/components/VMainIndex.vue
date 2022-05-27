@@ -25,8 +25,9 @@
           ref="vTabBar"
         />
       </VTitleBar>
-      <!-- <VBoardProperty :board="currentPetaBoard" /> -->
-      <VUtilsBar><VBoardProperty :board="currentPetaBoard" /></VUtilsBar>
+      <VUtilsBar>
+        <VBoardProperty :board="currentPetaBoard" />
+      </VUtilsBar>
     </t-top>
     <t-modals
       v-show="this.$components.modal.modalIds.length > 0"

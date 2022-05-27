@@ -6,8 +6,9 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar :isBrowser="true">
-        </VTitleBar>
+        <VTitleBar :isBrowser="true"></VTitleBar>
+        <VUtilsBar>
+        </VUtilsBar>
       </t-top>
       <t-browser>
         <VBrowser
@@ -44,9 +45,8 @@ import { Ref, Watch } from "vue-property-decorator";
 import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
-import VTabBar from "@/rendererProcess/components/top/VTabBar.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
-import VBoardProperty from "@/rendererProcess/components/top/VBoardProperty.vue";
+import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VInfo from "@/rendererProcess/components/info/VInfo.vue";
@@ -54,7 +54,6 @@ import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { DOWNLOAD_URL } from "@/commons/defines";
 import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
@@ -63,14 +62,13 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
     VBrowser,
     VImageImporter,
     VTasks,
-    VTabBar,
-    VBoardProperty,
     VTitleBar,
     VContextMenu,
     VComplement,
     VInfo,
     VSettings,
-    VDialog
+    VDialog,
+    VUtilsBar
   },
 })
 export default class BrowserIndex extends Vue {
@@ -129,7 +127,7 @@ t-root {
     >t-top {
       display: block;
       width: 100%;
-      overflow: hidden;
+      z-index: 2;
     }
     >t-browser {
       display: block;
@@ -137,6 +135,7 @@ t-root {
       padding: 8px;
       background-color: var(--bg-color);
       flex: 1;
+      z-index: 1;
     }
     >t-modals {
       position: absolute;
@@ -144,7 +143,7 @@ t-root {
       height: 100%;
       top: 0px;
       left: 0px;
-      z-index: 2;
+      z-index: 3;
     }
   }
 }
