@@ -889,8 +889,8 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
   }
   function initBrowserWindow() {
     const window = new BrowserWindow({
-      width: 1000,
-      height: 1000,
+      width: dataStates.data.browserWindow.width,
+      height: dataStates.data.browserWindow.height,
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
       frame: false,
@@ -916,35 +916,23 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
       window.loadURL("app://./index.html" + "?browser");
     }
     window.setMenuBarVisibility(false);
-    // if (dataStates.data.windowIsMaximized) {
-    //   window.maximize();
-    // }
+    if (dataStates.data.browserWindow.maximized) {
+      window.maximize();
+    }
     window.on("close", () => {
-      // if (!window.isMaximized()) {
-      //   dataStates.data.windowSize.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-      //   dataStates.data.windowSize.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
-      // }
-      // dataStates.data.windowIsMaximized = window.isMaximized();
-      // dataStates.save();
-      // const log = mainLogger.logChunk();
-      // log.log("#Save Window Size", dataStates.data.windowSize);
-      // if (process.platform !== "darwin") {
-      //   draggingPreviewWindow.destroy();
-      // }
+      if (!window.isMaximized()) {
+        dataStates.data.browserWindow.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+        dataStates.data.browserWindow.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+      }
+      dataStates.data.browserWindow.maximized = window.isMaximized();
+      dataStates.save();
     });
-    // window.addListener("blur", () => {
-    //   emitMainEvent("windowFocused", false);
-    // });
-    // window.addListener("focus", () => {
-    //   emitMainEvent("windowFocused", true);
-    // });
-    // window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
     return window;
   }
   function initWindow() {
     const window = new BrowserWindow({
-      width: dataStates.data.windowSize.width,
-      height: dataStates.data.windowSize.height,
+      width: dataStates.data.mainWindow.width,
+      height: dataStates.data.mainWindow.height,
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
       frame: false,
@@ -982,18 +970,16 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     //   console.log(method, params);
     // })
     // window.webContents.debugger.sendCommand('Network.enable');
-    if (dataStates.data.windowIsMaximized) {
+    if (dataStates.data.mainWindow.maximized) {
       window.maximize();
     }
     window.on("close", () => {
       if (!window.isMaximized()) {
-        dataStates.data.windowSize.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-        dataStates.data.windowSize.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+        dataStates.data.mainWindow.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+        dataStates.data.mainWindow.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
       }
-      dataStates.data.windowIsMaximized = window.isMaximized();
+      dataStates.data.mainWindow.maximized = window.isMaximized();
       dataStates.save();
-      const log = mainLogger.logChunk();
-      log.log("#Save Window Size", dataStates.data.windowSize);
       if (process.platform !== "darwin") {
         draggingPreviewWindow.destroy();
       }

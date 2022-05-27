@@ -1,12 +1,22 @@
 import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH } from "@/commons/defines";
 
 export const defaultStates = {
-  windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT },
-  windowIsMaximized: false,
+  // windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT },
+  // windowIsMaximized: false,
   selectedPetaBoardId: "",
   browserTileSize: 128,
   visibleLayerPanel: true,
-  loadedPetaBoardId: ""
+  loadedPetaBoardId: "",
+  mainWindow: {
+    width: WINDOW_DEFAULT_WIDTH,
+    height: WINDOW_DEFAULT_HEIGHT,
+    maximized: false,
+  },
+  browserWindow: {
+    width: WINDOW_DEFAULT_WIDTH,
+    height: WINDOW_DEFAULT_HEIGHT,
+    maximized: false,
+  }
 }
 // export interface StateSet {
 //   key: string,

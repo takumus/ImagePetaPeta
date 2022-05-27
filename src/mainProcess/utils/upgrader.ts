@@ -114,6 +114,16 @@ export function upgradeStates(states: States) {
     states.loadedPetaBoardId = states.selectedPetaBoardId;
     changed = true;
   }
+  // 2.7.0
+  if (states.mainWindow === undefined) {
+    states.mainWindow = deepcopy(defaultStates.mainWindow);
+    changed = true;
+  }
+  // 2.7.0
+  if (states.browserWindow === undefined) {
+    states.browserWindow = deepcopy(defaultStates.browserWindow);
+    changed = true;
+  }
   return {
     data: states,
     changed
