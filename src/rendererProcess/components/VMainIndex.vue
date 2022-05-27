@@ -25,7 +25,8 @@
           ref="vTabBar"
         />
       </VTitleBar>
-      <VBoardProperty :board="currentPetaBoard" />
+      <!-- <VBoardProperty :board="currentPetaBoard" /> -->
+      <VUtilsBar><VBoardProperty :board="currentPetaBoard" /></VUtilsBar>
     </t-top>
     <t-modals
       v-show="this.$components.modal.modalIds.length > 0"
@@ -66,6 +67,7 @@ import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTabBar from "@/rendererProcess/components/top/VTabBar.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VBoardProperty from "@/rendererProcess/components/top/VBoardProperty.vue";
+import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VInfo from "@/rendererProcess/components/info/VInfo.vue";
@@ -97,7 +99,8 @@ import { minimId } from "@/commons/utils/utils";
     VComplement,
     VInfo,
     VSettings,
-    VDialog
+    VDialog,
+    VUtilsBar
   },
 })
 export default class MainIndex extends Vue {

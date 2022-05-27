@@ -644,6 +644,11 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
             window?.close();
           }
         },
+        windowToggleDevTools: async (event) => {
+          const log = mainLogger.logChunk();
+          log.log("#Toggle Dev Tools");
+          getWindowFromEvent(event)?.webContents.toggleDevTools();
+        },
         getPlatform: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Platform");
@@ -909,7 +914,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "?browser").then(() => {
         if (!process.env.IS_TEST) {
-          window.webContents.openDevTools({ mode: "detach" });
+          window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {
@@ -951,7 +956,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "?main").then(() => {
         if (!process.env.IS_TEST) {
-          window.webContents.openDevTools({ mode: "detach" });
+          window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {

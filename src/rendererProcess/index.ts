@@ -15,6 +15,7 @@ import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/com
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
 (async () => {
   AnimatedGIFLoader.add?.();
@@ -38,4 +39,11 @@ import { API } from "@/rendererProcess/api";
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
   app.mount("#app");
+  const keyboard = new Keyboards();
+  keyboard.down(["d"], () => {
+    if (Keyboards.pressedOR("control", "meta")) {
+      API.send("windowToggleDevTools");
+    }
+  });
+  keyboard.enabled = true;
 })();
