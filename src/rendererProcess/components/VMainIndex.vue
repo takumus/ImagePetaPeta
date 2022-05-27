@@ -100,7 +100,7 @@ import { minimId } from "@/commons/utils/utils";
     VDialog
   },
 })
-export default class Index extends Vue {
+export default class MainIndex extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: VBoard;
   @Ref("vTabBar")
@@ -306,116 +306,8 @@ export default class Index extends Vue {
 }
 </script>
 
-<style lang="scss">
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-body, html {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-  margin: 0px;
-  padding: 0px;
-  font-size: 12px;
-  font-family: "Helvetica Neue",
-    Arial,
-    "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans",
-    Meiryo,
-    sans-serif;
-}
+<style lang="scss" scoped>
 t-root {
-  --rounded: 8px;
-  & {
-    --bg-color: #ffffff;
-    --modal-bg-color: #00000070;
-    --border-color: #999999;
-    --font-color: #333333;
-    --button-bg-color: #ffffff;
-    --button-hover-bg-color: #e9e9e9;
-    --button-active-bg-color: #dddddd;
-    --tab-bg-color: #e9e9e9;
-    --tab-selected-color: #ffffff;
-    --tab-hovered-color: #f5f5f5;
-    --tab-border-color: #cccccc;
-    --window-buttons-hover: #cccccc;
-    --window-buttons-close-hover: #ff0000;
-    --contextmenu-item-color: #ffffff;
-    --contextmenu-item-hover-color: #e9e9e9;
-    --icon-filter: brightness(0.7) invert(100%);
-  }
-  &.dark {
-    --bg-color: #141414;
-    --modal-bg-color: #ffffff30;
-    --border-color: #5c5c5c;
-    --font-color: #d3d3d3;
-    --button-bg-color: #141414;
-    --button-hover-bg-color: #272727;
-    --button-active-bg-color: #3f3f3f;
-    --tab-bg-color: #272727;
-    --tab-selected-color: #141414;
-    --tab-hovered-color: #202020;
-    --tab-border-color: #444444;
-    --window-buttons-hover: #444444;
-    --window-buttons-close-hover: #ff0000;
-    --contextmenu-item-color: #272727;
-    --contextmenu-item-hover-color: #444444;
-    --icon-filter: unset;
-  }
-  background-color: var(--bg-color);
-  color: var(--font-color);
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: #cccccc;
-    border-radius: var(--rounded);
-    min-height: 16px;
-  }
-  >.border {
-    z-index: 10;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    // border: solid 1.5px var(--font-color);
-    pointer-events: none;
-  }
-  button {
-    display: inline-block;
-    border-radius: var(--rounded);
-    border: none;
-    background-color: var(--button-bg-color);
-    color: var(--font-color);
-    padding: 4px 16px;
-    height: 24px;
-    line-height: 1.0em;
-    font-size: 1.0em;
-    cursor: pointer;
-    // box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
-    border: solid 1.2px var(--border-color);
-    margin: 4px;
-    outline: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    &:hover {
-      background-color: var(--button-hover-bg-color);
-      // box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
-    }
-    &:active {
-      background-color: var(--button-active-bg-color);
-      // box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.5);
-    }
-  }
-  >t-modals {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0px;
-    left: 0px;
-    z-index: 2;
-  }
   >t-top {
     position: fixed;
     top: 0px;
@@ -424,4 +316,7 @@ t-root {
     z-index: 3;
   }
 }
+</style>
+<style lang="scss">
+@import "@/rendererProcess/components/index.scss";
 </style>

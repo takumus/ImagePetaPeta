@@ -3,7 +3,7 @@ import { createI18n } from "vue-i18n";
 // import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import languages from "@/commons/languages";
-import App from "@/rendererProcess/components/VIndex.vue";
+import App from "@/rendererProcess/components/VMainIndex.vue";
 import BrowserIndex from "@/rendererProcess/components/VBrowserIndex.vue";
 import { App as _App } from "vue";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
