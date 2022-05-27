@@ -275,7 +275,7 @@ export default class VBoard extends Vue {
           this.$components.contextMenu.open([{
             label: this.$t("boards.menu.openBrowser"),
             click: () => {
-              this.$components.browser.open();
+              API.send("openBrowser");
             }
           }, { separate: true }, {
             label: this.$t("boards.menu.resetPosition"),

@@ -136,7 +136,6 @@ export default class VBrowser extends Vue {
     this.thumbnailsResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.thumbnails);
 
-    this.$components.browser = this;
     this.thumbnailsSize = this.$states.browserTileSize;
     this.keyboards.down(["a"], this.keyA);
   }

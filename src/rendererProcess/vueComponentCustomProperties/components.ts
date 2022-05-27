@@ -10,11 +10,6 @@ interface GLOBALS {
     open: (element: any, items: string[]) => void;
     updateItems: (items: string[]) => void;
   }
-  browser: {
-    open: () => void;
-    close: () => void;
-    visible: boolean;
-  }
   info: {
     open: () => void
     close: () => void
