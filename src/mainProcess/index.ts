@@ -777,19 +777,6 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
           draggingPreviewWindow.destroy();
           return ids;
         },
-        updateState: async (event, stateSet) => {
-          const log = mainLogger.logChunk();
-          log.log("#UpadteState");
-          try {
-            log.log(stateSet.key, "=", stateSet.value);
-            (dataStates.data as any)[stateSet.key] = stateSet.value;
-            dataStates.save();
-            return true;
-          } catch (error) {
-            log.error(error);
-          }
-          return false;
-        },
         updateStates: async (event, states) => {
           const log = mainLogger.logChunk();
           try {

@@ -65,7 +65,6 @@ import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplica
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
-import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
     VBrowser,

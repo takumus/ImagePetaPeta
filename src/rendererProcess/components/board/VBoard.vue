@@ -73,7 +73,6 @@ import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
-import { StateSet } from "@/commons/datas/states";
 // PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -654,7 +653,6 @@ export default class VBoard extends Vue {
       }
     });
     Cursor.setDefaultCursor();
-    // API.send("updateState", StateSet("loadedPetaBoardId", this.board.id));
     this.$states.loadedPetaBoardId = this.board.id;
   }
   async createPPanel(petaPanel: PetaPanel) {

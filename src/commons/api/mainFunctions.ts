@@ -3,7 +3,7 @@ import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
-import { States, StateSet } from "@/commons/datas/states";
+import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 
@@ -28,7 +28,6 @@ export interface MainFunctions {
   openImageFile: (petaImage: PetaImage) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;
   getStates: () => Promise<States>;
-  updateState: (stateSet: StateSet) => Promise<boolean>;
   updateStates: (states: States) => Promise<boolean>;
   showDBFolder: () => Promise<boolean>;
   showConfigFolder: () => Promise<boolean>;

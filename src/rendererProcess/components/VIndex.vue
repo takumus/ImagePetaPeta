@@ -84,7 +84,6 @@ import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplica
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
-import { StateSet } from "@/commons/datas/states";
 @Options({
   components: {
     VBrowser,
@@ -231,8 +230,6 @@ export default class Index extends Vue {
       return;
     }
     logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
-    // API.send("updateState", StateSet("selectedPetaBoardId", board.id));
-    // API.send("updateState", StateSet("loadedPetaBoardId", ""));
     this.$states.selectedPetaBoardId = board.id;
     this.$states.loadedPetaBoardId = "";
     if (this.errorPetaBoardId == board.id) {
