@@ -376,7 +376,7 @@ import { WindowType } from "@/commons/datas/windowType";
           try {
             log.log("#Get PetaImages");
             const petaImages = await petaDatas.getPetaImages();
-            log.log("return:", petaImages.length);
+            log.log("return:", true);
             return petaImages;
           } catch(e) {
             log.error(e);
