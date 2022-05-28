@@ -301,7 +301,7 @@ import { WindowType } from "@/commons/datas/windowType";
           log.log("#Browse Image Files");
           const window = getWindowFromEvent(event);
           if (window) {
-            const result = await dialog.showOpenDialog(window, {
+            const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"]
             });
             if (result.canceled) {
@@ -320,7 +320,7 @@ import { WindowType } from "@/commons/datas/windowType";
           log.log("#Browse Image Directories");
           const window = getWindowFromEvent(event);
           if (window) {
-            const result = await dialog.showOpenDialog(window, {
+            const result = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"]
             });
             if (result.canceled) {
@@ -603,7 +603,7 @@ import { WindowType } from "@/commons/datas/windowType";
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = getWindowFromEvent(event)?.isFocused() ? true : false;
+          const isFocued = getWindowFromEvent(event)?.window.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -616,17 +616,17 @@ import { WindowType } from "@/commons/datas/windowType";
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          getWindowFromEvent(event)?.minimize();
+          getWindowFromEvent(event)?.window.minimize();
         },
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
           const window = getWindowFromEvent(event);
-          if (window?.isMaximized()) {
-            window?.unmaximize();
+          if (window?.window.isMaximized()) {
+            window?.window.unmaximize();
             return;
           }
-          window?.maximize();
+          window?.window.maximize();
         },
         windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
@@ -635,17 +635,17 @@ import { WindowType } from "@/commons/datas/windowType";
           if (window === mainWindow) {
             app.quit();
           } else {
-            window?.close();
+            window?.window.close();
           }
         },
         windowActivate: async (event) => {
-          getWindowFromEvent(event)?.moveTop();
-          getWindowFromEvent(event)?.focus();
+          getWindowFromEvent(event)?.window.moveTop();
+          getWindowFromEvent(event)?.window.focus();
         },
         windowToggleDevTools: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Toggle Dev Tools");
-          getWindowFromEvent(event)?.webContents.toggleDevTools();
+          getWindowFromEvent(event)?.window.webContents.toggleDevTools();
         },
         getPlatform: async (event) => {
           const log = mainLogger.logChunk();
@@ -675,7 +675,7 @@ import { WindowType } from "@/commons/datas/windowType";
           log.log("#Browse PetaImage Directory");
           const window = getWindowFromEvent(event);
           if (window) {
-            const file = await dialog.showOpenDialog(window, {
+            const file = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"]
             });
             if (file.canceled) {
@@ -1095,9 +1095,15 @@ import { WindowType } from "@/commons/datas/windowType";
   }
   function getWindowFromEvent(event: IpcMainInvokeEvent) {
     if (mainWindow?.webContents.mainFrame === event.sender.mainFrame) {
-      return mainWindow;
+      return {
+        window: mainWindow,
+        type: WindowType.MAIN
+      };
     } else if (browserWindow?.webContents.mainFrame === event.sender.mainFrame) {
-      return browserWindow;
+      return {
+        window: browserWindow,
+        type: WindowType.BROWSER
+      };
     }
     return undefined;
   }
