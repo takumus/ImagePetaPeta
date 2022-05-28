@@ -296,11 +296,12 @@ import { WindowType } from "@/commons/datas/windowType";
         showMainWindow: async () => {
           checkUpdate();
         },
-        importImageFiles: async () => {
+        importImageFiles: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          if (mainWindow) {
-            const result = await dialog.showOpenDialog(mainWindow, {
+          const window = getWindowFromEvent(event);
+          if (window) {
+            const result = await dialog.showOpenDialog(window, {
               properties: ["openFile", "multiSelections"]
             });
             if (result.canceled) {
@@ -314,11 +315,12 @@ import { WindowType } from "@/commons/datas/windowType";
           log.log("window is not ready");
           return 0;
         },
-        importImageDirectories: async () => {
+        importImageDirectories: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
-          if (mainWindow) {
-            const result = await dialog.showOpenDialog(mainWindow, {
+          const window = getWindowFromEvent(event);
+          if (window) {
+            const result = await dialog.showOpenDialog(window, {
               properties: ["openDirectory"]
             });
             if (result.canceled) {
@@ -671,8 +673,9 @@ import { WindowType } from "@/commons/datas/windowType";
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          if (browserWindow) {
-            const file = await dialog.showOpenDialog(browserWindow, {
+          const window = getWindowFromEvent(event);
+          if (window) {
+            const file = await dialog.showOpenDialog(window, {
               properties: ["openDirectory"]
             });
             if (file.canceled) {
