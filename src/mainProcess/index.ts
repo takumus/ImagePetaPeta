@@ -298,7 +298,7 @@ import { WindowType } from "@/commons/datas/windowType";
         importImageFiles: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          const window = getWindowFromEvent(event);
+          const window = getWindowByEvent(event);
           if (window) {
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"]
@@ -317,7 +317,7 @@ import { WindowType } from "@/commons/datas/windowType";
         importImageDirectories: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
-          const window = getWindowFromEvent(event);
+          const window = getWindowByEvent(event);
           if (window) {
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"]
@@ -602,7 +602,7 @@ import { WindowType } from "@/commons/datas/windowType";
         getWindowIsFocused: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = getWindowFromEvent(event)?.window.isFocused() ? true : false;
+          const isFocued = getWindowByEvent(event)?.window.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -615,12 +615,12 @@ import { WindowType } from "@/commons/datas/windowType";
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          getWindowFromEvent(event)?.window.minimize();
+          getWindowByEvent(event)?.window.minimize();
         },
         windowMaximize: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          const window = getWindowFromEvent(event);
+          const window = getWindowByEvent(event);
           if (window?.window.isMaximized()) {
             window?.window.unmaximize();
             return;
@@ -630,7 +630,7 @@ import { WindowType } from "@/commons/datas/windowType";
         windowClose: async (event, quit) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          const window = getWindowFromEvent(event);
+          const window = getWindowByEvent(event);
           if (window?.type === WindowType.MAIN) {
             app.quit();
           } else {
@@ -638,13 +638,13 @@ import { WindowType } from "@/commons/datas/windowType";
           }
         },
         windowActivate: async (event) => {
-          getWindowFromEvent(event)?.window.moveTop();
-          getWindowFromEvent(event)?.window.focus();
+          getWindowByEvent(event)?.window.moveTop();
+          getWindowByEvent(event)?.window.focus();
         },
         windowToggleDevTools: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Toggle Dev Tools");
-          getWindowFromEvent(event)?.window.webContents.toggleDevTools();
+          getWindowByEvent(event)?.window.webContents.toggleDevTools();
         },
         getPlatform: async (event) => {
           const log = mainLogger.logChunk();
@@ -672,7 +672,7 @@ import { WindowType } from "@/commons/datas/windowType";
         browsePetaImageDirectory: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          const window = getWindowFromEvent(event);
+          const window = getWindowByEvent(event);
           if (window) {
             const file = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"]
@@ -1092,7 +1092,7 @@ import { WindowType } from "@/commons/datas/windowType";
     }
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
-  function getWindowFromEvent(event: IpcMainInvokeEvent) {
+  function getWindowByEvent(event: IpcMainInvokeEvent) {
     const windowSet = Object.keys(windows).map((key) => {
       return {
         type: key as WindowType,
