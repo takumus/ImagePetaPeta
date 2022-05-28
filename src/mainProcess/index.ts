@@ -636,6 +636,10 @@ import { WindowType } from "@/commons/datas/windowType";
             window?.close();
           }
         },
+        windowActivate: async (event) => {
+          getWindowFromEvent(event)?.moveTop();
+          getWindowFromEvent(event)?.focus();
+        },
         windowToggleDevTools: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Toggle Dev Tools");
@@ -855,6 +859,7 @@ import { WindowType } from "@/commons/datas/windowType";
             browserWindow = initBrowserWindow();
           } else {
             browserWindow?.moveTop();
+            browserWindow?.focus();
           }
         }
       }

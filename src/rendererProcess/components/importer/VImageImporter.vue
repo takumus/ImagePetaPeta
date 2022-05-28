@@ -26,6 +26,7 @@ export default class VImageImporter extends Vue {
       event.preventDefault();
       event.stopPropagation();
       if (event.dataTransfer) {
+        API.send("windowActivate");
         const htmls = [event.dataTransfer.getData('text/html')];
         const fileList: File[] = [];
         for (const file of event.dataTransfer.files) {

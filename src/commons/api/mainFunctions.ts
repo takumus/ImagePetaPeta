@@ -39,6 +39,7 @@ export interface MainFunctions {
   windowMaximize: () => Promise<void>;
   windowMinimize: () => Promise<void>;
   windowClose: (quit: boolean) => Promise<void>;
+  windowActivate: () => Promise<void>;
   getPlatform: () => Promise<NodeJS.Platform>;
   regenerateMetadatas: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;

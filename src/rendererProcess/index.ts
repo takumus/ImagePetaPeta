@@ -14,23 +14,27 @@ import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
+import * as GlobalWindowType from "@/rendererProcess/vueComponentCustomProperties/windowType";
 import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProperties/windowIsFocused";
 
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
+import { WindowType } from "@/commons/datas/windowType";
 (async () => {
+  const windowType = GlobalWindowType.createPlugin();
   AnimatedGIFLoader.add?.();
-  const isBrowser = location.search.includes("?browser");
-  console.log(isBrowser ? "BROWSER" : "MAIN");
-  const app = isBrowser ? createApp(BrowserIndex) : createApp(App);
-  const appUse = async (plugin: Plugin) => await plugin.install!(app);
+  const app = windowType.windowType === WindowType.BROWSER ? createApp(BrowserIndex) : createApp(App);
+  async function appUse(plugin: Plugin) {
+    return await plugin.install?.(app);
+  }
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
   });
   const platform = await API.send("getPlatform");
   appUse(i18n);
+  appUse(windowType);
   appUse(GlobalSystemInfo.createPlugin(platform));
   appUse(GlobalDefines);
   appUse(GlobalAPI);
@@ -41,6 +45,7 @@ import { API } from "@/rendererProcess/api";
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
   await appUse(GlobalWindowIsFocused.createPlugin());
+  console.log("WindowType:", windowType.windowType);
   app.mount("#app");
   const keyboard = new Keyboards();
   keyboard.down(["d"], () => {
