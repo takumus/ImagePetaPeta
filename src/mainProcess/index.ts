@@ -48,8 +48,7 @@ import { WindowType } from "@/commons/datas/windowType";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  let mainWindow: BrowserWindow | undefined = undefined;
-  let browserWindow: BrowserWindow | undefined = undefined;
+  const windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -181,8 +180,8 @@ import { WindowType } from "@/commons/datas/windowType";
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
-    if (mainWindow?.isDestroyed() || mainWindow === undefined) {
-      mainWindow = initMainWindow();
+    if (windows.main?.isDestroyed() || windows.main === undefined) {
+      windows.main = initMainWindow();
     }
   });
   app.on("before-quit", (event) => {
@@ -281,8 +280,8 @@ import { WindowType } from "@/commons/datas/windowType";
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    mainWindow = initMainWindow();
-    // browserWindow = initBrowserWindow();
+    windows.main = initMainWindow();
+    // windows.browser = initBrowserWindow();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -578,7 +577,7 @@ import { WindowType } from "@/commons/datas/windowType";
           try {
             log.log("#Update Settings");
             dataSettings.data = settings;
-            mainWindow?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            windows.main?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             dataSettings.save();
             emitMainEvent("updateSettings", settings);
             log.log("return:", dataSettings.data);
@@ -611,7 +610,7 @@ import { WindowType } from "@/commons/datas/windowType";
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
-          mainWindow?.webContents.setZoomLevel(level);
+          windows.main?.webContents.setZoomLevel(level);
         },
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
@@ -632,7 +631,7 @@ import { WindowType } from "@/commons/datas/windowType";
           const log = mainLogger.logChunk();
           log.log("#Window Close");
           const window = getWindowFromEvent(event);
-          if (window === mainWindow) {
+          if (window?.type === WindowType.MAIN) {
             app.quit();
           } else {
             window?.window.close();
@@ -858,11 +857,11 @@ import { WindowType } from "@/commons/datas/windowType";
           return petaImages.map((petaImage) => petaImage.id);
         },
         openBrowser: async () => {
-          if (browserWindow?.isDestroyed() || browserWindow === undefined) {
-            browserWindow = initBrowserWindow();
+          if (windows.browser?.isDestroyed() || windows.browser === undefined) {
+            windows.browser = initBrowserWindow();
           } else {
-            browserWindow?.moveTop();
-            browserWindow?.focus();
+            windows.browser?.moveTop();
+            windows.browser?.focus();
           }
         }
       }
@@ -878,18 +877,18 @@ import { WindowType } from "@/commons/datas/windowType";
       mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
-      if (mainWindow && quit) {
-        mainWindow.loadURL("data:text/html;charset=utf-8,");
+      if (windows.main && quit) {
+        windows.main.loadURL("data:text/html;charset=utf-8,");
       }
     } catch { }
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    if (mainWindow !== undefined && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send(key, ...args);
+    if (windows.main !== undefined && !windows.main.isDestroyed()) {
+      windows.main.webContents.send(key, ...args);
     }
-    if (browserWindow !== undefined && !browserWindow.isDestroyed()) {
-      browserWindow.webContents.send(key, ...args);
+    if (windows.browser !== undefined && !windows.browser.isDestroyed()) {
+      windows.browser.webContents.send(key, ...args);
     }
   }
   function initBrowserWindow() {
@@ -1094,15 +1093,18 @@ import { WindowType } from "@/commons/datas/windowType";
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
   function getWindowFromEvent(event: IpcMainInvokeEvent) {
-    if (mainWindow?.webContents.mainFrame === event.sender.mainFrame) {
+    const windowSet = Object.keys(windows).map((key) => {
       return {
-        window: mainWindow,
-        type: WindowType.MAIN
-      };
-    } else if (browserWindow?.webContents.mainFrame === event.sender.mainFrame) {
-      return {
-        window: browserWindow,
-        type: WindowType.BROWSER
+        type: key as WindowType,
+        window: windows[key as WindowType]
+      }
+    }).find((window) => {
+      return window.window?.webContents.mainFrame === event.sender.mainFrame
+    });
+    if (windowSet && windowSet.window !== undefined) {
+      return windowSet as {
+        type: WindowType,
+        window: BrowserWindow
       };
     }
     return undefined;
