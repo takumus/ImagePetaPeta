@@ -180,7 +180,7 @@ import { WindowType } from "@/commons/datas/windowType";
     }
   }]);
   app.on("activate", async () => {
-    mainLogger.logChunk().log("#Electron event: activate");
+    mainLogger.logChunk().log("$Electron event: activate");
     if (mainWindow?.isDestroyed() || mainWindow === undefined) {
       mainWindow = initMainWindow();
     }
@@ -872,7 +872,7 @@ import { WindowType } from "@/commons/datas/windowType";
   //-------------------------------------------------------------------------------------------------//
   function showError(error: ErrorWindowParameters, quit = true) {
     try {
-      mainLogger.logChunk().log("#Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
+      mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
       if (mainWindow && quit) {
@@ -890,6 +890,7 @@ import { WindowType } from "@/commons/datas/windowType";
     }
   }
   function initBrowserWindow() {
+    mainLogger.logChunk().log("$Init Browser Window");
     const window = new BrowserWindow({
       width: dataStates.data.browserWindow.width,
       height: dataStates.data.browserWindow.height,
@@ -922,6 +923,7 @@ import { WindowType } from "@/commons/datas/windowType";
       window.maximize();
     }
     window.on("close", () => {
+      mainLogger.logChunk().log("#Destroy Browser Window");
       if (!window.isMaximized()) {
         dataStates.data.browserWindow.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
         dataStates.data.browserWindow.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
@@ -938,6 +940,7 @@ import { WindowType } from "@/commons/datas/windowType";
     return window;
   }
   function initMainWindow() {
+    mainLogger.logChunk().log("$Init Main Window");
     const window = new BrowserWindow({
       width: dataStates.data.mainWindow.width,
       height: dataStates.data.mainWindow.height,
@@ -982,6 +985,7 @@ import { WindowType } from "@/commons/datas/windowType";
       window.maximize();
     }
     window.on("close", () => {
+      mainLogger.logChunk().log("$Destroy Main Window");
       if (!window.isMaximized()) {
         dataStates.data.mainWindow.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
         dataStates.data.mainWindow.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
