@@ -171,6 +171,18 @@ import { WindowType } from "@/commons/datas/windowType";
     electronのready前にやらないといけない事
   */
   //-------------------------------------------------------------------------------------------------//
+  const windowPreferences: Electron.BrowserWindowConstructorOptions = {
+    minWidth: WINDOW_MIN_WIDTH,
+    minHeight: WINDOW_MIN_HEIGHT,
+    frame: false,
+    titleBarStyle: "hiddenInset",
+    show: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: Path.join(__dirname, "preload.js")
+    },
+  };
   protocol.registerSchemesAsPrivileged([{
     scheme: "app",
     privileges: {
@@ -891,120 +903,68 @@ import { WindowType } from "@/commons/datas/windowType";
       windows.browser.webContents.send(key, ...args);
     }
   }
-  function initBrowserWindow() {
-    mainLogger.logChunk().log("$Init Browser Window");
-    const window = new BrowserWindow({
-      width: dataStates.data.browserWindow.width,
-      height: dataStates.data.browserWindow.height,
-      minWidth: WINDOW_MIN_WIDTH,
-      minHeight: WINDOW_MIN_HEIGHT,
-      frame: false,
-      titleBarStyle: "hiddenInset",
-      show: true,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        preload: Path.join(__dirname, "preload.js")
-      },
-      trafficLightPosition: {
-        x: 8,
-        y: 8
-      }
-    });
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(getEntryURL(process.env.WEBPACK_DEV_SERVER_URL, WindowType.BROWSER)).then(() => {
-        if (!process.env.IS_TEST) {
-          window.webContents.openDevTools({ mode: "right" });
-        }
-      })
-    } else {
-      window.loadURL(getEntryURL("app://./index.html", WindowType.BROWSER));
-    }
-    window.setMenuBarVisibility(false);
-    if (dataStates.data.browserWindow.maximized) {
+  function initWindow(window: BrowserWindow, type: WindowType) {
+    const state = dataStates.data.windows[type];
+    if (state.maximized) {
       window.maximize();
     }
     window.on("close", () => {
-      mainLogger.logChunk().log("#Destroy Browser Window");
+      mainLogger.logChunk().log(`$Destroy ${type} Window`);
       if (!window.isMaximized()) {
-        dataStates.data.browserWindow.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-        dataStates.data.browserWindow.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+        state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+        state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
       }
-      dataStates.data.browserWindow.maximized = window.isMaximized();
-      dataStates.save();
-    });
-    window.addListener("blur", () => {
-      emitMainEvent("windowFocused", false, WindowType.BROWSER);
-    });
-    window.addListener("focus", () => {
-      emitMainEvent("windowFocused", true, WindowType.BROWSER);
-    });
-    return window;
-  }
-  function initMainWindow() {
-    mainLogger.logChunk().log("$Init Main Window");
-    const window = new BrowserWindow({
-      width: dataStates.data.mainWindow.width,
-      height: dataStates.data.mainWindow.height,
-      minWidth: WINDOW_MIN_WIDTH,
-      minHeight: WINDOW_MIN_HEIGHT,
-      frame: false,
-      titleBarStyle: "hiddenInset",
-      show: true,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        preload: Path.join(__dirname, "preload.js")
-      },
-      trafficLightPosition: {
-        x: 13,
-        y: 13
-      }
-    });
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(getEntryURL(process.env.WEBPACK_DEV_SERVER_URL, WindowType.MAIN)).then(() => {
-        if (!process.env.IS_TEST) {
-          window.webContents.openDevTools({ mode: "right" });
-        }
-      })
-    } else {
-      window.loadURL(getEntryURL("app://./index.html", WindowType.MAIN));
-    }
-    window.setMenuBarVisibility(false);
-    // window.webContents.debugger.attach("1.1");
-    // console.log(window.webContents.debugger.isAttached(), window.webContents.debugger);
-    // window.webContents.debugger.on('detach', (event, reason) => {
-    //   console.log('Debugger detached due to : ', reason)
-    // })
-    // window.webContents.debugger.on("message", (event, method, params) => {
-    //   if (method == "Network.responseReceived") {
-    //     console.log(params.response);
-    //   }
-    //   console.log(method, params);
-    // })
-    // window.webContents.debugger.sendCommand('Network.enable');
-    if (dataStates.data.mainWindow.maximized) {
-      window.maximize();
-    }
-    window.on("close", () => {
-      mainLogger.logChunk().log("$Destroy Main Window");
-      if (!window.isMaximized()) {
-        dataStates.data.mainWindow.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-        dataStates.data.mainWindow.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
-      }
-      dataStates.data.mainWindow.maximized = window.isMaximized();
+      state.maximized = window.isMaximized();
       dataStates.save();
       if (process.platform !== "darwin") {
         draggingPreviewWindow.destroy();
       }
     });
     window.addListener("blur", () => {
-      emitMainEvent("windowFocused", false, WindowType.MAIN);
+      emitMainEvent("windowFocused", false, type);
     });
     window.addListener("focus", () => {
-      emitMainEvent("windowFocused", true, WindowType.MAIN);
+      emitMainEvent("windowFocused", true, type);
     });
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      window.loadURL(getEntryURL(process.env.WEBPACK_DEV_SERVER_URL, type)).then(() => {
+        if (!process.env.IS_TEST) {
+          window.webContents.openDevTools({ mode: "right" });
+        }
+      })
+    } else {
+      window.loadURL(getEntryURL("app://./index.html", type));
+    }
+  }
+  function initBrowserWindow() {
+    mainLogger.logChunk().log("$Init Browser Window");
+    const window = new BrowserWindow({
+      ...windowPreferences,
+      width: dataStates.data.windows.browser.width,
+      height: dataStates.data.windows.browser.height,
+      trafficLightPosition: {
+        x: 8,
+        y: 8
+      }
+    });
+    window.setMenuBarVisibility(false);
+    initWindow(window, WindowType.BROWSER);
+    return window;
+  }
+  function initMainWindow() {
+    mainLogger.logChunk().log("$Init Main Window");
+    const window = new BrowserWindow({
+      ...windowPreferences,
+      width: dataStates.data.windows.main.width,
+      height: dataStates.data.windows.main.height,
+      trafficLightPosition: {
+        x: 13,
+        y: 13
+      }
+    });
+    window.setMenuBarVisibility(false);
     window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+    initWindow(window, WindowType.MAIN);
     return window;
   }
   async function prepareUpdate(remote: RemoteBinaryInfo) {

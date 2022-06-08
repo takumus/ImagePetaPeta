@@ -1,4 +1,5 @@
 import { WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH } from "@/commons/defines";
+import { WindowType } from "./windowType";
 
 export const defaultStates = {
   // windowSize: { width: WINDOW_DEFAULT_WIDTH, height: WINDOW_DEFAULT_HEIGHT },
@@ -7,16 +8,32 @@ export const defaultStates = {
   browserTileSize: 128,
   visibleLayerPanel: true,
   loadedPetaBoardId: "",
-  mainWindow: {
-    width: WINDOW_DEFAULT_WIDTH,
-    height: WINDOW_DEFAULT_HEIGHT,
-    maximized: false,
-  },
-  browserWindow: {
-    width: WINDOW_DEFAULT_WIDTH,
-    height: WINDOW_DEFAULT_HEIGHT,
-    maximized: false,
-  }
+  windows: {
+    main: {
+      width: WINDOW_DEFAULT_WIDTH,
+      height: WINDOW_DEFAULT_HEIGHT,
+      maximized: false
+    },
+    browser: {
+      width: WINDOW_DEFAULT_WIDTH,
+      height: WINDOW_DEFAULT_HEIGHT,
+      maximized: false
+    },
+    settings: {
+      width: WINDOW_DEFAULT_WIDTH,
+      height: WINDOW_DEFAULT_HEIGHT,
+      maximized: false
+    },
+    details: {
+      width: WINDOW_DEFAULT_WIDTH,
+      height: WINDOW_DEFAULT_HEIGHT,
+      maximized: false
+    }
+  } as { [key in WindowType]: {
+    width: number,
+    height: number,
+    maximized: boolean,
+  } }
 }
 // export interface StateSet {
 //   key: string,
