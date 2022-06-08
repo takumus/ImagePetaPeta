@@ -171,18 +171,6 @@ import { WindowType } from "@/commons/datas/windowType";
     electronのready前にやらないといけない事
   */
   //-------------------------------------------------------------------------------------------------//
-  const windowPreferences: Electron.BrowserWindowConstructorOptions = {
-    minWidth: WINDOW_MIN_WIDTH,
-    minHeight: WINDOW_MIN_HEIGHT,
-    frame: false,
-    titleBarStyle: "hiddenInset",
-    show: true,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      preload: Path.join(__dirname, "preload.js")
-    },
-  };
   protocol.registerSchemesAsPrivileged([{
     scheme: "app",
     privileges: {
@@ -903,13 +891,28 @@ import { WindowType } from "@/commons/datas/windowType";
       windows.browser.webContents.send(key, ...args);
     }
   }
-  function initWindow(window: BrowserWindow, type: WindowType) {
+  function createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
+    const window = new BrowserWindow({
+      minWidth: WINDOW_MIN_WIDTH,
+      minHeight: WINDOW_MIN_HEIGHT,
+      frame: false,
+      titleBarStyle: "hiddenInset",
+      show: true,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: Path.join(__dirname, "preload.js")
+      },
+      ...options,
+    })
     const state = dataStates.data.windows[type];
+    mainLogger.logChunk().log("$Create Window:", type);
+    window.setMenuBarVisibility(false);
     if (state.maximized) {
       window.maximize();
     }
     window.on("close", () => {
-      mainLogger.logChunk().log(`$Destroy ${type} Window`);
+      mainLogger.logChunk().log("$Destroy Window:", type);
       if (!window.isMaximized()) {
         state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
         state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
@@ -927,19 +930,18 @@ import { WindowType } from "@/commons/datas/windowType";
       emitMainEvent("windowFocused", true, type);
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(getEntryURL(process.env.WEBPACK_DEV_SERVER_URL, type)).then(() => {
+      window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}?${type}`).then(() => {
         if (!process.env.IS_TEST) {
           window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {
-      window.loadURL(getEntryURL("app://./index.html", type));
+      window.loadURL(`app://./index.html?${type}`);
     }
+    return window;
   }
   function initBrowserWindow() {
-    mainLogger.logChunk().log("$Init Browser Window");
-    const window = new BrowserWindow({
-      ...windowPreferences,
+    return createWindow(WindowType.BROWSER, {
       width: dataStates.data.windows.browser.width,
       height: dataStates.data.windows.browser.height,
       trafficLightPosition: {
@@ -947,25 +949,17 @@ import { WindowType } from "@/commons/datas/windowType";
         y: 8
       }
     });
-    window.setMenuBarVisibility(false);
-    initWindow(window, WindowType.BROWSER);
-    return window;
   }
   function initMainWindow() {
-    mainLogger.logChunk().log("$Init Main Window");
-    const window = new BrowserWindow({
-      ...windowPreferences,
+    return createWindow(WindowType.MAIN, {
       width: dataStates.data.windows.main.width,
       height: dataStates.data.windows.main.height,
       trafficLightPosition: {
         x: 13,
         y: 13
-      }
+      },
+      alwaysOnTop: dataSettings.data.alwaysOnTop
     });
-    window.setMenuBarVisibility(false);
-    window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
-    initWindow(window, WindowType.MAIN);
-    return window;
   }
   async function prepareUpdate(remote: RemoteBinaryInfo) {
     updateInstallerFilePath = Path.resolve(DIR_DOWNLOAD, `ImagePetaPeta-${remote.version}.exe`);
@@ -1068,9 +1062,6 @@ import { WindowType } from "@/commons/datas/windowType";
       };
     }
     return undefined;
-  }
-  function getEntryURL(baseURL: string, windowType: WindowType) {
-    return baseURL + "?" + windowType;
   }
   function relaunch() {
     app.relaunch();
