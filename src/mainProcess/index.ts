@@ -627,7 +627,7 @@ import { WindowType } from "@/commons/datas/windowType";
           }
           window?.window.maximize();
         },
-        windowClose: async (event, quit) => {
+        windowClose: async (event) => {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
           const window = getWindowByEvent(event);

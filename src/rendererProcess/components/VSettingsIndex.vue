@@ -6,7 +6,7 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar :isBrowser="true"></VTitleBar>
+        <VTitleBar></VTitleBar>
       </t-top>
       <t-browser>
         <VSettings />
