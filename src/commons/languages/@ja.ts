@@ -123,6 +123,7 @@ const ja = {
     browser: "ブラウザ",
     datas: "データ",
     others: "その他",
+    info: "情報",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions: "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",

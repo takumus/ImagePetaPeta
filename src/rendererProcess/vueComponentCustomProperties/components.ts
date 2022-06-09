@@ -10,10 +10,6 @@ interface GLOBALS {
     open: (element: any, items: string[]) => void;
     updateItems: (items: string[]) => void;
   }
-  info: {
-    open: () => void
-    close: () => void
-  }
   dialog: {
     show: (label: string, items: string[]) => Promise<number>
   }

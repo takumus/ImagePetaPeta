@@ -155,6 +155,40 @@
         </label><br>
         <p>{{$t("settings.showFPSDescriptions")}}</p>
       </t-content>
+      <t-content v-show="currentTab == 'info'" class="info">
+        <p>
+          {{ $appInfo.name }} {{ $appInfo.version }}
+        </p>
+        <button
+          tabindex="-1"
+          @click="gotoGithub">
+          {{$t("info.githubButton")}}
+        </button>
+        <button
+          tabindex="-1"
+          @click="gotoIssues">
+          {{$t("info.issuesButton")}}
+        </button>
+        <p></p>
+        <button
+          tabindex="-1"
+          @click="showDBFolder">
+          {{$t("info.dbFolderButton")}}
+        </button>
+        <button
+          tabindex="-1"
+          @click="showConfigFolder">
+          {{$t("info.configFolderButton")}}
+        </button>
+        <p>{{$t("info.assets")}}</p>
+        <button
+          tabindex="-1"
+          @click="gotoIcons8">
+          Icons8.com
+        </button>
+        <p>{{$t("info.licenses")}}</p>
+        <pre>{{ licenses }}</pre>
+      </t-content>
     </t-contents>
   </t-settings-root>
 </template>
@@ -168,6 +202,8 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 // Others
 import { API } from "@/rendererProcess/api";
 import { Settings } from "@/commons/datas/settings";
+import { LICENSES } from "@/@assets/licenses";
+import { SUPPORT_URL } from "@/commons/defines";
 @Options({
   components: {
     VEditableLabel
@@ -177,7 +213,7 @@ export default class VSettings extends Vue {
   regenerateMetadatasCompleted = true;
   regenerateMetadatasDone = 0;
   regenerateMetadatasCount = 0;
-  tabs = ["general", "control", "browser", "datas", "others"];
+  tabs = ["general", "control", "browser", "datas", "others", "info"];
   currentTab = "general";
   tempPetaImageDirectory = "";
   async mounted() {
@@ -221,6 +257,24 @@ export default class VSettings extends Vue {
       }
     }
   }
+  get licenses() {
+    return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n`).join('\n');
+  }
+  gotoGithub() {
+    API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
+  }
+  gotoIssues() {
+    API.send("openURL", `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(this.$appInfo.version)}`);
+  }
+  gotoIcons8() {
+    API.send("openURL", "https://icons8.com/");
+  }
+  showDBFolder() {
+    API.send("showDBFolder");
+  }
+  showConfigFolder() {
+    API.send("showConfigFolder");
+  }
 }
 </script>
 
@@ -260,6 +314,24 @@ t-settings-root {
       }
       .file-path {
         width: 100%;
+      }
+      &.info {
+        text-align: center;
+        display: block;
+        >pre {
+          text-align: left;
+          overflow: hidden;
+          word-break: break-all;
+          white-space: pre-wrap;
+          height: 128px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          font-size: 0.8em;
+        }
+        >p {
+          white-space: nowrap;
+          font-size: 1em;
+        }
       }
     }
   }

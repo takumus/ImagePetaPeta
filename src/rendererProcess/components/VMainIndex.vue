@@ -36,7 +36,6 @@
         :petaTagInfos="petaTagInfos"
         @addPanel="addPanel"
       /> -->
-      <VInfo />
       <VImageImporter
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />
@@ -69,7 +68,6 @@ import VBoardProperty from "@/rendererProcess/components/top/VBoardProperty.vue"
 import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
-import VInfo from "@/rendererProcess/components/info/VInfo.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
@@ -96,7 +94,6 @@ import { minimId } from "@/commons/utils/utils";
     VTitleBar,
     VContextMenu,
     VComplement,
-    VInfo,
     VSettings,
     VDialog,
     VUtilsBar

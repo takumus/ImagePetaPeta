@@ -24,12 +24,12 @@
       </button>
     </t-shared>
     <t-shared class=" right" v-if="$windowIsFocused.value">
-      <button
+      <!-- <button
         tabindex="-1"
-        @click="$components.info.open"
+        @click="openSettings"
       >
         <t-icon class="info"></t-icon>
-      </button>
+      </button> -->
       <button
         tabindex="-1"
         @click="openSettings"

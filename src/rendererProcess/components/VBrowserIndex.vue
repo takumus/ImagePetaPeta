@@ -20,7 +20,6 @@
     <t-modals
       v-show="this.$components.modal.modalIds.length > 0"
     >
-      <VInfo />
       <VImageImporter />
       <VTasks />
     </t-modals>
@@ -48,7 +47,6 @@ import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
-import VInfo from "@/rendererProcess/components/info/VInfo.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
@@ -64,7 +62,6 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
     VTitleBar,
     VContextMenu,
     VComplement,
-    VInfo,
     VSettings,
     VDialog,
     VUtilsBar
