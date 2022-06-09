@@ -1,10 +1,11 @@
-import { createApp, Plugin } from "vue";
+import { createApp as _createApp, Plugin } from "vue";
 import { createI18n } from "vue-i18n";
 // import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import languages from "@/commons/languages";
 import App from "@/rendererProcess/components/VMainIndex.vue";
 import BrowserIndex from "@/rendererProcess/components/VBrowserIndex.vue";
+import SettingsIndex from "@/rendererProcess/components/VSettingsIndex.vue";
 import { App as _App } from "vue";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalStates from "@/rendererProcess/vueComponentCustomProperties/states";
@@ -21,10 +22,21 @@ import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/tex
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+function createApp(type: WindowType) {
+  switch(type) {
+    case WindowType.MAIN:
+      return _createApp(App);
+    case WindowType.BROWSER:
+      return _createApp(BrowserIndex);
+    case WindowType.SETTINGS:
+      return _createApp(SettingsIndex);
+  }
+  return _createApp(App);
+}
 (async () => {
   const windowType = GlobalWindowType.createPlugin();
   AnimatedGIFLoader.add?.();
-  const app = windowType.windowType === WindowType.BROWSER ? createApp(BrowserIndex) : createApp(App);
+  const app = createApp(windowType.windowType);
   async function appUse(plugin: Plugin) {
     return await plugin.install?.(app);
   }

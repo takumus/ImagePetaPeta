@@ -32,7 +32,7 @@
       </button>
       <button
         tabindex="-1"
-        @click="$components.settings.open"
+        @click="openSettings"
       >
         <t-icon class="settings"></t-icon>
       </button>
@@ -62,6 +62,9 @@ export default class VUtilsBar extends Vue {
   }
   openBrowser() {
     API.send("openBrowser");
+  }
+  openSettings() {
+    API.send("openSettings");
   }
 }
 </script>

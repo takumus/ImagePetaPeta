@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH } from "@/commons/defines";
+import { PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -863,6 +863,14 @@ import { WindowType } from "@/commons/datas/windowType";
             windows.browser?.moveTop();
             windows.browser?.focus();
           }
+        },
+        openSettings: async () => {
+          if (windows.settings?.isDestroyed() || windows.settings === undefined) {
+            windows.settings = initSettingsWindow();
+          } else {
+            windows.settings?.moveTop();
+            windows.settings?.focus();
+          }
         }
       }
     }
@@ -944,6 +952,18 @@ import { WindowType } from "@/commons/datas/windowType";
     return createWindow(WindowType.BROWSER, {
       width: dataStates.data.windows.browser.width,
       height: dataStates.data.windows.browser.height,
+      trafficLightPosition: {
+        x: 8,
+        y: 8
+      }
+    });
+  }
+  function initSettingsWindow() {
+    return createWindow(WindowType.SETTINGS, {
+      width: WINDOW_SETTINGS_WIDTH,
+      height: WINDOW_SETTINGS_HEIGHT,
+      minWidth: WINDOW_SETTINGS_WIDTH,
+      minHeight: WINDOW_SETTINGS_HEIGHT,
       trafficLightPosition: {
         x: 8,
         y: 8

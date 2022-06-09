@@ -14,10 +14,6 @@ interface GLOBALS {
     open: () => void
     close: () => void
   }
-  settings: {
-    open: () => void
-    close: () => void
-  },
   dialog: {
     show: (label: string, items: string[]) => Promise<number>
   }

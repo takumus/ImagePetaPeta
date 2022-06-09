@@ -37,7 +37,6 @@
         @addPanel="addPanel"
       /> -->
       <VInfo />
-      <VSettings />
       <VImageImporter
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />

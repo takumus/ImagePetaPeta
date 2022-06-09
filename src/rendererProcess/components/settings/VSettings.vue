@@ -1,172 +1,162 @@
 <template>
-  <VModal
-    :visible="visible"
-    :center="true"
-    :childStyle="{
-      width: '500px'
-    }"
-    :visibleCloseButton="true"
-    @close="close"
-  >
-    <t-settings-root>
-      <p>{{$t("settings.settings")}}</p>
-      <ul>
-        <li
-          v-for="tab in tabs"
-          :key="tab"
-          :class="{
-            selected: currentTab == tab
-          }"
-          @click="currentTab = tab"
+  <t-settings-root>
+    <p>{{$t("settings.settings")}}</p>
+    <ul>
+      <li
+        v-for="tab in tabs"
+        :key="tab"
+        :class="{
+          selected: currentTab == tab
+        }"
+        @click="currentTab = tab"
+      >
+        {{$t("settings." + tab)}}
+      </li>
+    </ul>
+    <t-contents>
+      <!--
+        General
+      -->
+      <t-content v-show="currentTab == 'general'">
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.darkMode"
+            :disabled="$settings.autoDarkMode"
+            @change="$settings.darkMode = Boolean($event.target.checked)"
+          >
+          {{$t("settings.darkMode")}}
+        </label>
+        <br>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.autoDarkMode"
+            @change="$settings.autoDarkMode = Boolean($event.target.checked)"
+          >
+          {{$t("settings.autoDarkMode")}}
+        </label>
+        <p>{{$t("settings.autoDarkModeDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.alwaysOnTop"
+            @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+          >
+          {{$t("settings.alwaysOnTop")}}
+        </label>
+        <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.autoAddTag"
+            @change="$settings.autoAddTag = Boolean($event.target.checked)"
+          >
+          {{$t("settings.autoAddTag")}}
+        </label>
+        <p>{{$t("settings.autoAddTagDescriptions")}}</p>
+      </t-content>
+      <!--
+        Control
+      -->
+      <t-content v-show="currentTab == 'control'">
+        <label>
+          {{$t("settings.zoomSensitivity")}}:
+        </label>
+        <input
+          type="number"
+          :value="$settings.zoomSensitivity"
+          @change="$settings.zoomSensitivity = Number($event.target.value)"
         >
-          {{$t("settings." + tab)}}
-        </li>
-      </ul>
-      <t-contents>
-        <!--
-          General
-        -->
-        <t-content v-show="currentTab == 'general'">
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.darkMode"
-              :disabled="$settings.autoDarkMode"
-              @change="$settings.darkMode = Boolean($event.target.checked)"
-            >
-            {{$t("settings.darkMode")}}
-          </label>
-          <br>
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.autoDarkMode"
-              @change="$settings.autoDarkMode = Boolean($event.target.checked)"
-            >
-            {{$t("settings.autoDarkMode")}}
-          </label>
-          <p>{{$t("settings.autoDarkModeDescriptions")}}</p>
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.alwaysOnTop"
-              @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
-            >
-            {{$t("settings.alwaysOnTop")}}
-          </label>
-          <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.autoAddTag"
-              @change="$settings.autoAddTag = Boolean($event.target.checked)"
-            >
-            {{$t("settings.autoAddTag")}}
-          </label>
-          <p>{{$t("settings.autoAddTagDescriptions")}}</p>
-        </t-content>
-        <!--
-          Control
-        -->
-        <t-content v-show="currentTab == 'control'">
-          <label>
-            {{$t("settings.zoomSensitivity")}}:
-          </label>
+        <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
+        <label>
+          {{$t("settings.moveSensitivity")}}:
+        </label>
+        <input
+          type="number"
+          :value="$settings.moveSensitivity"
+          @change="$settings.moveSensitivity = Number($event.target.value)"
+        >
+        <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
+      </t-content>
+      <!--
+        Browser
+      -->
+      <t-content v-show="currentTab == 'browser'">
+        <button
+          @click="regenerateMetadatas"
+        >
+          {{$t("settings.regenerateMetadatasButton")}}
+        </button>
+        <label
+          v-show="!regenerateMetadatasCompleted"
+        >
+          {{regenerateMetadatasDone}}/{{regenerateMetadatasCount}}
+        </label>
+        <p>{{$t("settings.regenerateMetadatasDescriptions")}}</p>
+        <label>
           <input
-            type="number"
-            :value="$settings.zoomSensitivity"
-            @change="$settings.zoomSensitivity = Number($event.target.value)"
+            type="checkbox"
+            :checked="$settings.loadThumbnailsInOriginal"
+            @change="$settings.loadThumbnailsInOriginal = Boolean($event.target.checked)"
           >
-          <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
-          <label>
-            {{$t("settings.moveSensitivity")}}:
-          </label>
+          {{$t("settings.loadThumbnailsInOriginal")}}
+        </label>
+        <p>{{$t("settings.loadThumbnailsInOriginalDescriptions")}}</p>
+      </t-content>
+      <!--
+        Datas
+      -->
+      <t-content v-show="currentTab == 'datas'">
+        <button
+          @click="browsePetaImageDirectory"
+        >
+          {{$t("settings.browsePetaImageDirectoryButton")}}
+        </button>
+        <input type="text" v-model="tempPetaImageDirectory" class="file-path">
+        <br>
+        <button
+          @click="changePetaImageDirectory"
+          :disabled="tempPetaImageDirectory == ''"
+        >
+          {{$t("settings.changePetaImageDirectoryButton")}}
+        </button>
+        <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
+      </t-content>
+      <!--
+        Others
+      -->
+      <t-content v-show="currentTab == 'others'">
+        <label>
           <input
-            type="number"
-            :value="$settings.moveSensitivity"
-            @change="$settings.moveSensitivity = Number($event.target.value)"
+            type="checkbox"
+            :checked="$settings.ignoreMinorUpdate"
+            @change="$settings.ignoreMinorUpdate = Boolean($event.target.checked)"
           >
-          <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
-        </t-content>
-        <!--
-          Browser
-        -->
-        <t-content v-show="currentTab == 'browser'">
-          <button
-            @click="regenerateMetadatas"
+          {{$t("settings.ignoreMinorUpdate")}}
+        </label><br>
+        <p>{{$t("settings.ignoreMinorUpdateDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.alwaysShowNSFW"
+            @change="$settings.alwaysShowNSFW = Boolean($event.target.checked)"
           >
-            {{$t("settings.regenerateMetadatasButton")}}
-          </button>
-          <label
-            v-show="!regenerateMetadatasCompleted"
+          {{$t("settings.alwaysShowNSFW")}}
+        </label><br>
+        <p>{{$t("settings.alwaysShowNSFWDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.showFPS"
+            @change="$settings.showFPS = Boolean($event.target.checked)"
           >
-            {{regenerateMetadatasDone}}/{{regenerateMetadatasCount}}
-          </label>
-          <p>{{$t("settings.regenerateMetadatasDescriptions")}}</p>
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.loadThumbnailsInOriginal"
-              @change="$settings.loadThumbnailsInOriginal = Boolean($event.target.checked)"
-            >
-            {{$t("settings.loadThumbnailsInOriginal")}}
-          </label>
-          <p>{{$t("settings.loadThumbnailsInOriginalDescriptions")}}</p>
-        </t-content>
-        <!--
-          Datas
-        -->
-        <t-content v-show="currentTab == 'datas'">
-          <button
-            @click="browsePetaImageDirectory"
-          >
-            {{$t("settings.browsePetaImageDirectoryButton")}}
-          </button>
-          <input type="text" v-model="tempPetaImageDirectory" class="file-path">
-          <br>
-          <button
-            @click="changePetaImageDirectory"
-            :disabled="tempPetaImageDirectory == ''"
-          >
-            {{$t("settings.changePetaImageDirectoryButton")}}
-          </button>
-          <p>{{$t("settings.changePetaImageDirectoryDescriptions")}}</p>
-        </t-content>
-        <!--
-          Others
-        -->
-        <t-content v-show="currentTab == 'others'">
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.ignoreMinorUpdate"
-              @change="$settings.ignoreMinorUpdate = Boolean($event.target.checked)"
-            >
-            {{$t("settings.ignoreMinorUpdate")}}
-          </label><br>
-          <p>{{$t("settings.ignoreMinorUpdateDescriptions")}}</p>
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.alwaysShowNSFW"
-              @change="$settings.alwaysShowNSFW = Boolean($event.target.checked)"
-            >
-            {{$t("settings.alwaysShowNSFW")}}
-          </label><br>
-          <p>{{$t("settings.alwaysShowNSFWDescriptions")}}</p>
-          <label>
-            <input
-              type="checkbox"
-              :checked="$settings.showFPS"
-              @change="$settings.showFPS = Boolean($event.target.checked)"
-            >
-            {{$t("settings.showFPS")}}
-          </label><br>
-          <p>{{$t("settings.showFPSDescriptions")}}</p>
-        </t-content>
-      </t-contents>
-    </t-settings-root>
-  </VModal>
+          {{$t("settings.showFPS")}}
+        </label><br>
+        <p>{{$t("settings.showFPSDescriptions")}}</p>
+      </t-content>
+    </t-contents>
+  </t-settings-root>
 </template>
 
 <script lang="ts">
@@ -174,19 +164,16 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
-import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { Settings } from "@/commons/datas/settings";
 @Options({
   components: {
-    VModal,
     VEditableLabel
   },
 })
 export default class VSettings extends Vue {
-  visible = false;
   regenerateMetadatasCompleted = true;
   regenerateMetadatasDone = 0;
   regenerateMetadatasCount = 0;
@@ -194,7 +181,6 @@ export default class VSettings extends Vue {
   currentTab = "general";
   tempPetaImageDirectory = "";
   async mounted() {
-    this.$components.settings = this;
     API.on("regenerateMetadatasProgress", (_, done, count) => {
       this.regenerateMetadatasDone = done;
       this.regenerateMetadatasCount = count;
@@ -205,16 +191,7 @@ export default class VSettings extends Vue {
     API.on("regenerateMetadatasComplete", (_) => {
       this.regenerateMetadatasCompleted = true;
     });
-  }
-  open() {
-    this.visible = false;
-    this.$nextTick(() => {
-      this.visible = true;
-    });
     this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
-  }
-  close() {
-    this.visible = false;
   }
   regenerateMetadatas() {
     API.send("regenerateMetadatas");
@@ -250,7 +227,10 @@ export default class VSettings extends Vue {
 <style lang="scss" scoped>
 t-settings-root {
   text-align: center;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
   >ul {
     list-style-type: none;
     padding: 0px;
@@ -264,8 +244,7 @@ t-settings-root {
     }
   }
   >t-contents {
-    // color: #333333;
-    height: 190px;
+    height: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
     display: block;
