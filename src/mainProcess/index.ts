@@ -1073,7 +1073,7 @@ import { WindowType } from "@/commons/datas/windowType";
         window: windows[key as WindowType]
       }
     }).find((window) => {
-      return window.window?.webContents.mainFrame === event.sender.mainFrame
+      return window.window && !window.window.isDestroyed() && window.window.webContents.mainFrame === event.sender.mainFrame
     });
     if (windowSet && windowSet.window !== undefined) {
       return windowSet as {
