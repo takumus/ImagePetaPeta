@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
+import { BOARD_DARK_BACKGROUND_FILL_COLOR, PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -911,6 +911,7 @@ import { WindowType } from "@/commons/datas/windowType";
         contextIsolation: true,
         preload: Path.join(__dirname, "preload.js")
       },
+      backgroundColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
       ...options,
     })
     const state = dataStates.data.windows[type];
