@@ -30,6 +30,8 @@
               :tile="data"
               :original="original"
               :petaTagInfos="petaTagInfos"
+              :parentAreaMinY="areaMinY"
+              :parentAreaMaxY="areaMaxY"
               @select="selectThumbnail"
               @menu="petaImageMenu"
               @drag="drag"

@@ -103,6 +103,10 @@ export default class VTile extends Vue {
   original = false;
   @Prop()
   petaTagInfos!: PetaTagInfo[];
+  @Prop()
+  parentAreaMinY!: number;
+  @Prop()
+  parentAreaMaxY!: number;
   imageURL = "";
   pressing = false;
   loadingImage = true;
@@ -110,6 +114,7 @@ export default class VTile extends Vue {
   click: ClickChecker = new ClickChecker();
   loadOriginalTimeoutHandler = -1;
   fetchTagsTimeoutHandler = -1;
+  loadedOriginal = false;
   mounted() {
     this.changeVisible();
   }
@@ -200,25 +205,38 @@ export default class VTile extends Vue {
     .map((pti) => pti.petaTag);
     this.loadingTags = false;
   }
-  @Watch("original")
-  changeOriginal() {
-    this.changeVisible();
-  }
   @Watch("tile.visible")
-  async changeVisible() {
+  changeVisible() {
     window.clearTimeout(this.fetchTagsTimeoutHandler);
     window.clearTimeout(this.loadOriginalTimeoutHandler);
     if (this.tile.visible) {
       this.fetchTagsTimeoutHandler = window.setTimeout(() => {
         this.fetchPetaTags();
       }, Math.random() * BROWSER_FETCH_TAGS_DELAY);
-      this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
-      if (this.original) {
-        this.loadOriginalTimeoutHandler = window.setTimeout(() => {
-          this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
-        }, BROWSER_LOAD_ORIGINAL_DELAY);
+      if (!this.loadedOriginal) {
+        this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
+        if (this.original) {
+          this.loadOriginalTimeoutHandler = window.setTimeout(() => {
+            this.imageURL = getImageURL(this.tile.petaImage, ImageType.ORIGINAL);
+            this.loadedOriginal = true;
+          }, BROWSER_LOAD_ORIGINAL_DELAY);
+        }
       }
+    } else {
+      this.loadedOriginal = false;
     }
+  }
+  @Watch("original")
+  changeOriginal() {
+    this.changeVisible();
+  }
+  @Watch("parentAreaMinY")
+  changeParentAreaMinY() {
+    this.changeVisible();
+  }
+  @Watch("parentAreaMaxY")
+  changeParentAreaMaxY() {
+    this.changeVisible();
   }
   @Watch("petaTagInfos")
   changeFetchTags() {
