@@ -577,7 +577,9 @@ import { WindowType } from "@/commons/datas/windowType";
           try {
             log.log("#Update Settings");
             dataSettings.data = settings;
+            windows.browser?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             windows.main?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            windows.settings?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
             dataSettings.save();
             emitMainEvent("updateSettings", settings);
             log.log("return:", dataSettings.data);
@@ -758,6 +760,8 @@ import { WindowType } from "@/commons/datas/windowType";
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
+          windows.main?.moveTop();
+          draggingPreviewWindow.window?.moveTop();
           event.sender.startDrag({
             file: files[0]!,
             files: files,
@@ -956,7 +960,8 @@ import { WindowType } from "@/commons/datas/windowType";
       trafficLightPosition: {
         x: 8,
         y: 8
-      }
+      },
+      alwaysOnTop: dataSettings.data.alwaysOnTop
     });
   }
   function initSettingsWindow() {
@@ -968,7 +973,8 @@ import { WindowType } from "@/commons/datas/windowType";
       trafficLightPosition: {
         x: 8,
         y: 8
-      }
+      },
+      alwaysOnTop: dataSettings.data.alwaysOnTop
     });
   }
   function initMainWindow() {
