@@ -642,11 +642,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           const log = mainLogger.logChunk();
           log.log("#Window Close");
           const window = getWindowByEvent(event);
-          if (window?.type === WindowType.MAIN && process.platform !== "darwin") {
-            app.quit();
-          } else {
-            window?.window.close();
-          }
+          window?.window.close();
         },
         windowActivate: async (event) => {
           getWindowByEvent(event)?.window.moveTop();
@@ -980,7 +976,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
   }
   function initMainWindow() {
-    return createWindow(WindowType.MAIN, {
+    const window = createWindow(WindowType.MAIN, {
       width: dataWindowStates.data.main.width,
       height: dataWindowStates.data.main.height,
       trafficLightPosition: {
@@ -989,6 +985,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       },
       alwaysOnTop: dataSettings.data.alwaysOnTop
     });
+    window.addListener("close", () => {
+      if (process.platform !== "darwin") {
+        app.quit();
+      }
+    })
+    return window;
   }
   function saveWindowSize(windowType: WindowType) {
     mainLogger.logChunk().log("$Save Window States:", windowType);
