@@ -902,19 +902,20 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
-      if (windows.board && quit) {
-        windows.board.loadURL("data:text/html;charset=utf-8,");
-      }
+      Object.values(windows).forEach((window) => {
+        if (window !== undefined && !window.isDestroyed()) {
+          window.loadURL("data:text/html;charset=utf-8,");
+        }
+      });
     } catch { }
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    if (windows.board !== undefined && !windows.board.isDestroyed()) {
-      windows.board.webContents.send(key, ...args);
-    }
-    if (windows.browser !== undefined && !windows.browser.isDestroyed()) {
-      windows.browser.webContents.send(key, ...args);
-    }
+    Object.values(windows).forEach((window) => {
+      if (window !== undefined && !window.isDestroyed()) {
+        window.webContents.send(key, ...args);
+      }
+    });
   }
   function closeWindow(type: WindowType) {
     mainLogger.logChunk().log("$Close Window:", type);
