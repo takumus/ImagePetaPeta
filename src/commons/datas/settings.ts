@@ -25,7 +25,8 @@ const defaultSettings = {
       "-n", "1",
       "--scale_ratio", "2"
     ],
-  }
+  },
+  show: "board" as ("board" | "browser" | "both")
 }
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);

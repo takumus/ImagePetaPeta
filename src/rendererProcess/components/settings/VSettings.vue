@@ -55,6 +55,17 @@
           {{$t("settings.autoAddTag")}}
         </label>
         <p>{{$t("settings.autoAddTagDescriptions")}}</p>
+        <label>
+          <select
+            @change="$settings.show = $event.target.value"
+          >
+            <option value="board" :selected="$settings.show === 'board'">{{$t("settings.showBoard")}}</option>
+            <option value="browser" :selected="$settings.show === 'browser'">{{$t("settings.showBrowser")}}</option>
+            <option value="board-browser" :selected="$settings.show === 'board-browser'">{{$t("settings.showBoardBrowser")}}</option>
+          </select>
+          {{$t("settings.show")}}
+        </label>
+        <p>{{$t("settings.showDescriptions")}}</p>
       </t-content>
       <!--
         Control

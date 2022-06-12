@@ -89,6 +89,11 @@ export function upgradeSettings(settings: Settings) {
     settings.waifu2x = deepcopy(defaultSettings.waifu2x);
     changed = true;
   }
+  // v2.8.0
+  if (settings.show === undefined) {
+    settings.show = defaultSettings.show;
+    changed = true;
+  }
   return {
     data: settings,
     changed
