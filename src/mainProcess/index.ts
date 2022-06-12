@@ -1117,7 +1117,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     log.log(remote, needToUpdate);
     if (needToUpdate) {
       log.log("this version is old");
-      prepareUpdate(remote);
+      // prepareUpdate(remote);
+      emitMainEvent("notifyUpdate", remote.version, false);
     } else {
       log.log("this version is latest");
     }
