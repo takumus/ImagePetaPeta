@@ -5,6 +5,7 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
+import { WindowStates } from "@/commons/datas/windowStates";
 import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import DB from "@/mainProcess/storages/db";
@@ -114,10 +115,14 @@ export function upgradeStates(states: States) {
     states.loadedPetaBoardId = states.selectedPetaBoardId;
     changed = true;
   }
-  // 2.7.0
-  if (states.windows === undefined) {
-    states.windows = deepcopy(defaultStates.windows);
+  return {
+    data: states,
+    changed
   }
+}
+export function upgradeWindowStates(states: WindowStates) {
+  let changed = false;
+  // 
   return {
     data: states,
     changed

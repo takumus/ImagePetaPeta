@@ -19,7 +19,7 @@ import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
-import { upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates } from "@/mainProcess/utils/upgrader";
+import { upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates, upgradeWindowStates } from "@/mainProcess/utils/upgrader";
 import { arrLast, minimId } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
@@ -36,6 +36,7 @@ import Transparent from "@/@assets/transparent.png";
 import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { WindowType } from "@/commons/datas/windowType";
+import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -63,6 +64,7 @@ import { WindowType } from "@/commons/datas/windowType";
   let FILE_IMAGES_TAGS_DB: string;
   let FILE_SETTINGS: string;
   let FILE_STATES: string;
+  let FILE_WINDOW_STATES: string;
   let dataLogger: Logger;
   let dataPetaImages: DB<PetaImage>;
   let dataPetaBoards: DB<PetaBoard>;
@@ -70,6 +72,7 @@ import { WindowType } from "@/commons/datas/windowType";
   let dataPetaImagesPetaTags: DB<PetaImagePetaTag>;
   let dataSettings: Config<Settings>;
   let dataStates: Config<States>;
+  let dataWindowStates: Config<WindowStates>;
   let petaDatas: PetaDatas;
   let updateInstallerFilePath: string;
   let checkUpdateTimeoutHandler: NodeJS.Timeout;
@@ -117,11 +120,13 @@ import { WindowType } from "@/commons/datas/windowType";
     FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
     FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
     FILE_STATES = file.initFile(DIR_APP, "states.json");
+    FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
     dataPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
     dataPetaBoards = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
     dataPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
     dataPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
     dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
+    dataWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
     [dataPetaImages, dataPetaBoards, dataPetaTags, dataPetaImagesPetaTags].forEach((db) => {
       db.on("beginCompaction", () => {
         mainLogger.logChunk().log(`begin compaction(${db.name})`);
@@ -577,9 +582,13 @@ import { WindowType } from "@/commons/datas/windowType";
           try {
             log.log("#Update Settings");
             dataSettings.data = settings;
-            windows.browser?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
-            windows.main?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
-            windows.settings?.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            Object.keys(windows).forEach((key) => {
+              const window = windows[key as WindowType];
+              if (window === undefined || window.isDestroyed()) {
+                return;
+              }
+              window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+            });
             dataSettings.save();
             emitMainEvent("updateSettings", settings);
             log.log("return:", dataSettings.data);
@@ -633,7 +642,7 @@ import { WindowType } from "@/commons/datas/windowType";
           const log = mainLogger.logChunk();
           log.log("#Window Close");
           const window = getWindowByEvent(event);
-          if (window?.type === WindowType.MAIN) {
+          if (window?.type === WindowType.MAIN && process.platform !== "darwin") {
             app.quit();
           } else {
             window?.window.close();
@@ -918,7 +927,7 @@ import { WindowType } from "@/commons/datas/windowType";
       backgroundColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
       ...options,
     })
-    const state = dataStates.data.windows[type];
+    const state = dataWindowStates.data[type];
     mainLogger.logChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);
     if (state.maximized) {
@@ -926,21 +935,14 @@ import { WindowType } from "@/commons/datas/windowType";
     }
     window.on("close", () => {
       mainLogger.logChunk().log("$Destroy Window:", type);
-      if (!window.isMaximized()) {
-        state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-        state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
-      }
-      state.maximized = window.isMaximized();
-      dataStates.save();
-      if (process.platform !== "darwin") {
-        draggingPreviewWindow.destroy();
-      }
+      saveWindowSize(type);
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false, type);
     });
     window.addListener("focus", () => {
       emitMainEvent("windowFocused", true, type);
+      window.moveTop();
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}?${type}`).then(() => {
@@ -955,8 +957,8 @@ import { WindowType } from "@/commons/datas/windowType";
   }
   function initBrowserWindow() {
     return createWindow(WindowType.BROWSER, {
-      width: dataStates.data.windows.browser.width,
-      height: dataStates.data.windows.browser.height,
+      width: dataWindowStates.data.browser.width,
+      height: dataWindowStates.data.browser.height,
       trafficLightPosition: {
         x: 8,
         y: 8
@@ -979,14 +981,28 @@ import { WindowType } from "@/commons/datas/windowType";
   }
   function initMainWindow() {
     return createWindow(WindowType.MAIN, {
-      width: dataStates.data.windows.main.width,
-      height: dataStates.data.windows.main.height,
+      width: dataWindowStates.data.main.width,
+      height: dataWindowStates.data.main.height,
       trafficLightPosition: {
         x: 13,
         y: 13
       },
       alwaysOnTop: dataSettings.data.alwaysOnTop
     });
+  }
+  function saveWindowSize(windowType: WindowType) {
+    mainLogger.logChunk().log("$Save Window States:", windowType);
+    const state = dataWindowStates.data[windowType];
+    const window = windows[windowType];
+    if (window === undefined || window.isDestroyed()) {
+      return;
+    }
+    if (!window.isMaximized()) {
+      state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+      state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+    }
+    state.maximized = window.isMaximized();
+    dataWindowStates.save();
   }
   async function prepareUpdate(remote: RemoteBinaryInfo) {
     updateInstallerFilePath = Path.resolve(DIR_DOWNLOAD, `ImagePetaPeta-${remote.version}.exe`);
