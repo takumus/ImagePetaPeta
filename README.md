@@ -3,7 +3,7 @@
 写真やイラスト資料を閲覧、管理するソフトです。
 ## インストール
 ### Windows
-下記よりzipファイルをダウンロードしてインストールしてください。  
+下記よりzipファイル **(ImagePetaPeta-beta.Setup.X.X.X-beta.zip)** をダウンロードしてインストールしてください。  
 <https://github.com/takumus/ImagePetaPeta/releases/>  
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
 <img src="./README/install01.png" width="256px">
