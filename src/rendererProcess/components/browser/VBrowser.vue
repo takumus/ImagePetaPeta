@@ -139,6 +139,7 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer.observe(this.thumbnails);
 
     this.thumbnailsSize = this.$states.browserTileSize;
+    this.keyboards.enabled = true;
     this.keyboards.down(["a"], this.keyA);
   }
   unmounted() {
@@ -297,9 +298,6 @@ export default class VBrowser extends Vue {
       }
     }
   }
-  onModalState(value: boolean) {
-    this.keyboards.enabled = value;
-  }
   @Watch("selectedPetaTags", { deep: true })
   changeSelectedTags() {
     this.currentScrollThumbnailId = "";
@@ -424,6 +422,7 @@ export default class VBrowser extends Vue {
       return;
     }
     if (Keyboards.pressedOR("control", "meta")) {
+      this.clearSelectionAllImages();
       this.filteredPetaImages.forEach((pi) => {
         pi._selected = true;
       });
