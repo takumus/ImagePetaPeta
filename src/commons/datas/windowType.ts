@@ -1,5 +1,5 @@
 export enum WindowType {
-  MAIN = "main",
+  BOARD = "board",
   BROWSER = "browser",
   SETTINGS = "settings",
   DETAILS = "details"

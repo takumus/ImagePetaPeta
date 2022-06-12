@@ -24,7 +24,7 @@ import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 function createApp(type: WindowType) {
   switch(type) {
-    case WindowType.MAIN:
+    case WindowType.BOARD:
       return _createApp(App);
     case WindowType.BROWSER:
       return _createApp(BrowserIndex);

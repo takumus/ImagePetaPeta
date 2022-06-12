@@ -8,7 +8,7 @@ export type WindowStates = {
   }
 };
 export const defaultWindowStates: WindowStates = {
-  main: {
+  board: {
     width: WINDOW_DEFAULT_WIDTH,
     height: WINDOW_DEFAULT_HEIGHT,
     maximized: false

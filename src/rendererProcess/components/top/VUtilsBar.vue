@@ -6,9 +6,9 @@
     <t-shared class="left" v-if="$windowIsFocused.value">
       <button
         tabindex="-1"
-        @click="openBrowser"
+        @click="open"
       >
-        <t-icon class="browser"></t-icon>
+        <t-icon :class="$windowType"></t-icon>
       </button>
       <button
         tabindex="-1"
@@ -47,6 +47,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 // Others
 import { API } from "@/rendererProcess/api";
+import { WindowType } from "@/commons/datas/windowType";
 @Options({
   components: {
   },
@@ -60,8 +61,12 @@ export default class VUtilsBar extends Vue {
   unmounted() {
     //
   }
-  openBrowser() {
-    API.send("openBrowser");
+  open() {
+    if (this.$windowType === WindowType.BOARD) {
+      API.send("openBrowser");
+    } else if (this.$windowType === WindowType.BROWSER) {
+      API.send("openBoard");
+    }
   }
   openSettings() {
     API.send("openSettings");
@@ -116,6 +121,9 @@ t-utils-bar-root {
           background-position: center center;
           filter: var(--icon-filter);
           &.browser {
+            background-image: url("~@/@assets/board.png");
+          }
+          &.board {
             background-image: url("~@/@assets/browser.png");
           }
           &.import-file {

@@ -185,17 +185,15 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
-    if (windows.main?.isDestroyed() || windows.main === undefined) {
-      windows.main = initMainWindow();
+    if (windows.board?.isDestroyed() || windows.board === undefined) {
+      windows.board = initBoardWindow();
     }
   });
   app.on("before-quit", (event) => {
     draggingPreviewWindow.destroy();
   });
   app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-      app.quit();
-    }
+    //
   });
   //-------------------------------------------------------------------------------------------------//
   /*
@@ -285,7 +283,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    windows.main = initMainWindow();
+    windows.board = initBoardWindow();
     // windows.browser = initBrowserWindow();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
@@ -621,7 +619,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
-          windows.main?.webContents.setZoomLevel(level);
+          windows.board?.webContents.setZoomLevel(level);
         },
         windowMinimize: async (event) => {
           const log = mainLogger.logChunk();
@@ -765,7 +763,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
-          windows.main?.moveTop();
+          windows.board?.moveTop();
           draggingPreviewWindow.window?.moveTop();
           event.sender.startDrag({
             file: files[0]!,
@@ -865,6 +863,14 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return petaImages.map((petaImage) => petaImage.id);
         },
+        openBoard: async() => {
+          if (windows.board?.isDestroyed() || windows.board === undefined) {
+            windows.board = initBoardWindow();
+          } else {
+            windows.board?.moveTop();
+            windows.board?.focus();
+          }
+        },
         openBrowser: async () => {
           if (windows.browser?.isDestroyed() || windows.browser === undefined) {
             windows.browser = initBrowserWindow();
@@ -894,18 +900,43 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
-      if (windows.main && quit) {
-        windows.main.loadURL("data:text/html;charset=utf-8,");
+      if (windows.board && quit) {
+        windows.board.loadURL("data:text/html;charset=utf-8,");
       }
     } catch { }
     showErrorWindow(error, quit);
   }
   function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    if (windows.main !== undefined && !windows.main.isDestroyed()) {
-      windows.main.webContents.send(key, ...args);
+    if (windows.board !== undefined && !windows.board.isDestroyed()) {
+      windows.board.webContents.send(key, ...args);
     }
     if (windows.browser !== undefined && !windows.browser.isDestroyed()) {
       windows.browser.webContents.send(key, ...args);
+    }
+  }
+  function closeWindow(type: WindowType) {
+    mainLogger.logChunk().log("$Close Window:", type);
+    saveWindowSize(type);
+    if (type === WindowType.SETTINGS) {
+      return;
+    }
+    const activeWindows = Object.keys(windows).filter((key) => {
+      if (key == WindowType.SETTINGS) {
+        return false;
+      }
+      if (key == type) {
+        return false;
+      }
+      const window = windows[key as WindowType];
+      if (window === undefined || window.isDestroyed()) {
+        return false;
+      }
+      return true;
+    }).map((key) => {
+      return windows[key as WindowType] as BrowserWindow;
+    });
+    if (activeWindows.length === 0 && process.platform !== "darwin") {
+      app.quit();
     }
   }
   function createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
@@ -930,8 +961,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       window.maximize();
     }
     window.on("close", () => {
-      mainLogger.logChunk().log("$Destroy Window:", type);
-      saveWindowSize(type);
+      closeWindow(type);
     });
     window.addListener("blur", () => {
       emitMainEvent("windowFocused", false, type);
@@ -975,21 +1005,21 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       alwaysOnTop: dataSettings.data.alwaysOnTop
     });
   }
-  function initMainWindow() {
-    const window = createWindow(WindowType.MAIN, {
-      width: dataWindowStates.data.main.width,
-      height: dataWindowStates.data.main.height,
+  function initBoardWindow() {
+    const window = createWindow(WindowType.BOARD, {
+      width: dataWindowStates.data.board.width,
+      height: dataWindowStates.data.board.height,
       trafficLightPosition: {
         x: 13,
         y: 13
       },
       alwaysOnTop: dataSettings.data.alwaysOnTop
     });
-    window.addListener("close", () => {
-      if (process.platform !== "darwin") {
-        app.quit();
-      }
-    })
+    // window.addListener("close", () => {
+    //   if (process.platform !== "darwin") {
+    //     app.quit();
+    //   }
+    // })
     return window;
   }
   function saveWindowSize(windowType: WindowType) {
