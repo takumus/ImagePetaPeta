@@ -904,7 +904,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     try {
       Object.values(windows).forEach((window) => {
         if (window !== undefined && !window.isDestroyed()) {
-          window.loadURL("data:text/html;charset=utf-8,");
+          window.loadURL("about:blank");
         }
       });
     } catch { }
