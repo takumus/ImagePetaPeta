@@ -84,6 +84,7 @@
       -->
       <t-content v-show="currentTab == 'browser'">
         <button
+          v-show="regenerateMetadatasCompleted"
           @click="regenerateMetadatas"
         >
           {{$t("settings.regenerateMetadatasButton")}}
