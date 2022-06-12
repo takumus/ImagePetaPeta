@@ -283,8 +283,14 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    windows.board = initBoardWindow();
-    // windows.browser = initBrowserWindow();
+    if (dataSettings.data.show === "both") {
+      windows.board = initBoardWindow();
+      windows.browser = initBrowserWindow();
+    } else if (dataSettings.data.show === "browser") {
+      windows.browser = initBrowserWindow();
+    } else {
+      windows.board = initBoardWindow();
+    }
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*

@@ -61,7 +61,7 @@
           >
             <option value="board" :selected="$settings.show === 'board'">{{$t("settings.showBoard")}}</option>
             <option value="browser" :selected="$settings.show === 'browser'">{{$t("settings.showBrowser")}}</option>
-            <option value="board-browser" :selected="$settings.show === 'board-browser'">{{$t("settings.showBoardBrowser")}}</option>
+            <option value="both" :selected="$settings.show === 'both'">{{$t("settings.showBoth")}}</option>
           </select>
           {{$t("settings.show")}}
         </label>
