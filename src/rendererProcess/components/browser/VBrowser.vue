@@ -192,7 +192,7 @@ export default class VBrowser extends Vue {
     }
     const petaImages = petaImage._selected ? [] : [petaImage];
     petaImages.push(...this.selectedPetaImages);
-    API.send("startDrag", petaImages, 128, "");
+    API.send("startDrag", petaImages, this.actualThumbnailSize, "");
     this.close();
   }
   selectThumbnail(thumb: Tile, force = false) {

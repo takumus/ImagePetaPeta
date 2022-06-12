@@ -9,6 +9,7 @@ export class DraggingPreviewWindow {
   private draggingPreviewWindow: BrowserWindow | undefined;
   private followCursorTimeoutHandler: NodeJS.Timeout | undefined;
   private isSameAll = valueChecker().isSameAll;
+  private scale = 1;
   constructor(private width = 256, private height = 256) {
     // this.createWindow();
   }
@@ -23,6 +24,7 @@ export class DraggingPreviewWindow {
     )) {
       return;
     }
+    // this.scale = screen.getDisplayNearestPoint(point).scaleFactor;
     this.move(point.x, point.y);
   }
   createWindow() {
@@ -78,12 +80,15 @@ export class DraggingPreviewWindow {
   }
   move(x: number, y: number) {
     try {
+      const width = this.width * this.scale;
+      const height = this.height * this.scale;
       this.draggingPreviewWindow?.setBounds({
-        width: Math.floor(this.width),
-        height: Math.floor(this.height),
-        x: Math.floor(x - this.width / 2),
-        y: Math.floor(y - this.height / 2)
+        width: Math.floor(width),
+        height: Math.floor(height),
+        x: Math.floor(x - width / 2),
+        y: Math.floor(y - height / 2)
       });
+      console.log(this.draggingPreviewWindow?.getSize());
     } catch(error) {
       //
     }
