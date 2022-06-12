@@ -185,7 +185,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
-    if (windows.board?.isDestroyed() || windows.board === undefined) {
+    if (windows.board === undefined || windows.board.isDestroyed()) {
       windows.board = initBoardWindow();
     }
   });
@@ -763,7 +763,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
-          windows.board?.moveTop();
+          if (windows.board !== undefined && !windows.board.isDestroyed()) {
+            windows.board.moveTop();
+          }
           draggingPreviewWindow.window?.moveTop();
           event.sender.startDrag({
             file: files[0]!,
@@ -864,7 +866,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           return petaImages.map((petaImage) => petaImage.id);
         },
         openBoard: async() => {
-          if (windows.board?.isDestroyed() || windows.board === undefined) {
+          if (windows.board === undefined || windows.board.isDestroyed()) {
             windows.board = initBoardWindow();
           } else {
             windows.board?.moveTop();
@@ -872,7 +874,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
         },
         openBrowser: async () => {
-          if (windows.browser?.isDestroyed() || windows.browser === undefined) {
+          if (windows.browser === undefined || windows.browser.isDestroyed()) {
             windows.browser = initBrowserWindow();
           } else {
             windows.browser?.moveTop();
@@ -880,7 +882,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
         },
         openSettings: async () => {
-          if (windows.settings?.isDestroyed() || windows.settings === undefined) {
+          if (windows.settings === undefined || windows.settings.isDestroyed()) {
             windows.settings = initSettingsWindow();
           } else {
             windows.settings?.moveTop();
