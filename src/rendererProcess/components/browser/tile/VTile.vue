@@ -90,7 +90,7 @@ import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
-import { BROWSER_FETCH_TAGS_DELAY, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE } from "@/commons/defines";
+import { BROWSER_FETCH_TAGS_DELAY, BROWSER_FETCH_TAGS_DELAY_RANDOM, BROWSER_LOAD_ORIGINAL_DELAY, PLACEHOLDER_SIZE } from "@/commons/defines";
 @Options({
   components: {
   },
@@ -212,7 +212,7 @@ export default class VTile extends Vue {
     if (this.tile.visible) {
       this.fetchTagsTimeoutHandler = window.setTimeout(() => {
         this.fetchPetaTags();
-      }, Math.random() * BROWSER_FETCH_TAGS_DELAY);
+      }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
       if (!this.loadedOriginal) {
         this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
         if (this.original) {
