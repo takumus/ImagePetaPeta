@@ -40,6 +40,11 @@ export function upgradePetaImage(petaImage: PetaImage) {
   if (petaImage.metadataVersion === undefined) {
     petaImage.metadataVersion = 0;
   }
+  petaImage.palette.map((color) => {
+    if (color.positionSD === undefined) {
+      color.positionSD = 0;
+    }
+  });
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {
