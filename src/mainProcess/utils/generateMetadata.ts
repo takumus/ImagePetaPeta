@@ -51,10 +51,7 @@ export async function generateMetadata(params: {
         {
           buffer: raw.data,
           width: raw.info.width,
-          height: raw.info.height,
-          sample: 2000,
-          mergeCIEDiff: 5,
-          fixColorCIEDiff: 10
+          height: raw.info.height
         }
       ) || [];
       console.timeEnd(" plt");

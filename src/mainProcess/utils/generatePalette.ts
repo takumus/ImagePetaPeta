@@ -19,22 +19,21 @@ export function getSimplePalette(
   imageData: {
     buffer: Buffer,
     width: number,
-    height: number, 
-    sample: number,
-    mergeCIEDiff: number,
-    fixColorCIEDiff: number
+    height: number,
   }
 ) {
-  const palette = getPalette(imageData);
+  const palette = getPalette({
+    sample: 2000,
+    mergeCIEDiff: 5,
+    fixColorCIEDiff: 10,
+    ...imageData
+  });
   // allPalette.push(...palette);
   // cie94色差で色削除
   for (let i = 0; i < palette.length; i++) {
     for (let ii = i + 1; ii < palette.length; ii++) {
       const cieDiff = getDiff(palette[i]!, palette[ii]!);
       if (cieDiff < 15) {
-        // palette[i]!.differenceSD += palette[ii]!.differenceSD;
-        // // palette[i]!.differenceSD += cieDiff;
-        // palette[i]!.differenceSD /= 2;
         palette.splice(ii, 1);
         ii--;
       }
