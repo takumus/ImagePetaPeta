@@ -69,14 +69,12 @@ export function getPalette(
   const pixelCount = imageData.width * imageData.height;
   const pixels = createPixels(imageData.buffer, imageData.width * imageData.height);
   const qPalette = quantize(pixels, 64).palette();
-  const colors = qPalette.map((color) => {
+  const colors = qPalette.map((color): PetaColor => {
     return {
       r: color[0],
       g: color[1],
       b: color[2],
       population: 0,
-      positions: [] as { x: number, y: number }[],
-      differences: [] as number[],
       positionSD: 0
     }
   });
@@ -95,6 +93,7 @@ export function getPalette(
   }
   colors.map((color) => {
     const similars: {[key: string]: { count: number, color: [number, number, number] }} = {};
+    const positions: { x: number, y: number }[] = [];
     for (let i = 0; i < pixels.length; i += resolution) {
       const rc = pixels[i]!;
       const y = Math.floor(i / imageData.width);
@@ -105,8 +104,7 @@ export function getPalette(
       );
       if (cieDiff < imageData.fixColorCIEDiff) {
         color.population++;
-        color.positions.push({ x, y });
-        color.differences.push(cieDiff);
+        positions.push({ x, y });
         const key = rc[0] + "," + rc[1] + "," + rc[2];
         if (similars[key] === undefined) {
           similars[key] = {
@@ -125,7 +123,7 @@ export function getPalette(
       color.r = similar.color[0];
       color.g = similar.color[1];
       color.b = similar.color[2];
-      const avgPos = color.positions.reduce((p, c) => {
+      const avgPos = positions.reduce((p, c) => {
         return {
           x: p.x + c.x,
           y: p.y + c.y
@@ -133,7 +131,7 @@ export function getPalette(
       }, { x: 0, y: 0 });
       avgPos.x /= color.population;
       avgPos.y /= color.population;
-      const sdPos = color.positions.reduce((p, c) => {
+      const sdPos = positions.reduce((p, c) => {
         return {
           x: p.x + Math.pow(c.x - avgPos.x, 2),
           y: p.y + Math.pow(c.y - avgPos.y, 2)
