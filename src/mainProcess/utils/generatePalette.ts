@@ -26,9 +26,6 @@ export function getSimplePalette(
   }
 ) {
   const palette = getPalette(imageData);
-  palette.sort((a, b) => {
-    return b.population - a.population;
-  });
   // allPalette.push(...palette);
   // cie94色差で色削除
   for (let i = 0; i < palette.length; i++) {
@@ -124,6 +121,8 @@ export function getPalette(
   });
   return colors.filter((color) => {
     return color.population > 0;
+  }).sort((a, b) => {
+    return b.population - a.population;
   });
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
