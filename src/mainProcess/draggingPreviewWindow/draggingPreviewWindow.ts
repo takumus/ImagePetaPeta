@@ -88,7 +88,6 @@ export class DraggingPreviewWindow {
         x: Math.floor(x - width / 2),
         y: Math.floor(y - height / 2)
       });
-      console.log(this.draggingPreviewWindow?.getSize());
     } catch(error) {
       //
     }

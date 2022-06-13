@@ -56,7 +56,7 @@ export async function generateMetadata(params: {
           buffer: raw.data,
           width: raw.info.width,
           height: raw.info.height,
-          sample: 1000,
+          sample: 2000,
           mergeCIEDiff: 5,
           fixColorCIEDiff: 10
         }
@@ -114,22 +114,6 @@ export async function generateMetadata(params: {
     placeholder: ""
   };
   return data;
-}
-function swatchToPetaColor(swatch: Swatch | null): PetaColor {
-  if (!swatch) {
-    return {
-      r: 255,
-      g: 255,
-      b: 255,
-      population: 0,
-    }
-  }
-  return {
-    r: swatch.r,
-    g: swatch.g,
-    b: swatch.b,
-    population: swatch.population
-  }
 }
 
 function createPixels(buffer: Buffer, pixelCount: number) {
@@ -210,7 +194,9 @@ function getSubPalette(
       color.b = similar.color[2];
     }
   });
-  return colors;
+  return colors.filter((color) => {
+    return color.population > 0;
+  });
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
   return rgbDiff(
