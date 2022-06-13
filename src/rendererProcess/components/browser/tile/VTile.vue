@@ -58,7 +58,7 @@
             :key="color.id"
             :style="{
               backgroundColor: color.color,
-              flex: 1//Math.floor(color.population * 70 + 30)
+              flex: Math.floor(color.population * 80 + 20)
             }"
           >
           </t-color>
@@ -179,16 +179,19 @@ export default class VTile extends Vue {
     return this.tile.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
   }
   get palette() {
+    const all = this.tile.petaImage.palette.reduce((p, c) => {
+      return p + c.population;
+    }, 0);
     return this.tile.petaImage.palette.map((color, i) => {
       return {
         color: `rgb(${color.r}, ${color.g}, ${color.b})`,
-        population: color.population,
+        population: color.population / all,
         id: i
       };
     })
-    // .sort((a, b) => {
-    //   return b.population - a.population;
-    // });
+    .sort((a, b) => {
+      return b.population - a.population;
+    });
   }
   get placeholderColor() {
     const petaColor = this.tile.petaImage.palette[0];

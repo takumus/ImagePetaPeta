@@ -31,8 +31,10 @@ export function getSimplePalette(
   for (let i = 0; i < palette.length; i++) {
     for (let ii = i + 1; ii < palette.length; ii++) {
       const cieDiff = getDiff(palette[i]!, palette[ii]!);
-      if (cieDiff < 10) {
-        palette[i]!.population += palette[ii]!.population;
+      if (cieDiff < 15) {
+        // palette[i]!.differenceSD += palette[ii]!.differenceSD;
+        // // palette[i]!.differenceSD += cieDiff;
+        // palette[i]!.differenceSD /= 2;
         palette.splice(ii, 1);
         ii--;
       }
@@ -73,7 +75,10 @@ export function getPalette(
       r: color[0],
       g: color[1],
       b: color[2],
-      population: 0
+      population: 0,
+      positions: [] as { x: number, y: number }[],
+      differences: [] as number[],
+      positionSD: 0
     }
   });
   for (let i = 0; i < colors.length; i++) {
@@ -93,12 +98,16 @@ export function getPalette(
     const similars: {[key: string]: { count: number, color: [number, number, number] }} = {};
     for (let i = 0; i < pixels.length; i += resolution) {
       const rc = pixels[i]!;
+      const y = Math.floor(i / imageData.width);
+      const x = i % imageData.width;
       const cieDiff = rgbDiff(
         rc,
         [color.r, color.g, color.b]
       );
       if (cieDiff < imageData.fixColorCIEDiff) {
         color.population++;
+        color.positions.push({ x, y });
+        color.differences.push(cieDiff);
         const key = rc[0] + "," + rc[1] + "," + rc[2];
         if (similars[key] === undefined) {
           similars[key] = {
@@ -117,6 +126,23 @@ export function getPalette(
       color.r = similar.color[0];
       color.g = similar.color[1];
       color.b = similar.color[2];
+      const avgPos = color.positions.reduce((p, c) => {
+        return {
+          x: p.x + c.x,
+          y: p.y + c.y
+        };
+      }, { x: 0, y: 0 });
+      avgPos.x /= color.population;
+      avgPos.y /= color.population;
+      const sdPos = color.positions.reduce((p, c) => {
+        return {
+          x: p.x + Math.pow(c.x - avgPos.x, 2),
+          y: p.y + Math.pow(c.y - avgPos.y, 2)
+        };
+      }, { x: 0, y: 0 });
+      sdPos.x /= color.population;
+      sdPos.y /= color.population;
+      color.positionSD = Math.floor(sdPos.x + sdPos.y);
     }
   });
   return colors.filter((color) => {

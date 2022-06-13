@@ -20,7 +20,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
       });
       palettes.push({
         palette: metadata.palette,
-        allPalette: metadata.allPalette,
+        allPalette: [...metadata.palette].sort((a, b) => b.positionSD - a.positionSD),
         path: "./metadata_tile_" + f + ".webp"
       });
       console.timeEnd(label);
@@ -58,7 +58,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
         ).join("")
         + `]</div><br>All(${p.allPalette.length})<div>[`
         + p.allPalette.map(
-          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">█</span>`
+          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`
         ).join("")
         + `]</div><br><br>`
       ).join("")}
