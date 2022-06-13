@@ -19,7 +19,7 @@ import crypto from "crypto";
 import dateFormat from "dateformat";
 import { upgradePetaBoard, upgradePetaImage } from "@/mainProcess/utils/upgrader";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
-import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, DEFAULT_BOARD_NAME, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
+import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE, DEFAULT_BOARD_NAME, PETAIMAGE_METADATA_VERSION, PLACEHOLDER_COMPONENT, PLACEHOLDER_SIZE, UNTAGGED_ID } from "@/commons/defines";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
 import { TaskStatus } from "@/commons/api/interfaces/task";
@@ -214,6 +214,9 @@ export class PetaDatas {
     const images = await this.datas.dataPetaImages.find({});
     const generate = async (image: PetaImage, i: number) => {
       upgradePetaImage(image);
+      if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
+        return;
+      }
       const data = await file.readFile(Path.resolve(this.paths.DIR_IMAGES, image.file.original));
       const result = await generateMetadata({
         data,
@@ -224,6 +227,7 @@ export class PetaDatas {
       image.placeholder = result.placeholder;
       image.palette = result.palette;
       image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
+      image.metadataVersion = PETAIMAGE_METADATA_VERSION;
       await this.updatePetaImage(image, UpdateMode.UPDATE);
       log.log(`thumbnail (${i + 1} / ${images.length})`);
       this.emitMainEvent("regenerateMetadatasProgress", i + 1, images.length);
@@ -613,7 +617,8 @@ export class PetaDatas {
       placeholder: petaMetaData.placeholder,
       palette: petaMetaData.palette,
       id: id,
-      nsfw: false
+      nsfw: false,
+      metadataVersion: PETAIMAGE_METADATA_VERSION
     }
     if (this.datas.dataSettings.data.autoAddTag) {
       const name = dateFormat(addDate, "yyyy-mm-dd");

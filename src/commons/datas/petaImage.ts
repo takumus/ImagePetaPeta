@@ -14,7 +14,8 @@ export interface PetaImage {
   placeholder: string,
   palette: PetaColor[],
   nsfw: boolean,
-  _selected?: boolean
+  _selected?: boolean,
+  metadataVersion: number
 }
 export type PetaImages = {[id: string]: PetaImage};
 export function dbPetaImagesToPetaImages(dbImages: PetaImages, copy = true) {

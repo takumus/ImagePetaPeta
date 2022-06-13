@@ -36,6 +36,10 @@ export function upgradePetaImage(petaImage: PetaImage) {
   if (petaImage.palette === undefined) {
     petaImage.palette = [];
   }
+  // v2.8.0
+  if (petaImage.metadataVersion === undefined) {
+    petaImage.metadataVersion = 0;
+  }
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {
