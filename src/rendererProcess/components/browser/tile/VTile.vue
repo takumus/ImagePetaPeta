@@ -58,7 +58,7 @@
             :key="color.id"
             :style="{
               backgroundColor: color.color,
-              flex: Math.floor(color.population * 80 + 20)
+              flex: Math.floor(color.population * 95 + 5)
             }"
           >
           </t-color>

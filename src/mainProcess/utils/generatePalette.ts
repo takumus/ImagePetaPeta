@@ -23,9 +23,9 @@ export function getSimplePalette(
   }
 ) {
   const palette = getPalette({
-    sample: 2000,
+    sample: 3000,
     mergeCIEDiff: 5,
-    fixColorCIEDiff: 10,
+    fixColorCIEDiff: 5,
     ...imageData
   });
   // allPalette.push(...palette);
@@ -39,21 +39,24 @@ export function getSimplePalette(
       }
     }
   }
-  if (palette.length >= 6) {
-    const newMergedPalette: PetaColor[] = [];
-    // 人口の多い色3つ。
-    newMergedPalette.push(...palette.splice(0, 5));
-    // 鮮やか順に
-    palette.sort((a, b) => {
-      return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
-    });
-    newMergedPalette.push(...palette.splice(0, 3));
-    newMergedPalette.sort((a, b) => {
-      return b.population - a.population;
-    });
-    palette.length = 0;
-    palette.push(...newMergedPalette);
-  }
+  // if (palette.length >= 6) {
+  //   const newMergedPalette: PetaColor[] = [];
+  //   // 人口の多い色3つ。
+  //   newMergedPalette.push(...palette.splice(0, 5));
+  //   // 鮮やか順に
+  //   palette.sort((a, b) => {
+  //     return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
+  //   });
+  //   newMergedPalette.push(...palette.splice(0, 3));
+  //   newMergedPalette.sort((a, b) => {
+  //     return b.population - a.population;
+  //   });
+  //   palette.length = 0;
+  //   palette.push(...newMergedPalette);
+  // }
+  // palette.sort((a, b) => {
+  //   return b.population - a.population;
+  // });
   return palette;
 }
 export function getPalette(
