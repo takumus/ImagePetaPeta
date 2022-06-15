@@ -185,8 +185,11 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   }]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
-    if (windows.board === undefined || windows.board.isDestroyed()) {
-      windows.board = initBoardWindow();
+    if (
+      (windows.board === undefined || windows.board.isDestroyed())
+      && (windows.browser === undefined || windows.browser.isDestroyed())
+    ) {
+      showWindows();
     }
   });
   app.on("before-quit", (event) => {
@@ -283,14 +286,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    if (dataSettings.data.show === "both") {
-      windows.board = initBoardWindow();
-      windows.browser = initBrowserWindow();
-    } else if (dataSettings.data.show === "browser") {
-      windows.browser = initBrowserWindow();
-    } else {
-      windows.board = initBoardWindow();
-    }
+    showWindows();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -946,6 +942,16 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
     if (activeWindows.length === 0 && process.platform !== "darwin") {
       app.quit();
+    }
+  }
+  function showWindows() {
+    if (dataSettings.data.show === "both") {
+      windows.board = initBoardWindow();
+      windows.browser = initBrowserWindow();
+    } else if (dataSettings.data.show === "browser") {
+      windows.browser = initBrowserWindow();
+    } else {
+      windows.board = initBoardWindow();
     }
   }
   function createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
