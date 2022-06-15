@@ -58,7 +58,7 @@
             :key="color.id"
             :style="{
               backgroundColor: color.color,
-              flex: Math.floor(color.population * 95 + 5)
+              flex: Math.floor(color.population * 80 + 20)
             }"
           >
           </t-color>
@@ -362,13 +362,14 @@ t-tile-root {
       width: 100%;
       >t-color-background {
         display: flex;
-        // background-color: rgba($color: (#000000), $alpha: 0.5);
+        background-color: #ffffff;
         border-radius: var(--rounded);
         height: 8px;
         width: 100%;
         overflow: hidden;
         // border: solid 4px rgba($color: #000000, $alpha: 0.5);
-        box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.4);
+        // box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.4);
+        box-shadow: 0px 0px 0px 1.5px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
         >t-color {
           // width: 8px;
           height: 100%;
