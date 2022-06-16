@@ -56,7 +56,7 @@ function createApp(type: WindowType) {
   await appUse(GlobalSettings);
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
-  await appUse(GlobalWindowIsFocused.createPlugin());
+  await appUse(GlobalWindowIsFocused.createPlugin(windowType.windowType));
   console.log("WindowType:", windowType.windowType);
   app.mount("#app");
   const keyboard = new Keyboards();

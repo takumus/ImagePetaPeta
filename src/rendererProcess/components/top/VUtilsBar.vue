@@ -3,7 +3,7 @@
     <t-property>
       <slot></slot>
     </t-property>
-    <t-shared class="left" v-if="$windowIsFocused.value">
+    <t-shared class="left" v-if="visible">
       <button
         tabindex="-1"
         @click="open"
@@ -23,7 +23,7 @@
         <t-icon class="import-folder"></t-icon>
       </button>
     </t-shared>
-    <t-shared class=" right" v-if="$windowIsFocused.value">
+    <t-shared class=" right" v-if="visible">
       <!-- <button
         tabindex="-1"
         @click="openSettings"
@@ -70,6 +70,9 @@ export default class VUtilsBar extends Vue {
   }
   openSettings() {
     API.send("openSettings");
+  }
+  get visible() {
+    return this.$focusedWindows.focused || !this.$focusedWindows.activeOtherMainWindows;
   }
 }
 </script>

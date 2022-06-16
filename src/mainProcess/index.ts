@@ -50,6 +50,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   */
   //-------------------------------------------------------------------------------------------------//
   const windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
+  const activeWindows: { [key in WindowType]?: boolean } = {};
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -890,6 +891,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             windows.settings?.moveTop();
             windows.settings?.focus();
           }
+        },
+        getActiveWindows: async () => {
+          return activeWindows;
         }
       }
     }
@@ -922,25 +926,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   function closeWindow(type: WindowType) {
     mainLogger.logChunk().log("$Close Window:", type);
     saveWindowSize(type);
+    activeWindows[type] = false;
+    emitMainEvent("activeWindows", activeWindows);
     if (type === WindowType.SETTINGS) {
       return;
     }
-    const activeWindows = Object.keys(windows).filter((key) => {
-      if (key == WindowType.SETTINGS) {
-        return false;
-      }
-      if (key == type) {
-        return false;
-      }
-      const window = windows[key as WindowType];
-      if (window === undefined || window.isDestroyed()) {
-        return false;
-      }
-      return true;
-    }).map((key) => {
-      return windows[key as WindowType] as BrowserWindow;
-    });
-    if (activeWindows.length === 0 && process.platform !== "darwin") {
+    if (!activeWindows.board && !activeWindows.browser && process.platform !== "darwin") {
       app.quit();
     }
   }
@@ -968,7 +959,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       },
       backgroundColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
       ...options,
-    })
+    });
+    activeWindows[type] = true;
+    emitMainEvent("activeWindows", activeWindows);
     const state = dataWindowStates.data[type];
     mainLogger.logChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);

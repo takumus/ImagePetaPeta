@@ -290,10 +290,10 @@ export default class MainIndex extends Vue {
       this.savePetaBoard(board, true);
     });
   }
-  @Watch("$windowIsFocused.value")
+  @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {
-    // console.log(this.$windowIsFocused.value);
-    if (!this.$windowIsFocused.value) {
+    // console.log(this.$focusedWindows.focused);
+    if (!this.$focusedWindows.focused) {
       this.vPetaBoard.clearSelectionAll(true);
       this.vPetaBoard.orderPIXIRender();
     }

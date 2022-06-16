@@ -6,6 +6,7 @@ import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
+import { WindowType } from "../datas/windowType";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
@@ -35,6 +36,7 @@ export interface MainFunctions {
   updateSettings: (settings: Settings) => Promise<boolean>;
   getSettings: () => Promise<Settings>;
   getWindowIsFocused: () => Promise<boolean>;
+  getActiveWindows: () => Promise<{ [key in WindowType]?: boolean }>;
   setZoomLevel: (level: number) => Promise<void>;
   windowMaximize: () => Promise<void>;
   windowMinimize: () => Promise<void>;

@@ -107,9 +107,9 @@ export default class BrowserIndex extends Vue {
     }
     return this.$settings.darkMode;
   }
-  @Watch("$windowIsFocused.value")
+  @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {
-    // console.log(this.$windowIsFocused.value);
+    // console.log(this.$focusedWindows.focused);
   }
 }
 </script>

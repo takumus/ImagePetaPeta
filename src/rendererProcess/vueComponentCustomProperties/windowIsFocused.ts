@@ -1,21 +1,35 @@
+import { WindowType } from "@/commons/datas/windowType";
 import { API } from "@/rendererProcess/api";
 import { reactive, App, ref } from "vue";
-const windowIsFocused = ref(false);
-export function createPlugin() {
+const windowIsFocused = reactive({
+  focused: false,
+  activeOtherMainWindows: false,
+  activeWindows: {} as { [key in WindowType]?: boolean }
+});
+export function createPlugin(myWindowType: WindowType) {
   return {
     async install(app: App) {
-      app.config.globalProperties.$windowIsFocused = windowIsFocused;
-      windowIsFocused.value = await API.send("getWindowIsFocused");
+      app.config.globalProperties.$focusedWindows = windowIsFocused;
+      windowIsFocused.focused = await API.send("getWindowIsFocused");
+      windowIsFocused.activeWindows = await API.send("getActiveWindows");
+      function activeOtherMainWindows() {
+        windowIsFocused.activeOtherMainWindows = myWindowType === WindowType.BOARD ? Boolean(windowIsFocused.activeWindows.browser) : myWindowType === WindowType.BROWSER ? Boolean(windowIsFocused.activeWindows.board) : true;
+      }
+      activeOtherMainWindows();
       API.on("windowFocused", (event, focused, windowType) => {
         if (location.search.includes("?" + windowType)) {
-          windowIsFocused.value = focused;
+          windowIsFocused.focused = focused;
         }
-      })
+      });
+      API.on("activeWindows", (event, windows) => {
+        Object.assign(windowIsFocused.activeWindows, windows);
+        activeOtherMainWindows();
+      });
     }
   }
 }
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
-    $windowIsFocused: typeof windowIsFocused;
+    $focusedWindows: typeof windowIsFocused;
   }
 }
