@@ -61,7 +61,7 @@ export default class VTasks extends Vue {
     }))
   }
   get visible() {
-    return this.taskStatusArray.length > 0 && (this.$focusedWindows.focused || !this.$focusedWindows.activeOtherMainWindows);
+    return this.taskStatusArray.length > 0 && (this.$focusedWindows.isMainWindow || this.$focusedWindows.focused);
   }
   get closable() {
     return Object.values(this.taskStatuses).filter((status) => {

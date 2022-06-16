@@ -36,7 +36,7 @@ export interface MainFunctions {
   updateSettings: (settings: Settings) => Promise<boolean>;
   getSettings: () => Promise<Settings>;
   getWindowIsFocused: () => Promise<boolean>;
-  getActiveWindows: () => Promise<{ [key in WindowType]?: boolean }>;
+  getMainWindowType: () => Promise<WindowType | undefined>;
   setZoomLevel: (level: number) => Promise<void>;
   windowMaximize: () => Promise<void>;
   windowMinimize: () => Promise<void>;

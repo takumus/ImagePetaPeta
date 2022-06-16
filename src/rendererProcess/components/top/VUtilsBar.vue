@@ -72,7 +72,7 @@ export default class VUtilsBar extends Vue {
     API.send("openSettings");
   }
   get visible() {
-    return this.$focusedWindows.focused || !this.$focusedWindows.activeOtherMainWindows;
+    return this.$focusedWindows.isMainWindow || this.$focusedWindows.focused;
   }
 }
 </script>

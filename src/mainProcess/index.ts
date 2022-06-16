@@ -51,6 +51,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   //-------------------------------------------------------------------------------------------------//
   const windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   const activeWindows: { [key in WindowType]?: boolean } = {};
+  let mainWindowType: WindowType | undefined = undefined; 
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -892,8 +893,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             windows.settings?.focus();
           }
         },
-        getActiveWindows: async () => {
-          return activeWindows;
+        getMainWindowType: async () => {
+          return mainWindowType;
         }
       }
     }
@@ -927,12 +928,16 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     mainLogger.logChunk().log("$Close Window:", type);
     saveWindowSize(type);
     activeWindows[type] = false;
-    emitMainEvent("activeWindows", activeWindows);
-    if (type === WindowType.SETTINGS) {
-      return;
-    }
-    if (!activeWindows.board && !activeWindows.browser && process.platform !== "darwin") {
-      app.quit();
+    if (activeWindows.board) {
+      emitMainEvent("mainWindowType", WindowType.BOARD);
+      mainWindowType = WindowType.BOARD;
+    } else if (activeWindows.browser) {
+      emitMainEvent("mainWindowType", WindowType.BROWSER);
+      mainWindowType = WindowType.BROWSER;
+    } else {
+      if (process.platform !== "darwin") {
+        app.quit();
+      }
     }
   }
   function showWindows() {
@@ -961,7 +966,6 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       ...options,
     });
     activeWindows[type] = true;
-    emitMainEvent("activeWindows", activeWindows);
     const state = dataWindowStates.data[type];
     mainLogger.logChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);
@@ -976,6 +980,10 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
     window.addListener("focus", () => {
       emitMainEvent("windowFocused", true, type);
+      if (type === WindowType.BOARD || type === WindowType.BROWSER) {
+        emitMainEvent("mainWindowType", type);
+        mainWindowType = type;
+      }
       window.moveTop();
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
