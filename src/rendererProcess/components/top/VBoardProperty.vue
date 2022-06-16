@@ -78,7 +78,6 @@ t-board-property-root {
   height: 100%;
   width: 100%;
   padding: 4px;
-  padding-left: 6px;
   text-align: center;
   >input {
     display: inline-block;

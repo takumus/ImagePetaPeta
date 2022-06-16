@@ -1,32 +1,34 @@
 <template>
   <t-search-root>
-    <t-tag
-      v-for="tag in selectedPetaTags"
-      :key="tag.id"
-    >
-      <VEditableLabel
-        :label="tag.name"
-        :labelLook="tag.label"
-        :clickToEdit="true"
-        :allowEmpty="true"
-        @focus="complementTag"
-        @change="(value) => editSearchTag(tag, value)"
-        @delete="editSearchTag(tag, '')"
-      />
-    </t-tag>
-    <t-tag class="last">
-      <VEditableLabel
-        :label="''"
-        :labelLook="$texts.plus + '       '"
-        :clickToEdit="true"
-        @change="addSelectedTag"
-        @focus="complementTag"
-        @delete="removeLastPetaTag()"
-        :growWidth="true"
-        :noOutline="true"
-        ref="searchInput"
-      />
-    </t-tag>
+    <t-search-box>
+      <t-tag
+        v-for="tag in selectedPetaTags"
+        :key="tag.id"
+      >
+        <VEditableLabel
+          :label="tag.name"
+          :labelLook="tag.label"
+          :clickToEdit="true"
+          :allowEmpty="true"
+          @focus="complementTag"
+          @change="(value) => editSearchTag(tag, value)"
+          @delete="editSearchTag(tag, '')"
+        />
+      </t-tag>
+      <t-tag class="last">
+        <VEditableLabel
+          :label="''"
+          :labelLook="$texts.plus + '       '"
+          :clickToEdit="true"
+          @change="addSelectedTag"
+          @focus="complementTag"
+          @delete="removeLastPetaTag()"
+          :growWidth="true"
+          :noOutline="true"
+          ref="searchInput"
+        />
+      </t-tag>
+    </t-search-box>
   </t-search-root>
 </template>
 
@@ -120,32 +122,38 @@ export default class VSearch extends Vue {
 
 <style lang="scss" scoped>
 t-search-root {
-  border-radius: var(--rounded);
-  border: solid 1.2px var(--border-color);
-  outline: none;
-  padding: 4px 4px 0px 0px;
-  font-size: 1.0em;
-  width: 100%;
-  word-break: break-all;
-  white-space: pre-wrap;
-  text-align: left;
-  // text-align: center;
-  // display: block;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  >t-tag {
-    display: inline-block;
-    margin: 0px 0px 4px 4px;
+  display: block;
+  padding: 4px 160px;
+  text-align: center;
+  >t-search-box {
     border-radius: var(--rounded);
-    padding: 4px;
-    background-color: var(--tab-bg-color);
-    // border: solid 1.2px var(--border-color);
-    &.last {
-      width: 100%;
-      background-color: unset;
-      flex: 1 1 64px;
+    border: solid 1.2px var(--border-color);
+    outline: none;
+    padding: 4px 4px 0px 0px;
+    font-size: 1.0em;
+    width: 100%;
+    height: 100%;
+    word-break: break-all;
+    white-space: pre-wrap;
+    text-align: left;
+    // text-align: center;
+    // display: block;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    >t-tag {
+      display: inline-block;
+      margin: 0px 0px 4px 4px;
+      border-radius: var(--rounded);
+      padding: 4px;
+      background-color: var(--tab-bg-color);
+      // border: solid 1.2px var(--border-color);
+      &.last {
+        width: 100%;
+        background-color: unset;
+        flex: 1 1 64px;
+      }
     }
   }
 }

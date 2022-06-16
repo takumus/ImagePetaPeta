@@ -83,14 +83,14 @@ t-utils-bar-root {
   width: 100%;
   position: relative;
   background-color: var(--tab-selected-color);
-  height: 30px;
+  min-height: 30px;
   box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
   border-bottom: solid 1px var(--bg-color);
   display: block;
   >t-shared {
     position: absolute;
     top: 0px;
-    height: 100%;
+    height: 30px;
     padding: 4px;
     display: flex;
     flex-shrink: 1;
@@ -146,11 +146,7 @@ t-utils-bar-root {
     }
   }
   >t-property {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    height: 100%;
-    width: 100%;
+    display: block;
   }
 }
 </style>

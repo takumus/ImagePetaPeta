@@ -6,14 +6,20 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar></VTitleBar>
+        <VTitleBar>
+        </VTitleBar>
         <VUtilsBar>
+          <VSearch
+            :petaTagInfos="petaTagInfos"
+            :selectedPetaTags="selectedPetaTags"
+          />
         </VUtilsBar>
       </t-top>
       <t-browser>
         <VBrowser
           :petaImages="petaImages"
           :petaTagInfos="petaTagInfos"
+          :selectedPetaTags="selectedPetaTags"
         />
       </t-browser>
     </t-content>
@@ -49,11 +55,13 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
+import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
+import { PetaTag } from "@/commons/datas/petaTag";
 @Options({
   components: {
     VBrowser,
@@ -64,12 +72,14 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
     VComplement,
     VSettings,
     VDialog,
-    VUtilsBar
+    VUtilsBar,
+    VSearch
   },
 })
 export default class BrowserIndex extends Vue {
   petaImages: PetaImages = {};
   petaTagInfos: PetaTagInfo[] = [];
+  selectedPetaTags: PetaTag[] = [];
   title = "";
   async mounted() {
     window.onerror = (e) => {

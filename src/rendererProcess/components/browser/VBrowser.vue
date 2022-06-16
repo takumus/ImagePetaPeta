@@ -8,14 +8,6 @@
       />
     </t-left>
     <t-center>
-      <t-header>
-        <t-search>
-          <VSearch
-            :petaTagInfos="petaTagInfos"
-            :selectedPetaTags="selectedPetaTags"
-          />
-        </t-search>
-      </t-header>
       <t-content>
         <t-tiles
           ref="thumbnails"
@@ -70,7 +62,6 @@ import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
-import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
@@ -91,8 +82,7 @@ import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
     VProperty,
     VEditableLabel,
     VModal,
-    VTags,
-    VSearch
+    VTags
   },
   emits: [
     "select",
@@ -104,6 +94,8 @@ export default class VBrowser extends Vue {
   petaImages: PetaImages = {};
   @Prop()
   petaTagInfos: PetaTagInfo[] = [];
+  @Prop()
+  selectedPetaTags: PetaTag[] = [];
   visible = false;
   @Ref("thumbnails")
   thumbnails!: HTMLDivElement;
@@ -124,7 +116,6 @@ export default class VBrowser extends Vue {
   thumbnailsSize = 0;
   currentScrollThumbnailId = "";
   keyboards = new Keyboards();
-  selectedPetaTags: PetaTag[] = [];
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
   mounted() {
@@ -453,16 +444,6 @@ t-browser-root {
     width: 100%;
     height: 100%;
     padding: 8px;
-    >t-header {
-      width: 100%;
-      padding-bottom: 8px;
-      display: block;
-      >t-search {
-        display: block;
-        max-width: 512px;
-        margin: 0 auto;
-      }
-    }
     >t-content {
       width: 100%;
       height: 100%;
