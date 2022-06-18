@@ -125,9 +125,14 @@ export default class MainIndex extends Vue {
       this.getPetaTagInfos();
     });
     API.on("updatePetaImage", (e, petaImage) => {
-      // log("vIndex", "on savePetaImage", petaImage.id);
-      // this.petaImages[petaImage.id] = petaImage;
       Object.assign(this.petaImages[petaImage.id], petaImage);
+      if (this.vPetaBoard && this.currentPetaBoard) {
+        // 現在のボードにイメージが存在したら、再レンダリング。
+        // NSFW用。
+        if (this.currentPetaBoard.petaPanels.find((pp) => pp.petaImageId === petaImage.id)) {
+          this.vPetaBoard.orderPIXIRender();
+        }
+      }
     });
     API.on("notifyUpdate", async (event, latest, downloaded) => {
       if (downloaded && await this.$components.dialog.show(
