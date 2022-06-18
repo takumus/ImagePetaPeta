@@ -19,6 +19,9 @@ try {
 module.exports = {
   productionSourceMap: false,
   chainWebpack: config => {
+    config.performance
+      .maxEntrypointSize(16 * 1024 * 1024) // 16mb
+      .maxAssetSize(16 * 1024 * 1024) // 16mb
     config
       .entry("app")
       .clear();
