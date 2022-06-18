@@ -1469,7 +1469,7 @@
 
 "@types/fuzzy-search@^2.1.2":
   version "2.1.2"
-  resolved "https://registry.npmjs.org/@types/fuzzy-search/-/fuzzy-search-2.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/@types/fuzzy-search/-/fuzzy-search-2.1.2.tgz#d57b2af8fb723baa1792d40d511f431c4c8f75af"
   integrity sha512-YOqA50Z3xcycm4Br5+MBUpSumfdOAcv34A8A8yFn62zBQPTzJSXQk11qYE5w8BWQ0KrVThXUgEQh7ZLrYI1NaQ==
 
 "@types/glob@^7.1.1":
@@ -5588,7 +5588,7 @@ functions-have-names@^1.2.2:
 
 fuzzy-search@^3.2.1:
   version "3.2.1"
-  resolved "https://registry.npmjs.org/fuzzy-search/-/fuzzy-search-3.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/fuzzy-search/-/fuzzy-search-3.2.1.tgz#65d5faad6bc633aee86f1898b7788dfe312ac6c9"
   integrity sha512-vAcPiyomt1ioKAsAL2uxSABHJ4Ju/e4UeDM+g1OlR0vV4YhLGMNsdLNvZTpEDY4JCSt0E4hASCNM5t2ETtsbyg==
 
 gensync@^1.0.0-beta.2:
