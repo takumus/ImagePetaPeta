@@ -748,10 +748,11 @@ export default class VBoard extends Vue {
     return Math.floor(this.board.transform.scale * 100);
   }
   @Watch("$nsfw.showNSFW")
-  changeShowNSFWWithoutConfirm() {
+  changeShowNSFW() {
     this.pPanelsArray.forEach((pp) => {
       pp.showNSFW = this.$nsfw.showNSFW;
     });
+    this.orderPIXIRender();
   }
   @Watch("board.petaPanels", { deep: true })
   changeBoardPetaPanels() {
