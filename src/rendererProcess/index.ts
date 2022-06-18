@@ -15,6 +15,7 @@ import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
+import GlobalNSFW from "@/rendererProcess/vueComponentCustomProperties/nsfw";
 import * as GlobalWindowType from "@/rendererProcess/vueComponentCustomProperties/windowType";
 import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProperties/windowIsFocused";
 
@@ -54,6 +55,7 @@ function createApp(type: WindowType) {
   appUse(GlobalSystemDarkMode);
   appUse(GlobalTexts.createPlugin(platform));
   await appUse(GlobalSettings);
+  appUse(GlobalNSFW);
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
   await appUse(GlobalWindowIsFocused.createPlugin(windowType.windowType));

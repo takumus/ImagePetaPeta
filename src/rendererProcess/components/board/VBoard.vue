@@ -661,7 +661,7 @@ export default class VBoard extends Vue {
     }
     const pPanel = new PPanel(petaPanel);
     pPanel.setZoomScale(this.board?.transform.scale || 1);
-    pPanel.showNSFW = this.$settings.alwaysShowNSFW;
+    pPanel.showNSFW = this.$nsfw.showNSFW;
     pPanel.onUpdateGIF = () => {
       if (!this.loading) {
         this.orderPIXIRender();
@@ -747,10 +747,10 @@ export default class VBoard extends Vue {
     }
     return Math.floor(this.board.transform.scale * 100);
   }
-  @Watch("$settings.alwaysShowNSFW")
+  @Watch("$nsfw.showNSFW")
   changeShowNSFWWithoutConfirm() {
     this.pPanelsArray.forEach((pp) => {
-      pp.showNSFW = this.$settings.alwaysShowNSFW;
+      pp.showNSFW = this.$nsfw.showNSFW;
     });
   }
   @Watch("board.petaPanels", { deep: true })

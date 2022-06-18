@@ -176,7 +176,7 @@ export default class VTile extends Vue {
     this.loadingImage = false;
   }
   get showNSFW() {
-    return this.tile.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
+    return this.tile.petaImage.nsfw && !this.$nsfw.showNSFW;
   }
   get palette() {
     const all = this.tile.petaImage.palette.reduce((p, c) => {

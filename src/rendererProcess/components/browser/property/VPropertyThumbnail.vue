@@ -42,7 +42,7 @@ export default class VPropertyThumbnail extends Vue {
     return this.imageURL != "";
   }
   get showNSFW() {
-    return this.propertyThumbnail.petaImage.nsfw && !this.$settings.alwaysShowNSFW;
+    return this.propertyThumbnail.petaImage.nsfw && !this.$nsfw.showNSFW;
   }
 }
 </script>

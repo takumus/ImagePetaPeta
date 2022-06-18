@@ -98,7 +98,7 @@ export default class VLayerCell extends Vue {
     return this.pPanel?.petaPanel._petaImage?.name || "";
   }
   get showNSFW() {
-    return this.pPanel?.petaPanel._petaImage?.nsfw && !this.$settings.alwaysShowNSFW;
+    return this.pPanel?.petaPanel._petaImage?.nsfw && !this.$nsfw.showNSFW;
   }
   mousedown(event: MouseEvent) {
     this.click.down(vec2FromMouseEvent(event));
