@@ -88,7 +88,11 @@ export class PetaDatas {
       if (mode == UpdateMode.REMOVE) {
         this.emitMainEvent("updatePetaTags");
       }
-      if (mode != UpdateMode.UPDATE) {
+      if (mode == UpdateMode.UPDATE) {
+        datas.forEach((petaImage) => {
+          this.emitMainEvent("updatePetaImage", petaImage);
+        });
+      } else {
         this.emitMainEvent("updatePetaImages");
       }
       handler.emitStatus({
