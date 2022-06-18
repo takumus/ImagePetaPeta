@@ -35,7 +35,7 @@ export function showErrorWindow(error: ErrorWindowParameters, quit = true) {
       <h2><a href="javascript:require('electron').shell.openExternal('${SUPPORT_URL}?usp=pp_url&entry.1300869761=%E3%83%90%E3%82%B0&entry.1709939184=${encodeURIComponent(app.getVersion())}');">SUPPORT</a></h2>
       </body>`
     );
-    errorWindow.setAlwaysOnTop(true);
+    errorWindow.moveTop();
     errorWindow.on("close", () => {
       if (quit) {
         app.exit();
