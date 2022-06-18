@@ -54,4 +54,6 @@ export interface MainFunctions {
   openBoard: () => Promise<void>;
   openSettings: () => Promise<void>;
   windowToggleDevTools: () => Promise<void>;
+  getShowNSFW: () => Promise<boolean>;
+  setShowNSFW: (value: boolean) => Promise<void>;
 }

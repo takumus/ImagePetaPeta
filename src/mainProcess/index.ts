@@ -52,6 +52,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   const windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   const activeWindows: { [key in WindowType]?: boolean } = {};
   let mainWindowType: WindowType | undefined = undefined; 
+  let temporaryShowNSFW = false;
   let draggingPreviewWindow: DraggingPreviewWindow;
   let DIR_ROOT: string;
   let DIR_APP: string;
@@ -593,6 +594,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             });
             dataSettings.save();
             emitMainEvent("updateSettings", settings);
+            emitMainEvent("showNSFW", getShowNSFW());
             log.log("return:", dataSettings.data);
             return true;
           } catch(e) {
@@ -895,6 +897,13 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         },
         getMainWindowType: async () => {
           return mainWindowType;
+        },
+        getShowNSFW: async () => {
+          return getShowNSFW();
+        },
+        setShowNSFW: async (event, value) => {
+          temporaryShowNSFW = value;
+          emitMainEvent("showNSFW", getShowNSFW());
         }
       }
     }
@@ -1154,6 +1163,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       };
     }
     return undefined;
+  }
+  function getShowNSFW() {
+    return temporaryShowNSFW || dataSettings.data.alwaysShowNSFW;
   }
   function relaunch() {
     app.relaunch();

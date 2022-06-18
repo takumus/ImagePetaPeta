@@ -55,7 +55,7 @@ function createApp(type: WindowType) {
   appUse(GlobalSystemDarkMode);
   appUse(GlobalTexts.createPlugin(platform));
   await appUse(GlobalSettings);
-  appUse(GlobalNSFW);
+  await appUse(GlobalNSFW);
   await appUse(GlobalStates);
   await appUse(GlobalAppInfo);
   await appUse(GlobalWindowIsFocused.createPlugin(windowType.windowType));

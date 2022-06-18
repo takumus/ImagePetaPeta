@@ -346,10 +346,19 @@ export default class VBoard extends Vue {
       if (!this.pPanel) {
         return;
       }
+      this.pPanel.showNSFW = this.$nsfw.showNSFW;
       await this.pPanel.load();
       this.pPanel.playGIF();
       this.loaded = true;
     })();
+  }
+  @Watch("$nsfw.showNSFW")
+  changeShowNSFW() {
+    if (!this.pPanel) {
+      return;
+    }
+    this.pPanel.showNSFW = this.$nsfw.showNSFW;
+    this.orderPIXIRender();
   }
 }
 </script>

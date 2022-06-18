@@ -17,4 +17,5 @@ export interface MainEvents {
   regenerateMetadatasComplete: () => void;
   updateSettings: (settings: Settings) => void;
   updateStates: (states: States) => void;
+  showNSFW: (value: boolean) => void;
 }

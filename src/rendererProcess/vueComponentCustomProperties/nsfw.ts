@@ -1,20 +1,15 @@
 import { reactive, App, ref, watch as _watch, ComponentCustomProperties } from "vue";
+import { API } from "../api";
 const nsfw = reactive({
-  temporaryShowNSFW: false,
-  alwaysShowNSFW: false,
   showNSFW: false
 })
 export default {
   async install(app: App) {
     app.config.globalProperties.$nsfw = nsfw;
-    const settings = (app.config.globalProperties as ComponentCustomProperties).$settings;
-    function update() {
-      nsfw.alwaysShowNSFW = settings.alwaysShowNSFW;
-      nsfw.showNSFW = nsfw.alwaysShowNSFW || nsfw.temporaryShowNSFW;
-    }
-    _watch(() => settings.alwaysShowNSFW, update);
-    _watch(() => nsfw.temporaryShowNSFW, update);
-    update();
+    nsfw.showNSFW = await API.send("getShowNSFW");
+    API.on("showNSFW", (event, value) => {
+      nsfw.showNSFW = value;
+    });
   }
 }
 declare module '@vue/runtime-core' {
