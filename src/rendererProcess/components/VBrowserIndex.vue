@@ -58,10 +58,11 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
+import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { PetaTag } from "@/commons/datas/petaTag";
+import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 @Options({
   components: {
     VBrowser,
@@ -82,15 +83,19 @@ export default class BrowserIndex extends Vue {
   selectedPetaTags: PetaTag[] = [];
   title = "";
   async mounted() {
-    API.on("updatePetaImages", (e) => {
-      this.getPetaImages();
+    API.on("updatePetaImages", (e, petaImages, mode) => {
+      if (mode === UpdateMode.UPSERT) {
+        petaImages.forEach((petaImage) => {
+          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
+        });
+      } else if (mode === UpdateMode.REMOVE) {
+        petaImages.forEach((petaImage) => {
+          delete this.petaImages[petaImage.id];
+        });
+      }
     });
     API.on("updatePetaTags", (e) => {
       this.getPetaTagInfos();
-    });
-    API.on("updatePetaImage", (e, petaImage) => {
-      // log("vIndex", "on savePetaImage", petaImage.id);
-      // this.petaImages[petaImage.id] = petaImage;
     });
     this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;

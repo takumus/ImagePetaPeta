@@ -18,11 +18,13 @@ export interface PetaImage {
   metadataVersion: number
 }
 export type PetaImages = {[id: string]: PetaImage};
+export function dbPetaImageToPetaImage(petaImage: PetaImage) {
+  petaImage._selected = false;
+  return petaImage;
+}
 export function dbPetaImagesToPetaImages(dbImages: PetaImages, copy = true) {
   const images = copy ? deepcopy(dbImages) : dbImages;
-  Object.values(images).forEach((image) => {
-    image._selected = false;
-  })
+  Object.values(images).forEach(dbPetaImageToPetaImage);
   return images;
 }
 export function petaImagesToDBPetaImages(images: PetaImages, copy = true) {

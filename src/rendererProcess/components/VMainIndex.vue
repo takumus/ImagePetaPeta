@@ -73,7 +73,7 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/commons/defines";
-import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
+import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/commons/datas/petaBoard";
 import { PetaPanel, createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
@@ -114,31 +114,60 @@ export default class MainIndex extends Vue {
   title = "";
   errorPetaBoardId = "";
   async mounted() {
-    API.on("updatePetaImages", async (e) => {
-      await this.getPetaImages();
+    API.on("updatePetaImages", async (e, petaImages, mode) => {
+      if (mode === UpdateMode.UPSERT) {
+        let changeCurrentBoard = false;
+        petaImages.forEach((petaImage) => {
+          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
+          this.boards.forEach((board) => {
+            board.petaPanels.forEach((petaPanel) => {
+              if (petaPanel.petaImageId === petaImage.id) {
+                petaPanel._petaImage = this.petaImages[petaImage.id];
+              }
+            });
+          });
+          if (this.currentPetaBoard) {
+            changeCurrentBoard = this.currentPetaBoard.petaPanels.filter((petaPanel) => {
+              return petaPanel.petaImageId === petaImage.id;
+            }).length > 0;
+          }
+          if (changeCurrentBoard) {
+            this.vPetaBoard.load();
+          }
+        });
+        this.addOrderedPetaPanels();
+      } else if (mode === UpdateMode.UPDATE) {
+        petaImages.forEach((newPetaImage) => {
+          const petaImage = this.petaImages[newPetaImage.id];
+          if (petaImage) {
+            Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
+          }
+        });
+        this.vPetaBoard.orderPIXIRender();
+      } else if (mode === UpdateMode.REMOVE) {
+        let changeCurrentBoard = false;
+        petaImages.forEach((petaImage) => {
+          delete this.petaImages[petaImage.id];
+          this.boards.forEach((board) => {
+            board.petaPanels.forEach((petaPanel) => {
+              if (petaPanel.petaImageId === petaImage.id) {
+                petaPanel._petaImage = undefined;
+              }
+            });
+          });
+          if (this.currentPetaBoard) {
+            changeCurrentBoard = this.currentPetaBoard.petaPanels.filter((petaPanel) => {
+              return petaPanel.petaImageId === petaImage.id;
+            }).length > 0;
+          }
+        });
+        if (changeCurrentBoard) {
+          this.vPetaBoard.load();
+        }
+      }
     });
     API.on("updatePetaTags", (e) => {
       this.getPetaTagInfos();
-    });
-    API.on("updatePetaImage", (e, petaImage, mode) => {
-      Object.assign(this.petaImages[petaImage.id], petaImage);
-      if (this.vPetaBoard && this.currentPetaBoard) {
-        // 現在のボードに画像が存在したら
-        if (this.currentPetaBoard.petaPanels.find((pp) => pp.petaImageId === petaImage.id)) {
-          if (mode === UpdateMode.UPDATE) {
-            // NSFWかもしれないので再レンダリング
-            this.vPetaBoard.orderPIXIRender();
-          }
-          //  else if (mode === UpdateMode.UPSERT) {
-          //   // 追加だったら再ロード
-
-          //   this.vPetaBoard.load();
-          // } else if (mode === UpdateMode.REMOVE) {
-          //   // 削除だったら再ロード
-          //   this.vPetaBoard.load();
-          // }
-        }
-      }
     });
     API.on("notifyUpdate", async (event, latest, downloaded) => {
       if (downloaded && await this.$components.dialog.show(
@@ -173,7 +202,6 @@ export default class MainIndex extends Vue {
   }
   async getPetaImages() {
     this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-    this.addOrderedPetaPanels();
   }
   async getPetaBoards() {
     this.boards = await API.send("getPetaBoards");

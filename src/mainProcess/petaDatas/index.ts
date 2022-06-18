@@ -49,7 +49,6 @@ export class PetaDatas {
     log.log("##Update PetaImage");
     log.log("mode:", mode);
     log.log("image:", minimId(petaImage.id));
-    this.emitMainEvent("updatePetaImage", petaImage, mode);
     if (mode == UpdateMode.REMOVE) {
       await this.datas.dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
       log.log("removed tags");
@@ -88,9 +87,7 @@ export class PetaDatas {
       if (mode == UpdateMode.REMOVE) {
         this.emitMainEvent("updatePetaTags");
       }
-      if (mode !== UpdateMode.UPDATE) {
-        this.emitMainEvent("updatePetaImages");
-      }
+      this.emitMainEvent("updatePetaImages", datas, mode);
       handler.emitStatus({
         i18nKey: "tasks.updateDatas",
         log: [],
@@ -352,11 +349,11 @@ export class PetaDatas {
           const addResult = await this.importImage({
             data, name, fileDate
           });
-          petaImages.push(addResult.petaImage);
           if (addResult.exists) {
             result = ImportImageResult.EXISTS;
           } else {
             addedFileCount++;
+            petaImages.push(addResult.petaImage);
           }
           log.log("imported", result);
         } catch (err) {
@@ -390,7 +387,7 @@ export class PetaDatas {
       if (this.datas.dataSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");
       }
-      this.emitMainEvent("updatePetaImages");
+      this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
       return petaImages;
     }, {});
   }
@@ -535,11 +532,11 @@ export class PetaDatas {
           const importResult = await this.importImage({
             data: buffer, name
           });
-          petaImages.push(importResult.petaImage);
           if (importResult.exists) {
             result = ImportImageResult.EXISTS;
           } else {
             addedFileCount++;
+            petaImages.push(importResult.petaImage);
           }
           log.log("imported", name, result);
         } catch (err) {
@@ -568,7 +565,7 @@ export class PetaDatas {
       if (this.datas.dataSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");
       }
-      this.emitMainEvent("updatePetaImages");
+      this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
       return petaImages;
     }, {});
   }
