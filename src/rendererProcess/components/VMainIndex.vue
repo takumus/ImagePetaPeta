@@ -208,9 +208,11 @@ export default class MainIndex extends Vue {
         this.addPanel(panel, offsetIndex++);
       // }
     });
-    this.orderedAddPanelIds = [];
-    if (this.currentPetaBoard) {
-      this.vPetaBoard.load();
+    if (this.orderedAddPanelIds.length > 0) {
+      this.orderedAddPanelIds = [];
+      if (this.currentPetaBoard) {
+        this.vPetaBoard.load();
+      }
     }
   }
   addPanel(petaPanel: PetaPanel, offsetIndex: number) {
