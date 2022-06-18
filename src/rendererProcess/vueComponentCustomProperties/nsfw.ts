@@ -12,12 +12,8 @@ export default {
       nsfw.alwaysShowNSFW = settings.alwaysShowNSFW;
       nsfw.showNSFW = nsfw.alwaysShowNSFW || nsfw.temporaryShowNSFW;
     }
-    _watch(() => settings.alwaysShowNSFW, () => {
-      update();
-    });
-    _watch(() => nsfw.temporaryShowNSFW, () => {
-      update();
-    });
+    _watch(() => settings.alwaysShowNSFW, update);
+    _watch(() => nsfw.temporaryShowNSFW, update);
     update();
   }
 }
