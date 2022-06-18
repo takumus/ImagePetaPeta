@@ -11,7 +11,6 @@ export default {
     function update() {
       nsfw.alwaysShowNSFW = settings.alwaysShowNSFW;
       nsfw.showNSFW = nsfw.alwaysShowNSFW || nsfw.temporaryShowNSFW;
-      console.log(nsfw.showNSFW);
     }
     _watch(() => settings.alwaysShowNSFW, () => {
       update();
