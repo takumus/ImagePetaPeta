@@ -127,6 +127,7 @@ export default class MainIndex extends Vue {
     API.on("updatePetaImage", (e, petaImage) => {
       // log("vIndex", "on savePetaImage", petaImage.id);
       // this.petaImages[petaImage.id] = petaImage;
+      Object.assign(this.petaImages[petaImage.id], petaImage);
     });
     API.on("notifyUpdate", async (event, latest, downloaded) => {
       if (downloaded && await this.$components.dialog.show(
