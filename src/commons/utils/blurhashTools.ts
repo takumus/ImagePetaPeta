@@ -1,4 +1,4 @@
-import { rgbDiff } from "@vibrant/color/lib/converter";
+import { rgbDiff } from "@/rendererProcess/utils/colorUtils";
 import { PetaColor } from "../datas/petaColor";
 import { PetaImage } from "../datas/petaImage";
 export function getSimilarityScore(hash1: string, hash2: string) {

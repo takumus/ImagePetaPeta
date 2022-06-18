@@ -1,5 +1,5 @@
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgbDiff, rgbToHsl } from "@vibrant/color/lib/converter";
+import { rgbDiff } from "@/rendererProcess/utils/colorUtils";
 import quantize from 'quantize';
 function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
