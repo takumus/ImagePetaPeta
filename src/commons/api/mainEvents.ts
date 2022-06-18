@@ -3,10 +3,11 @@ import { Settings } from "../datas/settings";
 import { States } from "../datas/states";
 import { WindowType } from "../datas/windowType";
 import { TaskStatus } from "./interfaces/task";
+import { UpdateMode } from "./interfaces/updateMode";
 
 export interface MainEvents {
   updatePetaImages: () => void;
-  updatePetaImage: (petaImage: PetaImage) => void;
+  updatePetaImage: (petaImage: PetaImage, mode: UpdateMode) => void;
   updatePetaTags: () => void;
   taskStatus: (id: string, task: TaskStatus) => void;
   notifyUpdate: (latest: string, downloaded: boolean) => void;

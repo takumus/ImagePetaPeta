@@ -51,38 +51,10 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
   },
 })
 export default class SettingsIndex extends Vue {
-  petaImages: PetaImages = {};
-  petaTagInfos: PetaTagInfo[] = [];
   title = "";
   async mounted() {
-    window.onerror = (e) => {
-      logChunk().log("vIndex", "window error:", e);
-    }
-    logChunk().log("vIndex", "INIT RENDERER!");
-    API.on("updatePetaImages", (e) => {
-      this.getPetaImages();
-    });
-    API.on("updatePetaTags", (e) => {
-      this.getPetaTagInfos();
-    });
-    API.on("updatePetaImage", (e, petaImage) => {
-      // log("vIndex", "on savePetaImage", petaImage.id);
-      // this.petaImages[petaImage.id] = petaImage;
-    });
     this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
-    await this.getPetaImages();
-    await this.getPetaTagInfos();
-    this.$nextTick(() => {
-      API.send("showMainWindow");
-    });
-  }
-  async getPetaImages() {
-    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-    // this.addOrderedPetaPanels();
-  }
-  async getPetaTagInfos() {
-    this.petaTagInfos = await API.send("getPetaTagInfos");
   }
   get darkMode() {
     if (this.$settings.autoDarkMode) {

@@ -82,10 +82,6 @@ export default class BrowserIndex extends Vue {
   selectedPetaTags: PetaTag[] = [];
   title = "";
   async mounted() {
-    window.onerror = (e) => {
-      logChunk().log("vIndex", "window error:", e);
-    }
-    logChunk().log("vIndex", "INIT RENDERER!");
     API.on("updatePetaImages", (e) => {
       this.getPetaImages();
     });

@@ -23,6 +23,7 @@ import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/tex
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+import { logChunk } from "./utils/rendererLogger";
 function createApp(type: WindowType) {
   switch(type) {
     case WindowType.BOARD:
@@ -36,6 +37,10 @@ function createApp(type: WindowType) {
 }
 (async () => {
   const windowType = GlobalWindowType.createPlugin();
+  logChunk().log(`window "${windowType.windowType}" init`);
+  window.onerror = (e) => {
+    logChunk().log(`window "${windowType.windowType}" error:`, e);
+  }
   AnimatedGIFLoader.add?.();
   const app = createApp(windowType.windowType);
   async function appUse(plugin: Plugin) {

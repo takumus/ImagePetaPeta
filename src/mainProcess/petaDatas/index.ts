@@ -49,6 +49,7 @@ export class PetaDatas {
     log.log("##Update PetaImage");
     log.log("mode:", mode);
     log.log("image:", minimId(petaImage.id));
+    this.emitMainEvent("updatePetaImage", petaImage, mode);
     if (mode == UpdateMode.REMOVE) {
       await this.datas.dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
       log.log("removed tags");
@@ -62,7 +63,6 @@ export class PetaDatas {
     }
     await this.datas.dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.UPSERT);
     log.log("updated");
-    // emitMainEvent("updatePetaImage", petaImage);
     return true;
   }
   async updatePetaImages(datas: PetaImage[], mode: UpdateMode) {
@@ -88,11 +88,7 @@ export class PetaDatas {
       if (mode == UpdateMode.REMOVE) {
         this.emitMainEvent("updatePetaTags");
       }
-      if (mode == UpdateMode.UPDATE) {
-        datas.forEach((petaImage) => {
-          this.emitMainEvent("updatePetaImage", petaImage);
-        });
-      } else {
+      if (mode !== UpdateMode.UPDATE) {
         this.emitMainEvent("updatePetaImages");
       }
       handler.emitStatus({

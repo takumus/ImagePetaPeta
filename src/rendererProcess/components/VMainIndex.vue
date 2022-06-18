@@ -114,23 +114,29 @@ export default class MainIndex extends Vue {
   title = "";
   errorPetaBoardId = "";
   async mounted() {
-    window.onerror = (e) => {
-      logChunk().log("vIndex", "window error:", e);
-    }
-    logChunk().log("vIndex", "INIT RENDERER!");
-    API.on("updatePetaImages", (e) => {
-      this.getPetaImages();
+    API.on("updatePetaImages", async (e) => {
+      await this.getPetaImages();
     });
     API.on("updatePetaTags", (e) => {
       this.getPetaTagInfos();
     });
-    API.on("updatePetaImage", (e, petaImage) => {
+    API.on("updatePetaImage", (e, petaImage, mode) => {
       Object.assign(this.petaImages[petaImage.id], petaImage);
       if (this.vPetaBoard && this.currentPetaBoard) {
-        // 現在のボードにイメージが存在したら、再レンダリング。
-        // NSFW用。
+        // 現在のボードに画像が存在したら
         if (this.currentPetaBoard.petaPanels.find((pp) => pp.petaImageId === petaImage.id)) {
-          this.vPetaBoard.orderPIXIRender();
+          if (mode === UpdateMode.UPDATE) {
+            // NSFWかもしれないので再レンダリング
+            this.vPetaBoard.orderPIXIRender();
+          }
+          //  else if (mode === UpdateMode.UPSERT) {
+          //   // 追加だったら再ロード
+
+          //   this.vPetaBoard.load();
+          // } else if (mode === UpdateMode.REMOVE) {
+          //   // 削除だったら再ロード
+          //   this.vPetaBoard.load();
+          // }
         }
       }
     });
