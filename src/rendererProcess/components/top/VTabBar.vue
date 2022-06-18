@@ -7,7 +7,7 @@
       @mousedown="mousedown($event, b, index, $target)"
       @contextmenu="menu($event, b)"
       :key="b.id"
-      :ref="`tab-${b.id}`"
+      :ref="(element) => setTabRef(element, b.id)"
     >
       <t-label-wrapper>
         <t-label>
@@ -83,6 +83,7 @@ export default class VTabBar extends Vue {
   beforeSortSelectedIndex = 0;
   afterSortSelectedIndex = 0;
   draggingPetaBoard: PetaBoard | undefined;
+  tabs: { [key: string]: HTMLElement } = {};
   mounted() {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
@@ -121,7 +122,7 @@ export default class VTabBar extends Vue {
       let newIndex = 0;
       this.boards
       .map((b) => {
-        const elem: HTMLElement = b == this.draggingPetaBoard ? this.draggingTab : (this.$refs[`tab-${b.id}`] as HTMLElement);
+        const elem: HTMLElement = b == this.draggingPetaBoard ? this.draggingTab : this.tabs[b.id]!;
         return {
           rect: elem.getBoundingClientRect(),
           board: b
@@ -146,6 +147,12 @@ export default class VTabBar extends Vue {
     if (this.beforeSortSelectedIndex != this.afterSortSelectedIndex) {
       this.$emit("sort");
     }
+  }
+  beforeUpdate() {
+    this.tabs = {};
+  }
+  setTabRef(element: HTMLElement, id: string) {
+    this.tabs[id] = element;
   }
   selectPetaBoard(board: PetaBoard) {
     this.$emit("select", board);

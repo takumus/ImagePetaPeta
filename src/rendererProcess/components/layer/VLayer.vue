@@ -19,7 +19,7 @@
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
           :key="layerCellData.id"
-          :ref="`panel-${layerCellData.pPanel.petaPanel.id}`"
+          :ref="(element) => setVLayerCellRef(element, layerCellData.pPanel.petaPanel.id)"
           :pPanel="layerCellData.pPanel"
           :draggingPPanel="draggingPPanel"
           @startDrag="startDrag"
@@ -73,6 +73,7 @@ export default class VLayer extends Vue {
   autoScrollVY = 0;
   mouseY = 0;
   fixedHeight = 0;
+  vLayerCells: { [key: string]: VLayerCell} = {};
   async mounted() {
     this.keyboards.enabled = true;
     this.keyboards.down(["escape"], this.pressEscape);
@@ -86,6 +87,9 @@ export default class VLayer extends Vue {
       }
     }, 1000 / 60);
   }
+  beforeUpdate() {
+    this.vLayerCells = {};
+  }
   unmounted() {
     this.keyboards.destroy();
     window.removeEventListener("mousemove", this.mousemove);
@@ -94,8 +98,11 @@ export default class VLayer extends Vue {
   pressEscape(pressed: boolean) {
     //
   }
+  setVLayerCellRef(element: VLayerCell, id: string) {
+    this.vLayerCells[id] = element;
+  }
   scrollTo(pPanel: PPanel) {
-    const layerCell = this.$refs[`panel-${pPanel.petaPanel.id}`] as VLayerCell | undefined;
+    const layerCell = this.vLayerCells[pPanel.petaPanel.id];
     if (!layerCell) {
       return;
     }
@@ -126,7 +133,7 @@ export default class VLayer extends Vue {
   sort() {
     let changed = false;
     this.pPanels.map((pPanel) => {
-      const layerCell = pPanel == this.draggingPPanel ? this.cellDrag : this.$refs[`panel-${pPanel.petaPanel.id}`] as VLayerCell;
+      const layerCell = pPanel == this.draggingPPanel ? this.cellDrag : this.vLayerCells[pPanel.petaPanel.id]!;
       return {
         layerCell,
         y: layerCell.$el.getBoundingClientRect().y
