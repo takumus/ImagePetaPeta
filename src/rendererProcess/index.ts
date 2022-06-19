@@ -3,7 +3,7 @@ import { createI18n } from "vue-i18n";
 // import { Loader as PIXILoader } from '@pixi/loaders';
 import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import languages from "@/commons/languages";
-import App from "@/rendererProcess/components/VMainIndex.vue";
+import BoardIndex from "@/rendererProcess/components/VBoardIndex.vue";
 import BrowserIndex from "@/rendererProcess/components/VBrowserIndex.vue";
 import SettingsIndex from "@/rendererProcess/components/VSettingsIndex.vue";
 import { App as _App } from "vue";
@@ -27,13 +27,13 @@ import { logChunk } from "./utils/rendererLogger";
 function createApp(type: WindowType) {
   switch(type) {
     case WindowType.BOARD:
-      return _createApp(App);
+      return _createApp(BoardIndex);
     case WindowType.BROWSER:
       return _createApp(BrowserIndex);
     case WindowType.SETTINGS:
       return _createApp(SettingsIndex);
   }
-  return _createApp(App);
+  return _createApp(BoardIndex);
 }
 (async () => {
   const windowType = GlobalWindowType.createPlugin();

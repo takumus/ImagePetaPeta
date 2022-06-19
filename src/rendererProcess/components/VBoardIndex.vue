@@ -94,7 +94,7 @@ import { minimId } from "@/commons/utils/utils";
     VUtilsBar
   },
 })
-export default class MainIndex extends Vue {
+export default class BoardIndex extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: VBoard;
   @Ref("vTabBar")
