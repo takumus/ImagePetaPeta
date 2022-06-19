@@ -31,11 +31,6 @@
     <t-modals
       v-show="this.$components.modal.modalIds.length > 0"
     >
-      <!-- <VBrowser
-        :petaImages="petaImages"
-        :petaTagInfos="petaTagInfos"
-        @addPanel="addPanel"
-      /> -->
       <VImageImporter
         @addPanelByDragAndDrop="addPanelByDragAndDrop"
       />
@@ -106,7 +101,6 @@ export default class MainIndex extends Vue {
   vTabBar!: VTabBar;
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
-  petaTagInfos: PetaTagInfo[] = [];
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
@@ -166,9 +160,6 @@ export default class MainIndex extends Vue {
         }
       }
     });
-    API.on("updatePetaTags", (e) => {
-      this.getPetaTagInfos();
-    });
     API.on("notifyUpdate", async (event, latest, downloaded) => {
       if (downloaded && await this.$components.dialog.show(
         this.$t("utils.installUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
@@ -185,7 +176,6 @@ export default class MainIndex extends Vue {
     document.title = this.title;
     await this.getPetaImages();
     await this.getPetaBoards();
-    await this.getPetaTagInfos();
     await this.restoreBoard();
     this.$nextTick(() => {
       API.send("showMainWindow");
@@ -215,9 +205,6 @@ export default class MainIndex extends Vue {
         });
       }
     });
-  }
-  async getPetaTagInfos() {
-    this.petaTagInfos = await API.send("getPetaTagInfos");
   }
   addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
     this.orderedAddPanelIds = ids;
