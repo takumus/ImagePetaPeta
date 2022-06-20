@@ -124,22 +124,22 @@ t-utils-bar-root {
           background-position: center center;
           filter: var(--icon-filter);
           &.browser {
-            background-image: url("~@/@assets/board.png");
+            background-image: url("~@/@assets/board.svg");
           }
           &.board {
-            background-image: url("~@/@assets/browser.png");
+            background-image: url("~@/@assets/browser.svg");
           }
           &.import-file {
-            background-image: url("~@/@assets/importFile.png");
+            background-image: url("~@/@assets/importFile.svg");
           }
           &.import-folder {
-            background-image: url("~@/@assets/importFolder.png");
+            background-image: url("~@/@assets/importFolder.svg");
           }
           &.settings {
-            background-image: url("~@/@assets/settings.png");
+            background-image: url("~@/@assets/settings.svg");
           }
           &.info {
-            background-image: url("~@/@assets/info.png");
+            background-image: url("~@/@assets/info.svg");
           }
         }
       }

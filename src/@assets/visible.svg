@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <rect width="64" height="64" id="artboard_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#artboard_1" clip-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="visible" clip-path="url(#clip_1)">
+    <path d="M60 32C60 32 34.2328 60.0887 4 32C33.8692 4.0068 60 32 60 32" id="New-shape" fill="#CCCCCC" fill-rule="evenodd" stroke="none" />
+    <path d="M22 32C22 26.4772 26.4772 22 32 22C37.5228 22 42 26.4772 42 32C42 37.5228 37.5228 42 32 42C26.4772 42 22 37.5228 22 32Z" id="Ellipse" fill="#333333" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>
