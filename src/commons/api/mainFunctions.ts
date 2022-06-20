@@ -50,9 +50,7 @@ export interface MainFunctions {
   installUpdate: () => Promise<boolean>;
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
   getDropFromBrowserPetaImageIds: () => Promise<string[] | undefined>;
-  openBrowser: () => Promise<void>;
-  openBoard: () => Promise<void>;
-  openSettings: () => Promise<void>;
+  openWindow: (windowType: WindowType) => Promise<void>;
   windowToggleDevTools: () => Promise<void>;
   getShowNSFW: () => Promise<boolean>;
   setShowNSFW: (value: boolean) => Promise<void>;

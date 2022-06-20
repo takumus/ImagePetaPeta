@@ -49,6 +49,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { API } from "@/rendererProcess/api";
+import { WindowType } from "@/commons/datas/windowType";
 @Options({
   components: {
   },
@@ -65,7 +66,7 @@ export default class VBoardProperty extends Vue {
     //
   }
   openBrowser() {
-    API.send("openBrowser");
+    API.send("openWindow", WindowType.BROWSER);
   }
 }
 </script>

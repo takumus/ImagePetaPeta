@@ -73,6 +73,7 @@ import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
+import { WindowType } from "@/commons/datas/windowType";
 // PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -275,7 +276,7 @@ export default class VBoard extends Vue {
           this.$components.contextMenu.open([{
             label: this.$t("boards.menu.openBrowser"),
             click: () => {
-              API.send("openBrowser");
+              API.send("openWindow", WindowType.BROWSER);
             }
           }, { separate: true }, {
             label: this.$t("boards.menu.resetPosition"),

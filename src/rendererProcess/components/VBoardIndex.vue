@@ -63,7 +63,6 @@ import VBoardProperty from "@/rendererProcess/components/top/VBoardProperty.vue"
 import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
-import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
@@ -89,7 +88,6 @@ import { minimId } from "@/commons/utils/utils";
     VTitleBar,
     VContextMenu,
     VComplement,
-    VSettings,
     VDialog,
     VUtilsBar
   },

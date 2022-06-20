@@ -63,13 +63,13 @@ export default class VUtilsBar extends Vue {
   }
   open() {
     if (this.$windowType === WindowType.BOARD) {
-      API.send("openBrowser");
+      API.send("openWindow", WindowType.BROWSER);
     } else if (this.$windowType === WindowType.BROWSER) {
-      API.send("openBoard");
+      API.send("openWindow", WindowType.BOARD);
     }
   }
   openSettings() {
-    API.send("openSettings");
+    API.send("openWindow", WindowType.SETTINGS);
   }
   get visible() {
     return this.$focusedWindows.isMainWindow || this.$focusedWindows.focused;

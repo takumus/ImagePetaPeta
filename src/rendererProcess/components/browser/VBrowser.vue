@@ -76,6 +76,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
+import { WindowType } from "@/commons/datas/windowType";
 @Options({
   components: {
     VTile,
@@ -266,6 +267,7 @@ export default class VBrowser extends Vue {
   }
   openDetail(petaImage: PetaImage) {
     console.log(petaImage);
+    API.send("openWindow", WindowType.DETAILS);
   }
   open() {
     this.visible = false;

@@ -8,19 +8,11 @@
       <t-top>
         <VTitleBar>
         </VTitleBar>
-        <VUtilsBar>
-          <VSearch
-            :petaTagInfos="petaTagInfos"
-            :selectedPetaTags="selectedPetaTags"
-          />
-        </VUtilsBar>
+        <!-- <VUtilsBar>
+        </VUtilsBar> -->
       </t-top>
       <t-browser>
-        <VBrowser
-          :petaImages="petaImages"
-          :petaTagInfos="petaTagInfos"
-          :selectedPetaTags="selectedPetaTags"
-        />
+        AAA
       </t-browser>
     </t-content>
     <t-modals
@@ -46,7 +38,6 @@
 import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
 // Components
-import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
@@ -64,7 +55,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 @Options({
   components: {
-    VBrowser,
     VImageImporter,
     VTasks,
     VTitleBar,
@@ -75,7 +65,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
     VSearch
   },
 })
-export default class BrowserIndex extends Vue {
+export default class DetailsIndex extends Vue {
   petaImages: PetaImages = {};
   petaTagInfos: PetaTagInfo[] = [];
   selectedPetaTags: PetaTag[] = [];

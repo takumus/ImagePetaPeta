@@ -871,28 +871,25 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return petaImages.map((petaImage) => petaImage.id);
         },
-        openBoard: async() => {
-          if (windows.board === undefined || windows.board.isDestroyed()) {
-            windows.board = initBoardWindow();
+        async openWindow(event, windowType) {
+          if (windows[windowType] === undefined || windows[windowType]?.isDestroyed()) {
+            switch (windowType) {
+              case WindowType.BOARD:
+                windows[windowType] = initBoardWindow();
+                break;
+              case WindowType.BROWSER:
+                windows[windowType] = initBrowserWindow();
+                break;
+              case WindowType.SETTINGS:
+                windows[windowType] = initSettingsWindow();
+                break;
+              case WindowType.DETAILS:
+                windows[windowType] = initDetailsWindow();
+                break;
+            }
           } else {
-            windows.board?.moveTop();
-            windows.board?.focus();
-          }
-        },
-        openBrowser: async () => {
-          if (windows.browser === undefined || windows.browser.isDestroyed()) {
-            windows.browser = initBrowserWindow();
-          } else {
-            windows.browser?.moveTop();
-            windows.browser?.focus();
-          }
-        },
-        openSettings: async () => {
-          if (windows.settings === undefined || windows.settings.isDestroyed()) {
-            windows.settings = initSettingsWindow();
-          } else {
-            windows.settings?.moveTop();
-            windows.settings?.focus();
+            windows[windowType]?.moveTop();
+            windows[windowType]?.focus();
           }
         },
         getMainWindowType: async () => {
@@ -1031,7 +1028,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
   }
   function initBoardWindow() {
-    const window = createWindow(WindowType.BOARD, {
+    return createWindow(WindowType.BOARD, {
       width: dataWindowStates.data.board.width,
       height: dataWindowStates.data.board.height,
       trafficLightPosition: {
@@ -1040,12 +1037,17 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       },
       alwaysOnTop: dataSettings.data.alwaysOnTop
     });
-    // window.addListener("close", () => {
-    //   if (process.platform !== "darwin") {
-    //     app.quit();
-    //   }
-    // })
-    return window;
+  }
+  function initDetailsWindow() {
+    return createWindow(WindowType.DETAILS, {
+      width: dataWindowStates.data.details.width,
+      height: dataWindowStates.data.details.height,
+      trafficLightPosition: {
+        x: 8,
+        y: 8
+      },
+      alwaysOnTop: dataSettings.data.alwaysOnTop
+    });
   }
   function saveWindowSize(windowType: WindowType) {
     mainLogger.logChunk().log("$Save Window States:", windowType);

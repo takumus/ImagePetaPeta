@@ -6,6 +6,7 @@ import languages from "@/commons/languages";
 import BoardIndex from "@/rendererProcess/components/VBoardIndex.vue";
 import BrowserIndex from "@/rendererProcess/components/VBrowserIndex.vue";
 import SettingsIndex from "@/rendererProcess/components/VSettingsIndex.vue";
+import DetailsIndex from "@/rendererProcess/components/VDetailsIndex.vue";
 import { App as _App } from "vue";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalStates from "@/rendererProcess/vueComponentCustomProperties/states";
@@ -24,7 +25,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { logChunk } from "./utils/rendererLogger";
-function createApp(type: WindowType) {
+function createApp(type: WindowType | string) {
   switch(type) {
     case WindowType.BOARD:
       return _createApp(BoardIndex);
@@ -32,6 +33,8 @@ function createApp(type: WindowType) {
       return _createApp(BrowserIndex);
     case WindowType.SETTINGS:
       return _createApp(SettingsIndex);
+    case WindowType.DETAILS:
+      return _createApp(DetailsIndex);
   }
   return _createApp(BoardIndex);
 }
