@@ -161,11 +161,11 @@ export default class VLayerCell extends Vue {
     filter: var(--icon-filter);
     &.visible {
       background-size: 14px;
-      background-image: url("~@/@assets/visible.svg");
+      background-image: url("~@/@assets/visible.png");
     }
     &.lock {
       background-size: 11px;
-      background-image: url("~@/@assets/locked.svg");
+      background-image: url("~@/@assets/locked.png");
     }
     &.disabled {
       opacity: 0.3;

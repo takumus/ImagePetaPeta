@@ -244,7 +244,7 @@ t-layer-root {
     background: no-repeat;
     background-position: center center;
     background-size: 14px;
-    background-image: url("~@/@assets/layer.svg");
+    background-image: url("~@/@assets/layer.png");
     height: 14px;
     min-width: 14px;
     flex-shrink: 0;

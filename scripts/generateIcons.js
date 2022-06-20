@@ -19,14 +19,6 @@ const sharp = require("sharp");
   await exportImage("./rawAssets/icon/icon.png", "./build/Square150x150Logo.png", 150);
   await exportImage("./rawAssets/icon/icon.png", "./build/StoreLogo.png", 50);
   await exportImage("./rawAssets/icon/icon.png", "./build/MacIcon.png", 512);
-  // button icons
-  const buttonIcons = fs.readdirSync("./rawAssets/buttonIcons");
-  buttonIcons.forEach((path) => {
-    if (!fs.statSync(`./rawAssets/buttonIcons/${path}`).isDirectory()) {
-      return;
-    }
-    fs.copyFileSync(`./rawAssets/buttonIcons/${path}/${path}.svg`, `./src/@assets/${path}.svg`);
-  })
   console.log("generate icons complete");
 })();
 
