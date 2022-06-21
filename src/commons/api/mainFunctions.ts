@@ -54,4 +54,5 @@ export interface MainFunctions {
   windowToggleDevTools: () => Promise<void>;
   getShowNSFW: () => Promise<boolean>;
   setShowNSFW: (value: boolean) => Promise<void>;
+  searchImageByGoogle: (petaImage: PetaImage) => Promise<boolean>;
 }

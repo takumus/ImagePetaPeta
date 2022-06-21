@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
+import { BOARD_DARK_BACKGROUND_FILL_COLOR, PACKAGE_JSON_URL, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -901,7 +901,41 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         setShowNSFW: async (event, value) => {
           temporaryShowNSFW = value;
           emitMainEvent("showNSFW", getShowNSFW());
-        }
+        },
+        async searchImageByGoogle(event, petaImage) {
+          return Tasks.spawn("Search Image By Google", async (handler) => {
+            handler.emitStatus({
+              i18nKey: "tasks.searchImageByGoogle",
+              progress: {
+                all: 1,
+                current: 1
+              },
+              log: [],
+              status: "begin",
+              cancelable: false
+            });
+            const log = mainLogger.logChunk();
+            log.log("#Search Image By Google");
+            try {
+              await searchImageByGoogle(petaImage);
+              handler.emitStatus({
+                i18nKey: "tasks.searchImageByGoogle",
+                progress: {
+                  all: 1,
+                  current: 1
+                },
+                log: [],
+                status: "complete",
+                cancelable: false
+              });
+              log.log("return:", true);
+              return true;
+            } catch (err) {
+              log.error(err);
+            }
+            return false;
+          }, {});
+        },
       }
     }
   });
@@ -1048,6 +1082,44 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       },
       alwaysOnTop: dataSettings.data.alwaysOnTop
     });
+  }
+  async function searchImageByGoogle(petaImage: PetaImage) {
+    const imageFilePath = Path.resolve(DIR_THUMBNAILS, petaImage.file.thumbnail);
+    const window = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        offscreen: true
+      },
+    });
+    try {
+      await window.loadURL("https://images.google.com/imghp?sbi=1");
+      window.webContents.debugger.attach("1.1");
+      const res1 = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
+      const res2 = await window.webContents.debugger.sendCommand("DOM.querySelector", {
+        nodeId: res1.root.nodeId,
+        selector: "#awyMjb"
+      });
+      window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
+        nodeId: res2.nodeId,
+        files: [imageFilePath]
+      });
+      await new Promise((res, rej) => {
+        window.webContents.addListener("did-finish-load", () => {
+          shell.openExternal(window.webContents.getURL());
+          res(true);
+        });
+        setTimeout(() => {
+          rej("timeout");
+        }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
+      });
+    } catch (error) {
+      window.destroy();
+      throw error;
+    }
+    window.destroy();
+      return true;
   }
   function saveWindowSize(windowType: WindowType) {
     mainLogger.logChunk().log("$Save Window States:", windowType);

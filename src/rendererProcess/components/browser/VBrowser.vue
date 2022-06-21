@@ -263,6 +263,12 @@ export default class VBrowser extends Vue {
           await API.send("waifu2xConvert", this.selectedPetaImages);
         }
       },
+      {
+        label: this.$t("browser.petaImageMenu.searchImageByGoogle"),
+        click: async () => {
+          await API.send("searchImageByGoogle", thumb.petaImage);
+        }
+      },
     ], position);
   }
   openDetail(petaImage: PetaImage) {

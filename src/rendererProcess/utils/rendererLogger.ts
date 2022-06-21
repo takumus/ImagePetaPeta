@@ -1,13 +1,14 @@
 import { API } from "../api";
 import { v4 as uuid } from "uuid";
 export function logChunk() {
-  const id = uuid().substring(0, 4);
+  const uid = uuid().substring(0, 4);
   return {
     log: (...args: any[]) => {
-      API.send("log", id, ...args);
+      API.send("log", uid, ...args);
     },
     error: (...args: any[]) => {
-      API.send("log", id, "Error:", ...args);
-    }
+      API.send("log", uid, "Error:", ...args);
+    },
+    uid
   }
 }

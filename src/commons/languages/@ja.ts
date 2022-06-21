@@ -65,7 +65,8 @@ const ja = {
         return `${ctx.list(0)}枚の画像を削除`
       },
       openImageFile: "画像ファイルの場所を開く",
-      waifu2x: "waifu2xを使ってアップコンバートする"
+      waifu2x: "waifu2xを使ってアップコンバートする",
+      searchImageByGoogle: "Googleで類似画像を検索する"
     },
     removeImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像を削除しますか?`
@@ -213,6 +214,15 @@ const ja = {
         failed: "失敗"
       }
     },
+    searchImageByGoogle: {
+      name: "検索URLを生成中。",
+      logs: {
+        begin: "開始",
+        complete: "完了",
+        failed: "失敗",
+        progress: ""
+      },
+    }
   } as {[key: string]: {
     name: string,
     logs: {
