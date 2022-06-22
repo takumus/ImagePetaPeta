@@ -76,6 +76,7 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 export default class DetailsIndex extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: VBoard;
+  board: PetaBoard | null = null;
   petaImages: PetaImages = {};
   petaTagInfos: PetaTagInfo[] = [];
   selectedPetaTags: PetaTag[] = [];
@@ -134,9 +135,27 @@ export default class DetailsIndex extends Vue {
     }
     return this.petaImages[this.petaImageId];
   }
-  get board(): PetaBoard | undefined {
+  async getPetaImages() {
+    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
+    // this.addOrderedPetaPanels();
+  }
+  async getPetaTagInfos() {
+    this.petaTagInfos = await API.send("getPetaTagInfos");
+  }
+  get darkMode() {
+    if (this.$settings.autoDarkMode) {
+      return this.$systemDarkMode.value;
+    }
+    return this.$settings.darkMode;
+  }
+  get petaImageURL() {
+    return getImageURL(this.petaImage, ImageType.ORIGINAL);
+  }
+  @Watch("petaImage")
+  changePetaImage() {
     if (this.petaImage === undefined) {
-      return undefined;
+      this.board = null;
+      return;
     }
     const width = 256;
     const panel: PetaPanel = {
@@ -160,7 +179,7 @@ export default class DetailsIndex extends Vue {
       locked: true,
       _petaImage: this.petaImage
     }
-    const board: PetaBoard = {
+    this.board = {
       petaPanels: [panel],
       id: "details",
       name: "details",
@@ -174,31 +193,6 @@ export default class DetailsIndex extends Vue {
       },
       index: 0
     }
-    return board;
-  }
-  async getPetaImages() {
-    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-    // this.addOrderedPetaPanels();
-  }
-  async getPetaTagInfos() {
-    this.petaTagInfos = await API.send("getPetaTagInfos");
-  }
-  get darkMode() {
-    if (this.$settings.autoDarkMode) {
-      return this.$systemDarkMode.value;
-    }
-    return this.$settings.darkMode;
-  }
-  get petaImageURL() {
-    return getImageURL(this.petaImage, ImageType.ORIGINAL);
-  }
-  @Watch("petaImage")
-  changePetaImage() {
-    console.log(this.petaImage);
-  }
-  @Watch("$focusedWindows.focused")
-  changeWindowIsFocused() {
-    // console.log(this.$focusedWindows.focused);
   }
 }
 </script>
