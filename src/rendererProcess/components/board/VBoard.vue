@@ -19,13 +19,6 @@
         @update="updateCrop"
       />
     </t-crop>
-    <t-info>
-      <t-fps
-        v-show="$settings.showFPS"
-      >
-        {{fps}}fps
-      </t-fps>
-    </t-info>
     <VBoardLoading
       :zIndex="2"
       :loading="loading"
@@ -35,6 +28,7 @@
     ></VBoardLoading>
     <VLayer
       ref="layer"
+      v-show="!detailsMode"
       :zIndex="1"
       :visible="true"
       :pPanelsArray="pPanelsArray"
@@ -87,6 +81,8 @@ import { WindowType } from "@/commons/datas/windowType";
 })
 export default class VBoard extends Vue {
   @Prop()
+  detailsMode = false;
+  @Prop()
   board?: PetaBoard;
   @Prop()
   zIndex = 0;
@@ -127,8 +123,6 @@ export default class VBoard extends Vue {
   selectionGraphics = new PIXI.Graphics();
   stageRect = new Vec2();
   mousePosition = new Vec2();
-  frame = 0;
-  fps = 0;
   keyboards?: Keyboards;
   cancel: (() => Promise<void[]>) | undefined;
   resolution = -1;
@@ -138,10 +132,6 @@ export default class VBoard extends Vue {
       this.constructIfResolutionChanged();
     }, 200);
     this.resolutionMatchMedia.addEventListener("change", this.constructIfResolutionChanged);
-    setInterval(() => {
-      this.fps = this.frame;
-      this.frame = 0;
-    }, 1000);
   }
   unmounted() {
     this.destruct();
@@ -175,7 +165,9 @@ export default class VBoard extends Vue {
     this.pixi.stage.on("pointermove", (e) => this.pTransformer.mousemove(e));
     this.pixi.stage.on("pointermoveoutside", (e) => this.pTransformer.mousemove(e));
     this.pixi.stage.addChild(this.backgroundSprite);
-    this.pixi.stage.addChild(this.crossLine);
+    if (!this.detailsMode) {
+      this.pixi.stage.addChild(this.crossLine);
+    }
     this.pixi.stage.addChild(this.centerWrapper);
     this.centerWrapper.addChild(this.rootContainer);
     this.rootContainer.addChild(this.panelsCenterWrapper);
@@ -190,7 +182,7 @@ export default class VBoard extends Vue {
     this.resizer.observe(this.panelsBackground);
     this.renderPIXI();
     this.keyboards = new Keyboards();
-    this.keyboards.enabled = true;
+    this.keyboards.enabled = !this.detailsMode;
     this.keyboards.down(["delete"], this.keyDelete);
     this.keyboards.down(["backspace"], this.keyBackspace);
     this.keyboards.change(["shift"], this.keyShift);
@@ -237,7 +229,7 @@ export default class VBoard extends Vue {
       return;
     }
     this.click.down(e.data.global);
-    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE) {
+    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE || (this.detailsMode && e.data.button == MouseButton.LEFT)) {
       this.mouseRightPressing = true;
       this.dragging = true;
       this.dragOffset
@@ -264,7 +256,7 @@ export default class VBoard extends Vue {
     return null;
   }
   mouseup(e: PIXI.InteractionEvent) {
-    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE) {
+    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE || (this.detailsMode && e.data.button == MouseButton.LEFT)) {
       this.mouseRightPressing = false;
       if (this.click.isClick && e.data.button == MouseButton.RIGHT) {
         const pPanel = this.getPPanelFromObject(e.target);
@@ -272,7 +264,7 @@ export default class VBoard extends Vue {
           this.pointerdownPPanel(pPanel, e);
           this.selectedPPanels.forEach((pPanel) => pPanel.dragging = false);
           this.petaPanelMenu(pPanel, new Vec2(e.data.global));
-        } else {
+        } else if (!this.detailsMode) {
           this.$components.contextMenu.open([{
             label: this.$t("boards.menu.openBrowser"),
             click: () => {
@@ -359,7 +351,6 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
-    this.frame++;
     this.pPanelsArray.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
       pPanel.petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(this.mousePosition)).add(pPanel.draggingOffset);
     });
@@ -468,6 +459,9 @@ export default class VBoard extends Vue {
     delete this.pPanels[pPanel.petaPanel.id];
   }
   petaPanelMenu(pPanel: PPanel, position: Vec2) {
+    if (this.detailsMode) {
+      return;
+    }
     const isMultiple = this.selectedPPanels.length > 1;
     this.$components.contextMenu.open([
       {
@@ -685,7 +679,7 @@ export default class VBoard extends Vue {
     PIXI.utils.clearTextureCache();
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
-    if (!this.board) {
+    if (!this.board || this.detailsMode) {
       return;
     }
     if (!Keyboards.pressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {

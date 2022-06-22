@@ -15,6 +15,7 @@
         <VBoard
           :zIndex="1"
           :board="board"
+          :detailsMode="true"
           ref="vPetaBoard"
         />
       </t-browser>
