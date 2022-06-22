@@ -6,7 +6,7 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar>
+        <VTitleBar :title="$t('titles.details')">
         </VTitleBar>
         <!-- <VUtilsBar>
         </VUtilsBar> -->
@@ -62,6 +62,7 @@ import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
 import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { PetaPanel } from "@/commons/datas/petaPanel";
+import { Keyboards } from "../utils/keyboards";
 @Options({
   components: {
     VTasks,
@@ -82,6 +83,7 @@ export default class DetailsIndex extends Vue {
   selectedPetaTags: PetaTag[] = [];
   title = "";
   petaImageId? = "";
+  keyboards: Keyboards = new Keyboards();
   async mounted() {
     API.on("updatePetaImages", async (e, petaImages, mode) => {
       if (mode === UpdateMode.UPSERT) {
@@ -121,12 +123,16 @@ export default class DetailsIndex extends Vue {
       this.petaImageId = petaImage.id;
     });
     this.petaImageId = (await API.send("getDetailsPetaImage"))?.id;
-    this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
+    this.title = `${this.$t("titles.details")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     await this.getPetaImages();
     await this.getPetaTagInfos();
     this.$nextTick(() => {
       API.send("showMainWindow");
+    });
+    this.keyboards.enabled = true;
+    this.keyboards.up(["escape"], () => {
+      API.send("windowClose");
     });
   }
   get petaImage() {

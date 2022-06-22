@@ -171,7 +171,7 @@ export default class BoardIndex extends Vue {
         API.send("openURL", `${DOWNLOAD_URL}${latest}`);
       }
     });
-    this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
+    this.title = `${this.$t("titles.boards")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     await this.getPetaImages();
     await this.getPetaBoards();

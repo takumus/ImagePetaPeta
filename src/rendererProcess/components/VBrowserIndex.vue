@@ -6,7 +6,7 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar>
+        <VTitleBar :title="$t('titles.browser')">
         </VTitleBar>
         <VUtilsBar>
           <VSearch
@@ -95,7 +95,7 @@ export default class BrowserIndex extends Vue {
     API.on("updatePetaTags", (e) => {
       this.getPetaTagInfos();
     });
-    this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
+    this.title = `${this.$t("titles.browser")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     await this.getPetaImages();
     await this.getPetaTagInfos();

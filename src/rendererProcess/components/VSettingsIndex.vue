@@ -6,7 +6,8 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar></VTitleBar>
+        <VTitleBar :title="$t('titles.settings')">
+        </VTitleBar>
       </t-top>
       <t-browser>
         <VSettings />
@@ -29,7 +30,6 @@
 import { Options, Vue } from "vue-class-component";
 import { Ref, Watch } from "vue-property-decorator";
 // Components
-import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
@@ -37,12 +37,9 @@ import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { dbPetaImagesToPetaImages, PetaImages } from "@/commons/datas/petaImage";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { logChunk } from "@/rendererProcess/utils/rendererLogger";
+import { Keyboards } from "../utils/keyboards";
 @Options({
   components: {
-    VBrowser,
     VTitleBar,
     VContextMenu,
     VComplement,
@@ -52,9 +49,14 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 })
 export default class SettingsIndex extends Vue {
   title = "";
+  keyboards: Keyboards = new Keyboards();
   async mounted() {
-    this.title = `${this.$appInfo.name} ${this.$appInfo.version}`;
+    this.title = `${this.$t("titles.settings")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
+    this.keyboards.enabled = true;
+    this.keyboards.up(["escape"], () => {
+      API.send("windowClose");
+    });
   }
   get darkMode() {
     if (this.$settings.autoDarkMode) {

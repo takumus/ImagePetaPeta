@@ -1,6 +1,5 @@
 <template>
   <t-settings-root>
-    <p>{{$t("settings.settings")}}</p>
     <ul>
       <li
         v-for="tab in tabs"

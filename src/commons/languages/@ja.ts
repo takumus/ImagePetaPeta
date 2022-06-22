@@ -1,5 +1,11 @@
 const ja = {
   hello: "こんにちは",
+  titles: {
+    details: "詳細",
+    browser: "ブラウザ",
+    boards: "ボード",
+    settings: "設定"
+  },
   shared: {
     yes: "はい",
     no: "いいえ",

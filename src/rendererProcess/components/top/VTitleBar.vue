@@ -1,8 +1,11 @@
 <template>
   <t-titlebar-root>
+    <t-title>
+      <t-icon>{{title}}</t-icon>
+    </t-title>
     <t-content>
       <t-top>
-        <!-- {{title}} -->
+        <!-- -->
       </t-top>
       <t-bottom>
         <t-draggable
@@ -56,6 +59,8 @@ import { API } from "@/rendererProcess/api";
   ]
 })
 export default class VTitleBar extends Vue {
+  @Prop()
+  title!: string;
   mounted() {
     //
   }
@@ -84,6 +89,21 @@ t-titlebar-root {
   background-color: var(--tab-bg-color);
   min-height: var(--tab-height);
   display: flex;
+  position: relative;
+  >t-title {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    >t-icon {
+      width: 100%;
+      text-align: center;
+      display: inline-block;
+      font-size: 0.9em;
+    }
+  }
   >t-content {
     flex-grow: 1;
     overflow: hidden;
