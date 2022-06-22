@@ -903,38 +903,16 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           emitMainEvent("showNSFW", getShowNSFW());
         },
         async searchImageByGoogle(event, petaImage) {
-          return Tasks.spawn("Search Image By Google", async (handler) => {
-            handler.emitStatus({
-              i18nKey: "tasks.searchImageByGoogle",
-              progress: {
-                all: 1,
-                current: 1
-              },
-              log: [],
-              status: "begin",
-              cancelable: false
-            });
-            const log = mainLogger.logChunk();
-            log.log("#Search Image By Google");
-            try {
-              await searchImageByGoogle(petaImage);
-              handler.emitStatus({
-                i18nKey: "tasks.searchImageByGoogle",
-                progress: {
-                  all: 1,
-                  current: 1
-                },
-                log: [],
-                status: "complete",
-                cancelable: false
-              });
-              log.log("return:", true);
-              return true;
-            } catch (err) {
-              log.error(err);
-            }
-            return false;
-          }, {});
+          const log = mainLogger.logChunk();
+          log.log("#Search Image By Google");
+          try {
+            await searchImageByGoogle(petaImage);
+            log.log("return:", true);
+            return true;
+          } catch (error) {
+            log.error(error);
+          }
+          return false;
         },
       }
     }
@@ -1084,42 +1062,98 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
   }
   async function searchImageByGoogle(petaImage: PetaImage) {
-    const imageFilePath = Path.resolve(DIR_THUMBNAILS, petaImage.file.thumbnail);
-    const window = new BrowserWindow({
-      show: false,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        offscreen: true
-      },
-    });
-    try {
-      await window.loadURL("https://images.google.com/imghp?sbi=1");
-      window.webContents.debugger.attach("1.1");
-      const res1 = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
-      const res2 = await window.webContents.debugger.sendCommand("DOM.querySelector", {
-        nodeId: res1.root.nodeId,
-        selector: "#awyMjb"
+    return Tasks.spawn("Search Image By Google", async (handler, petaImage: PetaImage) => {
+      handler.emitStatus({
+        i18nKey: "tasks.searchImageByGoogle",
+        progress: {
+          all: 3,
+          current: 0
+        },
+        log: [],
+        status: "begin",
+        cancelable: false
       });
-      window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
-        nodeId: res2.nodeId,
-        files: [imageFilePath]
+      const imageFilePath = Path.resolve(DIR_THUMBNAILS, petaImage.file.thumbnail);
+      const window = new BrowserWindow({
+        show: false,
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+          offscreen: true
+        },
       });
-      await new Promise((res, rej) => {
-        window.webContents.addListener("did-finish-load", () => {
-          shell.openExternal(window.webContents.getURL());
-          res(true);
+      try {
+        await window.loadURL("https://images.google.com/imghp?sbi=1");
+        handler.emitStatus({
+          i18nKey: "tasks.searchImageByGoogle",
+          progress: {
+            all: 3,
+            current: 1
+          },
+          log: ["loaded: https://images.google.com/imghp?sbi=1"],
+          status: "progress",
+          cancelable: false
         });
-        setTimeout(() => {
-          rej("timeout");
-        }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
-      });
-    } catch (error) {
+        await new Promise((res) => {
+          setTimeout(res, 1000);
+        });
+        window.webContents.debugger.attach("1.1");
+        const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
+        const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
+          nodeId: document.root.nodeId,
+          selector: "input[name=encoded_image]"
+        });
+        await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
+          nodeId: input.nodeId,
+          files: [imageFilePath]
+        });
+        handler.emitStatus({
+          i18nKey: "tasks.searchImageByGoogle",
+          progress: {
+            all: 3,
+            current: 2
+          },
+          log: ["uploading: https://images.google.com/imghp?sbi=1"],
+          status: "progress",
+          cancelable: false
+        });
+        await new Promise((res, rej) => {
+          const timeoutHandler = setTimeout(() => {
+            rej("timeout");
+          }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
+          window.webContents.addListener("did-finish-load", () => {
+            shell.openExternal(window.webContents.getURL());
+            clearTimeout(timeoutHandler);
+            handler.emitStatus({
+              i18nKey: "tasks.searchImageByGoogle",
+              progress: {
+                all: 3,
+                current: 3
+              },
+              log: ["uploaded: https://images.google.com/imghp?sbi=1"],
+              status: "complete",
+              cancelable: false
+            });
+            res(true);
+          });
+        });
+      } catch (error) {
+        window.destroy();
+        handler.emitStatus({
+          i18nKey: "tasks.searchImageByGoogle",
+          progress: {
+            all: 3,
+            current: 3
+          },
+          log: [],
+          status: "failed",
+          cancelable: false
+        });
+        throw error;
+      }
       window.destroy();
-      throw error;
-    }
-    window.destroy();
       return true;
+    }, petaImage);
   }
   function saveWindowSize(windowType: WindowType) {
     mainLogger.logChunk().log("$Save Window States:", windowType);

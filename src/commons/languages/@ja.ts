@@ -211,7 +211,9 @@ const ja = {
           return `waifu2xログ: ${ctx.list(0)}`;
         },
         complete: "完了",
-        failed: "失敗"
+        failed: (ctx: any) => {
+          return `失敗: ${ctx.list(0)}`;
+        },
       }
     },
     searchImageByGoogle: {
@@ -219,8 +221,12 @@ const ja = {
       logs: {
         begin: "開始",
         complete: "完了",
-        failed: "失敗",
-        progress: ""
+        failed: (ctx: any) => {
+          return `失敗: ${ctx.list(0)}`;
+        },
+        progress: (ctx: any) => {
+          return `${ctx.list(0)}`;
+        }
       },
     }
   } as {[key: string]: {
