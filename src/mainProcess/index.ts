@@ -301,10 +301,10 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>
     } {
       return {
-        showMainWindow: async () => {
+        async showMainWindow() {
           checkUpdate();
         },
-        importImageFiles: async (event) => {
+        async importImageFiles(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
           const window = getWindowByEvent(event);
@@ -323,7 +323,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           log.log("window is not ready");
           return 0;
         },
-        importImageDirectories: async (event) => {
+        async importImageDirectories(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
           const window = getWindowByEvent(event);
@@ -347,7 +347,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           log.log("window is not ready");
           return 0;
         },
-        importImagesFromClipboard: async (event, buffers) => {
+        async importImagesFromClipboard(event, buffers) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Import Images From Clipboard");
@@ -357,7 +357,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return [];
         },
-        cancelTasks: async (event, ids) => {
+        async cancelTasks(event, ids) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Cancel Tasks");
@@ -372,7 +372,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return;
         },
-        getPetaImages: async (event) => {
+        async getPetaImages(event) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImages");
@@ -390,7 +390,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return {};
         },
-        updatePetaImages: async (event, datas, mode) => {
+        async updatePetaImages(event, datas, mode) {
           return Tasks.spawn("UpdatePetaImages", async (handler) => {
             const log = mainLogger.logChunk();
             log.log("#Update PetaImages");
@@ -410,7 +410,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             return false;
           }, {});
         },
-        getPetaBoards: async (event) => {
+        async getPetaBoards(event) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaBoards");
@@ -428,7 +428,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return [];
         },
-        updatePetaBoards: async (event, boards, mode) => {
+        async updatePetaBoards(event, boards, mode) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaBoards");
@@ -446,7 +446,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        updatePetaTags: async (event, tags, mode) => {
+        async updatePetaTags(event, tags, mode) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaTags");
@@ -465,7 +465,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        updatePetaImagesPetaTags: async (event, petaImageIds, petaTagIds, mode) => {
+        async updatePetaImagesPetaTags(event, petaImageIds, petaTagIds, mode) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
@@ -483,7 +483,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        getPetaImageIdsByPetaTagIds: async (event, petaTagIds) => {
+        async getPetaImageIdsByPetaTagIds(event, petaTagIds) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImageIds By PetaTagIds");
@@ -501,7 +501,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return [];
         },
-        getPetaTagIdsByPetaImageIds: async (event, petaImageIds) => {
+        async getPetaTagIdsByPetaImageIds(event, petaImageIds) {
           const log = mainLogger.logChunk();
           try {
             // log.log("#Get PetaTagIds By PetaImageIds");
@@ -519,7 +519,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return [];
         },
-        getPetaTagInfos: async () => {
+        async getPetaTagInfos() {
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagInfos");
@@ -537,23 +537,23 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return [];
         },
-        log: async (event, id: string, ...args: any) => {
+        async log(event, id: string, ...args: any) {
           dataLogger.log(LogFrom.RENDERER, id, ...args);
           return true;
         },
-        openURL: async (event, url) => {
+        async openURL(event, url) {
           const log = mainLogger.logChunk();
           log.log("#Open URL");
           log.log("url:", url);
           shell.openExternal(url);
           return true;
         },
-        openImageFile: async (event, petaImage) => {
+        async openImageFile(event, petaImage) {
           const log = mainLogger.logChunk();
           log.log("#Open Image File");
           shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
         },
-        getAppInfo: async (event) => {
+        async getAppInfo(event) {
           const log = mainLogger.logChunk();
           log.log("#Get App Info");
           const info = {
@@ -563,25 +563,25 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           log.log("return:", info);
           return info;
         },
-        showDBFolder: async (event) => {
+        async showDBFolder(event) {
           const log = mainLogger.logChunk();
           log.log("#Show DB Folder");
           shell.showItemInFolder(DIR_ROOT);
           return true;
         },
-        showConfigFolder: async (event) => {
+        async showConfigFolder(event) {
           const log = mainLogger.logChunk();
           log.log("#Show Config Folder");
           shell.showItemInFolder(DIR_APP);
           return true;
         },
-        showImageInFolder: async (event, petaImage) => {
+        async showImageInFolder(event, petaImage) {
           const log = mainLogger.logChunk();
           log.log("#Show Image In Folder");
           shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
-        updateSettings: async (event, settings) => {
+        async updateSettings(event, settings) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Update Settings");
@@ -609,31 +609,31 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        getSettings: async (event) => {
+        async getSettings(event) {
           const log = mainLogger.logChunk();
           log.log("#Get Settings");
           log.log("return:", dataSettings.data);
           return dataSettings.data;
         },
-        getWindowIsFocused: async (event) => {
+        async getWindowIsFocused(event) {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
           const isFocued = getWindowByEvent(event)?.window.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
-        setZoomLevel: async (event, level) => {
+        async setZoomLevel(event, level) {
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
           windows.board?.webContents.setZoomLevel(level);
         },
-        windowMinimize: async (event) => {
+        async windowMinimize(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
           getWindowByEvent(event)?.window.minimize();
         },
-        windowMaximize: async (event) => {
+        async windowMaximize(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
           const window = getWindowByEvent(event);
@@ -643,28 +643,28 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           window?.window.maximize();
         },
-        windowClose: async (event) => {
+        async windowClose(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
           const window = getWindowByEvent(event);
           window?.window.close();
         },
-        windowActivate: async (event) => {
+        async windowActivate(event) {
           getWindowByEvent(event)?.window.moveTop();
           getWindowByEvent(event)?.window.focus();
         },
-        windowToggleDevTools: async (event) => {
+        async windowToggleDevTools(event) {
           const log = mainLogger.logChunk();
           log.log("#Toggle Dev Tools");
           getWindowByEvent(event)?.window.webContents.toggleDevTools();
         },
-        getPlatform: async (event) => {
+        async getPlatform(event) {
           const log = mainLogger.logChunk();
           log.log("#Get Platform");
           log.log("return:", process.platform);
           return process.platform;
         },
-        regenerateMetadatas: async (event) => {
+        async regenerateMetadatas(event) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Regenerate Thumbnails");
@@ -681,7 +681,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return;
         },
-        browsePetaImageDirectory: async (event) => {
+        async browsePetaImageDirectory(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
           const window = getWindowByEvent(event);
@@ -706,7 +706,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return "";
         },
-        changePetaImageDirectory: async (event, path) => {
+        async changePetaImageDirectory(event, path) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Change PetaImage Directory");
@@ -730,12 +730,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        getStates: async (event) => {
+        async getStates(event) {
           const log = mainLogger.logChunk();
           log.log("#Get States");
           return dataStates.data;
         },
-        waifu2xConvert: async (event, petaImages) => {
+        async waifu2xConvert(event, petaImages) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Waifu2x Convert");
@@ -747,7 +747,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        installUpdate: async (event) => {
+        async installUpdate(event) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Install Update");
@@ -759,7 +759,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        startDrag: async (event, petaImages, iconSize, iconData) => {
+        async startDrag(event, petaImages, iconSize, iconData) {
           const first = petaImages[0];
           if (!first) {
             return;
@@ -785,7 +785,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             dropFromBrowserPetaImageIds = undefined;
           }, 100);
         },
-        getDropFromBrowserPetaImageIds: async () => {
+        async getDropFromBrowserPetaImageIds() {
           if (!dropFromBrowserPetaImageIds) {
             return undefined;
           }
@@ -796,7 +796,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           draggingPreviewWindow.destroy();
           return ids;
         },
-        updateStates: async (event, states) => {
+        async updateStates(event, states) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Update States");
@@ -810,7 +810,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
-        importImagesByDragAndDrop: async (event, htmls, arrayBuffers, filePaths) => {
+        async importImagesByDragAndDrop(event, htmls, arrayBuffers, filePaths) {
           const log = mainLogger.logChunk();
           log.log("#ImportImagesByDragAndDrop");
           log.log(htmls.length, arrayBuffers.length, filePaths.length);
@@ -893,13 +893,13 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             windows[windowType]?.focus();
           }
         },
-        getMainWindowType: async () => {
+        async getMainWindowType() {
           return mainWindowType;
         },
-        getShowNSFW: async () => {
+        async getShowNSFW() {
           return getShowNSFW();
         },
-        setShowNSFW: async (event, value) => {
+        async setShowNSFW(event, value) {
           temporaryShowNSFW = value;
           emitMainEvent("showNSFW", getShowNSFW());
         },
@@ -1179,48 +1179,6 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     }
     state.maximized = window.isMaximized();
     dataWindowStates.save();
-  }
-  async function prepareUpdate(remote: RemoteBinaryInfo) {
-    updateInstallerFilePath = Path.resolve(DIR_DOWNLOAD, `ImagePetaPeta-${remote.version}.exe`);
-    const log = mainLogger.logChunk();
-    try {
-      log.log("check downloaded binary", updateInstallerFilePath);
-      // すでにバイナリが存在したらハッシュチェック。
-      const sha256 = crypto.createHash("sha256").update(await file.readFile(updateInstallerFilePath)).digest("hex");
-      if (sha256 == remote.sha256.win) {
-        log.log("notify (donwload success)");
-        // ハッシュが一致したらインストール確認通知
-        emitMainEvent("notifyUpdate", remote.version, true);
-        return;
-      } else {
-        log.log("notify (download failed)");
-        emitMainEvent("notifyUpdate", remote.version, false);
-        return;
-      }
-    } catch (error) {
-      log.error(error);
-    }
-    try {
-      const url = `https://github.com/takumus/ImagePetaPeta/releases/download/${remote.version}/ImagePetaPeta-beta.Setup.${remote.version}.exe`;
-      log.log("download binary:", url);
-      // バイナリをダウンロード
-      const result = await axios.get(
-        url,
-        {
-          responseType: "arraybuffer",
-          onDownloadProgress: (event) => {
-            // console.log(event);
-          }
-        }
-      );
-      log.log("binary downloaded:", url);
-      // 保存
-      await file.writeFile(updateInstallerFilePath, result.data);
-      prepareUpdate(remote);
-    } catch (error) {
-      emitMainEvent("notifyUpdate", remote.version, false);
-      log.error(error);
-    }
   }
   async function getLatestVersion(): Promise<RemoteBinaryInfo> {
     const log = mainLogger.logChunk();
