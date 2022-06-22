@@ -211,9 +211,7 @@ const ja = {
           return `waifu2xログ: ${ctx.list(0)}`;
         },
         complete: "完了",
-        failed: (ctx: any) => {
-          return `失敗: ${ctx.list(0)}`;
-        },
+        failed: "失敗",
       }
     },
     searchImageByGoogle: {

@@ -50,7 +50,7 @@ export default class VTasks extends Vue {
       if (task.status == "complete") {
         window.setTimeout(() => {
           delete this.taskStatuses[id];
-        }, 200);
+        }, 500);
       }
     });
   }
