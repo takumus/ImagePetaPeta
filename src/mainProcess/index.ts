@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, PACKAGE_JSON_URL, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
+import { BOARD_DARK_BACKGROUND_FILL_COLOR, PACKAGE_JSON_URL, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT, SEARCH_IMAGE_BY_GOOGLE_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -1083,14 +1083,14 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         },
       });
       try {
-        await window.loadURL("https://images.google.com/imghp?sbi=1");
+        await window.loadURL(SEARCH_IMAGE_BY_GOOGLE_URL);
         handler.emitStatus({
           i18nKey: "tasks.searchImageByGoogle",
           progress: {
             all: 3,
             current: 1
           },
-          log: ["loaded: https://images.google.com/imghp?sbi=1"],
+          log: [`loaded: ${SEARCH_IMAGE_BY_GOOGLE_URL}`],
           status: "progress",
           cancelable: false
         });
@@ -1113,7 +1113,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             all: 3,
             current: 2
           },
-          log: ["uploading: https://images.google.com/imghp?sbi=1"],
+          log: [`uploading: ${SEARCH_IMAGE_BY_GOOGLE_URL}`],
           status: "progress",
           cancelable: false
         });
@@ -1130,7 +1130,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
                 all: 3,
                 current: 3
               },
-              log: ["uploaded: https://images.google.com/imghp?sbi=1"],
+              log: [`uploaded: ${SEARCH_IMAGE_BY_GOOGLE_URL}`],
               status: "complete",
               cancelable: false
             });
