@@ -271,9 +271,9 @@ export default class VBrowser extends Vue {
       },
     ], position);
   }
-  openDetail(petaImage: PetaImage) {
-    console.log(petaImage);
-    API.send("openWindow", WindowType.DETAILS);
+  async openDetail(petaImage: PetaImage) {
+    await API.send("setDetailsPetaImage", petaImage);
+    await API.send("openWindow", WindowType.DETAILS);
   }
   open() {
     this.visible = false;
