@@ -54,6 +54,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   let mainWindowType: WindowType | undefined = undefined; 
   let temporaryShowNSFW = false;
   let draggingPreviewWindow: DraggingPreviewWindow;
+  let detailsPetaImage: PetaImage | undefined = undefined;
   let DIR_ROOT: string;
   let DIR_APP: string;
   let DIR_LOG: string;
@@ -914,6 +915,16 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           return false;
         },
+        async setDetailsPetaImage(event, petaImage: PetaImage) {
+          detailsPetaImage = petaImage;
+          emitMainEvent("detailsPetaImage", detailsPetaImage);
+          return;
+        },
+        async getDetailsPetaImage() {
+          return new Promise<PetaImage | undefined>((res) => {
+            res(detailsPetaImage);
+          })
+        }
       }
     }
   });
