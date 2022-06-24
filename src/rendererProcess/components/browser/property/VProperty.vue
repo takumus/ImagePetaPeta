@@ -287,6 +287,7 @@ t-property-root {
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
+      overflow-y: auto;
       >t-tag {
         display: inline-block;
         margin: 0px 0px 4px 4px;
