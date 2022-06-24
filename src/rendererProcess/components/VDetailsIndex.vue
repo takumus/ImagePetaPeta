@@ -12,12 +12,21 @@
         </VUtilsBar> -->
       </t-top>
       <t-browser>
-        <VBoard
-          :zIndex="1"
-          :board="board"
-          :detailsMode="true"
-          ref="vPetaBoard"
-        />
+        <t-board>
+          <VBoard
+            :zIndex="1"
+            :board="board"
+            :detailsMode="true"
+            ref="vPetaBoard"
+          />
+        </t-board>
+        <t-property v-if="petaImageInfo">
+          <VProperty
+            :petaImages="singlePetaImages"
+            :petaTagInfos="petaTagInfos"
+            @selectTag="() => {}"
+          />
+        </t-property>
       </t-browser>
     </t-content>
     <t-modals
@@ -49,6 +58,7 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
+import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImage, PetaImages } from "@/commons/datas/petaImage";
@@ -71,7 +81,8 @@ import { Keyboards } from "../utils/keyboards";
     VComplement,
     VDialog,
     VUtilsBar,
-    VBoard
+    VBoard,
+    VProperty
   },
 })
 export default class DetailsIndex extends Vue {
@@ -109,8 +120,7 @@ export default class DetailsIndex extends Vue {
           delete this.petaImages[petaImage.id];
           this.board?.petaPanels.forEach((petaPanel) => {
             if (petaPanel.petaImageId === petaImage.id) {
-              petaPanel._petaImage = undefined;
-              this.vPetaBoard.load();
+              API.send("windowClose");
             }
           });
         });
@@ -140,6 +150,12 @@ export default class DetailsIndex extends Vue {
       return undefined;
     }
     return this.petaImages[this.petaImageId];
+  }
+  get singlePetaImages() {
+    if (this.petaImage === undefined) {
+      return [];
+    }
+    return [this.petaImage];
   }
   async getPetaImages() {
     this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
@@ -219,11 +235,24 @@ t-root {
       z-index: 2;
     }
     >t-browser {
-      display: block;
+      display: flex;
       overflow: hidden;
       background-color: var(--bg-color);
       flex: 1;
       z-index: 1;
+      >t-board {
+        display: block;
+        flex: 1;
+        z-index: 1;
+      }
+      >t-property {
+        padding: 8px;
+        display: block;
+        background-color: var(--bg-color);
+        z-index: 2;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.4);
+        width: 180px;
+      }
     }
     >t-modals {
       position: absolute;
