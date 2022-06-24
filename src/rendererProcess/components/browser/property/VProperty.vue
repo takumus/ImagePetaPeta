@@ -21,27 +21,33 @@
     </t-infos>
     <t-tags v-show="!noImage">
       <p>{{$t("browser.property.tags")}}</p>
-      <ul v-if="!fetchingTags">
-        <li v-for="tag in sharedPetaTags" :key="tag.id">
+      <t-search-box v-if="!fetchingTags">
+        <t-tag
+          v-for="tag in sharedPetaTags"
+          :key="tag.id"
+        >
           <VEditableLabel
             :label="tag.name"
-            :labelLook="`${tag.name}`"
-            :readonly="true"
+            :labelLook="tag.name"
+            :clickToEdit="true"
+            :allowEmpty="true"
             @focus="complementTag"
             @click="selectTag(tag)"
             @contextmenu="tagMenu($event, tag)"
           />
-        </li>
-        <li class="add">
+        </t-tag>
+        <t-tag class="last">
           <VEditableLabel
             :label="''"
-            :labelLook="$t('browser.property.clickToAddTag')"
+            :labelLook="$texts.plus + '       '"
             :clickToEdit="true"
             @change="(name) => addTag(name)"
             @focus="complementTag"
+            :growWidth="true"
+            :noOutline="true"
           />
-        </li>
-      </ul>
+        </t-tag>
+      </t-search-box>
       <ul v-else>
         <li>
           {{$t("browser.property.fetchingTags")}}
@@ -265,6 +271,36 @@ t-property-root {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    >t-search-box {
+      // border-radius: var(--rounded);
+      // border: solid 1.2px var(--border-color);
+      outline: none;
+      padding: 4px 4px 0px 0px;
+      font-size: 1.0em;
+      width: 100%;
+      word-break: break-all;
+      white-space: pre-wrap;
+      text-align: left;
+      // text-align: center;
+      // display: block;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      >t-tag {
+        display: inline-block;
+        margin: 0px 0px 4px 4px;
+        border-radius: var(--rounded);
+        padding: 4px;
+        background-color: var(--tab-bg-color);
+        // border: solid 1.2px var(--border-color);
+        &.last {
+          width: 100%;
+          background-color: unset;
+          flex: 1 1 64px;
+        }
+      }
+    }
     ul {
       white-space: nowrap;
       padding: 0px;
