@@ -82,7 +82,7 @@ export default class BrowserIndex extends Vue {
   title = "";
   async mounted() {
     API.on("updatePetaImages", (e, petaImages, mode) => {
-      if (mode === UpdateMode.UPSERT) {
+      if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
         petaImages.forEach((petaImage) => {
           this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
         });

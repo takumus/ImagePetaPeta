@@ -479,6 +479,7 @@ export class PetaDatas {
           newPetaImage.name = petaImage.name;
           log.log("update new petaImage");
           await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
+          this.emitMainEvent("updatePetaImages", [newPetaImage], UpdateMode.UPDATE);
           log.log("get tags");
           const pipts = await this.datas.dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
           log.log("tags:", pipts.length);
