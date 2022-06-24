@@ -244,6 +244,8 @@ t-root {
         display: block;
         flex: 1;
         z-index: 1;
+        background-repeat: repeat;
+        background-image: url("~@/@assets/transparentBackground.png");
       }
       >t-property {
         padding: 8px;
