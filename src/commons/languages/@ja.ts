@@ -38,6 +38,7 @@ const ja = {
       resetPosition: "位置をリセット"
     },
     panelMenu: {
+      details: "詳細を見る",
       playGIF: "GIFを再生",
       stopGIF: "GIFを停止",
       crop: "トリミング",

@@ -475,6 +475,19 @@ export default class VBoard extends Vue {
     const isMultiple = this.selectedPPanels.length > 1;
     this.$components.contextMenu.open([
       {
+        label: this.$t("boards.panelMenu.details"),
+        click: () => {
+          if (pPanel.petaPanel._petaImage === undefined) {
+            return;
+          }
+          API.send("setDetailsPetaImage", pPanel.petaPanel._petaImage);
+          API.send("openWindow", WindowType.DETAILS);
+        }
+      },
+      {
+        separate: true
+      },
+      {
         skip: isMultiple || !pPanel.isGIF,
         label: pPanel.isPlayingGIF ? this.$t("boards.panelMenu.stopGIF") : this.$t("boards.panelMenu.playGIF"),
         click: () => {
