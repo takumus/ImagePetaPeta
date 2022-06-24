@@ -20,6 +20,13 @@
       >
         {{$t("browser.property.clearSelectionButton")}}
       </button>
+      <button
+        tabindex="-1"
+        v-if="propertyThumbnails.length === 1"
+        @click="openDetails"
+      >
+        {{$t("browser.property.openDetailsButton")}}
+      </button>
     </t-buttons>
   </t-property-root>
 </template>
@@ -35,6 +42,8 @@ import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
+import { API } from "@/rendererProcess/api";
+import { WindowType } from "@/commons/datas/windowType";
 @Options({
   components: {
     VPropertyThumbnail
@@ -69,6 +78,13 @@ export default class VPreview extends Vue {
     this.petaImages.forEach((pi) => {
       pi._selected = false;
     })
+  }
+  openDetails() {
+    const petaImage = this.petaImages[0];
+    if (petaImage) {
+      API.send("setDetailsPetaImage", petaImage);
+      API.send("openWindow", WindowType.DETAILS);
+    }
   }
   get propertyThumbnails(): PropertyThumbnail[] {
     const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;

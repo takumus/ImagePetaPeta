@@ -97,6 +97,7 @@ const ja = {
         },
       },
       clearSelectionButton: "選択解除",
+      openDetailsButton: "詳細",
       clearSelectionDialog: "選択解除しますか?",
       tags: "タグ一覧",
       infos: {

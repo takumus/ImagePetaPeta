@@ -12,7 +12,7 @@
             :key="color.id"
             :style="{
               backgroundColor: color.color,
-              flex: 1//Math.floor(color.population * 70 + 30)
+              flex: Math.floor(color.population * 80 + 20)
             }"
           >
           </t-color>
@@ -168,6 +168,9 @@ export default class VProperty extends Vue {
   get singlePetaImageInfo() {
     if (this.petaImages.length == 1) {
       const petaImage = this.petaImages[0]!;
+      const all = petaImage.palette.reduce((p, c) => {
+        return p + c.population;
+      }, 0);
       return {
         name: petaImage.name,
         fileDate: dateFormat(petaImage.fileDate, "yyyy/mm/dd hh:MM:ss"),
@@ -175,7 +178,7 @@ export default class VProperty extends Vue {
         palette: petaImage.palette.map((color, i) => {
           return {
             color: `rgb(${color.r}, ${color.g}, ${color.b})`,
-            population: color.population,
+            population: color.population / all,
             id: i
           };
         })
