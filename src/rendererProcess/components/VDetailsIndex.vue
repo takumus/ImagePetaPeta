@@ -20,7 +20,7 @@
             ref="vPetaBoard"
           />
         </t-board>
-        <t-property v-if="petaImageInfo">
+        <t-property>
           <VProperty
             :petaImages="singlePetaImages"
             :petaTagInfos="petaTagInfos"
