@@ -166,8 +166,8 @@ export default class VBoard extends Vue {
     this.pixi.stage.on("pointerupoutside", (e) => this.pTransformer.mouseup(e));
     this.pixi.stage.on("pointermove", (e) => this.pTransformer.mousemove(e));
     this.pixi.stage.on("pointermoveoutside", (e) => this.pTransformer.mousemove(e));
-    this.pixi.stage.addChild(this.backgroundSprite);
     if (!this.detailsMode) {
+      this.pixi.stage.addChild(this.backgroundSprite);
       this.pixi.stage.addChild(this.crossLine);
     }
     this.pixi.stage.addChild(this.centerWrapper);
