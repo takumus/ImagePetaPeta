@@ -84,7 +84,7 @@ t-utils-bar-root {
   position: relative;
   background-color: var(--tab-selected-color);
   min-height: 30px;
-  box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.4);
   border-bottom: solid 1px var(--bg-color);
   display: block;
   >t-shared {
