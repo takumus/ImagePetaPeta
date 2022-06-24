@@ -34,6 +34,7 @@
       </t-content>
     </t-center>
     <t-right>
+      <VPreview :petaImages="selectedPetaImages" />
       <VProperty
         :petaImages="selectedPetaImages"
         :petaTagInfos="petaTagInfos"
@@ -60,6 +61,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
+import VPreview from "@/rendererProcess/components/browser/property/VPreview.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 // Others
@@ -81,6 +83,7 @@ import { WindowType } from "@/commons/datas/windowType";
   components: {
     VTile,
     VProperty,
+    VPreview,
     VEditableLabel,
     VModal,
     VTags

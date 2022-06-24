@@ -1,26 +1,5 @@
 <template>
   <t-property-root>
-    <t-previews
-      ref="previews"
-      v-show="!noImage"
-    >
-      <VPropertyThumbnail
-        v-for="(data) in propertyThumbnails"
-        :key="data.petaImage.id"
-        :propertyThumbnail="data"
-      />
-    </t-previews>
-    <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
-    <t-buttons
-      v-show="!noImage"
-    >
-      <button
-        tabindex="-1"
-        @click="clearSelection"
-      >
-        {{$t("browser.property.clearSelectionButton")}}
-      </button>
-    </t-buttons>
     <t-infos v-if="singlePetaImageInfo">
       <p>{{$t("browser.property.infos.label")}}</p>
       {{$t("browser.property.infos.name")}}: {{singlePetaImageInfo.name}}<br>
@@ -115,25 +94,12 @@ export default class VProperty extends Vue {
   petaImages!: PetaImage[];
   @Prop()
   petaTagInfos!: PetaTagInfo[];
-  @Ref("previews")
-  previews!: HTMLElement;
-  previewWidth = 0;
-  previewHeight = 0;
-  previewsResizer?: ResizeObserver;
   fetchingTags = true;
   mounted() {
-    this.previewsResizer = new ResizeObserver((entries) => {
-      this.resizePreviews(entries[0]!.contentRect);
-    });
-    this.previewsResizer.observe(this.previews);
+    //
   }
   unmounted() {
-    this.previewsResizer?.unobserve(this.previews);
-    this.previewsResizer?.disconnect();
-  }
-  resizePreviews(rect: DOMRectReadOnly) {
-    this.previewWidth = rect.width;
-    this.previewHeight = rect.height;
+    //
   }
   async addTag(name: string) {
     // タグを探す。なかったら作る。
@@ -199,37 +165,6 @@ export default class VProperty extends Vue {
     this.sharedPetaTags = this.petaTagInfos.filter((pti) => result.find((id) => id == pti.petaTag.id)).map((pi) => pi.petaTag);
     this.fetchingTags = false;
   }
-  get propertyThumbnails(): PropertyThumbnail[] {
-    const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
-    const petaImages = [...this.petaImages];
-    // プレビュー数の最大を抑える。
-    petaImages.splice(0, petaImages.length - MAX_PREVIEW_COUNT);
-    const thumbnails = petaImages.map((p, i): PropertyThumbnail => {
-      let width = 0;
-      let height = 0;
-      if (p.height / p.width < this.previewHeight / maxWidth) {
-        width = maxWidth;
-        height = maxWidth * p.height;
-      } else {
-        height = this.previewHeight;
-        width = this.previewHeight / p.height;
-      }
-      return {
-        petaImage: p,
-        position: new Vec2(0, 0),
-        width: width,
-        height: height
-      }
-    });
-    const last = thumbnails[thumbnails.length - 1]!;
-    thumbnails.forEach((thumb, i) => {
-      thumb.position = new Vec2(
-        petaImages.length > 1 ? (this.previewWidth - last.width) * (i / (petaImages.length - 1)) : this.previewWidth / 2 - thumb.width / 2,
-        this.previewHeight / 2 - thumb.height / 2
-      )
-    });
-    return thumbnails;
-  }
   get singlePetaImageInfo() {
     if (this.petaImages.length == 1) {
       const petaImage = this.petaImages[0]!;
@@ -287,6 +222,7 @@ export default class VProperty extends Vue {
 
 <style lang="scss" scoped>
 t-property-root {
+  flex: 1;
   width: 100%;
   height: 100%;
   // color: #333333;
@@ -294,17 +230,6 @@ t-property-root {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  >t-previews {
-    position: relative;
-    width: 100%;
-    height: 30%;
-    overflow: hidden;
-    display: block;
-  }
-  >t-buttons {
-    text-align: center;
-    display: block;
-  }
   >t-infos {
     display: block;
     word-break: break-all;
