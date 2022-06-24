@@ -476,7 +476,7 @@ export class PetaDatas {
           }
           newPetaImage.addDate = petaImage.addDate;
           newPetaImage.fileDate = petaImage.fileDate;
-          newPetaImage.name = petaImage.name;
+          newPetaImage.name = petaImage.name + "-converted";
           log.log("update new petaImage");
           await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
           this.emitMainEvent("updatePetaImages", [newPetaImage], UpdateMode.UPDATE);
