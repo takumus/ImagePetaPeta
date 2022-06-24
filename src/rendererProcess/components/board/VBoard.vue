@@ -68,6 +68,7 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+import w from "@/rendererProcess/utils/pixi-gif/decompress.worker";
 // PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
@@ -127,6 +128,7 @@ export default class VBoard extends Vue {
   cancel: (() => Promise<void[]>) | undefined;
   resolution = -1;
   resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+  mouseOffset = new Vec2();
   mounted() {
     setTimeout(() => {
       this.constructIfResolutionChanged();
@@ -205,6 +207,8 @@ export default class VBoard extends Vue {
   resize(rect: DOMRectReadOnly) {
     this.stageRect.x = rect.width;
     this.stageRect.y = rect.height;
+    this.mouseOffset.set(this.panelsBackground.getBoundingClientRect());
+    this.updateDetailsPetaPanel();
     if (this.pixi) {
       this.pixi.renderer.resize(rect.width, rect.height);
       this.pixi.view.style.width = rect.width + "px";
@@ -228,13 +232,14 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
-    this.click.down(e.data.global);
+    const mouse = this.getMouseFromEvent(e);
+    this.click.down(mouse);
     if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE || (this.detailsMode && e.data.button == MouseButton.LEFT)) {
       this.mouseRightPressing = true;
       this.dragging = true;
       this.dragOffset
       .set(this.board.transform.position)
-      .sub(e.data.global);
+      .sub(mouse);
     } else if (e.data.button == MouseButton.LEFT) {
       this.mouseLeftPressing = true;
       const pPanel = this.getPPanelFromObject(e.target);
@@ -243,7 +248,7 @@ export default class VBoard extends Vue {
       } else if (e.target.name != "transformer") {
         this.clearSelectionAll();
         this.selecting = true;
-        this.selection.topLeft = new Vec2(this.rootContainer.toLocal(e.data.global));
+        this.selection.topLeft = new Vec2(this.rootContainer.toLocal(mouse));
         this.selection.bottomRight = this.selection.topLeft.clone();
       }
     }
@@ -256,6 +261,7 @@ export default class VBoard extends Vue {
     return null;
   }
   mouseup(e: PIXI.InteractionEvent) {
+    const mouse = this.getMouseFromEvent(e).add(this.mouseOffset);
     if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE || (this.detailsMode && e.data.button == MouseButton.LEFT)) {
       this.mouseRightPressing = false;
       if (this.click.isClick && e.data.button == MouseButton.RIGHT) {
@@ -263,7 +269,7 @@ export default class VBoard extends Vue {
         if (pPanel) {
           this.pointerdownPPanel(pPanel, e);
           this.selectedPPanels.forEach((pPanel) => pPanel.dragging = false);
-          this.petaPanelMenu(pPanel, new Vec2(e.data.global));
+          this.petaPanelMenu(pPanel, new Vec2(mouse));
         } else if (!this.detailsMode) {
           this.$components.contextMenu.open([{
             label: this.$t("boards.menu.openBrowser"),
@@ -275,7 +281,7 @@ export default class VBoard extends Vue {
             click: () => {
               this.resetTransform();
             }
-          }], new Vec2(e.data.global));
+          }], new Vec2(mouse));
         }
       }
       this.dragging = false;
@@ -290,17 +296,21 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   mousemove(e: PIXI.InteractionEvent) {
-    this.mousePosition = new Vec2(e.data.global);
+    const mouse = this.getMouseFromEvent(e);
+    this.mousePosition = new Vec2(mouse);
     this.click.move(this.mousePosition);
     if (this.mouseLeftPressing || this.mouseRightPressing || this.draggingPanels) {
       this.orderPIXIRender();
     }
   }
+  getMouseFromEvent(e: PIXI.InteractionEvent) {
+    return new Vec2(e.data.global);
+  }
   wheel(event: WheelEvent) {
     if (!this.board) {
       return;
     }
-    const mouse = vec2FromMouseEvent(event).sub(this.stageRect.clone().div(2));
+    const mouse = vec2FromMouseEvent(event).sub(this.mouseOffset).sub(this.stageRect.clone().div(2));
     if (event.ctrlKey || this.$systemInfo.platform == "win32") {
       const currentZoom = this.board.transform.scale;
       this.board.transform.scale *= 1 + -event.deltaY * this.$settings.zoomSensitivity * 0.00001;
@@ -536,6 +546,7 @@ export default class VBoard extends Vue {
     const offset = new Vec2(20, 20).mult(offsetIndex);
     petaPanel.width *= 1 / this.board.transform.scale;
     petaPanel.height *= 1 / this.board.transform.scale;
+    petaPanel.position.sub(this.mouseOffset);
     petaPanel.position = new Vec2(this.panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
     this.draggingPanels = true;
     const maxIndex = this.getMaxIndex();
@@ -592,6 +603,7 @@ export default class VBoard extends Vue {
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
   async load(): Promise<void> {
+    this.updateDetailsPetaPanel();
     const log = logChunk().log;
     this.endCrop();
     Cursor.setCursor("wait");
@@ -681,6 +693,7 @@ export default class VBoard extends Vue {
     PIXI.utils.clearTextureCache();
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
+    const mouse = this.getMouseFromEvent(e);
     if (!this.board || this.detailsMode) {
       return;
     }
@@ -697,7 +710,7 @@ export default class VBoard extends Vue {
     this.layer.scrollTo(pPanel);
     this.draggingPanels = true;
     this.selectedPPanels.forEach((pPanel) => {
-      const pos = new Vec2(e.data.global);
+      const pos = new Vec2(mouse);
       pPanel.draggingOffset = new Vec2(pPanel.position).sub(this.panelsCenterWrapper.toLocal(pos));
       pPanel.dragging = true;
     });
@@ -728,6 +741,28 @@ export default class VBoard extends Vue {
   }
   keyShift(pressed: boolean) {
     this.pTransformer.fit = pressed;
+  }
+  updateDetailsPetaPanel() {
+    if (!this.detailsMode) {
+      return;
+    }
+    const petaPanel = this.board?.petaPanels[0];
+    const petaImage = petaPanel?._petaImage;
+    if (petaPanel && petaImage) {
+      let width = 0;
+      let height = 0;
+      const maxWidth = this.stageRect.x * 0.9;
+      const maxHeight = this.stageRect.y * 0.9;
+      if (petaImage.height / petaImage.width < maxHeight / maxWidth) {
+        width = maxWidth;
+        height = maxWidth * petaImage.height;
+      } else {
+        height = maxHeight;
+        width = maxHeight / petaImage.height;
+      }
+      petaPanel.width = width;
+      petaPanel.height = height;
+    }
   }
   get pPanelsArray() {
     return Object.values(this.pPanels);
@@ -776,9 +811,7 @@ export default class VBoard extends Vue {
 
 <style lang="scss" scoped>
 t-board-root {
-  position: absolute;
-  top: 0px;
-  left: 0px;
+  position: relative;
   width: 100%;
   height: 100%;
   display: block;
@@ -799,25 +832,6 @@ t-board-root {
     width: 100%;
     height: 100%;
     display: block;
-  }
-  >t-info {
-    position: absolute;
-    z-index: 2;
-    bottom: 0px;
-    left: 0px;
-    padding: 8px;
-    height: 40px;
-    display: flex;
-    >t-fps {
-      display: block;
-      padding: 4px;
-      border-radius: var(--rounded);
-      background-color: var(--bg-color);
-      border: solid 1px var(--border-color);
-      height: 100%;
-      width: 50px;
-      text-align: center;
-    }
   }
 }
 </style>

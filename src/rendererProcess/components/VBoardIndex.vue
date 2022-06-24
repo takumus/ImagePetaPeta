@@ -4,31 +4,35 @@
       dark: darkMode
     }"
   >
-    <VBoard
-      :zIndex="1"
-      :board="currentPetaBoard"
-      :detailsMode="false"
-      ref="vPetaBoard"
-      @change="changePetaBoard"
-    />
-    <t-top>
-      <VTitleBar>
-        <VTabBar
-          :boards="sortedPetaBoards"
-          :title="title"
-          :currentPetaBoardId="currentPetaBoardId"
-          @remove="removePetaBoard"
-          @add="addPetaBoard"
-          @select="selectPetaBoard"
-          @sort="changePetaBoards"
+    <t-content>
+      <t-top>
+        <VTitleBar>
+          <VTabBar
+            :boards="sortedPetaBoards"
+            :title="title"
+            :currentPetaBoardId="currentPetaBoardId"
+            @remove="removePetaBoard"
+            @add="addPetaBoard"
+            @select="selectPetaBoard"
+            @sort="changePetaBoards"
+            @change="changePetaBoard"
+            ref="vTabBar"
+          />
+        </VTitleBar>
+        <VUtilsBar>
+          <VBoardProperty :board="currentPetaBoard" />
+        </VUtilsBar>
+      </t-top>
+      <t-browser>
+        <VBoard
+          :zIndex="1"
+          :board="currentPetaBoard"
+          :detailsMode="false"
+          ref="vPetaBoard"
           @change="changePetaBoard"
-          ref="vTabBar"
         />
-      </VTitleBar>
-      <VUtilsBar>
-        <VBoardProperty :board="currentPetaBoard" />
-      </VUtilsBar>
-    </t-top>
+      </t-browser>
+    </t-content>
     <t-modals
       v-show="this.$components.modal.modalIds.length > 0"
     >
@@ -331,12 +335,27 @@ export default class BoardIndex extends Vue {
 
 <style lang="scss" scoped>
 t-root {
-  >t-top {
+  >t-content {
     position: fixed;
     top: 0px;
     left: 0px;
+    display: flex;
+    height: 100%;
     width: 100%;
+    flex-direction: column;
     z-index: 3;
+    >t-top {
+      display: block;
+      width: 100%;
+      z-index: 2;
+    }
+    >t-browser {
+      display: block;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      flex: 1;
+      z-index: 1;
+    }
   }
   >t-modals {
     position: absolute;
