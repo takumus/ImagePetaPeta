@@ -302,32 +302,6 @@ t-property-root {
         }
       }
     }
-    ul {
-      white-space: nowrap;
-      padding: 0px;
-      margin: 0px;
-      flex-grow: 1;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      >li {
-        list-style-type: none;
-        padding: 4px;
-        cursor: pointer;
-        display: flex;
-        &:hover * {
-          text-decoration: underline;
-        }
-        &::before {
-          width: 16px;
-          display: inline-block;
-          line-height: 1.5em;
-          content: "・";
-        }
-        &.add::before {
-          content: "＋";
-        }
-      }
-    }
   }
   p {
     text-align: center;
