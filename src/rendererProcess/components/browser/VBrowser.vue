@@ -38,7 +38,7 @@
       <VProperty
         :petaImages="selectedPetaImages"
         :petaTagInfos="petaTagInfos"
-        @selectTag="(tag) => selectedPetaTags = [tag]"
+        @selectTag="selectTag"
       />
       <input
         type="range"
@@ -299,6 +299,10 @@ export default class VBrowser extends Vue {
         return b.addDate - a.addDate;
       }
     }
+  }
+  selectTag(tag: PetaTag) {
+    this.selectedPetaTags.length = 0;
+    this.selectedPetaTags.push(tag);
   }
   @Watch("selectedPetaTags", { deep: true })
   changeSelectedTags() {

@@ -31,6 +31,7 @@
             :labelLook="tag.name"
             :clickToEdit="true"
             :allowEmpty="true"
+            :readonly="true"
             @focus="complementTag"
             @click="selectTag(tag)"
             @contextmenu="tagMenu($event, tag)"
