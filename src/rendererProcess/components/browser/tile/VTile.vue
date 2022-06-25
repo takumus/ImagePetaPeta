@@ -338,18 +338,23 @@ t-tile-root {
       position: absolute;
       bottom: 0px;
       pointer-events: none;
-      overflow-wrap: break-word;
-      padding: 8px;
-      line-height: 1.2em;
-      display: block;
+      outline: none;
+      padding: 2px 2px;
+      font-size: 1.0em;
+      word-break: break-all;
+      white-space: pre-wrap;
+      text-align: left;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap-reverse;
+      justify-content: right;
       >t-tag {
-        background-color: rgba($color: (#000000), $alpha: 0.5);
-        color: #ffffff;
-        padding: 2px;
+        display: inline-block;
+        margin: 1px 1px;
         border-radius: var(--rounded);
-        margin-right: 4px;
-        font-size: 0.8em;
-        display: inline;
+        padding: 3px;
+        background-color: var(--tab-bg-color);
+        font-size: 0.7em;
       }
     }
     >t-palette {
