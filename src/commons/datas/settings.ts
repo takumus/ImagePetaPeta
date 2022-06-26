@@ -1,15 +1,13 @@
 import deepcopy from "deepcopy";
 const defaultSettings = {
-  lowMemoryMode: false,
   darkMode: false,
   autoDarkMode: true,
   alwaysOnTop: false,
-  enableHardwareAcceleration: true,
   showFPS: false,
   zoomSensitivity: 100,
   moveSensitivity: 100,
   autoHideUI: false,
-  loadTilesInOriginal: false,
+  loadTilesInOriginal: true,
   alwaysShowNSFW: false,
   petaImageDirectory: {
     default: true,
