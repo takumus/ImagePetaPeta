@@ -8,8 +8,8 @@
       <t-top>
         <VTitleBar :title="$t('titles.details')">
         </VTitleBar>
-        <!-- <VUtilsBar>
-        </VUtilsBar> -->
+        <VUtilsBar>
+        </VUtilsBar>
       </t-top>
       <t-browser>
         <t-board>
@@ -246,6 +246,7 @@ t-root {
         z-index: 1;
         background-repeat: repeat;
         background-image: url("~@/@assets/transparentBackground.png");
+        cursor: grab;
       }
       >t-property {
         padding: 8px;

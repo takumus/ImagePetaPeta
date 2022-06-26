@@ -963,6 +963,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     } else if (activeWindows.browser) {
       emitMainEvent("mainWindowType", WindowType.BROWSER);
       mainWindowType = WindowType.BROWSER;
+    } else if (activeWindows.details) {
+      emitMainEvent("mainWindowType", WindowType.DETAILS);
+      mainWindowType = WindowType.DETAILS;
     } else {
       if (process.platform !== "darwin") {
         app.quit();
@@ -1009,7 +1012,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
     window.addListener("focus", () => {
       emitMainEvent("windowFocused", true, type);
-      if (type === WindowType.BOARD || type === WindowType.BROWSER) {
+      if (type === WindowType.BOARD || type === WindowType.BROWSER || type === WindowType.DETAILS) {
         emitMainEvent("mainWindowType", type);
         mainWindowType = type;
       }

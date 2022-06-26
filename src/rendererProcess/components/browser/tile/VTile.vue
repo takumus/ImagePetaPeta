@@ -31,7 +31,7 @@
           draggable="false"
           :src="imageURL"
           v-show="!loadingImage"
-          decoding="async"
+          
           loading="lazy"
           @load="loaded"
         >

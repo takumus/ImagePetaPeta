@@ -5,18 +5,28 @@
     </t-property>
     <t-shared class="left" v-if="visible">
       <button
+        v-if="$windowType === 'browser' || $windowType === 'details'"
         tabindex="-1"
-        @click="open"
+        @click="openBoard()"
       >
-        <t-icon :class="$windowType"></t-icon>
+        <t-icon class="board"></t-icon>
       </button>
       <button
+        v-if="$windowType === 'board' || $windowType === 'details'"
+        tabindex="-1"
+        @click="openBrowser()"
+      >
+        <t-icon class="browser"></t-icon>
+      </button>
+      <button
+        v-if="$windowType !== 'details'"
         tabindex="-1"
         @click="$api.send('importImageFiles')"
       >
         <t-icon class="import-file"></t-icon>
       </button>
       <button
+        v-if="$windowType !== 'details'"
         tabindex="-1"
         @click="$api.send('importImageDirectories')"
       >
@@ -61,12 +71,11 @@ export default class VUtilsBar extends Vue {
   unmounted() {
     //
   }
-  open() {
-    if (this.$windowType === WindowType.BOARD) {
-      API.send("openWindow", WindowType.BROWSER);
-    } else if (this.$windowType === WindowType.BROWSER) {
-      API.send("openWindow", WindowType.BOARD);
-    }
+  openBoard() {
+    API.send("openWindow", WindowType.BOARD);
+  }
+  openBrowser() {
+    API.send("openWindow", WindowType.BROWSER);
   }
   openSettings() {
     API.send("openWindow", WindowType.SETTINGS);
@@ -123,10 +132,10 @@ t-utils-bar-root {
           background-repeat: no-repeat;
           background-position: center center;
           filter: var(--icon-filter);
-          &.browser {
+          &.board {
             background-image: url("~@/@assets/board.png");
           }
-          &.board {
+          &.browser {
             background-image: url("~@/@assets/browser.png");
           }
           &.import-file {
