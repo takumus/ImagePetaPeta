@@ -9,7 +9,7 @@ const defaultSettings = {
   zoomSensitivity: 100,
   moveSensitivity: 100,
   autoHideUI: false,
-  loadThumbnailsInOriginal: false,
+  loadTilesInOriginal: false,
   alwaysShowNSFW: false,
   petaImageDirectory: {
     default: true,

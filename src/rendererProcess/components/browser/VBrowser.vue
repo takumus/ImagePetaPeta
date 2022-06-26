@@ -24,7 +24,7 @@
               :petaTagInfos="petaTagInfos"
               :parentAreaMinY="areaMinY"
               :parentAreaMaxY="areaMaxY"
-              @select="selectThumbnail"
+              @select="selectTile"
               @menu="petaImageMenu"
               @drag="drag"
               @dblclick="openDetail"
@@ -118,7 +118,7 @@ export default class VBrowser extends Vue {
   scrollAreaResizer?: ResizeObserver;
   firstSelectedTile: Tile | null = null;
   thumbnailsSize = 0;
-  currentScrollThumbnailId = "";
+  currentScrollTileId = "";
   keyboards = new Keyboards();
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
@@ -151,12 +151,12 @@ export default class VBrowser extends Vue {
       const d = Math.abs(t.position.y - this.thumbnails.scrollTop);
       if (d < min) {
         min = d;
-        this.currentScrollThumbnailId = t.petaImage.id;
+        this.currentScrollTileId = t.petaImage.id;
       }
     });
   }
   restoreScrollPosition() {
-    const current = this.tiles.find((bt) => bt.petaImage.id == this.currentScrollThumbnailId);
+    const current = this.tiles.find((bt) => bt.petaImage.id == this.currentScrollTileId);
     if (current) {
       this.thumbnails.scrollTo(0, current.position.y);
     }
@@ -187,10 +187,10 @@ export default class VBrowser extends Vue {
     }
     const petaImages = petaImage._selected ? [] : [petaImage];
     petaImages.push(...this.selectedPetaImages);
-    API.send("startDrag", petaImages, this.actualThumbnailSize, "");
+    API.send("startDrag", petaImages, this.actualTileSize, "");
     this.close();
   }
-  selectThumbnail(thumb: Tile, force = false) {
+  selectTile(thumb: Tile, force = false) {
     if (this.selectedPetaImages.length < 1 || (!Keyboards.pressedOR("control", "meta", "shift"))) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedTile = thumb;
@@ -239,7 +239,7 @@ export default class VBrowser extends Vue {
   }
   petaImageMenu(thumb: Tile, position: Vec2) {
     if (!thumb.petaImage._selected) {
-      this.selectThumbnail(thumb, true);
+      this.selectTile(thumb, true);
     }
     this.$components.contextMenu.open([
       {
@@ -311,7 +311,7 @@ export default class VBrowser extends Vue {
   }
   @Watch("selectedPetaTags", { deep: true })
   changeSelectedTags() {
-    this.currentScrollThumbnailId = "";
+    this.currentScrollTileId = "";
     this.$nextTick(() => {
       this.thumbnails.scrollTop = 0;
     });
@@ -326,7 +326,7 @@ export default class VBrowser extends Vue {
     this.fetchFilteredPetaImages();
   }
   @Watch("thumbnailsSize")
-  changeThumbnailsSize() {
+  changeTilesSize() {
     this.restoreScrollPosition();
   }
   get petaImagesArray() {
@@ -358,7 +358,7 @@ export default class VBrowser extends Vue {
     }
     return c;
   }
-  get actualThumbnailSize() {
+  get actualTileSize() {
     return this.thumbnailsWidth / this.thumbnailsRowCount;
   }
   get scrollHeight() {
@@ -369,7 +369,7 @@ export default class VBrowser extends Vue {
     }, 0);
   }
   get tiles(): Tile[] {
-    if (this.actualThumbnailSize == 0) {
+    if (this.actualTileSize == 0) {
       return [];
     }
     const yList: number[] = [];
@@ -400,13 +400,13 @@ export default class VBrowser extends Vue {
           mvi = vi;
         }
       });
-      const position = new Vec2(mvi * this.actualThumbnailSize, yList[mvi]);
-      const height = p.height * this.actualThumbnailSize;
+      const position = new Vec2(mvi * this.actualTileSize, yList[mvi]);
+      const height = p.height * this.actualTileSize;
       yList[mvi] += height;
       return {
         petaImage: p,
         position: position,
-        width: this.actualThumbnailSize,
+        width: this.actualTileSize,
         height: height,
         petaTags: [],
         visible: 
@@ -426,7 +426,7 @@ export default class VBrowser extends Vue {
     return tiles;
   }
   get original() {
-    return this.$settings.loadThumbnailsInOriginal && this.actualThumbnailSize > BROWSER_THUMBNAIL_SIZE;
+    return this.$settings.loadTilesInOriginal && this.actualTileSize > BROWSER_THUMBNAIL_SIZE;
   }
   keyA() {
     if (isKeyboardLocked()) {

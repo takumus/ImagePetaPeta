@@ -63,10 +63,10 @@ export function upgradeSettings(settings: Settings) {
   //   settings.tileSize = defaultSettings.tileSize;
   //   changed = true;
   // }
-  if (settings.loadThumbnailsInOriginal === undefined) {
-    settings.loadThumbnailsInOriginal = defaultSettings.loadThumbnailsInOriginal;
-    changed = true;
-  }
+  // if (settings.loadTilesInOriginal === undefined) {
+  //   settings.loadTilesInOriginal = defaultSettings.loadTilesInOriginal;
+  //   changed = true;
+  // }
   // v1.6.0
   if (settings.alwaysShowNSFW === undefined) {
     settings.alwaysShowNSFW = defaultSettings.alwaysShowNSFW;
@@ -101,6 +101,10 @@ export function upgradeSettings(settings: Settings) {
   // v2.8.0
   if (settings.show === undefined) {
     settings.show = defaultSettings.show;
+    changed = true;
+  }
+  if (settings.loadTilesInOriginal === undefined) {
+    settings.loadTilesInOriginal = defaultSettings.loadTilesInOriginal;
     changed = true;
   }
   return {

@@ -108,12 +108,12 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.loadThumbnailsInOriginal"
-            @change="$settings.loadThumbnailsInOriginal = Boolean($event.target.checked)"
+            :checked="$settings.loadTilesInOriginal"
+            @change="$settings.loadTilesInOriginal = Boolean($event.target.checked)"
           >
-          {{$t("settings.loadThumbnailsInOriginal")}}
+          {{$t("settings.loadTilesInOriginal")}}
         </label>
-        <p>{{$t("settings.loadThumbnailsInOriginalDescriptions")}}</p>
+        <p>{{$t("settings.loadTilesInOriginalDescriptions")}}</p>
       </t-content>
       <!--
         Datas
