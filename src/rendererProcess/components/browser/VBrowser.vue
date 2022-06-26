@@ -200,8 +200,10 @@ export default class VBrowser extends Vue {
       thumb.petaImage._selected = !thumb.petaImage._selected || force;
     } else {
       // コントロールキーが押されていなければ選択をリセット
-      this.clearSelectionAllImages();
       thumb.petaImage._selected = true;
+      this.petaImagesArray.forEach((pi) => {
+        pi._selected = thumb.petaImage === pi;
+      });
     }
     if (this.firstSelectedTile && Keyboards.pressed("shift")) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
@@ -275,6 +277,9 @@ export default class VBrowser extends Vue {
     ], position);
   }
   async openDetail(petaImage: PetaImage) {
+    if (Keyboards.pressedOR("control", "meta", "shift")) {
+      return;
+    }
     await API.send("setDetailsPetaImage", petaImage);
     await API.send("openWindow", WindowType.DETAILS);
   }
