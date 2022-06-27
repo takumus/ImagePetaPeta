@@ -5,7 +5,16 @@
       <t-datas>
         <t-data>
           <t-name>{{$t("browser.property.infos.name")}}</t-name>
-          <t-value>{{singlePetaImageInfo.name}}</t-value>
+          <t-value>
+            <VEditableLabel
+              :label="singlePetaImageInfo.name"
+              :labelLook="singlePetaImageInfo.name"
+              :clickToEdit="true"
+              :allowEmpty="true"
+              :growWidth="true"
+              @change="changeName"
+            />
+          </t-value>
         </t-data>
         <t-data>
           <t-name>{{$t("browser.property.infos.fileDate")}}</t-name>
@@ -146,6 +155,13 @@ export default class VProperty extends Vue {
       UpdateMode.REMOVE
     );
   }
+  changeName(name: string) {
+    if (this.singlePetaImageInfo === undefined) {
+      return;
+    }
+    this.singlePetaImageInfo.petaImage.name = name;
+    API.send("updatePetaImages", [this.singlePetaImageInfo.petaImage], UpdateMode.UPDATE);
+  }
   clearSelection() {
     this.petaImages.forEach((pi) => {
       pi._selected = false;
@@ -191,6 +207,7 @@ export default class VProperty extends Vue {
       }, 0);
       return {
         name: petaImage.name,
+        petaImage: petaImage,
         fileDate: dateFormat(petaImage.fileDate, "yyyy/mm/dd hh:MM:ss"),
         addDate: dateFormat(petaImage.addDate, "yyyy/mm/dd hh:MM:ss"),
         palette: petaImage.palette.map((color, i) => {
@@ -266,7 +283,7 @@ t-property-root {
           width: 40%;
           position: relative;
           text-align: right;
-          padding-right: 8px;
+          padding: 0px 8px;
           &::after {
             position: absolute;
             right: 0px;
@@ -274,7 +291,7 @@ t-property-root {
           }
         }
         >t-value {
-          padding-left: 8px;
+          padding: 0px 8px;
           display: block;
           width: 60%;
           overflow-wrap: break-word;
