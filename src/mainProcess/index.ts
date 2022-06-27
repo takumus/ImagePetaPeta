@@ -351,7 +351,13 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           const log = mainLogger.logChunk();
           try {
             log.log("#Import Images From Clipboard");
-            return (await petaDatas.importImagesFromBuffers(buffers, "clipboard")).map((petaImage) => petaImage.id);
+            return (await petaDatas.importImagesFromBuffers(buffers.map((buffer) => {
+              return {
+                buffer: buffer,
+                name: "clipboard",
+                note: ""
+              }
+            }))).map((petaImage) => petaImage.id);
           } catch (error) {
             log.error(error);
           }
@@ -819,27 +825,30 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             log.log("trying to download:", htmls, htmls.map((html) => {
               return getURLFromImgTag(html);
             }));
-            const buffers = await promiseSerial(
+            const datas = await promiseSerial(
               async (url) => {
                 let data: Buffer;
+                let remoteURL = "";
                 if (url.trim().indexOf("data:") == 0) {
                   // dataURIだったら
                   data = dataURIToBuffer(url);
                 } else {
                   // 普通のurlだったら
                   data = (await axios.get(url, { responseType: "arraybuffer" })).data;
+                  remoteURL = url;
                 }
-                return data;
+                return {
+                  buffer: data,
+                  note: remoteURL,
+                  name: "downloaded"
+                };
               },
               htmls.map((html) => {
                 return getURLFromImgTag(html);
               })
             ).promise;
-            if (buffers.length > 0) {
-              petaImages = await petaDatas.importImagesFromBuffers(
-                buffers,
-                "download"
-              );
+            if (datas.length > 0) {
+              petaImages = await petaDatas.importImagesFromBuffers(datas);
               log.log("result:", petaImages.length);
             }
           } catch (error) {
@@ -851,9 +860,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
                 log.log("trying to read ArrayBuffer:", arrayBuffers.length);
                 petaImages = await petaDatas.importImagesFromBuffers(
                   arrayBuffers.map((ab) => {
-                    return Buffer.from(ab);
-                  }),
-                  "noname"
+                    return {
+                      buffer: Buffer.from(ab),
+                      name: "noname",
+                      note: ""
+                    };
+                  })
                 );
                 log.log("result:", petaImages.length);
               }

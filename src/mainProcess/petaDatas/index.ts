@@ -347,7 +347,7 @@ export class PetaDatas {
           const name = Path.basename(filePath);
           const fileDate = (await file.stat(filePath)).mtime;
           const addResult = await this.importImage({
-            data, name, fileDate
+            data, name, fileDate, note: ""
           });
           if (addResult.exists) {
             result = ImportImageResult.EXISTS;
@@ -514,7 +514,7 @@ export class PetaDatas {
     });
     return petaImages;
   }
-  async importImagesFromBuffers(buffers: Buffer[], name: string) {
+  async importImagesFromBuffers(datas: { buffer: Buffer, name: string, note: string }[]) {
     return Tasks.spawn("ImportImagesFromBuffers", async (handler) => {
       handler.emitStatus({
         i18nKey: "tasks.importingFiles",
@@ -523,15 +523,17 @@ export class PetaDatas {
       });
       const log = this.mainLogger.logChunk();
       log.log("##Import Images From Buffers");
-      log.log("buffers:", buffers.length);
+      log.log("buffers:", datas.length);
       let addedFileCount = 0;
       const petaImages: PetaImage[] = [];
-      const importImage = async (buffer: Buffer, index: number) => {
-        log.log("import:", index + 1, "/", buffers.length);
+      const importImage = async (data: { buffer: Buffer, name: string, note: string }, index: number) => {
+        log.log("import:", index + 1, "/", datas.length);
         let result = ImportImageResult.SUCCESS;
         try {
           const importResult = await this.importImage({
-            data: buffer, name
+            data: data.buffer,
+            name: data.name,
+            note: data.note
           });
           if (importResult.exists) {
             result = ImportImageResult.EXISTS;
@@ -547,21 +549,21 @@ export class PetaDatas {
         handler.emitStatus({
           i18nKey: "tasks.importingFiles",
           progress: {
-            all: buffers.length,
+            all: datas.length,
             current: index + 1,
           },
-          log: [result, name],
+          log: [result, data.name],
           status: "progress"
         });
       }
-      const result =  promiseSerial(importImage, buffers);
+      const result =  promiseSerial(importImage, datas);
       handler.onCancel = result.cancel;
       await result.promise;
-      log.log("return:", addedFileCount, "/", buffers.length);
+      log.log("return:", addedFileCount, "/", datas.length);
       handler.emitStatus({
         i18nKey: "tasks.importingFiles",
-        log: [addedFileCount.toString(), buffers.length.toString()],
-        status: addedFileCount == buffers.length ? "complete" : "failed"
+        log: [addedFileCount.toString(), datas.length.toString()],
+        status: addedFileCount == datas.length ? "complete" : "failed"
       });
       if (this.datas.dataSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");
@@ -573,7 +575,7 @@ export class PetaDatas {
   async getPetaImage(id: string) {
     return (await this.datas.dataPetaImages.find({ id }))[0];
   }
-  async importImage(param: { data: Buffer, name: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
+  async importImage(param: { data: Buffer, name: string, note: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await this.getPetaImage(id);
     if (exists) return {
@@ -608,6 +610,7 @@ export class PetaDatas {
         thumbnail: `${originalFileName}.${petaMetaData.thumbnail.format}`
       },
       name: param.name,
+      note: param.note,
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
       width: 1,
@@ -615,7 +618,6 @@ export class PetaDatas {
       placeholder: petaMetaData.placeholder,
       palette: petaMetaData.palette,
       id: id,
-      note: "",
       nsfw: false,
       metadataVersion: PETAIMAGE_METADATA_VERSION
     }
