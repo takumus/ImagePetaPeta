@@ -330,7 +330,7 @@ t-settings-root {
         >pre {
           text-align: left;
           overflow: hidden;
-          word-break: break-word;
+          white-space: pre-wrap;
           height: 128px;
           overflow-y: auto;
           overflow-x: hidden;
