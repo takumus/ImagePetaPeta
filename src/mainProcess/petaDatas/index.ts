@@ -615,6 +615,7 @@ export class PetaDatas {
       placeholder: petaMetaData.placeholder,
       palette: petaMetaData.palette,
       id: id,
+      note: "",
       nsfw: false,
       metadataVersion: PETAIMAGE_METADATA_VERSION
     }

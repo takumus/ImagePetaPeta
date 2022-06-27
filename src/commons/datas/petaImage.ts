@@ -13,7 +13,7 @@ export interface PetaImage {
   id: string,
   placeholder: string,
   palette: PetaColor[],
-  note: "",
+  note: string,
   nsfw: boolean,
   _selected?: boolean,
   metadataVersion: number
