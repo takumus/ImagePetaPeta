@@ -45,6 +45,9 @@ export function upgradePetaImage(petaImage: PetaImage) {
       color.positionSD = 0;
     }
   });
+  if (petaImage.note === undefined) {
+    petaImage.note = "";
+  }
   return petaImage;
 }
 export function upgradeSettings(settings: Settings) {
