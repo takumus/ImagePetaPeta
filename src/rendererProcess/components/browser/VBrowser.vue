@@ -454,7 +454,7 @@ t-browser-root {
   overflow: hidden;
   >t-left {
     padding: 8px;
-    width: 20%;
+    width: 200px;
     min-width: 180px;
     display: block;
   }
@@ -485,7 +485,7 @@ t-browser-root {
     }
   }
   >t-right {
-    width: 20%;
+    width: 200px;
     min-width: 180px;
     padding: 8px;
     display: flex;
