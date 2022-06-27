@@ -892,6 +892,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             windows[windowType]?.moveTop();
             windows[windowType]?.focus();
           }
+          moveSettingsWindowToTop();
         },
         async getMainWindowType() {
           return mainWindowType;
@@ -958,14 +959,11 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     saveWindowSize(type);
     activeWindows[type] = false;
     if (activeWindows.board) {
-      emitMainEvent("mainWindowType", WindowType.BOARD);
-      mainWindowType = WindowType.BOARD;
+      changeMainWindow(WindowType.BOARD);
     } else if (activeWindows.browser) {
-      emitMainEvent("mainWindowType", WindowType.BROWSER);
-      mainWindowType = WindowType.BROWSER;
+      changeMainWindow(WindowType.BROWSER);
     } else if (activeWindows.details) {
-      emitMainEvent("mainWindowType", WindowType.DETAILS);
-      mainWindowType = WindowType.DETAILS;
+      changeMainWindow(WindowType.DETAILS);
     } else {
       if (process.platform !== "darwin") {
         app.quit();
@@ -1013,21 +1011,38 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     window.addListener("focus", () => {
       emitMainEvent("windowFocused", true, type);
       if (type === WindowType.BOARD || type === WindowType.BROWSER || type === WindowType.DETAILS) {
-        emitMainEvent("mainWindowType", type);
-        mainWindowType = type;
+        changeMainWindow(type);
       }
       window.moveTop();
     });
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}?${type}`).then(() => {
         if (!process.env.IS_TEST) {
-          window.webContents.openDevTools({ mode: "right" });
+          // window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {
       window.loadURL(`app://./index.html?${type}`);
     }
     return window;
+  }
+  function changeMainWindow(type: WindowType) {
+    mainWindowType = type;
+    emitMainEvent("mainWindowType", type);
+    moveSettingsWindowToTop();
+  }
+  function moveSettingsWindowToTop() {
+    if (mainWindowType) {
+      const mainWindow = windows[mainWindowType];
+      if (
+        mainWindow  !== undefined
+        && !mainWindow.isDestroyed()
+        && windows.settings !== undefined
+        && !windows.settings.isDestroyed()
+      ) {
+        windows.settings.setParentWindow(mainWindow);
+      }
+    }
   }
   function initBrowserWindow() {
     return createWindow(WindowType.BROWSER, {
