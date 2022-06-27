@@ -97,7 +97,7 @@ t-dialog-root {
       display: block;
       >p {
         text-align: center;
-        white-space: pre;
+        word-break: break-word;
       }
       >t-buttons {
         display: block;

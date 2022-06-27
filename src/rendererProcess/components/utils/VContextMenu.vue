@@ -101,7 +101,7 @@ export default class VContextMenu extends Vue {
   border-radius: var(--rounded);
   overflow: hidden;
   >.item {
-    white-space: nowrap;
+    word-break: break-word;
     list-style-type: none;
     min-width: 128px;
     padding: 8px 24px;

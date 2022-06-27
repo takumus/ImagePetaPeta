@@ -48,15 +48,14 @@ t-board-loading-root {
   >.log {
     text-align: left;
     overflow: hidden;
-    word-break: break-all;
-    white-space: pre-wrap;
+    word-break: break-word;
     height: 64px;
     overflow-y: auto;
     overflow-x: hidden;
     font-size: 0.8em;
   }
   >p {
-    white-space: nowrap;
+    word-break: break-word;
   }
 }
 </style>

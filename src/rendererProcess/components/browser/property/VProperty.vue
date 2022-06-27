@@ -355,8 +355,7 @@ t-property-root {
       padding: 4px 4px 0px 0px;
       font-size: 1.0em;
       width: 100%;
-      word-break: break-all;
-      white-space: pre-wrap;
+      word-break: break-word;
       text-align: left;
       // text-align: center;
       // display: block;

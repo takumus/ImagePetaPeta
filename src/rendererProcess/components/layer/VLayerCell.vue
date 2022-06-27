@@ -194,7 +194,7 @@ export default class VLayerCell extends Vue {
     flex: 1;
     overflow: hidden;
     max-height: 100%;
-    word-break: break-all;
+    word-break: break-word;
   }
 }
 </style>

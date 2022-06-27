@@ -213,8 +213,7 @@ export default class VComplement extends Vue {
   overflow-y: auto;
   overflow-x: hidden;
   >.item {
-    word-break: break-all;
-    white-space: pre-wrap;
+    word-break: break-word;
     list-style-type: none;
     min-width: 128px;
     width: 256px;

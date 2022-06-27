@@ -319,9 +319,7 @@ t-settings-root {
       >p {
         font-size: 0.8em;
         margin-left: 16px;
-        white-space: pre;
-        word-break: break-all;
-        white-space: pre-wrap;
+        word-break: break-word;
       }
       .file-path {
         width: 100%;
@@ -332,15 +330,14 @@ t-settings-root {
         >pre {
           text-align: left;
           overflow: hidden;
-          word-break: break-all;
-          white-space: pre-wrap;
+          word-break: break-word;
           height: 128px;
           overflow-y: auto;
           overflow-x: hidden;
           font-size: 0.8em;
         }
         >p {
-          white-space: nowrap;
+          word-break: break-word;
           font-size: 1em;
         }
       }

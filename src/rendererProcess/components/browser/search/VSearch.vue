@@ -133,8 +133,7 @@ t-search-root {
     font-size: 1.0em;
     width: 100%;
     height: 100%;
-    word-break: break-all;
-    white-space: pre-wrap;
+    word-break: break-word;
     text-align: left;
     // text-align: center;
     // display: block;

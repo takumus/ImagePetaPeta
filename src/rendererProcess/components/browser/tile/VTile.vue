@@ -341,8 +341,7 @@ t-tile-root {
       outline: none;
       padding: 2px 2px;
       font-size: 1.0em;
-      word-break: break-all;
-      white-space: pre-wrap;
+      word-break: break-word;
       text-align: left;
       display: flex;
       flex-direction: row;

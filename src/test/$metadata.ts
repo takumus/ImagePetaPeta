@@ -42,7 +42,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
         background-color: #333333;
         color: #ffffff;
         font-weight: bold;
-        word-break: break-all;
+        word-break: break-word;
       }
       span {
         letter-spacing: -0.03em;

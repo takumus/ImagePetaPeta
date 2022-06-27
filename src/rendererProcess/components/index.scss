@@ -90,7 +90,6 @@ t-root {
     outline: none;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
     &:hover {
       background-color: var(--button-hover-bg-color);
       // box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);

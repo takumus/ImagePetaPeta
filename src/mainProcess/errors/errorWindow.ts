@@ -26,7 +26,7 @@ export function showErrorWindow(error: ErrorWindowParameters, quit = true) {
       `data:text/html;charset=utf-8,
       <head>
       <title>${noHtml(app.getName())} Fatal Error</title>
-      <style>pre { white-space: pre-wrap; } * { font-family: monospace; }</style>
+      <style>pre { word-break: break-word; } * { font-family: monospace; }</style>
       </head>
       <body>
       <h1>${noHtml(error.category)}${noHtml(('000' + error.code).slice(-3))} ${noHtml(error.title)}</h1>

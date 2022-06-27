@@ -165,8 +165,7 @@ t-editable-label-root {
     cursor: pointer;
     height: 16px;
     width: 100%;
-    word-break: break-all;
-    white-space: pre-wrap;
+    word-break: break-word;
     display: inline-block;
     text-decoration: inherit;
     &.no-outline {

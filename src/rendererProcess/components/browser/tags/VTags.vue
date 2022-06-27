@@ -132,7 +132,6 @@ export default class VTags extends Vue {
 t-tags-root {
   flex-direction: column;
   text-align: center;
-  white-space: nowrap;
   display: flex;
   width: 100%;
   height: 100%;
