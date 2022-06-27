@@ -26,11 +26,13 @@
       v-if="!isMac"
     >
       <t-window-button
+        v-if="resizable"
         @click="minimizeWindow"
       >
         <t-icon>&#xe921;</t-icon>
       </t-window-button>
       <t-window-button
+        v-if="resizable"
         @click="maximizeWindow"
       >
         <t-icon>&#xe922;</t-icon>
@@ -52,6 +54,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 // Others
 import { API } from "@/rendererProcess/api";
+import { WindowType } from "@/commons/datas/windowType";
 @Options({
   components: {
   },
@@ -75,6 +78,9 @@ export default class VTitleBar extends Vue {
   }
   closeWindow() {
     API.send("windowClose");
+  }
+  get resizable() {
+    return this.$windowType !== WindowType.SETTINGS;
   }
   get isMac() {
     return this.$systemInfo.platform == "darwin";
