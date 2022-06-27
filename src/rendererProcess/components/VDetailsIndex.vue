@@ -254,7 +254,7 @@ t-root {
         background-color: var(--bg-color);
         z-index: 2;
         // box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.4);
-        width: 240px;
+        width: 300px;
       }
     }
     >t-modals {
