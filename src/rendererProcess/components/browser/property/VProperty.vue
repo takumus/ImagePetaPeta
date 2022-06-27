@@ -2,10 +2,21 @@
   <t-property-root>
     <t-infos v-if="singlePetaImageInfo">
       <p>{{$t("browser.property.infos.label")}}</p>
-      {{$t("browser.property.infos.name")}}: {{singlePetaImageInfo.name}}<br>
-      {{$t("browser.property.infos.fileDate")}}: {{singlePetaImageInfo.fileDate}}<br>
-      {{$t("browser.property.infos.addDate")}}: {{singlePetaImageInfo.addDate}}<br>
-       <t-palette>
+      <t-datas>
+        <t-data>
+          <t-name>{{$t("browser.property.infos.name")}}</t-name>
+          <t-value>{{singlePetaImageInfo.name}}</t-value>
+        </t-data>
+        <t-data>
+          <t-name>{{$t("browser.property.infos.fileDate")}}</t-name>
+          <t-value>{{singlePetaImageInfo.fileDate}}</t-value>
+        </t-data>
+        <t-data>
+          <t-name>{{$t("browser.property.infos.addDate")}}</t-name>
+          <t-value>{{singlePetaImageInfo.addDate}}</t-value>
+        </t-data>
+      </t-datas>
+      <t-palette>
         <t-color-background>
           <t-color
             v-for="color in singlePetaImageInfo.palette"
@@ -242,7 +253,35 @@ t-property-root {
   overflow: hidden;
   >t-infos {
     display: block;
-    word-break: break-all;
+    >t-datas {
+      display: block;
+      >t-data {
+        display: flex;
+        margin-bottom: 8px;
+        &:last-child {
+          margin-bottom: 0px;
+        }
+        >t-name {
+          display: block;
+          width: 40%;
+          position: relative;
+          text-align: right;
+          padding-right: 8px;
+          &::after {
+            position: absolute;
+            right: 0px;
+            content: ":";
+          }
+        }
+        >t-value {
+          padding-left: 8px;
+          display: block;
+          width: 60%;
+          overflow-wrap: break-word;
+        }
+      }
+    }
+    display: block;
     >t-palette {
       pointer-events: none;
       padding: 8px;
@@ -256,7 +295,7 @@ t-property-root {
         width: 100%;
         overflow: hidden;
         // border: solid 4px rgba($color: #000000, $alpha: 0.5);
-        box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.4);
+        box-shadow: 0px 0px 0px 1px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
         >t-color {
           // width: 8px;
           height: 100%;
