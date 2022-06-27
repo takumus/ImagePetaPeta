@@ -104,6 +104,7 @@ const ja = {
         label: "情報",
         addDate: "追加日",
         fileDate: "変更日",
+        note: "ノート",
         name: "名前"
       }
     },

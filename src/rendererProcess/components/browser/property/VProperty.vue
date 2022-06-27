@@ -7,12 +7,25 @@
           <t-name>{{$t("browser.property.infos.name")}}</t-name>
           <t-value>
             <VEditableLabel
-              :label="singlePetaImageInfo.name"
-              :labelLook="singlePetaImageInfo.name"
+              :label="singlePetaImageInfo.petaImage.name"
+              :labelLook="singlePetaImageInfo.petaImage.name"
               :clickToEdit="true"
               :allowEmpty="true"
               :growWidth="true"
               @change="changeName"
+            />
+          </t-value>
+        </t-data>
+        <t-data>
+          <t-name>{{$t("browser.property.infos.note")}}</t-name>
+          <t-value>
+            <VEditableLabel
+              :label="singlePetaImageInfo.petaImage.note"
+              :labelLook="singlePetaImageInfo.petaImage.note"
+              :clickToEdit="true"
+              :allowEmpty="true"
+              :growWidth="true"
+              @change="changeNote"
             />
           </t-value>
         </t-data>
@@ -160,6 +173,13 @@ export default class VProperty extends Vue {
       return;
     }
     this.singlePetaImageInfo.petaImage.name = name;
+    API.send("updatePetaImages", [this.singlePetaImageInfo.petaImage], UpdateMode.UPDATE);
+  }
+  changeNote(note: string) {
+    if (this.singlePetaImageInfo === undefined) {
+      return;
+    }
+    this.singlePetaImageInfo.petaImage.note = note;
     API.send("updatePetaImages", [this.singlePetaImageInfo.petaImage], UpdateMode.UPDATE);
   }
   clearSelection() {
