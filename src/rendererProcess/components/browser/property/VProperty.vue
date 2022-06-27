@@ -182,6 +182,12 @@ export default class VProperty extends Vue {
     this.singlePetaImageInfo.petaImage.note = note;
     API.send("updatePetaImages", [this.singlePetaImageInfo.petaImage], UpdateMode.UPDATE);
   }
+  changeNSFW(value: boolean) {
+    this.petaImages.forEach((pi, i) => {
+      pi.nsfw = value;
+    });
+    updatePetaImages(this.petaImages, UpdateMode.UPDATE);
+  }
   clearSelection() {
     this.petaImages.forEach((pi) => {
       pi._selected = false;
@@ -260,12 +266,6 @@ export default class VProperty extends Vue {
       return nsfw;
     }
     return "not-same";
-  }
-  changeNSFW(value: boolean) {
-    this.petaImages.forEach((pi, i) => {
-      pi.nsfw = value;
-    });
-    updatePetaImages(this.petaImages, UpdateMode.UPDATE);
   }
   @Watch("petaImages")
   changePetaImages() {
