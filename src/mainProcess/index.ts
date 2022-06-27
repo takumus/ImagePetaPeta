@@ -1061,6 +1061,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       height: WINDOW_SETTINGS_HEIGHT,
       minWidth: WINDOW_SETTINGS_WIDTH,
       minHeight: WINDOW_SETTINGS_HEIGHT,
+      maximizable: false,
+      minimizable: false,
       trafficLightPosition: {
         x: 8,
         y: 8
