@@ -357,7 +357,7 @@ t-root {
     height: 100%;
     top: 0px;
     left: 0px;
-    z-index: 2;
+    z-index: 4;
   }
 }
 </style>
