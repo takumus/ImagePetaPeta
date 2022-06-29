@@ -267,6 +267,7 @@ t-tile-root {
       height: 100%;
       cursor: pointer;
       filter: brightness(0.7);
+      position: relative;
       &.selected-image {
         filter: brightness(1.0);
         border-radius: var(--rounded);
@@ -293,7 +294,7 @@ t-tile-root {
         background-image: url("~@/@assets/transparentBackground.png");
       }
       >t-placeholder {
-        position: relative;
+        position: absolute;
         z-index: 2;
         top: 0px;
         left: 0px;
@@ -309,7 +310,7 @@ t-tile-root {
       }
       >t-nsfw {
         z-index: 2;
-        position: relative;
+        position: absolute;
         top: 0px;
         left: 0px;
         width: 100%;
