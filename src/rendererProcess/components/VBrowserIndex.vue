@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: darkMode
+      dark: $darkMode.value
     }"
   >
     <t-content>
@@ -109,12 +109,6 @@ export default class BrowserIndex extends Vue {
   }
   async getPetaTagInfos() {
     this.petaTagInfos = await API.send("getPetaTagInfos");
-  }
-  get darkMode() {
-    if (this.$settings.autoDarkMode) {
-      return this.$systemDarkMode.value;
-    }
-    return this.$settings.darkMode;
   }
   @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {

@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: darkMode
+      dark: $darkMode.value
     }"
   >
     <t-content>
@@ -164,12 +164,6 @@ export default class DetailsIndex extends Vue {
   async getPetaTagInfos() {
     this.petaTagInfos = await API.send("getPetaTagInfos");
   }
-  get darkMode() {
-    if (this.$settings.autoDarkMode) {
-      return this.$systemDarkMode.value;
-    }
-    return this.$settings.darkMode;
-  }
   get petaImageURL() {
     return getImageURL(this.petaImage, ImageType.ORIGINAL);
   }
@@ -253,7 +247,6 @@ t-root {
         display: block;
         background-color: var(--bg-color);
         z-index: 2;
-        // box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.4);
         width: 300px;
       }
     }

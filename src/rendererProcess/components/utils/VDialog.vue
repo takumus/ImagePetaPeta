@@ -98,6 +98,7 @@ t-dialog-root {
       >p {
         text-align: center;
         word-break: break-word;
+        white-space: pre-wrap;
       }
       >t-buttons {
         display: block;

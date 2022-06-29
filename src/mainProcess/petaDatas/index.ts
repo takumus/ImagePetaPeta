@@ -398,15 +398,7 @@ export class PetaDatas {
       // バージョンアップ時のプロパティ更新
       upgradePetaBoard(board);
     })
-    if (data.length == 0) {
-      log.log("no boards");
-      const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, this.datas.dataSettings.data.darkMode);
-      await this.updatePetaBoard(board, UpdateMode.UPSERT);
-      data.push(board);
-      return data;
-    } else {
-      return data;
-    }
+    return data;
   }
   async waifu2x(petaImages: PetaImage[]) {
     return Tasks.spawn("waifu2x", async (handler) => {

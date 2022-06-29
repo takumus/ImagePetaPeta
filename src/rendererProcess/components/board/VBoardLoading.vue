@@ -49,6 +49,7 @@ t-board-loading-root {
     text-align: left;
     overflow: hidden;
     word-break: break-word;
+    white-space: pre-wrap;
     height: 64px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -56,6 +57,7 @@ t-board-loading-root {
   }
   >p {
     word-break: break-word;
+    white-space: pre-wrap;
   }
 }
 </style>

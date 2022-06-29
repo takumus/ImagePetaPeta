@@ -277,7 +277,6 @@ t-tab-root {
   width: 100%;
   background-color: var(--tab-selected-color);
   height: 30px;
-  box-shadow: -1px 2px 2px 0px rgba(0, 0, 0, 0.4);
   position: relative;
   border-bottom: solid 1px var(--bg-color);
   >.shared-buttons {

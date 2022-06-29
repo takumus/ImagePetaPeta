@@ -260,7 +260,6 @@ t-tile-root {
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
-    // transition: box-shadow 100ms ease-in-out;
     display: block;
     >t-images {
       display: block;
@@ -268,8 +267,6 @@ t-tile-root {
       height: 100%;
       cursor: pointer;
       filter: brightness(0.7);
-      // transition: filter 100ms ease-in-out;
-      // background-color: #ffffff;
       &.selected-image {
         filter: brightness(1.0);
         border-radius: var(--rounded);
@@ -325,7 +322,7 @@ t-tile-root {
       }
     }
     &:hover {
-      box-shadow: 1px 1px 5px rgba($color: #000000, $alpha: 0.5);
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
       >t-images {
         filter: brightness(1.0);
       }
@@ -371,15 +368,10 @@ t-tile-root {
         height: 8px;
         width: 100%;
         overflow: hidden;
-        // border: solid 4px rgba($color: #000000, $alpha: 0.5);
-        // box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.4);
         box-shadow: 0px 0px 0px 1.5px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
         >t-color {
-          // width: 8px;
           height: 100%;
-          // margin: 0px 4px;
           display: block;
-          // border-radius: 10px;
         }
       }
     }

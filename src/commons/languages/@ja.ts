@@ -79,7 +79,7 @@ const ja = {
       return `${ctx.list(0)}枚の画像を削除しますか?`
     },
     removeTagDialog: (ctx: any) => {
-      return `タグ"${ctx.list(0)}"を削除しますか?\n画像は削除されません。`
+      return `タグ "${ctx.list(0)}" を削除しますか?\n画像は削除されません。`
     },
     tagAlreadyExistsDialog: (ctx: any) => {
       return `タグ"${ctx.list(0)}"はすでに存在します`
@@ -167,10 +167,10 @@ const ja = {
     ignoreMinorUpdate: "マイナーアップデートの通知を無視する",
     ignoreMinorUpdateDescriptions: "大きな重要なアップデート以外の、小さなアップデートを無視します。\nアップデートの頻度が多くて困っている人向けの設定です。",
     changePetaImageDirectoryDialog: (ctx: any) => {
-      return `データの保存先を"${ctx.list(0)}"に変更しますか?\n"はい"を押すと再起動します。`
+      return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`
     },
     changePetaImageDirectoryErrorDialog: (ctx: any) => {
-      return `データの保存先を"${ctx.list(0)}"に変更出来ませんでした。\n他のフォルダを選んでください。`
+      return `データの保存先を\n"${ctx.list(0)}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`
     },
   },
   imageImporter: {

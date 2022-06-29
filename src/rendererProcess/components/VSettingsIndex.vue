@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: darkMode
+      dark: $darkMode.value
     }"
   >
     <t-content>
@@ -57,12 +57,6 @@ export default class SettingsIndex extends Vue {
     this.keyboards.up(["escape"], () => {
       API.send("windowClose");
     });
-  }
-  get darkMode() {
-    if (this.$settings.autoDarkMode) {
-      return this.$systemDarkMode.value;
-    }
-    return this.$settings.darkMode;
   }
   @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {

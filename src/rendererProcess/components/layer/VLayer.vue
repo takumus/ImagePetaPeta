@@ -225,7 +225,7 @@ t-layer-root {
   position: fixed;
   right: 0px;
   bottom: 0px;
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   margin: 8px;
   padding: 8px;
   top: 50%;

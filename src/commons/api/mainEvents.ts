@@ -19,4 +19,5 @@ export interface MainEvents {
   updateStates: (states: States) => void;
   showNSFW: (value: boolean) => void;
   detailsPetaImage: (petaImage: PetaImage) => void;
+  darkMode: (value: boolean) => void;
 }

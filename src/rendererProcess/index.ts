@@ -15,6 +15,7 @@ import GlobalDefines from "@/rendererProcess/vueComponentCustomProperties/define
 import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
+import GlobalDarkMode from "@/rendererProcess/vueComponentCustomProperties/darkMode";
 import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
 import GlobalNSFW from "@/rendererProcess/vueComponentCustomProperties/nsfw";
 import * as GlobalWindowType from "@/rendererProcess/vueComponentCustomProperties/windowType";
@@ -62,6 +63,7 @@ function createApp(type: WindowType | string) {
   appUse(GlobalComponents);
   appUse(GlobalSystemDarkMode);
   appUse(GlobalTexts.createPlugin(platform));
+  await appUse(GlobalDarkMode);
   await appUse(GlobalSettings);
   await appUse(GlobalNSFW);
   await appUse(GlobalStates);

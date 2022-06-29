@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, Tray, Menu, screen } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, nativeTheme } from "electron";
 import * as Path from "path";
 import axios from "axios";
 import dataURIToBuffer from "data-uri-to-buffer";
@@ -6,13 +6,13 @@ import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, PACKAGE_JSON_URL, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT, SEARCH_IMAGE_BY_GOOGLE_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
+import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_FILL_COLOR, DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT, SEARCH_IMAGE_BY_GOOGLE_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
 import Config from "@/mainProcess/storages/config";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { PetaBoard } from "@/commons/datas/petaBoard";
+import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { MainEvents } from "@/commons/api/mainEvents";
@@ -290,6 +290,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     */
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
+    nativeTheme.on("updated", () => {
+      emitDarkMode();
+    })
     showWindows();
     draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
@@ -421,6 +424,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           try {
             log.log("#Get PetaBoards");
             const petaBoards = await petaDatas.getPetaBoards();
+            if (petaBoards.length == 0) {
+              log.log("no boards! create empty board");
+              const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
+              await petaDatas.updatePetaBoard(board, UpdateMode.UPSERT);
+              petaBoards.push(board);
+            }
             log.log("return:", petaBoards.length);
             return petaBoards;
           } catch(e) {
@@ -602,6 +611,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             dataSettings.save();
             emitMainEvent("updateSettings", settings);
             emitMainEvent("showNSFW", getShowNSFW());
+            emitDarkMode();
             log.log("return:", dataSettings.data);
             return true;
           } catch(e) {
@@ -934,9 +944,10 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           return;
         },
         async getDetailsPetaImage() {
-          return new Promise<PetaImage | undefined>((res) => {
-            res(detailsPetaImage);
-          })
+          return detailsPetaImage;
+        },
+        async getIsDarkMode() {
+          return isDarkMode();
         }
       }
     }
@@ -1004,7 +1015,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         contextIsolation: true,
         preload: Path.join(__dirname, "preload.js")
       },
-      backgroundColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
+      backgroundColor: isDarkMode() ? BOARD_DARK_BACKGROUND_FILL_COLOR : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
       ...options,
     });
     activeWindows[type] = true;
@@ -1255,6 +1266,15 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       log.log("this version is latest");
     }
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
+  }
+  function isDarkMode() {
+    if (dataSettings.data.autoDarkMode) {
+      return nativeTheme.shouldUseDarkColors;
+    }
+    return dataSettings.data.darkMode;
+  }
+  function emitDarkMode() {
+    emitMainEvent("darkMode", isDarkMode());
   }
   function getWindowByEvent(event: IpcMainInvokeEvent) {
     const windowSet = Object.keys(windows).map((key) => {

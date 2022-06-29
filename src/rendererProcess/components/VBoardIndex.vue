@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: darkMode
+      dark: $darkMode.value
     }"
   >
     <t-content>
@@ -286,7 +286,7 @@ export default class BoardIndex extends Vue {
   }
   async addPetaBoard() {
     const name = getNameAvoidDuplication(DEFAULT_BOARD_NAME, this.boards.map((b) => b.name));
-    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.darkMode);
+    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$darkMode.value);
     await API.send(
       "updatePetaBoards",
       [board],
@@ -304,12 +304,6 @@ export default class BoardIndex extends Vue {
   }
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
-  }
-  get darkMode() {
-    if (this.$settings.autoDarkMode) {
-      return this.$systemDarkMode.value;
-    }
-    return this.$settings.darkMode;
   }
   changePetaBoard(board: PetaBoard) {
     if (!board) {

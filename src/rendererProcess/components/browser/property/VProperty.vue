@@ -314,7 +314,7 @@ t-property-root {
           padding: 0px 8px;
           display: block;
           width: 60%;
-          overflow-wrap: break-word;
+          word-break: break-word;
         }
       }
     }
