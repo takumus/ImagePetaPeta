@@ -34,12 +34,12 @@
       </button>
     </t-shared>
     <t-shared class=" right" v-if="visible">
-      <!-- <button
+      <button
         tabindex="-1"
-        @click="openSettings"
+        @click="toggleNSFW"
       >
-        <t-icon class="info"></t-icon>
-      </button> -->
+        <t-icon :class="$nsfw.showNSFW ? 'nsfw' : 'sfw'"></t-icon>
+      </button>
       <button
         tabindex="-1"
         @click="openSettings"
@@ -79,6 +79,9 @@ export default class VUtilsBar extends Vue {
   }
   openSettings() {
     API.send("openWindow", WindowType.SETTINGS);
+  }
+  async toggleNSFW() {
+    await API.send("setShowNSFW", !this.$nsfw.showNSFW);
   }
   get visible() {
     return this.$focusedWindows.isMainWindow || this.$focusedWindows.focused;
@@ -146,6 +149,12 @@ t-utils-bar-root {
           }
           &.settings {
             background-image: url("~@/@assets/settings.png");
+          }
+          &.nsfw {
+            background-image: url("~@/@assets/nsfw.png");
+          }
+          &.sfw {
+            background-image: url("~@/@assets/sfw.png");
           }
           &.info {
             background-image: url("~@/@assets/info.png");
