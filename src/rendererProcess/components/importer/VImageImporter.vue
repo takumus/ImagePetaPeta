@@ -56,6 +56,7 @@ export default class VImageImporter extends Vue {
       this.currentMousePosition = vec2FromMouseEvent(event);
     });
     document.addEventListener("paste", async (event) => {
+      const mousePosition = this.currentMousePosition.clone();
       const items = event.clipboardData?.files;
       if (!items || items.length < 1) {
         return;
@@ -70,7 +71,7 @@ export default class VImageImporter extends Vue {
       }
       await promiseSerial(readBuffer, [...items]).promise;
       const ids = await API.send("importImagesFromClipboard", buffers);
-      this.$emit("addPanelByDragAndDrop", ids, this.currentMousePosition, false);
+      this.$emit("addPanelByDragAndDrop", ids, mousePosition, false);
     });
   }
 }
