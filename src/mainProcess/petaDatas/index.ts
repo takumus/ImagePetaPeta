@@ -351,6 +351,7 @@ export class PetaDatas {
           });
           if (addResult.exists) {
             result = ImportImageResult.EXISTS;
+            petaImages.push(addResult.petaImage);
           } else {
             addedFileCount++;
             petaImages.push(addResult.petaImage);
@@ -529,11 +530,12 @@ export class PetaDatas {
           });
           if (importResult.exists) {
             result = ImportImageResult.EXISTS;
+            petaImages.push(importResult.petaImage);
           } else {
             addedFileCount++;
             petaImages.push(importResult.petaImage);
           }
-          log.log("imported", name, result);
+          log.log("imported", data.name, result);
         } catch (err) {
           log.error(err);
           result = ImportImageResult.ERROR;
