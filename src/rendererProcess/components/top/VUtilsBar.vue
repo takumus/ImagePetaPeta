@@ -81,7 +81,14 @@ export default class VUtilsBar extends Vue {
     API.send("openWindow", WindowType.SETTINGS);
   }
   async toggleNSFW() {
-    await API.send("setShowNSFW", !this.$nsfw.showNSFW);
+    const value = !this.$nsfw.showNSFW;
+    if (value) {
+      if (await this.$components.dialog.show(this.$t("utilsBar.nsfwConfirm"), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+        await API.send("setShowNSFW", true);
+      }
+    } else {
+      await API.send("setShowNSFW", false);
+    }
   }
   get visible() {
     return this.$focusedWindows.isMainWindow || this.$focusedWindows.focused;

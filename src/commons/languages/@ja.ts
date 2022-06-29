@@ -19,6 +19,9 @@ const ja = {
       return `新しいアップデートをダウンロードしておこうと思ったのですが、\nダウンロードに失敗しました。\n現在のバージョン:${ctx.list(0)}\n最新のバージョン:${ctx.list(1)}\n手動でダウンロードしますか?`;
     }
   },
+  utilsBar: {
+    nsfwConfirm: "NSFWマークの付いた画像が表示されます。\nよろしいですか?"
+  },
   home: {
     infoButton: "情報",
     settingsButton: "設定",
