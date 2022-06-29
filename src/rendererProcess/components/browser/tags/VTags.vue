@@ -1,7 +1,7 @@
 <template>
   <t-tags-root>
-    <ul>
-      <li
+    <t-tags>
+      <t-tag
         @click="selectPetaTag()"
         :class="{ selected: selectedAll }"
       >
@@ -9,8 +9,8 @@
           :label="`${$t('browser.all')}(${petaImagesArray.length})`"
           :readonly="true"
         />
-      </li>
-      <li
+      </t-tag>
+      <t-tag
         v-for="c in browserTags"
         :key="c.petaTag.id"
         :class="{ selected: c.selected }"
@@ -21,10 +21,22 @@
           :labelLook="`${c.petaTag.name}(${c.count})`"
           :readonly="c.readonly"
           @change="(name) => changeTag(c.petaTag, name)"
-          @contextmenu="tagMenu($event, c.petaTag)"
+          @contextmenu="tagMenu($event, c)"
         />
-      </li>
-    </ul>
+      </t-tag>
+    </t-tags>
+    <t-tag-add>
+      <t-tag>
+        <VEditableLabel
+          :label="''"
+          :labelLook="$texts.plus + '       '"
+          :clickToEdit="true"
+          @change="(name) => addTag(name)"
+          :growWidth="true"
+          :noOutline="true"
+        />
+      </t-tag>
+    </t-tag-add>
   </t-tags-root>
 </template>
 
@@ -38,7 +50,7 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 
 // Others
 import { PetaImage } from "@/commons/datas/petaImage";
-import { PetaTag } from "@/commons/datas/petaTag";
+import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
@@ -68,15 +80,24 @@ export default class VTags extends Vue {
   unmounted() {
     //
   }
-  tagMenu(event: MouseEvent, tag: PetaTag) {
+  tagMenu(event: MouseEvent, tag: BrowserTag) {
+    if (tag.readonly) {
+      return;
+    }
     this.$components.contextMenu.open([
       {
-        label: this.$t("browser.tagMenu.remove", [tag.name]),
+        label: this.$t("browser.tagMenu.remove", [tag.petaTag.name]),
         click: () => {
-          this.removeTag(tag);
+          this.removeTag(tag.petaTag);
         }
       }
     ], vec2FromMouseEvent(event));
+  }
+  async addTag(name: string) {
+    if (this.petaTagInfos.find((pi) => pi.petaTag.name === name)) {
+      return;
+    }
+    API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.UPSERT);
   }
   async removeTag(petaTag: PetaTag) {
     if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
@@ -135,32 +156,39 @@ t-tags-root {
   display: flex;
   width: 100%;
   height: 100%;
-  >ul {
-    text-align: left;
-    padding-left: 0px;
-    width: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    flex: 1;
-    margin: 0px;
-    >li {
-      width: 100%;
+  >t-tag-add {
+    padding: 4px 4px 0px 0px;
+    >t-tag {
+      // margin: 0px 0px 4px 4px;
       padding: 4px;
-      list-style-type: none;
-      cursor: pointer;
-      display: flex;
-      &:hover * {
-        text-decoration: underline;
-      }
-      &::before {
-        content: "・";
-        line-height: 1.5em;
-        width: 16px;
-        display: inline-block;
-        flex-shrink: 0;
-      }
-      &.selected::before {
-        content: "✔";
+    }
+  }
+  >t-tags {
+    // border-radius: var(--rounded);
+    // border: solid 1.2px var(--border-color);
+    outline: none;
+    padding: 4px 4px 0px 0px;
+    font-size: 1.0em;
+    width: 100%;
+    // word-break: break-word;
+    text-align: left;
+    // text-align: center;
+    // display: block;
+    // display: flex;
+    // flex-direction: column;
+    // flex-wrap: wrap;
+    // justify-content: left;
+    overflow-y: auto;
+    >t-tag {
+      display: block;
+      width: fit-content;
+      margin: 0px 0px 4px 4px;
+      border-radius: var(--rounded);
+      padding: 4px;
+      background-color: var(--tab-bg-color);
+      &.selected {
+        font-weight: bold;
+        font-size: 1.2em;
       }
     }
   }
