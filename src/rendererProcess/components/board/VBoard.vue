@@ -687,6 +687,7 @@ export default class VBoard extends Vue {
     this.loadingLog = "";
     this.cancel = undefined;
     log("vBoard", "load complete");
+    this.sortIndex();
     this.orderPIXIRender();
     Object.values(this.pPanels).forEach((pPanel) => {
       if (!pPanel.petaPanel.gif.stopped) {
