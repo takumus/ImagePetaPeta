@@ -52,6 +52,10 @@ export default class VModal extends Vue {
   center = false;
   @Prop()
   visibleCloseButton = true;
+  @Prop()
+  ignore = false;
+  @Prop()
+  defaultZIndex = 0;
   zIndex = 0;
   noBackground = false;
   @Ref("background")
@@ -70,6 +74,7 @@ export default class VModal extends Vue {
     this.background.addEventListener("mouseup", this.mouseup);
     this.keyboards.enabled = true;
     this.keyboards.down(["escape"], this.pressEscape);
+    this.zIndex = this.defaultZIndex;
   }
   unmounted() {
     this.background.removeEventListener("mousedown", this.mousedown);
@@ -97,6 +102,9 @@ export default class VModal extends Vue {
   }
   @Watch("visible")
   changeVisible() {
+    if (this.ignore) {
+      return;
+    }
     // 自分のidを除外
     this.$components.modal.modalIds = this.$components.modal.modalIds.filter((id) => id != this.modalId);
     if (this.visible) {

@@ -2,7 +2,8 @@
   <VModal
     :visible="loading"
     :center="true"
-    :zIndex="zIndex"
+    :defaultZIndex="zIndex"
+    :ignore="true"
   >
     <t-board-loading-root>
       <p>
