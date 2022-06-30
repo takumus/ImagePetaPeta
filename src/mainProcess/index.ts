@@ -827,14 +827,22 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           return false;
         },
         async importImagesByDragAndDrop(event, htmls, arrayBuffers, filePaths) {
-          const log = mainLogger.logChunk();
-          log.log("#ImportImagesByDragAndDrop");
-          log.log(htmls.length, arrayBuffers.length, filePaths.length);
+          const log1 = mainLogger.logChunk();
+          log1.log("#ImportImagesByDragAndDrop");
+          log1.log(htmls.length, arrayBuffers.length, filePaths.length);
           let petaImages: PetaImage[] = [];
+          const urls: string[] = [];
+          const log2 = mainLogger.logChunk();
           try {
-            log.log("trying to download:", htmls, htmls.map((html) => {
-              return getURLFromImgTag(html);
-            }));
+            htmls.map((html) => {
+              try {
+                urls.push(getURLFromImgTag(html));
+              } catch (error) {
+                //
+                log2.error("invalid html", error);
+              }
+            });
+            log2.log("1.trying to download:", urls);
             const datas = await promiseSerial(
               async (url) => {
                 let data: Buffer;
@@ -853,45 +861,46 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
                   name: "downloaded"
                 };
               },
-              htmls.map((html) => {
-                return getURLFromImgTag(html);
-              })
+              urls
             ).promise;
             if (datas.length > 0) {
               petaImages = await petaDatas.importImagesFromBuffers(datas);
-              log.log("result:", petaImages.length);
+              log2.log("result:", petaImages.length);
             }
           } catch (error) {
-            log.error(error);
+            log2.error(error);
           }
+          const log3 = mainLogger.logChunk();
           try {
             if (petaImages.length == 0) {
               if (arrayBuffers.length > 0) {
-                log.log("trying to read ArrayBuffer:", arrayBuffers.length);
+                log3.log("2.trying to read ArrayBuffer:", arrayBuffers.length);
                 petaImages = await petaDatas.importImagesFromBuffers(
                   arrayBuffers.map((ab) => {
                     return {
                       buffer: Buffer.from(ab),
-                      name: "noname",
-                      note: ""
+                      name: urls.length > 0 ? "downloaded" : "noname",
+                      note: urls.length > 0 ? urls[0]! : ""
                     };
                   })
                 );
-                log.log("result:", petaImages.length);
+                log3.log("result:", petaImages.length);
               }
             }
           } catch (error) {
-            log.error(error);
+            log3.error(error);
           }
+          const log4 = mainLogger.logChunk();
           try {
             if (petaImages.length == 0) {
-              log.log("trying to read filePath:", filePaths.length);
+              log4.log("3.trying to read filePath:", filePaths.length);
               petaImages = await petaDatas.importImagesFromFilePaths(filePaths);
-              log.log("result:", petaImages.length);
+              log4.log("result:", petaImages.length);
             }
           } catch (error) {
-            log.error(error);
+            log4.error(error);
           }
+          log1.log("return:", petaImages.length);
           return petaImages.map((petaImage) => petaImage.id);
         },
         async openWindow(event, windowType) {
