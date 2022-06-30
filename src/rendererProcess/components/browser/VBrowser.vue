@@ -67,7 +67,7 @@ import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { BROWSER_THUMBNAIL_SIZE, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
+import { BROWSER_THUMBNAIL_SIZE, BROWSER_THUMBNAIL_ZOOM_MAX, BROWSER_THUMBNAIL_ZOOM_MIN, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
@@ -130,6 +130,17 @@ export default class VBrowser extends Vue {
       this.resizeScrollArea(entries[0]!.contentRect);
     });
     this.thumbnails.addEventListener("scroll", this.updateScrollArea);
+    this.thumbnails.addEventListener("wheel", (e) => {
+      if (Keyboards.pressedOR("control", "meta")) {
+        this.thumbnailsSize -= e.deltaY * this.$settings.zoomSensitivity * 0.001;
+        this.thumbnailsSize = Math.floor(this.thumbnailsSize);
+        if (this.thumbnailsSize < BROWSER_THUMBNAIL_ZOOM_MIN) {
+          this.thumbnailsSize = BROWSER_THUMBNAIL_ZOOM_MIN;
+        } else if (this.thumbnailsSize > BROWSER_THUMBNAIL_ZOOM_MAX) {
+          this.thumbnailsSize = BROWSER_THUMBNAIL_ZOOM_MAX;
+        }
+      }
+    })
     this.thumbnailsResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.thumbnails);
 
