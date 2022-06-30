@@ -52,10 +52,6 @@ const ja = {
       reset: "リセット",
       remove: "削除"
     },
-    imageLoadError: "画像読み込みエラー",
-    loadManyImageDialog: (ctx: any) => {
-      return `このボードには${ctx.list(0)}枚の大量の画像が存在します。\n場合によってはメモリ不足になりますが、読み込みますか?`
-    },
     addManyImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像をボードに追加しますか?`
     },
@@ -69,7 +65,7 @@ const ja = {
   browser: {
     tagMenu: {
       remove: (ctx: any) => {
-        return `タグ"${ctx.list(0)}"を削除`
+        return `タグ "${ctx.list(0)}" を削除`
       },
     },
     petaImageMenu: {
@@ -77,8 +73,8 @@ const ja = {
         return `${ctx.list(0)}枚の画像を削除`
       },
       openImageFile: "画像ファイルの場所を開く",
-      waifu2x: "waifu2xを使ってアップコンバートする",
-      searchImageByGoogle: "Googleで類似画像を検索する"
+      waifu2x: "waifu2xで変換する",
+      searchImageByGoogle: "Googleで類似画像を検索"
     },
     removeImageDialog: (ctx: any) => {
       return `${ctx.list(0)}枚の画像を削除しますか?`
@@ -87,7 +83,7 @@ const ja = {
       return `タグ "${ctx.list(0)}" を削除しますか?\n画像は削除されません。`
     },
     tagAlreadyExistsDialog: (ctx: any) => {
-      return `タグ"${ctx.list(0)}"はすでに存在します`
+      return `タグ" ${ctx.list(0)}" はすでに存在します`
     },
     property: {
       clickToAddTag: "タグ追加",
@@ -119,7 +115,7 @@ const ja = {
   tab: {
     menu: {
       remove: (ctx: any) => {
-        return `ボード"${ctx.list(0)}"を削除`
+        return `ボード "${ctx.list(0)}" を削除`
       }
     }
   },
