@@ -475,6 +475,27 @@ export default class VBoard extends Vue {
     const isMultiple = this.selectedPPanels.length > 1;
     this.$components.contextMenu.open([
       {
+        label: this.$t("boards.panelMenu.toFront"),
+        click: () => {
+          this.selectedPPanels.forEach((pPanel) => {
+            pPanel.petaPanel.index += this.pPanelsArray.length;
+          });
+          this.sortIndex();
+        }
+      },
+      {
+        label: this.$t("boards.panelMenu.toBack"),
+        click: () => {
+          this.selectedPPanels.forEach((pPanel) => {
+            pPanel.petaPanel.index -= this.pPanelsArray.length;
+          });
+          this.sortIndex();
+        }
+      },
+      {
+        separate: true
+      },
+      {
         label: this.$t("boards.panelMenu.details"),
         click: () => {
           if (pPanel.petaPanel._petaImage === undefined) {

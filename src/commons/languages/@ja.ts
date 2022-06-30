@@ -41,6 +41,8 @@ const ja = {
       resetPosition: "位置をリセット"
     },
     panelMenu: {
+      toFront: "最前面へ移動",
+      toBack: "最背面へ移動",
       details: "詳細を見る",
       playGIF: "GIFを再生",
       stopGIF: "GIFを停止",
