@@ -106,6 +106,7 @@ t-utils-bar-root {
   box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.4);
   border-bottom: solid 1px var(--bg-color);
   display: block;
+  z-index: 2;
   >t-shared {
     position: absolute;
     top: 0px;
