@@ -19,14 +19,20 @@
         <t-data>
           <t-name>{{$t("browser.property.infos.note")}}</t-name>
           <t-value>
-            <VEditableLabel
+            <!-- <VEditableLabel
               :label="singlePetaImageInfo.petaImage.note"
               :labelLook="singlePetaImageInfo.petaImage.note"
               :clickToEdit="true"
               :allowEmpty="true"
               :growWidth="true"
               @change="changeNote"
-            />
+            /> -->
+            <textarea
+              lock-keyboard
+              v-model="singlePetaImageInfo.petaImage.note"
+              @keypress.enter="keyPressEnter"
+            >
+            </textarea>
           </t-value>
         </t-data>
         <t-data>
@@ -175,6 +181,16 @@ export default class VProperty extends Vue {
     this.singlePetaImageInfo.petaImage.name = name;
     API.send("updatePetaImages", [this.singlePetaImageInfo.petaImage], UpdateMode.UPDATE);
   }
+  keyPressEnter(e: KeyboardEvent) {
+    const textarea = e.target as HTMLTextAreaElement;
+    if (e.shiftKey) {
+      // shiftで改行なので。
+      return;
+    }
+    e.preventDefault();
+    this.changeNote(textarea.value);
+    textarea.blur();
+  }
   changeNote(note: string) {
     if (this.singlePetaImageInfo === undefined) {
       return;
@@ -315,6 +331,16 @@ t-property-root {
           display: block;
           width: 60%;
           word-break: break-word;
+          >textarea {
+            width: 100%;
+            height: 80px;
+            resize: none;
+            background-color: transparent;
+            color: inherit;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+          }
         }
       }
     }
