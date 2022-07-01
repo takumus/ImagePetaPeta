@@ -181,7 +181,7 @@ t-editable-label-root {
       display: inline-block;
       text-decoration: inherit;
       outline: none;
-      &::after {
+      &::before {
         content: "";
         display: inline-block;
       }
