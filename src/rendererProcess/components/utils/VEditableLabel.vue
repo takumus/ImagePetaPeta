@@ -18,7 +18,7 @@
       @dblclick="edit(true)"
       @click="edit()"
       @input="input"
-      @keydown.enter="preventLineBreak"
+      @keypress.enter="keyPressEnter"
       @keydown.tab="preventLineBreak"
       lock-keyboard
     >
@@ -65,11 +65,6 @@ export default class VEditableLabel extends Vue {
   keyboard = new Keyboards(false);
   mounted() {
     this.changeLabel();
-    this.keyboard.down(["enter"], () => {
-      setTimeout(() => {
-        this.apply();
-      }, 1);
-    });
     this.keyboard.down(["backspace", "delete"], () => {
       if (this.tempText == "") {
         this.$emit("delete", this);
@@ -98,6 +93,11 @@ export default class VEditableLabel extends Vue {
       sel?.removeAllRanges();
       sel?.addRange(range);
     });
+  }
+  keyPressEnter(e: KeyboardEvent) {
+    setTimeout(() => {
+      this.apply();
+    }, 1);
   }
   preventLineBreak(e: KeyboardEvent) {
     e.preventDefault();
