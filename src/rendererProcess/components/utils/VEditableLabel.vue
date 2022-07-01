@@ -5,24 +5,27 @@
     }"
     :class="{ editing: editing }"
   >
-    <t-editable-label
+    <t-outline
       :class="{
         'no-outline': noOutline
       }"
-      v-text="labelLook && !editing ? labelLook : tempText"
-      ref="label"
-      placeholder=""
-      :contenteditable="editing"
-      @blur="cancel"
-      @focus="focus($event)"
-      @dblclick="edit(true)"
-      @click="edit()"
-      @input="input"
-      @keypress.enter="keyPressEnter"
-      @keydown.tab="preventLineBreak"
-      lock-keyboard
     >
-    </t-editable-label>
+      <t-editable-label
+        v-text="labelLook && !editing ? labelLook : tempText"
+        ref="label"
+        placeholder=""
+        :contenteditable="editing"
+        @blur="cancel"
+        @focus="focus($event)"
+        @dblclick="edit(true)"
+        @click="edit()"
+        @input="input"
+        @keypress.enter="keyPressEnter"
+        @keydown.tab="preventLineBreak"
+        lock-keyboard
+      >
+      </t-editable-label>
+    </t-outline>
   </t-editable-label-root>
 </template>
 
@@ -154,32 +157,44 @@ t-editable-label-root {
   padding: 0px;
   margin: 0px;
   display: inline-block;
-  >t-editable-label {
-    line-height: 1.5em;
-    font-size: 1.0em;
-    text-align: left;
-    padding: 0px;
-    margin: 0px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    height: 16px;
-    width: 100%;
-    word-break: break-word;
+  text-align: left;
+  >t-outline {
     display: inline-block;
-    text-decoration: inherit;
-    &.no-outline {
-      outline: none;
-    }
-    &::after {
-      content: "";
+    // background-color: #ff0000;
+    text-align: left;
+    >t-editable-label {
+      line-height: 1.5em;
+      font-size: 1.0em;
+      text-align: left;
+      padding: 0px;
+      margin: 0px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      height: 16px;
+      width: 100%;
+      word-break: break-word;
       display: inline-block;
+      text-decoration: inherit;
+      outline: none;
+      &::after {
+        content: "";
+        display: inline-block;
+      }
     }
   }
   &.editing {
-    >.editable-label {
-      &:empty::after {
-        content: "   ";
+    >t-outline {
+      border-radius: 4px;
+      padding: 0px 4px;
+      border: solid 1px var(--font-color);
+      &.no-outline {
+        border: none;
+      }
+      >t-editable-label {
+        &:empty::after {
+          content: "";
+        }
       }
     }
   }
