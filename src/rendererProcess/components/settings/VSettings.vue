@@ -123,8 +123,12 @@
           @click="browsePetaImageDirectory"
         >
           {{$t("settings.browsePetaImageDirectoryButton")}}
-        </button>
-        <input type="text" v-model="tempPetaImageDirectory" class="file-path">
+        </button><br>
+        <VEditableLabel
+          :label="tempPetaImageDirectory"
+          :clickToEdit="true"
+          @input="(value) => tempPetaImageDirectory = value"
+        />
         <br>
         <button
           @click="changePetaImageDirectory"
