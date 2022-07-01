@@ -9,6 +9,9 @@
       :class="{
         'no-outline': noOutline
       }"
+      :style="{
+        width: growWidth ? '100%' : 'unset'
+      }"
     >
       <t-editable-label
         v-text="labelLook && !editing ? labelLook : tempText"
@@ -98,6 +101,7 @@ export default class VEditableLabel extends Vue {
     });
   }
   keyPressEnter(e: KeyboardEvent) {
+    e.preventDefault();
     setTimeout(() => {
       this.apply();
     }, 1);
@@ -200,3 +204,5 @@ t-editable-label-root {
   }
 }
 </style>
+a
+a
