@@ -110,6 +110,10 @@ export function upgradeSettings(settings: Settings) {
     settings.loadTilesInOriginal = defaultSettings.loadTilesInOriginal;
     changed = true;
   }
+  if (settings.showTagsOnTile === undefined) {
+    settings.showTagsOnTile = defaultSettings.showTagsOnTile;
+    changed = true;
+  }
   return {
     data: settings,
     changed

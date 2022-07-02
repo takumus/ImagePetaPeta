@@ -38,7 +38,7 @@
         <t-background>
         </t-background>
       </t-images>
-      <t-tags>
+      <t-tags v-if="$settings.showTagsOnTile">
         <t-tag
           v-for="petaTag in myPetaTags"
           :key="petaTag.id"
@@ -202,6 +202,9 @@ export default class VTile extends Vue {
   }
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
+    if (!this.$settings.showTagsOnTile) {
+      return;
+    }
     const result = await API.send("getPetaTagIdsByPetaImageIds", [this.tile.petaImage.id]);
     this.myPetaTags = this.petaTagInfos
     .filter((petaTagInfo) => result.find((id) => id == petaTagInfo.petaTag.id))
@@ -243,7 +246,11 @@ export default class VTile extends Vue {
   }
   @Watch("petaTagInfos")
   changeFetchTags() {
-    this.fetchPetaTags();
+    this.changeVisible();
+  }
+  @Watch("$settings.showTagsOnTile")
+  changeShowTagsOnTile() {
+    this.changeVisible();
   }
 }
 </script>

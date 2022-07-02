@@ -114,6 +114,15 @@
           {{$t("settings.loadTilesInOriginal")}}
         </label>
         <p>{{$t("settings.loadTilesInOriginalDescriptions")}}</p>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.showTagsOnTile"
+            @change="$settings.showTagsOnTile = Boolean($event.target.checked)"
+          >
+          {{$t("settings.showTagsOnTile")}}
+        </label>
+        <p>{{$t("settings.showTagsOnTileDescriptions")}}</p>
       </t-content>
       <!--
         Datas

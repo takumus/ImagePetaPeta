@@ -8,6 +8,7 @@ const defaultSettings = {
   moveSensitivity: 100,
   autoHideUI: false,
   loadTilesInOriginal: true,
+  showTagsOnTile: true,
   alwaysShowNSFW: false,
   petaImageDirectory: {
     default: true,
