@@ -214,6 +214,21 @@ t-tab-root {
         padding: 0px 8px;
       }
     }
+    &:not(.selected):not(:hover) + t-tab:not(.selected):not(:hover) {
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        width: 0px;
+        border-left: solid 1px var(--border-color);
+        // height: 100%;
+        top: var(--rounded);
+        bottom: var(--rounded);
+        left: 0px;
+        background-color: var(--border-color);
+        border-radius: 1px;
+      }
+    }
     &.selected {
       z-index: 2;
       border-radius: var(--rounded) var(--rounded) 0px 0px;
