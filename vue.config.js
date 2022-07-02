@@ -101,6 +101,12 @@ module.exports = {
           allowToChangeInstallationDirectory: true,
           deleteAppDataOnUninstall: true
         },
+        protocols: {
+          name: "image-petapeta-protocol",
+          schemes: [
+            "image-petapeta"
+          ]
+        },
         ...appxConfig
       }
     }

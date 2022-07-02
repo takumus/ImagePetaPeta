@@ -202,6 +202,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   app.on("window-all-closed", () => {
     //
   });
+  app.setAsDefaultProtocolClient("image-petapeta")
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready
