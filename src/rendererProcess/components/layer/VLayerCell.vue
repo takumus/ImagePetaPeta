@@ -63,8 +63,6 @@ export default class VLayerCell extends Vue {
   pPanel: PPanel | null = null;
   @Prop()
   drag = false;
-  @Prop()
-  draggingPPanel!: PPanel;
   @Ref()
   visibleIcon!: HTMLElement;
   @Ref()
@@ -80,7 +78,7 @@ export default class VLayerCell extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
   }
   get hide() {
-    return this.draggingPPanel == this.pPanel;
+    return false;
   }
   get url() {
     return this.pPanel ? getImageURL(this.pPanel.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;

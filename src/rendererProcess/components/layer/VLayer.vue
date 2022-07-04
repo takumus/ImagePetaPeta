@@ -17,17 +17,20 @@
     >
       <ul ref="layers">
         <VLayerCell
-          v-for="layerCellData in layerCellDatas"
-          :key="layerCellData.id"
-          :ref="(element) => setVLayerCellRef(element, layerCellData.pPanel.petaPanel.id)"
-          :pPanel="layerCellData.pPanel"
-          :draggingPPanel="draggingPPanel"
+          v-for="pPanel in pPanels"
+          :key="pPanel.petaPanel.id"
+          :ref="(element) => setVLayerCellRef(element, pPanel.petaPanel.id)"
+          :pPanel="pPanel"
+          :style="{
+            visibility: pPanel !== draggingPPanel ? 'visible' : 'hidden'
+          }"
           @startDrag="startDrag"
-          @click.right="rightClick(layerCellData.pPanel, $event)"
-          @click.left="leftClick(layerCellData.pPanel, $event)"
+          @click.right="rightClick(pPanel, $event)"
+          @click.left="leftClick(pPanel, $event)"
         />
         <VLayerCell
           ref="cellDrag"
+          v-show="draggingPPanel"
           :pPanel="draggingPPanel"
           :drag="true"
         />
@@ -76,7 +79,6 @@ export default class VLayer extends Vue {
   vLayerCells: { [key: string]: VLayerCell} = {};
   async mounted() {
     this.keyboards.enabled = true;
-    this.keyboards.down(["escape"], this.pressEscape);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
     setInterval(() => {
@@ -94,9 +96,6 @@ export default class VLayer extends Vue {
     this.keyboards.destroy();
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
-  }
-  pressEscape(pressed: boolean) {
-    //
   }
   setVLayerCellRef(element: VLayerCell, id: string) {
     this.vLayerCells[id] = element;
@@ -202,14 +201,6 @@ export default class VLayer extends Vue {
     }
     return this.pPanelsArray.sort((a, b) => {
       return b.petaPanel.index - a.petaPanel.index;
-    });
-  }
-  get layerCellDatas() {
-    return this.pPanels.map((pPanel, i) => {
-      return {
-        pPanel: pPanel,
-        id: i
-      }
     });
   }
 }
