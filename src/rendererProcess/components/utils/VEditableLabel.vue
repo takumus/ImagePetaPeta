@@ -167,7 +167,7 @@ t-editable-label-root {
     // background-color: #ff0000;
     text-align: left;
     >t-editable-label {
-      line-height: 1.5em;
+      line-height: 1.2em;
       font-size: 1.0em;
       text-align: left;
       padding: 0px;
@@ -199,6 +199,7 @@ t-editable-label-root {
         &:empty::after {
           content: "";
         }
+        cursor: text;
       }
     }
   }
