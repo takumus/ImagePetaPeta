@@ -33,6 +33,7 @@
           v-show="!loadingImage"
           
           loading="lazy"
+          decoding="async"
           @load="loaded"
         >
         <t-background>
