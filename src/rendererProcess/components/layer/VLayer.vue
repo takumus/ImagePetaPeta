@@ -55,7 +55,7 @@ import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import { SortHelper } from "../utils/sortHelper";
-type LayerCellData = {
+type CellData = {
   data: PPanel,
   id: number
 }
@@ -80,17 +80,17 @@ export default class VLayer extends Vue {
   layersParent!: HTMLElement;
   @Ref()
   cellDrag!: VLayerCell;
-  draggingPPanel: LayerCellData | null = null;
+  draggingPPanel: CellData | null = null;
   vLayerCells: { [key: string]: VLayerCell} = {};
-  sortHelper: SortHelper<LayerCellData> = new SortHelper(
+  sortHelper: SortHelper<CellData> = new SortHelper(
     (data) => {
-      return this.vLayerCells[data.data.petaPanel.id]!
+      return this.vLayerCells[data.data.petaPanel.id];
     },
     (data) => {
-      return data.data.petaPanel.index
+      return data.data.petaPanel.index;
     },
     (data, index) => {
-      data.data.petaPanel.index = index
+      data.data.petaPanel.index = index;
     },
     () => {
       this.$emit("sortIndex");
@@ -142,7 +142,7 @@ export default class VLayer extends Vue {
   toggleVisible() {
     this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
   }
-  get layerCellDatas(): LayerCellData[] {
+  get layerCellDatas(): CellData[] {
     if (!this.pPanelsArray) {
       return [];
     }

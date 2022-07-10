@@ -4,13 +4,13 @@ export class SortHelper<T extends { data: any, id: number }> {
   layers!: HTMLElement;
   layersParent!: HTMLElement;
   cellDrag!: Vue;
-  draggingPPanel: T | null = null;
+  draggingData: T | null = null;
   autoScrollVY = 0;
   mouseY = 0;
   fixedHeight = 0;
   layerCellDatas: T[] = [];
   constructor(
-    private dataToComponent: (data: T) => Vue,
+    private dataToComponent: (data: T) => Vue | undefined,
     private dataToIndex: (data: T) => number,
     private setIndex: (data: T, index: number) => void,
     private sortIndex: () => void,
@@ -25,7 +25,7 @@ export class SortHelper<T extends { data: any, id: number }> {
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
     setInterval(() => {
-      if (this.draggingPPanel) {
+      if (this.draggingData) {
         this.layersParent.scrollTop += this.autoScrollVY;
         this.updateDragCell(this.mouseY);
         this.sort();
@@ -36,22 +36,21 @@ export class SortHelper<T extends { data: any, id: number }> {
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
   }
-  scrollTo = (pPanel: T) => {
-    // const layerCell = this.vLayerCells[pPanel.petaPanel.id];
-    const layerCell = this.dataToComponent(pPanel);
+  scrollTo = (data: T) => {
+    const layerCell = this.dataToComponent(data);
     if (!layerCell) {
       return;
     }
     this.layersParent.scrollTop = layerCell.$el.getBoundingClientRect().y - this.layersParent.getBoundingClientRect().y + this.layersParent.scrollTop;
   }
-  startDrag = (pPanel: T, event: MouseEvent) => {
+  startDrag = (data: T, event: MouseEvent) => {
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
     this.fixedHeight = this.layers.getBoundingClientRect().height;
     this.fixedHeight = this.fixedHeight < this.layersParent.getBoundingClientRect().height ? this.layersParent.getBoundingClientRect().height : this.fixedHeight;
     this.layers.style.height = this.fixedHeight + "px";
     this.layers.style.overflow = "hidden";
-    this.draggingPPanel = pPanel;
-    this.changeDraggingData(this.draggingPPanel);
+    this.draggingData = data;
+    this.changeDraggingData(this.draggingData);
     this.updateDragCell(this.mouseY);
     // this.clearSelectionAll(true);
     // pPanel.selected = true;
@@ -59,8 +58,8 @@ export class SortHelper<T extends { data: any, id: number }> {
     // this.$emit("update");
   }
   mousemove = (event: MouseEvent) => {
-    // console.log(this.draggingPPanel)
-    if (!this.draggingPPanel) {
+    // console.log(this.draggingData)
+    if (!this.draggingData) {
       return;
     }
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
@@ -71,26 +70,22 @@ export class SortHelper<T extends { data: any, id: number }> {
   sort = () => {
     let changed = false;
     this.layerCellDatas.map((cellData) => {
-      const layerCell = cellData.data == this.draggingPPanel?.data ? this.cellDrag : this.dataToComponent(cellData);
+      const layerCell = cellData.data == this.draggingData?.data ? this.cellDrag : this.dataToComponent(cellData);
       const layerCellData = cellData;
       return {
         layerCell,
         layerCellData,
-        y: layerCell.$el.getBoundingClientRect().y
+        y: layerCell ? layerCell.$el.getBoundingClientRect().y : 0
       }
     }).sort((a, b) => {
       return b.y - a.y;
     }).forEach((v, index) => {
-      // if (!v.layerCell.pPanel) {
-      //   return;
-      // }
       if (this.dataToIndex(v.layerCellData) != index) {
         changed = true;
       }
       this.setIndex(v.layerCellData, index);
     });
     if (changed) {
-      // this.$emit("sortIndex");
       this.sortIndex();
     }
   }
@@ -110,8 +105,8 @@ export class SortHelper<T extends { data: any, id: number }> {
     this.cellDrag.$el.style.top = `${absolute ? y : (y + this.layersParent.scrollTop - offset)}px`;
   }
   mouseup = (event: MouseEvent) => {
-    this.draggingPPanel = null;
-    this.changeDraggingData(this.draggingPPanel);
+    this.draggingData = null;
+    this.changeDraggingData(this.draggingData);
     this.autoScrollVY = 0;
     this.layers.style.height = "unset";
     this.layers.style.overflow = "unset";
