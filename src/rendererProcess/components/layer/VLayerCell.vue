@@ -59,7 +59,12 @@ import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 })
 export default class VLayerCell extends Vue {
   @Prop()
-  pPanel: PPanel | null = null;
+  cellData: {
+    id: number,
+    data: PPanel
+  } | null = null;
+  // @Prop()
+  // pPanel: PPanel | null = null;
   @Prop()
   drag = false;
   @Ref()
@@ -77,22 +82,22 @@ export default class VLayerCell extends Vue {
     window.removeEventListener("mousemove", this.mousemove);
   }
   get url() {
-    return this.pPanel ? getImageURL(this.pPanel.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
+    return this.cellData ? getImageURL(this.cellData.data.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
   }
   get selected() {
-    return this.pPanel?.selected;
+    return this.cellData?.data.selected;
   }
   get locked() {
-    return this.pPanel?.petaPanel.locked;
+    return this.cellData?.data.petaPanel.locked;
   }
   get visible() {
-    return this.pPanel?.petaPanel.visible;
+    return this.cellData?.data.petaPanel.visible;
   }
   get name() {
-    return this.pPanel?.petaPanel._petaImage?.name || "";
+    return this.cellData?.data.petaPanel._petaImage?.name || "";
   }
   get showNSFW() {
-    return this.pPanel?.petaPanel._petaImage?.nsfw && !this.$nsfw.showNSFW;
+    return this.cellData?.data.petaPanel._petaImage?.nsfw && !this.$nsfw.showNSFW;
   }
   mousedown(event: MouseEvent) {
     this.click.down(vec2FromMouseEvent(event));
@@ -100,11 +105,11 @@ export default class VLayerCell extends Vue {
   }
   mouseup(event: MouseEvent) {
     this.mouseIsDown = false;
-    if (this.click.isClick && this.pPanel) {
+    if (this.click.isClick && this.cellData) {
       if (event.target == this.visibleIcon) {
-        this.pPanel.petaPanel.visible = !this.pPanel?.petaPanel.visible;
+        this.cellData.data.petaPanel.visible = !this.cellData.data?.petaPanel.visible;
       } else if (event.target == this.lockedIcon) {
-        this.pPanel.petaPanel.locked = !this.pPanel?.petaPanel.locked;
+        this.cellData.data.petaPanel.locked = !this.cellData.data?.petaPanel.locked;
       }
     }
   }
@@ -115,7 +120,7 @@ export default class VLayerCell extends Vue {
     this.click.move(vec2FromMouseEvent(event));
     if (!this.click.isClick) {
       this.mouseIsDown = false;
-      this.$emit("startDrag", this.pPanel, event);
+      this.$emit("startDrag", this.cellData, event);
     }
   }
 }

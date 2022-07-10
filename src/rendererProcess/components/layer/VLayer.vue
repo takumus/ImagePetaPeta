@@ -21,16 +21,18 @@
           :key="layerCellData.id"
           :ref="(element) => setVLayerCellRef(element, layerCellData.data.petaPanel.id)"
           :pPanel="layerCellData.data"
+          :cellData="layerCellData"
           :style="{
-            visibility: draggingPPanel === layerCellData.data ? 'hidden' : 'visible'
+            visibility: draggingPPanel?.data === layerCellData.data ? 'hidden' : 'visible'
           }"
-          @startDrag="startDrag"
+          @startDrag="sortHelper.startDrag"
           @click.right="rightClick(layerCellData.data, $event)"
           @click.left="leftClick(layerCellData.data, $event)"
         />
         <VLayerCell
           ref="cellDrag"
-          :pPanel="draggingPPanel"
+          :pPanel="draggingPPanel?.data"
+          :cellData="draggingPPanel"
           :drag="true"
           :style="{
             visibility: !draggingPPanel ? 'hidden' : 'visible'
@@ -52,6 +54,11 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromMouseEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
+import { SortHelper } from "../utils/sortHelper";
+type LayerCellData = {
+  data: PPanel,
+  id: number
+}
 @Options({
   components: {
     VLayerCell
@@ -73,105 +80,46 @@ export default class VLayer extends Vue {
   layersParent!: HTMLElement;
   @Ref()
   cellDrag!: VLayerCell;
-  draggingPPanel: PPanel | null = null;
-  autoScrollVY = 0;
-  mouseY = 0;
-  fixedHeight = 0;
+  draggingPPanel: LayerCellData | null = null;
   vLayerCells: { [key: string]: VLayerCell} = {};
+  sortHelper: SortHelper<LayerCellData> = new SortHelper(
+    (data) => {
+      return this.vLayerCells[data.data.petaPanel.id]!
+    },
+    (data) => {
+      return data.data.petaPanel.index
+    },
+    (data, index) => {
+      data.data.petaPanel.index = index
+    },
+    () => {
+      this.$emit("sortIndex");
+    },
+    (draggingData) => {
+      this.draggingPPanel = draggingData;
+    }
+  );
   async mounted() {
-    window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("mouseup", this.mouseup);
-    setInterval(() => {
-      if (this.draggingPPanel) {
-        this.layersParent.scrollTop += this.autoScrollVY;
-        this.updateDragCell(this.mouseY);
-        this.sort();
-      }
-    }, 1000 / 60);
+    this.sortHelper.init(this.layers, this.layersParent, this.cellDrag);
+  }
+  unmounted() {
+    this.sortHelper.destroy();
+  }
+  @Watch("layerCellDatas")
+  changeLayerCellDatas() {
+    this.sortHelper.layerCellDatas = this.layerCellDatas;
   }
   beforeUpdate() {
     this.vLayerCells = {};
-  }
-  unmounted() {
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("mouseup", this.mouseup);
   }
   setVLayerCellRef(element: VLayerCell, id: string) {
     this.vLayerCells[id] = element;
   }
   scrollTo(pPanel: PPanel) {
-    const layerCell = this.vLayerCells[pPanel.petaPanel.id];
-    if (!layerCell) {
-      return;
-    }
-    this.layersParent.scrollTop = layerCell.$el.getBoundingClientRect().y - this.layersParent.getBoundingClientRect().y + this.layersParent.scrollTop;
-  }
-  startDrag(pPanel: PPanel, event: MouseEvent) {
-    this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
-    this.fixedHeight = this.layers.getBoundingClientRect().height;
-    this.fixedHeight = this.fixedHeight < this.layersParent.getBoundingClientRect().height ? this.layersParent.getBoundingClientRect().height : this.fixedHeight;
-    this.layers.style.height = this.fixedHeight + "px";
-    this.layers.style.overflow = "hidden";
-    this.draggingPPanel = pPanel;
-    this.updateDragCell(this.mouseY);
-    this.clearSelectionAll(true);
-    pPanel.selected = true;
-    this.sort();
-    this.$emit("update");
-  }
-  mousemove(event: MouseEvent) {
-    if (!this.draggingPPanel) {
-      return;
-    }
-    this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
-    this.updateDragCell(this.mouseY);
-    this.sort();
-    this.autoScroll(this.mouseY);
-  }
-  sort() {
-    let changed = false;
-    this.layerCellDatas.map((cellData) => {
-      const layerCell = cellData.data == this.draggingPPanel ? this.cellDrag : this.vLayerCells[cellData.data.petaPanel.id]!;
-      return {
-        layerCell,
-        y: layerCell.$el.getBoundingClientRect().y
-      }
-    }).sort((a, b) => {
-      return b.y - a.y;
-    }).forEach((v, index) => {
-      if (!v.layerCell.pPanel) {
-        return;
-      }
-      if (v.layerCell.pPanel.petaPanel.index != index) {
-        changed = true;
-      }
-      v.layerCell.pPanel.petaPanel.index = index;
+    this.sortHelper.scrollTo({
+      id: 0,
+      data: pPanel
     });
-    if (changed) {
-      this.$emit("sortIndex");
-    }
-  }
-  autoScroll(mouseY: number) {
-    const height = this.layersParent.getBoundingClientRect().height;
-    const autoScrollY = 20;
-    if (mouseY < autoScrollY) {
-      this.autoScrollVY = -(autoScrollY - mouseY);
-    } else if (mouseY > height - autoScrollY) {
-      this.autoScrollVY = (mouseY - (height - autoScrollY));
-    } else {
-      this.autoScrollVY = 0;
-    }
-  }
-  updateDragCell(y: number, absolute = false) {
-    const offset = this.cellDrag.$el.getBoundingClientRect().height / 2;
-    this.cellDrag.$el.style.top = `${absolute ? y : (y + this.layersParent.scrollTop - offset)}px`;
-  }
-  mouseup(event: MouseEvent) {
-    this.draggingPPanel = null;
-    this.autoScrollVY = 0;
-    this.layers.style.height = "unset";
-    this.layers.style.overflow = "unset";
-    this.updateDragCell(0, true);
   }
   rightClick(pPanel: PPanel, event: MouseEvent) {
     if (!pPanel.selected) {
@@ -194,7 +142,7 @@ export default class VLayer extends Vue {
   toggleVisible() {
     this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
   }
-  get layerCellDatas() {
+  get layerCellDatas(): LayerCellData[] {
     if (!this.pPanelsArray) {
       return [];
     }
