@@ -11,22 +11,22 @@
       @click.left="toggleVisible"
     >
     </t-header>
-    <t-layers
+    <t-layers-parent
       v-show="$states.visibleLayerPanel"
       ref="layersParent"
     >
-      <ul ref="layers">
+      <t-layers ref="layers">
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
           :key="layerCellData.id"
-          :ref="(element) => setVLayerCellRef(element, layerCellData.pPanel.petaPanel.id)"
-          :pPanel="layerCellData.pPanel"
+          :ref="(element) => setVLayerCellRef(element, layerCellData.data.petaPanel.id)"
+          :pPanel="layerCellData.data"
           :style="{
-            visibility: draggingPPanel === layerCellData.pPanel ? 'hidden' : 'visible'
+            visibility: draggingPPanel === layerCellData.data ? 'hidden' : 'visible'
           }"
           @startDrag="startDrag"
-          @click.right="rightClick(layerCellData.pPanel, $event)"
-          @click.left="leftClick(layerCellData.pPanel, $event)"
+          @click.right="rightClick(layerCellData.data, $event)"
+          @click.left="leftClick(layerCellData.data, $event)"
         />
         <VLayerCell
           ref="cellDrag"
@@ -36,8 +36,8 @@
             visibility: !draggingPPanel ? 'hidden' : 'visible'
           }"
         />
-      </ul>
-    </t-layers>
+      </t-layers>
+    </t-layers-parent>
   </t-layer-root>
 </template>
 
@@ -73,15 +73,12 @@ export default class VLayer extends Vue {
   layersParent!: HTMLElement;
   @Ref()
   cellDrag!: VLayerCell;
-  keyboards = new Keyboards();
   draggingPPanel: PPanel | null = null;
   autoScrollVY = 0;
   mouseY = 0;
   fixedHeight = 0;
   vLayerCells: { [key: string]: VLayerCell} = {};
   async mounted() {
-    this.keyboards.enabled = true;
-    this.keyboards.down(["escape"], this.pressEscape);
     window.addEventListener("mousemove", this.mousemove);
     window.addEventListener("mouseup", this.mouseup);
     setInterval(() => {
@@ -96,12 +93,8 @@ export default class VLayer extends Vue {
     this.vLayerCells = {};
   }
   unmounted() {
-    this.keyboards.destroy();
     window.removeEventListener("mousemove", this.mousemove);
     window.removeEventListener("mouseup", this.mouseup);
-  }
-  pressEscape(pressed: boolean) {
-    //
   }
   setVLayerCellRef(element: VLayerCell, id: string) {
     this.vLayerCells[id] = element;
@@ -137,8 +130,8 @@ export default class VLayer extends Vue {
   }
   sort() {
     let changed = false;
-    this.pPanels.map((pPanel) => {
-      const layerCell = pPanel == this.draggingPPanel ? this.cellDrag : this.vLayerCells[pPanel.petaPanel.id]!;
+    this.layerCellDatas.map((cellData) => {
+      const layerCell = cellData.data == this.draggingPPanel ? this.cellDrag : this.vLayerCells[cellData.data.petaPanel.id]!;
       return {
         layerCell,
         y: layerCell.$el.getBoundingClientRect().y
@@ -201,19 +194,16 @@ export default class VLayer extends Vue {
   toggleVisible() {
     this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
   }
-  get pPanels() {
+  get layerCellDatas() {
     if (!this.pPanelsArray) {
       return [];
     }
     return this.pPanelsArray.sort((a, b) => {
       return b.petaPanel.index - a.petaPanel.index;
-    });
-  }
-  get layerCellDatas() {
-    // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
-    return this.pPanels.map((pPanel, i) => {
+    }).map((pPanel, i) => {
+      // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
       return {
-        pPanel: pPanel,
+        data: pPanel,
         id: i
       }
     });
@@ -257,13 +247,14 @@ t-layer-root {
     margin-bottom: 8px;
     filter: var(--icon-filter);
   }
-  >t-layers {
+  >t-layers-parent {
     display: block;
     overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
     flex: 1;
-    >ul {
+    >t-layers {
+      display: block;
       margin: 0px;
       padding: 0px;
       position: relative;
