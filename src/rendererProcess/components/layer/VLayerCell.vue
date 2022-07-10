@@ -3,7 +3,6 @@
     class="layer-cell-root"
     :class="{
       drag: drag,
-      hide: hide,
       selected: selected
     }"
     @mousedown.left="mousedown($event)"
@@ -76,9 +75,6 @@ export default class VLayerCell extends Vue {
   unmounted() {
     window.removeEventListener("mouseup", this.mouseup);
     window.removeEventListener("mousemove", this.mousemove);
-  }
-  get hide() {
-    return false;
   }
   get url() {
     return this.pPanel ? getImageURL(this.pPanel.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
