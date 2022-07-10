@@ -47,7 +47,7 @@ export default class VTasks extends Vue {
   mounted() {
     API.on("taskStatus", (e, id, task) => {
       this.taskStatuses[id] = task;
-      if (task.status == "complete") {
+      if (task.status === "complete") {
         window.setTimeout(() => {
           delete this.taskStatuses[id];
         }, 500);
@@ -65,8 +65,8 @@ export default class VTasks extends Vue {
   }
   get closable() {
     return Object.values(this.taskStatuses).filter((status) => {
-      return status.status == "complete" || status.status === "failed";
-    }).length == this.taskStatusArray.length;
+      return status.status === "complete" || status.status === "failed";
+    }).length === this.taskStatusArray.length;
   }
   close() {
     Object.keys(this.taskStatuses).filter((id) => this.taskStatuses[id]?.status === "failed").forEach((key) => {

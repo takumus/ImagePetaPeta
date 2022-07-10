@@ -1,5 +1,5 @@
 export function isLatest(meVersion: string, remoteVersion: string, ignoreMinor: boolean) {
-  if (meVersion == remoteVersion) {
+  if (meVersion === remoteVersion) {
     return true;
   }
   const meNumbers = meVersion.split(".");

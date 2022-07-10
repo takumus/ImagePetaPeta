@@ -63,14 +63,14 @@ export default class VTasks extends Vue {
       console.warn(i18nKey, "にundefinedが含まれています。怪しい。");
       console.warn(localized);
     }
-    if (task.status == "begin") {
+    if (task.status === "begin") {
       this.log = "";
     }
     this.addLog(`[${task.status}]${
-      task.status == "progress" && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
+      task.status === "progress" && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
     }:${localized}`);
     Cursor.setCursor("wait");
-    if (task.status == "complete" || task.status == "failed") {
+    if (task.status === "complete" || task.status === "failed") {
       this.progress = 100;
       Cursor.setDefaultCursor();
       this.cancelable = false;

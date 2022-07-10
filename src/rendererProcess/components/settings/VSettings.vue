@@ -5,7 +5,7 @@
         v-for="tab in tabs"
         :key="tab"
         :class="{
-          selected: currentTab == tab
+          selected: currentTab === tab
         }"
         @click="currentTab = tab"
       >
@@ -16,7 +16,7 @@
       <!--
         General
       -->
-      <t-content v-show="currentTab == 'general'">
+      <t-content v-show="currentTab === 'general'">
         <label>
           <input
             type="checkbox"
@@ -69,7 +69,7 @@
       <!--
         Control
       -->
-      <t-content v-show="currentTab == 'control'">
+      <t-content v-show="currentTab === 'control'">
         <label>
           {{$t("settings.zoomSensitivity")}}:
         </label>
@@ -92,7 +92,7 @@
       <!--
         Browser
       -->
-      <t-content v-show="currentTab == 'browser'">
+      <t-content v-show="currentTab === 'browser'">
         <button
           v-show="regenerateMetadatasCompleted"
           @click="regenerateMetadatas"
@@ -127,7 +127,7 @@
       <!--
         Datas
       -->
-      <t-content v-show="currentTab == 'datas'">
+      <t-content v-show="currentTab === 'datas'">
         <button
           @click="browsePetaImageDirectory"
         >
@@ -141,7 +141,7 @@
         <br>
         <button
           @click="changePetaImageDirectory"
-          :disabled="tempPetaImageDirectory == ''"
+          :disabled="tempPetaImageDirectory === ''"
         >
           {{$t("settings.changePetaImageDirectoryButton")}}
         </button>
@@ -150,7 +150,7 @@
       <!--
         Others
       -->
-      <t-content v-show="currentTab == 'others'">
+      <t-content v-show="currentTab === 'others'">
         <label>
           <input
             type="checkbox"
@@ -179,7 +179,7 @@
         </label><br>
         <p>{{$t("settings.showFPSDescriptions")}}</p>
       </t-content>
-      <t-content v-show="currentTab == 'info'" class="info">
+      <t-content v-show="currentTab === 'info'" class="info">
         <p>
           {{ $appInfo.name }} {{ $appInfo.version }}
         </p>
@@ -268,7 +268,7 @@ export default class VSettings extends Vue {
         this.$t("settings.changePetaImageDirectoryDialog", [this.tempPetaImageDirectory]),
         [this.$t("shared.yes"), this.$t("shared.no")]
       );
-      if (result == 0) {
+      if (result === 0) {
         if (!await API.send("changePetaImageDirectory", this.tempPetaImageDirectory)) {
           await this.$components.dialog.show(
             this.$t("settings.changePetaImageDirectoryErrorDialog", [this.tempPetaImageDirectory]),

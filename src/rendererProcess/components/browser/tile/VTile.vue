@@ -47,7 +47,7 @@
           {{petaTag.name}}
         </t-tag>
         <t-tag
-          v-if="myPetaTags.length == 0 && !loadingTags"
+          v-if="myPetaTags.length === 0 && !loadingTags"
         >
           {{$t("browser.untagged")}}
         </t-tag>
@@ -208,7 +208,7 @@ export default class VTile extends Vue {
     }
     const result = await API.send("getPetaTagIdsByPetaImageIds", [this.tile.petaImage.id]);
     this.myPetaTags = this.petaTagInfos
-    .filter((petaTagInfo) => result.find((id) => id == petaTagInfo.petaTag.id))
+    .filter((petaTagInfo) => result.find((id) => id === petaTagInfo.petaTag.id))
     .map((pti) => pti.petaTag);
     this.loadingTags = false;
   }

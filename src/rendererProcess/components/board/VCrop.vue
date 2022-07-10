@@ -81,7 +81,7 @@ export default class VBoard extends Vue {
       cp.rotate.interactive = false;
       cp.index = i;
       if (i != 3 && i != 7) {
-        if (i == 0 || i == 1 || i == 2) {
+        if (i === 0 || i === 1 || i === 2) {
           cp.yPosition = -1;
         } else {
           cp.yPosition = 1;
@@ -90,7 +90,7 @@ export default class VBoard extends Vue {
         cp.yPosition = 0;
       }
       if (i != 1 && i != 5) {
-        if (i == 2 || i == 3 || i == 4) {
+        if (i === 2 || i === 3 || i === 4) {
           cp.xPosition = 1;
         } else {
           cp.xPosition = -1;
@@ -147,16 +147,16 @@ export default class VBoard extends Vue {
     this.mousePosition = new Vec2(e.data.global);
     if (this.draggingControlPoint) {
       const pos = this.selectionContainer.toLocal(this.mousePosition);
-      if (this.draggingControlPoint.xPosition == -1) {
+      if (this.draggingControlPoint.xPosition === -1) {
         this.minX = pos.x / this.width;
       }
-      if (this.draggingControlPoint.xPosition == 1) {
+      if (this.draggingControlPoint.xPosition === 1) {
         this.maxX = pos.x / this.width;
       }
-      if (this.draggingControlPoint.yPosition == -1) {
+      if (this.draggingControlPoint.yPosition === -1) {
         this.minY = pos.y / this.height;
       }
-      if (this.draggingControlPoint.yPosition == 1) {
+      if (this.draggingControlPoint.yPosition === 1) {
         this.maxY = pos.y / this.height;
       }
     }

@@ -17,7 +17,7 @@ export class DelayUpdater<T> {
   }
   order(data: T) {
     const newData = JSON.stringify(data);
-    if (this.data == newData) return;
+    if (this.data === newData) return;
     this.data = newData;
     window.clearInterval(this.timerId);
     this._ordered = true;

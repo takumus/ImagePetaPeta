@@ -100,19 +100,19 @@ export default class VTags extends Vue {
     API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.UPSERT);
   }
   async removeTag(petaTag: PetaTag) {
-    if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+    if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
       await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
-      const index = this.selectedPetaTags.findIndex((pt) => pt == petaTag);
+      const index = this.selectedPetaTags.findIndex((pt) => pt === petaTag);
       if (index >= 0) {
         this.selectedPetaTags.splice(index, 1);
       }
     }
   }
   async changeTag(petaTag: PetaTag, newName: string) {
-    if (petaTag.name == newName) {
+    if (petaTag.name === newName) {
       return;
     }
-    if (this.browserTags.find((c) => c.petaTag.name == newName)) {
+    if (this.browserTags.find((c) => c.petaTag.name === newName)) {
       this.$components.dialog.show(this.$t("browser.tagAlreadyExistsDialog", [newName]), [this.$t("shared.yes")]);
       return;
     }
@@ -144,7 +144,7 @@ export default class VTags extends Vue {
     return browserTags;
   }
   get selectedAll() {
-    return this.selectedPetaTags.length == 0;
+    return this.selectedPetaTags.length === 0;
   }
 }
 </script>

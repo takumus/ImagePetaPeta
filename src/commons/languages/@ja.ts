@@ -203,7 +203,7 @@ const ja = {
       logs: {
         begin: "開始",
         progress: (ctx: any) => {
-          return `${ctx.list(0) == "error" ? "エラー" : ctx.list(0) == "exists" ? "重複" : "追加"}:${ctx.list(1)}`
+          return `${ctx.list(0) === "error" ? "エラー" : ctx.list(0) === "exists" ? "重複" : "追加"}:${ctx.list(1)}`
         },
         complete: (ctx: any) => {
           return `${ctx.list(1)}件中${ctx.list(0)}件のインポートに成功しました。`

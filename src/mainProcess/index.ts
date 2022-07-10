@@ -425,7 +425,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           try {
             log.log("#Get PetaBoards");
             const petaBoards = await petaDatas.getPetaBoards();
-            if (petaBoards.length == 0) {
+            if (petaBoards.length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
               await petaDatas.updatePetaBoard(board, UpdateMode.UPSERT);
@@ -728,11 +728,11 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           try {
             log.log("#Change PetaImage Directory");
             path = Path.resolve(path);
-            if (Path.resolve() == path) {
+            if (Path.resolve() === path) {
               log.error("Invalid file path:", path);
               return false;
             }
-            if (DIR_APP == path) {
+            if (DIR_APP === path) {
               log.error("Invalid file path:", path);
               return false;
             }
@@ -848,7 +848,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
               async (url) => {
                 let data: Buffer;
                 let remoteURL = "";
-                if (url.trim().indexOf("data:") == 0) {
+                if (url.trim().indexOf("data:") === 0) {
                   // dataURIだったら
                   data = dataURIToBuffer(url);
                 } else {
@@ -873,7 +873,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           const log3 = mainLogger.logChunk();
           try {
-            if (petaImages.length == 0) {
+            if (petaImages.length === 0) {
               if (arrayBuffers.length > 0) {
                 log3.log("2.trying to read ArrayBuffer:", arrayBuffers.length);
                 petaImages = await petaDatas.importImagesFromBuffers(
@@ -893,7 +893,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           }
           const log4 = mainLogger.logChunk();
           try {
-            if (petaImages.length == 0) {
+            if (petaImages.length === 0) {
               log4.log("3.trying to read filePath:", filePaths.length);
               petaImages = await petaDatas.importImagesFromFilePaths(filePaths);
               log4.log("result:", petaImages.length);

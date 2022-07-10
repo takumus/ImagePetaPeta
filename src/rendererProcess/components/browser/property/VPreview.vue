@@ -87,7 +87,7 @@ export default class VPreview extends Vue {
     }
   }
   get propertyThumbnails(): PropertyThumbnail[] {
-    const maxWidth = this.petaImages.length == 1 ? this.previewWidth : this.previewWidth * 0.7;
+    const maxWidth = this.petaImages.length === 1 ? this.previewWidth : this.previewWidth * 0.7;
     const petaImages = [...this.petaImages];
     // プレビュー数の最大を抑える。
     petaImages.splice(0, petaImages.length - MAX_PREVIEW_COUNT);
@@ -118,7 +118,7 @@ export default class VPreview extends Vue {
     return thumbnails;
   }
   get noImage() {
-    return this.petaImages.length == 0;
+    return this.petaImages.length === 0;
   }
 }
 </script>

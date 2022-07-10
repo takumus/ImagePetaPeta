@@ -12,7 +12,7 @@ w.addEventListener('message', async (e) => {
       parsedFrame: pf,
       index: i,
       length: frames.length,
-      isLast: i == frames.length - 1
+      isLast: i === frames.length - 1
     } as DecompressWorkerData);
     delete (pf as any).pixels;
     delete (pf as any).patch;

@@ -224,7 +224,7 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   preventWheelClick(event: MouseEvent) {
-    if (event.button == MouseButton.MIDDLE) {
+    if (event.button === MouseButton.MIDDLE) {
       event.preventDefault();
     }
   }
@@ -234,13 +234,13 @@ export default class VBoard extends Vue {
     }
     const mouse = this.getMouseFromEvent(e);
     this.click.down(mouse);
-    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE || (this.detailsMode && e.data.button == MouseButton.LEFT)) {
+    if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE || (this.detailsMode && e.data.button === MouseButton.LEFT)) {
       this.mouseRightPressing = true;
       this.dragging = true;
       this.dragOffset
       .set(this.board.transform.position)
       .sub(mouse);
-    } else if (e.data.button == MouseButton.LEFT) {
+    } else if (e.data.button === MouseButton.LEFT) {
       this.mouseLeftPressing = true;
       const pPanel = this.getPPanelFromObject(e.target);
       if (pPanel) {
@@ -255,16 +255,16 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   getPPanelFromObject(object: PIXI.DisplayObject) {
-    if (this.pPanelsArray.find((c) => c == object)) {
+    if (this.pPanelsArray.find((c) => c === object)) {
       return object as PPanel;
     }
     return null;
   }
   mouseup(e: PIXI.InteractionEvent) {
     const mouse = this.getMouseFromEvent(e).add(this.mouseOffset);
-    if (e.data.button == MouseButton.RIGHT || e.data.button == MouseButton.MIDDLE || (this.detailsMode && e.data.button == MouseButton.LEFT)) {
+    if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE || (this.detailsMode && e.data.button === MouseButton.LEFT)) {
       this.mouseRightPressing = false;
-      if (this.click.isClick && e.data.button == MouseButton.RIGHT) {
+      if (this.click.isClick && e.data.button === MouseButton.RIGHT) {
         const pPanel = this.getPPanelFromObject(e.target);
         if (pPanel) {
           this.pointerdownPPanel(pPanel, e);
@@ -285,7 +285,7 @@ export default class VBoard extends Vue {
         }
       }
       this.dragging = false;
-    } else if (e.data.button == MouseButton.LEFT) {
+    } else if (e.data.button === MouseButton.LEFT) {
       this.mouseLeftPressing = false;
       this.pPanelsArray.forEach((pPanel) => {
         pPanel.dragging = false;
@@ -311,7 +311,7 @@ export default class VBoard extends Vue {
       return;
     }
     const mouse = vec2FromMouseEvent(event).sub(this.mouseOffset).sub(this.stageRect.clone().div(2));
-    if (event.ctrlKey || this.$systemInfo.platform == "win32") {
+    if (event.ctrlKey || this.$systemInfo.platform === "win32") {
       const currentZoom = this.board.transform.scale;
       this.board.transform.scale *= 1 + -event.deltaY * this.$settings.zoomSensitivity * 0.00001;
       if (this.board.transform.scale > BOARD_ZOOM_MAX) {
@@ -574,7 +574,7 @@ export default class VBoard extends Vue {
       return;
     }
     this.endCrop();
-    if (offsetIndex == 0) {
+    if (offsetIndex === 0) {
       this.clearSelectionAll();
     }
     const offset = new Vec2(20, 20).mult(offsetIndex);

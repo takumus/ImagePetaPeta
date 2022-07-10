@@ -16,7 +16,7 @@ export async function spawn<T, K>(name: string, exec: (handler: TaskHandler, par
       if (emitStatusCallback) {
         emitStatusCallback(id, status);
       }
-      if (status.status == "failed" || status.status == "complete") {
+      if (status.status === "failed" || status.status === "complete") {
         done = true;
       }
     }

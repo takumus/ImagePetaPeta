@@ -83,7 +83,7 @@ export default class VUtilsBar extends Vue {
   async toggleNSFW() {
     const value = !this.$nsfw.showNSFW;
     if (value) {
-      if (await this.$components.dialog.show(this.$t("utilsBar.nsfwConfirm"), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+      if (await this.$components.dialog.show(this.$t("utilsBar.nsfwConfirm"), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
         await API.send("setShowNSFW", true);
       }
     } else {

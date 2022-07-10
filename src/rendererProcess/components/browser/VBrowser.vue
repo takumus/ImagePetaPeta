@@ -167,7 +167,7 @@ export default class VBrowser extends Vue {
     });
   }
   restoreScrollPosition() {
-    const current = this.tiles.find((bt) => bt.petaImage.id == this.currentScrollTileId);
+    const current = this.tiles.find((bt) => bt.petaImage.id === this.currentScrollTileId);
     if (current) {
       this.thumbnails.scrollTo(0, current.position.y);
     }
@@ -256,7 +256,7 @@ export default class VBrowser extends Vue {
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
         click: async () => {
-          if (await this.$components.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+          if (await this.$components.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
             await updatePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
           }
         }
@@ -309,7 +309,7 @@ export default class VBrowser extends Vue {
   sort(a: PetaImage, b: PetaImage) {
     switch(this.sortMode) {
       case SortMode.ADD_DATE: {
-        if (a.addDate == b.addDate) {
+        if (a.addDate === b.addDate) {
           return b.fileDate - a.fileDate;
         }
         return b.addDate - a.addDate;
@@ -347,7 +347,7 @@ export default class VBrowser extends Vue {
     return this.petaImagesArray.filter((pi) => pi._selected);
   }
   async fetchFilteredPetaImages() {
-    if (this.selectedPetaTags.length == 0) {
+    if (this.selectedPetaTags.length === 0) {
       this.filteredPetaImages = [...this.petaImagesArray].sort(this.sort);
       return;
     }
@@ -380,7 +380,7 @@ export default class VBrowser extends Vue {
     }, 0);
   }
   get tiles(): Tile[] {
-    if (this.actualTileSize == 0) {
+    if (this.actualTileSize === 0) {
       return [];
     }
     const yList: number[] = [];

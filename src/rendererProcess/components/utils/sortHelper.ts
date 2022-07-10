@@ -70,7 +70,7 @@ export class SortHelper<T extends { data: any, id: number }> {
   sort = () => {
     let changed = false;
     this.layerCellDatas.map((cellData) => {
-      const layerCell = cellData.data == this.draggingData?.data ? this.cellDrag : this.dataToComponent(cellData);
+      const layerCell = cellData.data === this.draggingData?.data ? this.cellDrag : this.dataToComponent(cellData);
       const layerCellData = cellData;
       return {
         layerCell,

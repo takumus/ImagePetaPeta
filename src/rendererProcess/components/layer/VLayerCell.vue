@@ -106,9 +106,9 @@ export default class VLayerCell extends Vue {
   mouseup(event: MouseEvent) {
     this.mouseIsDown = false;
     if (this.click.isClick && this.cellData) {
-      if (event.target == this.visibleIcon) {
+      if (event.target === this.visibleIcon) {
         this.cellData.data.petaPanel.visible = !this.cellData.data?.petaPanel.visible;
-      } else if (event.target == this.lockedIcon) {
+      } else if (event.target === this.lockedIcon) {
         this.cellData.data.petaPanel.locked = !this.cellData.data?.petaPanel.locked;
       }
     }

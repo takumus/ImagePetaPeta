@@ -85,16 +85,16 @@ export default class VModal extends Vue {
     this.$emit("close");
   }
   mousedown(event: MouseEvent) {
-    this.clickBackground = event.target == this.background;
+    this.clickBackground = event.target === this.background;
   }
   mouseup(event: MouseEvent) {
-    if (event.target == this.background && this.clickBackground) {
+    if (event.target === this.background && this.clickBackground) {
       this.close();
       this.clickBackground = false;
     }
   }
   get isActive() {
-    return this.modalId == this.$components.modal.modalIds[this.$components.modal.modalIds.length - 1];
+    return this.modalId === this.$components.modal.modalIds[this.$components.modal.modalIds.length - 1];
   }
   @Watch("$components.modal.modalIds")
   changeModal() {

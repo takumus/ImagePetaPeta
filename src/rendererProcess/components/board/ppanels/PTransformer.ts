@@ -51,7 +51,7 @@ export class PTransformer extends PIXI.Container {
     this.addChild(...this.corners);
   }
   setScale(scale: number) {
-    if (scale == this._scale) {
+    if (scale === this._scale) {
       return;
     }
     this._scale = scale;
@@ -111,7 +111,7 @@ export class PTransformer extends PIXI.Container {
   }
   mousemove(e: PIXI.InteractionEvent) {
     this.click.move(e.data.global);
-    if (this.controlStatus == ControlStatus.PANEL_SIZE) {
+    if (this.controlStatus === ControlStatus.PANEL_SIZE) {
       const scale = this.pairCorner.getDistance(this.toLocal(e.data.global)) / this.beginSizingDistance;
       this.selectedPPanels.forEach((pPanel, i) => {
         pPanel.petaPanel.width = this.beginSizingPetaPanels[i]!.width * scale;
@@ -136,7 +136,7 @@ export class PTransformer extends PIXI.Container {
           )
         );
       })
-    } else if (this.controlStatus == ControlStatus.PANEL_ROTATE) {
+    } else if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.rotatingRotation = center.getDiff(this.toLocal(e.data.global)).atan2();
       if (this.fit) {
@@ -171,7 +171,7 @@ export class PTransformer extends PIXI.Container {
     }
   }
   update() {
-    if (this.controlStatus == ControlStatus.PANEL_ROTATE) {
+    if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.corners.forEach((c, i) => {
         const diff = center.getDiff(this.beginTransformCorners[i]!);
@@ -182,7 +182,7 @@ export class PTransformer extends PIXI.Container {
         c.currentRotation = r;
       });
     } else {
-      if (this.selectedPPanels.length == 1) {
+      if (this.selectedPPanels.length === 1) {
         this.selectedPPanels[0]!.getCorners().forEach((c, i) => {
           const p = this.toLocal(this.selectedPPanels[0]!.toGlobal(c));
           this.corners[i * 2]!.x = p.x;

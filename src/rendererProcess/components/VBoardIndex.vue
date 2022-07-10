@@ -166,12 +166,12 @@ export default class BoardIndex extends Vue {
     API.on("notifyUpdate", async (event, latest, downloaded) => {
       if (downloaded && await this.$components.dialog.show(
         this.$t("utils.installUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
-      ) == 0) {
+      ) === 0) {
         await API.send("installUpdate");
         API.send("openURL", `${DOWNLOAD_URL}${latest}`);
       } else if (!downloaded && await this.$components.dialog.show(
         this.$t("utils.downloadUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
-      ) == 0) {
+      ) === 0) {
         API.send("openURL", `${DOWNLOAD_URL}${latest}`);
       }
     });
@@ -187,7 +187,7 @@ export default class BoardIndex extends Vue {
   async restoreBoard() {
     const states = await API.send("getStates");
     this.errorPetaBoardId = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
-    const lastBoard = this.boards.find((board) => board.id == states.selectedPetaBoardId);
+    const lastBoard = this.boards.find((board) => board.id === states.selectedPetaBoardId);
     this.selectPetaBoard(lastBoard);
     if (!lastBoard) {
       this.selectPetaBoard(this.boards[0]);
@@ -248,13 +248,13 @@ export default class BoardIndex extends Vue {
     if (!board) {
       return;
     }
-    if (this.currentPetaBoard?.id == board.id) {
+    if (this.currentPetaBoard?.id === board.id) {
       return;
     }
     logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
     this.$states.selectedPetaBoardId = board.id;
     this.$states.loadedPetaBoardId = "";
-    if (this.errorPetaBoardId == board.id) {
+    if (this.errorPetaBoardId === board.id) {
       if (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
         return;
       } else {
@@ -274,10 +274,10 @@ export default class BoardIndex extends Vue {
       return;
     }
     this.boardUpdaters[board.id]!.forceUpdate();
-    const leftBoardId = this.boards[this.boards.findIndex((b) => b.id == board.id) - 1]?.id;
+    const leftBoardId = this.boards[this.boards.findIndex((b) => b.id === board.id) - 1]?.id;
     await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();
-    const leftBoard = this.boards.find((board) => board.id == leftBoardId);
+    const leftBoard = this.boards.find((board) => board.id === leftBoardId);
     if (leftBoard) {
       this.selectPetaBoard(leftBoard);
     } else {
@@ -297,10 +297,10 @@ export default class BoardIndex extends Vue {
     this.selectPetaBoard(board);
   }
   get currentPetaBoard(): PetaBoard | undefined {
-    if (this.errorPetaBoardId == this.currentPetaBoardId) {
+    if (this.errorPetaBoardId === this.currentPetaBoardId) {
       return undefined;
     }
-    return this.boards.find((board) => board.id == this.currentPetaBoardId);
+    return this.boards.find((board) => board.id === this.currentPetaBoardId);
   }
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);

@@ -149,7 +149,7 @@ export default class VProperty extends Vue {
   }
   async addTag(name: string) {
     // タグを探す。なかったら作る。
-    let petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == name)?.petaTag;
+    let petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name === name)?.petaTag;
     // リクエスト2回飛ばさない
     if (!petaTag) {
       petaTag = createPetaTag(name);
@@ -238,11 +238,11 @@ export default class VProperty extends Vue {
       return;
     }
     const result = await API.send("getPetaTagIdsByPetaImageIds", this.petaImages.map((petaImage) => petaImage.id));
-    this.sharedPetaTags = this.petaTagInfos.filter((pti) => result.find((id) => id == pti.petaTag.id)).map((pi) => pi.petaTag);
+    this.sharedPetaTags = this.petaTagInfos.filter((pti) => result.find((id) => id === pti.petaTag.id)).map((pi) => pi.petaTag);
     this.fetchingTags = false;
   }
   get singlePetaImageInfo() {
-    if (this.petaImages.length == 1) {
+    if (this.petaImages.length === 1) {
       const petaImage = this.petaImages[0]!;
       const all = petaImage.palette.reduce((p, c) => {
         return p + c.population;
@@ -264,13 +264,13 @@ export default class VProperty extends Vue {
     return undefined;
   }
   get noImage() {
-    return this.petaImages.length == 0;
+    return this.petaImages.length === 0;
   }
   get nsfw() {
     let nsfw = false;
     let same = true;
     this.petaImages.forEach((pi, i) => {
-      if (i == 0) {
+      if (i === 0) {
         nsfw = pi.nsfw;
         return;
       }

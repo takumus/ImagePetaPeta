@@ -72,7 +72,7 @@ export default class VEditableLabel extends Vue {
   mounted() {
     this.changeLabel();
     this.keyboard.down(["backspace", "delete"], () => {
-      if (this.tempText == "") {
+      if (this.tempText === "") {
         this.$emit("delete", this);
       }
     });
@@ -124,7 +124,7 @@ export default class VEditableLabel extends Vue {
       }
       this.tempText = this.tempText.trim();
       if (!this.allowEmpty) {
-        if (this.label == this.tempText || this.tempText == "") {
+        if (this.label === this.tempText || this.tempText === "") {
           this.tempText = this.label;
           return;
         }

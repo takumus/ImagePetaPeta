@@ -11,7 +11,7 @@
         <t-draggable
           class="left"
           :class="{
-            mac: $systemInfo.platform == 'darwin'
+            mac: $systemInfo.platform === 'darwin'
           }"
         >
         </t-draggable>
@@ -83,7 +83,7 @@ export default class VTitleBar extends Vue {
     return this.$windowType !== WindowType.SETTINGS;
   }
   get isMac() {
-    return this.$systemInfo.platform == "darwin";
+    return this.$systemInfo.platform === "darwin";
   }
 }
 </script>

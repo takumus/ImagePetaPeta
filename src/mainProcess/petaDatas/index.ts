@@ -49,7 +49,7 @@ export class PetaDatas {
     log.log("##Update PetaImage");
     log.log("mode:", mode);
     log.log("image:", minimId(petaImage.id));
-    if (mode == UpdateMode.REMOVE) {
+    if (mode === UpdateMode.REMOVE) {
       await this.datas.dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
       log.log("removed tags");
       await this.datas.dataPetaImages.remove({ id: petaImage.id });
@@ -60,7 +60,7 @@ export class PetaDatas {
       log.log("removed thumbnail");
       return true;
     }
-    await this.datas.dataPetaImages.update({ id: petaImage.id }, petaImage, mode == UpdateMode.UPSERT);
+    await this.datas.dataPetaImages.update({ id: petaImage.id }, petaImage, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -84,7 +84,7 @@ export class PetaDatas {
         });
       }
       await promiseSerial(update, datas).promise;
-      if (mode == UpdateMode.REMOVE) {
+      if (mode === UpdateMode.REMOVE) {
         this.emitMainEvent("updatePetaTags");
       }
       this.emitMainEvent("updatePetaImages", datas, mode);
@@ -100,12 +100,12 @@ export class PetaDatas {
     log.log("##Update PetaBoard");
     log.log("mode:", mode);
     log.log("board:", minimId(board.id));
-    if (mode == UpdateMode.REMOVE) {
+    if (mode === UpdateMode.REMOVE) {
       await this.datas.dataPetaBoards.remove({ id: board.id });
       log.log("removed");
       return true;
     }
-    await this.datas.dataPetaBoards.update({ id: board.id }, board, mode == UpdateMode.UPSERT);
+    await this.datas.dataPetaBoards.update({ id: board.id }, board, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -119,7 +119,7 @@ export class PetaDatas {
       return ids;
     }
     // untagged
-    if (petaTagIds.length == 0) {
+    if (petaTagIds.length === 0) {
       log.log("type: untagged");
       const taggedIds = Array.from(new Set((await this.datas.dataPetaImagesPetaTags.find({})).map((pipt) => {
         return pipt.petaImageId;
@@ -145,7 +145,7 @@ export class PetaDatas {
     }))).filter((id) => {
       return pipts.filter((pipt) => {
         return pipt.petaImageId === id;
-      }).length == petaTagIds.length
+      }).length === petaTagIds.length
     });
     return ids;
   }
@@ -164,8 +164,8 @@ export class PetaDatas {
     })));
     const petaTagIds = ids.filter((id) => {
       return pipts.filter((pipt) => {
-        return pipt.petaTagId == id;
-      }).length == petaImageIds.length;
+        return pipt.petaTagId === id;
+      }).length === petaImageIds.length;
     });
     return petaTagIds;
   }
@@ -237,14 +237,14 @@ export class PetaDatas {
     log.log("##Update PetaTag");
     log.log("mode:", mode);
     log.log("tag:", minimId(tag.id));
-    if (mode == UpdateMode.REMOVE) {
+    if (mode === UpdateMode.REMOVE) {
       await this.datas.dataPetaImagesPetaTags.remove({ petaTagId: tag.id });
       await this.datas.dataPetaTags.remove({ id: tag.id });
       log.log("removed");
       return true;
     }
     // tag.petaImages = Array.from(new Set(tag.petaImages));
-    await this.datas.dataPetaTags.update({ id: tag.id }, tag, mode == UpdateMode.UPSERT);
+    await this.datas.dataPetaTags.update({ id: tag.id }, tag, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -284,17 +284,17 @@ export class PetaDatas {
     log.log("##Update PetaImagePetaTag");
     log.log("mode:", mode);
     log.log("tag:", minimId(petaImagePetaTag.id));
-    if (mode == UpdateMode.REMOVE) {
+    if (mode === UpdateMode.REMOVE) {
       await this.datas.dataPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
       log.log("removed");
       return true;
     }
-    await this.datas.dataPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode == UpdateMode.UPSERT);
+    await this.datas.dataPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
   getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
-    if (thumbnail == ImageType.ORIGINAL) {
+    if (thumbnail === ImageType.ORIGINAL) {
       return Path.resolve(this.paths.DIR_IMAGES, petaImage.file.original);
     } else {
       return Path.resolve(this.paths.DIR_THUMBNAILS, petaImage.file.thumbnail);
@@ -383,7 +383,7 @@ export class PetaDatas {
       handler.emitStatus({
         i18nKey: "tasks.importingFiles",
         log: [addedFileCount.toString(), _filePaths.length.toString()],
-        status: addedFileCount == _filePaths.length ? "complete" : "failed"
+        status: addedFileCount === _filePaths.length ? "complete" : "failed"
       });
       if (this.datas.dataSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");
@@ -428,7 +428,7 @@ export class PetaDatas {
         const childProcess = runExternalApplication(
           execFilePath,
           parameters,
-          process.platform == "win32" ? "utf16le" : "utf8",
+          process.platform === "win32" ? "utf16le" : "utf8",
           (l) => {
             log.log(l);
             handler.emitStatus({
@@ -557,7 +557,7 @@ export class PetaDatas {
       handler.emitStatus({
         i18nKey: "tasks.importingFiles",
         log: [addedFileCount.toString(), datas.length.toString()],
-        status: addedFileCount == datas.length ? "complete" : "failed"
+        status: addedFileCount === datas.length ? "complete" : "failed"
       });
       if (this.datas.dataSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");

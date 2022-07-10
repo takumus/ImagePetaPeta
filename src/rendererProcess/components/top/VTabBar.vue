@@ -1,8 +1,8 @@
 <template>
   <t-tab-root>
     <t-tab
-      :class="{ selected: b == board }"
-      :style="{ opacity: b == board && dragging ? 0 : 1 }"
+      :class="{ selected: b === board }"
+      :style="{ opacity: b === board && dragging ? 0 : 1 }"
       v-for="(b, index) in boards"
       @mousedown="mousedown($event, b, index, $target)"
       @contextmenu="menu($event, b)"
@@ -122,7 +122,7 @@ export default class VTabBar extends Vue {
       let newIndex = 0;
       this.boards
       .map((b) => {
-        const elem: HTMLElement = b == this.draggingPetaBoard ? this.draggingTab : this.tabs[b.id]!;
+        const elem: HTMLElement = b === this.draggingPetaBoard ? this.draggingTab : this.tabs[b.id]!;
         return {
           rect: elem.getBoundingClientRect(),
           board: b
@@ -132,7 +132,7 @@ export default class VTabBar extends Vue {
       .forEach((b, index) => {
         b.board.index = index;
         // 選択中ボードのインデックス復元。
-        if (b.board == selectedPetaBoard) {
+        if (b.board === selectedPetaBoard) {
           newIndex = index;
         }
       });
@@ -158,7 +158,7 @@ export default class VTabBar extends Vue {
     this.$emit("select", board);
   }
   changePetaBoardName(board: PetaBoard, name: string) {
-    if (name == "") {
+    if (name === "") {
       return;
     }
     board.name = name;
@@ -171,10 +171,10 @@ export default class VTabBar extends Vue {
     this.$emit("add");
   }
   get board() {
-    return this.boards.find((board) => board.id == this.currentPetaBoardId);
+    return this.boards.find((board) => board.id === this.currentPetaBoardId);
   }
   get isMac() {
-    return this.$systemInfo.platform == "darwin";
+    return this.$systemInfo.platform === "darwin";
   }
 }
 </script>

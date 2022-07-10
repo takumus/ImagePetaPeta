@@ -18,7 +18,7 @@
       @mouseleave="moveSelectionAbsolute(-1)"
       class="item"
       :class="{
-        selected: i == currentIndex
+        selected: i === currentIndex
       }"
     >
       {{item}}
@@ -132,7 +132,7 @@ export default class VComplement extends Vue {
     }, 1);
   }
   open(input: VEditableLabel, items: string[]): void {
-    if (input == this.target && this.show) {
+    if (input === this.target && this.show) {
       return;
     }
     this.updateItems(items);

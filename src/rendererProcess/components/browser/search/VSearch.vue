@@ -67,7 +67,7 @@ export default class VSearch extends Vue {
     //
   }
   async removeTag(petaTag: PetaTag) {
-    if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) == 0) {
+    if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
       await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
     }
   }
@@ -81,17 +81,17 @@ export default class VSearch extends Vue {
   }
   editSearchTag(tag: PetaTag, value: string) {
     value = value.trim().replace(/\r?\n/g, "");
-    const index = this.selectedPetaTags.findIndex((petaTag) => petaTag == tag);
+    const index = this.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
     this.selectedPetaTags.splice(index, 1);
     if (value != "") {
-      const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == value)?.petaTag;
+      const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name === value)?.petaTag;
       if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
         this.selectedPetaTags.splice(index, 0, petaTag);
       }
     }
   }
   addSelectedTag(tagName: string) {
-    const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name == tagName)?.petaTag;
+    const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name === tagName)?.petaTag;
     const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
     if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
       this.selectedPetaTags.length = 0;

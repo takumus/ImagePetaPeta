@@ -26,7 +26,7 @@ export function mkdir(path: string, recursive = false): Promise<string> {
   return new Promise((res, rej) => {
     fs.mkdir(path, { recursive }, (err) => {
       if (err) {
-        if (err.code == "EEXIST") {
+        if (err.code === "EEXIST") {
           res(path);
         } else {
           rej(err);
@@ -144,13 +144,13 @@ async function _readDirRecursive(path: string, onFile: (filePaths: string[]) => 
           _files.push(cPath);
         }
       } catch(error) {
-        if (error == "canceled") {
+        if (error === "canceled") {
           throw "canceled";
         }
       }
     }
   } catch (error) {
-    if (error == "canceled") {
+    if (error === "canceled") {
       throw "canceled";
     }
     return [path];
