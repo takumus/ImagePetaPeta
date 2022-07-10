@@ -210,6 +210,7 @@ export default class VLayer extends Vue {
     });
   }
   get layerCellDatas() {
+    // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
     return this.pPanels.map((pPanel, i) => {
       return {
         pPanel: pPanel,
