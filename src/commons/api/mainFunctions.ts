@@ -58,4 +58,5 @@ export interface MainFunctions {
   setShowNSFW: (value: boolean) => Promise<void>;
   searchImageByGoogle: (petaImage: PetaImage) => Promise<boolean>;
   getIsDarkMode: () => Promise<boolean>;
+  getIsDataInitialized: () => Promise<boolean>;
 }

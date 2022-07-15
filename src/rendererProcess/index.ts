@@ -40,42 +40,55 @@ function createApp(type: WindowType | string) {
   return _createApp(BoardIndex);
 }
 (async () => {
-  const windowType = GlobalWindowType.createPlugin();
-  logChunk().log(`window "${windowType.windowType}" init`);
-  window.onerror = (e) => {
-    logChunk().log(`window "${windowType.windowType}" error:`, e);
-  }
-  AnimatedGIFLoader.add?.();
-  const app = createApp(windowType.windowType);
-  async function appUse(plugin: Plugin) {
-    return await plugin.install?.(app);
-  }
-  const i18n = createI18n({
-    locale: "ja",
-    messages: languages,
-  });
-  const platform = await API.send("getPlatform");
-  appUse(i18n);
-  appUse(windowType);
-  appUse(GlobalSystemInfo.createPlugin(platform));
-  appUse(GlobalDefines);
-  appUse(GlobalAPI);
-  appUse(GlobalComponents);
-  appUse(GlobalSystemDarkMode);
-  appUse(GlobalTexts.createPlugin(platform));
-  await appUse(GlobalDarkMode);
-  await appUse(GlobalSettings);
-  await appUse(GlobalNSFW);
-  await appUse(GlobalStates);
-  await appUse(GlobalAppInfo);
-  await appUse(GlobalWindowIsFocused.createPlugin(windowType.windowType));
-  console.log("WindowType:", windowType.windowType);
-  app.mount("#app");
-  const keyboard = new Keyboards();
-  keyboard.down(["d"], () => {
-    if (Keyboards.pressedOR("control", "meta")) {
-      API.send("windowToggleDevTools");
+  let initialized = false;
+  const initVue = async () => {
+    if (initialized) {
+      return;
     }
+    initialized = true;
+    const windowType = GlobalWindowType.createPlugin();
+    logChunk().log(`window "${windowType.windowType}" init`);
+    window.onerror = (e) => {
+      logChunk().log(`window "${windowType.windowType}" error:`, e);
+    }
+    AnimatedGIFLoader.add?.();
+    const app = createApp(windowType.windowType);
+    async function appUse(plugin: Plugin) {
+      return await plugin.install?.(app);
+    }
+    const i18n = createI18n({
+      locale: "ja",
+      messages: languages,
+    });
+    const platform = await API.send("getPlatform");
+    appUse(i18n);
+    appUse(windowType);
+    appUse(GlobalSystemInfo.createPlugin(platform));
+    appUse(GlobalDefines);
+    appUse(GlobalAPI);
+    appUse(GlobalComponents);
+    appUse(GlobalSystemDarkMode);
+    appUse(GlobalTexts.createPlugin(platform));
+    await appUse(GlobalDarkMode);
+    await appUse(GlobalSettings);
+    await appUse(GlobalNSFW);
+    await appUse(GlobalStates);
+    await appUse(GlobalAppInfo);
+    await appUse(GlobalWindowIsFocused.createPlugin(windowType.windowType));
+    console.log("WindowType:", windowType.windowType);
+    app.mount("#app");
+    const keyboard = new Keyboards();
+    keyboard.down(["d"], () => {
+      if (Keyboards.pressedOR("control", "meta")) {
+        API.send("windowToggleDevTools");
+      }
+    });
+    keyboard.enabled = true;
+  }
+  API.on("dataInitialized", () => {
+    initVue();
   });
-  keyboard.enabled = true;
+  if (await API.send("getIsDataInitialized")) {
+    initVue();
+  }
 })();

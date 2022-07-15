@@ -20,4 +20,5 @@ export interface MainEvents {
   showNSFW: (value: boolean) => void;
   detailsPetaImage: (petaImage: PetaImage) => void;
   darkMode: (value: boolean) => void;
+  dataInitialized: () => void;
 }

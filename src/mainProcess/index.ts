@@ -81,6 +81,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   let updateInstallerFilePath: string;
   let checkUpdateTimeoutHandler: NodeJS.Timeout;
   let dropFromBrowserPetaImageIds: string[] | undefined = undefined;
+  let isDataInitialized = false;
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
@@ -228,10 +229,31 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     });
     //-------------------------------------------------------------------------------------------------//
     /*
+      ipcへ関数を登録
+    */
+    //-------------------------------------------------------------------------------------------------//
+    const mainFunctions = getMainFunctions();
+    Object.keys(mainFunctions).forEach((key) => {
+      ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
+    });
+    //-------------------------------------------------------------------------------------------------//
+    /*
+      メインウインドウ・プレビューウインドウを初期化
+    */
+    //-------------------------------------------------------------------------------------------------//
+    createProtocol("app");
+    nativeTheme.on("updated", () => {
+      emitDarkMode();
+    })
+    showWindows();
+    draggingPreviewWindow = new DraggingPreviewWindow();
+    //-------------------------------------------------------------------------------------------------//
+    /*
       データベースのロード
     */
     //-------------------------------------------------------------------------------------------------//
     try {
+      await new Promise((res) => setTimeout(res, 5000));
       await dataPetaBoards.init();
       await dataPetaImages.init();
       await dataPetaTags.init();
@@ -249,6 +271,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       });
       return;
     }
+    isDataInitialized = true;
+    emitMainEvent("dataInitialized");
     //-------------------------------------------------------------------------------------------------//
     /*
       データのマイグレーション
@@ -276,26 +300,26 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       });
       return;
     }
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      ipcへ関数を登録
-    */
-    //-------------------------------------------------------------------------------------------------//
-    const mainFunctions = getMainFunctions();
-    Object.keys(mainFunctions).forEach((key) => {
-      ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
-    });
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      メインウインドウ・プレビューウインドウを初期化
-    */
-    //-------------------------------------------------------------------------------------------------//
-    createProtocol("app");
-    nativeTheme.on("updated", () => {
-      emitDarkMode();
-    })
-    showWindows();
-    draggingPreviewWindow = new DraggingPreviewWindow();
+    // //-------------------------------------------------------------------------------------------------//
+    // /*
+    //   ipcへ関数を登録
+    // */
+    // //-------------------------------------------------------------------------------------------------//
+    // const mainFunctions = getMainFunctions();
+    // Object.keys(mainFunctions).forEach((key) => {
+    //   ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
+    // });
+    // //-------------------------------------------------------------------------------------------------//
+    // /*
+    //   メインウインドウ・プレビューウインドウを初期化
+    // */
+    // //-------------------------------------------------------------------------------------------------//
+    // createProtocol("app");
+    // nativeTheme.on("updated", () => {
+    //   emitDarkMode();
+    // })
+    // showWindows();
+    // draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
       IPCのメインプロセス側のAPI
@@ -958,6 +982,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         },
         async getIsDarkMode() {
           return isDarkMode();
+        },
+        async getIsDataInitialized() {
+          return isDataInitialized;
         }
       }
     }
