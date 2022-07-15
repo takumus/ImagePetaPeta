@@ -253,7 +253,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     */
     //-------------------------------------------------------------------------------------------------//
     try {
-      await new Promise((res) => setTimeout(res, 5000));
+      // 時間かかったときのテスト
+      // await new Promise((res) => setTimeout(res, 5000));
       await dataPetaBoards.init();
       await dataPetaImages.init();
       await dataPetaTags.init();
