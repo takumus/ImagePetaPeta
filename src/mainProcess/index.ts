@@ -303,26 +303,6 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       });
       return;
     }
-    // //-------------------------------------------------------------------------------------------------//
-    // /*
-    //   ipcへ関数を登録
-    // */
-    // //-------------------------------------------------------------------------------------------------//
-    // const mainFunctions = getMainFunctions();
-    // Object.keys(mainFunctions).forEach((key) => {
-    //   ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
-    // });
-    // //-------------------------------------------------------------------------------------------------//
-    // /*
-    //   メインウインドウ・プレビューウインドウを初期化
-    // */
-    // //-------------------------------------------------------------------------------------------------//
-    // createProtocol("app");
-    // nativeTheme.on("updated", () => {
-    //   emitDarkMode();
-    // })
-    // showWindows();
-    // draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
       IPCのメインプロセス側のAPI
