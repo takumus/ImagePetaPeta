@@ -255,10 +255,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     try {
       // 時間かかったときのテスト
       // await new Promise((res) => setTimeout(res, 5000));
-      await dataPetaBoards.init();
-      await dataPetaImages.init();
-      await dataPetaTags.init();
-      await dataPetaImagesPetaTags.init();
+      await Promise.all([
+        dataPetaBoards.init(),
+        dataPetaImages.init(),
+        dataPetaTags.init(),
+        dataPetaImagesPetaTags.init()
+      ]);
       await dataPetaTags.ensureIndex({
         fieldName: "id",
         unique: true
