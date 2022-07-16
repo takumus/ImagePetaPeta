@@ -275,8 +275,8 @@ export default class VSettings extends Vue {
     API.on("regenerateMetadatasComplete", (_) => {
       this.regenerateMetadatasCompleted = true;
     });
-    API.on("notifyUpdate", async (event, latest, downloaded) => {
-      this.latestVersion = latest;
+    API.on("foundLatestVersion", async (event, remote) => {
+      this.latestVersion = remote.version;
       this.updateAvailable = true;
       this.currentTab = "update";
     });
