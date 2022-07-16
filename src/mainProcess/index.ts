@@ -123,6 +123,16 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   app.on("window-all-closed", () => {
     //
   });
+  app.on("second-instance", () => {
+    const count = Object.values(windows).filter((window) => {
+      return window !== undefined && !window.isDestroyed();
+    }).map((window) => {
+      window.focus();
+    }).length;
+    if (count < 1) {
+      showWindows();
+    }
+  });
   app.setAsDefaultProtocolClient("image-petapeta")
   //-------------------------------------------------------------------------------------------------//
   /*
