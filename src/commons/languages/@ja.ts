@@ -12,11 +12,8 @@ const ja = {
     closeButton: "閉じる",
   },
   utils: {
-    installUpdateDialog: (ctx: any) => {
-      return `実は、裏で新しいアップデートをダウンロードしておきました。\n現在のバージョン:${ctx.list(0)}\n最新のバージョン:${ctx.list(1)}\n今すぐインストールしますか?`;
-    },
     downloadUpdateDialog: (ctx: any) => {
-      return `新しいアップデートをダウンロードしておこうと思ったのですが、\nダウンロードに失敗しました。\n現在のバージョン:${ctx.list(0)}\n最新のバージョン:${ctx.list(1)}\n手動でダウンロードしますか?`;
+      return `新しいアップデートを発見しました!!!\n現在のバージョン: ${ctx.list(0)}\n最新のバージョン: ${ctx.list(1)}\n手動でダウンロードしますか?`;
     }
   },
   utilsBar: {

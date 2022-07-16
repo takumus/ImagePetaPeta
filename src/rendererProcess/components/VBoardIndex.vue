@@ -164,12 +164,7 @@ export default class BoardIndex extends Vue {
       }
     });
     API.on("notifyUpdate", async (event, latest, downloaded) => {
-      if (downloaded && await this.$components.dialog.show(
-        this.$t("utils.installUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
-      ) === 0) {
-        await API.send("installUpdate");
-        API.send("openURL", `${DOWNLOAD_URL}${latest}`);
-      } else if (!downloaded && await this.$components.dialog.show(
+      if (await this.$components.dialog.show(
         this.$t("utils.downloadUpdateDialog", [this.$appInfo.version, latest]), [this.$t("shared.yes"), this.$t("shared.no")]
       ) === 0) {
         API.send("openURL", `${DOWNLOAD_URL}${latest}`);
