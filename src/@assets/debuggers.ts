@@ -1,1 +1,1 @@
-export const DEBUGGERS = ["nakkun", "しおやろう", "todo", "hinako"];
+export const DEBUGGERS = ["nakkun", "しおやろう？", "todo", "hinako"];
