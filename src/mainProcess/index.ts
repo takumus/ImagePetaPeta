@@ -889,6 +889,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         },
         async getIsDataInitialized() {
           return isDataInitialized;
+        },
+        async getLatestVersion() {
+          return await getLatestVersion();
         }
       }
     }
@@ -1075,7 +1078,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       windows.board = initBoardWindow();
     }
   }
-  function createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
+  function createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions, args?: any) {
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -1110,14 +1113,15 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       }
       window.moveTop();
     });
+    const urlParams = `?type=${type}&args=${args}`;
     if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}?${type}`).then(() => {
+      window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}${urlParams}`).then(() => {
         if (!process.env.IS_TEST) {
           // window.webContents.openDevTools({ mode: "right" });
         }
       })
     } else {
-      window.loadURL(`app://./index.html?${type}`);
+      window.loadURL(`app://./index.html${urlParams}`);
     }
     return window;
   }
@@ -1150,7 +1154,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
-  function initSettingsWindow() {
+  function initSettingsWindow(update: boolean = false) {
     return createWindow(WindowType.SETTINGS, {
       width: WINDOW_SETTINGS_WIDTH,
       height: WINDOW_SETTINGS_HEIGHT,
@@ -1163,7 +1167,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         y: 8
       },
       alwaysOnTop: configSettings.data.alwaysOnTop
-    });
+    }, update ? "update" : "none");
   }
   function initBoardWindow() {
     return createWindow(WindowType.BOARD, {
@@ -1300,7 +1304,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     try {
       const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
       const packageJSON = (await axios.get(url, { responseType: "json" })).data;
+      packageJSON.version = "1.0.0";
       return {
+        isLatest: isLatest(app.getVersion(), packageJSON.version, configSettings.data.ignoreMinorUpdate),
         version: packageJSON.version,
         sha256: {
           win: packageJSON["binary-sha256-win"],
@@ -1311,6 +1317,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       log.error(e);
     }
     return {
+      isLatest: true,
       version: app.getVersion(),
       sha256: {
         win: "",
@@ -1328,11 +1335,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     const log = mainLogger.logChunk();
     log.log("$Check Update");
     const remote: RemoteBinaryInfo = await getLatestVersion();
-    const needToUpdate = !isLatest(app.getVersion(), remote.version, configSettings.data.ignoreMinorUpdate);
-    log.log(remote, needToUpdate);
-    if (needToUpdate) {
+    log.log(remote);
+    if (!remote.isLatest) {
       log.log("this version is old");
-      // prepareUpdate(remote);
+      if (windows.settings === undefined || windows.settings.isDestroyed()) {
+        windows.settings = initSettingsWindow(true);
+      }
       emitMainEvent("notifyUpdate", remote.version, false);
     } else {
       log.log("this version is latest");

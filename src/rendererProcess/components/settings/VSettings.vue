@@ -179,6 +179,24 @@
         </label><br>
         <p>{{$t("settings.showFPSDescriptions")}}</p>
       </t-content>
+      <!--
+        Update
+      -->
+      <t-content v-show="currentTab === 'update'" class="update">
+        <p v-if="updateAvailable">
+          {{$t("settings.updateAvailable")}}<br>
+          {{$t("settings.currentVersion")}}: {{$appInfo.version}}<br>
+          {{$t("settings.latestVersion")}}: {{latestVersion}}<br>
+          <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button>
+        </p>
+        <p v-else>
+          {{$t("settings.thisIsLatest")}}
+        </p>
+        <!-- <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button> -->
+      </t-content>
+      <!--
+        Info
+      -->
       <t-content v-show="currentTab === 'info'" class="info">
         <p>
           {{ $appInfo.name }} {{ $appInfo.version }}
@@ -227,7 +245,7 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import { API } from "@/rendererProcess/api";
 import { Settings } from "@/commons/datas/settings";
 import { LICENSES } from "@/@assets/licenses";
-import { SUPPORT_URL } from "@/commons/defines";
+import { DOWNLOAD_URL, SUPPORT_URL } from "@/commons/defines";
 @Options({
   components: {
     VEditableLabel
@@ -237,9 +255,11 @@ export default class VSettings extends Vue {
   regenerateMetadatasCompleted = true;
   regenerateMetadatasDone = 0;
   regenerateMetadatasCount = 0;
-  tabs = ["general", "control", "browser", "datas", "others", "info"];
+  tabs = ["general", "control", "browser", "datas", "others", "update", "info"];
   currentTab = "general";
   tempPetaImageDirectory = "";
+  updateAvailable = false;
+  latestVersion = "1.1.1";
   async mounted() {
     API.on("regenerateMetadatasProgress", (_, done, count) => {
       this.regenerateMetadatasDone = done;
@@ -251,7 +271,17 @@ export default class VSettings extends Vue {
     API.on("regenerateMetadatasComplete", (_) => {
       this.regenerateMetadatasCompleted = true;
     });
+    API.on("notifyUpdate", async (event, latest, downloaded) => {
+      this.latestVersion = latest;
+      this.updateAvailable = true;
+      this.currentTab = "update";
+    });
     this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
+    if (this.$windowArgs === "update") {
+      this.currentTab = "update";
+      this.updateAvailable = true;
+      this.latestVersion = (await API.send("getLatestVersion")).version;
+    }
   }
   regenerateMetadatas() {
     API.send("regenerateMetadatas");
@@ -299,6 +329,9 @@ export default class VSettings extends Vue {
   showConfigFolder() {
     API.send("showConfigFolder");
   }
+  downloadUpdate() {
+    API.send("openURL", `${DOWNLOAD_URL}${this.latestVersion}`);
+  }
 }
 </script>
 
@@ -336,6 +369,14 @@ t-settings-root {
       }
       .file-path {
         width: 100%;
+      }
+      &.update {
+        text-align: center;
+        display: block;
+        >p {
+          font-size: 1em;
+          word-break: break-word;
+        }
       }
       &.info {
         text-align: center;

@@ -132,6 +132,7 @@ const ja = {
     datas: "データ",
     others: "その他",
     info: "情報",
+    update: "アップデート",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions: "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
@@ -166,6 +167,11 @@ const ja = {
     autoAddTagDescriptions: "インポート時、自動で日付のタグを追加します。",
     ignoreMinorUpdate: "マイナーアップデートの通知を無視する",
     ignoreMinorUpdateDescriptions: "大きな重要なアップデート以外の、小さなアップデートを無視します。\nアップデートの頻度が多くて困っている人向けの設定です。",
+    updateAvailable: "新しいバージョンがあります。",
+    thisIsLatest: "既に最新バージョンです。",
+    latestVersion: "最新バージョン",
+    currentVersion: "現在のバージョン",
+    updateButton: "アップデートする",
     changePetaImageDirectoryDialog: (ctx: any) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`
     },

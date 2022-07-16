@@ -7,6 +7,7 @@ import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { WindowType } from "../datas/windowType";
+import { RemoteBinaryInfo } from "../datas/remoteBinaryInfo";
 
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
@@ -59,4 +60,5 @@ export interface MainFunctions {
   searchImageByGoogle: (petaImage: PetaImage) => Promise<boolean>;
   getIsDarkMode: () => Promise<boolean>;
   getIsDataInitialized: () => Promise<boolean>;
+  getLatestVersion: () => Promise<RemoteBinaryInfo>;
 }
