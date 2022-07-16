@@ -1340,6 +1340,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       log.log("this version is old");
       if (windows.settings === undefined || windows.settings.isDestroyed()) {
         windows.settings = initSettingsWindow(true);
+      } else {
+        windows.settings.focus();
       }
       emitMainEvent("notifyUpdate", remote.version, false);
     } else {
