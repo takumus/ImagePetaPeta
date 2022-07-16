@@ -61,7 +61,6 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   let DIR_IMAGES: string;
   let DIR_THUMBNAILS: string;
   let DIR_TEMP: string;
-  let DIR_DOWNLOAD: string;
   let FILE_IMAGES_DB: string;
   let FILE_BOARDS_DB: string;
   let FILE_TAGS_DB: string;
@@ -70,13 +69,13 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   let FILE_STATES: string;
   let FILE_WINDOW_STATES: string;
   let dataLogger: Logger;
-  let dataPetaImages: DB<PetaImage>;
-  let dataPetaBoards: DB<PetaBoard>;
-  let dataPetaTags: DB<PetaTag>;
-  let dataPetaImagesPetaTags: DB<PetaImagePetaTag>;
-  let dataSettings: Config<Settings>;
-  let dataStates: Config<States>;
-  let dataWindowStates: Config<WindowStates>;
+  let dbPetaImages: DB<PetaImage>;
+  let dbPetaBoard: DB<PetaBoard>;
+  let dbPetaTags: DB<PetaTag>;
+  let dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
+  let configSettings: Config<Settings>;
+  let configStates: Config<States>;
+  let configWindowStates: Config<WindowStates>;
   let petaDatas: PetaDatas;
   let updateInstallerFilePath: string;
   let checkUpdateTimeoutHandler: NodeJS.Timeout;
@@ -101,21 +100,20 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     DIR_APP = file.initDirectory(false, app.getPath("userData"));
     DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
     FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
-    DIR_DOWNLOAD = file.initDirectory(false, app.getPath("downloads"));
-    dataSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
-    if (dataSettings.data.petaImageDirectory.default) {
+    configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
+    if (configSettings.data.petaImageDirectory.default) {
       DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
-      dataSettings.data.petaImageDirectory.path = DIR_ROOT;
+      configSettings.data.petaImageDirectory.path = DIR_ROOT;
     } else {
       try {
-        if (!isValidFilePath(dataSettings.data.petaImageDirectory.path)) {
+        if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
           throw new Error();
         }
-        DIR_ROOT = file.initDirectory(true, dataSettings.data.petaImageDirectory.path);
+        DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
       } catch (error) {
-        dataSettings.data.petaImageDirectory.default = true;
-        dataSettings.save();
-        throw new Error(`Cannot access PetaImage directory: "${dataSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
+        configSettings.data.petaImageDirectory.default = true;
+        configSettings.save();
+        throw new Error(`Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
       }
     }
     DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
@@ -126,13 +124,13 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
     FILE_STATES = file.initFile(DIR_APP, "states.json");
     FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
-    dataPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
-    dataPetaBoards = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
-    dataPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
-    dataPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
-    dataStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
-    dataWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
-    [dataPetaImages, dataPetaBoards, dataPetaTags, dataPetaImagesPetaTags].forEach((db) => {
+    dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
+    dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
+    dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
+    dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
+    configStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
+    configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
+    [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags].forEach((db) => {
       db.on("beginCompaction", () => {
         mainLogger.logChunk().log(`begin compaction(${db.name})`);
       });
@@ -142,17 +140,17 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       db.on("compactionError", (error) => {
         mainLogger.logChunk().error(`compaction error(${db.name})`, error);
       })
-    })
+    });
     Tasks.onEmitStatus((id, status) => {
       emitMainEvent("taskStatus", id, status);
     });
     petaDatas = new PetaDatas(
       {
-        dataPetaBoards,
-        dataPetaImages,
-        dataPetaImagesPetaTags,
-        dataPetaTags,
-        dataSettings
+        dbPetaBoard,
+        dbPetaImages,
+        dbPetaImagesPetaTags,
+        dbPetaTags,
+        configSettings
       }, {
         DIR_IMAGES,
         DIR_THUMBNAILS,
@@ -256,12 +254,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       // 時間かかったときのテスト
       // await new Promise((res) => setTimeout(res, 5000));
       await Promise.all([
-        dataPetaBoards.init(),
-        dataPetaImages.init(),
-        dataPetaTags.init(),
-        dataPetaImagesPetaTags.init()
+        dbPetaBoard.init(),
+        dbPetaImages.init(),
+        dbPetaTags.init(),
+        dbPetaImagesPetaTags.init()
       ]);
-      await dataPetaTags.ensureIndex({
+      await dbPetaTags.ensureIndex({
         fieldName: "id",
         unique: true
       });
@@ -282,16 +280,16 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     */
     //-------------------------------------------------------------------------------------------------//
     try {
-      const petaImagesArray = await dataPetaImages.find({});
+      const petaImagesArray = await dbPetaImages.find({});
       const petaImages: PetaImages = {};
       petaImagesArray.forEach((pi) => {
         petaImages[pi.id] = upgradePetaImage(pi);
       });
-      if (await upgradePetaTag(dataPetaTags, petaImages)) {
+      if (await upgradePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
         await promiseSerial((pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).promise;
       }
-      if (await upgradePetaImagesPetaTags(dataPetaTags, dataPetaImagesPetaTags, petaImages)) {
+      if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
       }
     } catch (error) {
@@ -608,19 +606,19 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           const log = mainLogger.logChunk();
           try {
             log.log("#Update Settings");
-            dataSettings.data = settings;
+            configSettings.data = settings;
             Object.keys(windows).forEach((key) => {
               const window = windows[key as WindowType];
               if (window === undefined || window.isDestroyed()) {
                 return;
               }
-              window.setAlwaysOnTop(dataSettings.data.alwaysOnTop);
+              window.setAlwaysOnTop(configSettings.data.alwaysOnTop);
             });
-            dataSettings.save();
+            configSettings.save();
             emitMainEvent("updateSettings", settings);
             emitMainEvent("showNSFW", getShowNSFW());
             emitDarkMode();
-            log.log("return:", dataSettings.data);
+            log.log("return:", configSettings.data);
             return true;
           } catch(e) {
             log.error(e);
@@ -636,8 +634,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         async getSettings(event) {
           const log = mainLogger.logChunk();
           log.log("#Get Settings");
-          log.log("return:", dataSettings.data);
-          return dataSettings.data;
+          log.log("return:", configSettings.data);
+          return configSettings.data;
         },
         async getWindowIsFocused(event) {
           const log = mainLogger.logChunk();
@@ -744,9 +742,9 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
               return false;
             }
             path = file.initDirectory(true, path);
-            dataSettings.data.petaImageDirectory.default = false;
-            dataSettings.data.petaImageDirectory.path = path;
-            dataSettings.save();
+            configSettings.data.petaImageDirectory.default = false;
+            configSettings.data.petaImageDirectory.path = path;
+            configSettings.save();
             relaunch();
             return true;
           } catch(error) {
@@ -757,7 +755,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         async getStates(event) {
           const log = mainLogger.logChunk();
           log.log("#Get States");
-          return dataStates.data;
+          return configStates.data;
         },
         async waifu2xConvert(event, petaImages) {
           const log = mainLogger.logChunk();
@@ -789,7 +787,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
             return;
           }
           draggingPreviewWindow.createWindow();
-          draggingPreviewWindow.setPetaImages(petaImages, dataSettings.data.alwaysShowNSFW);
+          draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
           draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
@@ -824,10 +822,10 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           const log = mainLogger.logChunk();
           try {
             log.log("#Update States");
-            dataStates.data = states;
-            dataStates.save();
+            configStates.data = states;
+            configStates.save();
             emitMainEvent("updateStates", states);
-            log.log("return:", dataStates.data);
+            log.log("return:", configStates.data);
             return true;
           } catch(e) {
             log.error(e);
@@ -1014,10 +1012,10 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     }
   }
   function showWindows() {
-    if (dataSettings.data.show === "both") {
+    if (configSettings.data.show === "both") {
       windows.board = initBoardWindow();
       windows.browser = initBrowserWindow();
-    } else if (dataSettings.data.show === "browser") {
+    } else if (configSettings.data.show === "browser") {
       windows.browser = initBrowserWindow();
     } else {
       windows.board = initBoardWindow();
@@ -1039,7 +1037,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       ...options,
     });
     activeWindows[type] = true;
-    const state = dataWindowStates.data[type];
+    const state = configWindowStates.data[type];
     mainLogger.logChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);
     if (state.maximized) {
@@ -1089,13 +1087,13 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   }
   function initBrowserWindow() {
     return createWindow(WindowType.BROWSER, {
-      width: dataWindowStates.data.browser.width,
-      height: dataWindowStates.data.browser.height,
+      width: configWindowStates.data.browser.width,
+      height: configWindowStates.data.browser.height,
       trafficLightPosition: {
         x: 8,
         y: 8
       },
-      alwaysOnTop: dataSettings.data.alwaysOnTop
+      alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
   function initSettingsWindow() {
@@ -1110,29 +1108,29 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         x: 8,
         y: 8
       },
-      alwaysOnTop: dataSettings.data.alwaysOnTop
+      alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
   function initBoardWindow() {
     return createWindow(WindowType.BOARD, {
-      width: dataWindowStates.data.board.width,
-      height: dataWindowStates.data.board.height,
+      width: configWindowStates.data.board.width,
+      height: configWindowStates.data.board.height,
       trafficLightPosition: {
         x: 13,
         y: 13
       },
-      alwaysOnTop: dataSettings.data.alwaysOnTop
+      alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
   function initDetailsWindow() {
     return createWindow(WindowType.DETAILS, {
-      width: dataWindowStates.data.details.width,
-      height: dataWindowStates.data.details.height,
+      width: configWindowStates.data.details.width,
+      height: configWindowStates.data.details.height,
       trafficLightPosition: {
         x: 8,
         y: 8
       },
-      alwaysOnTop: dataSettings.data.alwaysOnTop
+      alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
   async function searchImageByGoogle(petaImage: PetaImage) {
@@ -1231,7 +1229,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   }
   function saveWindowSize(windowType: WindowType) {
     mainLogger.logChunk().log("$Save Window States:", windowType);
-    const state = dataWindowStates.data[windowType];
+    const state = configWindowStates.data[windowType];
     const window = windows[windowType];
     if (window === undefined || window.isDestroyed()) {
       return;
@@ -1241,7 +1239,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
     }
     state.maximized = window.isMaximized();
-    dataWindowStates.save();
+    configWindowStates.save();
   }
   async function getLatestVersion(): Promise<RemoteBinaryInfo> {
     const log = mainLogger.logChunk();
@@ -1276,7 +1274,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     const log = mainLogger.logChunk();
     log.log("$Check Update");
     const remote: RemoteBinaryInfo = await getLatestVersion();
-    const needToUpdate = !isLatest(app.getVersion(), remote.version, dataSettings.data.ignoreMinorUpdate);
+    const needToUpdate = !isLatest(app.getVersion(), remote.version, configSettings.data.ignoreMinorUpdate);
     log.log(remote, needToUpdate);
     if (needToUpdate) {
       log.log("this version is old");
@@ -1288,10 +1286,10 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
   function isDarkMode() {
-    if (dataSettings.data.autoDarkMode) {
+    if (configSettings.data.autoDarkMode) {
       return nativeTheme.shouldUseDarkColors;
     }
-    return dataSettings.data.darkMode;
+    return configSettings.data.darkMode;
   }
   function emitDarkMode() {
     emitMainEvent("darkMode", isDarkMode());
@@ -1314,7 +1312,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     return undefined;
   }
   function getShowNSFW() {
-    return temporaryShowNSFW || dataSettings.data.alwaysShowNSFW;
+    return temporaryShowNSFW || configSettings.data.alwaysShowNSFW;
   }
   function relaunch() {
     app.relaunch();

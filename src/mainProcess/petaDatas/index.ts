@@ -28,11 +28,11 @@ import { generateMetadata } from "../utils/generateMetadata";
 export class PetaDatas {
   constructor(
     private datas: {
-      dataPetaImages: DB<PetaImage>,
-      dataPetaBoards: DB<PetaBoard>,
-      dataPetaTags: DB<PetaTag>,
-      dataPetaImagesPetaTags: DB<PetaImagePetaTag>,
-      dataSettings: Config<Settings>
+      dbPetaImages: DB<PetaImage>,
+      dbPetaBoard: DB<PetaBoard>,
+      dbPetaTags: DB<PetaTag>,
+      dbPetaImagesPetaTags: DB<PetaImagePetaTag>,
+      configSettings: Config<Settings>
     },
     private paths: {
       DIR_IMAGES: string,
@@ -50,9 +50,9 @@ export class PetaDatas {
     log.log("mode:", mode);
     log.log("image:", minimId(petaImage.id));
     if (mode === UpdateMode.REMOVE) {
-      await this.datas.dataPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
+      await this.datas.dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
       log.log("removed tags");
-      await this.datas.dataPetaImages.remove({ id: petaImage.id });
+      await this.datas.dbPetaImages.remove({ id: petaImage.id });
       log.log("removed db");
       await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch((e) => {});
       log.log("removed file");
@@ -60,7 +60,7 @@ export class PetaDatas {
       log.log("removed thumbnail");
       return true;
     }
-    await this.datas.dataPetaImages.update({ id: petaImage.id }, petaImage, mode === UpdateMode.UPSERT);
+    await this.datas.dbPetaImages.update({ id: petaImage.id }, petaImage, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -101,11 +101,11 @@ export class PetaDatas {
     log.log("mode:", mode);
     log.log("board:", minimId(board.id));
     if (mode === UpdateMode.REMOVE) {
-      await this.datas.dataPetaBoards.remove({ id: board.id });
+      await this.datas.dbPetaBoard.remove({ id: board.id });
       log.log("removed");
       return true;
     }
-    await this.datas.dataPetaBoards.update({ id: board.id }, board, mode === UpdateMode.UPSERT);
+    await this.datas.dbPetaBoard.update({ id: board.id }, board, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -114,17 +114,17 @@ export class PetaDatas {
     // all
     if (!petaTagIds) {
       log.log("type: all");
-      const ids = (await this.datas.dataPetaImages.find({})).map((pi) => pi.id);
+      const ids = (await this.datas.dbPetaImages.find({})).map((pi) => pi.id);
       log.log("return:", ids.length);
       return ids;
     }
     // untagged
     if (petaTagIds.length === 0) {
       log.log("type: untagged");
-      const taggedIds = Array.from(new Set((await this.datas.dataPetaImagesPetaTags.find({})).map((pipt) => {
+      const taggedIds = Array.from(new Set((await this.datas.dbPetaImagesPetaTags.find({})).map((pipt) => {
         return pipt.petaImageId;
       })));
-      const ids = (await this.datas.dataPetaImages.find({
+      const ids = (await this.datas.dbPetaImages.find({
         id: {
           $nin: taggedIds
         }
@@ -133,7 +133,7 @@ export class PetaDatas {
     }
     // filter by ids
     log.log("type: filter");
-    const pipts = (await this.datas.dataPetaImagesPetaTags.find({
+    const pipts = (await this.datas.dbPetaImagesPetaTags.find({
       $or: petaTagIds.map((id) => {
         return {
           petaTagId: id
@@ -153,7 +153,7 @@ export class PetaDatas {
     const log = this.mainLogger.logChunk();
     let pipts: PetaImagePetaTag[] = [];
     // console.time(log.uid);
-    pipts = await this.datas.dataPetaImagesPetaTags.find({
+    pipts = await this.datas.dbPetaImagesPetaTags.find({
       $or: petaImageIds.map((petaImageId) => {
         return { petaImageId };
       })
@@ -171,11 +171,11 @@ export class PetaDatas {
   }
   async getPetaTagInfos(untaggedName: string) {
     const log = this.mainLogger.logChunk();
-    const petaTags = await this.datas.dataPetaTags.find({});
-    const taggedIds = Array.from(new Set((await this.datas.dataPetaImagesPetaTags.find({})).map((pipt) => {
+    const petaTags = await this.datas.dbPetaTags.find({});
+    const taggedIds = Array.from(new Set((await this.datas.dbPetaImagesPetaTags.find({})).map((pipt) => {
       return pipt.petaImageId;
     })));
-    const count = (await this.datas.dataPetaImages.count({
+    const count = (await this.datas.dbPetaImages.count({
       id: {
         $nin: taggedIds
       }
@@ -183,7 +183,7 @@ export class PetaDatas {
     const petaTagInfos = await promiseSerial(async (petaTag) => {
       const info = {
         petaTag,
-        count: await this.datas.dataPetaImagesPetaTags.count({ petaTagId: petaTag.id })
+        count: await this.datas.dbPetaImagesPetaTags.count({ petaTagId: petaTag.id })
       } as PetaTagInfo;
       return info;
     }, petaTags).promise;
@@ -208,7 +208,7 @@ export class PetaDatas {
   async regenerateMetadatas() {
     const log = this.mainLogger.logChunk();
     this.emitMainEvent("regenerateMetadatasBegin");
-    const images = await this.datas.dataPetaImages.find({});
+    const images = await this.datas.dbPetaImages.find({});
     const generate = async (image: PetaImage, i: number) => {
       upgradePetaImage(image);
       if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
@@ -238,13 +238,13 @@ export class PetaDatas {
     log.log("mode:", mode);
     log.log("tag:", minimId(tag.id));
     if (mode === UpdateMode.REMOVE) {
-      await this.datas.dataPetaImagesPetaTags.remove({ petaTagId: tag.id });
-      await this.datas.dataPetaTags.remove({ id: tag.id });
+      await this.datas.dbPetaImagesPetaTags.remove({ petaTagId: tag.id });
+      await this.datas.dbPetaTags.remove({ id: tag.id });
       log.log("removed");
       return true;
     }
     // tag.petaImages = Array.from(new Set(tag.petaImages));
-    await this.datas.dataPetaTags.update({ id: tag.id }, tag, mode === UpdateMode.UPSERT);
+    await this.datas.dbPetaTags.update({ id: tag.id }, tag, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -285,11 +285,11 @@ export class PetaDatas {
     log.log("mode:", mode);
     log.log("tag:", minimId(petaImagePetaTag.id));
     if (mode === UpdateMode.REMOVE) {
-      await this.datas.dataPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
+      await this.datas.dbPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
       log.log("removed");
       return true;
     }
-    await this.datas.dataPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode === UpdateMode.UPSERT);
+    await this.datas.dbPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag, mode === UpdateMode.UPSERT);
     log.log("updated");
     return true;
   }
@@ -385,7 +385,7 @@ export class PetaDatas {
         log: [addedFileCount.toString(), _filePaths.length.toString()],
         status: addedFileCount === _filePaths.length ? "complete" : "failed"
       });
-      if (this.datas.dataSettings.data.autoAddTag) {
+      if (this.datas.configSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");
       }
       this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
@@ -394,7 +394,7 @@ export class PetaDatas {
   }
   async getPetaBoards() {
     const log = this.mainLogger.logChunk();
-    const data = await this.datas.dataPetaBoards.find({});
+    const data = await this.datas.dbPetaBoard.find({});
     data.forEach((board) => {
       // バージョンアップ時のプロパティ更新
       upgradePetaBoard(board);
@@ -404,7 +404,7 @@ export class PetaDatas {
   async waifu2x(petaImages: PetaImage[]) {
     return Tasks.spawn("waifu2x", async (handler) => {
       const log = this.mainLogger.logChunk();
-      const execFilePath = Path.resolve(this.datas.dataSettings.data.waifu2x.execFilePath);
+      const execFilePath = Path.resolve(this.datas.configSettings.data.waifu2x.execFilePath);
       let success = true;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
@@ -416,7 +416,7 @@ export class PetaDatas {
       await promiseSerial(async (petaImage, index) => {
         const inputFile = this.getImagePath(petaImage, ImageType.ORIGINAL);
         const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
-        const parameters = this.datas.dataSettings.data.waifu2x.parameters.map((param) => {
+        const parameters = this.datas.configSettings.data.waifu2x.parameters.map((param) => {
           if (param === "$$INPUT$$") {
             return inputFile;
           }
@@ -474,16 +474,16 @@ export class PetaDatas {
           await this.updatePetaImage(newPetaImage, UpdateMode.UPDATE);
           this.emitMainEvent("updatePetaImages", [newPetaImage], UpdateMode.UPDATE);
           log.log("get tags");
-          const pipts = await this.datas.dataPetaImagesPetaTags.find({ petaImageId: petaImage.id });
+          const pipts = await this.datas.dbPetaImagesPetaTags.find({ petaImageId: petaImage.id });
           log.log("tags:", pipts.length);
           await promiseSerial(async (pipt, index) => {
             log.log("copy tag: (", index, "/", pipts.length, ")");
             const newPIPT = createPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-            await this.datas.dataPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
+            await this.datas.dbPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
           }, pipts).promise;
           log.log(`add "before waifu2x" tag to old petaImage`);
           const name = "before waifu2x";
-          const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
+          const datePetaTag = (await this.datas.dbPetaTags.find({name: name}))[0] || createPetaTag(name);
           await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
           await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
           this.emitMainEvent("updatePetaTags");
@@ -500,7 +500,7 @@ export class PetaDatas {
     }, {});
   }
   async getPetaImages() {
-    const data = await this.datas.dataPetaImages.find({});
+    const data = await this.datas.dbPetaImages.find({});
     const petaImages: PetaImages = {};
     data.forEach((pi) => {
       petaImages[pi.id] = upgradePetaImage(pi);
@@ -559,7 +559,7 @@ export class PetaDatas {
         log: [addedFileCount.toString(), datas.length.toString()],
         status: addedFileCount === datas.length ? "complete" : "failed"
       });
-      if (this.datas.dataSettings.data.autoAddTag) {
+      if (this.datas.configSettings.data.autoAddTag) {
         this.emitMainEvent("updatePetaTags");
       }
       this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
@@ -567,7 +567,7 @@ export class PetaDatas {
     }, {});
   }
   async getPetaImage(id: string) {
-    return (await this.datas.dataPetaImages.find({ id }))[0];
+    return (await this.datas.dbPetaImages.find({ id }))[0];
   }
   async importImage(param: { data: Buffer, name: string, note: string, fileDate?: Date, addDate?: Date }): Promise<{ exists: boolean, petaImage: PetaImage }> {
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
@@ -615,14 +615,14 @@ export class PetaDatas {
       nsfw: false,
       metadataVersion: PETAIMAGE_METADATA_VERSION
     }
-    if (this.datas.dataSettings.data.autoAddTag) {
+    if (this.datas.configSettings.data.autoAddTag) {
       const name = dateFormat(addDate, "yyyy-mm-dd");
-      const datePetaTag = (await this.datas.dataPetaTags.find({name: name}))[0] || createPetaTag(name);
+      const datePetaTag = (await this.datas.dbPetaTags.find({name: name}))[0] || createPetaTag(name);
       await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
       await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
     await file.writeFile(Path.resolve(this.paths.DIR_IMAGES, originalFileName), param.data);
-    await this.datas.dataPetaImages.update({ id: petaImage.id }, petaImage, true);
+    await this.datas.dbPetaImages.update({ id: petaImage.id }, petaImage, true);
     return {
       petaImage: petaImage,
       exists: false
