@@ -1304,7 +1304,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     try {
       const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
       const packageJSON = (await axios.get(url, { responseType: "json" })).data;
-      packageJSON.version = "1.0.0";
+      // packageJSON.version = "3.0.0";
       return {
         isLatest: isLatest(app.getVersion(), packageJSON.version, configSettings.data.ignoreMinorUpdate),
         version: packageJSON.version,

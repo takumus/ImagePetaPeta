@@ -190,7 +190,9 @@
           <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button>
         </p>
         <p v-else>
-          {{$t("settings.thisIsLatest")}}
+          {{$t("settings.thisIsLatest")}}<br>
+          {{$t("settings.currentVersion")}}: {{$appInfo.version}}<br>
+          <button @click="releaseNote">{{$t("settings.releaseNoteButton")}}</button>
         </p>
         <!-- <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button> -->
       </t-content>
@@ -331,6 +333,9 @@ export default class VSettings extends Vue {
   }
   downloadUpdate() {
     API.send("openURL", `${DOWNLOAD_URL}${this.latestVersion}`);
+  }
+  releaseNote() {
+    API.send("openURL", `${DOWNLOAD_URL}${this.$appInfo.version}`);
   }
 }
 </script>
