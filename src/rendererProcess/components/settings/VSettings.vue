@@ -268,6 +268,7 @@ export default class VSettings extends Vue {
     API.on("regenerateMetadatasProgress", (_, done, count) => {
       this.regenerateMetadatasDone = done;
       this.regenerateMetadatasCount = count;
+      this.regenerateMetadatasCompleted = false;
     });
     API.on("regenerateMetadatasBegin", (_) => {
       this.regenerateMetadatasCompleted = false;
