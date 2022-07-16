@@ -232,8 +232,10 @@
           @click="gotoIcons8">
           Icons8.com
         </button>
+        <p>{{$t("info.debuggers")}}</p>
+        <pre class="debuggers">{{ debuggers }}</pre>
         <p>{{$t("info.licenses")}}</p>
-        <pre>{{ licenses }}</pre>
+        <pre class="licenses">{{ licenses }}</pre>
       </t-content>
     </t-contents>
   </t-settings-root>
@@ -250,6 +252,7 @@ import { API } from "@/rendererProcess/api";
 import { Settings } from "@/commons/datas/settings";
 import { LICENSES } from "@/@assets/licenses";
 import { DOWNLOAD_URL, SUPPORT_URL } from "@/commons/defines";
+import { DEBUGGERS } from "@/@assets/debuggers";
 @Options({
   components: {
     VEditableLabel
@@ -318,6 +321,9 @@ export default class VSettings extends Vue {
   }
   get licenses() {
     return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n`).join('\n');
+  }
+  get debuggers() {
+    return DEBUGGERS.join(", ");
   }
   gotoGithub() {
     API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
@@ -392,12 +398,14 @@ t-settings-root {
         text-align: center;
         display: block;
         >pre {
-          text-align: left;
+          &.licenses {
+            text-align: left;
+          }
+          &.debuggers {
+            text-align: center;
+          }
           overflow: hidden;
           white-space: pre-wrap;
-          height: 128px;
-          overflow-y: auto;
-          overflow-x: hidden;
           font-size: 0.8em;
         }
         >p {

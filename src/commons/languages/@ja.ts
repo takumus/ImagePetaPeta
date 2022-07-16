@@ -122,7 +122,8 @@ const ja = {
     dbFolderButton: "データベースフォルダ",
     configFolderButton: "コンフィグフォルダ",
     licenses: "使用しているライブラリ情報",
-    assets: "使用しているアセット情報"
+    assets: "使用しているアセット情報",
+    debuggers: "デバッグ協力"
   },
   settings: {
     settings: "設定",
