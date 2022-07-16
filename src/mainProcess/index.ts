@@ -28,7 +28,6 @@ import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "@/mainProcess/petaDatas";
-import crypto from "crypto";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { isLatest } from "@/commons/utils/versionCheck";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
@@ -43,6 +42,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   ------------------------------------*/
   if (!app.requestSingleInstanceLock()) {
     app.quit();
+    return;
   }
   //-------------------------------------------------------------------------------------------------//
   /*
@@ -51,129 +51,51 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
   //-------------------------------------------------------------------------------------------------//
   const windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   const activeWindows: { [key in WindowType]?: boolean } = {};
-  let mainWindowType: WindowType | undefined = undefined; 
-  let temporaryShowNSFW = false;
-  let draggingPreviewWindow: DraggingPreviewWindow;
-  let detailsPetaImage: PetaImage | undefined = undefined;
-  let DIR_ROOT: string;
-  let DIR_APP: string;
-  let DIR_LOG: string;
-  let DIR_IMAGES: string;
-  let DIR_THUMBNAILS: string;
-  let DIR_TEMP: string;
-  let FILE_IMAGES_DB: string;
-  let FILE_BOARDS_DB: string;
-  let FILE_TAGS_DB: string;
-  let FILE_IMAGES_TAGS_DB: string;
-  let FILE_SETTINGS: string;
-  let FILE_STATES: string;
-  let FILE_WINDOW_STATES: string;
-  let dataLogger: Logger;
-  let dbPetaImages: DB<PetaImage>;
-  let dbPetaBoard: DB<PetaBoard>;
-  let dbPetaTags: DB<PetaTag>;
-  let dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
-  let configSettings: Config<Settings>;
-  let configStates: Config<States>;
-  let configWindowStates: Config<WindowStates>;
-  let petaDatas: PetaDatas;
-  let updateInstallerFilePath: string;
-  let checkUpdateTimeoutHandler: NodeJS.Timeout;
-  let dropFromBrowserPetaImageIds: string[] | undefined = undefined;
-  let isDataInitialized = false;
+  const mainLogger = new MainLogger();
+  const draggingPreviewWindow = new DraggingPreviewWindow();
   const i18n = createI18n({
     locale: "ja",
     messages: languages,
   });
-  const mainLogger = new MainLogger();
+  let temporaryShowNSFW = false;
+  let isDataInitialized = false;
+  let mainWindowType: WindowType | undefined; 
+  let detailsPetaImage: PetaImage | undefined;
+  let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
+  let dropFromBrowserPetaImageIds: string[] | undefined;
   //-------------------------------------------------------------------------------------------------//
   /*
     ファイルパスとDBの、検証・読み込み・作成
   */
   //-------------------------------------------------------------------------------------------------//
-  try {
-    // ログは最優先で初期化
-    DIR_LOG = file.initDirectory(false, app.getPath("logs"));
-    dataLogger = new Logger(DIR_LOG);
-    mainLogger.logger = dataLogger;
-    // その他の初期化
-    DIR_APP = file.initDirectory(false, app.getPath("userData"));
-    DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
-    FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
-    configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
-    if (configSettings.data.petaImageDirectory.default) {
-      DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
-      configSettings.data.petaImageDirectory.path = DIR_ROOT;
-    } else {
-      try {
-        if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
-          throw new Error();
-        }
-        DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
-      } catch (error) {
-        configSettings.data.petaImageDirectory.default = true;
-        configSettings.save();
-        throw new Error(`Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
-      }
-    }
-    DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
-    DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, "thumbnails");
-    FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
-    FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
-    FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
-    FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
-    FILE_STATES = file.initFile(DIR_APP, "states.json");
-    FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
-    dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
-    dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
-    dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
-    dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
-    configStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
-    configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
-    [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags].forEach((db) => {
-      db.on("beginCompaction", () => {
-        mainLogger.logChunk().log(`begin compaction(${db.name})`);
-      });
-      db.on("doneCompaction", () => {
-        mainLogger.logChunk().log(`done compaction(${db.name})`);
-      });
-      db.on("compactionError", (error) => {
-        mainLogger.logChunk().error(`compaction error(${db.name})`, error);
-      })
-    });
-    Tasks.onEmitStatus((id, status) => {
-      emitMainEvent("taskStatus", id, status);
-    });
-    petaDatas = new PetaDatas(
-      {
-        dbPetaBoard,
-        dbPetaImages,
-        dbPetaImagesPetaTags,
-        dbPetaTags,
-        configSettings
-      }, {
-        DIR_IMAGES,
-        DIR_THUMBNAILS,
-        DIR_TEMP
-      }, 
-      emitMainEvent,
-      mainLogger
-    );
-  } catch (err) {
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      何らかの原因でファイルとディレクトリの準備が失敗した場合
-      エラー画面を出してアプリ終了
-    */
-    //-------------------------------------------------------------------------------------------------//
-    showError({
-      category: "M",
-      code: 1,
-      title: "Initialization Error",
-      message: String(err)
-    });
+  const constants = getConstants();
+  if (constants === undefined) {
     return;
   }
+  const {
+    DIR_APP,
+    DIR_ROOT,
+    DIR_LOG,
+    DIR_IMAGES,
+    DIR_THUMBNAILS,
+    DIR_TEMP,
+    FILE_IMAGES_DB,
+    FILE_BOARDS_DB,
+    FILE_TAGS_DB,
+    FILE_IMAGES_TAGS_DB,
+    FILE_SETTINGS,
+    FILE_STATES,
+    FILE_WINDOW_STATES,
+    dataLogger,
+    dbPetaImages,
+    dbPetaBoard,
+    dbPetaTags,
+    dbPetaImagesPetaTags,
+    configSettings,
+    configStates,
+    configWindowStates,
+    petaDatas
+  } = constants;
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready前にやらないといけない事
@@ -244,7 +166,6 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       emitDarkMode();
     })
     showWindows();
-    draggingPreviewWindow = new DraggingPreviewWindow();
     //-------------------------------------------------------------------------------------------------//
     /*
       データベースのロード
@@ -770,15 +691,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           return false;
         },
         async installUpdate(event) {
-          const log = mainLogger.logChunk();
-          try {
-            log.log("#Install Update");
-            log.log("path:", updateInstallerFilePath);
-            shell.openPath(updateInstallerFilePath);
-            return true;
-          } catch (error) {
-            log.error(error);
-          }
+          // 
           return false;
         },
         async startDrag(event, petaImages, iconSize, iconData) {
@@ -975,6 +888,137 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     色々な関数
   */
   //-------------------------------------------------------------------------------------------------//
+  function getConstants() {
+    let DIR_ROOT: string;
+    let DIR_APP: string;
+    let DIR_LOG: string;
+    let DIR_IMAGES: string;
+    let DIR_THUMBNAILS: string;
+    let DIR_TEMP: string;
+    let FILE_IMAGES_DB: string;
+    let FILE_BOARDS_DB: string;
+    let FILE_TAGS_DB: string;
+    let FILE_IMAGES_TAGS_DB: string;
+    let FILE_SETTINGS: string;
+    let FILE_STATES: string;
+    let FILE_WINDOW_STATES: string;
+    let dataLogger: Logger;
+    let dbPetaImages: DB<PetaImage>;
+    let dbPetaBoard: DB<PetaBoard>;
+    let dbPetaTags: DB<PetaTag>;
+    let dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
+    let configSettings: Config<Settings>;
+    let configStates: Config<States>;
+    let configWindowStates: Config<WindowStates>;
+    let petaDatas: PetaDatas;
+    try {
+      // ログは最優先で初期化
+      DIR_LOG = file.initDirectory(false, app.getPath("logs"));
+      dataLogger = new Logger(DIR_LOG);
+      mainLogger.logger = dataLogger;
+      // その他の初期化
+      DIR_APP = file.initDirectory(false, app.getPath("userData"));
+      DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
+      FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
+      configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
+      if (configSettings.data.petaImageDirectory.default) {
+        DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
+        configSettings.data.petaImageDirectory.path = DIR_ROOT;
+      } else {
+        try {
+          if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
+            throw new Error();
+          }
+          DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
+        } catch (error) {
+          configSettings.data.petaImageDirectory.default = true;
+          configSettings.save();
+          throw new Error(`Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
+        }
+      }
+      DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
+      DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, "thumbnails");
+      FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
+      FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
+      FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
+      FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
+      FILE_STATES = file.initFile(DIR_APP, "states.json");
+      FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
+      dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
+      dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
+      dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
+      dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
+      configStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
+      configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
+      [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags].forEach((db) => {
+        db.on("beginCompaction", () => {
+          mainLogger.logChunk().log(`begin compaction(${db.name})`);
+        });
+        db.on("doneCompaction", () => {
+          mainLogger.logChunk().log(`done compaction(${db.name})`);
+        });
+        db.on("compactionError", (error) => {
+          mainLogger.logChunk().error(`compaction error(${db.name})`, error);
+        })
+      });
+      Tasks.onEmitStatus((id, status) => {
+        emitMainEvent("taskStatus", id, status);
+      });
+      petaDatas = new PetaDatas(
+        {
+          dbPetaBoard,
+          dbPetaImages,
+          dbPetaImagesPetaTags,
+          dbPetaTags,
+          configSettings
+        }, {
+          DIR_IMAGES,
+          DIR_THUMBNAILS,
+          DIR_TEMP
+        }, 
+        emitMainEvent,
+        mainLogger
+      );
+    } catch (err) {
+      //-------------------------------------------------------------------------------------------------//
+      /*
+        何らかの原因でファイルとディレクトリの準備が失敗した場合
+        エラー画面を出してアプリ終了
+      */
+      //-------------------------------------------------------------------------------------------------//
+      showError({
+        category: "M",
+        code: 1,
+        title: "Initialization Error",
+        message: String(err)
+      });
+      return undefined;
+    }
+    return {
+      DIR_APP,
+      DIR_ROOT,
+      DIR_LOG,
+      DIR_IMAGES,
+      DIR_THUMBNAILS,
+      DIR_TEMP,
+      FILE_IMAGES_DB,
+      FILE_BOARDS_DB,
+      FILE_TAGS_DB,
+      FILE_IMAGES_TAGS_DB,
+      FILE_SETTINGS,
+      FILE_STATES,
+      FILE_WINDOW_STATES,
+      dataLogger,
+      dbPetaImages,
+      dbPetaBoard,
+      dbPetaTags,
+      dbPetaImagesPetaTags,
+      configSettings,
+      configStates,
+      configWindowStates,
+      petaDatas
+    }
+  }
   function showError(error: ErrorWindowParameters, quit = true) {
     try {
       mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
