@@ -154,15 +154,6 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.ignoreMinorUpdate"
-            @change="$settings.ignoreMinorUpdate = Boolean($event.target.checked)"
-          >
-          {{$t("settings.ignoreMinorUpdate")}}
-        </label><br>
-        <p>{{$t("settings.ignoreMinorUpdateDescriptions")}}</p>
-        <label>
-          <input
-            type="checkbox"
             :checked="$settings.alwaysShowNSFW"
             @change="$settings.alwaysShowNSFW = Boolean($event.target.checked)"
           >
@@ -183,17 +174,28 @@
         Update
       -->
       <t-content v-show="currentTab === 'update'" class="update">
-        <p v-if="updateAvailable">
-          {{$t("settings.updateAvailable")}}<br>
-          {{$t("settings.currentVersion")}}: {{$appInfo.version}}<br>
-          {{$t("settings.latestVersion")}}: {{latestVersion}}<br>
-          <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button>
-        </p>
-        <p v-else>
-          {{$t("settings.thisIsLatest")}}<br>
-          {{$t("settings.currentVersion")}}: {{$appInfo.version}}<br>
-          <button @click="releaseNote">{{$t("settings.releaseNoteButton")}}</button>
-        </p>
+        <t-strong>
+          <p v-if="updateAvailable">
+            {{$t("settings.updateAvailable")}}<br>
+            {{$t("settings.currentVersion")}}: {{$appInfo.version}}<br>
+            {{$t("settings.latestVersion")}}: {{latestVersion}}<br>
+            <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button>
+          </p>
+          <p v-else>
+            {{$t("settings.thisIsLatest")}}<br>
+            {{$t("settings.currentVersion")}}: {{$appInfo.version}}<br>
+            <button @click="releaseNote">{{$t("settings.releaseNoteButton")}}</button>
+          </p>
+        </t-strong>
+        <label>
+          <input
+            type="checkbox"
+            :checked="$settings.ignoreMinorUpdate"
+            @change="$settings.ignoreMinorUpdate = Boolean($event.target.checked)"
+          >
+          {{$t("settings.ignoreMinorUpdate")}}
+        </label><br>
+        <p>{{$t("settings.ignoreMinorUpdateDescriptions")}}</p>
         <!-- <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button> -->
       </t-content>
       <!--
@@ -376,11 +378,13 @@ t-settings-root {
         width: 100%;
       }
       &.update {
-        text-align: center;
-        display: block;
-        >p {
-          font-size: 1em;
-          word-break: break-word;
+        >t-strong {
+          text-align: center;
+          display: block;
+          >p {
+            font-size: 1em;
+            word-break: break-word;
+          }
         }
       }
       &.info {
