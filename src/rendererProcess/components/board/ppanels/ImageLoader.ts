@@ -19,6 +19,7 @@ export function getAnimatedGIF(key: string) {
   return animatedGIFCache[key];
 }
 export function getImage(petaImage: PetaImage | undefined) {
+  let canceled = false;
   let cancelAnimatedGIFLoader = () => {
     //
   }
@@ -27,6 +28,10 @@ export function getImage(petaImage: PetaImage | undefined) {
   }
   const loader = new PIXI.Loader(undefined);
   loader.use(async (resource, next) => {
+    if (canceled) {
+      next();
+      return;
+    }
     if (resource.extension === "gif") {
       const result = AnimatedGIF.fromBuffer(resource.data, undefined);
       cancelAnimatedGIFLoader = result.cancel;
@@ -41,6 +46,10 @@ export function getImage(petaImage: PetaImage | undefined) {
     next();
   });
   const promise = new Promise<ImageLoaderResult>((res, rej) => {
+    if (canceled) {
+      rej("canceled");
+      return;
+    }
     cancelResourcesLoader = rej;
     if (!petaImage) {
       rej("petaImage is undefined");
@@ -66,6 +75,12 @@ export function getImage(petaImage: PetaImage | undefined) {
       const resource = resources[imageURL];
       const texture = resource?.texture;
       const animatedGIF = resource?.animation as AnimatedGIF | undefined;
+      if (canceled) {
+        animatedGIF?.destroy();
+        texture?.destroy();
+        rej("canceled");
+        return;
+      }
       if (animatedGIF) {
         animatedGIF.autoUpdate = false;
         addAnimatedGIF(imageURL, animatedGIF);
@@ -82,6 +97,7 @@ export function getImage(petaImage: PetaImage | undefined) {
   return {
     promise,
     cancel: () => {
+      canceled = true;
       cancelAnimatedGIFLoader();
       cancelResourcesLoader("canceled");
       loader.reset();
