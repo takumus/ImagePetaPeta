@@ -715,9 +715,14 @@ export default class VBoard extends Vue {
     this.panelsCenterWrapper.addChild(pPanel);
     pPanel.orderRender();
     this.orderPIXIRender();
-    await pPanel.load();
-    pPanel.orderRender();
-    this.orderPIXIRender();
+    pPanel.load().then(() => {
+      pPanel.orderRender();
+      this.orderPIXIRender();
+    }).catch((error) => {
+      // throw error;
+    })
+    // pPanel.orderRender();
+    // this.orderPIXIRender();
     await new Promise((res, rej) => {
       setTimeout(res);
     });
