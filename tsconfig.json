@@ -16,7 +16,8 @@
     "types": [
       "webpack-env",
       "resize-observer-browser",
-      "./src/@types"
+      "./src/@types",
+      "node"
     ],
     "paths": {
       "@/*": [
