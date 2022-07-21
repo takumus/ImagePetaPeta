@@ -41,20 +41,20 @@ const AnimatedGIFLoader: ILoaderPlugin = {
     );
   },
   /** Implement loader */
-  use(resource: LoaderResource, next: (...args: any[]) => void): void
-  {
-    if (resource.extension === GIF_EXTENSION)
-    {
-      AnimatedGIF.fromBuffer(resource.data, undefined).promise.then((data) => {
-        resource.animation = data;
-        next();
-      }).catch((error) => {
-        next();
-      })
-      return;
-    }
-    next();
-  }
+  // use(resource: LoaderResource, next: (...args: any[]) => void): void
+  // {
+  //   if (resource.extension === GIF_EXTENSION)
+  //   {
+  //     AnimatedGIF.fromBuffer(resource.data, undefined).promise.then((data) => {
+  //       resource.animation = data;
+  //       next();
+  //     }).catch((error) => {
+  //       next();
+  //     })
+  //     return;
+  //   }
+  //   next();
+  // }
 };
 
 export { AnimatedGIFLoader };
