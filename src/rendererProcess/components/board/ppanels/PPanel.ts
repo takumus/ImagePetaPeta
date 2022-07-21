@@ -6,6 +6,7 @@ import { getImage } from "./ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
+import LOADINGImage from "@/@assets/loadingBackground.png";
 export class PPanel extends PIXI.Sprite {
   public selected = false;
   public unselected = false;
@@ -15,12 +16,14 @@ export class PPanel extends PIXI.Sprite {
   public gif: AnimatedGIF | undefined;
   public imageWrapper = new PIXI.Sprite();
   public noImage = true;
+  public loading = true;
   public onUpdateGIF: ((frame: number) => void) | undefined;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private cover = new PIXI.Sprite();
   private nsfwTile?: PIXI.TilingSprite;
   private noImageTile?: PIXI.TilingSprite;
+  private loadingTile?: PIXI.TilingSprite;
   private needToRender = valueChecker().isSameAll;
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
@@ -41,8 +44,9 @@ export class PPanel extends PIXI.Sprite {
       this.nsfwTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NSFWImage), 100, 100);
       this.nsfwTile.visible = false;
       this.noImageTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NOIMAGEImage), 100, 100);
+      this.loadingTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(LOADINGImage), 100, 100);
       this.setZoomScale(this.zoomScale);
-      this.cover.addChild(this.noImageTile, this.nsfwTile);
+      this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
     })();
   }
   public setPetaPanel(petaPanel: PetaPanel) {
@@ -50,45 +54,54 @@ export class PPanel extends PIXI.Sprite {
     this.defaultHeight = petaPanel.height / petaPanel.width;
   }
   public async load() {
-    this.noImage = true;
-    const result = getImage(this.petaPanel._petaImage);
-    this._cancelLoading = result.cancel;
-    const image = await result.promise;
-    if (this.gif) {
-      this.imageWrapper.removeChild(this.gif);
-      this.gif.onFrameChange = undefined;
-      this.gif.destroy();
-      this.gif = undefined;
-    }
-    if (image.animatedGIF) {
-      this.gif = image.animatedGIF;
-      this.gif.onFrameChange = this.onUpdateGIF;
-      this.imageWrapper.addChild(this.gif);
-      if (this.petaPanel.gif.stopped) {
-        this.gif.stop();
-        this.gif.currentFrame = this.petaPanel.gif.frame;
+    try {
+      this.noImage = true;
+      this.loading = true;
+      const result = getImage(this.petaPanel._petaImage);
+      this._cancelLoading = result.cancel;
+      const image = await result.promise;
+      this.loading = false;
+      if (this.gif) {
+        this.imageWrapper.removeChild(this.gif);
+        this.gif.onFrameChange = undefined;
+        this.gif.destroy();
+        this.gif = undefined;
       }
-      this.noImage = false;
-    } else if (image.texture) {
-      try {
-        this.image.texture = image.texture;
-      } catch (error) {
-        // console.log(error);
+      if (image.animatedGIF) {
+        this.gif = image.animatedGIF;
+        this.gif.onFrameChange = this.onUpdateGIF;
+        this.imageWrapper.addChild(this.gif);
+        if (this.petaPanel.gif.stopped) {
+          this.gif.stop();
+          this.gif.currentFrame = this.petaPanel.gif.frame;
+        }
+        this.noImage = false;
+      } else if (image.texture) {
+        try {
+          this.image.texture = image.texture;
+        } catch (error) {
+          // console.log(error);
+        }
+        this.noImage = false;
       }
-      this.noImage = false;
+    } catch (error) {
+      this.loading = false;
+      throw error;
     }
   }
   public setZoomScale(scale: number) {
     if (this.needToScaling(
       "scale", scale,
       "nsfwTile", this.nsfwTile,
-      "noImageTile", this.noImageTile
+      "noImageTile", this.noImageTile,
+      "loadingTile", this.loadingTile
     )) {
       return;
     }
     this.zoomScale = scale;
     this.nsfwTile?.tileScale.set(0.5 * (1 / this.zoomScale));
     this.noImageTile?.tileScale.set(0.5 * (1 / this.zoomScale));
+    this.loadingTile?.tileScale.set(0.5 * (1 / this.zoomScale));
   }
   public orderRender() {
     try {
@@ -109,9 +122,11 @@ export class PPanel extends PIXI.Sprite {
         "unselected", this.unselected,
         "selected", this.selected,
         "noImage", this.noImage,
+        "loading", this.loading,
         "nsfw", showNSFW,
         "nsfwTile", this.nsfwTile,
-        "noImageTile", this.noImageTile
+        "noImageTile", this.noImageTile,
+        "loadingTile", this.loadingTile
       )) {
         return;
       }
@@ -169,28 +184,31 @@ export class PPanel extends PIXI.Sprite {
           panelHeight
         );
       }
-      if (this.noImage || showNSFW) {
-        this.cover.visible = true;
-        if (this.nsfwTile) {
-          this.nsfwTile.x = -panelWidth / 2;
-          this.nsfwTile.y = -panelHeight / 2;
-          this.nsfwTile.width = panelWidth;
-          this.nsfwTile.height = panelHeight;
-          this.nsfwTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
-          this.nsfwTile
-          this.nsfwTile.visible = showNSFW ? true : false;
-        }
-        if (this.noImageTile) {
-          this.noImageTile.x = -panelWidth / 2;
-          this.noImageTile.y = -panelHeight / 2;
-          this.noImageTile.width = panelWidth;
-          this.noImageTile.height = panelHeight;
-          this.noImageTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
-          this.noImageTile.visible = this.noImage;
-        }
-      } else {
-        this.cover.visible = false;
+      if (this.nsfwTile) {
+        this.nsfwTile.x = -panelWidth / 2;
+        this.nsfwTile.y = -panelHeight / 2;
+        this.nsfwTile.width = panelWidth;
+        this.nsfwTile.height = panelHeight;
+        this.nsfwTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
+        this.nsfwTile.visible = showNSFW ? true : false;
       }
+      if (this.noImageTile) {
+        this.noImageTile.x = -panelWidth / 2;
+        this.noImageTile.y = -panelHeight / 2;
+        this.noImageTile.width = panelWidth;
+        this.noImageTile.height = panelHeight;
+        this.noImageTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
+        this.noImageTile.visible = this.noImage;
+      }
+      if (this.loadingTile) {
+        this.loadingTile.x = -panelWidth / 2;
+        this.loadingTile.y = -panelHeight / 2;
+        this.loadingTile.width = panelWidth;
+        this.loadingTile.height = panelHeight;
+        this.loadingTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
+        this.loadingTile.visible = this.loading;
+      }
+      this.cover.visible = (this.nsfwTile?.visible || this.noImageTile?.visible || this.loadingTile?.visible) ? true : false;
       this.x = this.petaPanel.position.x;
       this.y = this.petaPanel.position.y;
       this.rotation = this.petaPanel.rotation;

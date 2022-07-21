@@ -718,7 +718,7 @@ export default class VBoard extends Vue {
     pPanel.load().then(() => {
       pPanel.orderRender();
       this.orderPIXIRender();
-    }).catch((error) => {
+    }).catch(() => {
       // throw error;
     })
     // pPanel.orderRender();
