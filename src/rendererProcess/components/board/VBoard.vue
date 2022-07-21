@@ -705,6 +705,7 @@ export default class VBoard extends Vue {
     }
     const pPanel = new PPanel(petaPanel);
     pPanel.setZoomScale(this.board?.transform.scale || 1);
+    await pPanel.init();
     pPanel.showNSFW = this.$nsfw.showNSFW;
     pPanel.onUpdateGIF = () => {
       if (!this.loading) {
@@ -719,10 +720,10 @@ export default class VBoard extends Vue {
       pPanel.orderRender();
       this.orderPIXIRender();
     }).catch(() => {
+      pPanel.orderRender();
+      this.orderPIXIRender();
       // throw error;
-    })
-    // pPanel.orderRender();
-    // this.orderPIXIRender();
+    });
     await new Promise((res, rej) => {
       setTimeout(res);
     });

@@ -30,6 +30,9 @@ export class PPanel extends PIXI.Sprite {
   private zoomScale = 1;
   private _cancelLoading? = () => { return; }
   public showNSFW = false;
+  private static nsfwTexture?: PIXI.Texture;
+  private static noImageTexture?: PIXI.Texture;
+  private static loadingTexture?: PIXI.Texture;
   constructor(public petaPanel: PetaPanel) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -40,14 +43,23 @@ export class PPanel extends PIXI.Sprite {
     this.cover.visible = false;
     this.setPetaPanel(this.petaPanel);
     this.orderRender();
-    (async () => {
-      this.nsfwTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NSFWImage), 100, 100);
-      this.nsfwTile.visible = false;
-      this.noImageTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(NOIMAGEImage), 100, 100);
-      this.loadingTile = new PIXI.TilingSprite(await PIXI.Texture.fromURL(LOADINGImage), 100, 100);
-      this.setZoomScale(this.zoomScale);
-      this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
-    })();
+  }
+  async init() {
+    if (!PPanel.nsfwTexture) {
+      PPanel.nsfwTexture = await PIXI.Texture.fromURL(NSFWImage);
+    }
+    if (!PPanel.noImageTexture) {
+      PPanel.noImageTexture = await PIXI.Texture.fromURL(NOIMAGEImage);
+    }
+    if (!PPanel.loadingTexture) {
+      PPanel.loadingTexture = await PIXI.Texture.fromURL(LOADINGImage);
+    }
+    this.nsfwTile = new PIXI.TilingSprite(PPanel.nsfwTexture, 100, 100);
+    this.nsfwTile.visible = false;
+    this.noImageTile = new PIXI.TilingSprite(PPanel.noImageTexture, 100, 100);
+    this.loadingTile = new PIXI.TilingSprite(PPanel.loadingTexture, 100, 100);
+    this.setZoomScale(this.zoomScale);
+    this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
   }
   public setPetaPanel(petaPanel: PetaPanel) {
     this.petaPanel = petaPanel;

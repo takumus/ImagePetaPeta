@@ -346,6 +346,7 @@ export default class VBoard extends Vue {
       if (!this.pPanel) {
         return;
       }
+      await this.pPanel.init();
       this.pPanel.showNSFW = this.$nsfw.showNSFW;
       await this.pPanel.load();
       this.pPanel.playGIF();
