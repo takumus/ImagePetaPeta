@@ -1,4 +1,4 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, nativeTheme } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, nativeTheme, screen } from "electron";
 import * as Path from "path";
 import axios from "axios";
 import dataURIToBuffer from "data-uri-to-buffer";
@@ -36,6 +36,7 @@ import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWi
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { WindowType } from "@/commons/datas/windowType";
 import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
+import { Vec2 } from "@/commons/utils/vec2";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -833,21 +834,35 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
           return petaImages.map((petaImage) => petaImage.id);
         },
         async openWindow(event, windowType) {
+          const position = new Vec2();
+          try {
+            const parentWindowPosition = getWindowByEvent(event)?.window.getPosition();
+            if (parentWindowPosition) {
+              const display = screen.getDisplayNearestPoint({
+                x: parentWindowPosition[0]!,
+                y: parentWindowPosition[1]!
+              });
+              position.set(display.bounds);
+            }
+          } catch (error) {
+            //
+          }
           if (windows[windowType] === undefined || windows[windowType]?.isDestroyed()) {
             switch (windowType) {
               case WindowType.BOARD:
-                windows[windowType] = initBoardWindow();
+                windows[windowType] = initBoardWindow(position.x, position.y);
                 break;
               case WindowType.BROWSER:
-                windows[windowType] = initBrowserWindow();
+                windows[windowType] = initBrowserWindow(position.x, position.y);
                 break;
               case WindowType.SETTINGS:
-                windows[windowType] = initSettingsWindow();
+                windows[windowType] = initSettingsWindow(position.x, position.y);
                 break;
               case WindowType.DETAILS:
-                windows[windowType] = initDetailsWindow();
+                windows[windowType] = initDetailsWindow(position.x, position.y);
                 break;
             }
+            windows[windowType]?.center();
           } else {
             windows[windowType]?.moveTop();
             windows[windowType]?.focus();
@@ -1143,7 +1158,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
       }
     }
   }
-  function initBrowserWindow() {
+  function initBrowserWindow(x?: number, y?: number) {
     return createWindow(WindowType.BROWSER, {
       width: configWindowStates.data.browser.width,
       height: configWindowStates.data.browser.height,
@@ -1151,10 +1166,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         x: 8,
         y: 8
       },
+      x,
+      y,
       alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
-  function initSettingsWindow(update: boolean = false) {
+  function initSettingsWindow(x?: number, y?: number, update: boolean = false) {
     return createWindow(WindowType.SETTINGS, {
       width: WINDOW_SETTINGS_WIDTH,
       height: WINDOW_SETTINGS_HEIGHT,
@@ -1167,10 +1184,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         x: 8,
         y: 8
       },
+      x,
+      y,
       alwaysOnTop: configSettings.data.alwaysOnTop
     }, update ? "update" : "none");
   }
-  function initBoardWindow() {
+  function initBoardWindow(x?: number, y?: number) {
     return createWindow(WindowType.BOARD, {
       width: configWindowStates.data.board.width,
       height: configWindowStates.data.board.height,
@@ -1178,10 +1197,12 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         x: 13,
         y: 13
       },
+      x,
+      y,
       alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
-  function initDetailsWindow() {
+  function initDetailsWindow(x?: number, y?: number) {
     return createWindow(WindowType.DETAILS, {
       width: configWindowStates.data.details.width,
       height: configWindowStates.data.details.height,
@@ -1189,6 +1210,8 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
         x: 8,
         y: 8
       },
+      x,
+      y,
       alwaysOnTop: configSettings.data.alwaysOnTop
     });
   }
@@ -1340,7 +1363,7 @@ import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates"
     if (!remote.isLatest) {
       log.log("this version is old");
       if (windows.settings === undefined || windows.settings.isDestroyed()) {
-        windows.settings = initSettingsWindow(true);
+        windows.settings = initSettingsWindow(0, 0, true);
       }
       moveSettingsWindowToTop();
       emitMainEvent("foundLatestVersion", remote);
