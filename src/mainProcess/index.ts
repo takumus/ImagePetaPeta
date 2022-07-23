@@ -836,11 +836,11 @@ import { Vec2 } from "@/commons/utils/vec2";
         async openWindow(event, windowType) {
           const position = new Vec2();
           try {
-            const parentWindowPosition = getWindowByEvent(event)?.window.getPosition();
-            if (parentWindowPosition) {
+            const parentWindowBounds = getWindowByEvent(event)?.window.getBounds();
+            if (parentWindowBounds) {
               const display = screen.getDisplayNearestPoint({
-                x: parentWindowPosition[0]!,
-                y: parentWindowPosition[1]!
+                x: parentWindowBounds.x + parentWindowBounds.width / 2,
+                y: parentWindowBounds.y + parentWindowBounds.height / 2
               });
               position.set(display.bounds);
             }
