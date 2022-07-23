@@ -128,7 +128,7 @@ import { Vec2 } from "@/commons/utils/vec2";
     const count = Object.values(windows).filter((window) => {
       return window !== undefined && !window.isDestroyed();
     }).map((window) => {
-      window.focus();
+      window?.focus();
     }).length;
     if (count < 1) {
       showWindows();
@@ -978,7 +978,7 @@ import { Vec2 } from "@/commons/utils/vec2";
       dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
       configStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
       configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
-      [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags].forEach((db) => {
+      ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<any>[]).forEach((db) => {
         db.on("beginCompaction", () => {
           mainLogger.logChunk().log(`begin compaction(${db.name})`);
         });
