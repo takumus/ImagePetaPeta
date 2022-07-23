@@ -40,7 +40,7 @@ function createApp(type: WindowType | string) {
   return _createApp(BoardIndex);
 }
 (async () => {
-  document.body.addEventListener("touchstart", function(e){
+  document.body.addEventListener("touchstart", (e) => {
     e.preventDefault();
   }, {
     passive: false,
