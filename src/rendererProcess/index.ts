@@ -40,6 +40,12 @@ function createApp(type: WindowType | string) {
   return _createApp(BoardIndex);
 }
 (async () => {
+  document.body.addEventListener("touchstart", function(e){
+    e.preventDefault();
+  }, {
+    passive: false,
+    capture: false
+  });
   let initialized = false;
   const initVue = async () => {
     if (initialized) {
