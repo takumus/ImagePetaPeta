@@ -50,7 +50,7 @@ export class DraggingPreviewWindow {
           javascript: false,
         },
       });
-      this.draggingPreviewWindow.setIgnorePointerEvents(true);
+      this.draggingPreviewWindow.setIgnoreMouseEvents(true);
       this.draggingPreviewWindow.setMenuBarVisibility(false);
       // this.draggingPreviewWindow.setOpacity(0);
       this.followCursor();
