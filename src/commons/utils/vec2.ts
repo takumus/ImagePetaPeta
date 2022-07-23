@@ -93,6 +93,6 @@ export class Vec2 {
     return "(" + this.x.toFixed(4) + "," + this.y.toFixed(4) + ")";
   }
 }
-export function vec2FromMouseEvent(event: MouseEvent) {
+export function vec2FromPointerEvent(event: PointerEvent | WheelEvent | DragEvent) {
   return new Vec2(event.clientX, event.clientY);
 }

@@ -117,7 +117,7 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
@@ -216,7 +216,7 @@ export default class VProperty extends Vue {
       return pti.petaTag.name;
     }));
   }
-  tagMenu(event: MouseEvent, tag: PetaTag) {
+  tagMenu(event: PointerEvent, tag: PetaTag) {
     this.$components.contextMenu.open([
       {
         label: this.$t("browser.property.tagMenu.remove", [tag.name]),
@@ -224,7 +224,7 @@ export default class VProperty extends Vue {
           this.removeTag(tag);
         }
       }
-    ], vec2FromMouseEvent(event));
+    ], vec2FromPointerEvent(event));
   }
   selectTag(tag: PetaTag) {
     this.$emit("selectTag", tag);

@@ -48,7 +48,7 @@ import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
 import VLayer from "@/rendererProcess/components/layer/VLayer.vue";
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { MouseButton } from "@/commons/datas/mouseButton";
@@ -156,16 +156,16 @@ export default class VBoard extends Vue {
     });
     this.pixi.view.addEventListener("dblclick", this.resetTransform);
     this.pixi.view.addEventListener("mousewheel", this.wheel as any);
-    this.pixi.view.addEventListener("mousedown", this.preventWheelClick);
-    this.pixi.stage.on("pointerdown", this.mousedown);
-    this.pixi.stage.on("pointerup", this.mouseup);
-    this.pixi.stage.on("pointerupoutside", this.mouseup);
-    this.pixi.stage.on("pointermove", this.mousemove);
-    this.pixi.stage.on("pointermoveoutside", this.mousemove);
-    this.pixi.stage.on("pointerup", (e) => this.pTransformer.mouseup(e));
-    this.pixi.stage.on("pointerupoutside", (e) => this.pTransformer.mouseup(e));
-    this.pixi.stage.on("pointermove", (e) => this.pTransformer.mousemove(e));
-    this.pixi.stage.on("pointermoveoutside", (e) => this.pTransformer.mousemove(e));
+    this.pixi.view.addEventListener("pointerdown", this.preventWheelClick);
+    this.pixi.stage.on("pointerdown", this.pointerdown);
+    this.pixi.stage.on("pointerup", this.pointerup);
+    this.pixi.stage.on("pointerupoutside", this.pointerup);
+    this.pixi.stage.on("pointermove", this.pointermove);
+    this.pixi.stage.on("pointermoveoutside", this.pointermove);
+    this.pixi.stage.on("pointerup", (e) => this.pTransformer.pointerup(e));
+    this.pixi.stage.on("pointerupoutside", (e) => this.pTransformer.pointerup(e));
+    this.pixi.stage.on("pointermove", (e) => this.pTransformer.pointermove(e));
+    this.pixi.stage.on("pointermoveoutside", (e) => this.pTransformer.pointermove(e));
     if (!this.detailsMode) {
       this.pixi.stage.addChild(this.backgroundSprite);
       this.pixi.stage.addChild(this.crossLine);
@@ -195,7 +195,7 @@ export default class VBoard extends Vue {
       logChunk().log("destruct PIXI");
       this.pixi.view.removeEventListener("dblclick", this.resetTransform);
       this.pixi.view.removeEventListener("mousewheel", this.wheel as any);
-      this.pixi.view.removeEventListener("mousedown", this.preventWheelClick);
+      this.pixi.view.removeEventListener("pointerdown", this.preventWheelClick);
       this.pixi.destroy(true);
     }
     this.resizer?.unobserve(this.panelsBackground);
@@ -223,12 +223,12 @@ export default class VBoard extends Vue {
     this.renderPIXI();
     this.orderPIXIRender();
   }
-  preventWheelClick(event: MouseEvent) {
+  preventWheelClick(event: PointerEvent) {
     if (event.button === MouseButton.MIDDLE) {
       event.preventDefault();
     }
   }
-  mousedown(e: PIXI.InteractionEvent) {
+  pointerdown(e: PIXI.InteractionEvent) {
     if (!this.board) {
       return;
     }
@@ -260,7 +260,7 @@ export default class VBoard extends Vue {
     }
     return null;
   }
-  mouseup(e: PIXI.InteractionEvent) {
+  pointerup(e: PIXI.InteractionEvent) {
     const mouse = this.getMouseFromEvent(e).add(this.mouseOffset);
     if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE || (this.detailsMode && e.data.button === MouseButton.LEFT)) {
       this.mouseRightPressing = false;
@@ -295,7 +295,7 @@ export default class VBoard extends Vue {
     }
     this.orderPIXIRender();
   }
-  mousemove(e: PIXI.InteractionEvent) {
+  pointermove(e: PIXI.InteractionEvent) {
     const mouse = this.getMouseFromEvent(e);
     this.mousePosition = new Vec2(mouse);
     this.click.move(this.mousePosition);
@@ -310,7 +310,7 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
-    const mouse = vec2FromMouseEvent(event).sub(this.mouseOffset).sub(this.stageRect.clone().div(2));
+    const mouse = vec2FromPointerEvent(event).sub(this.mouseOffset).sub(this.stageRect.clone().div(2));
     if (event.ctrlKey || this.$systemInfo.platform === "win32") {
       const currentZoom = this.board.transform.scale;
       this.board.transform.scale *= 1 + -event.deltaY * this.$settings.zoomSensitivity * 0.00001;

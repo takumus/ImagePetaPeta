@@ -10,7 +10,7 @@ import { Options, Vue } from "vue-class-component";
 // Others
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { API } from "@/rendererProcess/api";
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 @Options({
   components: {
@@ -45,19 +45,19 @@ export default class VImageImporter extends Vue {
         }, fileList).promise;
         const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
         if (dropFromBrowserPetaImageIds) {
-          this.$emit("addPanelByDragAndDrop", dropFromBrowserPetaImageIds, vec2FromMouseEvent(event), true);
+          this.$emit("addPanelByDragAndDrop", dropFromBrowserPetaImageIds, vec2FromPointerEvent(event), true);
           return;
         }
         const ids = await API.send("importImagesByDragAndDrop", htmls, arrayBuffers, filePaths);
-        this.$emit("addPanelByDragAndDrop", ids, vec2FromMouseEvent(event), false);
+        this.$emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
       }
     });
     document.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
-    window.addEventListener("mousemove", (event) => {
-      this.currentMousePosition = vec2FromMouseEvent(event);
+    window.addEventListener("pointermove", (event) => {
+      this.currentMousePosition = vec2FromPointerEvent(event);
     });
     document.addEventListener("paste", async (event) => {
       const mousePosition = this.currentMousePosition.clone();

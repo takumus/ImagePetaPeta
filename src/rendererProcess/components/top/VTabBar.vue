@@ -4,7 +4,7 @@
       :class="{ selected: b === board }"
       :style="{ opacity: b === board && dragging ? 0 : 1 }"
       v-for="(b, index) in boards"
-      @mousedown="mousedown($event, b, index, $target)"
+      @pointerdown="pointerdown($event, b, index, $target)"
       @contextmenu="menu($event, b)"
       :key="b.id"
       :ref="(element) => setTabRef(element, b.id)"
@@ -51,7 +51,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
@@ -78,21 +78,21 @@ export default class VTabBar extends Vue {
   draggingTab!: HTMLElement;
   dragging = false;
   pressing = false;
-  mousedownOffsetX = 0;
+  pointerdownOffsetX = 0;
   editName = false;
   beforeSortSelectedIndex = 0;
   afterSortSelectedIndex = 0;
   draggingPetaBoard: PetaBoard | undefined;
   tabs: { [key: string]: HTMLElement } = {};
   mounted() {
-    window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("mouseup", this.mouseup);
+    window.addEventListener("pointermove", this.pointermove);
+    window.addEventListener("pointerup", this.pointerup);
   }
   unmounted() {
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("mouseup", this.mouseup);
+    window.removeEventListener("pointermove", this.pointermove);
+    window.removeEventListener("pointerup", this.pointerup);
   }
-  mousedown(event: MouseEvent, board: PetaBoard, index: number, target: HTMLElement) {
+  pointerdown(event: PointerEvent, board: PetaBoard, index: number, target: HTMLElement) {
     if (isKeyboardLocked()) return;
     if (event.button != MouseButton.LEFT) return;
     this.selectPetaBoard(board);
@@ -100,23 +100,23 @@ export default class VTabBar extends Vue {
     this.draggingPetaBoard = board;
     const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect();
     if (!rect) return;
-    this.mousedownOffsetX = rect.x - event.clientX;
+    this.pointerdownOffsetX = rect.x - event.clientX;
     this.draggingTab.style.left = `${rect.x}px`;
     this.draggingTab.style.height = `${rect.height}px`;
     this.beforeSortSelectedIndex = index;
   }
-  menu(event: MouseEvent, board: PetaBoard) {
+  menu(event: PointerEvent, board: PetaBoard) {
     this.$components.contextMenu.open([{
       label: this.$t("tab.menu.remove", [board.name]),
       click: () => {
         this.removePetaBoard(board);
       }
-    }], vec2FromMouseEvent(event));
+    }], vec2FromPointerEvent(event));
   }
-  mousemove(event: MouseEvent) {
+  pointermove(event: PointerEvent) {
     if (!this.pressing) return;
     if (this.dragging) {
-      this.draggingTab.style.left = `${this.mousedownOffsetX + event.clientX}px`;
+      this.draggingTab.style.left = `${this.pointerdownOffsetX + event.clientX}px`;
       // ソート前の選択中ボードのインデックス
       const selectedPetaBoard = this.board;
       let newIndex = 0;
@@ -140,7 +140,7 @@ export default class VTabBar extends Vue {
     }
     this.dragging = true;
   }
-  mouseup() {
+  pointerup() {
     if (!this.pressing) return;
     this.dragging = false;
     this.pressing = false;

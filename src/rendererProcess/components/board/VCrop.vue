@@ -64,10 +64,10 @@ export default class VBoard extends Vue {
       antialias: true,
       backgroundAlpha: 0
     });
-    this.pixi.stage.on("pointerup", this.mouseup);
-    this.pixi.stage.on("pointerupoutside", this.mouseup);
-    this.pixi.stage.on("pointermove", this.mousemove);
-    this.pixi.stage.on("pointermoveoutside", this.mousemove);
+    this.pixi.stage.on("pointerup", this.pointerup);
+    this.pixi.stage.on("pointerupoutside", this.pointerup);
+    this.pixi.stage.on("pointermove", this.pointermove);
+    this.pixi.stage.on("pointermoveoutside", this.pointermove);
     this.pixi.stage.interactive = true;
     this.pixi.ticker.stop();
     this.pixi.stage.addChild(this.rootContainer);
@@ -139,11 +139,11 @@ export default class VBoard extends Vue {
     this.rootContainer.y = rect.height / 2;
     this.orderPIXIRender();
   }
-  mouseup(e: PIXI.InteractionEvent) {
+  pointerup(e: PIXI.InteractionEvent) {
     this.draggingControlPoint = undefined;
     this.dragging = false;
   }
-  mousemove(e: PIXI.InteractionEvent) {
+  pointermove(e: PIXI.InteractionEvent) {
     this.mousePosition = new Vec2(e.data.global);
     if (this.draggingControlPoint) {
       const pos = this.selectionContainer.toLocal(this.mousePosition);

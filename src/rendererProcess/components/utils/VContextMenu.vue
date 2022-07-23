@@ -46,7 +46,7 @@ export default class VContextMenu extends Vue {
   show = false;
   mounted() {
     this.$components.contextMenu = this;
-    window.addEventListener("mousedown", (event) => {
+    window.addEventListener("pointerdown", (event) => {
       if ((event.target as HTMLElement).parentElement != this.contextMenu) {
         this.select();
         return;

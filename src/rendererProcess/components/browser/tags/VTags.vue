@@ -55,7 +55,7 @@ import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
 @Options({
@@ -80,7 +80,7 @@ export default class VTags extends Vue {
   unmounted() {
     //
   }
-  tagMenu(event: MouseEvent, tag: BrowserTag) {
+  tagMenu(event: PointerEvent, tag: BrowserTag) {
     if (tag.readonly) {
       return;
     }
@@ -91,7 +91,7 @@ export default class VTags extends Vue {
           this.removeTag(tag.petaTag);
         }
       }
-    ], vec2FromMouseEvent(event));
+    ], vec2FromPointerEvent(event));
   }
   async addTag(name: string) {
     if (this.petaTagInfos.find((pi) => pi.petaTag.name === name)) {

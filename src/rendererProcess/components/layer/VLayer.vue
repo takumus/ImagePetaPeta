@@ -52,7 +52,7 @@ import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
-import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import { SortHelper } from "../utils/sortHelper";
 type CellData = {
@@ -121,14 +121,14 @@ export default class VLayer extends Vue {
       data: pPanel
     });
   }
-  rightClick(pPanel: PPanel, event: MouseEvent) {
+  rightClick(pPanel: PPanel, event: PointerEvent) {
     if (!pPanel.selected) {
       this.clearSelectionAll();
     }
     pPanel.selected = true;
-    this.$emit("petaPanelMenu", pPanel, vec2FromMouseEvent(event));
+    this.$emit("petaPanelMenu", pPanel, vec2FromPointerEvent(event));
   }
-  leftClick(pPanel: PPanel, event: MouseEvent) {
+  leftClick(pPanel: PPanel, event: PointerEvent) {
     this.clearSelectionAll();
     pPanel.selected = true;
   }

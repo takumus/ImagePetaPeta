@@ -70,24 +70,24 @@ export default class VModal extends Vue {
   clickBackground = false;
   keyboards = new Keyboards();
   async mounted() {
-    this.background.addEventListener("mousedown", this.mousedown);
-    this.background.addEventListener("mouseup", this.mouseup);
+    this.background.addEventListener("pointerdown", this.pointerdown);
+    this.background.addEventListener("pointerup", this.pointerup);
     this.keyboards.enabled = true;
     this.keyboards.down(["escape"], this.pressEscape);
     this.zIndex = this.defaultZIndex;
   }
   unmounted() {
-    this.background.removeEventListener("mousedown", this.mousedown);
-    this.background.removeEventListener("mouseup", this.mouseup);
+    this.background.removeEventListener("pointerdown", this.pointerdown);
+    this.background.removeEventListener("pointerup", this.pointerup);
     this.keyboards.destroy();
   }
   close() {
     this.$emit("close");
   }
-  mousedown(event: MouseEvent) {
+  pointerdown(event: PointerEvent) {
     this.clickBackground = event.target === this.background;
   }
-  mouseup(event: MouseEvent) {
+  pointerup(event: PointerEvent) {
     if (event.target === this.background && this.clickBackground) {
       this.close();
       this.clickBackground = false;

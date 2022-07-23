@@ -5,7 +5,7 @@
       drag: drag,
       selected: selected
     }"
-    @mousedown.left="mousedown($event)"
+    @pointerdown.left="pointerdown($event)"
   >
     <t-icon
       class="visible"
@@ -47,7 +47,7 @@ import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 import { PPanel } from "../board/ppanels/PPanel";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
-import { vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 // Others
 @Options({
   components: {
@@ -74,12 +74,12 @@ export default class VLayerCell extends Vue {
   click: ClickChecker = new ClickChecker();
   mouseIsDown = false;
   async mounted() {
-    window.addEventListener("mouseup", this.mouseup);
-    window.addEventListener("mousemove", this.mousemove);
+    window.addEventListener("pointerup", this.pointerup);
+    window.addEventListener("pointermove", this.pointermove);
   }
   unmounted() {
-    window.removeEventListener("mouseup", this.mouseup);
-    window.removeEventListener("mousemove", this.mousemove);
+    window.removeEventListener("pointerup", this.pointerup);
+    window.removeEventListener("pointermove", this.pointermove);
   }
   get url() {
     return this.cellData ? getImageURL(this.cellData.data.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
@@ -99,11 +99,11 @@ export default class VLayerCell extends Vue {
   get showNSFW() {
     return this.cellData?.data.petaPanel._petaImage?.nsfw && !this.$nsfw.showNSFW;
   }
-  mousedown(event: MouseEvent) {
-    this.click.down(vec2FromMouseEvent(event));
+  pointerdown(event: PointerEvent) {
+    this.click.down(vec2FromPointerEvent(event));
     this.mouseIsDown = true;
   }
-  mouseup(event: MouseEvent) {
+  pointerup(event: PointerEvent) {
     this.mouseIsDown = false;
     if (this.click.isClick && this.cellData) {
       if (event.target === this.visibleIcon) {
@@ -113,11 +113,11 @@ export default class VLayerCell extends Vue {
       }
     }
   }
-  mousemove(event: MouseEvent) {
+  pointermove(event: PointerEvent) {
     if (!this.mouseIsDown) {
       return;
     }
-    this.click.move(vec2FromMouseEvent(event));
+    this.click.move(vec2FromPointerEvent(event));
     if (!this.click.isClick) {
       this.mouseIsDown = false;
       this.$emit("startDrag", this.cellData, event);

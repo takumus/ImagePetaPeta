@@ -38,7 +38,7 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";

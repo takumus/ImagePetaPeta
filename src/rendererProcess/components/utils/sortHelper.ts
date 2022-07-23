@@ -22,8 +22,8 @@ export class SortHelper<T extends { data: any, id: number }> {
     this.layers = layers;
     this.layersParent = layersParent;
     this.cellDrag = cellDrag;
-    window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("mouseup", this.mouseup);
+    window.addEventListener("pointermove", this.pointermove);
+    window.addEventListener("pointerup", this.pointerup);
     setInterval(() => {
       if (this.draggingData) {
         this.layersParent.scrollTop += this.autoScrollVY;
@@ -33,8 +33,8 @@ export class SortHelper<T extends { data: any, id: number }> {
     }, 1000 / 60);
   }
   destroy() {
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("mouseup", this.mouseup);
+    window.removeEventListener("pointermove", this.pointermove);
+    window.removeEventListener("pointerup", this.pointerup);
   }
   scrollTo = (data: T) => {
     const layerCell = this.dataToComponent(data);
@@ -43,7 +43,7 @@ export class SortHelper<T extends { data: any, id: number }> {
     }
     this.layersParent.scrollTop = layerCell.$el.getBoundingClientRect().y - this.layersParent.getBoundingClientRect().y + this.layersParent.scrollTop;
   }
-  startDrag = (data: T, event: MouseEvent) => {
+  startDrag = (data: T, event: PointerEvent) => {
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
     this.fixedHeight = this.layers.getBoundingClientRect().height;
     this.fixedHeight = this.fixedHeight < this.layersParent.getBoundingClientRect().height ? this.layersParent.getBoundingClientRect().height : this.fixedHeight;
@@ -57,7 +57,7 @@ export class SortHelper<T extends { data: any, id: number }> {
     this.sort();
     // this.$emit("update");
   }
-  mousemove = (event: MouseEvent) => {
+  pointermove = (event: PointerEvent) => {
     // console.log(this.draggingData)
     if (!this.draggingData) {
       return;
@@ -104,7 +104,7 @@ export class SortHelper<T extends { data: any, id: number }> {
     const offset = this.cellDrag.$el.getBoundingClientRect().height / 2;
     this.cellDrag.$el.style.top = `${absolute ? y : (y + this.layersParent.scrollTop - offset)}px`;
   }
-  mouseup = (event: MouseEvent) => {
+  pointerup = (event: PointerEvent) => {
     this.draggingData = null;
     this.changeDraggingData(this.draggingData);
     this.autoScrollVY = 0;

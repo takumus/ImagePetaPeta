@@ -8,7 +8,7 @@
   >
     <t-tile-wrapper>
       <t-images
-        @mousedown="mousedown($event)"
+        @pointerdown="pointerdown($event)"
         @dragstart="dragstart($event)"
         @dblclick="dblclick($event)"
         draggable="true"
@@ -81,7 +81,7 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
-import { Vec2, vec2FromMouseEvent } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { MouseButton } from "@/commons/datas/mouseButton";
@@ -120,19 +120,19 @@ export default class VTile extends Vue {
     this.changeVisible();
   }
   unmounted() {
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("mouseup", this.mouseup);
+    window.removeEventListener("pointermove", this.pointermove);
+    window.removeEventListener("pointerup", this.pointerup);
     window.clearTimeout(this.loadOriginalTimeoutHandler);
     window.clearTimeout(this.fetchTagsTimeoutHandler);
   }
-  dragstart(event: MouseEvent) {
+  dragstart(event: PointerEvent) {
     event.preventDefault();
     this.$emit("drag", this.tile.petaImage);
   }
-  mousedown(event: MouseEvent) {
+  pointerdown(event: PointerEvent) {
     this.click.down(new Vec2(event.clientX, event.clientY));
-    window.addEventListener("mousemove", this.mousemove);
-    window.addEventListener("mouseup", this.mouseup);
+    window.addEventListener("pointermove", this.pointermove);
+    window.addEventListener("pointerup", this.pointerup);
     switch (event.button) {
       case MouseButton.LEFT: {
         this.pressing = true;
@@ -141,7 +141,7 @@ export default class VTile extends Vue {
     }
     // API.send("startDrag", this.tile.petaImage);
   }
-  mousemove(event: MouseEvent) {
+  pointermove(event: PointerEvent) {
     if (!this.pressing) return;
     this.click.move(new Vec2(event.clientX, event.clientY));
     if (!this.click.isClick) {
@@ -151,13 +151,14 @@ export default class VTile extends Vue {
       //   elementRect.x + elementRect.width / 2,
       //   elementRect.y + elementRect.height / 2
       // );
-      // this.$emit("add", this.tile, vec2FromMouseEvent(event), position);
+      // this.$emit("add", this.tile, vec2FromPointerEvent(event), position);
       this.pressing = false;
     }
   }
-  mouseup(event: MouseEvent) {
-    window.removeEventListener("mousemove", this.mousemove);
-    window.removeEventListener("mouseup", this.mouseup);
+  pointerup(event: PointerEvent) {
+    console.log(event)
+    window.removeEventListener("pointermove", this.pointermove);
+    window.removeEventListener("pointerup", this.pointerup);
     this.pressing = false;
     if (this.click.isClick) {
       switch(event.button) {
@@ -165,12 +166,12 @@ export default class VTile extends Vue {
           this.$emit("select", this.tile);
           break;
         case MouseButton.RIGHT:
-          this.$emit("menu", this.tile, vec2FromMouseEvent(event));
+          this.$emit("menu", this.tile, vec2FromPointerEvent(event));
           break;
       }
     }
   }
-  dblclick(event: MouseEvent) {
+  dblclick(event: PointerEvent) {
     this.$emit("dblclick", this.tile.petaImage);
   }
   loaded() {

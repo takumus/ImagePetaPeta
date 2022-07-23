@@ -13,8 +13,8 @@
     <li
       v-for="item, i in filteredItems"
       :key="item"
-      @mousedown="select(item)"
-      @mousemove="moveSelectionAbsolute(i)"
+      @pointerdown="select(item)"
+      @pointermove="moveSelectionAbsolute(i)"
       @mouseleave="moveSelectionAbsolute(-1)"
       class="item"
       :class="{

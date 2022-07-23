@@ -39,7 +39,7 @@ export class PControlPoint extends PIXI.Container {
         Cursor.setDefaultCursor();
       }
     });
-    this.rotate.on("mousedown", () => {
+    this.rotate.on("pointerdown", () => {
       rotating = true;
     });
     this.size.on("mouseover", () => {
@@ -58,10 +58,13 @@ export class PControlPoint extends PIXI.Container {
         Cursor.setDefaultCursor();
       }
     });
-    this.size.on("mousedown", () => {
+    this.size.on("pointerdown", () => {
       sizing = true;
     });
-    window.addEventListener("mouseup", () => {
+    window.addEventListener("touchend", () => {
+      console.log("touchend")
+    })
+    window.addEventListener("pointerup", () => {
       if (!sizing && !rotating) {
         return;
       }

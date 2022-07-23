@@ -106,10 +106,10 @@ export class PTransformer extends PIXI.Container {
   get pPanelsArray() {
     return Object.values(this.pPanels);
   }
-  mouseup(e: PIXI.InteractionEvent) {
+  pointerup(e: PIXI.InteractionEvent) {
     this.controlStatus = ControlStatus.NONE;
   }
-  mousemove(e: PIXI.InteractionEvent) {
+  pointermove(e: PIXI.InteractionEvent) {
     this.click.move(e.data.global);
     if (this.controlStatus === ControlStatus.PANEL_SIZE) {
       const scale = this.pairCorner.getDistance(this.toLocal(e.data.global)) / this.beginSizingDistance;
