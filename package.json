@@ -18,10 +18,11 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "preserve": "yarn generate-assets",
-    "prebuild": "rimraf ./dist_electron && yarn audit --groups dependencies && yarn generate-assets",
+    "prebuild": "yarn tsc && rimraf ./dist_electron && yarn audit --groups dependencies && yarn generate-assets",
     "generate-assets": "yarn generate-licenses && yarn generate-icons && yarn generate-cursors",
     "release": "yarn build && node ./scripts/addBinaryHash.js && node ./scripts/commitAndAddTag.js",
-    "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test"
+    "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
+    "tsc": "tsc -p ./tsconfig.json --noEmit "
   },
   "main": "background.js",
   "dependencies": {
