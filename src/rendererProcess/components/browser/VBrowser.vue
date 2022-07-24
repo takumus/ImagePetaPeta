@@ -79,6 +79,7 @@ import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
 import { WindowType } from "@/commons/datas/windowType";
+import deepcopy from "deepcopy";
 @Options({
   components: {
     VTile,
@@ -159,6 +160,9 @@ export default class VBrowser extends Vue {
   saveScrollPosition() {
     let min = Infinity;
     this.tiles.forEach((t) => {
+      if (t.petaImage === undefined) {
+        return;
+      }
       const d = Math.abs(t.position.y - this.thumbnails.scrollTop);
       if (d < min) {
         min = d;
@@ -167,7 +171,7 @@ export default class VBrowser extends Vue {
     });
   }
   restoreScrollPosition() {
-    const current = this.tiles.find((bt) => bt.petaImage.id === this.currentScrollTileId);
+    const current = this.tiles.find((bt) => bt.petaImage?.id === this.currentScrollTileId);
     if (current) {
       this.thumbnails.scrollTo(0, current.position.y);
     }
@@ -202,6 +206,9 @@ export default class VBrowser extends Vue {
     this.close();
   }
   selectTile(thumb: Tile, force = false) {
+    if (thumb.petaImage === undefined) {
+      return;
+    }
     if (this.selectedPetaImages.length < 1 || (!Keyboards.pressedOR("control", "meta", "shift"))) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedTile = thumb;
@@ -227,6 +234,9 @@ export default class VBrowser extends Vue {
         Math.max( this.firstSelectedTile.position.y + this.firstSelectedTile.height, thumb.position.y + thumb.height)
       ).clone().sub(topLeft);
       this.tiles.forEach((pt) => {
+        if (pt.petaImage === undefined) {
+          return;
+        }
         let widthDiff = pt.width / 2 + size.x / 2 - Math.abs((pt.position.x + pt.width / 2) - (topLeft.x + size.x / 2));
         let heightDiff = pt.height / 2 + size.y / 2 - Math.abs((pt.position.y + pt.height / 2) - (topLeft.y + size.y / 2));
         if (widthDiff > pt.width) {
@@ -249,9 +259,14 @@ export default class VBrowser extends Vue {
     });
   }
   petaImageMenu(thumb: Tile, position: Vec2) {
+    if (thumb.petaImage === undefined) {
+      return;
+    }
+    const petaImage = thumb.petaImage;
     if (!thumb.petaImage._selected) {
       this.selectTile(thumb, true);
     }
+    
     this.$components.contextMenu.open([
       {
         label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
@@ -264,7 +279,7 @@ export default class VBrowser extends Vue {
       {
         label: this.$t("browser.petaImageMenu.openImageFile"),
         click: async () => {
-          await API.send("openImageFile", thumb.petaImage);
+          await API.send("openImageFile", petaImage);
         }
       },
       // {
@@ -282,7 +297,7 @@ export default class VBrowser extends Vue {
       {
         label: this.$t("browser.petaImageMenu.searchImageByGoogle"),
         click: async () => {
-          await API.send("searchImageByGoogle", thumb.petaImage);
+          await API.send("searchImageByGoogle", petaImage);
         }
       },
     ], position);
@@ -387,7 +402,9 @@ export default class VBrowser extends Vue {
     for (let i = 0; i < this.thumbnailsRowCount; i++) {
       yList.push(0);
     }
-    const images = this.filteredPetaImages
+    let prevDateString = "";
+    const tiles: Tile[] = [];
+    this.filteredPetaImages
     // .map((pi) => {
     //   if (!this.targetPetaImage) {
     //     return {
@@ -404,22 +421,57 @@ export default class VBrowser extends Vue {
     // .map((p) => p.petaImage)
     .map((p) => {
       let minY = Number.MAX_VALUE;
+      let maxY = Number.MIN_VALUE;
       let mvi = 0;
       yList.forEach((y, vi) => {
         if (minY > y) {
           minY = y;
           mvi = vi;
         }
+        if (maxY < y) {
+          maxY = y;
+        }
       });
+      let newGroup = false;
+      const date = new Date(p.addDate);
+      const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+      if (prevDateString != currentDateString) {
+        prevDateString = currentDateString;
+        mvi = 0;
+        minY = maxY;
+        yList.fill(minY);
+        newGroup = true;
+      }
+      if (newGroup) {
+        const height = 32;
+        const position = new Vec2(mvi * this.actualTileSize, yList[mvi]);
+        yList.fill(minY + height);
+        const pClone = deepcopy(p);
+        pClone.id += currentDateString;
+        tiles.push({
+          petaImage: pClone,
+          position: position,
+          width: this.thumbnailsWidth,
+          height: height,
+          visible: 
+            (this.areaMinY < position.y && position.y < this.areaMaxY)
+            ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
+            ||(this.areaMinY > position.y && position.y + height > this.areaMaxY),
+          preVisible: 
+            (this.areaPreVisibleMinY < position.y && position.y < this.areaPreVisibleMaxY)
+            ||(this.areaPreVisibleMinY < position.y + height && position.y + height < this.areaPreVisibleMaxY)
+            ||(this.areaPreVisibleMinY > position.y && position.y + height > this.areaPreVisibleMaxY),
+          group: currentDateString
+        })
+      }
       const position = new Vec2(mvi * this.actualTileSize, yList[mvi]);
       const height = p.height * this.actualTileSize;
       yList[mvi] += height;
-      return {
+      const tile: Tile = {
         petaImage: p,
         position: position,
         width: this.actualTileSize,
         height: height,
-        petaTags: [],
         visible: 
           (this.areaMinY < position.y && position.y < this.areaMaxY)
           ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
@@ -429,8 +481,9 @@ export default class VBrowser extends Vue {
           ||(this.areaPreVisibleMinY < position.y + height && position.y + height < this.areaPreVisibleMaxY)
           ||(this.areaPreVisibleMinY > position.y && position.y + height > this.areaPreVisibleMaxY),
       }
+      tiles.push(tile);
     });
-    return images;
+    return tiles;
   }
   get visibleTiles(): Tile[] {
     const tiles = this.tiles.filter((p) => p.preVisible);

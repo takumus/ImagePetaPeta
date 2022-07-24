@@ -6,7 +6,7 @@
       height: tile.height + 'px'
     }"
   >
-    <t-tile-wrapper>
+    <t-tile-wrapper v-if="tile.group === undefined">
       <t-images
         @pointerdown="pointerdown($event)"
         @dragstart="dragstart($event)"
@@ -73,6 +73,9 @@
         </t-icon>
       </t-selected>
     </t-tile-wrapper>
+    <t-group v-else>
+      {{tile.group}}
+    </t-group>
   </t-tile-root>
 </template>
 
@@ -178,9 +181,15 @@ export default class VTile extends Vue {
     this.loadingImage = false;
   }
   get showNSFW() {
+    if (this.tile.petaImage === undefined) {
+      return false;
+    }
     return this.tile.petaImage.nsfw && !this.$nsfw.showNSFW;
   }
   get palette() {
+    if (this.tile.petaImage === undefined) {
+      return [];
+    }
     const all = this.tile.petaImage.palette.reduce((p, c) => {
       return p + c.population;
     }, 0);
@@ -196,6 +205,9 @@ export default class VTile extends Vue {
     });
   }
   get placeholderColor() {
+    if (this.tile.petaImage === undefined) {
+      return "#ffffff";
+    }
     const petaColor = this.tile.petaImage.palette[0];
     if (petaColor) {
       return `rgb(${petaColor.r}, ${petaColor.g}, ${petaColor.b})`;
@@ -205,6 +217,9 @@ export default class VTile extends Vue {
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
     if (!this.$settings.showTagsOnTile) {
+      return;
+    }
+    if (this.tile.petaImage === undefined) {
       return;
     }
     const result = await API.send("getPetaTagIdsByPetaImageIds", [this.tile.petaImage.id]);
@@ -263,6 +278,17 @@ t-tile-root {
   position: absolute;
   padding-right: 8px;
   padding-top: 8px;
+  >t-group {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: block;
+    text-align: center;
+    line-height: 24px;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
   >t-tile-wrapper {
     position: relative;
     width: 100%;
