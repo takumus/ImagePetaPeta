@@ -71,17 +71,8 @@ import { Windows } from "./utils/windows";
   const {
     DIR_APP,
     DIR_ROOT,
-    DIR_LOG,
     DIR_IMAGES,
     DIR_THUMBNAILS,
-    DIR_TEMP,
-    FILE_IMAGES_DB,
-    FILE_BOARDS_DB,
-    FILE_TAGS_DB,
-    FILE_IMAGES_TAGS_DB,
-    FILE_SETTINGS,
-    FILE_STATES,
-    FILE_WINDOW_STATES,
     dataLogger,
     dbPetaImages,
     dbPetaBoard,
@@ -89,7 +80,6 @@ import { Windows } from "./utils/windows";
     dbPetaImagesPetaTags,
     configSettings,
     configStates,
-    configWindowStates,
     petaDatas,
     windows
   } = constants;
