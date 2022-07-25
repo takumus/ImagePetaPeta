@@ -1,4 +1,4 @@
-import { isLatest } from "@/commons/utils/versionCheck";
+import { isLatest } from "@/commons/utils/versions";
 
 for (let i = 0; i < 100; i++) {
   const v1 = Math.floor(Math.random() * 3) + "." + Math.floor(Math.random() * 3) + "." + Math.floor(Math.random() * 5) + "-beta";

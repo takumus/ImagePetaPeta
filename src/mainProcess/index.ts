@@ -1,12 +1,11 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, BrowserWindow, nativeImage, nativeTheme, screen } from "electron";
+import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, nativeImage, nativeTheme } from "electron";
 import * as Path from "path";
 import axios from "axios";
-import dataURIToBuffer from "data-uri-to-buffer";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_FILL_COLOR, DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT, SEARCH_IMAGE_BY_GOOGLE_URL, UPDATE_CHECK_INTERVAL, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -15,12 +14,11 @@ import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
-import { MainEvents } from "@/commons/api/mainEvents";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
 import { upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates, upgradeWindowStates } from "@/mainProcess/utils/upgrader";
-import { arrLast, minimId } from "@/commons/utils/utils";
+import { arrLast } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { PetaTag } from "@/commons/datas/petaTag";
@@ -29,15 +27,14 @@ import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
-import { isLatest } from "@/commons/utils/versionCheck";
+import { getLatestVersion } from "@/commons/utils/versions";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
 import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
-import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { WindowType } from "@/commons/datas/windowType";
 import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
-import { Vec2 } from "@/commons/utils/vec2";
 import { searchImageByGoogle } from "./utils/searchImageByGoogle";
+import { Windows } from "./utils/windows";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -51,8 +48,6 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  const windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
-  const activeWindows: { [key in WindowType]?: boolean } = {};
   const mainLogger = new MainLogger();
   const draggingPreviewWindow = new DraggingPreviewWindow();
   const i18n = createI18n({
@@ -61,7 +56,6 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
   });
   let temporaryShowNSFW = false;
   let isDataInitialized = false;
-  let mainWindowType: WindowType | undefined; 
   let detailsPetaImage: PetaImage | undefined;
   let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
   let dropFromBrowserPetaImageIds: string[] | undefined;
@@ -96,7 +90,8 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     configSettings,
     configStates,
     configWindowStates,
-    petaDatas
+    petaDatas,
+    windows
   } = constants;
   //-------------------------------------------------------------------------------------------------//
   /*
@@ -113,10 +108,10 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
     if (
-      (windows.board === undefined || windows.board.isDestroyed())
-      && (windows.browser === undefined || windows.browser.isDestroyed())
+      (windows.windows.board === undefined || windows.windows.board.isDestroyed())
+      && (windows.windows.browser === undefined || windows.windows.browser.isDestroyed())
     ) {
-      showWindows();
+      windows.showWindows();
     }
   });
   app.on("before-quit", (event) => {
@@ -126,13 +121,13 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     //
   });
   app.on("second-instance", () => {
-    const count = Object.values(windows).filter((window) => {
+    const count = Object.values(windows.windows).filter((window) => {
       return window !== undefined && !window.isDestroyed();
     }).map((window) => {
       window?.focus();
     }).length;
     if (count < 1) {
-      showWindows();
+      windows.showWindows();
     }
   });
   app.setAsDefaultProtocolClient("image-petapeta")
@@ -177,7 +172,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     nativeTheme.on("updated", () => {
       emitDarkMode();
     })
-    showWindows();
+    windows.showWindows();
     //-------------------------------------------------------------------------------------------------//
     /*
       データベースのロード
@@ -206,7 +201,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
       return;
     }
     isDataInitialized = true;
-    emitMainEvent("dataInitialized");
+    windows.emitMainEvent("dataInitialized");
     //-------------------------------------------------------------------------------------------------//
     /*
       データのマイグレーション
@@ -249,7 +244,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
         async importImageFiles(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          const window = getWindowByEvent(event);
+          const window = windows.getWindowByEvent(event);
           if (window) {
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"]
@@ -268,7 +263,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
         async importImageDirectories(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Directories");
-          const window = getWindowByEvent(event);
+          const window = windows.getWindowByEvent(event);
           if (window) {
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"]
@@ -405,7 +400,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           try {
             log.log("#Update PetaTags");
             await promiseSerial((tag) => petaDatas.updatePetaTag(tag, mode), tags).promise;
-            emitMainEvent("updatePetaTags");
+            windows.emitMainEvent("updatePetaTags");
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -541,15 +536,15 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
             log.log("#Update Settings");
             configSettings.data = settings;
             Object.keys(windows).forEach((key) => {
-              const window = windows[key as WindowType];
+              const window = windows.windows[key as WindowType];
               if (window === undefined || window.isDestroyed()) {
                 return;
               }
               window.setAlwaysOnTop(configSettings.data.alwaysOnTop);
             });
             configSettings.save();
-            emitMainEvent("updateSettings", settings);
-            emitMainEvent("showNSFW", getShowNSFW());
+            windows.emitMainEvent("updateSettings", settings);
+            windows.emitMainEvent("showNSFW", getShowNSFW());
             emitDarkMode();
             log.log("return:", configSettings.data);
             return true;
@@ -573,7 +568,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
         async getWindowIsFocused(event) {
           const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
-          const isFocued = getWindowByEvent(event)?.window.isFocused() ? true : false;
+          const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
@@ -581,17 +576,17 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           const log = mainLogger.logChunk();
           log.log("#Set Zoom Level");
           log.log("level:", level);
-          windows.board?.webContents.setZoomLevel(level);
+          windows.windows.board?.webContents.setZoomLevel(level);
         },
         async windowMinimize(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
-          getWindowByEvent(event)?.window.minimize();
+          windows.getWindowByEvent(event)?.window.minimize();
         },
         async windowMaximize(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          const window = getWindowByEvent(event);
+          const window = windows.getWindowByEvent(event);
           if (window?.window.isMaximized()) {
             window?.window.unmaximize();
             return;
@@ -601,17 +596,17 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
         async windowClose(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          const window = getWindowByEvent(event);
+          const window = windows.getWindowByEvent(event);
           window?.window.close();
         },
         async windowActivate(event) {
-          getWindowByEvent(event)?.window.moveTop();
-          getWindowByEvent(event)?.window.focus();
+          windows.getWindowByEvent(event)?.window.moveTop();
+          windows.getWindowByEvent(event)?.window.focus();
         },
         async windowToggleDevTools(event) {
           const log = mainLogger.logChunk();
           log.log("#Toggle Dev Tools");
-          getWindowByEvent(event)?.window.webContents.toggleDevTools();
+          windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
         },
         async getPlatform(event) {
           const log = mainLogger.logChunk();
@@ -639,7 +634,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
         async browsePetaImageDirectory(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          const window = getWindowByEvent(event);
+          const window = windows.getWindowByEvent(event);
           if (window) {
             const file = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"]
@@ -717,8 +712,8 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
-          if (windows.board !== undefined && !windows.board.isDestroyed()) {
-            windows.board.moveTop();
+          if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
+            windows.windows.board.moveTop();
           }
           draggingPreviewWindow.window?.moveTop();
           event.sender.startDrag({
@@ -749,7 +744,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
             log.log("#Update States");
             configStates.data = states;
             configStates.save();
-            emitMainEvent("updateStates", states);
+            windows.emitMainEvent("updateStates", states);
             log.log("return:", configStates.data);
             return true;
           } catch(e) {
@@ -771,50 +766,17 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           return [];
         },
         async openWindow(event, windowType) {
-          const position = new Vec2();
-          try {
-            const parentWindowBounds = getWindowByEvent(event)?.window.getBounds();
-            if (parentWindowBounds) {
-              const display = screen.getDisplayNearestPoint({
-                x: parentWindowBounds.x + parentWindowBounds.width / 2,
-                y: parentWindowBounds.y + parentWindowBounds.height / 2
-              });
-              position.set(display.bounds);
-            }
-          } catch (error) {
-            //
-          }
-          if (windows[windowType] === undefined || windows[windowType]?.isDestroyed()) {
-            switch (windowType) {
-              case WindowType.BOARD:
-                windows[windowType] = initBoardWindow(position.x, position.y);
-                break;
-              case WindowType.BROWSER:
-                windows[windowType] = initBrowserWindow(position.x, position.y);
-                break;
-              case WindowType.SETTINGS:
-                windows[windowType] = initSettingsWindow(position.x, position.y);
-                break;
-              case WindowType.DETAILS:
-                windows[windowType] = initDetailsWindow(position.x, position.y);
-                break;
-            }
-            windows[windowType]?.center();
-          } else {
-            windows[windowType]?.moveTop();
-            windows[windowType]?.focus();
-          }
-          moveSettingsWindowToTop();
+          windows.openWindow(event, windowType);
         },
         async getMainWindowType() {
-          return mainWindowType;
+          return windows.mainWindowType;
         },
         async getShowNSFW() {
           return getShowNSFW();
         },
         async setShowNSFW(event, value) {
           temporaryShowNSFW = value;
-          emitMainEvent("showNSFW", getShowNSFW());
+          windows.emitMainEvent("showNSFW", getShowNSFW());
         },
         async searchImageByGoogle(event, petaImage) {
           const log = mainLogger.logChunk();
@@ -830,7 +792,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
         },
         async setDetailsPetaImage(event, petaImage: PetaImage) {
           detailsPetaImage = petaImage;
-          emitMainEvent("detailsPetaImage", detailsPetaImage);
+          windows.emitMainEvent("detailsPetaImage", detailsPetaImage);
           return;
         },
         async getDetailsPetaImage() {
@@ -843,7 +805,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           return isDataInitialized;
         },
         async getLatestVersion() {
-          return await getLatestVersion();
+          return getLatestVersion(configSettings.data.ignoreMinorUpdate);
         }
       }
     }
@@ -854,19 +816,23 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
   */
   //-------------------------------------------------------------------------------------------------//
   function getConstants() {
-    let DIR_ROOT: string;
-    let DIR_APP: string;
-    let DIR_LOG: string;
-    let DIR_IMAGES: string;
-    let DIR_THUMBNAILS: string;
-    let DIR_TEMP: string;
-    let FILE_IMAGES_DB: string;
-    let FILE_BOARDS_DB: string;
-    let FILE_TAGS_DB: string;
-    let FILE_IMAGES_TAGS_DB: string;
-    let FILE_SETTINGS: string;
-    let FILE_STATES: string;
-    let FILE_WINDOW_STATES: string;
+    const dirs = {
+      DIR_ROOT: "",
+      DIR_APP: "",
+      DIR_LOG: "",
+      DIR_IMAGES: "",
+      DIR_THUMBNAILS: "",
+      DIR_TEMP: ""
+    }
+    const files = {
+      FILE_IMAGES_DB: "",
+      FILE_BOARDS_DB: "",
+      FILE_TAGS_DB: "",
+      FILE_IMAGES_TAGS_DB: "",
+      FILE_SETTINGS: "",
+      FILE_STATES: "",
+      FILE_WINDOW_STATES: ""
+    }
     let dataLogger: Logger;
     let dbPetaImages: DB<PetaImage>;
     let dbPetaBoard: DB<PetaBoard>;
@@ -876,45 +842,46 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     let configStates: Config<States>;
     let configWindowStates: Config<WindowStates>;
     let petaDatas: PetaDatas;
+    let windows: Windows;
     try {
       // ログは最優先で初期化
-      DIR_LOG = file.initDirectory(false, app.getPath("logs"));
-      dataLogger = new Logger(DIR_LOG);
+      dirs.DIR_LOG = file.initDirectory(false, app.getPath("logs"));
+      dataLogger = new Logger(dirs.DIR_LOG);
       mainLogger.logger = dataLogger;
       // その他の初期化
-      DIR_APP = file.initDirectory(false, app.getPath("userData"));
-      DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
-      FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
-      configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
+      dirs.DIR_APP = file.initDirectory(false, app.getPath("userData"));
+      dirs.DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
+      files.FILE_SETTINGS = file.initFile(dirs.DIR_APP, "settings.json");
+      configSettings = new Config<Settings>(files.FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
       if (configSettings.data.petaImageDirectory.default) {
-        DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
-        configSettings.data.petaImageDirectory.path = DIR_ROOT;
+        dirs.DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
+        configSettings.data.petaImageDirectory.path = dirs.DIR_ROOT;
       } else {
         try {
           if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
             throw new Error();
           }
-          DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
+          dirs.DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
         } catch (error) {
           configSettings.data.petaImageDirectory.default = true;
           configSettings.save();
           throw new Error(`Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
         }
       }
-      DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
-      DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, "thumbnails");
-      FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
-      FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
-      FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
-      FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
-      FILE_STATES = file.initFile(DIR_APP, "states.json");
-      FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
-      dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
-      dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
-      dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
-      dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
-      configStates = new Config<States>(FILE_STATES, defaultStates, upgradeStates);
-      configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
+      dirs.DIR_IMAGES = file.initDirectory(true, dirs.DIR_ROOT, "images");
+      dirs.DIR_THUMBNAILS = file.initDirectory(true, dirs.DIR_ROOT, "thumbnails");
+      files.FILE_IMAGES_DB = file.initFile(dirs.DIR_ROOT, "images.db");
+      files.FILE_BOARDS_DB = file.initFile(dirs.DIR_ROOT, "boards.db");
+      files.FILE_TAGS_DB = file.initFile(dirs.DIR_ROOT, "tags.db");
+      files.FILE_IMAGES_TAGS_DB = file.initFile(dirs.DIR_ROOT, "images_tags.db");
+      files.FILE_STATES = file.initFile(dirs.DIR_APP, "states.json");
+      files.FILE_WINDOW_STATES = file.initFile(dirs.DIR_APP, "windowStates.json");
+      dbPetaImages = new DB<PetaImage>("petaImages", files.FILE_IMAGES_DB);
+      dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
+      dbPetaTags = new DB<PetaTag>("petaTags", files.FILE_TAGS_DB);
+      dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", files.FILE_IMAGES_TAGS_DB);
+      configStates = new Config<States>(files.FILE_STATES, defaultStates, upgradeStates);
+      configWindowStates = new Config<WindowStates>(files.FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
       ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<any>[]).forEach((db) => {
         db.on("beginCompaction", () => {
           mainLogger.logChunk().log(`begin compaction(${db.name})`);
@@ -926,8 +893,9 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           mainLogger.logChunk().error(`compaction error(${db.name})`, error);
         })
       });
+      windows = new Windows(mainLogger, configSettings, configWindowStates, isDarkMode);
       Tasks.onEmitStatus((id, status) => {
-        emitMainEvent("taskStatus", id, status);
+        windows.emitMainEvent("taskStatus", id, status);
       });
       petaDatas = new PetaDatas(
         {
@@ -936,12 +904,9 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
           dbPetaImagesPetaTags,
           dbPetaTags,
           configSettings
-        }, {
-          DIR_IMAGES,
-          DIR_THUMBNAILS,
-          DIR_TEMP
         }, 
-        emitMainEvent,
+        dirs, 
+        windows.emitMainEvent,
         mainLogger
       );
     } catch (err) {
@@ -960,19 +925,8 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
       return undefined;
     }
     return {
-      DIR_APP,
-      DIR_ROOT,
-      DIR_LOG,
-      DIR_IMAGES,
-      DIR_THUMBNAILS,
-      DIR_TEMP,
-      FILE_IMAGES_DB,
-      FILE_BOARDS_DB,
-      FILE_TAGS_DB,
-      FILE_IMAGES_TAGS_DB,
-      FILE_SETTINGS,
-      FILE_STATES,
-      FILE_WINDOW_STATES,
+      ...dirs,
+      ...files,
       dataLogger,
       dbPetaImages,
       dbPetaBoard,
@@ -981,7 +935,8 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
       configSettings,
       configStates,
       configWindowStates,
-      petaDatas
+      petaDatas,
+      windows
     }
   }
   function showError(error: ErrorWindowParameters, quit = true) {
@@ -989,208 +944,13 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
       mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
     } catch { }
     try {
-      Object.values(windows).forEach((window) => {
+      Object.values(windows.windows).forEach((window) => {
         if (window !== undefined && !window.isDestroyed()) {
           window.loadURL("about:blank");
         }
       });
     } catch { }
     showErrorWindow(error, quit);
-  }
-  function emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
-    Object.values(windows).forEach((window) => {
-      if (window !== undefined && !window.isDestroyed()) {
-        window.webContents.send(key, ...args);
-      }
-    });
-  }
-  function closeWindow(type: WindowType) {
-    mainLogger.logChunk().log("$Close Window:", type);
-    saveWindowSize(type);
-    activeWindows[type] = false;
-    if (activeWindows.board) {
-      changeMainWindow(WindowType.BOARD);
-    } else if (activeWindows.browser) {
-      changeMainWindow(WindowType.BROWSER);
-    } else if (activeWindows.details) {
-      changeMainWindow(WindowType.DETAILS);
-    } else {
-      if (process.platform !== "darwin") {
-        app.quit();
-      }
-    }
-  }
-  function showWindows() {
-    if (configSettings.data.show === "both") {
-      windows.board = initBoardWindow();
-      windows.browser = initBrowserWindow();
-    } else if (configSettings.data.show === "browser") {
-      windows.browser = initBrowserWindow();
-    } else {
-      windows.board = initBoardWindow();
-    }
-  }
-  function createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions, args?: any) {
-    const window = new BrowserWindow({
-      minWidth: WINDOW_MIN_WIDTH,
-      minHeight: WINDOW_MIN_HEIGHT,
-      frame: false,
-      titleBarStyle: "hiddenInset",
-      show: true,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        preload: Path.join(__dirname, "preload.js")
-      },
-      backgroundColor: isDarkMode() ? BOARD_DARK_BACKGROUND_FILL_COLOR : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-      ...options,
-    });
-    activeWindows[type] = true;
-    const state = configWindowStates.data[type];
-    mainLogger.logChunk().log("$Create Window:", type);
-    window.setMenuBarVisibility(false);
-    if (state.maximized) {
-      window.maximize();
-    }
-    window.on("close", () => {
-      closeWindow(type);
-    });
-    window.addListener("blur", () => {
-      emitMainEvent("windowFocused", false, type);
-    });
-    window.addListener("focus", () => {
-      emitMainEvent("windowFocused", true, type);
-      if (type === WindowType.BOARD || type === WindowType.BROWSER || type === WindowType.DETAILS) {
-        changeMainWindow(type);
-      }
-      window.moveTop();
-    });
-    const urlParams = `?type=${type}&args=${args}`;
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}${urlParams}`).then(() => {
-        if (!process.env.IS_TEST) {
-          // window.webContents.openDevTools({ mode: "right" });
-        }
-      })
-    } else {
-      window.loadURL(`app://./index.html${urlParams}`);
-    }
-    return window;
-  }
-  function changeMainWindow(type: WindowType) {
-    mainWindowType = type;
-    emitMainEvent("mainWindowType", type);
-    moveSettingsWindowToTop();
-  }
-  function moveSettingsWindowToTop() {
-    if (mainWindowType) {
-      const mainWindow = windows[mainWindowType];
-      if (
-        mainWindow  !== undefined
-        && !mainWindow.isDestroyed()
-        && windows.settings !== undefined
-        && !windows.settings.isDestroyed()
-      ) {
-        windows.settings.setParentWindow(mainWindow);
-      }
-    }
-  }
-  function initBrowserWindow(x?: number, y?: number) {
-    return createWindow(WindowType.BROWSER, {
-      width: configWindowStates.data.browser.width,
-      height: configWindowStates.data.browser.height,
-      trafficLightPosition: {
-        x: 8,
-        y: 8
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop
-    });
-  }
-  function initSettingsWindow(x?: number, y?: number, update: boolean = false) {
-    return createWindow(WindowType.SETTINGS, {
-      width: WINDOW_SETTINGS_WIDTH,
-      height: WINDOW_SETTINGS_HEIGHT,
-      minWidth: WINDOW_SETTINGS_WIDTH,
-      minHeight: WINDOW_SETTINGS_HEIGHT,
-      maximizable: false,
-      minimizable: false,
-      fullscreenable: false,
-      trafficLightPosition: {
-        x: 8,
-        y: 8
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop
-    }, update ? "update" : "none");
-  }
-  function initBoardWindow(x?: number, y?: number) {
-    return createWindow(WindowType.BOARD, {
-      width: configWindowStates.data.board.width,
-      height: configWindowStates.data.board.height,
-      trafficLightPosition: {
-        x: 13,
-        y: 13
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop
-    });
-  }
-  function initDetailsWindow(x?: number, y?: number) {
-    return createWindow(WindowType.DETAILS, {
-      width: configWindowStates.data.details.width,
-      height: configWindowStates.data.details.height,
-      trafficLightPosition: {
-        x: 8,
-        y: 8
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop
-    });
-  }
-  function saveWindowSize(windowType: WindowType) {
-    mainLogger.logChunk().log("$Save Window States:", windowType);
-    const state = configWindowStates.data[windowType];
-    const window = windows[windowType];
-    if (window === undefined || window.isDestroyed()) {
-      return;
-    }
-    if (!window.isMaximized()) {
-      state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-      state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
-    }
-    state.maximized = window.isMaximized();
-    configWindowStates.save();
-  }
-  async function getLatestVersion(): Promise<RemoteBinaryInfo> {
-    const log = mainLogger.logChunk();
-    try {
-      const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
-      const packageJSON = (await axios.get(url, { responseType: "json" })).data;
-      // packageJSON.version = "3.0.0";
-      return {
-        isLatest: isLatest(app.getVersion(), packageJSON.version, configSettings.data.ignoreMinorUpdate),
-        version: packageJSON.version,
-        sha256: {
-          win: packageJSON["binary-sha256-win"],
-          mac: packageJSON["binary-sha256-mac"],
-        }
-      }
-    } catch(e) {
-      log.error(e);
-    }
-    return {
-      isLatest: true,
-      version: app.getVersion(),
-      sha256: {
-        win: "",
-        mac: "",
-      }
-    }
   }
   async function checkUpdate() {
     if (checkUpdateTimeoutHandler) {
@@ -1201,15 +961,15 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     }
     const log = mainLogger.logChunk();
     log.log("$Check Update");
-    const remote: RemoteBinaryInfo = await getLatestVersion();
+    const remote: RemoteBinaryInfo = await getLatestVersion(configSettings.data.ignoreMinorUpdate);
     log.log(remote);
     if (!remote.isLatest) {
       log.log("this version is old");
-      if (windows.settings === undefined || windows.settings.isDestroyed()) {
-        windows.settings = initSettingsWindow(0, 0, true);
+      if (windows.windows.settings === undefined || windows.windows.settings.isDestroyed()) {
+        windows.windows.settings = windows.initSettingsWindow(0, 0, true);
       }
-      moveSettingsWindowToTop();
-      emitMainEvent("foundLatestVersion", remote);
+      windows.moveSettingsWindowToTop();
+      windows.emitMainEvent("foundLatestVersion", remote);
     } else {
       log.log("this version is latest");
     }
@@ -1222,24 +982,7 @@ import { searchImageByGoogle } from "./utils/searchImageByGoogle";
     return configSettings.data.darkMode;
   }
   function emitDarkMode() {
-    emitMainEvent("darkMode", isDarkMode());
-  }
-  function getWindowByEvent(event: IpcMainInvokeEvent) {
-    const windowSet = Object.keys(windows).map((key) => {
-      return {
-        type: key as WindowType,
-        window: windows[key as WindowType]
-      }
-    }).find((window) => {
-      return window.window && !window.window.isDestroyed() && window.window.webContents.mainFrame === event.sender.mainFrame
-    });
-    if (windowSet && windowSet.window !== undefined) {
-      return windowSet as {
-        type: WindowType,
-        window: BrowserWindow
-      };
-    }
-    return undefined;
+    windows.emitMainEvent("darkMode", isDarkMode());
   }
   function getShowNSFW() {
     return temporaryShowNSFW || configSettings.data.alwaysShowNSFW;
