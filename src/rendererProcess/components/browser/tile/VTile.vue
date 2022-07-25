@@ -276,8 +276,6 @@ export default class VTile extends Vue {
 t-tile-root {
   display: block;
   position: absolute;
-  padding-right: 8px;
-  padding-top: 8px;
   >t-group {
     position: relative;
     width: 100%;

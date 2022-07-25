@@ -194,7 +194,7 @@ export default class VBrowser extends Vue {
     this.updateScrollArea();
   }
   resizeImages(rect: DOMRectReadOnly) {
-    this.thumbnailsWidth = rect.width;
+    this.thumbnailsWidth = rect.width - 8;
   }
   drag(petaImage: PetaImage) {
     if (!Keyboards.pressedOR("shift", "control", "meta") && !petaImage._selected) {
@@ -444,7 +444,7 @@ export default class VBrowser extends Vue {
       }
       if (newGroup) {
         const height = 32;
-        const position = new Vec2(mvi * this.actualTileSize, yList[mvi]);
+        const position = new Vec2(0, yList[mvi]);
         yList.fill(minY + height);
         const pClone = deepcopy(p);
         pClone.id += currentDateString;
@@ -458,14 +458,14 @@ export default class VBrowser extends Vue {
           group: currentDateString
         })
       }
-      const position = new Vec2(mvi * this.actualTileSize, yList[mvi]);
+      const position = new Vec2(mvi * this.actualTileSize + 8, yList[mvi]);
       const height = p.height * this.actualTileSize;
       yList[mvi] += height;
       const tile: Tile = {
         petaImage: p,
         position: position,
-        width: this.actualTileSize,
-        height: height,
+        width: this.actualTileSize - 8,
+        height: height - 8,
         visible: false,
         preVisible: false,
       }
