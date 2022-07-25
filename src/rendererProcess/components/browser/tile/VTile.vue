@@ -33,7 +33,6 @@
           v-show="!loadingImage"
           
           loading="lazy"
-          decoding="async"
           @load="loaded"
         >
         <t-background>
@@ -107,7 +106,7 @@ export default class VTile extends Vue {
   fetchTagsTimeoutHandler = -1;
   loadedOriginal = false;
   mounted() {
-    this.changeVisible();
+    this.updateContent(true);
   }
   unmounted() {
     window.removeEventListener("pointermove", this.pointermove);
@@ -146,7 +145,6 @@ export default class VTile extends Vue {
     }
   }
   pointerup(event: PointerEvent) {
-    console.log(event)
     window.removeEventListener("pointermove", this.pointermove);
     window.removeEventListener("pointerup", this.pointerup);
     this.pressing = false;
@@ -197,14 +195,17 @@ export default class VTile extends Vue {
     .map((pti) => pti.petaTag);
     this.loadingTags = false;
   }
-  @Watch("tile.visible")
-  changeVisible() {
-    window.clearTimeout(this.fetchTagsTimeoutHandler);
+  updateContent(tags = false) {
+    if (tags) {
+      window.clearTimeout(this.fetchTagsTimeoutHandler);
+    }
     window.clearTimeout(this.loadOriginalTimeoutHandler);
     if (this.tile.visible) {
-      this.fetchTagsTimeoutHandler = window.setTimeout(() => {
-        this.fetchPetaTags();
-      }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
+      if (tags) {
+        this.fetchTagsTimeoutHandler = window.setTimeout(() => {
+          this.fetchPetaTags();
+        }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
+      }
       if (!this.loadedOriginal) {
         this.imageURL = getImageURL(this.tile.petaImage, ImageType.THUMBNAIL);
         if (this.original) {
@@ -218,25 +219,36 @@ export default class VTile extends Vue {
       this.loadedOriginal = false;
     }
   }
+  get visible() {
+    return this.tile.visible;
+  }
+  @Watch("visible")
+  changeVisible() {
+    this.updateContent(true);
+  }
+  @Watch("tile.width")
+  changeTileWidth() {
+    this.updateContent();
+  }
   @Watch("original")
   changeOriginal() {
-    this.changeVisible();
+    this.updateContent();
   }
   @Watch("parentAreaMinY")
   changeParentAreaMinY() {
-    this.changeVisible();
+    this.updateContent();
   }
   @Watch("parentAreaMaxY")
   changeParentAreaMaxY() {
-    this.changeVisible();
+    this.updateContent();
   }
   @Watch("petaTagInfos")
   changeFetchTags() {
-    this.changeVisible();
+    this.updateContent(true);
   }
   @Watch("$settings.showTagsOnTile")
   changeShowTagsOnTile() {
-    this.changeVisible();
+    this.updateContent(true);
   }
 }
 </script>

@@ -178,8 +178,8 @@ export default class VBrowser extends Vue {
     }
   }
   updateScrollArea(event?: Event) {
-    const preVisibleOffset = this.scrollAreaHeight * 2;
-    const visibleOffset = this.scrollAreaHeight * 0.3;
+    const preVisibleOffset = this.scrollAreaHeight * 1;
+    const visibleOffset = this.scrollAreaHeight * 0.2;
     this.areaMinY = this.thumbnails.scrollTop - visibleOffset;
     this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + visibleOffset;
     this.areaPreVisibleMinY = this.thumbnails.scrollTop - preVisibleOffset;
@@ -447,7 +447,7 @@ export default class VBrowser extends Vue {
         const height = 32;
         const position = new Vec2(0, yList[mvi]);
         yList.fill(minY + height);
-        tiles.push({
+        const tile: Tile = {
           position: position,
           width: this.thumbnailsWidth,
           height: height,
@@ -455,7 +455,9 @@ export default class VBrowser extends Vue {
           preVisible: false,
           group: currentDateString,
           id: currentDateString
-        })
+        };
+        this.updateVisibility(tile);
+        tiles.push(tile)
       }
       const position = new Vec2(mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN, yList[mvi]);
       const height = p.height * this.actualTileSize;
@@ -469,23 +471,21 @@ export default class VBrowser extends Vue {
         preVisible: false,
         id: p.id
       }
+      this.updateVisibility(tile);
       tiles.push(tile);
     });
     return tiles;
   }
+  updateVisibility(tile: Tile) {
+    tile.visible = (this.areaMinY < tile.position.y && tile.position.y < this.areaMaxY)
+      ||(this.areaMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaMaxY)
+      ||(this.areaMinY > tile.position.y && tile.position.y + tile.height > this.areaMaxY);
+    tile.preVisible = (this.areaPreVisibleMinY < tile.position.y && tile.position.y < this.areaPreVisibleMaxY)
+      ||(this.areaPreVisibleMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaPreVisibleMaxY)
+      ||(this.areaPreVisibleMinY > tile.position.y && tile.position.y + tile.height > this.areaPreVisibleMaxY);
+  }
   get visibleTiles(): Tile[] {
-    this.tiles.map((tile) => {
-      tile.visible =
-        (this.areaMinY < tile.position.y && tile.position.y < this.areaMaxY)
-        ||(this.areaMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaMaxY)
-        ||(this.areaMinY > tile.position.y && tile.position.y + tile.height > this.areaMaxY);
-      tile.preVisible =
-        (this.areaPreVisibleMinY < tile.position.y && tile.position.y < this.areaPreVisibleMaxY)
-        ||(this.areaPreVisibleMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaPreVisibleMaxY)
-        ||(this.areaPreVisibleMinY > tile.position.y && tile.position.y + tile.height > this.areaPreVisibleMaxY);
-    });
-    const visibleTiles = this.tiles.filter((p) => p.preVisible);
-    return visibleTiles;
+    return this.tiles.filter((p) => p.preVisible);
   }
   get original() {
     return this.$settings.loadTilesInOriginal && this.actualTileSize > BROWSER_THUMBNAIL_SIZE;
