@@ -896,7 +896,7 @@ import { Windows } from "./utils/windows";
           configSettings
         }, 
         dirs, 
-        windows.emitMainEvent,
+        windows.emitMainEvent.bind(windows),
         mainLogger
       );
     } catch (err) {
