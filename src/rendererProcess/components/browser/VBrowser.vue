@@ -453,14 +453,8 @@ export default class VBrowser extends Vue {
           position: position,
           width: this.thumbnailsWidth,
           height: height,
-          visible: 
-            (this.areaMinY < position.y && position.y < this.areaMaxY)
-            ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
-            ||(this.areaMinY > position.y && position.y + height > this.areaMaxY),
-          preVisible: 
-            (this.areaPreVisibleMinY < position.y && position.y < this.areaPreVisibleMaxY)
-            ||(this.areaPreVisibleMinY < position.y + height && position.y + height < this.areaPreVisibleMaxY)
-            ||(this.areaPreVisibleMinY > position.y && position.y + height > this.areaPreVisibleMaxY),
+          visible: false,
+          preVisible: false,
           group: currentDateString
         })
       }
@@ -472,22 +466,26 @@ export default class VBrowser extends Vue {
         position: position,
         width: this.actualTileSize,
         height: height,
-        visible: 
-          (this.areaMinY < position.y && position.y < this.areaMaxY)
-          ||(this.areaMinY < position.y + height && position.y + height < this.areaMaxY)
-          ||(this.areaMinY > position.y && position.y + height > this.areaMaxY),
-        preVisible: 
-          (this.areaPreVisibleMinY < position.y && position.y < this.areaPreVisibleMaxY)
-          ||(this.areaPreVisibleMinY < position.y + height && position.y + height < this.areaPreVisibleMaxY)
-          ||(this.areaPreVisibleMinY > position.y && position.y + height > this.areaPreVisibleMaxY),
+        visible: false,
+        preVisible: false,
       }
       tiles.push(tile);
     });
     return tiles;
   }
   get visibleTiles(): Tile[] {
-    const tiles = this.tiles.filter((p) => p.preVisible);
-    return tiles;
+    this.tiles.map((tile) => {
+      tile.visible =
+        (this.areaMinY < tile.position.y && tile.position.y < this.areaMaxY)
+        ||(this.areaMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaMaxY)
+        ||(this.areaMinY > tile.position.y && tile.position.y + tile.height > this.areaMaxY);
+      tile.preVisible =
+        (this.areaPreVisibleMinY < tile.position.y && tile.position.y < this.areaPreVisibleMaxY)
+        ||(this.areaPreVisibleMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaPreVisibleMaxY)
+        ||(this.areaPreVisibleMinY > tile.position.y && tile.position.y + tile.height > this.areaPreVisibleMaxY);
+    });
+    const visibleTiles = this.tiles.filter((p) => p.preVisible);
+    return visibleTiles;
   }
   get original() {
     return this.$settings.loadTilesInOriginal && this.actualTileSize > BROWSER_THUMBNAIL_SIZE;
