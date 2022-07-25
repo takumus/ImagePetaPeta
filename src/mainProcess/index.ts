@@ -37,6 +37,7 @@ import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import { WindowType } from "@/commons/datas/windowType";
 import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
 import { Vec2 } from "@/commons/utils/vec2";
+import { searchImageByGoogle } from "./utils/searchImageByGoogle";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -757,81 +758,17 @@ import { Vec2 } from "@/commons/utils/vec2";
           return false;
         },
         async importImagesByDragAndDrop(event, htmls, arrayBuffers, filePaths) {
-          const log1 = mainLogger.logChunk();
-          log1.log("#ImportImagesByDragAndDrop");
-          log1.log(htmls.length, arrayBuffers.length, filePaths.length);
-          let petaImages: PetaImage[] = [];
-          const urls: string[] = [];
-          const log2 = mainLogger.logChunk();
+          const log = mainLogger.logChunk();
           try {
-            htmls.map((html) => {
-              try {
-                urls.push(getURLFromImgTag(html));
-              } catch (error) {
-                //
-                log2.error("invalid html", error);
-              }
-            });
-            log2.log("1.trying to download:", urls);
-            const datas = await promiseSerial(
-              async (url) => {
-                let data: Buffer;
-                let remoteURL = "";
-                if (url.trim().indexOf("data:") === 0) {
-                  // dataURIだったら
-                  data = dataURIToBuffer(url);
-                } else {
-                  // 普通のurlだったら
-                  data = (await axios.get(url, { responseType: "arraybuffer" })).data;
-                  remoteURL = url;
-                }
-                return {
-                  buffer: data,
-                  note: remoteURL,
-                  name: "downloaded"
-                };
-              },
-              urls
-            ).promise;
-            if (datas.length > 0) {
-              petaImages = await petaDatas.importImagesFromBuffers(datas);
-              log2.log("result:", petaImages.length);
-            }
-          } catch (error) {
-            log2.error(error);
+            log.log("#ImportImagesByDragAndDrop");
+            log.log(htmls.length, arrayBuffers.length, filePaths.length);
+            const petaImages = await petaDatas.importImagesByDragAndDrop(htmls, arrayBuffers, filePaths);
+            log.log("return:", petaImages.length);
+            return petaImages;
+          } catch (e) {
+            log.error(e);
           }
-          const log3 = mainLogger.logChunk();
-          try {
-            if (petaImages.length === 0) {
-              if (arrayBuffers.length > 0) {
-                log3.log("2.trying to read ArrayBuffer:", arrayBuffers.length);
-                petaImages = await petaDatas.importImagesFromBuffers(
-                  arrayBuffers.map((ab) => {
-                    return {
-                      buffer: Buffer.from(ab),
-                      name: urls.length > 0 ? "downloaded" : "noname",
-                      note: urls.length > 0 ? urls[0]! : ""
-                    };
-                  })
-                );
-                log3.log("result:", petaImages.length);
-              }
-            }
-          } catch (error) {
-            log3.error(error);
-          }
-          const log4 = mainLogger.logChunk();
-          try {
-            if (petaImages.length === 0) {
-              log4.log("3.trying to read filePath:", filePaths.length);
-              petaImages = await petaDatas.importImagesFromFilePaths(filePaths);
-              log4.log("result:", petaImages.length);
-            }
-          } catch (error) {
-            log4.error(error);
-          }
-          log1.log("return:", petaImages.length);
-          return petaImages.map((petaImage) => petaImage.id);
+          return [];
         },
         async openWindow(event, windowType) {
           const position = new Vec2();
@@ -883,7 +820,7 @@ import { Vec2 } from "@/commons/utils/vec2";
           const log = mainLogger.logChunk();
           log.log("#Search Image By Google");
           try {
-            await searchImageByGoogle(petaImage);
+            await searchImageByGoogle(petaImage, DIR_THUMBNAILS);
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -1214,100 +1151,6 @@ import { Vec2 } from "@/commons/utils/vec2";
       y,
       alwaysOnTop: configSettings.data.alwaysOnTop
     });
-  }
-  async function searchImageByGoogle(petaImage: PetaImage) {
-    return Tasks.spawn("Search Image By Google", async (handler, petaImage: PetaImage) => {
-      handler.emitStatus({
-        i18nKey: "tasks.searchImageByGoogle",
-        progress: {
-          all: 3,
-          current: 0
-        },
-        log: [],
-        status: "begin",
-        cancelable: false
-      });
-      const imageFilePath = Path.resolve(DIR_THUMBNAILS, petaImage.file.thumbnail);
-      const window = new BrowserWindow({
-        show: false,
-        webPreferences: {
-          nodeIntegration: false,
-          contextIsolation: true,
-          offscreen: true
-        },
-      });
-      try {
-        await window.loadURL(SEARCH_IMAGE_BY_GOOGLE_URL);
-        handler.emitStatus({
-          i18nKey: "tasks.searchImageByGoogle",
-          progress: {
-            all: 3,
-            current: 1
-          },
-          log: [`loaded: ${SEARCH_IMAGE_BY_GOOGLE_URL}`],
-          status: "progress",
-          cancelable: false
-        });
-        await new Promise((res) => {
-          setTimeout(res, 1000);
-        });
-        window.webContents.debugger.attach("1.1");
-        const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
-        const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
-          nodeId: document.root.nodeId,
-          selector: "input[name=encoded_image]"
-        });
-        await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
-          nodeId: input.nodeId,
-          files: [imageFilePath]
-        });
-        handler.emitStatus({
-          i18nKey: "tasks.searchImageByGoogle",
-          progress: {
-            all: 3,
-            current: 2
-          },
-          log: [`uploading: ${SEARCH_IMAGE_BY_GOOGLE_URL}`],
-          status: "progress",
-          cancelable: false
-        });
-        await new Promise((res, rej) => {
-          const timeoutHandler = setTimeout(() => {
-            rej("timeout");
-          }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
-          window.webContents.addListener("did-finish-load", () => {
-            shell.openExternal(window.webContents.getURL());
-            clearTimeout(timeoutHandler);
-            handler.emitStatus({
-              i18nKey: "tasks.searchImageByGoogle",
-              progress: {
-                all: 3,
-                current: 3
-              },
-              log: [`uploaded: ${SEARCH_IMAGE_BY_GOOGLE_URL}`],
-              status: "complete",
-              cancelable: false
-            });
-            res(true);
-          });
-        });
-      } catch (error) {
-        window.destroy();
-        handler.emitStatus({
-          i18nKey: "tasks.searchImageByGoogle",
-          progress: {
-            all: 3,
-            current: 3
-          },
-          log: [],
-          status: "failed",
-          cancelable: false
-        });
-        throw error;
-      }
-      window.destroy();
-      return true;
-    }, petaImage);
   }
   function saveWindowSize(windowType: WindowType) {
     mainLogger.logChunk().log("$Save Window States:", windowType);

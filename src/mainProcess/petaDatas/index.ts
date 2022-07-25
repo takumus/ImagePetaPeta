@@ -25,6 +25,9 @@ import { runExternalApplication } from "@/mainProcess/utils/runExternalApplicati
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { generateMetadata } from "../utils/generateMetadata";
+import axios from "axios";
+import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
+import dataUriToBuffer from "data-uri-to-buffer";
 export class PetaDatas {
   constructor(
     private datas: {
@@ -299,6 +302,79 @@ export class PetaDatas {
     } else {
       return Path.resolve(this.paths.DIR_THUMBNAILS, petaImage.file.thumbnail);
     }
+  }
+  async importImagesByDragAndDrop(htmls: string[], arrayBuffers: ArrayBuffer[], filePaths: string[]) {
+    let petaImages: PetaImage[] = [];
+    const urls: string[] = [];
+    const log2 = this.mainLogger.logChunk();
+    try {
+      htmls.map((html) => {
+        try {
+          urls.push(getURLFromImgTag(html));
+        } catch (error) {
+          //
+          log2.error("invalid html", error);
+        }
+      });
+      log2.log("1.trying to download:", urls);
+      const datas = await promiseSerial(
+        async (url) => {
+          let data: Buffer;
+          let remoteURL = "";
+          if (url.trim().indexOf("data:") === 0) {
+            // dataURIだったら
+            data = dataUriToBuffer(url);
+          } else {
+            // 普通のurlだったら
+            data = (await axios.get(url, { responseType: "arraybuffer" })).data;
+            remoteURL = url;
+          }
+          return {
+            buffer: data,
+            note: remoteURL,
+            name: "downloaded"
+          };
+        },
+        urls
+      ).promise;
+      if (datas.length > 0) {
+        petaImages = await this.importImagesFromBuffers(datas);
+        log2.log("result:", petaImages.length);
+      }
+    } catch (error) {
+      log2.error(error);
+    }
+    const log3 = this.mainLogger.logChunk();
+    try {
+      if (petaImages.length === 0) {
+        if (arrayBuffers.length > 0) {
+          log3.log("2.trying to read ArrayBuffer:", arrayBuffers.length);
+          petaImages = await this.importImagesFromBuffers(
+            arrayBuffers.map((ab) => {
+              return {
+                buffer: Buffer.from(ab),
+                name: urls.length > 0 ? "downloaded" : "noname",
+                note: urls.length > 0 ? urls[0]! : ""
+              };
+            })
+          );
+          log3.log("result:", petaImages.length);
+        }
+      }
+    } catch (error) {
+      log3.error(error);
+    }
+    const log4 = this.mainLogger.logChunk();
+    try {
+      if (petaImages.length === 0) {
+        log4.log("3.trying to read filePath:", filePaths.length);
+        petaImages = await this.importImagesFromFilePaths(filePaths);
+        log4.log("result:", petaImages.length);
+      }
+    } catch (error) {
+      log4.error(error);
+    }
+    return petaImages.map((petaImage) => petaImage.id);
   }
   async importImagesFromFilePaths(filePaths: string[]) {
     return Tasks.spawn("ImportImagesFromFilePaths", async (handler) => {
