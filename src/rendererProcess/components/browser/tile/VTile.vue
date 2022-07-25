@@ -52,19 +52,6 @@
           {{$t("browser.untagged")}}
         </t-tag>
       </t-tags>
-      <t-palette>
-        <t-color-background>
-          <t-color
-            v-for="color in palette"
-            :key="color.id"
-            :style="{
-              backgroundColor: color.color,
-              flex: Math.floor(color.population * 80 + 20)
-            }"
-          >
-          </t-color>
-        </t-color-background>
-      </t-palette>
       <t-selected
         v-show="tile.petaImage._selected"
       >
@@ -185,24 +172,6 @@ export default class VTile extends Vue {
       return false;
     }
     return this.tile.petaImage.nsfw && !this.$nsfw.showNSFW;
-  }
-  get palette() {
-    if (this.tile.petaImage === undefined) {
-      return [];
-    }
-    const all = this.tile.petaImage.palette.reduce((p, c) => {
-      return p + c.population;
-    }, 0);
-    return this.tile.petaImage.palette.map((color, i) => {
-      return {
-        color: `rgb(${color.r}, ${color.g}, ${color.b})`,
-        population: color.population / all,
-        id: i
-      };
-    })
-    .sort((a, b) => {
-      return b.population - a.population;
-    });
   }
   get placeholderColor() {
     if (this.tile.petaImage === undefined) {
@@ -360,9 +329,6 @@ t-tile-root {
       >t-images {
         filter: brightness(1.0);
       }
-      >t-palette {
-        visibility: visible;
-      }
     }
     >t-tags {
       width: 100%;
@@ -385,28 +351,6 @@ t-tile-root {
         padding: 3px;
         background-color: var(--tab-bg-color);
         font-size: 0.7em;
-      }
-    }
-    >t-palette {
-      position: absolute;
-      visibility: hidden;
-      top: 0px;
-      pointer-events: none;
-      padding: 8px;
-      display: block;
-      width: 100%;
-      >t-color-background {
-        display: flex;
-        background-color: #ffffff;
-        border-radius: var(--rounded);
-        height: 8px;
-        width: 100%;
-        overflow: hidden;
-        box-shadow: 0px 0px 0px 1.5px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
-        >t-color {
-          height: 100%;
-          display: block;
-        }
       }
     }
     >t-selected {

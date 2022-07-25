@@ -28,6 +28,7 @@ export const BROWSER_THUMBNAIL_SIZE = 256;
 export const BROWSER_THUMBNAIL_ZOOM_MIN = 64;
 export const BROWSER_THUMBNAIL_ZOOM_MAX = 512;
 export const BROWSER_THUMBNAIL_ZOOM_STEP = 16;
+export const BROWSER_THUMBNAIL_MARGIN = 8;
 export const UPDATE_CHECK_INTERVAL = 1000 * 60 * 60 * 1; // 1時間
 export const GLOBAL_API_NAME = "main-api";
 export const DB_COMPACTION_DELAY = 1000;

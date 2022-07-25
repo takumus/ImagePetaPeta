@@ -10,4 +10,5 @@ export interface Tile {
   visible: boolean,
   preVisible: boolean,
   group?: string;
+  id: string;
 }

@@ -14,11 +14,11 @@
         >
           <t-tiles-content
             ref="thumbsWrapper"
-            :style="{height: scrollHeight + 8 + 'px'}"
+            :style="{height: scrollHeight + $defines.BROWSER_THUMBNAIL_MARGIN + 'px'}"
           >
             <VTile
               v-for="(data) in visibleTiles"
-              :key="data.petaImage.id"
+              :key="data.id"
               :tile="data"
               :original="original"
               :petaTagInfos="petaTagInfos"
@@ -67,7 +67,7 @@ import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { BROWSER_THUMBNAIL_SIZE, BROWSER_THUMBNAIL_ZOOM_MAX, BROWSER_THUMBNAIL_ZOOM_MIN, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
+import { BROWSER_THUMBNAIL_MARGIN, BROWSER_THUMBNAIL_SIZE, BROWSER_THUMBNAIL_ZOOM_MAX, BROWSER_THUMBNAIL_ZOOM_MIN, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
@@ -130,6 +130,7 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer = new ResizeObserver((entries) => {
       this.resizeScrollArea(entries[0]!.contentRect);
     });
+    this.$defines.BROWSER_THUMBNAIL_MARGIN
     this.thumbnails.addEventListener("scroll", this.updateScrollArea);
     this.thumbnails.addEventListener("wheel", (e) => {
       if (Keyboards.pressedOR("control", "meta")) {
@@ -194,7 +195,7 @@ export default class VBrowser extends Vue {
     this.updateScrollArea();
   }
   resizeImages(rect: DOMRectReadOnly) {
-    this.thumbnailsWidth = rect.width - 8;
+    this.thumbnailsWidth = rect.width - BROWSER_THUMBNAIL_MARGIN;
   }
   drag(petaImage: PetaImage) {
     if (!Keyboards.pressedOR("shift", "control", "meta") && !petaImage._selected) {
@@ -446,28 +447,27 @@ export default class VBrowser extends Vue {
         const height = 32;
         const position = new Vec2(0, yList[mvi]);
         yList.fill(minY + height);
-        const pClone = deepcopy(p);
-        pClone.id += currentDateString;
         tiles.push({
-          petaImage: pClone,
           position: position,
           width: this.thumbnailsWidth,
           height: height,
           visible: false,
           preVisible: false,
-          group: currentDateString
+          group: currentDateString,
+          id: currentDateString
         })
       }
-      const position = new Vec2(mvi * this.actualTileSize + 8, yList[mvi]);
+      const position = new Vec2(mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN, yList[mvi]);
       const height = p.height * this.actualTileSize;
       yList[mvi] += height;
       const tile: Tile = {
         petaImage: p,
         position: position,
-        width: this.actualTileSize - 8,
-        height: height - 8,
+        width: this.actualTileSize - BROWSER_THUMBNAIL_MARGIN,
+        height: height - BROWSER_THUMBNAIL_MARGIN,
         visible: false,
         preVisible: false,
+        id: p.id
       }
       tiles.push(tile);
     });
