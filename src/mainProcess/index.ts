@@ -525,7 +525,7 @@ import { Windows } from "./utils/windows";
           try {
             log.log("#Update Settings");
             configSettings.data = settings;
-            Object.keys(windows).forEach((key) => {
+            Object.keys(windows.windows).forEach((key) => {
               const window = windows.windows[key as WindowType];
               if (window === undefined || window.isDestroyed()) {
                 return;
