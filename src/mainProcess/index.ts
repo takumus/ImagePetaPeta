@@ -27,7 +27,7 @@ import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
-import { getLatestVersion } from "@/commons/utils/versions";
+import { getLatestVersion, isLatest } from "@/commons/utils/versions";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
 import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
@@ -35,6 +35,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
 import { searchImageByGoogle } from "./utils/searchImageByGoogle";
 import { Windows } from "./utils/windows";
+import { DBInfo } from "@/commons/datas/dbInfo";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -80,6 +81,7 @@ import { Windows } from "./utils/windows";
     dbPetaImagesPetaTags,
     configSettings,
     configStates,
+    configDBInfo,
     petaDatas,
     windows
   } = constants;
@@ -209,6 +211,10 @@ import { Windows } from "./utils/windows";
       }
       if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
+      }
+      if (configDBInfo.data.version !== app.getVersion()) {
+        configDBInfo.data.version = app.getVersion();
+        configDBInfo.save();
       }
     } catch (error) {
       showError({
@@ -821,13 +827,15 @@ import { Windows } from "./utils/windows";
       FILE_IMAGES_TAGS_DB: "",
       FILE_SETTINGS: "",
       FILE_STATES: "",
-      FILE_WINDOW_STATES: ""
+      FILE_WINDOW_STATES: "",
+      FILE_DBINFO: ""
     }
     let dataLogger: Logger;
     let dbPetaImages: DB<PetaImage>;
     let dbPetaBoard: DB<PetaBoard>;
     let dbPetaTags: DB<PetaTag>;
     let dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
+    let configDBInfo: Config<DBInfo>;
     let configSettings: Config<Settings>;
     let configStates: Config<States>;
     let configWindowStates: Config<WindowStates>;
@@ -865,7 +873,12 @@ import { Windows } from "./utils/windows";
       files.FILE_TAGS_DB = file.initFile(dirs.DIR_ROOT, "tags.db");
       files.FILE_IMAGES_TAGS_DB = file.initFile(dirs.DIR_ROOT, "images_tags.db");
       files.FILE_STATES = file.initFile(dirs.DIR_APP, "states.json");
+      files.FILE_DBINFO = file.initFile(dirs.DIR_ROOT, "dbInfo.json");
       files.FILE_WINDOW_STATES = file.initFile(dirs.DIR_APP, "windowStates.json");
+      configDBInfo = new Config<DBInfo>(files.FILE_DBINFO, { version: app.getVersion() });
+      if (!isLatest(app.getVersion(), configDBInfo.data.version, false)) {
+        throw new Error(`DB version is higher than App version. \nDB version:${configDBInfo.data.version}\nApp version:${app.getVersion()}`);
+      }
       dbPetaImages = new DB<PetaImage>("petaImages", files.FILE_IMAGES_DB);
       dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
       dbPetaTags = new DB<PetaTag>("petaTags", files.FILE_TAGS_DB);
@@ -922,6 +935,7 @@ import { Windows } from "./utils/windows";
       dbPetaBoard,
       dbPetaTags,
       dbPetaImagesPetaTags,
+      configDBInfo,
       configSettings,
       configStates,
       configWindowStates,
