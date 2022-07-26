@@ -9,6 +9,12 @@
     </t-left>
     <t-center>
       <t-content>
+        <t-search>
+          <VSearch
+            :petaTagInfos="petaTagInfos"
+            :selectedPetaTags="selectedPetaTags"
+          />
+        </t-search>
         <t-tiles
           ref="thumbnails"
         >
@@ -64,6 +70,7 @@ import VProperty from "@/rendererProcess/components/browser/property/VProperty.v
 import VPreview from "@/rendererProcess/components/browser/property/VPreview.vue";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
+import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
@@ -87,7 +94,8 @@ import deepcopy from "deepcopy";
     VPreview,
     VEditableLabel,
     VModal,
-    VTags
+    VTags,
+    VSearch
   },
   emits: [
     "select",
@@ -532,14 +540,19 @@ t-browser-root {
       position: relative;
       flex: 1;
       overflow: hidden;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      >t-search {
+        width: 100%;
+        display: block;
+      }
       >t-tiles {
         width: 100%;
-        height: 100%;
         position: relative;
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
+        border-radius: 8px;
         >t-tiles-content {
           display: block;
         }

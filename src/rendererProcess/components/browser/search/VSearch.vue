@@ -123,8 +123,9 @@ export default class VSearch extends Vue {
 <style lang="scss" scoped>
 t-search-root {
   display: block;
-  padding: 4px 160px;
+  padding: 0px 8px 8px 8px;
   text-align: center;
+  width: 100%;
   >t-search-box {
     border-radius: var(--rounded);
     border: solid 1.2px var(--border-color);

@@ -9,10 +9,6 @@
         <VTitleBar :title="$t('titles.browser')">
         </VTitleBar>
         <VUtilsBar>
-          <VSearch
-            :petaTagInfos="petaTagInfos"
-            :selectedPetaTags="selectedPetaTags"
-          />
         </VUtilsBar>
       </t-top>
       <t-browser>
@@ -54,7 +50,6 @@ import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
-import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
@@ -71,8 +66,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
     VContextMenu,
     VComplement,
     VDialog,
-    VUtilsBar,
-    VSearch
+    VUtilsBar
   },
 })
 export default class BrowserIndex extends Vue {
