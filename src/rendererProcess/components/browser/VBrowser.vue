@@ -9,12 +9,17 @@
     </t-left>
     <t-center>
       <t-content>
-        <t-search>
-          <VSearch
-            :petaTagInfos="petaTagInfos"
-            :selectedPetaTags="selectedPetaTags"
-          />
-        </t-search>
+        <t-top>
+          <t-search>
+            <VSearch
+              :petaTagInfos="petaTagInfos"
+              :selectedPetaTags="selectedPetaTags"
+            />
+          </t-search>
+          <t-buttons>
+            <input type="checkbox" v-model="group">
+          </t-buttons>
+        </t-top>
         <t-tiles
           ref="thumbnails"
         >
@@ -131,6 +136,7 @@ export default class VBrowser extends Vue {
   keyboards = new Keyboards();
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
+  group = false;
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0]!.contentRect);
@@ -444,7 +450,7 @@ export default class VBrowser extends Vue {
       let newGroup = false;
       const date = new Date(p.addDate);
       const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-      if (prevDateString != currentDateString) {
+      if (prevDateString != currentDateString && this.group) {
         prevDateString = currentDateString;
         mvi = 0;
         minY = maxY;
@@ -542,9 +548,16 @@ t-browser-root {
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      >t-search {
+      >t-top {
         width: 100%;
-        display: block;
+        display: flex;
+        >t-search {
+          display: block;
+          flex: 1;
+        }
+        >t-buttons {
+          display: block;
+        }
       }
       >t-tiles {
         width: 100%;

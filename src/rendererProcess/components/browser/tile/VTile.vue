@@ -183,6 +183,7 @@ export default class VTile extends Vue {
   }
   myPetaTags: PetaTag[] = [];
   async fetchPetaTags() {
+    this.myPetaTags = [];
     if (!this.$settings.showTagsOnTile) {
       return;
     }
