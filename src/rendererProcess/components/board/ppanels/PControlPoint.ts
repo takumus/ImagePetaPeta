@@ -62,7 +62,7 @@ export class PControlPoint extends PIXI.Container {
       sizing = true;
     });
     window.addEventListener("touchend", () => {
-      console.log("touchend")
+      // console.log("touchend")
     })
     window.addEventListener("pointerup", () => {
       if (!sizing && !rotating) {

@@ -103,7 +103,7 @@ export default class DetailsIndex extends Vue {
           this.board?.petaPanels.forEach((petaPanel) => {
             if (petaPanel.petaImageId === petaImage.id) {
               petaPanel._petaImage = this.petaImages[petaImage.id];
-              this.vPetaBoard.load();
+              this.vPetaBoard.load({});
             }
           });
         });

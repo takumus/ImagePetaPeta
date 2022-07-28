@@ -129,7 +129,12 @@ export default class BoardIndex extends Vue {
             }).length > 0;
           }
           if (changeCurrentBoard) {
-            this.vPetaBoard.load();
+            this.vPetaBoard.load({
+              reload: {
+                additions: petaImages.map((petaImage) => petaImage.id),
+                deletions: []
+              }
+            });
           }
         });
         this.addOrderedPetaPanels();
@@ -159,7 +164,12 @@ export default class BoardIndex extends Vue {
           }
         });
         if (changeCurrentBoard) {
-          this.vPetaBoard.load();
+          this.vPetaBoard.load({
+            reload: {
+              additions: [],
+              deletions: petaImages.map((petaImage) => petaImage.id)
+            }
+          });
         }
       }
     });
@@ -223,7 +233,12 @@ export default class BoardIndex extends Vue {
     if (this.orderedAddPanelIds.length > 0) {
       this.orderedAddPanelIds = [];
       if (this.currentPetaBoard) {
-        this.vPetaBoard.load();
+        this.vPetaBoard.load({
+          reload: {
+            additions: [],
+            deletions: []
+          }
+        });
       }
     }
   }

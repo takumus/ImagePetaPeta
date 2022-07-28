@@ -21,9 +21,9 @@
     </t-crop>
     <VBoardLoading
       :zIndex="2"
-      :loading="loading"
-      :log="loadingLog"
-      :progress="loadingProgress"
+      :loading="extracting"
+      :log="extractingLog"
+      :progress="extractingProgress"
       ref="loadingModal"
     ></VBoardLoading>
     <VLayer
@@ -61,15 +61,11 @@ import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { minimId } from "@/commons/utils/utils";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { Loader as PIXILoader } from '@pixi/loaders';
-import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
-import w from "@/rendererProcess/utils/pixi-gif/decompress.worker";
-// PIXILoader.registerPlugin(AnimatedGIFLoader);
 @Options({
   components: {
     VCrop,
@@ -93,9 +89,9 @@ export default class VBoard extends Vue {
   loadingModal!: VBoardLoading;
   @Ref()
   layer!: VLayer;
-  loading = false;
-  loadingLog = "";
-  loadingProgress = 0;
+  extracting = false;
+  extractingLog = "";
+  extractingProgress = 0;
   croppingPetaPanel: PetaPanel | null = null;
   cropping = false;
   dragOffset = new Vec2();
@@ -125,7 +121,7 @@ export default class VBoard extends Vue {
   stageRect = new Vec2();
   mousePosition = new Vec2();
   keyboards?: Keyboards;
-  cancel: (() => Promise<void[]>) | undefined;
+  cancelExtract: (() => Promise<void[]>) | undefined;
   resolution = -1;
   resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
   mouseOffset = new Vec2();
@@ -214,8 +210,6 @@ export default class VBoard extends Vue {
       this.pixi.view.style.width = rect.width + "px";
       this.pixi.view.style.height = rect.height + "px";
     }
-    // this.panelsCenterWrapper.x = rect.width / 2;
-    // this.panelsCenterWrapper.y = rect.height / 2 ;
     this.centerWrapper.x = rect.width / 2;
     this.centerWrapper.y = rect.height / 2;
     this.updateRect();
@@ -433,9 +427,7 @@ export default class VBoard extends Vue {
     this.pPanelsArray.forEach((pp) => {
       pp.unselected = false;
     });
-    // this.setBackgroundBrightness(1);
     if (this.selectedPPanels.length > 0) {
-      // this.setBackgroundBrightness(0.7);
       this.unselectedPPanels.forEach((pp) => {
         pp.unselected = true;
       });
@@ -636,59 +628,111 @@ export default class VBoard extends Vue {
     }
     return Math.max(...this.board.petaPanels.map((petaPanel) => petaPanel.index));
   }
-  async load(): Promise<void> {
+  async load(params: {
+    reload?: {
+      additions: string[],
+      deletions: string[]
+    }
+  }): Promise<void> {
     this.updateDetailsPetaPanel();
     const log = logChunk().log;
     this.endCrop();
     Cursor.setCursor("wait");
-    this.loading = true;
-    if (this.cancel) {
+    this.extracting = true;
+    if (this.cancelExtract !== undefined) {
       log("vBoard", `canceling loading`);
       this.pPanelsArray.forEach((pPanel) => {
         pPanel.cancelLoading();
       });
-      await this.cancel();
+      await this.cancelExtract();
       log("vBoard", `canceled loading`);
-      return this.load();
+      return this.load(params);
     }
-    this.pPanelsArray.forEach((pPanel) => {
-      this.removePPanel(pPanel);
-    });
-    this.pTransformer.pPanels = this.pPanels = {};
+    // リロードじゃないならクリア。
+    if (params.reload === undefined) {
+      this.pPanelsArray.forEach((pPanel) => {
+        this.removePPanel(pPanel);
+      });
+      this.pTransformer.pPanels = this.pPanels = {};
+    }
     if (!this.board) {
       return;
     }
-    log("vBoard", "load", minimId(this.board.id));
-    const load = async (petaPanel: PetaPanel, index: number) => {
-      if (!this.board) {
+    log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(this.board.id));
+    const extract = async (petaPanel: PetaPanel, index: number) => {
+      if (this.board === undefined) {
         return;
       }
       const progress =  `${index + 1}/${this.board.petaPanels.length}`;
+      let loadResult = "";
       try {
-        await this.createPPanel(petaPanel);
-        log("vBoard", `loaded(${minimId(petaPanel._petaImage?.id)}):`, progress);
-        this.loadingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
+        if (this.pPanels[petaPanel.id] === undefined) {
+          // pPanelが無ければ作成。
+          const pPanel = new PPanel(petaPanel);
+          pPanel.setZoomScale(this.board?.transform.scale || 1);
+          await pPanel.init();
+          pPanel.showNSFW = this.$nsfw.showNSFW;
+          pPanel.onUpdateGIF = this.onUpdateGif;
+          this.pPanels[petaPanel.id] = pPanel;
+          this.panelsCenterWrapper.addChild(pPanel);
+          pPanel.orderRender();
+          this.orderPIXIRender();
+          (async () => {
+            try {
+              await pPanel.load();
+            } catch(error) {
+              //
+            }
+            pPanel.orderRender();
+            this.orderPIXIRender();
+          })();
+          await new Promise((res) => {
+            setTimeout(res);
+          });
+          loadResult = "create";
+        } else if (params.reload && params.reload.deletions.includes(petaPanel.petaImageId)) {
+          // petaImageが無ければnoImageに。
+          this.pPanels[petaPanel.id]!.noImage = true;
+          loadResult = "delete";
+        } else if (params.reload && this.pPanels[petaPanel.id]!.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
+          // pPanelはあるが、noImageだったら再ロードトライ。
+          (async () => {
+            try {
+              await this.pPanels[petaPanel.id]!.load();
+            } catch(error) {
+              //
+            }
+            this.pPanels[petaPanel.id]!.orderRender();
+            this.orderPIXIRender();
+          })();
+          await new Promise((res) => {
+            setTimeout(res);
+          });
+          loadResult = "reload";
+        } else {
+          loadResult = "skip";
+        }
+        log("vBoard", `loaded[${loadResult}](${minimId(petaPanel._petaImage?.id)}):`, progress);
+        this.extractingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
       } catch (error) {
         log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, error);
-        this.loadingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.loadingLog;
+        this.extractingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
       }
-      this.loadingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
-      this.orderPIXIRender();
+      this.extractingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
     }
-    const result = promiseSerial(load, [...this.board.petaPanels]);
-    this.cancel = result.cancel;
+    const extraction = promiseSerial(extract, [...this.board.petaPanels]);
+    this.cancelExtract = extraction.cancel;
     try {
-      await result.promise;
+      await extraction.promise;
     } catch (error) {
       log("vBoard", "load error:", error);
     }
-    this.loading = false;
-    this.loadingProgress = 0;
-    this.loadingLog = "";
-    this.cancel = undefined;
+    this.extracting = false;
+    this.extractingProgress = 0;
+    this.extractingLog = "";
+    this.cancelExtract = undefined;
     log("vBoard", "load complete");
     this.sortIndex();
-    this.orderPIXIRender();
     Object.values(this.pPanels).forEach((pPanel) => {
       if (!pPanel.petaPanel.gif.stopped) {
         pPanel.playGIF();
@@ -699,39 +743,11 @@ export default class VBoard extends Vue {
       this.$states.loadedPetaBoardId = this.board.id;
     }
   }
-  async createPPanel(petaPanel: PetaPanel) {
-    if (this.pPanels[petaPanel.id]) {
-      return petaPanel;
+  onUpdateGif() {
+    if (this.extracting) {
+      return;
     }
-    const pPanel = new PPanel(petaPanel);
-    pPanel.setZoomScale(this.board?.transform.scale || 1);
-    await pPanel.init();
-    pPanel.showNSFW = this.$nsfw.showNSFW;
-    pPanel.onUpdateGIF = () => {
-      if (!this.loading) {
-        this.orderPIXIRender();
-      }
-    }
-    this.pPanels[petaPanel.id] = pPanel;
-    this.panelsCenterWrapper.addChild(pPanel);
-    pPanel.orderRender();
     this.orderPIXIRender();
-    pPanel.load().then(() => {
-      pPanel.orderRender();
-      this.orderPIXIRender();
-    }).catch(() => {
-      pPanel.orderRender();
-      this.orderPIXIRender();
-      // throw error;
-    });
-    await new Promise((res, rej) => {
-      setTimeout(res);
-    });
-    return pPanel;
-  }
-  clearCache() {
-    PIXI.utils.destroyTextureCache();
-    PIXI.utils.clearTextureCache();
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
     const mouse = this.getMouseFromEvent(e);
@@ -845,7 +861,7 @@ export default class VBoard extends Vue {
   }
   @Watch("board")
   changeBoard() {
-    this.load();
+    this.load({});
   }
 }
 </script>
