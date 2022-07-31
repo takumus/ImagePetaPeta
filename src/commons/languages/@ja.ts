@@ -57,7 +57,8 @@ const ja = {
       reset: "リセット",
       cancel: "キャンセル"
     },
-    loading: "読込中..."
+    loading: "読込中...",
+    extracting: "展開中..."
   },
   browser: {
     tagMenu: {

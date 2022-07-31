@@ -7,9 +7,13 @@
   >
     <t-board-loading-root>
       <p>
-        {{$t("boards.loading")}}{{Math.floor(progress)}}%
+        {{$t("boards.extracting")}}{{Math.floor(extractProgress)}}%
       </p>
-      <VProgressBar :progress="progress"></VProgressBar>
+      <VProgressBar :progress="extractProgress"></VProgressBar>
+      <p>
+        {{$t("boards.loading")}}{{Math.floor(loadProgress)}}%
+      </p>
+      <VProgressBar :progress="loadProgress"></VProgressBar>
       <pre class="log">{{log}}</pre>
     </t-board-loading-root>
   </VModal>
@@ -32,7 +36,9 @@ export default class VBoardLoading extends Vue {
   @Prop()
   zIndex = 0;
   @Prop()
-  progress = 100;
+  extractProgress = 100;
+  @Prop()
+  loadProgress = 100;
   @Prop()
   log = "";
   @Prop()

@@ -21,9 +21,10 @@
     </t-crop>
     <VBoardLoading
       :zIndex="2"
-      :loading="extracting"
+      :loading="extracting || loading"
       :log="extractingLog"
-      :progress="extractingProgress"
+      :extractProgress="extractProgress"
+      :loadProgress="loadProgress"
       ref="loadingModal"
     ></VBoardLoading>
     <VLayer
@@ -90,8 +91,10 @@ export default class VBoard extends Vue {
   @Ref()
   layer!: VLayer;
   extracting = false;
+  loading = false;
   extractingLog = "";
-  extractingProgress = 0;
+  extractProgress = 0;
+  loadProgress = 0;
   croppingPetaPanel: PetaPanel | null = null;
   cropping = false;
   dragOffset = new Vec2();
@@ -639,6 +642,9 @@ export default class VBoard extends Vue {
     this.endCrop();
     Cursor.setCursor("wait");
     this.extracting = true;
+    this.loading = true;
+    this.loadProgress = 0;
+    this.extractProgress = 0;
     if (this.cancelExtract !== undefined) {
       log("vBoard", `canceling loading`);
       this.pPanelsArray.forEach((pPanel) => {
@@ -659,6 +665,7 @@ export default class VBoard extends Vue {
       return;
     }
     log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(this.board.id));
+    let loaded = 0;
     const extract = async (petaPanel: PetaPanel, index: number) => {
       if (this.board === undefined) {
         return;
@@ -666,6 +673,17 @@ export default class VBoard extends Vue {
       const progress =  `${index + 1}/${this.board.petaPanels.length}`;
       let loadResult = "";
       try {
+        const onLoaded = (petaPanel: PetaPanel) => {
+          loaded++;
+          if (this.board) {
+            this.loadProgress = Math.floor(loaded / this.board.petaPanels.length * 100);
+            const progress =  `${loaded}/${this.board.petaPanels.length}`;
+            this.extractingLog = `load complete   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
+            if (loaded == this.board.petaPanels.length) {
+              this.loading = false;
+            }
+          }
+        }
         if (this.pPanels[petaPanel.id] === undefined) {
           // pPanelが無ければ作成。
           const pPanel = new PPanel(petaPanel);
@@ -685,6 +703,7 @@ export default class VBoard extends Vue {
             }
             pPanel.orderRender();
             this.orderPIXIRender();
+            onLoaded(petaPanel);
           })();
           await new Promise((res) => {
             setTimeout(res);
@@ -694,6 +713,7 @@ export default class VBoard extends Vue {
           // petaImageが無ければnoImageに。
           this.pPanels[petaPanel.id]!.noImage = true;
           loadResult = "delete";
+          onLoaded(petaPanel);
         } else if (params.reload && this.pPanels[petaPanel.id]!.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
           // pPanelはあるが、noImageだったら再ロードトライ。
           (async () => {
@@ -704,21 +724,23 @@ export default class VBoard extends Vue {
             }
             this.pPanels[petaPanel.id]!.orderRender();
             this.orderPIXIRender();
+            onLoaded(petaPanel);
           })();
           await new Promise((res) => {
             setTimeout(res);
           });
           loadResult = "reload";
         } else {
+          onLoaded(petaPanel);
           loadResult = "skip";
         }
         log("vBoard", `loaded[${loadResult}](${minimId(petaPanel._petaImage?.id)}):`, progress);
-        this.extractingLog = `loaded(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
+        this.extractingLog = `extract complete(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
       } catch (error) {
         log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, error);
-        this.extractingLog = `loaderr(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
+        this.extractingLog = `extract error   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + this.extractingLog;
       }
-      this.extractingProgress = ((index + 1) / this.board.petaPanels.length) * 100;
+      this.extractProgress = ((index + 1) / this.board.petaPanels.length) * 100;
     }
     const extraction = promiseSerial(extract, [...this.board.petaPanels]);
     this.cancelExtract = extraction.cancel;
@@ -728,7 +750,6 @@ export default class VBoard extends Vue {
       log("vBoard", "load error:", error);
     }
     this.extracting = false;
-    this.extractingProgress = 0;
     this.extractingLog = "";
     this.cancelExtract = undefined;
     log("vBoard", "load complete");
