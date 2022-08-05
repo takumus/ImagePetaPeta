@@ -664,6 +664,13 @@ export default class VBoard extends Vue {
     if (!this.board) {
       return;
     }
+    if (this.board.petaPanels.length === 0) {
+      this.extracting = false;
+      this.loading = false;
+      Cursor.setDefaultCursor();
+      this.$states.loadedPetaBoardId = this.board.id;
+      return;
+    }
     log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(this.board.id));
     let loaded = 0;
     const extract = async (petaPanel: PetaPanel, index: number) => {
