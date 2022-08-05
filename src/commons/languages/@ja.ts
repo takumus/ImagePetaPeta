@@ -108,7 +108,8 @@ const ja = {
       }
     },
     untagged: "未分類",
-    all: "すべて"
+    all: "すべて",
+    grouping: "分割"
   },
   tab: {
     menu: {

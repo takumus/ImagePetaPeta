@@ -17,7 +17,10 @@
             />
           </t-search>
           <t-buttons>
-            <input type="checkbox" v-model="group">
+            <label>
+              <input type="checkbox" :checked="$states.groupingByDate" @change="$states.groupingByDate = Boolean($event.target.checked)">
+              <span>{{$t("browser.grouping")}}</span>
+            </label>
           </t-buttons>
         </t-top>
         <t-tiles
@@ -136,7 +139,6 @@ export default class VBrowser extends Vue {
   keyboards = new Keyboards();
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
-  group = false;
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0]!.contentRect);
@@ -157,6 +159,7 @@ export default class VBrowser extends Vue {
         }
       }
     })
+    this.$states.groupingByDate
     this.thumbnailsResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.thumbnails);
 
@@ -450,7 +453,7 @@ export default class VBrowser extends Vue {
       let newGroup = false;
       const date = new Date(p.addDate);
       const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-      if (prevDateString != currentDateString && this.group) {
+      if (prevDateString != currentDateString && this.$states.groupingByDate) {
         prevDateString = currentDateString;
         mvi = 0;
         minY = maxY;
@@ -551,12 +554,19 @@ t-browser-root {
       >t-top {
         width: 100%;
         display: flex;
+        padding: 0px 0px 8px 0px;
         >t-search {
           display: block;
           flex: 1;
+          padding: 0px 8px;
         }
         >t-buttons {
-          display: block;
+          display: flex;
+          align-items: center;
+          >label {
+            display: flex;
+            align-items: center;
+          }
         }
       }
       >t-tiles {

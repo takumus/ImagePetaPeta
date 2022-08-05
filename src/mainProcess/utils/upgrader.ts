@@ -137,7 +137,12 @@ export function upgradeStates(states: States) {
   }
   // 2.6.0
   if (states.loadedPetaBoardId === undefined) {
-    states.loadedPetaBoardId = states.selectedPetaBoardId;
+    states.loadedPetaBoardId = defaultStates.selectedPetaBoardId;
+    changed = true;
+  }
+  // 3.0.0
+  if (states.groupingByDate === undefined) {
+    states.groupingByDate = defaultStates.groupingByDate;
     changed = true;
   }
   return {
