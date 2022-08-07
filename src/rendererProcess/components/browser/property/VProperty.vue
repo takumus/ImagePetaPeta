@@ -19,18 +19,10 @@
         <t-data>
           <t-name>{{$t("browser.property.infos.note")}}</t-name>
           <t-value>
-            <!-- <VEditableLabel
-              :label="singlePetaImageInfo.petaImage.note"
-              :labelLook="singlePetaImageInfo.petaImage.note"
-              :clickToEdit="true"
-              :allowEmpty="true"
-              :growWidth="true"
-              @change="changeNote"
-            /> -->
             <textarea
               lock-keyboard
-              v-model="singlePetaImageInfo.petaImage.note"
-              @keypress.enter="keyPressEnter"
+              v-model="note"
+              @blur="blurNoteTextarea"
             >
             </textarea>
           </t-value>
@@ -141,6 +133,7 @@ export default class VProperty extends Vue {
   @Prop()
   petaTagInfos!: PetaTagInfo[];
   fetchingTags = true;
+  note = "";
   mounted() {
     //
   }
@@ -181,18 +174,15 @@ export default class VProperty extends Vue {
     this.singlePetaImageInfo.petaImage.name = name;
     API.send("updatePetaImages", [this.singlePetaImageInfo.petaImage], UpdateMode.UPDATE);
   }
-  keyPressEnter(e: KeyboardEvent) {
+  blurNoteTextarea(e: KeyboardEvent) {
     const textarea = e.target as HTMLTextAreaElement;
-    if (e.shiftKey) {
-      // shiftで改行なので。
-      return;
-    }
-    e.preventDefault();
     this.changeNote(textarea.value);
-    textarea.blur();
   }
   changeNote(note: string) {
     if (this.singlePetaImageInfo === undefined) {
+      return;
+    }
+    if (this.singlePetaImageInfo.petaImage.note === note) {
       return;
     }
     this.singlePetaImageInfo.petaImage.note = note;
@@ -286,6 +276,11 @@ export default class VProperty extends Vue {
   @Watch("petaImages")
   changePetaImages() {
     this.fetchPetaTags();
+    if (this.singlePetaImageInfo) {
+      this.note = this.singlePetaImageInfo.petaImage.note;
+    } else {
+      this.note = "";
+    }
   }
   @Watch("petaTagInfos")
   changeFetchTags() {
