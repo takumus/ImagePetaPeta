@@ -1,4 +1,5 @@
 const packageJSON = require("./package.json");
+const { defineConfig } = require('@vue/cli-service')
 const files = {
   renderer: {
     entry: "./src/rendererProcess/index.ts",
@@ -16,7 +17,8 @@ try {
 } catch (err) {
   console.error(`Cannot build appx. '${files.appxConfig}' is not found.`);
 }
-module.exports = {
+module.exports = defineConfig({
+  transpileDependencies: true,
   productionSourceMap: false,
   chainWebpack: config => {
     config.performance
@@ -24,9 +26,7 @@ module.exports = {
       .maxAssetSize(16 * 1024 * 1024) // 16mb
     config
       .entry("app")
-      .clear();
-    config
-      .entry("app")
+      .clear()
       .add(files.renderer.entry);
     config.plugin('html')
       .tap((args) => {
@@ -38,22 +38,18 @@ module.exports = {
       .use("vue-loader")
       .tap(options => {
         options.hotReload = false
-        return options
-      });
-    config.module
-      .rule("images")
-      .test(/\.(png)(\?.*)?$/)
-      .use("url-loader")
-    config.module
-      .rule("vue")
-      .use("vue-loader")
-      .tap((options) => ({
-        ...options,
-        hotReload: false,
-        compilerOptions: {
+        options.compilerOptions = {
           isCustomElement: (tag) => tag.startsWith("t-")
         }
-      }));
+        return options
+      })
+    config.module
+      .rule("images")
+      .set('parser', {
+        dataUrlCondition: {
+          // maxSize: 99999 * 1024 // 4KiB
+        }
+      })
     config.module
       .rule("worker")
       .test(/\.worker\.ts$/)
@@ -111,4 +107,4 @@ module.exports = {
       }
     }
   }
-}
+});
