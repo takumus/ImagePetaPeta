@@ -11,7 +11,7 @@
   >
     <li
       v-for="item in filteredItems"
-      :key="item._id"
+      :key="item.id"
       @click="select(item)"
       :class="{
         item: !item.separate,
