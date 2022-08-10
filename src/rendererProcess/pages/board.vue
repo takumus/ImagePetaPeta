@@ -34,7 +34,7 @@
       </t-browser>
     </t-content>
     <t-modals
-      v-show="this.$components.modal.modalIds.length > 0"
+      v-show="$components.modal.modalIds.length > 0"
     >
       <VImageImporter
         @addPanelByDragAndDrop="addPanelByDragAndDrop"

@@ -1,3 +1,3 @@
-import SettingsIndex from "@/rendererProcess/components/VSettingsIndex.vue";
+import SettingsIndex from "@/rendererProcess/pages/settings.vue";
 import { create } from "@/rendererProcess/pages/@create";
 create(SettingsIndex);

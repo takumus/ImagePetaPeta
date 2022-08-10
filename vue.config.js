@@ -5,7 +5,7 @@ const path = require("path");
 const files = {
   renderer: {
     pagesRoot: "./src/rendererProcess/pages/",
-    template: "./src/rendererProcess/index.html",
+    template: "./src/rendererProcess/template.html",
   },
   main: {
     preload: "./src/mainProcess/preload.ts",
