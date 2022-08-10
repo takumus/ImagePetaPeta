@@ -3,23 +3,25 @@ const { defineConfig } = require('@vue/cli-service');
 const fs = require("fs");
 const path = require("path");
 const files = {
-  pagesRoot: "./src/rendererProcess/pages/",
-  template: "./src/rendererProcess/index.html",
+  renderer: {
+    pagesRoot: "./src/rendererProcess/pages/",
+    template: "./src/rendererProcess/index.html",
+  },
   main: {
     preload: "./src/mainProcess/preload.ts",
     main: "./src/mainProcess/index.ts"
   },
   appxConfig: "./electron.config.appx.js"
 }
-const pages = fs.readdirSync(files.pagesRoot)
+const pages = fs.readdirSync(files.renderer.pagesRoot)
 .filter((name) => !name.startsWith("@") && name.endsWith(".ts"))
 .map((name) => name.replace(/\.ts/g, ""))
 .reduce((pages, name) => {
   return {
     ...pages,
     [name]: {
-      entry: path.join(files.pagesRoot, name + ".ts"),
-      template: files.template,
+      entry: path.join(files.renderer.pagesRoot, name + ".ts"),
+      template: files.renderer.template,
       filename: name + ".html"
     }
   }
