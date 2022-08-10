@@ -1,16 +1,29 @@
 const packageJSON = require("./package.json");
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require('@vue/cli-service');
+const fs = require("fs");
+const path = require("path");
 const files = {
-  renderer: {
-    entry: "./src/rendererProcess/index.ts",
-    template: "./src/rendererProcess/index.html",
-  },
+  pagesRoot: "./src/rendererProcess/pages/",
+  template: "./src/rendererProcess/index.html",
   main: {
     preload: "./src/mainProcess/preload.ts",
     main: "./src/mainProcess/index.ts"
   },
   appxConfig: "./electron.config.appx.js"
 }
+const pages = fs.readdirSync(files.pagesRoot)
+.filter((name) => !name.startsWith("@") && name.endsWith(".ts"))
+.map((name) => name.replace(/\.ts/g, ""))
+.reduce((pages, name) => {
+  return {
+    ...pages,
+    [name]: {
+      entry: path.join(files.pagesRoot, name + ".ts"),
+      template: files.template,
+      filename: name + ".html"
+    }
+  }
+}, {});
 let appxConfig = null;
 try {
   appxConfig = require(files.appxConfig);
@@ -20,13 +33,7 @@ try {
 module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
-  pages: {
-    index: {
-      entry: files.renderer.entry,
-      template: files.renderer.template,
-      filename: 'index.html',
-    },
-  },
+  pages,
   chainWebpack: config => {
     config.optimization.delete('splitChunks')
     config.performance

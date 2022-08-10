@@ -70,6 +70,7 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
+import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import { API } from "@/rendererProcess/api";
 import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/commons/defines";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
@@ -111,6 +112,7 @@ export default class BoardIndex extends Vue {
   title = "";
   errorPetaBoardId = "";
   async mounted() {
+    AnimatedGIFLoader.add?.();
     API.on("updatePetaImages", async (e, petaImages, mode) => {
       if (mode === UpdateMode.UPSERT) {
         let changeCurrentBoard = false;

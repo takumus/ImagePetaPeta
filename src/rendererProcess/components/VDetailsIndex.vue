@@ -60,6 +60,7 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 // Others
+import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
 import { API } from "@/rendererProcess/api";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
@@ -96,6 +97,7 @@ export default class DetailsIndex extends Vue {
   petaImageId? = "";
   keyboards: Keyboards = new Keyboards();
   async mounted() {
+    AnimatedGIFLoader.add?.();
     API.on("updatePetaImages", async (e, petaImages, mode) => {
       if (mode === UpdateMode.UPSERT) {
         petaImages.forEach((petaImage) => {

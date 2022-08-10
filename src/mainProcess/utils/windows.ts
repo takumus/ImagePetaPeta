@@ -82,15 +82,11 @@ export class Windows {
       window.moveTop();
     });
     const urlParams = `?type=${type}&args=${args}`;
-    if (process.env.WEBPACK_DEV_SERVER_URL) {
-      window.loadURL(`${process.env.WEBPACK_DEV_SERVER_URL}${urlParams}`).then(() => {
-        if (!process.env.IS_TEST) {
-          // window.webContents.openDevTools({ mode: "right" });
-        }
-      })
-    } else {
-      window.loadURL(`app://./index.html${urlParams}`);
-    }
+    const url = process.env.WEBPACK_DEV_SERVER_URL
+      ?`${process.env.WEBPACK_DEV_SERVER_URL}${type}${urlParams}`
+      :`app://./${type}.html${urlParams}`;
+    console.log(url);
+    window.loadURL(url);
     return window;
   }
   changeMainWindow(type: WindowType) {
