@@ -3,6 +3,7 @@ const { defineConfig } = require('@vue/cli-service');
 const fs = require("fs");
 const path = require("path");
 const files = {
+  windowTypes: "./src/commons/datas/windowType.ts",
   renderer: {
     pagesRoot: "./src/rendererProcess/pages/",
     template: "./src/rendererProcess/template.html",
@@ -26,11 +27,16 @@ const pages = fs.readdirSync(files.renderer.pagesRoot)
     }
   }
 }, {});
+const windowTypes = fs.readFileSync(files.windowTypes).toString().match(/"(.*?)"/g).map((name) => name.replace(/"/g, ""));
+if (windowTypes.sort().join() !== Object.keys(pages).sort().join()) {
+  console.error(`Error: ${files.windowTypes} or ${files.renderer.pagesRoot} is wrong.`);
+  process.kill(0);
+}
 let appxConfig = null;
 try {
   appxConfig = require(files.appxConfig);
 } catch (err) {
-  console.error(`Cannot build appx. '${files.appxConfig}' is not found.`);
+  console.error(`Error: Could not build appx. '${files.appxConfig}' is not found.`);
 }
 module.exports = defineConfig({
   transpileDependencies: true,
