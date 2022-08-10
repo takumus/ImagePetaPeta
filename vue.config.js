@@ -3,7 +3,7 @@ const { defineConfig } = require('@vue/cli-service')
 const files = {
   renderer: {
     entry: "./src/rendererProcess/index.ts",
-    template: "./src/rendererProcess/index.html"
+    template: "./src/rendererProcess/index.html",
   },
   main: {
     preload: "./src/mainProcess/preload.ts",
@@ -20,19 +20,18 @@ try {
 module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
+  pages: {
+    index: {
+      entry: files.renderer.entry,
+      template: files.renderer.template,
+      filename: 'index.html',
+    },
+  },
   chainWebpack: config => {
+    config.optimization.delete('splitChunks')
     config.performance
       .maxEntrypointSize(16 * 1024 * 1024) // 16mb
       .maxAssetSize(16 * 1024 * 1024) // 16mb
-    config
-      .entry("app")
-      .clear()
-      .add(files.renderer.entry);
-    config.plugin('html')
-      .tap((args) => {
-        args[0].template = files.renderer.template
-        return args;
-      })
     config.module
       .rule("vue")
       .use("vue-loader")
@@ -51,19 +50,21 @@ module.exports = defineConfig({
         }
       })
     config.module
-      .rule("worker")
-      .test(/\.worker\.ts$/)
-      .use("worker-loader")
-      .loader("worker-loader")
-    config.module
       .rule('ts')
       .exclude
       .add(/\.worker\.ts$/)
     config.module
       .rule("worker")
       .test(/\.worker\.ts$/)
+      .use("worker-loader")
+      .loader("worker-loader")
+    config.module
+      .rule("worker")
+      .test(/\.worker\.ts$/)
       .use("ts-loader")
       .loader("ts-loader")
+    console.log("rules:", Array.from(config.module.rules.store.values()).map((rule) => `${rule.name}`).join(", "));
+    // process.exit(0);
   },
   pluginOptions: {
     electronBuilder: {
