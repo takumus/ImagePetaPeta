@@ -27,7 +27,9 @@ const pages = fs.readdirSync(files.renderer.windowsRoot)
     }
   }
 }, {});
-const windowTypes = fs.readFileSync(files.windowTypes).toString().match(/"(.*?)"/g).map((name) => name.replace(/"/g, ""));
+const windowTypes = fs.readFileSync(files.windowTypes).toString()
+.match(/"(.*?)"/g)
+.map((name) => name.replace(/"/g, ""));
 if (windowTypes.sort().join() !== Object.keys(pages).sort().join()) {
   console.error(`Error: ${files.windowTypes} or ${files.renderer.windowsRoot} is wrong.`);
   process.kill(0);
@@ -61,7 +63,7 @@ module.exports = defineConfig({
       .rule("images")
       .set('parser', {
         dataUrlCondition: {
-          // maxSize: 99999 * 1024 // 4KiB
+          maxSize: 16 * 1024 * 1024 // 16mb
         }
       })
     config.module
@@ -78,8 +80,6 @@ module.exports = defineConfig({
       .test(/\.worker\.ts$/)
       .use("ts-loader")
       .loader("ts-loader")
-    console.log("rules:", Array.from(config.module.rules.store.values()).map((rule) => `${rule.name}`).join(", "));
-    // process.exit(0);
   },
   pluginOptions: {
     electronBuilder: {
