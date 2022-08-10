@@ -1,5 +1,6 @@
 # ImagePetaPeta-beta
-<img src="./README/app01.png" width="256px"><img src="./README/app02.png" width="256px">  
+<img src="./README/app.png" width="512px">  
+
 写真やイラスト資料を閲覧、管理するソフトです。
 ## インストール
 ### Windows
