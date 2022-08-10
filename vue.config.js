@@ -5,7 +5,7 @@ const path = require("path");
 const files = {
   windowTypes: "./src/commons/datas/windowType.ts",
   renderer: {
-    pagesRoot: "./src/rendererProcess/pages/",
+    windowsRoot: "./src/rendererProcess/windows/",
     template: "./src/rendererProcess/template.html",
   },
   main: {
@@ -14,14 +14,14 @@ const files = {
   },
   appxConfig: "./electron.config.appx.js"
 }
-const pages = fs.readdirSync(files.renderer.pagesRoot)
+const pages = fs.readdirSync(files.renderer.windowsRoot)
 .filter((name) => !name.startsWith("@") && name.endsWith(".ts"))
 .map((name) => name.replace(/\.ts/g, ""))
 .reduce((pages, name) => {
   return {
     ...pages,
     [name]: {
-      entry: path.join(files.renderer.pagesRoot, name + ".ts"),
+      entry: path.join(files.renderer.windowsRoot, name + ".ts"),
       template: files.renderer.template,
       filename: name + ".html"
     }
@@ -29,7 +29,7 @@ const pages = fs.readdirSync(files.renderer.pagesRoot)
 }, {});
 const windowTypes = fs.readFileSync(files.windowTypes).toString().match(/"(.*?)"/g).map((name) => name.replace(/"/g, ""));
 if (windowTypes.sort().join() !== Object.keys(pages).sort().join()) {
-  console.error(`Error: ${files.windowTypes} or ${files.renderer.pagesRoot} is wrong.`);
+  console.error(`Error: ${files.windowTypes} or ${files.renderer.windowsRoot} is wrong.`);
   process.kill(0);
 }
 let appxConfig = null;
