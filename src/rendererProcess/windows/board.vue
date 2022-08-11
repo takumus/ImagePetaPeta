@@ -83,6 +83,7 @@ import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplica
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
+import { WindowType } from "@/commons/datas/windowType";
 @Options({
   components: {
     VBrowser,
@@ -113,6 +114,7 @@ export default class BoardIndex extends Vue {
   errorPetaBoardId = "";
   async mounted() {
     AnimatedGIFLoader.add?.();
+    this.$windowType = WindowType.BOARD;
     API.on("updatePetaImages", async (e, petaImages, mode) => {
       if (mode === UpdateMode.UPSERT) {
         let changeCurrentBoard = false;

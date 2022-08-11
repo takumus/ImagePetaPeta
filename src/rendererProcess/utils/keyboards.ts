@@ -36,15 +36,18 @@ export class Keyboards {
     keys.forEach((key) => {
       (this.downListeners[key] || (this.downListeners[key] = new Set())).add(callback);
     });
+    return this;
   }
   public up(keys: string[], callback: KeyboardsCallback) {
     keys.forEach((key) => {
       (this.upListeners[key] || (this.upListeners[key] = new Set())).add(callback);
     });
+    return this;
   }
   public change(keys: string[], callback: KeyboardsCallback) {
     this.down(keys, callback);
     this.up(keys, callback);
+    return this;
   }
   private emit(key: string, pressed: boolean, event?: KeyboardEvent) {
     (pressed ? this.downListeners : this.upListeners)[key]

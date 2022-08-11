@@ -81,11 +81,11 @@ export class Windows {
       }
       window.moveTop();
     });
-    const urlParams = `?type=${type}&args=${args}`;
-    const url = process.env.WEBPACK_DEV_SERVER_URL
-      ?`${process.env.WEBPACK_DEV_SERVER_URL}${type}${urlParams}`
-      :`app://./${type}.html${urlParams}`;
-    console.log(url);
+    const url = (
+      process.env.WEBPACK_DEV_SERVER_URL !== undefined
+      ?`${process.env.WEBPACK_DEV_SERVER_URL}${type}`
+      :`app://./${type}.html`
+    ) + `?args=${args}`;
     window.loadURL(url);
     return window;
   }
