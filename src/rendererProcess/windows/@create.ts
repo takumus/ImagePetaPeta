@@ -1,6 +1,10 @@
 import { Component, createApp, Plugin } from "vue";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { API } from "@/rendererProcess/api";
+import { logChunk } from "@/rendererProcess/utils/rendererLogger";
+import { WindowType } from "@/commons/datas/windowType";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalStates from "@/rendererProcess/vueComponentCustomProperties/states";
 import GlobalDefines from "@/rendererProcess/vueComponentCustomProperties/defines";
@@ -15,10 +19,6 @@ import * as GlobalSystemInfo from "@/rendererProcess/vueComponentCustomPropertie
 import * as GlobalWindowType from "@/rendererProcess/vueComponentCustomProperties/windowType";
 import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProperties/windowIsFocused";
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { API } from "@/rendererProcess/api";
-import { logChunk } from "@/rendererProcess/utils/rendererLogger";
-import { WindowType } from "@/commons/datas/windowType";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
