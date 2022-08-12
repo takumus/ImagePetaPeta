@@ -166,8 +166,6 @@ const ja = {
     browsePetaImageDirectoryButton: "データの保存先を選ぶ",
     changePetaImageDirectoryButton: "データの保存先を適用",
     changePetaImageDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
-    autoAddTag: "自動タグ追加",
-    autoAddTagDescriptions: "インポート時、自動で日付のタグを追加します。",
     ignoreMinorUpdate: "マイナーアップデートの通知を無視する",
     ignoreMinorUpdateDescriptions: "大きな重要なアップデート以外の、小さなアップデートを無視します。\nアップデートの頻度が多くて困っている人向けの設定です。",
     updateAvailable: "新しいバージョンがあります。",

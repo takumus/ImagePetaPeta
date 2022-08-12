@@ -46,15 +46,6 @@
         </label>
         <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
         <label>
-          <input
-            type="checkbox"
-            :checked="$settings.autoAddTag"
-            @change="$settings.autoAddTag = Boolean($event.target.checked)"
-          >
-          {{$t("settings.autoAddTag")}}
-        </label>
-        <p>{{$t("settings.autoAddTagDescriptions")}}</p>
-        <label>
           <select
             @change="$settings.show = $event.target.value"
           >

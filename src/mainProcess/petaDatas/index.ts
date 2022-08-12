@@ -461,9 +461,6 @@ export class PetaDatas {
         log: [addedFileCount.toString(), _filePaths.length.toString()],
         status: addedFileCount === _filePaths.length ? "complete" : "failed"
       });
-      if (this.datas.configSettings.data.autoAddTag) {
-        this.emitMainEvent("updatePetaTags");
-      }
       this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
       return petaImages;
     }, {});
@@ -635,9 +632,6 @@ export class PetaDatas {
         log: [addedFileCount.toString(), datas.length.toString()],
         status: addedFileCount === datas.length ? "complete" : "failed"
       });
-      if (this.datas.configSettings.data.autoAddTag) {
-        this.emitMainEvent("updatePetaTags");
-      }
       this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
       return petaImages;
     }, {});
@@ -690,12 +684,6 @@ export class PetaDatas {
       id: id,
       nsfw: false,
       metadataVersion: PETAIMAGE_METADATA_VERSION
-    }
-    if (this.datas.configSettings.data.autoAddTag) {
-      const name = dateFormat(addDate, "yyyy-mm-dd");
-      const datePetaTag = (await this.datas.dbPetaTags.find({name: name}))[0] || createPetaTag(name);
-      await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
-      await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
     }
     await file.writeFile(Path.resolve(this.paths.DIR_IMAGES, originalFileName), param.data);
     await this.datas.dbPetaImages.update({ id: petaImage.id }, petaImage, true);

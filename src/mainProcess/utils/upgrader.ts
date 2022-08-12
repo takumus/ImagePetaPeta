@@ -83,10 +83,10 @@ export function upgradeSettings(settings: Settings) {
     changed = true;
   }
   // v1.7.0
-  if (settings.autoAddTag === undefined) {
-    settings.autoAddTag = defaultSettings.autoAddTag;
-    changed = true;
-  }
+  // if (settings.autoAddTag === undefined) {
+  //   settings.autoAddTag = defaultSettings.autoAddTag;
+  //   changed = true;
+  // }
   // v2.4.0
   if (settings.ignoreMinorUpdate === undefined) {
     settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;

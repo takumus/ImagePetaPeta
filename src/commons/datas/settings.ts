@@ -14,7 +14,6 @@ const defaultSettings = {
     default: true,
     path: ""
   },
-  autoAddTag: true,
   ignoreMinorUpdate: true,
   waifu2x: {
     execFilePath: "",
