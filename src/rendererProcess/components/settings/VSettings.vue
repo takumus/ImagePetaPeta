@@ -20,9 +20,8 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.darkMode"
+            v-model="$settings.darkMode"
             :disabled="$settings.autoDarkMode"
-            @change="$settings.darkMode = Boolean($event.target.checked)"
           >
           {{$t("settings.darkMode")}}
         </label>
@@ -30,8 +29,7 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.autoDarkMode"
-            @change="$settings.autoDarkMode = Boolean($event.target.checked)"
+            v-model="$settings.autoDarkMode"
           >
           {{$t("settings.autoDarkMode")}}
         </label>
@@ -39,19 +37,18 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.alwaysOnTop"
-            @change="$settings.alwaysOnTop = Boolean($event.target.checked)"
+            v-model="$settings.alwaysOnTop"
           >
           {{$t("settings.alwaysOnTop")}}
         </label>
         <p>{{$t("settings.alwaysOnTopDescriptions")}}</p>
         <label>
           <select
-            @change="$settings.show = $event.target.value"
+            v-model="$settings.show"
           >
-            <option value="board" :selected="$settings.show === 'board'">{{$t("settings.showBoard")}}</option>
-            <option value="browser" :selected="$settings.show === 'browser'">{{$t("settings.showBrowser")}}</option>
-            <option value="both" :selected="$settings.show === 'both'">{{$t("settings.showBoth")}}</option>
+            <option value="board">{{$t("settings.showBoard")}}</option>
+            <option value="browser">{{$t("settings.showBrowser")}}</option>
+            <option value="both">{{$t("settings.showBoth")}}</option>
           </select>
           {{$t("settings.show")}}
         </label>
@@ -66,8 +63,7 @@
         </label>
         <input
           type="number"
-          :value="$settings.zoomSensitivity"
-          @change="$settings.zoomSensitivity = Number($event.target.value)"
+          v-model="$settings.zoomSensitivity"
         >
         <p>{{$t("settings.zoomSensitivityDescriptions")}}</p>
         <label>
@@ -75,8 +71,7 @@
         </label>
         <input
           type="number"
-          :value="$settings.moveSensitivity"
-          @change="$settings.moveSensitivity = Number($event.target.value)"
+          v-model="$settings.moveSensitivity"
         >
         <p>{{$t("settings.moveSensitivityDescriptions")}}</p>
       </t-content>
@@ -99,8 +94,7 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.loadTilesInOriginal"
-            @change="$settings.loadTilesInOriginal = Boolean($event.target.checked)"
+            v-model="$settings.loadTilesInOriginal"
           >
           {{$t("settings.loadTilesInOriginal")}}
         </label>
@@ -108,8 +102,7 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.showTagsOnTile"
-            @change="$settings.showTagsOnTile = Boolean($event.target.checked)"
+            v-model="$settings.showTagsOnTile"
           >
           {{$t("settings.showTagsOnTile")}}
         </label>
@@ -145,8 +138,7 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.alwaysShowNSFW"
-            @change="$settings.alwaysShowNSFW = Boolean($event.target.checked)"
+            v-model="$settings.alwaysShowNSFW"
           >
           {{$t("settings.alwaysShowNSFW")}}
         </label><br>
@@ -154,8 +146,7 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.showFPS"
-            @change="$settings.showFPS = Boolean($event.target.checked)"
+            v-model="$settings.showFPS"
           >
           {{$t("settings.showFPS")}}
         </label><br>
@@ -181,8 +172,7 @@
         <label>
           <input
             type="checkbox"
-            :checked="$settings.ignoreMinorUpdate"
-            @change="$settings.ignoreMinorUpdate = Boolean($event.target.checked)"
+            v-model="$settings.ignoreMinorUpdate"
           >
           {{$t("settings.ignoreMinorUpdate")}}
         </label><br>
