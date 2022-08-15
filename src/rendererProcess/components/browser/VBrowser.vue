@@ -148,7 +148,6 @@ export default class VBrowser extends Vue {
     this.scrollAreaResizer = new ResizeObserver((entries) => {
       this.resizeScrollArea(entries[0]!.contentRect);
     });
-    this.$defines.BROWSER_THUMBNAIL_MARGIN
     this.thumbnails.addEventListener("scroll", this.updateScrollArea);
     this.thumbnails.addEventListener("wheel", (e) => {
       if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
@@ -474,7 +473,7 @@ export default class VBrowser extends Vue {
       }
       if (newGroup) {
         const height = 32;
-        const position = new Vec2(0, yList[mvi]);
+        const position = new Vec2(0, yList[mvi]! + BROWSER_THUMBNAIL_MARGIN);
         yList.fill(minY + height);
         const tile: Tile = {
           position: position,
@@ -488,7 +487,7 @@ export default class VBrowser extends Vue {
         this.updateVisibility(tile);
         tiles.push(tile)
       }
-      const position = new Vec2(mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN, yList[mvi]);
+      const position = new Vec2(mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN, yList[mvi]! + BROWSER_THUMBNAIL_MARGIN);
       const height = p.height * this.actualTileSize;
       yList[mvi] += height;
       const tile: Tile = {
