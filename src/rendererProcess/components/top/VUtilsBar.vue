@@ -101,10 +101,10 @@ t-utils-bar-root {
   --top-draggable-height: 10px;
   width: 100%;
   position: relative;
-  background-color: var(--tab-selected-color);
+  background-color: var(--color-main);
   min-height: 30px;
   box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.4);
-  border-bottom: solid 1px var(--bg-color);
+  border-bottom: solid 1px var(--color-main);
   display: block;
   z-index: 2;
   >t-shared {
@@ -142,7 +142,7 @@ t-utils-bar-root {
           background-size: 14px;
           background-repeat: no-repeat;
           background-position: center center;
-          filter: var(--icon-filter);
+          filter: var(--filter-icon);
           &.board {
             background-image: url("~@/@assets/board.png");
           }

@@ -131,16 +131,16 @@ export default class VLayerCell extends Vue {
   cursor: pointer;
   margin: 0px;
   padding: 4px;
-  background-color: var(--button-bg-color);
+  background-color: var(--color-main);
   display: flex;
   align-items: center;
   height: 64px;
   width: 100%;
   &.selected {
-    background-color: var(--button-active-bg-color) !important;
+    background-color: var(--color-hover) !important;
   }
   &.drag, &:hover {
-    background-color: var(--button-hover-bg-color);
+    background-color: var(--color-hover);
   }
   &.drag {
     position: absolute;
@@ -157,7 +157,7 @@ export default class VLayerCell extends Vue {
     background-position: center center;
     background-size: 12px;
     display: block;
-    filter: var(--icon-filter);
+    filter: var(--filter-icon);
     &.visible {
       background-size: 14px;
       background-image: url("~@/@assets/visible.png");

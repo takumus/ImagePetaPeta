@@ -29,7 +29,7 @@ export default class VProgressBar extends Vue {
 
 <style lang="scss" scoped>
 t-progress-bar-root {
-  background-color: var(--font-color);
+  background-color: var(--color-font);
   width: 100%;
   height: 16px;
   overflow: hidden;
@@ -40,7 +40,7 @@ t-progress-bar-root {
     width: 50%;
     height: 100%;
     border-radius: var(--rounded);
-    background-color: var(--bg-color);
+    background-color: var(--color-main);
     display: block;
   }
 }

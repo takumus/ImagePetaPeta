@@ -113,6 +113,8 @@ export default class BrowserIndex extends Vue {
 
 <style lang="scss" scoped>
 t-root {
+  background-color: var(--color-main);
+  color: var(--color-font);
   >t-content {
     position: fixed;
     top: 0px;
@@ -130,7 +132,7 @@ t-root {
       display: block;
       overflow: hidden;
       padding: 8px;
-      background-color: var(--bg-color);
+      background-color: var(--color-main);
       flex: 1;
       z-index: 1;
     }

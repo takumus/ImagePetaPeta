@@ -359,19 +359,14 @@ t-property-root {
       width: 100%;
       >t-color-background {
         display: flex;
-        // background-color: rgba($color: (#000000), $alpha: 0.5);
         border-radius: var(--rounded);
         height: 8px;
         width: 100%;
         overflow: hidden;
-        // border: solid 4px rgba($color: #000000, $alpha: 0.5);
         box-shadow: 0px 0px 0px 1px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
         >t-color {
-          // width: 8px;
           height: 100%;
-          // margin: 0px 4px;
           display: block;
-          // border-radius: 10px;
         }
       }
     }
@@ -382,16 +377,12 @@ t-property-root {
     flex-direction: column;
     overflow: hidden;
     >t-search-box {
-      // border-radius: var(--rounded);
-      // border: solid 1.2px var(--border-color);
       outline: none;
       padding: 4px 4px 0px 0px;
       font-size: 1.0em;
       width: 100%;
       word-break: break-word;
       text-align: left;
-      // text-align: center;
-      // display: block;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
@@ -402,8 +393,7 @@ t-property-root {
         margin: 0px 0px 4px 4px;
         border-radius: var(--rounded);
         padding: 4px;
-        background-color: var(--tab-bg-color);
-        // border: solid 1.2px var(--border-color);
+        background-color: var(--color-sub);
         &.last {
           width: 100%;
           background-color: unset;

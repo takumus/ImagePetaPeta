@@ -185,14 +185,14 @@ t-tab-root {
   --top-draggable-height: 10px;
   top: 0px;
   left: 0px;
-  background-color: var(--tab-bg-color);
-  color: var(--font-color);
+  background-color: var(--color-sub);
+  color: var(--color-font);
   height: var(--tab-height);
   display: flex;
   >t-tab {
     display: block;
     margin: 0px;
-    // border-right: solid 1px var(--tab-border-color);
+    // border-right: solid 1px var(--color-border);
     // border-left: solid 1px;
     margin-right: -1px;
     flex-shrink: 1;
@@ -204,7 +204,7 @@ t-tab-root {
     &.drag {
       position: absolute;
       pointer-events: none;
-      border-left: solid 1px var(--tab-border-color);
+      border-left: solid 1px var(--color-border);
     }
     &.add {
       min-width: 16px;
@@ -220,12 +220,12 @@ t-tab-root {
         display: block;
         position: absolute;
         width: 0px;
-        border-left: solid 1px var(--border-color);
+        border-left: solid 1px var(--color-border);
         // height: 100%;
         top: var(--rounded);
         bottom: var(--rounded);
         left: 0px;
-        background-color: var(--border-color);
+        background-color: var(--color-border);
         border-radius: 1px;
       }
     }
@@ -233,11 +233,11 @@ t-tab-root {
       z-index: 2;
       border-radius: var(--rounded) var(--rounded) 0px 0px;
       overflow: visible;
-      background-color: var(--tab-selected-color);
+      background-color: var(--color-main);
       flex-shrink: 0;
       border: none;
       &:hover {
-        background-color: var(--tab-selected-color);
+        background-color: var(--color-main);
       }
       &::before, &::after {
         content: '';
@@ -248,7 +248,7 @@ t-tab-root {
         width: var(--rounded);
         height: var(--rounded);
         border-radius: 0 0 100% 0;
-        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-selected-color);
+        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--color-main);
       }
       &::after {
         left: unset;
@@ -257,7 +257,7 @@ t-tab-root {
       }
     }
     &:hover:not(.selected) {
-      background-color: var(--tab-hovered-color);
+      background-color: var(--color-hover);
       overflow: visible;
       flex-shrink: 0;
       &::before, &::after {
@@ -269,7 +269,7 @@ t-tab-root {
         width: var(--rounded);
         height: var(--rounded);
         border-radius: 0 0 100% 0;
-        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--tab-hovered-color);
+        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--color-hover);
       }
       &::after {
         left: unset;

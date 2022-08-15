@@ -93,11 +93,11 @@ export default class VContextMenu extends Vue {
 <style lang="scss" scoped>
 .context-menu-root {
   position: fixed;
-  background-color: var(--contextmenu-item-color);
+  background-color: var(--color-main);
   padding: 0px;
   margin: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-  color: var(--font-color);
+  color: var(--color-font);
   border-radius: var(--rounded);
   overflow: hidden;
   >.item {
@@ -109,11 +109,11 @@ export default class VContextMenu extends Vue {
     font-size: 1em;
     cursor: pointer;
     &:hover {
-      background-color: var(--contextmenu-item-hover-color);
+      background-color: var(--color-hover);
     }
     >.disabled {
       &:hover {
-        background-color: var(--contextmenu-item-color);
+        background-color: var(--color-main);
       }
     }
   }

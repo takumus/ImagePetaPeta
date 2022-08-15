@@ -92,7 +92,7 @@ export default class VTitleBar extends Vue {
 t-titlebar-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
-  background-color: var(--tab-bg-color);
+  background-color: var(--color-sub);
   min-height: var(--tab-height);
   display: flex;
   position: relative;
@@ -153,7 +153,7 @@ t-titlebar-root {
         font-family: Segoe MDL2 Assets;
       }
       &:hover {
-        background-color: var(--window-buttons-hover);
+        background-color: var(--color-hover);
         &.close {
           color: #ffffff;
           background-color: var(--window-buttons-close-hover);

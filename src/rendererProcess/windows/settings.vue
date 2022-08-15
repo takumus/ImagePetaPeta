@@ -67,6 +67,8 @@ export default class SettingsIndex extends Vue {
 
 <style lang="scss" scoped>
 t-root {
+  background-color: var(--color-main);
+  color: var(--color-font);
   >t-content {
     position: fixed;
     top: 0px;
@@ -84,7 +86,7 @@ t-root {
       display: block;
       overflow: hidden;
       padding: 16px;
-      background-color: var(--bg-color);
+      background-color: var(--color-main);
       flex: 1;
       z-index: 1;
     }

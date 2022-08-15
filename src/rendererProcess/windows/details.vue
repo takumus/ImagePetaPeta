@@ -217,6 +217,8 @@ export default class DetailsIndex extends Vue {
 
 <style lang="scss" scoped>
 t-root {
+  background-color: var(--color-main);
+  color: var(--color-font);
   >t-content {
     position: fixed;
     top: 0px;
@@ -233,7 +235,7 @@ t-root {
     >t-browser {
       display: flex;
       overflow: hidden;
-      background-color: var(--bg-color);
+      background-color: var(--color-main);
       flex: 1;
       z-index: 1;
       >t-board {
@@ -247,7 +249,7 @@ t-root {
       >t-property {
         padding: 8px;
         display: block;
-        background-color: var(--bg-color);
+        background-color: var(--color-main);
         z-index: 2;
         width: 300px;
       }

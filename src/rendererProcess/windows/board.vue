@@ -336,6 +336,8 @@ export default class BoardIndex extends Vue {
 
 <style lang="scss" scoped>
 t-root {
+  background-color: var(--color-main);
+  color: var(--color-font);
   >t-content {
     position: fixed;
     top: 0px;
@@ -353,7 +355,7 @@ t-root {
     >t-browser {
       display: block;
       overflow: hidden;
-      background-color: var(--bg-color);
+      background-color: var(--color-main);
       flex: 1;
       z-index: 1;
     }

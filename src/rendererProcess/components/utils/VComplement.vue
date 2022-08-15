@@ -204,11 +204,11 @@ export default class VComplement extends Vue {
 <style lang="scss" scoped>
 .complement-root {
   position: fixed;
-  background-color: var(--contextmenu-item-color);
+  background-color: var(--color-main);
   padding: 0px;
   margin: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-  color: var(--font-color);
+  color: var(--color-font);
   border-radius: var(--rounded);
   overflow-y: auto;
   overflow-x: hidden;
@@ -222,7 +222,7 @@ export default class VComplement extends Vue {
     font-size: 1em;
     cursor: pointer;
     &.selected, &.close:hover {
-      background-color: var(--contextmenu-item-hover-color);
+      background-color: var(--color-hover);
     }
     &.close {
       text-align: center;

@@ -161,7 +161,7 @@ export default class VLayer extends Vue {
 
 <style lang="scss" scoped>
 t-layer-root {
-  background-color: var(--bg-color);
+  background-color: var(--color-main);
   border-radius: var(--rounded);
   overflow: hidden;
   display: flex;
@@ -193,7 +193,7 @@ t-layer-root {
     min-width: 14px;
     flex-shrink: 0;
     margin-bottom: 8px;
-    filter: var(--icon-filter);
+    filter: var(--filter-icon);
   }
   >t-layers-parent {
     display: block;

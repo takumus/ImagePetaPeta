@@ -191,7 +191,7 @@ t-editable-label-root {
     >t-outline {
       border-radius: 4px;
       padding: 0px 4px;
-      border: solid 1.2px var(--border-color);
+      border: solid 1.2px var(--color-border);
       &.no-outline {
         border: none;
       }

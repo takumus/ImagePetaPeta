@@ -362,7 +362,7 @@ t-tile-root {
         margin: 1px 1px;
         border-radius: var(--rounded);
         padding: 3px;
-        background-color: var(--tab-bg-color);
+        background-color: var(--color-sub);
         font-size: 0.7em;
       }
     }
@@ -375,12 +375,12 @@ t-tile-root {
       width: 100%;
       height: 100%;
       // background-color: rgba($color: #ffffff, $alpha: 0.4);
-      border: solid 4px var(--font-color);
+      border: solid 4px var(--color-font);
       display: block;
       >t-icon {
         border-radius: var(--rounded) 0px 0px 0px;
-        background-color: var(--font-color);
-        color: var(--bg-color);
+        background-color: var(--color-font);
+        color: var(--color-main);
         position: absolute;
         padding: 0px 6px;
         margin-right: -2px;

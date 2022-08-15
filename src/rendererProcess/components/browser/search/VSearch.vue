@@ -127,7 +127,7 @@ t-search-root {
   width: 100%;
   >t-search-box {
     border-radius: var(--rounded);
-    border: solid 1.2px var(--border-color);
+    border: solid 1.2px var(--color-border);
     outline: none;
     padding: 4px 4px 0px 0px;
     font-size: 1.0em;
@@ -146,8 +146,8 @@ t-search-root {
       margin: 0px 0px 4px 4px;
       border-radius: var(--rounded);
       padding: 4px;
-      background-color: var(--tab-bg-color);
-      // border: solid 1.2px var(--border-color);
+      background-color: var(--color-sub);
+      // border: solid 1.2px var(--color-border);
       &.last {
         width: 100%;
         background-color: unset;
