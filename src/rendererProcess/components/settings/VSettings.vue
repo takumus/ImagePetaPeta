@@ -358,7 +358,7 @@ t-settings-root {
       text-align: left;
       display: block;
       >p {
-        font-size: 0.8em;
+        font-size: var(--size-0);
         margin-left: 16px;
         word-break: break-word;
       }
@@ -370,7 +370,7 @@ t-settings-root {
           text-align: center;
           display: block;
           >p {
-            font-size: 1em;
+            font-size: var(--size-1);
             word-break: break-word;
           }
         }
@@ -387,11 +387,11 @@ t-settings-root {
           }
           overflow: hidden;
           white-space: pre-wrap;
-          font-size: 0.8em;
+          font-size: var(--size-0);
         }
         >p {
+          font-size: var(--size-1);
           word-break: break-word;
-          font-size: 1em;
         }
       }
     }

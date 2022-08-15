@@ -267,7 +267,7 @@ t-tile-root {
     text-align: center;
     line-height: 24px;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: var(--size-2);
   }
   >t-tile-wrapper {
     position: relative;
@@ -350,7 +350,7 @@ t-tile-root {
       pointer-events: none;
       outline: none;
       padding: 2px 2px;
-      font-size: 1.0em;
+      font-size: var(--size-0);
       word-break: break-word;
       text-align: left;
       display: flex;
@@ -363,7 +363,7 @@ t-tile-root {
         border-radius: var(--rounded);
         padding: 3px;
         background-color: var(--color-sub);
-        font-size: 0.7em;
+        font-size: var(--size-0);
       }
     }
     >t-selected {

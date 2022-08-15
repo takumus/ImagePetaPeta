@@ -219,7 +219,7 @@ export default class VComplement extends Vue {
     width: 256px;
     padding: 4px 24px;
     // padding-left: 24px;
-    font-size: 1em;
+    font-size: var(--size-1);
     cursor: pointer;
     &.selected, &.close:hover {
       background-color: var(--color-hover);

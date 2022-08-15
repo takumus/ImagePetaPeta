@@ -46,7 +46,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
       }
       span {
         letter-spacing: -0.03em;
-        font-size: 0.9em;
+        font-size: var(--size-0);
       }
       </style>
       </head>

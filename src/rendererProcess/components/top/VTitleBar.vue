@@ -107,7 +107,7 @@ t-titlebar-root {
       width: 100%;
       text-align: center;
       display: inline-block;
-      font-size: 0.9em;
+      font-size: var(--size-0);
     }
   }
   >t-content {

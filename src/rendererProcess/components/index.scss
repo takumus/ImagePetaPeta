@@ -3,6 +3,9 @@ t-root {
   // 共有
   --rounded: 8px;
   --window-buttons-close-hover: #ff0000;
+  --size-0: 0.8em;
+  --size-1: 1.0em;
+  --size-2: 1.2em;
   // 明るいモード
   & {
     --color-main: #ffffff;
@@ -41,8 +44,8 @@ t-root {
     background-color: var(--color-main);
     color: var(--color-font);
     padding: 4px 16px;
-    line-height: 1.0em;
-    font-size: 1.0em;
+    line-height: var(--size-1);
+    font-size: var(--size-1);
     cursor: pointer;
     border: solid 1.2px var(--color-border);
     margin: 4px;

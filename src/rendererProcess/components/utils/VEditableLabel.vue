@@ -167,8 +167,7 @@ t-editable-label-root {
     // background-color: #ff0000;
     text-align: left;
     >t-editable-label {
-      line-height: 1.2em;
-      font-size: 1.0em;
+      line-height: var(--size-2);
       text-align: left;
       padding: 0px;
       margin: 0px;

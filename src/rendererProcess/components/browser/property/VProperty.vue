@@ -379,7 +379,6 @@ t-property-root {
     >t-search-box {
       outline: none;
       padding: 4px 4px 0px 0px;
-      font-size: 1.0em;
       width: 100%;
       word-break: break-word;
       text-align: left;
@@ -404,7 +403,6 @@ t-property-root {
   }
   p {
     text-align: center;
-    font-size: 1.0em;
     margin: 4px 0px;
   }
 }

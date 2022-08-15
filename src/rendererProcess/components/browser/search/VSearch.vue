@@ -130,7 +130,6 @@ t-search-root {
     border: solid 1.2px var(--color-border);
     outline: none;
     padding: 4px 4px 0px 0px;
-    font-size: 1.0em;
     width: 100%;
     height: 100%;
     word-break: break-word;

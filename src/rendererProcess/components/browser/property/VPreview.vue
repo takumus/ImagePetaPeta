@@ -144,7 +144,6 @@ t-property-root {
   }
   p {
     text-align: center;
-    font-size: 1.0em;
     margin: 4px 0px;
   }
 }

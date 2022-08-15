@@ -96,9 +96,9 @@ t-task-root {
     height: 64px;
     overflow-y: auto;
     overflow-x: hidden;
-    font-size: 0.8em;
+    font-size: var(--size-0);
   }
-  p {
+  >p {
     word-break: break-word;
   }
 }
