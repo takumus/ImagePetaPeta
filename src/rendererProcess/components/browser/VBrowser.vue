@@ -136,9 +136,11 @@ export default class VBrowser extends Vue {
   firstSelectedTile: Tile | null = null;
   thumbnailsSize = 0;
   currentScrollTileId = "";
+  currentScrollTileOffset = 0;
   keyboards = new Keyboards();
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
+  ignoreScrollEvent = false;
   mounted() {
     this.thumbnailsResizer = new ResizeObserver((entries) => {
       this.resizeImages(entries[0]!.contentRect);
@@ -176,14 +178,16 @@ export default class VBrowser extends Vue {
     this.keyboards.destroy();
   }
   saveScrollPosition() {
-    let min = Infinity;
+    let minDistance = Infinity;
     this.tiles.forEach((t) => {
       if (t.petaImage === undefined) {
         return;
       }
-      const d = Math.abs(t.position.y - this.thumbnails.scrollTop);
-      if (d < min) {
-        min = d;
+      const offset = this.thumbnails.scrollTop - t.position.y;
+      const distance = Math.abs(offset);
+      if (distance < minDistance) {
+        minDistance = distance;
+        this.currentScrollTileOffset = offset;
         this.currentScrollTileId = t.petaImage.id;
       }
     });
@@ -191,16 +195,24 @@ export default class VBrowser extends Vue {
   restoreScrollPosition() {
     const current = this.tiles.find((bt) => bt.petaImage?.id === this.currentScrollTileId);
     if (current) {
-      this.thumbnails.scrollTo(0, current.position.y);
+      this.ignoreScrollEvent = true;
+      this.thumbnails.scrollTo(0, current.position.y + this.currentScrollTileOffset);
     }
   }
-  updateScrollArea(event?: Event) {
+  updateScrollArea(event?: Event, resize = false) {
     const preVisibleOffset = this.scrollAreaHeight * 1;
     const visibleOffset = this.scrollAreaHeight * 0.2;
     this.areaMinY = this.thumbnails.scrollTop - visibleOffset;
     this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + visibleOffset;
     this.areaPreVisibleMinY = this.thumbnails.scrollTop - preVisibleOffset;
     this.areaPreVisibleMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + preVisibleOffset;
+    if (resize) {
+      return;
+    }
+    if (this.ignoreScrollEvent) {
+      this.ignoreScrollEvent = false;
+      return;
+    }
     if (this.scrollAreaHeight && event) {
       this.saveScrollPosition();
     }
@@ -209,7 +221,7 @@ export default class VBrowser extends Vue {
     const areaHeight = rect.height;
     this.scrollAreaHeight = areaHeight;
     this.restoreScrollPosition();
-    this.updateScrollArea();
+    this.updateScrollArea(undefined, true);
   }
   resizeImages(rect: DOMRectReadOnly) {
     this.thumbnailsWidth = rect.width - BROWSER_THUMBNAIL_MARGIN;
