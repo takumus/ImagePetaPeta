@@ -64,8 +64,8 @@ export async function create(component: Component, windowType: WindowType) {
     passive: false,
     capture: false
   });
-  new Keyboards().down(["d"], () => {
-    if (Keyboards.pressedOR("control", "meta")) {
+  new Keyboards().down(["KeyD"], () => {
+    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
       API.send("windowToggleDevTools");
     }
   }).enabled = true;

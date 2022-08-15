@@ -71,7 +71,7 @@ export default class VEditableLabel extends Vue {
   keyboard = new Keyboards(false);
   mounted() {
     this.changeLabel();
-    this.keyboard.down(["backspace", "delete"], () => {
+    this.keyboard.down(["Backspace", "Delete"], () => {
       if (this.tempText === "") {
         this.$emit("delete", this);
       }

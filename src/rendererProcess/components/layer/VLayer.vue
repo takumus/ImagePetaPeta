@@ -133,7 +133,7 @@ export default class VLayer extends Vue {
     pPanel.selected = true;
   }
   clearSelectionAll(force = false) {
-    if (!Keyboards.pressed("shift") || force) {
+    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
       this.pPanelsArray.forEach((p) => {
         p.selected = false;
       });

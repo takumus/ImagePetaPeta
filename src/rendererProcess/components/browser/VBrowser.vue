@@ -151,7 +151,7 @@ export default class VBrowser extends Vue {
     this.$defines.BROWSER_THUMBNAIL_MARGIN
     this.thumbnails.addEventListener("scroll", this.updateScrollArea);
     this.thumbnails.addEventListener("wheel", (e) => {
-      if (Keyboards.pressedOR("control", "meta")) {
+      if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
         this.thumbnailsSize -= e.deltaY * this.$settings.zoomSensitivity * 0.001;
         this.thumbnailsSize = Math.floor(this.thumbnailsSize);
         if (this.thumbnailsSize < BROWSER_THUMBNAIL_ZOOM_MIN) {
@@ -167,7 +167,7 @@ export default class VBrowser extends Vue {
 
     this.thumbnailsSize = this.$states.browserTileSize;
     this.keyboards.enabled = true;
-    this.keyboards.down(["a"], this.keyA);
+    this.keyboards.down(["KeyA"], this.keyA);
   }
   unmounted() {
     this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
@@ -227,7 +227,7 @@ export default class VBrowser extends Vue {
     this.thumbnailsWidth = rect.width - BROWSER_THUMBNAIL_MARGIN;
   }
   drag(petaImage: PetaImage) {
-    if (!Keyboards.pressedOR("shift", "control", "meta") && !petaImage._selected) {
+    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") && !petaImage._selected) {
       this.clearSelectionAllImages();
     }
     const petaImages = petaImage._selected ? [] : [petaImage];
@@ -239,11 +239,11 @@ export default class VBrowser extends Vue {
     if (thumb.petaImage === undefined) {
       return;
     }
-    if (this.selectedPetaImages.length < 1 || (!Keyboards.pressedOR("control", "meta", "shift"))) {
+    if (this.selectedPetaImages.length < 1 || (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight"))) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedTile = thumb;
     }
-    if (Keyboards.pressedOR("control", "meta")) {
+    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
       // 選択サムネイルを反転
       thumb.petaImage._selected = !thumb.petaImage._selected || force;
     } else {
@@ -253,7 +253,7 @@ export default class VBrowser extends Vue {
         pi._selected = thumb.petaImage === pi;
       });
     }
-    if (this.firstSelectedTile && Keyboards.pressed("shift")) {
+    if (this.firstSelectedTile && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
         Math.min(this.firstSelectedTile.position.x, thumb.position.x),
@@ -333,7 +333,7 @@ export default class VBrowser extends Vue {
     ], position);
   }
   async openDetail(petaImage: PetaImage) {
-    if (Keyboards.pressedOR("control", "meta", "shift")) {
+    if (Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
       return;
     }
     await API.send("setDetailsPetaImage", petaImage);
@@ -523,7 +523,7 @@ export default class VBrowser extends Vue {
     if (isKeyboardLocked()) {
       return;
     }
-    if (Keyboards.pressedOR("control", "meta")) {
+    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
       this.clearSelectionAllImages();
       this.filteredPetaImages.forEach((pi) => {
         pi._selected = true;

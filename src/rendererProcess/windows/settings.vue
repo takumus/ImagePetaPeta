@@ -54,7 +54,7 @@ export default class SettingsIndex extends Vue {
     this.title = `${this.$t("titles.settings")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;
     this.keyboards.enabled = true;
-    this.keyboards.up(["escape"], () => {
+    this.keyboards.up(["Escape"], () => {
       API.send("windowClose");
     });
   }

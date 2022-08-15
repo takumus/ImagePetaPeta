@@ -64,26 +64,26 @@ export default class VComplement extends Vue {
   height = "unset";
   mounted() {
     this.$components.complement = this;
-    this.keyboards.down(["arrowup"], () => {
+    this.keyboards.down(["ArrowUp"], () => {
       if (!this.target) return;
       this.moveSelectionRelative(-1);
     });
-    this.keyboards.down(["arrowdown"], () => {
+    this.keyboards.down(["ArrowDown"], () => {
       if (!this.target) return;
       this.moveSelectionRelative(1);
     });
-    this.keyboards.down(["tab"], () => {
+    this.keyboards.down(["Tab"], () => {
       if (!this.target) return;
-      this.moveSelectionRelative(Keyboards.pressed("shift") ? -1 : 1);
+      this.moveSelectionRelative(Keyboards.pressedOR("ShiftLeft", "ShiftRight") ? -1 : 1);
     });
-    this.keyboards.down(["enter"], () => {
+    this.keyboards.down(["Enter"], () => {
       if (!this.target) return;
       const item = this.filteredItems[this.currentIndex];
       if (item) {
         this.select(item);
       }
     });
-    this.keyboards.down(["escape"], () => {
+    this.keyboards.down(["Escape"], () => {
       this.$nextTick(() => {
         this.blur();
       });

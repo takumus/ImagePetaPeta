@@ -121,7 +121,7 @@ export default class VTags extends Vue {
     this.selectPetaTag(petaTag);
   }
   selectPetaTag(petaTag?: PetaTag, single = false) {
-    if ((!Keyboards.pressed("shift") && !Keyboards.pressed("control")) || single) {
+    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") || single) {
       this.selectedPetaTags.length = 0;
     }
     const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);

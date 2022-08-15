@@ -73,7 +73,7 @@ export default class VModal extends Vue {
     this.background.addEventListener("pointerdown", this.pointerdown);
     this.background.addEventListener("pointerup", this.pointerup);
     this.keyboards.enabled = true;
-    this.keyboards.down(["escape"], this.pressEscape);
+    this.keyboards.down(["Escape"], this.pressEscape);
     this.zIndex = this.defaultZIndex;
   }
   unmounted() {

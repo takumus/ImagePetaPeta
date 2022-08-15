@@ -184,9 +184,9 @@ export default class VBoard extends Vue {
     this.renderPIXI();
     this.keyboards = new Keyboards();
     this.keyboards.enabled = !this.detailsMode;
-    this.keyboards.down(["delete"], this.keyDelete);
-    this.keyboards.down(["backspace"], this.keyBackspace);
-    this.keyboards.change(["shift"], this.keyShift);
+    this.keyboards.down(["Delete"], this.keyDelete);
+    this.keyboards.down(["Backspace"], this.keyBackspace);
+    this.keyboards.change(["ShiftLeft", "ShiftRight"], this.keyShift);
     PIXI.Ticker.shared.add(this.updateAnimatedGIF);
   }
   destruct() {
@@ -605,7 +605,7 @@ export default class VBoard extends Vue {
     this.orderPIXIRender();
   }
   clearSelectionAll(force = false) {
-    if (!Keyboards.pressed("shift") || force) {
+    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
       this.pPanelsArray.forEach((p) => {
         p.selected = false;
       });
@@ -782,7 +782,7 @@ export default class VBoard extends Vue {
     if (!this.board || this.detailsMode) {
       return;
     }
-    if (!Keyboards.pressed("shift") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
+    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") && (this.selectedPPanels.length <= 1 || !pPanel.selected)) {
       // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
       // 最前にして選択リセット
       this.clearSelectionAll();

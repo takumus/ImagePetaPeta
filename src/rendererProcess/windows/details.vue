@@ -143,7 +143,7 @@ export default class DetailsIndex extends Vue {
       API.send("showMainWindow");
     });
     this.keyboards.enabled = true;
-    this.keyboards.up(["escape"], () => {
+    this.keyboards.up(["Escape"], () => {
       API.send("windowClose");
     });
   }
