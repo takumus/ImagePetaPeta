@@ -21,8 +21,10 @@
           <t-value>
             <textarea
               lock-keyboard
+              ref="noteTextArea"
               v-model="note"
               @blur="blurNoteTextarea"
+              @input="resizeNote"
             >
             </textarea>
           </t-value>
@@ -134,6 +136,8 @@ export default class VProperty extends Vue {
   petaTagInfos!: PetaTagInfo[];
   fetchingTags = true;
   note = "";
+  @Ref()
+  noteTextArea!: HTMLTextAreaElement;
   mounted() {
     //
   }
@@ -166,6 +170,13 @@ export default class VProperty extends Vue {
       [petaTag.id],
       UpdateMode.REMOVE
     );
+  }
+  resizeNote() {
+    this.noteTextArea.style.height = this.noteTextArea.scrollHeight + 'px';//この行だけでOK？
+    this.noteTextArea.style.height = "auto";
+    this.$nextTick(()=>{
+      this.noteTextArea.style.height = this.noteTextArea.scrollHeight + 'px';
+    })
   }
   changeName(name: string) {
     if (this.singlePetaImageInfo === undefined) {
@@ -278,6 +289,7 @@ export default class VProperty extends Vue {
     this.fetchPetaTags();
     if (this.singlePetaImageInfo) {
       this.note = this.singlePetaImageInfo.petaImage.note;
+      this.$nextTick(this.resizeNote);
     } else {
       this.note = "";
     }
