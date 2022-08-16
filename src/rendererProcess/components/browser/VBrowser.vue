@@ -12,8 +12,8 @@
         <t-top>
           <t-search>
             <VSearch
-              :petaTagInfos="petaTagInfos"
-              :selectedPetaTags="selectedPetaTags"
+              v-model:petaTagInfos="petaTagInfos"
+              v-model:selectedPetaTags="selectedPetaTags"
             />
           </t-search>
           <t-buttons>
@@ -191,6 +191,10 @@ export default class VBrowser extends Vue {
       }
     });
   }
+  updatePetaTagInfos(ev: any) {
+    console.log(ev)
+  }
+
   restoreScrollPosition() {
     const current = this.tiles.find((bt) => bt.petaImage?.id === this.currentScrollTileId);
     if (current) {
