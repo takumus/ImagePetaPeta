@@ -1,13 +1,10 @@
 <template>
   <t-search-root>
     <t-search-box>
-      <t-tag
-        v-for="tag in selectedPetaTags"
-        :key="tag.id"
-      >
+      <t-tag v-for="tag in selectedPetaTags" :key="tag.id">
         <VEditableLabel
           :label="tag.name"
-          :labelLook="tag.label"
+          :labelLook="tag.name"
           :clickToEdit="true"
           :allowEmpty="true"
           @focus="complementTag"
@@ -32,92 +29,96 @@
   </t-search-root>
 </template>
 
-<script lang="ts">
-// Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
-
-// Components
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
-
-// Others
+<script lang="ts" setup>
+import { defineProps, defineEmits, watch } from "vue";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { API } from "@/rendererProcess/api";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
-@Options({
-  components: {
-    VEditableLabel
-  },
-  emits:[
-  ]
-})
-export default class VSearch extends Vue {
-  @Ref("searchInput")
-  searchInput!: VEditableLabel;
-  @Prop()
-  petaTagInfos: PetaTagInfo[] = [];
-  @Prop()
-  selectedPetaTags: PetaTag[] = [];
-  mounted() {
-    //
-  }
-  unmounted() {
-    //
-  }
-  async removeTag(petaTag: PetaTag) {
-    if (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
-      await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
+import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
+import { ref } from "@vue/reactivity";
+import { computed, getCurrentInstance, nextTick } from "@vue/runtime-core";
+
+const plugins = getCurrentInstance()?.proxy;
+const searchInput = ref<VEditableLabel>();
+
+const props = defineProps<{
+  petaTagInfos: PetaTagInfo[];
+  selectedPetaTags: PetaTag[];
+}>();
+
+const emit = defineEmits<{
+  (e: "update:selectedPetaTags", value: PetaTag[]): void;
+}>();
+
+const editSearchTag = (tag: PetaTag, value: string) => {
+  value = value.trim().replace(/\r?\n/g, "");
+  const index = props.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
+  const _selectedPetaTags = [...props.selectedPetaTags];
+  _selectedPetaTags.splice(index, 1);
+  emit("update:selectedPetaTags", _selectedPetaTags);
+  if (value != "") {
+    const petaTag = props.petaTagInfos.find(
+      (pti) => pti.petaTag.name === value
+    )?.petaTag;
+    if (petaTag && !_selectedPetaTags.includes(petaTag)) {
+      emit(
+        "update:selectedPetaTags",
+        _selectedPetaTags.splice(index, 0, petaTag)
+      );
     }
   }
-  removeLastPetaTag() {
-    const last = this.selectedPetaTags[this.selectedPetaTags.length - 1];
-    if (last) {
-      this.editSearchTag(last, "");
-    } else {
-      // blur();
-    }
+};
+
+const removeLastPetaTag = () => {
+  const last = props.selectedPetaTags[props.selectedPetaTags.length - 1];
+  if (last) {
+    editSearchTag(last, "");
+  } else {
+    // blur();
   }
-  editSearchTag(tag: PetaTag, value: string) {
-    value = value.trim().replace(/\r?\n/g, "");
-    const index = this.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
-    this.selectedPetaTags.splice(index, 1);
-    if (value != "") {
-      const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name === value)?.petaTag;
-      if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
-        this.selectedPetaTags.splice(index, 0, petaTag);
-      }
-    }
+};
+
+const addSelectedTag = (tagName: string) => {
+  const petaTag = props.petaTagInfos.find(
+    (pti) => pti.petaTag.name === tagName
+  )?.petaTag;
+  const untaggedId = props.selectedPetaTags.findIndex(
+    (petaTag) => petaTag.id === UNTAGGED_ID
+  );
+
+  if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
+    emit("update:selectedPetaTags", []);
   }
-  addSelectedTag(tagName: string) {
-    const petaTag = this.petaTagInfos.find((pti) => pti.petaTag.name === tagName)?.petaTag;
-    const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
-    if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
-      this.selectedPetaTags.length = 0;
-    }
-    if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
-      this.selectedPetaTags.push(petaTag);
-    }
-    this.$nextTick(() => {
-      this.searchInput.edit();
-    });
+
+  if (petaTag && !props.selectedPetaTags.includes(petaTag)) {
+    emit("update:selectedPetaTags", [...props.selectedPetaTags, petaTag]);
   }
-  complementTag(editableLabel: VEditableLabel) {
-    this.$components.complement.open(editableLabel, this.complementItems);
-  }
-  get complementItems() {
-    return this.petaTagInfos.filter((pti) => {
-      return !this.selectedPetaTags.includes(pti.petaTag)
-    }).map((pti) => {
+
+  nextTick(() => {
+    searchInput.value?.edit();
+  });
+};
+
+const complementItems = computed(() => {
+  return props.petaTagInfos
+    .filter((pti) => {
+      return !props.selectedPetaTags.includes(pti.petaTag);
+    })
+    .map((pti) => {
       return pti.petaTag.name;
     });
+});
+
+const complementTag = (editableLabel: VEditableLabel) => {
+  plugins?.$components.complement.open(editableLabel, complementItems.value);
+};
+
+watch(
+  () => complementItems.value,
+  () => {
+    plugins?.$components.complement.updateItems(complementItems.value);
   }
-  @Watch("complementItems")
-  updateComplements() {
-    this.$components.complement.updateItems(this.complementItems);
-  }
-}
+);
 </script>
 
 <style lang="scss" scoped>
@@ -125,7 +126,7 @@ t-search-root {
   display: block;
   text-align: center;
   width: 100%;
-  >t-search-box {
+  > t-search-box {
     border-radius: var(--rounded);
     border: solid 1.2px var(--color-border);
     outline: none;
@@ -140,7 +141,7 @@ t-search-root {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    >t-tag {
+    > t-tag {
       display: inline-block;
       margin: 0px 0px 4px 4px;
       border-radius: var(--rounded);
