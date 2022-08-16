@@ -3,8 +3,8 @@
     :style="{
       top: propertyThumbnail.position.y + 'px',
       left: propertyThumbnail.position.x + 'px',
-      width: this.propertyThumbnail.width + 'px',
-      height: this.propertyThumbnail.height + 'px'
+      width: propertyThumbnail.width + 'px',
+      height: propertyThumbnail.height + 'px'
     }"
   >
     <t-image-wrapper>
