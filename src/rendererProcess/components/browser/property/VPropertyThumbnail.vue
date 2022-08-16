@@ -19,32 +19,27 @@
   </t-property-thumbnail-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, ref, defineProps, onMounted, getCurrentInstance } from "vue";
 // Others
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";
 import { PropertyThumbnail } from "./propertyThumbnail";
-@Options({
-  components: {
-  }
-})
-export default class VPropertyThumbnail extends Vue {
-  @Prop()
-  propertyThumbnail!: PropertyThumbnail;
-  imageURL = "";
-  mounted() {
-    this.imageURL = getImageURL(this.propertyThumbnail.petaImage, ImageType.THUMBNAIL);
-  }
-  get loaded() {
-    return this.imageURL != "";
-  }
-  get showNSFW() {
-    return this.propertyThumbnail.petaImage.nsfw && !this.$nsfw.showNSFW;
-  }
-}
+const _this = getCurrentInstance()!.proxy!;
+const props = defineProps<{
+  propertyThumbnail:  PropertyThumbnail,
+}>();
+const imageURL = ref("");
+onMounted(() => {
+  imageURL.value = getImageURL(props.propertyThumbnail.petaImage, ImageType.THUMBNAIL);
+});
+const loaded = computed(() => {
+  return imageURL.value != "";
+});
+const showNSFW = computed(() => {
+  return props.propertyThumbnail.petaImage.nsfw && !_this.$nsfw.showNSFW;
+});
 </script>
 
 <style lang="scss" scoped>
