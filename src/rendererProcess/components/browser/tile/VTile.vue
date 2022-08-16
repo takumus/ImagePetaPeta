@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, nextTick, ref, watch, getCurrentInstance, onMounted, onUnmounted } from "vue";
+import { computed, ref, watch, getCurrentInstance, onMounted, onUnmounted } from "vue";
 // Others
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
@@ -78,8 +78,7 @@ import { ImageType } from "@/commons/datas/imageType";
 import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { logChunk } from "@/rendererProcess/utils/rendererLogger";
-import { BROWSER_FETCH_TAGS_DELAY, BROWSER_FETCH_TAGS_DELAY_RANDOM, BROWSER_LOAD_ORIGINAL_DELAY, BROWSER_LOAD_ORIGINAL_DELAY_RANDOM, PLACEHOLDER_SIZE } from "@/commons/defines";
+import { BROWSER_FETCH_TAGS_DELAY, BROWSER_FETCH_TAGS_DELAY_RANDOM, BROWSER_LOAD_ORIGINAL_DELAY, BROWSER_LOAD_ORIGINAL_DELAY_RANDOM } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 
 const emit = defineEmits<{

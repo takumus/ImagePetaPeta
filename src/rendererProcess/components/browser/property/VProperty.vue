@@ -108,7 +108,6 @@
 // import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
-import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
