@@ -129,9 +129,9 @@ const props = defineProps<{
   petaImages: PetaImage[],
   petaTagInfos: PetaTagInfo[],
 }>();
-let fetchingTags = ref(false);
-let note = ref("");
-let sharedPetaTags = ref<PetaTag[]>([]);
+const fetchingTags = ref(false);
+const note = ref("");
+const sharedPetaTags = ref<PetaTag[]>([]);
 const noteTextArea = ref<HTMLTextAreaElement>();
 const _this = getCurrentInstance()!.proxy!;
 async function addTag(name: string) {
