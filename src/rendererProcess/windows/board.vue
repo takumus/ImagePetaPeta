@@ -14,8 +14,7 @@
             @remove="removePetaBoard"
             @add="addPetaBoard"
             @select="selectPetaBoard"
-            @sort="changePetaBoards"
-            @change="changePetaBoard"
+            @update:board="changePetaBoard"
             ref="vTabBar"
           />
         </VTitleBar>
@@ -103,7 +102,7 @@ export default class BoardIndex extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: VBoard;
   @Ref("vTabBar")
-  vTabBar!: VTabBar;
+  vTabBar!: typeof VTabBar;
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
   orderedAddPanelIds: string[] = [];
@@ -316,12 +315,12 @@ export default class BoardIndex extends Vue {
     if (!board) {
       return;
     }
+    const index = this.boards.findIndex((_board) => _board.id === board.id);
+    if (this.boards[index]) {
+      this.boards[index] = board;
+    }
+    console.log(board.id);
     this.savePetaBoard(board, false);
-  }
-  changePetaBoards() {
-    this.boards.forEach((board) => {
-      this.savePetaBoard(board, true);
-    });
   }
   @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {

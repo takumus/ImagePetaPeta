@@ -4,10 +4,10 @@
       :class="{ selected: b === board }"
       :style="{ opacity: b === board && dragging ? 0 : 1 }"
       v-for="(b, index) in boards"
-      @pointerdown="pointerdown($event, b, index, $target)"
+      @pointerdown="pointerdown($event, b, index, $event.target)"
       @contextmenu="menu($event, b)"
       :key="b.id"
-      :ref="(element) => setTabRef(element, b.id)"
+      :ref="(element) => setTabRef(element as HTMLElement, b.id)"
     >
       <t-label-wrapper>
         <t-label>
@@ -43,10 +43,9 @@
   </t-tab-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
@@ -55,128 +54,130 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
-@Options({
-  components: {
-    VEditableLabel
-  },
-  emits: [
-    "remove",
-    "add",
-    "select",
-    "sort",
-    "change"
-  ]
-})
-export default class VTabBar extends Vue {
-  @Prop()
-  boards!: PetaBoard[];
-  @Prop()
-  title = "";
-  @Prop()
-  currentPetaBoardId = "";
-  @Ref("draggingTab")
-  draggingTab!: HTMLElement;
-  dragging = false;
-  pressing = false;
-  pointerdownOffsetX = 0;
-  editName = false;
-  beforeSortSelectedIndex = 0;
-  afterSortSelectedIndex = 0;
-  draggingPetaBoard: PetaBoard | undefined;
-  tabs: { [key: string]: HTMLElement } = {};
-  mounted() {
-    window.addEventListener("pointermove", this.pointermove);
-    window.addEventListener("pointerup", this.pointerup);
+
+const _this = getCurrentInstance()!.proxy!;
+const emit = defineEmits<{
+  (e: "add"): void
+  (e: "remove", board: PetaBoard): void,
+  (e: "select", board: PetaBoard): void,
+  (e: "update:board", board: PetaBoard): void
+}>();
+const props = defineProps<{
+  boards: PetaBoard[],
+  title: string,
+  currentPetaBoardId: string
+}>();
+const draggingTab = ref<HTMLElement>();
+const dragging = ref(false);
+const pressing = ref(false);
+const pointerdownOffsetX = ref(0);
+const editName = ref(false);
+const beforeSortSelectedIndex = ref(0);
+const afterSortSelectedIndex = ref(0);
+const draggingPetaBoardId = ref<string>();
+const tabs = ref<{ [key: string]: HTMLElement }>({});
+onMounted(() => {
+  window.addEventListener("pointermove", pointermove);
+  window.addEventListener("pointerup", pointerup);
+});
+onUnmounted(() => {
+  window.removeEventListener("pointermove", pointermove);
+  window.removeEventListener("pointerup", pointerup);
+});
+function pointerdown(event: PointerEvent, board: PetaBoard, index: number, target: HTMLElement) {
+  if (isKeyboardLocked()) return;
+  if (event.button != MouseButton.LEFT) return;
+  selectPetaBoard(board);
+  pressing.value = true;
+  draggingPetaBoardId.value = board.id;
+  const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect();
+  if (!rect) return;
+  pointerdownOffsetX.value = rect.x - event.clientX;
+  if (draggingTab.value) {
+    draggingTab.value.style.left = `${rect.x}px`;
+    draggingTab.value.style.height = `${rect.height}px`;
   }
-  unmounted() {
-    window.removeEventListener("pointermove", this.pointermove);
-    window.removeEventListener("pointerup", this.pointerup);
-  }
-  pointerdown(event: PointerEvent, board: PetaBoard, index: number, target: HTMLElement) {
-    if (isKeyboardLocked()) return;
-    if (event.button != MouseButton.LEFT) return;
-    this.selectPetaBoard(board);
-    this.pressing = true;
-    this.draggingPetaBoard = board;
-    const rect = (event.currentTarget as HTMLElement)?.getBoundingClientRect();
-    if (!rect) return;
-    this.pointerdownOffsetX = rect.x - event.clientX;
-    this.draggingTab.style.left = `${rect.x}px`;
-    this.draggingTab.style.height = `${rect.height}px`;
-    this.beforeSortSelectedIndex = index;
-  }
-  menu(event: PointerEvent, board: PetaBoard) {
-    this.$components.contextMenu.open([{
-      label: this.$t("tab.menu.remove", [board.name]),
-      click: () => {
-        this.removePetaBoard(board);
-      }
-    }], vec2FromPointerEvent(event));
-  }
-  pointermove(event: PointerEvent) {
-    if (!this.pressing) return;
-    if (this.dragging) {
-      this.draggingTab.style.left = `${this.pointerdownOffsetX + event.clientX}px`;
-      // ソート前の選択中ボードのインデックス
-      const selectedPetaBoard = this.board;
-      let newIndex = 0;
-      this.boards
-      .map((b) => {
-        const elem: HTMLElement = b === this.draggingPetaBoard ? this.draggingTab : this.tabs[b.id]!;
-        return {
-          rect: elem.getBoundingClientRect(),
-          board: b
-        }
-      })
-      .sort((a, b) => (a.rect.x + a.rect.width / 2) - (b.rect.x + b.rect.width / 2))
-      .forEach((b, index) => {
-        b.board.index = index;
-        // 選択中ボードのインデックス復元。
-        if (b.board === selectedPetaBoard) {
-          newIndex = index;
-        }
-      });
-      this.afterSortSelectedIndex = newIndex;
-    }
-    this.dragging = true;
-  }
-  pointerup() {
-    if (!this.pressing) return;
-    this.dragging = false;
-    this.pressing = false;
-    if (this.beforeSortSelectedIndex != this.afterSortSelectedIndex) {
-      this.$emit("sort");
-    }
-  }
-  beforeUpdate() {
-    this.tabs = {};
-  }
-  setTabRef(element: HTMLElement, id: string) {
-    this.tabs[id] = element;
-  }
-  selectPetaBoard(board: PetaBoard) {
-    this.$emit("select", board);
-  }
-  changePetaBoardName(board: PetaBoard, name: string) {
-    if (name === "") {
-      return;
-    }
-    board.name = name;
-    this.$emit("change", board);
-  }
-  async removePetaBoard(board: PetaBoard) {
-    this.$emit("remove", board);
-  }
-  async addPetaBoard() {
-    this.$emit("add");
-  }
-  get board() {
-    return this.boards.find((board) => board.id === this.currentPetaBoardId);
-  }
-  get isMac() {
-    return this.$systemInfo.platform === "darwin";
-  }
+  beforeSortSelectedIndex.value = index;
 }
+function menu(event: PointerEvent, board: PetaBoard) {
+  _this.$components.contextMenu.open([{
+    label: _this.$t("tab.menu.remove", [board.name]),
+    click: () => {
+      removePetaBoard(board);
+    }
+  }], vec2FromPointerEvent(event));
+}
+function pointermove(event: PointerEvent) {
+  if (!pressing.value) return;
+  const _draggingTab = draggingTab.value;
+  if (_draggingTab === undefined) {
+    return;
+  }
+  if (dragging.value) {
+    _draggingTab.style.left = `${pointerdownOffsetX.value + event.clientX}px`;
+    // ソート前の選択中ボードのインデックス
+    const selectedPetaBoard = board.value;
+    let newIndex = 0;
+    props.boards
+    .map((b) => {
+      const elem: HTMLElement = b.id === draggingPetaBoardId.value ? _draggingTab : tabs.value[b.id]!;
+      return {
+        rect: elem.getBoundingClientRect(),
+        board: b
+      }
+    })
+    .sort((a, b) => (a.rect.x + a.rect.width / 2) - (b.rect.x + b.rect.width / 2))
+    .forEach((b, index) => {
+      if (b.board.index !== index) {
+        emit("update:board", {
+          ...b.board,
+          index
+        });
+      }
+      // 選択中ボードのインデックス復元。
+      if (b.board.id === selectedPetaBoard?.id) {
+        newIndex = index;
+      }
+    });
+    afterSortSelectedIndex.value = newIndex;
+  }
+  dragging.value = true;
+}
+function pointerup() {
+  if (!pressing.value) return;
+  dragging.value = false;
+  pressing.value = false;
+}
+onBeforeUpdate(() => {
+  tabs.value = {};
+});
+function setTabRef(element: HTMLElement, id: string) {
+  tabs.value[id] = element;
+}
+function selectPetaBoard(board: PetaBoard) {
+  emit("select", board);
+}
+function changePetaBoardName(board: PetaBoard, name: string) {
+  if (name === "") {
+    return;
+  }
+  emit("update:board", {
+    ...board,
+    name
+  });
+}
+async function removePetaBoard(board: PetaBoard) {
+  emit("remove", board);
+}
+async function addPetaBoard() {
+  emit("add");
+}
+const board = computed(() => {
+  return props.boards.find((board) => board.id === props.currentPetaBoardId);
+});
+const isMac = computed(() => {
+  return _this.$systemInfo.platform === "darwin";
+});
 </script>
 
 <style lang="scss" scoped>
