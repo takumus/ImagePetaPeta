@@ -19,6 +19,8 @@ import * as GlobalSystemInfo from "@/rendererProcess/vueComponentCustomPropertie
 import * as GlobalWindowType from "@/rendererProcess/vueComponentCustomProperties/windowType";
 import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProperties/windowIsFocused";
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
+
+import { createDarkModeState, darkModeStateKey } from "@/rendererProcess/stores/darkModeStore";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
@@ -50,6 +52,7 @@ export async function create(component: Component, windowType: WindowType) {
     await appUse(GlobalStates);
     await appUse(GlobalAppInfo);
     await appUse(GlobalWindowIsFocused.createPlugin(windowType));
+    app.provide(darkModeStateKey, createDarkModeState());
     app.mount("#app");
   }
   API.on("dataInitialized", () => {
