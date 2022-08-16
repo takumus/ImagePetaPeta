@@ -38,7 +38,7 @@ import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vu
 import { ref } from "@vue/reactivity";
 import { computed, getCurrentInstance, nextTick } from "@vue/runtime-core";
 
-const plugins = getCurrentInstance()?.proxy;
+const _this = getCurrentInstance()!.proxy!;
 const searchInput = ref<VEditableLabel>();
 
 const props = defineProps<{
@@ -50,7 +50,7 @@ const emit = defineEmits<{
   (e: "update:selectedPetaTags", value: PetaTag[]): void;
 }>();
 
-const editSearchTag = (tag: PetaTag, value: string) => {
+function editSearchTag(tag: PetaTag, value: string) {
   value = value.trim().replace(/\r?\n/g, "");
   const index = props.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
   const _selectedPetaTags = [...props.selectedPetaTags];
@@ -67,18 +67,18 @@ const editSearchTag = (tag: PetaTag, value: string) => {
       );
     }
   }
-};
+}
 
-const removeLastPetaTag = () => {
+function removeLastPetaTag() {
   const last = props.selectedPetaTags[props.selectedPetaTags.length - 1];
   if (last) {
     editSearchTag(last, "");
   } else {
     // blur();
   }
-};
+}
 
-const addSelectedTag = (tagName: string) => {
+function addSelectedTag(tagName: string) {
   const petaTag = props.petaTagInfos.find(
     (pti) => pti.petaTag.name === tagName
   )?.petaTag;
@@ -97,7 +97,11 @@ const addSelectedTag = (tagName: string) => {
   nextTick(() => {
     searchInput.value?.edit();
   });
-};
+}
+
+function complementTag(editableLabel: VEditableLabel) {
+  _this.$components.complement.open(editableLabel, complementItems.value);
+}
 
 const complementItems = computed(() => {
   return props.petaTagInfos
@@ -109,14 +113,10 @@ const complementItems = computed(() => {
     });
 });
 
-const complementTag = (editableLabel: VEditableLabel) => {
-  plugins?.$components.complement.open(editableLabel, complementItems.value);
-};
-
 watch(
   () => complementItems.value,
   () => {
-    plugins?.$components.complement.updateItems(complementItems.value);
+    _this.$components.complement.updateItems(complementItems.value);
   }
 );
 </script>
