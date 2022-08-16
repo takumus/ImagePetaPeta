@@ -1,6 +1,6 @@
 <template>
   <ul
-    v-show="this.show"
+    v-show="show"
     class="context-menu-root"
     ref="contextMenu"
     :style="{
