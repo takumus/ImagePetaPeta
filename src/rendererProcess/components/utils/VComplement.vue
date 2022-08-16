@@ -1,6 +1,6 @@
 <template>
   <ul
-    v-show="this.show"
+    v-show="show"
     class="complement-root"
     ref="complement"
     :style="{
@@ -57,7 +57,7 @@ export default class VComplement extends Vue {
   filteredItems: string[] = [];
   position = new Vec2(0, 0);
   show = false;
-  target?: VEditableLabel;
+  target?: any;
   currentIndex = 0;
   keyboards: Keyboards = new Keyboards();
   searcher?: FuzzySearch<string>;
@@ -131,7 +131,7 @@ export default class VComplement extends Vue {
       }
     }, 1);
   }
-  open(input: VEditableLabel, items: string[]): void {
+  open(input: any, items: string[]): void {
     if (input === this.target && this.show) {
       return;
     }

@@ -203,14 +203,14 @@ function clearSelection() {
     pi._selected = false;
   })
 }
-function complementTag(editableLabel: VEditableLabel) {
+function complementTag(editableLabel: any) {
   _this.$components.complement.open(editableLabel, props.petaTagInfos.filter((pti) => {
     return pti.petaTag.id !== UNTAGGED_ID;
   }).map((pti) => {
     return pti.petaTag.name;
   }));
 }
-function tagMenu(event: PointerEvent, tag: PetaTag) {
+function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
   _this.$components.contextMenu.open([
     {
       label: _this.$t("browser.property.tagMenu.remove", [tag.name]),

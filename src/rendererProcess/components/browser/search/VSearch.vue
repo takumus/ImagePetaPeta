@@ -39,7 +39,7 @@ import { ref } from "@vue/reactivity";
 import { computed, getCurrentInstance, nextTick } from "@vue/runtime-core";
 
 const _this = getCurrentInstance()!.proxy!;
-const searchInput = ref<VEditableLabel>();
+const searchInput = ref<typeof VEditableLabel>();
 
 const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
@@ -99,7 +99,7 @@ function addSelectedTag(tagName: string) {
   });
 }
 
-function complementTag(editableLabel: VEditableLabel) {
+function complementTag(editableLabel: any) {
   _this.$components.complement.open(editableLabel, complementItems.value);
 }
 

@@ -15,7 +15,7 @@
     >
       <t-editable-label
         v-text="labelLook && !editing ? labelLook : tempText"
-        ref="label"
+        ref="labelInput"
         placeholder=""
         :contenteditable="editing"
         @blur="cancel"
@@ -32,128 +32,114 @@
   </t-editable-label-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
-@Options({
-  components: {
-  },
-  emits: [
-    "change",
-    "focus",
-    "input",
-    "delete"
-  ]
-})
-export default class VEditableLabel extends Vue {
-  @Prop()
-  label!: string;
-  @Prop()
-  labelLook!: string;
-  @Prop()
-  growWidth!: boolean;
-  @Prop()
-  readonly!: boolean;
-  @Prop()
-  clickToEdit!: boolean;
-  @Prop()
-  noOutline!: boolean;
-  @Prop()
-  allowEmpty!: boolean;
-  @Ref("label")
-  labelInput!: HTMLElement;
-  tempText = "Hello";
-  editing = false;
-  labelWidth = 0;
-  labelHeight = 0;
-  keyboard = new Keyboards(false);
-  mounted() {
-    this.changeLabel();
-    this.keyboard.down(["Backspace", "Delete"], () => {
-      if (this.tempText === "") {
-        this.$emit("delete", this);
-      }
-    });
+import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
+const _this = getCurrentInstance()!.proxy!;
+const emit = defineEmits<{
+  (e: "change", value: string): void
+  (e: "focus", editableLabel: typeof _this): void,
+  (e: "input", value: string): void,
+  (e: "delete", editableLabel: typeof _this): void
+}>();
+const props = defineProps<{
+  label: string,
+  labelLook?: string,
+  growWidth?: boolean,
+  readonly?: boolean,
+  clickToEdit?: boolean,
+  noOutline?: boolean,
+  allowEmpty?: boolean
+}>();
+const labelInput = ref<HTMLElement>();
+const tempText = ref("Hello");
+const editing = ref(false);
+const keyboard = new Keyboards(false);
+onMounted(() => {
+  changeLabel();
+  keyboard.down(["Backspace", "Delete"], () => {
+    if (tempText.value === "") {
+      emit("delete", _this);
+    }
+  });
+});
+async function edit(dblclick = false) {
+  if (props.readonly || editing.value) {
+    return;
   }
-  unmounted() {
-    //
+  if (!props.clickToEdit && !dblclick) {
+    // ワンクリック編集が有効じゃなかったら、ワンクリックで反応しない。
+    return;
   }
-  async edit(dblclick = false) {
-    if (this.readonly || this.editing) {
+  keyboard.enabled = true;
+  editing.value = true;
+  tempText.value = props.label;
+  nextTick(() => {
+    if (labelInput.value === undefined) {
       return;
     }
-    if (!this.clickToEdit && !dblclick) {
-      // ワンクリック編集が有効じゃなかったら、ワンクリックで反応しない。
-      return;
-    }
-    this.keyboard.enabled = true;
-    this.editing = true;
-    this.tempText = this.label;
-    this.$nextTick(() => {
-      this.labelInput.focus();
-      const range = document.createRange();
-      range.selectNodeContents(this.labelInput);
-      const sel = window.getSelection();
-      sel?.removeAllRanges();
-      sel?.addRange(range);
-    });
-  }
-  keyPressEnter(e: KeyboardEvent) {
-    e.preventDefault();
-    setTimeout(() => {
-      this.apply();
-    }, 1);
-  }
-  preventLineBreak(e: KeyboardEvent) {
-    e.preventDefault();
-  }
-  apply(text?: string) {
-    if (!this.editing) {
-      return;
-    }
-    this.editing = false;
-    this.keyboard.enabled = false;
-    if (this.readonly) {
-      return;
-    }
-    setTimeout(() => {
-      if (text !== undefined) {
-        this.tempText = text;
-      }
-      this.tempText = this.tempText.trim();
-      if (!this.allowEmpty) {
-        if (this.label === this.tempText || this.tempText === "") {
-          this.tempText = this.label;
-          return;
-        }
-      }
-      this.$emit("change", this.tempText);
-    }, 1);
-  }
-  cancel() {
-    if (!this.editing) {
-      return;
-    }
-    setTimeout(() => {
-      this.tempText = this.label;
-    }, 1);
-    this.editing = false;
-    this.keyboard.enabled = false;
-  }
-  input(event: InputEvent) {
-    this.tempText = (event.target as HTMLElement).innerText;
-    this.$emit("input", this.tempText);
-  }
-  focus(event: FocusEvent) {
-    this.$emit("focus", this);
-  }
-  @Watch("label")
-  changeLabel() {
-    this.tempText = this.label.trim().replace(/\r?\n/g, "");
-  }
+    labelInput.value.focus();
+    const range = document.createRange();
+    range.selectNodeContents(labelInput.value);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  });
 }
+function keyPressEnter(e: KeyboardEvent) {
+  e.preventDefault();
+  setTimeout(() => {
+    apply();
+  }, 1);
+}
+function preventLineBreak(e: KeyboardEvent) {
+  e.preventDefault();
+}
+function apply(text?: string) {
+  if (!editing.value) {
+    return;
+  }
+  editing.value = false;
+  keyboard.enabled = false;
+  if (props.readonly) {
+    return;
+  }
+  setTimeout(() => {
+    if (text !== undefined) {
+      tempText.value = text;
+    }
+    tempText.value = tempText.value.trim();
+    if (!props.allowEmpty) {
+      if (props.label === tempText.value || tempText.value === "") {
+        tempText.value = props.label;
+        return;
+      }
+    }
+    emit("change", tempText.value);
+  }, 1);
+}
+function cancel() {
+  if (!editing.value) {
+    return;
+  }
+  setTimeout(() => {
+    tempText.value = props.label;
+  }, 1);
+  editing.value = false;
+  keyboard.enabled = false;
+}
+function input(event: InputEvent) {
+  tempText.value = (event.target as HTMLElement).innerText;
+  emit("input", tempText.value);
+}
+function focus(event: FocusEvent) {
+  emit("focus", _this);
+}
+function changeLabel() {
+  tempText.value = props.label.trim().replace(/\r?\n/g, "");
+}
+watch(() => props.label, changeLabel);
 </script>
 
 <style lang="scss" scoped>
