@@ -12,13 +12,14 @@
         <t-top>
           <t-search>
             <VSearch
-              v-model:petaTagInfos="petaTagInfos"
-              v-model:selectedPetaTags="selectedPetaTags"
+              :petaTagInfos="petaTagInfos"
+              :selectedPetaTags="selectedPetaTags"
+              @update:selectedPetaTags="updateSelectedPetaTags"
             />
           </t-search>
           <t-buttons>
             <label>
-              <input type="checkbox" :checked="$states.groupingByDate" @change="$states.groupingByDate = Boolean($event.target.checked)">
+              <input type="checkbox" :checked="$states.groupingByDate" @change="$states.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)">
               <span>{{$t("browser.grouping")}}</span>
             </label>
           </t-buttons>
@@ -58,7 +59,7 @@
         type="range"
         v-model="thumbnailsSize"
         tabindex="-1"
-        @change="updateTileSize(Number($event.target.value))"
+        @change="updateTileSize(Number(($event.target as HTMLInputElement).value))"
         :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
         :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
         :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
@@ -191,8 +192,10 @@ export default class VBrowser extends Vue {
       }
     });
   }
-  updatePetaTagInfos(ev: any) {
-    console.log(ev)
+  updateSelectedPetaTags(ev: PetaTag[]) {
+    console.log(ev);
+    this.selectedPetaTags.length = 0;
+    this.selectedPetaTags.push(...ev);
   }
 
   restoreScrollPosition() {

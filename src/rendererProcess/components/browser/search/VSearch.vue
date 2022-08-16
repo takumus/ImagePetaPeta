@@ -47,42 +47,23 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:petaTagInfos", value: PetaTagInfo[]): void;
   (e: "update:selectedPetaTags", value: PetaTag[]): void;
 }>();
-
-const _spliceSelectedPetaTags = (
-  startIndex: number,
-  count = Infinity
-): { targetValues: PetaTag[]; otherValues: PetaTag[] } => {
-  const [otherValues, targetValues] = props.selectedPetaTags.reduce(
-    (result, value, index) => {
-      if (index >= startIndex && index < startIndex + count) {
-        return [[...result[0], value], result[1]];
-      }
-      return [result[0], [...result[1], value]];
-    },
-    [[], []] as [PetaTag[], PetaTag[]]
-  );
-  return {
-    targetValues: targetValues,
-    otherValues: otherValues,
-  };
-};
 
 const editSearchTag = (tag: PetaTag, value: string) => {
   value = value.trim().replace(/\r?\n/g, "");
   const index = props.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
-  const splicedSelectedPetaTags = _spliceSelectedPetaTags(index, 1);
-  emit("update:selectedPetaTags", splicedSelectedPetaTags.otherValues);
+  const _selectedPetaTags = [...props.selectedPetaTags];
+  _selectedPetaTags.splice(index, 1);
+  emit("update:selectedPetaTags", _selectedPetaTags);
   if (value != "") {
     const petaTag = props.petaTagInfos.find(
       (pti) => pti.petaTag.name === value
     )?.petaTag;
-    if (petaTag && !splicedSelectedPetaTags.otherValues.includes(petaTag)) {
+    if (petaTag && !_selectedPetaTags.includes(petaTag)) {
       emit(
         "update:selectedPetaTags",
-        splicedSelectedPetaTags.otherValues.splice(index, 0, petaTag)
+        _selectedPetaTags.splice(index, 0, petaTag)
       );
     }
   }
@@ -106,11 +87,11 @@ const addSelectedTag = (tagName: string) => {
   );
 
   if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
-    emit("update:petaTagInfos", []);
+    emit("update:selectedPetaTags", []);
   }
 
   if (petaTag && !props.selectedPetaTags.includes(petaTag)) {
-    emit("update:selectedPetaTags", [petaTag]);
+    emit("update:selectedPetaTags", [...props.selectedPetaTags, petaTag]);
   }
 
   nextTick(() => {
