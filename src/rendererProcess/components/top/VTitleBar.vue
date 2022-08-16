@@ -47,45 +47,33 @@
   </t-titlebar-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance } from "vue";
 // Components
 // Others
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
-@Options({
-  components: {
-  },
-  emits: [
-  ]
-})
-export default class VTitleBar extends Vue {
-  @Prop()
-  title!: string;
-  mounted() {
-    //
-  }
-  unmounted() {
-    //
-  }
-  minimizeWindow() {
-    API.send("windowMinimize");
-  }
-  maximizeWindow() {
-    API.send("windowMaximize");
-  }
-  closeWindow() {
-    API.send("windowClose");
-  }
-  get resizable() {
-    return this.$windowType !== WindowType.SETTINGS;
-  }
-  get isMac() {
-    return this.$systemInfo.platform === "darwin";
-  }
+const _this = getCurrentInstance()!.proxy!;
+defineProps<{
+  title: string
+}>();
+
+function minimizeWindow() {
+  API.send("windowMinimize");
 }
+function maximizeWindow() {
+  API.send("windowMaximize");
+}
+function closeWindow() {
+  API.send("windowClose");
+}
+const resizable = computed(() => {
+  return _this.$windowType !== WindowType.SETTINGS;
+});
+const isMac = computed(() => {
+  return _this.$systemInfo.platform === "darwin";
+});
 </script>
 
 <style lang="scss" scoped>
