@@ -50,50 +50,35 @@
   </t-utils-bar-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
-// Components
+import { computed, getCurrentInstance } from "vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
-@Options({
-  components: {
-  },
-  emits: [
-  ]
-})
-export default class VUtilsBar extends Vue {
-  mounted() {
-    //
-  }
-  unmounted() {
-    //
-  }
-  openBoard() {
-    API.send("openWindow", WindowType.BOARD);
-  }
-  openBrowser() {
-    API.send("openWindow", WindowType.BROWSER);
-  }
-  openSettings() {
-    API.send("openWindow", WindowType.SETTINGS);
-  }
-  async toggleNSFW() {
-    const value = !this.$nsfw.showNSFW;
-    if (value) {
-      if (await this.$components.dialog.show(this.$t("utilsBar.nsfwConfirm"), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
-        await API.send("setShowNSFW", true);
-      }
-    } else {
-      await API.send("setShowNSFW", false);
+const _this = getCurrentInstance()!.proxy!;
+function openBoard() {
+  API.send("openWindow", WindowType.BOARD);
+}
+function openBrowser() {
+  API.send("openWindow", WindowType.BROWSER);
+}
+function openSettings() {
+  API.send("openWindow", WindowType.SETTINGS);
+}
+async function toggleNSFW() {
+  const value = !_this.$nsfw.showNSFW;
+  if (value) {
+    if (await _this.$components.dialog.show(_this.$t("utilsBar.nsfwConfirm"), [_this.$t("shared.yes"), _this.$t("shared.no")]) === 0) {
+      await API.send("setShowNSFW", true);
     }
-  }
-  get visible() {
-    return this.$focusedWindows.isMainWindow || this.$focusedWindows.focused;
+  } else {
+    await API.send("setShowNSFW", false);
   }
 }
+const visible = computed(() => {
+  return _this.$focusedWindows.isMainWindow || _this.$focusedWindows.focused;
+});
 </script>
 
 <style lang="scss" scoped>
