@@ -120,7 +120,7 @@ import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import dateFormat from "dateformat";
-import { computed, nextTick, ref, watch, defineEmits, defineProps, getCurrentInstance } from "vue";
+import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void

@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, watch } from "vue";
+import { watch } from "vue";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";

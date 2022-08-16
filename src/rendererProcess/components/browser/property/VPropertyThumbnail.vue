@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, ref, defineProps, onMounted, getCurrentInstance } from "vue";
+import { computed, ref, onMounted, getCurrentInstance } from "vue";
 // Others
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";

@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, ref, defineProps, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 // Components
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
