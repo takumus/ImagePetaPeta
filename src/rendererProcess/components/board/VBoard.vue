@@ -887,7 +887,7 @@ export default class VBoard extends Vue {
     this.$emit("change", this.board);
     this.orderPIXIRender();
   }
-  @Watch("board")
+  @Watch("board.id")
   changeBoard() {
     this.load({});
   }
