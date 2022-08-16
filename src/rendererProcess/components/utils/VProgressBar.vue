@@ -9,22 +9,10 @@
   </t-progress-bar-root>
 </template>
 
-<script lang="ts">
-// Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
-@Options({
-  components: {
-    //
-  }
-})
-export default class VProgressBar extends Vue {
-  @Prop()
-  progress = 100;
-  mounted() {
-    //
-  }
-}
+<script setup lang="ts">
+defineProps<{
+  progress: number
+}>();
 </script>
 
 <style lang="scss" scoped>
