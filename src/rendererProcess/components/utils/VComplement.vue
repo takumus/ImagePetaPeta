@@ -57,7 +57,6 @@ const height = ref("unset");
 const keyboards = new Keyboards();
 let searcher: FuzzySearch<string>;
 onMounted(() => {
-  _this.$components.complement = _this as any;
   keyboards.down(["ArrowUp"], () => {
     if (!target.value) return;
     moveSelectionRelative(-1);
@@ -129,8 +128,8 @@ function open(_input: any, items: string[]): void {
   updateItems(items);
   target.value = _input;
   filteredItems.value = [];
-  _input.labelInput.addEventListener("blur", blur);
-  _input.labelInput.addEventListener("input", input);
+  target.value.labelInput.addEventListener("blur", blur);
+  target.value.labelInput.addEventListener("input", input);
   show.value = true;
   input();
   keyboards.enabled = true;
@@ -191,6 +190,10 @@ function updatePosition() {
     }
   }
 }
+_this.$components.complement = {
+  open,
+  updateItems
+};
 defineExpose({
   updateItems,
   open

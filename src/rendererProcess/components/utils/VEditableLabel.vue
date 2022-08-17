@@ -36,7 +36,8 @@
 // Vue
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
-const _this = getCurrentInstance()!.proxy!;
+const __this = getCurrentInstance()!;
+const _this = __this.proxy!;
 const emit = defineEmits<{
   (e: "change", value: string): void
   (e: "focus", editableLabel: typeof _this): void,
@@ -134,14 +135,23 @@ function input(event: InputEvent) {
   emit("input", tempText.value);
 }
 function focus(event: FocusEvent) {
-  emit("focus", _this);
+  emit("focus", {
+    $el: labelInput.value,
+    edit,
+    tempText,
+    apply,
+    labelInput
+  } as any);
 }
 function changeLabel() {
   tempText.value = props.label.trim().replace(/\r?\n/g, "");
 }
 watch(() => props.label, changeLabel);
 defineExpose({
-  edit
+  edit,
+  labelInput,
+  tempText,
+  apply
 });
 </script>
 

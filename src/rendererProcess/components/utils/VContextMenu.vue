@@ -43,7 +43,6 @@ const items = ref<ContextMenuItem[]>([]);
 const position = ref(new Vec2(0, 0));
 const show = ref(false);
 onMounted(()=> {
-  _this.$components.contextMenu = _this as any;
   window.addEventListener("pointerdown", (event) => {
     if ((event.target as HTMLElement).parentElement != contextMenu.value) {
       select();
@@ -85,6 +84,9 @@ function select(item?: ContextMenuItem) {
 const filteredItems = computed(() => {
   return items.value.filter((item) => item.skip != true);
 });
+_this.$components.contextMenu = {
+  open
+};
 defineExpose({
   open
 });
