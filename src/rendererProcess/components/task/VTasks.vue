@@ -48,7 +48,7 @@ onMounted(() => {
 const taskStatusArray = computed(() => {
   return Object.keys(taskStatuses.value).reverse().map((id) => ({
     id,
-    status: taskStatuses.value[id]
+    status: taskStatuses.value[id]!
   }))
 });
 const visible = computed(() => {
