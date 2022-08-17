@@ -25,7 +25,6 @@
       :log="extractingLog"
       :extractProgress="extractProgress"
       :loadProgress="loadProgress"
-      ref="loadingModal"
     ></VBoardLoading>
     <VLayer
       ref="layer"
@@ -86,8 +85,6 @@ export default class VBoard extends Vue {
   zIndex = 0;
   @Ref("panelsBackground")
   panelsBackground!: HTMLElement;
-  @Ref("loadingModal")
-  loadingModal!: VBoardLoading;
   @Ref()
   layer!: VLayer;
   extracting = false;
