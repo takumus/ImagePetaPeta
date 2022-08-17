@@ -73,7 +73,6 @@
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
-import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 import VPreview from "@/rendererProcess/components/browser/property/VPreview.vue";
@@ -102,7 +101,6 @@ import deepcopy from "deepcopy";
     VProperty,
     VPreview,
     VEditableLabel,
-    VModal,
     VTags,
     VSearch
   },
