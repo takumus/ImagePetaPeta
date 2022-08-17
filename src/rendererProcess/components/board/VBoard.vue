@@ -691,8 +691,8 @@ async function load(params: {
       }
       if (pPanels[petaPanel.id] === undefined) {
         // pPanelが無ければ作成。
-        pPanels[petaPanel.id] = new PPanel(petaPanel);
-        const pPanel = pPanels[petaPanel.id]!;
+        const pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel);
+        console.log(pPanel)
         pPanel.setZoomScale(props.board?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = _this.$nsfw.showNSFW;
