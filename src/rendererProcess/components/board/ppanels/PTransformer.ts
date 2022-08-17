@@ -7,6 +7,7 @@ import { PSelection } from "@/rendererProcess/components/board/ppanels/PSelectio
 import { PControlPoint } from "@/rendererProcess/components/board/ppanels/PControlPoint";
 import deepcopy from "deepcopy";
 import { ROTATION_BLOCK_INCREMENT } from "@/commons/defines";
+import { Ref } from "vue";
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",
@@ -27,12 +28,11 @@ export class PTransformer extends PIXI.Container {
   beginSizingPosition = new Vec2();
   beginSizingPetaPanels: PetaPanel[] = [];
   beginSizingDistance = 0;
-  pPanels: {[key: string]: PPanel} = {};
   click = new ClickChecker();
   pMultipleSelection: PSelection = new PSelection();
   _scale = 0;
   fit = false;
-  constructor() {
+  constructor(public pPanels: Ref<{[key: string]: PPanel}>) {
     super();
     for (let i = 0; i < 8; i++) {
       const c = new PControlPoint();
@@ -104,7 +104,7 @@ export class PTransformer extends PIXI.Container {
     return this.pPanelsArray.filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
   }
   get pPanelsArray() {
-    return Object.values(this.pPanels);
+    return Object.values(this.pPanels.value);
   }
   pointerup(e: PIXI.InteractionEvent) {
     this.controlStatus = ControlStatus.NONE;

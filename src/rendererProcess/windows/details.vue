@@ -88,7 +88,7 @@ import { Keyboards } from "../utils/keyboards";
 })
 export default class DetailsIndex extends Vue {
   @Ref("vPetaBoard")
-  vPetaBoard!: VBoard;
+  vPetaBoard!: typeof VBoard;
   board: PetaBoard | null = null;
   petaImages: PetaImages = {};
   petaTagInfos: PetaTagInfo[] = [];

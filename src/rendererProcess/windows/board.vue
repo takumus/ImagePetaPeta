@@ -103,7 +103,7 @@ import { WindowType } from "@/commons/datas/windowType";
 })
 export default class BoardIndex extends Vue {
   @Ref("vPetaBoard")
-  vPetaBoard!: VBoard;
+  vPetaBoard!: typeof VBoard;
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
   orderedAddPanelIds: string[] = [];
