@@ -24,70 +24,67 @@
   </ul>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
+import { computed } from "@vue/reactivity";
+
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { v4 as uuid } from "uuid";
 import { ContextMenuItem } from "@/rendererProcess/components/utils/contextMenuItem";
-@Options({
-  components: {
-  }
-})
-export default class VContextMenu extends Vue {
-  @Prop()
-  zIndex = 0;
-  @Ref("contextMenu")
-  contextMenu!: HTMLElement;
-  items: ContextMenuItem[] = [];
-  position = new Vec2(0, 0);
-  show = false;
-  mounted() {
-    this.$components.contextMenu = this;
-    window.addEventListener("pointerdown", (event) => {
-      if ((event.target as HTMLElement).parentElement != this.contextMenu) {
-        this.select();
-        return;
-      }
-    });
-  }
-  unmounted() {
-    //
-  }
-  open(items: ContextMenuItem[], position: Vec2): void {
-    if (this.show) {
-      this.select();
+defineProps<{
+  zIndex: number
+}>();
+
+const _this = getCurrentInstance()!.proxy!;
+const contextMenu = ref<HTMLElement>();
+const items = ref<ContextMenuItem[]>([]);
+const position = ref(new Vec2(0, 0));
+const show = ref(false);
+onMounted(()=> {
+  _this.$components.contextMenu = _this as any;
+  window.addEventListener("pointerdown", (event) => {
+    if ((event.target as HTMLElement).parentElement != contextMenu.value) {
+      select();
+      return;
     }
-    items.forEach((i) => i.id = uuid());
-    this.position.x = position.x + 8;
-    this.position.y = position.y + 8;
-    this.items = items;
-    this.show = true;
-    this.$nextTick(() => {
-      const rect = this.contextMenu.getBoundingClientRect();
-      if (rect.right > document.body.clientWidth) {
-        this.position.x = document.body.clientWidth - rect.width - 8;
-      }
-      if (rect.bottom > document.body.clientHeight) {
-        this.position.y = document.body.clientHeight - rect.height - 8;
-      }
-    });
+  });
+});
+function open(_items: ContextMenuItem[], _position: Vec2): void {
+  if (show.value) {
+    select();
   }
-  select(item?: ContextMenuItem) {
-    if (!this.show) return;
-    this.show = false;
-    if (item) {
-      if (item.click) {
-        item.click();
-      }
+  _items.forEach((i) => i.id = uuid());
+  position.value.x = _position.x + 8;
+  position.value.y = _position.y + 8;
+  items.value = _items;
+  show.value = true;
+  nextTick(() => {
+    if (contextMenu.value === undefined) {
+      return;
     }
-  }
-  get filteredItems() {
-    return this.items.filter((item) => item.skip != true);
+    const rect = contextMenu.value.getBoundingClientRect();
+    if (rect.right > document.body.clientWidth) {
+      position.value.x = document.body.clientWidth - rect.width - 8;
+    }
+    if (rect.bottom > document.body.clientHeight) {
+      position.value.y = document.body.clientHeight - rect.height - 8;
+    }
+  });
+}
+function select(item?: ContextMenuItem) {
+  if (!show.value) return;
+  show.value = false;
+  if (item) {
+    if (item.click) {
+      item.click();
+    }
   }
 }
+const filteredItems = computed(() => {
+  return items.value.filter((item) => item.skip != true);
+});
 </script>
 
 <style lang="scss" scoped>
