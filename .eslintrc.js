@@ -11,12 +11,14 @@ module.exports = {
   parser: 'vue-eslint-parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
+    project: './tsconfig.json',
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'vue/multi-word-component-names': 0
+    'vue/multi-word-component-names': 0,
+    // "@typescript-eslint/strict-boolean-expressions": ["error"]
   },
   globals: {
     defineProps: "readonly",
