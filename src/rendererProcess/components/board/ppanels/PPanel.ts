@@ -8,7 +8,7 @@ import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 export class PPanel extends PIXI.Sprite {
-  public selected = false;
+  // public selected = false;
   public unselected = false;
   public dragging = false;
   public draggingOffset = new Vec2();
@@ -132,7 +132,7 @@ export class PPanel extends PIXI.Sprite {
         "petaPanel.visible", this.petaPanel.visible,
         "petaPanel.locked", this.petaPanel.locked,
         "unselected", this.unselected,
-        "selected", this.selected,
+        "petaPanel._selected", this.petaPanel._selected,
         "noImage", this.noImage,
         "loading", this.loading,
         "nsfw", showNSFW,

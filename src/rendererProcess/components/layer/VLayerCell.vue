@@ -45,9 +45,9 @@ import { ImageType } from "@/commons/datas/imageType";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { Options, Vue } from "vue-class-component";
 import { Prop, Ref, Watch } from "vue-property-decorator";
-import { PPanel } from "../board/ppanels/PPanel";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
+import { PetaPanel } from "@/commons/datas/petaPanel";
 // Others
 @Options({
   components: {
@@ -61,7 +61,7 @@ export default class VLayerCell extends Vue {
   @Prop()
   cellData: {
     id: number,
-    data: PPanel
+    data: PetaPanel
   } | null = null;
   // @Prop()
   // pPanel: PPanel | null = null;
@@ -82,22 +82,22 @@ export default class VLayerCell extends Vue {
     window.removeEventListener("pointermove", this.pointermove);
   }
   get url() {
-    return this.cellData ? getImageURL(this.cellData.data.petaPanel._petaImage, ImageType.THUMBNAIL) : undefined;
+    return this.cellData ? getImageURL(this.cellData.data._petaImage, ImageType.THUMBNAIL) : undefined;
   }
   get selected() {
-    return this.cellData?.data.selected;
+    return this.cellData?.data._selected;
   }
   get locked() {
-    return this.cellData?.data.petaPanel.locked;
+    return this.cellData?.data.locked;
   }
   get visible() {
-    return this.cellData?.data.petaPanel.visible;
+    return this.cellData?.data.visible;
   }
   get name() {
-    return this.cellData?.data.petaPanel._petaImage?.name || "";
+    return this.cellData?.data._petaImage?.name || "";
   }
   get showNSFW() {
-    return this.cellData?.data.petaPanel._petaImage?.nsfw && !this.$nsfw.showNSFW;
+    return this.cellData?.data._petaImage?.nsfw && !this.$nsfw.showNSFW;
   }
   pointerdown(event: PointerEvent) {
     this.click.down(vec2FromPointerEvent(event));
@@ -107,9 +107,9 @@ export default class VLayerCell extends Vue {
     this.mouseIsDown = false;
     if (this.click.isClick && this.cellData) {
       if (event.target === this.visibleIcon) {
-        this.cellData.data.petaPanel.visible = !this.cellData.data?.petaPanel.visible;
+        this.cellData.data.visible = !this.cellData.data?.visible;
       } else if (event.target === this.lockedIcon) {
-        this.cellData.data.petaPanel.locked = !this.cellData.data?.petaPanel.locked;
+        this.cellData.data.locked = !this.cellData.data?.locked;
       }
     }
   }

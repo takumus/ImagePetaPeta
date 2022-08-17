@@ -26,16 +26,16 @@
       :extractProgress="extractProgress"
       :loadProgress="loadProgress"
     ></VBoardLoading>
-    <!-- <VLayer
+    <VLayer
       ref="layer"
       v-show="!detailsMode"
       :zIndex="1"
       :visible="true"
-      :pPanelsArray="pPanelsArray"
+      :pPanelsArray="board?.petaPanels"
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
-    /> -->
+    />
   </t-board-root>
 </template>
 
@@ -263,7 +263,7 @@ function pointerup(e: PIXI.InteractionEvent) {
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
         selectedPPanels().forEach((pPanel) => pPanel.dragging = false);
-        petaPanelMenu(pPanel, new Vec2(mouse));
+        petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
       } else if (!props.detailsMode) {
         _this.$components.contextMenu.open([{
           label: _this.$t("boards.menu.openBrowser"),
@@ -413,7 +413,7 @@ function animate() {
       const pPanelCorners = pPanel.getCorners().map((c) => {
         return new Vec2(rootContainer.toLocal(pPanel.toGlobal(c)));
       })
-      pPanel.selected = hitTest(
+      pPanel.petaPanel._selected = hitTest(
         _selection,
         {
           leftTop: pPanelCorners[0]!,
@@ -460,7 +460,8 @@ function removePPanel(pPanel: PPanel) {
   pPanel.destroy();
   delete pPanels[pPanel.petaPanel.id];
 }
-function petaPanelMenu(pPanel: PPanel, position: Vec2) {
+function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
+  const _pPanel = pPanels[pPanel.id];
   if (props.detailsMode) {
     return;
   }
@@ -490,10 +491,10 @@ function petaPanelMenu(pPanel: PPanel, position: Vec2) {
     {
       label: _this.$t("boards.panelMenu.details"),
       click: () => {
-        if (pPanel.petaPanel._petaImage === undefined) {
+        if (pPanel._petaImage === undefined) {
           return;
         }
-        API.send("setDetailsPetaImage", pPanel.petaPanel._petaImage);
+        API.send("setDetailsPetaImage", pPanel._petaImage);
         API.send("openWindow", WindowType.DETAILS);
       }
     },
@@ -501,25 +502,25 @@ function petaPanelMenu(pPanel: PPanel, position: Vec2) {
       separate: true
     },
     {
-      skip: isMultiple || !pPanel.isGIF,
-      label: pPanel.isPlayingGIF ? _this.$t("boards.panelMenu.stopGIF") : _this.$t("boards.panelMenu.playGIF"),
+      skip: isMultiple || !_pPanel?.isGIF,
+      label: _pPanel?.isPlayingGIF ? _this.$t("boards.panelMenu.stopGIF") : _this.$t("boards.panelMenu.playGIF"),
       click: () => {
-        if (pPanel.isPlayingGIF) {
-          pPanel.stopGIF();
+        if (_pPanel?.isPlayingGIF) {
+          _pPanel.stopGIF();
         } else {
-          pPanel.playGIF();
+          _pPanel?.playGIF();
         }
       }
     },
     {
-      skip: isMultiple || !pPanel.isGIF,
+      skip: isMultiple || !_pPanel?.isGIF,
       separate: true
     },
     {
       skip: isMultiple,
       label: _this.$t("boards.panelMenu.crop"),
       click: () => {
-        beginCrop(pPanel.petaPanel);
+        beginCrop(pPanel);
       }
     }, {
       skip: isMultiple,
@@ -604,7 +605,7 @@ function updateCrop(petaPanel: PetaPanel) {
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
     pPanelsArray().forEach((p) => {
-      p.selected = false;
+      p.petaPanel._selected = false;
     });
   }
 }
@@ -779,7 +780,7 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
   if (!props.board || props.detailsMode) {
     return;
   }
-  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") && (selectedPPanels().length <= 1 || !pPanel.selected)) {
+  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") && (selectedPPanels().length <= 1 || !pPanel.petaPanel._selected)) {
     // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
     // 最前にして選択リセット
     clearSelectionAll();
@@ -788,8 +789,8 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
     // 選択が１つ以下の場合選択範囲リセット
     clearSelectionAll();
   }
-  pPanel.selected = true;
-  layer.value?.scrollTo(pPanel);
+  pPanel.petaPanel._selected = true;
+  layer.value?.scrollTo(pPanel.petaPanel);
   draggingPanels = true;
   selectedPPanels().forEach((pPanel) => {
     const pos = new Vec2(mouse);
@@ -850,10 +851,10 @@ function pPanelsArray() {
   return Object.values(pPanels);
 }
 function selectedPPanels() {
-  return pPanelsArray().filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
+  return pPanelsArray().filter((pPanel) => pPanel.petaPanel._selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
 }
 function unselectedPPanels() {
-  return pPanelsArray().filter((pPanel) => !pPanel.selected);
+  return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
 }
 // const pPanelsArray = computed(() => {
 //   return Object.values(pPanels.value);

@@ -19,7 +19,7 @@
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
           :key="layerCellData.id"
-          :ref="(element) => setVLayerCellRef(element, layerCellData.data.petaPanel.id)"
+          :ref="(element) => setVLayerCellRef(element, layerCellData.data.id)"
           :pPanel="layerCellData.data"
           :cellData="layerCellData"
           :style="{
@@ -51,12 +51,12 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import { SortHelper } from "../utils/sortHelper";
+import { PetaPanel } from "@/commons/datas/petaPanel";
 type CellData = {
-  data: PPanel,
+  data: PetaPanel,
   id: number
 }
 @Options({
@@ -73,7 +73,7 @@ export default class VLayer extends Vue {
   @Prop()
   zIndex = 0;
   @Prop()
-  pPanelsArray!: PPanel[];
+  pPanelsArray!: PetaPanel[];
   @Ref()
   layers!: HTMLElement;
   @Ref()
@@ -84,13 +84,13 @@ export default class VLayer extends Vue {
   vLayerCells: { [key: string]: VLayerCell} = {};
   sortHelper: SortHelper<CellData> = new SortHelper(
     (data) => {
-      return this.vLayerCells[data.data.petaPanel.id];
+      return this.vLayerCells[data.data.id];
     },
     (data) => {
-      return data.data.petaPanel.index;
+      return data.data.index;
     },
     (data, index) => {
-      data.data.petaPanel.index = index;
+      data.data.index = index;
     },
     () => {
       this.$emit("sortIndex");
@@ -115,27 +115,27 @@ export default class VLayer extends Vue {
   setVLayerCellRef(element: VLayerCell, id: string) {
     this.vLayerCells[id] = element;
   }
-  scrollTo(pPanel: PPanel) {
+  scrollTo(pPanel: PetaPanel) {
     this.sortHelper.scrollTo({
       id: 0,
       data: pPanel
     });
   }
-  rightClick(pPanel: PPanel, event: PointerEvent) {
-    if (!pPanel.selected) {
+  rightClick(pPanel: PetaPanel, event: PointerEvent) {
+    if (!pPanel._selected) {
       this.clearSelectionAll();
     }
-    pPanel.selected = true;
+    pPanel._selected = true;
     this.$emit("petaPanelMenu", pPanel, vec2FromPointerEvent(event));
   }
-  leftClick(pPanel: PPanel, event: PointerEvent) {
+  leftClick(pPanel: PetaPanel, event: PointerEvent) {
     this.clearSelectionAll();
-    pPanel.selected = true;
+    pPanel._selected = true;
   }
   clearSelectionAll(force = false) {
     if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
       this.pPanelsArray.forEach((p) => {
-        p.selected = false;
+        p._selected = false;
       });
     }
   }
@@ -147,7 +147,7 @@ export default class VLayer extends Vue {
       return [];
     }
     return this.pPanelsArray.sort((a, b) => {
-      return b.petaPanel.index - a.petaPanel.index;
+      return b.index - a.index;
     }).map((pPanel, i) => {
       // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
       return {
