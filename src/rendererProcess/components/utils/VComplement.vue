@@ -32,173 +32,169 @@
   </ul>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
-
-// Components
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
+import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
+import { computed } from "@vue/reactivity";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import FuzzySearch from 'fuzzy-search';
-@Options({
-  components: {
+defineProps<{
+  zIndex: number
+}>();
+
+const _this = getCurrentInstance()!.proxy!;
+const complement = ref<HTMLElement>();
+const items = ref<string[]>([]);
+const filteredItems = ref<string[]>([]);
+const position = ref(new Vec2(0, 0));
+const show = ref(false);
+const target = ref<any>();
+const currentIndex = ref(0);
+const height = ref("unset");
+const keyboards = new Keyboards();
+let searcher: FuzzySearch<string>;
+onMounted(() => {
+  _this.$components.complement = _this as any;
+  keyboards.down(["ArrowUp"], () => {
+    if (!target.value) return;
+    moveSelectionRelative(-1);
+  });
+  keyboards.down(["ArrowDown"], () => {
+    if (!target.value) return;
+    moveSelectionRelative(1);
+  });
+  keyboards.down(["Tab"], () => {
+    if (!target.value) return;
+    moveSelectionRelative(Keyboards.pressedOR("ShiftLeft", "ShiftRight") ? -1 : 1);
+  });
+  keyboards.down(["Enter"], () => {
+    if (!target.value) return;
+    const item = filteredItems.value[currentIndex.value];
+    if (item) {
+      select(item);
+    }
+  });
+  keyboards.down(["Escape"], () => {
+    nextTick(() => {
+      blur();
+    });
+  });
+  setInterval(() => {
+    if (show.value) {
+      updatePosition();
+    }
+  }, 50);
+});
+function normalizeIndex() {
+  if (currentIndex.value < 0) {
+    if (filteredItems.value.length > 0) {
+      currentIndex.value = filteredItems.value.length - 1;
+    } else {
+      currentIndex.value = 0;
+    }
   }
-})
-export default class VComplement extends Vue {
-  @Prop()
-  zIndex = 0;
-  @Ref("complement")
-  complement!: HTMLElement;
-  items: string[] = [];
-  filteredItems: string[] = [];
-  position = new Vec2(0, 0);
-  show = false;
-  target?: any;
-  currentIndex = 0;
-  keyboards: Keyboards = new Keyboards();
-  searcher?: FuzzySearch<string>;
-  height = "unset";
-  mounted() {
-    this.$components.complement = this;
-    this.keyboards.down(["ArrowUp"], () => {
-      if (!this.target) return;
-      this.moveSelectionRelative(-1);
-    });
-    this.keyboards.down(["ArrowDown"], () => {
-      if (!this.target) return;
-      this.moveSelectionRelative(1);
-    });
-    this.keyboards.down(["Tab"], () => {
-      if (!this.target) return;
-      this.moveSelectionRelative(Keyboards.pressedOR("ShiftLeft", "ShiftRight") ? -1 : 1);
-    });
-    this.keyboards.down(["Enter"], () => {
-      if (!this.target) return;
-      const item = this.filteredItems[this.currentIndex];
-      if (item) {
-        this.select(item);
+  if (filteredItems.value.length > 0) {
+    currentIndex.value = currentIndex.value % filteredItems.value.length;
+  }
+}
+function moveSelectionAbsolute(index: number) {
+  currentIndex.value = index;
+  // this.normalizeIndex();
+  moveCursorToLast();
+}
+function moveSelectionRelative(index: number) {
+  currentIndex.value += index;
+  normalizeIndex();
+  moveCursorToLast();
+}
+function moveCursorToLast() {
+  setTimeout(() => {
+    const range = document.createRange();
+    if (target.value?.labelInput.firstChild) {
+      range.setStart(target.value.labelInput.firstChild, target.value.tempText.length);
+      range.collapse(true)
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    }
+  }, 1);
+}
+function open(_input: any, items: string[]): void {
+  if (_input === target.value && show.value) {
+    return;
+  }
+  updateItems(items);
+  target.value = _input;
+  filteredItems.value = [];
+  _input.labelInput.addEventListener("blur", blur);
+  _input.labelInput.addEventListener("input", input);
+  show.value = true;
+  input();
+  keyboards.enabled = true;
+  keyboards.lock();
+  updatePosition();
+}
+function updateItems(_items: string[]) {
+  items.value = _items;
+  searcher = new FuzzySearch(_items, undefined, {
+    sort: true
+  });
+  input();
+}
+function blur() {
+  show.value = false;
+  keyboards.enabled = false;
+  keyboards.unlock();
+  if (target.value) {
+    target.value.labelInput.removeEventListener("blur", blur);
+    target.value.labelInput.removeEventListener("input", input);
+    target.value.labelInput.blur();
+    target.value = undefined;
+  }
+}
+function input() {
+  if (!show.value || !target.value) {
+    return;
+  }
+  currentIndex.value = -1;
+  const value = target.value.tempText.trim();
+  // -Fuzzy
+  if (searcher) {
+    filteredItems.value = searcher?.search(value);
+  }
+  updatePosition();
+}
+function select(item: string) {
+  if (target.value) {
+    target.value.apply(item);
+    blur();
+  }
+}
+function updatePosition() {
+  if (target.value && target.value.$el) {
+    const inputRect = (target.value.$el as HTMLElement).getBoundingClientRect();
+    position.value.x = inputRect.x;
+    position.value.y = inputRect.y + inputRect.height;
+    height.value = "unset";
+    if (complement.value) {
+      const rect = complement.value.getBoundingClientRect();
+      if (position.value.x + rect.width > document.body.clientWidth - 9) {
+        position.value.x = document.body.clientWidth - rect.width - 8;
       }
-    });
-    this.keyboards.down(["Escape"], () => {
-      this.$nextTick(() => {
-        this.blur();
-      });
-    });
-    setInterval(() => {
-      if (this.show) {
-        this.updatePosition();
-      }
-    }, 50);
-  }
-  normalizeIndex() {
-    if (this.currentIndex < 0) {
-      if (this.filteredItems.length > 0) {
-        this.currentIndex = this.filteredItems.length - 1;
-      } else {
-        this.currentIndex = 0;
-      }
-    }
-    if (this.filteredItems.length > 0) {
-      this.currentIndex = this.currentIndex % this.filteredItems.length;
-    }
-  }
-  unmounted() {
-    //
-  }
-  moveSelectionAbsolute(index: number) {
-    this.currentIndex = index;
-    // this.normalizeIndex();
-    this.moveCursorToLast();
-  }
-  moveSelectionRelative(index: number) {
-    this.currentIndex += index;
-    this.normalizeIndex();
-    this.moveCursorToLast();
-  }
-  moveCursorToLast() {
-    setTimeout(() => {
-      const range = document.createRange();
-      if (this.target?.labelInput.firstChild) {
-        range.setStart(this.target.labelInput.firstChild, this.target.tempText.length);
-        range.collapse(true)
-        const sel = window.getSelection();
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-      }
-    }, 1);
-  }
-  open(input: any, items: string[]): void {
-    if (input === this.target && this.show) {
-      return;
-    }
-    this.updateItems(items);
-    this.target = input;
-    this.filteredItems = [];
-    input.labelInput.addEventListener("blur", this.blur);
-    input.labelInput.addEventListener("input", this.input);
-    this.show = true;
-    this.input();
-    this.keyboards.enabled = true;
-    this.keyboards.lock();
-    this.updatePosition();
-  }
-  updateItems(items: string[]) {
-    this.items = items;
-    this.searcher = new FuzzySearch(items, undefined, {
-      sort: true
-    });
-    this.input();
-  }
-  blur() {
-    this.show = false;
-    this.keyboards.enabled = false;
-    this.keyboards.unlock();
-    if (this.target) {
-      this.target.labelInput.removeEventListener("blur", this.blur);
-      this.target.labelInput.removeEventListener("input", this.input);
-      this.target.labelInput.blur();
-      this.target = undefined;
-    }
-  }
-  input() {
-    if (!this.show || !this.target) {
-      return;
-    }
-    this.currentIndex = -1;
-    const value = this.target.tempText.trim();
-    // -Fuzzy
-    if (this.searcher) {
-      this.filteredItems = this.searcher?.search(value);
-    }
-    this.updatePosition();
-  }
-  select(item: string) {
-    if (this.target) {
-      this.target.apply(item);
-      this.blur();
-    }
-  }
-  updatePosition() {
-    if (this.target && this.target.$el) {
-      const inputRect = (this.target.$el as HTMLElement).getBoundingClientRect();
-      this.position.x = inputRect.x;
-      this.position.y = inputRect.y + inputRect.height;
-      this.height = "unset";
-      const rect = this.complement.getBoundingClientRect();
-      if (this.position.x + rect.width > document.body.clientWidth - 9) {
-        this.position.x = document.body.clientWidth - rect.width - 8;
-      }
-      if (this.position.y + rect.height > document.body.clientHeight - 9) {
+      if (position.value.y + rect.height > document.body.clientHeight - 9) {
         // this.position.y = document.body.clientHeight - rect.height;
-        this.height = `${document.body.clientHeight - this.position.y - 8}px`;
+        height.value = `${document.body.clientHeight - position.value.y - 8}px`;
       }
     }
   }
 }
+defineExpose({
+  updateItems,
+  open
+});
 </script>
 
 <style lang="scss" scoped>
