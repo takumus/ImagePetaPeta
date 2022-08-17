@@ -1,24 +1,24 @@
 <template>
-  <t-board-property-root v-if="board">
+  <t-board-property-root>
     <button
       tabindex="-1"
-      @click="board.transform.scale = 1"
+      @click="scale = 1"
     >
-      {{Math.floor(board.transform.scale * 100)}}%
+      {{Math.floor(scale * 100)}}%
     </button>
     <button
       class="color"
       tabindex="-1"
       :style="{
-        backgroundColor: board.background.fillColor
+        backgroundColor: fillColor
       }"
-      @click="$refs['inputFillColor'].click()"
+      @click="inputFillColor?.click()"
     >
       &nbsp;
     </button>
     <input
       type="color"
-      v-model="board.background.fillColor"
+      v-model="fillColor"
       tabindex="-1"
       ref="inputFillColor"
     >
@@ -26,49 +26,77 @@
       class="color"
       tabindex="-1"
       :style="{
-        backgroundColor: board.background.lineColor
+        backgroundColor: lineColor
       }"
-      @click="$refs['inputLineColor'].click()"
+      @click="inputLineColor?.click()"
     >
       &nbsp;
     </button>
     <input
       type="color"
-      v-model="board.background.lineColor"
+      v-model="lineColor"
       tabindex="-1"
       ref="inputLineColor"
     >
   </t-board-property-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
-// Components
+import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, reactive, ref, unref } from "vue";
 // Others
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { API } from "@/rendererProcess/api";
-import { WindowType } from "@/commons/datas/windowType";
-@Options({
-  components: {
+const props = defineProps<{
+  board: PetaBoard
+}>();
+const emit = defineEmits<{
+  (e: "update", board: PetaBoard): void
+}>();
+const inputFillColor = ref<HTMLInputElement>();
+const inputLineColor = ref<HTMLInputElement>();
+const fillColor = computed({
+  get() {
+    return props.board.background.fillColor;
   },
-  emits: [
-  ]
-})
-export default class VBoardProperty extends Vue {
-  @Prop()
-  board!: PetaBoard;
-  mounted() {
-    //
+  set(value) {
+    emit("update", {
+      ...props.board,
+      background: {
+        ...props.board.background,
+        fillColor: value
+      }
+    });
   }
-  unmounted() {
-    //
+});
+const lineColor = computed({
+  get() {
+    return props.board.background.lineColor;
+  },
+  set(value) {
+    emit("update", {
+      ...props.board,
+      background: {
+        ...props.board.background,
+        lineColor: value
+      }
+    });
   }
-  openBrowser() {
-    API.send("openWindow", WindowType.BROWSER);
+});
+const scale = computed({
+  get() {
+    return props.board.transform.scale;
+  },
+  set(value) {
+    emit("update", {
+      ...props.board,
+      transform: {
+        ...props.board.transform,
+        scale: value
+      }
+    });
   }
-}
+});
+
 </script>
 
 <style lang="scss" scoped>

@@ -18,7 +18,11 @@
           />
         </VTitleBar>
         <VUtilsBar>
-          <VBoardProperty :board="currentPetaBoard" />
+          <VBoardProperty
+            v-if="currentPetaBoard"
+            :board="currentPetaBoard"
+            @update="changePetaBoard"
+          />
         </VUtilsBar>
       </t-top>
       <t-browser>
@@ -316,7 +320,7 @@ export default class BoardIndex extends Vue {
     if (this.boards[index]) {
       this.boards[index] = board;
     }
-    console.log(board.id);
+    // console.log(board.id);
     this.savePetaBoard(board, false);
   }
   @Watch("$focusedWindows.focused")
