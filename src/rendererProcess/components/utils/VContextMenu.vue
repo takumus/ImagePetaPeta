@@ -85,6 +85,9 @@ function select(item?: ContextMenuItem) {
 const filteredItems = computed(() => {
   return items.value.filter((item) => item.skip != true);
 });
+defineExpose({
+  open
+});
 </script>
 
 <style lang="scss" scoped>

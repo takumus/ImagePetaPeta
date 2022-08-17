@@ -56,7 +56,9 @@ function show(_label: string, _items: string[]) {
     resolve = res;
   });
 }
-// (_this as any).show = show;
+defineExpose({
+  show
+});
 </script>
 
 <style lang="scss" scoped>

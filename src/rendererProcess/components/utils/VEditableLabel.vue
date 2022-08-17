@@ -64,7 +64,7 @@ onMounted(() => {
     }
   });
 });
-async function edit(dblclick = false) {
+function edit(dblclick = false) {
   if (props.readonly || editing.value) {
     return;
   }
@@ -140,6 +140,9 @@ function changeLabel() {
   tempText.value = props.label.trim().replace(/\r?\n/g, "");
 }
 watch(() => props.label, changeLabel);
+defineExpose({
+  edit
+});
 </script>
 
 <style lang="scss" scoped>
