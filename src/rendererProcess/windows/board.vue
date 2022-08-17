@@ -15,7 +15,6 @@
             @add="addPetaBoard"
             @select="selectPetaBoard"
             @update:board="changePetaBoard"
-            ref="vTabBar"
           />
         </VTitleBar>
         <VUtilsBar>
@@ -101,8 +100,6 @@ import { WindowType } from "@/commons/datas/windowType";
 export default class BoardIndex extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: VBoard;
-  @Ref("vTabBar")
-  vTabBar!: typeof VTabBar;
   petaImages: PetaImages = {};
   boards: PetaBoard[] = [];
   orderedAddPanelIds: string[] = [];

@@ -29,11 +29,11 @@
 // Vue
 import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
 
-const _this = getCurrentInstance()!.proxy!;
 defineProps<{
   zIndex: number
 }>();
 
+const _this = getCurrentInstance()!.proxy!;
 const items = ref<string[]>([]);
 const label = ref("");
 const visible = ref(false);

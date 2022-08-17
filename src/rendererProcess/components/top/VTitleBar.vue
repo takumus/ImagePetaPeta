@@ -56,7 +56,7 @@ import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 const _this = getCurrentInstance()!.proxy!;
 defineProps<{
-  title: string
+  title?: string
 }>();
 
 function minimizeWindow() {
