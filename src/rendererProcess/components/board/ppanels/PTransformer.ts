@@ -32,7 +32,7 @@ export class PTransformer extends PIXI.Container {
   pMultipleSelection: PSelection = new PSelection();
   _scale = 0;
   fit = false;
-  constructor(public pPanels: Ref<{[key: string]: PPanel}>) {
+  constructor(public pPanels: {[key: string]: PPanel}) {
     super();
     for (let i = 0; i < 8; i++) {
       const c = new PControlPoint();
@@ -104,7 +104,7 @@ export class PTransformer extends PIXI.Container {
     return this.pPanelsArray.filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
   }
   get pPanelsArray() {
-    return Object.values(this.pPanels.value);
+    return Object.values(this.pPanels);
   }
   pointerup(e: PIXI.InteractionEvent) {
     this.controlStatus = ControlStatus.NONE;

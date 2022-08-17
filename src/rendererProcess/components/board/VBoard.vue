@@ -26,7 +26,7 @@
       :extractProgress="extractProgress"
       :loadProgress="loadProgress"
     ></VBoardLoading>
-    <VLayer
+    <!-- <VLayer
       ref="layer"
       v-show="!detailsMode"
       :zIndex="1"
@@ -35,7 +35,7 @@
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
-    />
+    /> -->
   </t-board-root>
 </template>
 
@@ -84,6 +84,8 @@ const extractProgress = ref(0);
 const loadProgress = ref(0);
 const croppingPetaPanel = ref<PetaPanel>();
 const cropping = ref(false);
+const dragging = ref(false);
+
 const dragOffset = new Vec2();
 const click = new ClickChecker();
 let resizer: ResizeObserver | undefined;
@@ -94,9 +96,8 @@ const panelsCenterWrapper = new PIXI.Container();
 const backgroundSprite = new PIXI.Graphics();
 const selectingBackground = new PIXI.Graphics();
 const crossLine = new PIXI.Graphics();
-const pPanels = ref<{[key: string]: PPanel}>({});
+let pPanels: {[key: string]: PPanel} = {};
 const pTransformer = new PTransformer(pPanels);
-const dragging = ref(false);
 let draggingPanels = false;
 let mouseLeftPressing = false;
 let mouseRightPressing = false;
@@ -244,7 +245,7 @@ function pointerdown(e: PIXI.InteractionEvent) {
 }
 function getPPanelFromObject(object: PIXI.DisplayObject) {
   // console.log(object)
-  // if (pPanelsArray.value.find((c) => c === object)) {
+  // if (pPanelsArray().find((c) => c === object)) {
   //   return object as PPanel;
   // }
   // return null;
@@ -261,7 +262,7 @@ function pointerup(e: PIXI.InteractionEvent) {
       const pPanel = getPPanelFromObject(e.target);
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
-        selectedPPanels.value.forEach((pPanel) => pPanel.dragging = false);
+        selectedPPanels().forEach((pPanel) => pPanel.dragging = false);
         petaPanelMenu(pPanel, new Vec2(mouse));
       } else if (!props.detailsMode) {
         _this.$components.contextMenu.open([{
@@ -280,7 +281,7 @@ function pointerup(e: PIXI.InteractionEvent) {
     dragging.value = false;
   } else if (e.data.button === MouseButton.LEFT) {
     mouseLeftPressing = false;
-    pPanelsArray.value.forEach((pPanel) => {
+    pPanelsArray().forEach((pPanel) => {
       pPanel.dragging = false;
     });
     draggingPanels = false;
@@ -330,7 +331,7 @@ function wheel(event: WheelEvent) {
 function updateScale() {
   if (props.board) {
     const scale = props.board.transform.scale;
-    pPanelsArray.value.forEach((pp) => {
+    pPanelsArray().forEach((pp) => {
       pp.setZoomScale(scale);
     });
   }
@@ -354,7 +355,7 @@ function animate() {
   if (!props.board) {
     return;
   }
-  pPanelsArray.value.filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
+  pPanelsArray().filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
     pPanel.petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(mousePosition)).add(pPanel.draggingOffset);
   });
   if (dragging.value) {
@@ -408,7 +409,7 @@ function animate() {
       _selection.rightBottom.x - _selection.leftTop.x,
       _selection.rightBottom.y - _selection.leftTop.y
     );
-    pPanelsArray.value.forEach((pPanel) => {
+    pPanelsArray().forEach((pPanel) => {
       const pPanelCorners = pPanel.getCorners().map((c) => {
         return new Vec2(rootContainer.toLocal(pPanel.toGlobal(c)));
       })
@@ -423,15 +424,15 @@ function animate() {
       ) && pPanel.petaPanel.visible && !pPanel.petaPanel.locked;
     });
   }
-  pPanelsArray.value.forEach((pp) => {
+  pPanelsArray().forEach((pp) => {
     pp.unselected = false;
   });
-  if (selectedPPanels.value.length > 0) {
-    unselectedPPanels.value.forEach((pp) => {
+  if (selectedPPanels().length > 0) {
+    unselectedPPanels().forEach((pp) => {
       pp.unselected = true;
     });
   }
-  pPanelsArray.value.forEach((pPanel) => {
+  pPanelsArray().forEach((pPanel) => {
     pPanel.orderRender();
   });
   pTransformer.update();
@@ -448,28 +449,28 @@ function removeSelectedPanels() {
   if (!props.board) {
     return;
   }
-  selectedPPanels.value.forEach((pPanel) => {
+  selectedPPanels().forEach((pPanel) => {
     removePPanel(pPanel);
   })
-  ref(props.board).value.petaPanels = pPanelsArray.value.map((pPanel) => pPanel.petaPanel);
+  ref(props.board).value.petaPanels = pPanelsArray().map((pPanel) => pPanel.petaPanel);
   orderPIXIRender();
 }
 function removePPanel(pPanel: PPanel) {
   panelsCenterWrapper.removeChild(pPanel);
   pPanel.destroy();
-  delete pPanels.value[pPanel.petaPanel.id];
+  delete pPanels[pPanel.petaPanel.id];
 }
 function petaPanelMenu(pPanel: PPanel, position: Vec2) {
   if (props.detailsMode) {
     return;
   }
-  const isMultiple = selectedPPanels.value.length > 1;
+  const isMultiple = selectedPPanels().length > 1;
   _this.$components.contextMenu.open([
     {
       label: _this.$t("boards.panelMenu.toFront"),
       click: () => {
-        selectedPPanels.value.forEach((pPanel) => {
-          pPanel.petaPanel.index += pPanelsArray.value.length;
+        selectedPPanels().forEach((pPanel) => {
+          pPanel.petaPanel.index += pPanelsArray().length;
         });
         sortIndex();
       }
@@ -477,8 +478,8 @@ function petaPanelMenu(pPanel: PPanel, position: Vec2) {
     {
       label: _this.$t("boards.panelMenu.toBack"),
       click: () => {
-        selectedPPanels.value.forEach((pPanel) => {
-          pPanel.petaPanel.index -= pPanelsArray.value.length;
+        selectedPPanels().forEach((pPanel) => {
+          pPanel.petaPanel.index -= pPanelsArray().length;
         });
         sortIndex();
       }
@@ -526,14 +527,14 @@ function petaPanelMenu(pPanel: PPanel, position: Vec2) {
     }, {
       label: _this.$t("boards.panelMenu.flipHorizontal"),
       click: () => {
-        selectedPPanels.value.forEach((pPanel) => {
+        selectedPPanels().forEach((pPanel) => {
           pPanel.petaPanel.width = -pPanel.petaPanel.width;
         });
       }
     }, {
       label: _this.$t("boards.panelMenu.flipVertical"),
       click: () => {
-        selectedPPanels.value.forEach((pPanel) => {
+        selectedPPanels().forEach((pPanel) => {
           pPanel.petaPanel.height = -pPanel.petaPanel.height;
         });
       }
@@ -542,7 +543,7 @@ function petaPanelMenu(pPanel: PPanel, position: Vec2) {
     }, {
       label: _this.$t("boards.panelMenu.reset"),
       click: () => {
-        selectedPPanels.value.forEach((pPanel) => {
+        selectedPPanels().forEach((pPanel) => {
           pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
           pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
           pPanel.petaPanel.crop.position.set(0, 0);
@@ -602,7 +603,7 @@ function updateCrop(petaPanel: PetaPanel) {
 }
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
-    pPanelsArray.value.forEach((p) => {
+    pPanelsArray().forEach((p) => {
       p.selected = false;
     });
   }
@@ -643,7 +644,7 @@ async function load(params: {
   extractProgress.value = 0;
   if (cancelExtract !== undefined) {
     log("vBoard", `canceling loading`);
-    pPanelsArray.value.forEach((pPanel) => {
+    pPanelsArray().forEach((pPanel) => {
       pPanel.cancelLoading();
     });
     await cancelExtract();
@@ -652,10 +653,10 @@ async function load(params: {
   }
   // リロードじゃないならクリア。
   if (params.reload === undefined) {
-    pPanelsArray.value.forEach((pPanel) => {
+    pPanelsArray().forEach((pPanel) => {
       removePPanel(pPanel);
     });
-    pPanels.value = {};
+    pTransformer.pPanels = pPanels = {};
   }
   if (!props.board) {
     return;
@@ -687,17 +688,14 @@ async function load(params: {
           }
         }
       }
-      if (pPanels.value[petaPanel.id] === undefined) {
+      if (pPanels[petaPanel.id] === undefined) {
         // pPanelが無ければ作成。
-        const pPanel = ref(new PPanel(petaPanel)).value as PPanel;
+        pPanels[petaPanel.id] = new PPanel(petaPanel);
+        const pPanel = pPanels[petaPanel.id]!;
         pPanel.setZoomScale(props.board?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = _this.$nsfw.showNSFW;
         pPanel.onUpdateGIF = onUpdateGif;
-        pPanels.value = {
-          ...pPanels.value,
-          [petaPanel.id]: pPanel
-        };
         panelsCenterWrapper.addChild(pPanel);
         pPanel.orderRender();
         orderPIXIRender();
@@ -717,18 +715,18 @@ async function load(params: {
         loadResult = "create";
       } else if (params.reload && params.reload.deletions.includes(petaPanel.petaImageId)) {
         // petaImageが無ければnoImageに。
-        pPanels.value[petaPanel.id]!.noImage = true;
+        pPanels[petaPanel.id]!.noImage = true;
         loadResult = "delete";
         onLoaded(petaPanel);
-      } else if (params.reload && pPanels.value[petaPanel.id]!.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
+      } else if (params.reload && pPanels[petaPanel.id]!.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
         // pPanelはあるが、noImageだったら再ロードトライ。
         (async () => {
           try {
-            await pPanels.value[petaPanel.id]!.load();
+            await pPanels[petaPanel.id]!.load();
           } catch(error) {
             //
           }
-          pPanels.value[petaPanel.id]!.orderRender();
+          pPanels[petaPanel.id]!.orderRender();
           orderPIXIRender();
           onLoaded(petaPanel);
         })();
@@ -760,7 +758,7 @@ async function load(params: {
   cancelExtract = undefined;
   log("vBoard", "load complete");
   sortIndex();
-  Object.values(pPanels.value).forEach((pPanel) => {
+  Object.values(pPanels).forEach((pPanel) => {
     if (!pPanel.petaPanel.gif.stopped) {
       pPanel.playGIF();
     }
@@ -781,19 +779,19 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
   if (!props.board || props.detailsMode) {
     return;
   }
-  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") && (selectedPPanels.value.length <= 1 || !pPanel.selected)) {
+  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") && (selectedPPanels().length <= 1 || !pPanel.selected)) {
     // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
     // 最前にして選択リセット
     clearSelectionAll();
   }
-  if (selectedPPanels.value.length <= 1) {
+  if (selectedPPanels().length <= 1) {
     // 選択が１つ以下の場合選択範囲リセット
     clearSelectionAll();
   }
   pPanel.selected = true;
   layer.value?.scrollTo(pPanel);
   draggingPanels = true;
-  selectedPPanels.value.forEach((pPanel) => {
+  selectedPPanels().forEach((pPanel) => {
     const pos = new Vec2(mouse);
     pPanel.draggingOffset = new Vec2(pPanel.position).sub(panelsCenterWrapper.toLocal(pos));
     pPanel.dragging = true;
@@ -811,7 +809,7 @@ function renderPIXI() {
   requestAnimationFrameHandle = requestAnimationFrame(renderPIXI);
 }
 function updateAnimatedGIF(deltaTime: number) {
-  Object.values(pPanels.value).forEach((pPanel) => {
+  Object.values(pPanels).forEach((pPanel) => {
     if (pPanel.isGIF) {
       pPanel.updateGIF(deltaTime);
     }
@@ -848,23 +846,26 @@ function updateDetailsPetaPanel() {
     petaPanel.height = height;
   }
 }
-const pPanelsArray = computed(() => {
-  return Object.values(pPanels.value);
-});
-const selectedPPanels = computed(() => {
-  return pPanelsArray.value.filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
-});
-const unselectedPPanels = computed(() => {
-  return pPanelsArray.value.filter((pPanel) => !pPanel.selected);
-});
-const scalePercent = computed(() => {
-  if (!props.board) {
-    return 100;
-  }
-  return Math.floor(props.board.transform.scale * 100);
-});
+function pPanelsArray() {
+  return Object.values(pPanels);
+}
+function selectedPPanels() {
+  return pPanelsArray().filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
+}
+function unselectedPPanels() {
+  return pPanelsArray().filter((pPanel) => !pPanel.selected);
+}
+// const pPanelsArray = computed(() => {
+//   return Object.values(pPanels.value);
+// });
+// const selectedPPanels = computed(() => {
+//   return pPanelsArray().filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
+// });
+// const unselectedPPanels = computed(() => {
+//   return pPanelsArray().filter((pPanel) => !pPanel.selected);
+// });
 watch(() => _this.$nsfw.showNSFW, () => {
-  pPanelsArray.value.forEach((pp) => {
+  pPanelsArray().forEach((pp) => {
     pp.showNSFW = _this.$nsfw.showNSFW;
   });
   orderPIXIRender();
