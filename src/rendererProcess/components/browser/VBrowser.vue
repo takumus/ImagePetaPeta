@@ -191,7 +191,6 @@ export default class VBrowser extends Vue {
     });
   }
   updateSelectedPetaTags(ev: PetaTag[]) {
-    console.log(ev);
     this.selectedPetaTags.length = 0;
     this.selectedPetaTags.push(...ev);
   }

@@ -278,7 +278,6 @@ const nsfw = computed(() => {
 });
 watch(() => props.petaImages, () => {
   fetchPetaTags();
-  console.log("petaTags");
   if (singlePetaImageInfo.value) {
     note.value = singlePetaImageInfo.value.petaImage.note;
     nextTick(() => {
