@@ -26,102 +26,91 @@
   </t-modal-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
 // Others
 import { v4 as uuid } from "uuid";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-@Options({
-  components: {
-  },
-  emits: [
-    "state",
-    "close"
-  ]
-})
-export default class VModal extends Vue {
-  @Prop()
-  visible = false;
-  @Prop()
-  parentStyle = {};
-  @Prop()
-  childStyle = {};
-  @Prop()
-  center = false;
-  @Prop()
-  visibleCloseButton = true;
-  @Prop()
-  ignore = false;
-  @Prop()
-  defaultZIndex = 0;
-  zIndex = 0;
-  noBackground = false;
-  @Ref("background")
-  background!: HTMLElement;
-  centerStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)"
+
+const props = defineProps<{
+  visible?: boolean,
+  parentStyle?: any,
+  childStyle?: any,
+  center?: boolean,
+  visibleCloseButton?: boolean,
+  ignore?: boolean,
+  defaultZIndex?: number
+}>();
+const emit = defineEmits<{
+  (e: "state", visible: boolean): void,
+  (e: "close"): void
+}>();
+const _this = getCurrentInstance()!.proxy!;
+const zIndex = ref(0);
+const noBackground = ref(false);
+const background = ref<HTMLElement>();
+const centerStyle = ref({
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)"
+});
+const modalId = uuid();
+const clickBackground = ref(false);
+const keyboards = new Keyboards();
+onMounted(() =>{
+  background.value?.addEventListener("pointerdown", pointerdown);
+  background.value?.addEventListener("pointerup", pointerup);
+  keyboards.enabled = true;
+  keyboards.down(["Escape"], pressEscape);
+  zIndex.value = props.defaultZIndex || 0;
+});
+onUnmounted(() => {
+  background.value?.removeEventListener("pointerdown", pointerdown);
+  background.value?.removeEventListener("pointerup", pointerup);
+  keyboards.destroy();
+});
+function close() {
+  emit("close");
+}
+function pointerdown(event: PointerEvent) {
+  clickBackground.value = event.target === background.value;
+}
+function pointerup(event: PointerEvent) {
+  if (event.target === background.value && clickBackground.value) {
+    close();
+    clickBackground.value = false;
   }
-  modalId = uuid();
-  clickBackground = false;
-  keyboards = new Keyboards();
-  async mounted() {
-    this.background.addEventListener("pointerdown", this.pointerdown);
-    this.background.addEventListener("pointerup", this.pointerup);
-    this.keyboards.enabled = true;
-    this.keyboards.down(["Escape"], this.pressEscape);
-    this.zIndex = this.defaultZIndex;
+}
+const isActive = computed(() => {
+  return modalId === _this.$components.modal.modalIds[_this.$components.modal.modalIds.length - 1];
+});
+watch(() => _this.$components.modal.modalIds, () => {
+  noBackground.value = !isActive.value;
+});
+function changeModal() {
+  noBackground.value = !isActive.value;
+}
+watch(() => props.visible, () => {
+  if (props.ignore) {
+    return;
   }
-  unmounted() {
-    this.background.removeEventListener("pointerdown", this.pointerdown);
-    this.background.removeEventListener("pointerup", this.pointerup);
-    this.keyboards.destroy();
+  // 自分のidを除外
+  _this.$components.modal.modalIds = _this.$components.modal.modalIds.filter((id) => id != modalId);
+  if (props.visible) {
+    // 自分のidを追加
+    _this.$components.modal.modalIds.push(modalId);
+    zIndex.value = _this.$components.modal.currentModalZIndex + 3;
+    _this.$components.modal.currentModalZIndex ++;
   }
-  close() {
-    this.$emit("close");
-  }
-  pointerdown(event: PointerEvent) {
-    this.clickBackground = event.target === this.background;
-  }
-  pointerup(event: PointerEvent) {
-    if (event.target === this.background && this.clickBackground) {
-      this.close();
-      this.clickBackground = false;
-    }
-  }
-  get isActive() {
-    return this.modalId === this.$components.modal.modalIds[this.$components.modal.modalIds.length - 1];
-  }
-  @Watch("$components.modal.modalIds")
-  changeModal() {
-    this.noBackground = !this.isActive;
-  }
-  @Watch("visible")
-  changeVisible() {
-    if (this.ignore) {
-      return;
-    }
-    // 自分のidを除外
-    this.$components.modal.modalIds = this.$components.modal.modalIds.filter((id) => id != this.modalId);
-    if (this.visible) {
-      // 自分のidを追加
-      this.$components.modal.modalIds.push(this.modalId);
-      this.zIndex = this.$components.modal.currentModalZIndex + 3;
-      this.$components.modal.currentModalZIndex ++;
-    }
-  }
-  @Watch("isActive")
-  changeActive(value: boolean) {
-    this.$emit("state", value);
-  }
-  pressEscape(pressed: boolean) {
-    if (this.isActive) {
-      this.close();
-    }
+});
+watch(() => isActive, () => {
+  emit("state", isActive.value);
+});
+function pressEscape(pressed: boolean) {
+  if (isActive.value) {
+    close();
   }
 }
 </script>
