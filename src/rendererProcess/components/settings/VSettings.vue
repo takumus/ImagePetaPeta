@@ -222,10 +222,9 @@
   </t-settings-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, onMounted, ref, watch } from "vue";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
@@ -234,99 +233,96 @@ import { Settings } from "@/commons/datas/settings";
 import { LICENSES } from "@/@assets/licenses";
 import { DOWNLOAD_URL, SUPPORT_URL } from "@/commons/defines";
 import { DEBUGGERS } from "@/@assets/debuggers";
-@Options({
-  components: {
-    VEditableLabel
-  },
-})
-export default class VSettings extends Vue {
-  regenerateMetadatasCompleted = true;
-  regenerateMetadatasDone = 0;
-  regenerateMetadatasCount = 0;
-  tabs = ["general", "control", "browser", "datas", "others", "update", "info"];
-  currentTab = "general";
-  tempPetaImageDirectory = "";
-  updateAvailable = false;
-  latestVersion = "1.1.1";
-  async mounted() {
-    API.on("regenerateMetadatasProgress", (_, done, count) => {
-      this.regenerateMetadatasDone = done;
-      this.regenerateMetadatasCount = count;
-      this.regenerateMetadatasCompleted = false;
-    });
-    API.on("regenerateMetadatasBegin", (_) => {
-      this.regenerateMetadatasCompleted = false;
-    });
-    API.on("regenerateMetadatasComplete", (_) => {
-      this.regenerateMetadatasCompleted = true;
-    });
-    API.on("foundLatestVersion", async (event, remote) => {
-      this.latestVersion = remote.version;
-      this.updateAvailable = true;
-      this.currentTab = "update";
-    });
-    this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
-    if (this.$windowArgs === "update") {
-      this.currentTab = "update";
-      this.updateAvailable = true;
-      this.latestVersion = (await API.send("getLatestVersion")).version;
-    }
+
+const _this = getCurrentInstance()!.proxy!;
+
+const regenerateMetadatasCompleted = ref(true);
+const regenerateMetadatasDone = ref(0);
+const regenerateMetadatasCount = ref(0);
+const tabNames = ["general", "control", "browser", "datas", "others", "update", "info"];
+const tabs = ref(tabNames);
+const currentTab = ref("general");
+const tempPetaImageDirectory = ref("");
+const updateAvailable = ref(false);
+const latestVersion = ref("1.1.1");
+onMounted(async () => {
+  API.on("regenerateMetadatasProgress", (_, done, count) => {
+    regenerateMetadatasDone.value = done;
+    regenerateMetadatasCount.value = count;
+    regenerateMetadatasCompleted.value = false;
+  });
+  API.on("regenerateMetadatasBegin", (_) => {
+    regenerateMetadatasCompleted.value = false;
+  });
+  API.on("regenerateMetadatasComplete", (_) => {
+    regenerateMetadatasCompleted.value = true;
+  });
+  API.on("foundLatestVersion", async (event, remote) => {
+    latestVersion.value = remote.version;
+    updateAvailable.value = true;
+    currentTab.value = "update";
+  });
+  tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
+  if (_this.$windowArgs === "update") {
+    currentTab.value = "update";
+    updateAvailable.value = true;
+    latestVersion.value = (await API.send("getLatestVersion")).version;
   }
-  regenerateMetadatas() {
-    API.send("regenerateMetadatas");
+});
+function regenerateMetadatas() {
+  API.send("regenerateMetadatas");
+}
+async function browsePetaImageDirectory() {
+  const path = await API.send("browsePetaImageDirectory");
+  if (path) {
+    tempPetaImageDirectory.value = path;
   }
-  async browsePetaImageDirectory() {
-    const path = await API.send("browsePetaImageDirectory");
-    if (path) {
-      this.tempPetaImageDirectory = path;
-    }
-  }
-  async changePetaImageDirectory() {
-    if (this.tempPetaImageDirectory) {
-      const result = await this.$components.dialog.show(
-        this.$t("settings.changePetaImageDirectoryDialog", [this.tempPetaImageDirectory]),
-        [this.$t("shared.yes"), this.$t("shared.no")]
-      );
-      if (result === 0) {
-        if (!await API.send("changePetaImageDirectory", this.tempPetaImageDirectory)) {
-          await this.$components.dialog.show(
-            this.$t("settings.changePetaImageDirectoryErrorDialog", [this.tempPetaImageDirectory]),
-            [this.$t("shared.yes")]
-          );
-          this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
-        }
-      } else {
-        this.tempPetaImageDirectory = this.$settings.petaImageDirectory.path;
+}
+async function changePetaImageDirectory() {
+  if (tempPetaImageDirectory.value) {
+    const result = await _this.$components.dialog.show(
+      _this.$t("settings.changePetaImageDirectoryDialog", [tempPetaImageDirectory.value]),
+      [_this.$t("shared.yes"), _this.$t("shared.no")]
+    );
+    if (result === 0) {
+      if (!await API.send("changePetaImageDirectory", tempPetaImageDirectory.value)) {
+        await _this.$components.dialog.show(
+          _this.$t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
+          [_this.$t("shared.yes")]
+        );
+        tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
       }
+    } else {
+      tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
     }
   }
-  get licenses() {
-    return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n`).join('\n');
-  }
-  get debuggers() {
-    return DEBUGGERS.join(", ");
-  }
-  gotoGithub() {
-    API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
-  }
-  gotoIssues() {
-    API.send("openURL", `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(this.$appInfo.version)}`);
-  }
-  gotoIcons8() {
-    API.send("openURL", "https://icons8.com/");
-  }
-  showDBFolder() {
-    API.send("showDBFolder");
-  }
-  showConfigFolder() {
-    API.send("showConfigFolder");
-  }
-  downloadUpdate() {
-    API.send("openURL", `${DOWNLOAD_URL}${this.latestVersion}`);
-  }
-  releaseNote() {
-    API.send("openURL", `${DOWNLOAD_URL}${this.$appInfo.version}`);
-  }
+}
+const licenses = computed(() => {
+  return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n`).join('\n');
+});
+const debuggers = computed(() => {
+  return DEBUGGERS.join(", ");
+});
+function gotoGithub() {
+  API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
+}
+function gotoIssues() {
+  API.send("openURL", `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(_this.$appInfo.version)}`);
+}
+function gotoIcons8() {
+  API.send("openURL", "https://icons8.com/");
+}
+function showDBFolder() {
+  API.send("showDBFolder");
+}
+function showConfigFolder() {
+  API.send("showConfigFolder");
+}
+function downloadUpdate() {
+  API.send("openURL", `${DOWNLOAD_URL}${latestVersion.value}`);
+}
+function releaseNote() {
+  API.send("openURL", `${DOWNLOAD_URL}${_this.$appInfo.version}`);
 }
 </script>
 
