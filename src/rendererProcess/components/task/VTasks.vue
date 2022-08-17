@@ -23,56 +23,48 @@
   </VModal>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, onMounted, ref } from "vue";
 // Components
 import VModal from "@/rendererProcess/components/modal/VModal.vue";
-import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 import VTask from "@/rendererProcess/components/task/VTask.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { TaskStatus } from "@/commons/api/interfaces/task";
-@Options({
-  components: {
-    VModal,
-    VTask,
-    VProgressBar
-  },
-  emits: []
-})
-export default class VTasks extends Vue {
-  taskStatuses: {[key: string]: TaskStatus} = {};
-  mounted() {
-    API.on("taskStatus", (e, id, task) => {
-      this.taskStatuses[id] = task;
-      if (task.status === "complete") {
-        window.setTimeout(() => {
-          delete this.taskStatuses[id];
-        }, 500);
-      }
-    });
-  }
-  get taskStatusArray() {
-    return Object.keys(this.taskStatuses).reverse().map((id) => ({
-      id,
-      status: this.taskStatuses[id]
-    }))
-  }
-  get visible() {
-    return this.taskStatusArray.length > 0 && (this.$focusedWindows.isMainWindow || this.$focusedWindows.focused);
-  }
-  get closable() {
-    return Object.values(this.taskStatuses).filter((status) => {
-      return status.status === "complete" || status.status === "failed";
-    }).length === this.taskStatusArray.length;
-  }
-  close() {
-    Object.keys(this.taskStatuses).filter((id) => this.taskStatuses[id]?.status === "failed").forEach((key) => {
-      delete this.taskStatuses[key];
-    });
-  }
+
+const _this = getCurrentInstance()!.proxy!;
+const taskStatuses = ref<{[key: string]: TaskStatus}>({});
+onMounted(() => {
+  API.on("taskStatus", (e, id, task) => {
+    taskStatuses.value[id] = task;
+    if (task.status === "complete") {
+      window.setTimeout(() => {
+        delete taskStatuses.value[id];
+      }, 500);
+    }
+  });
+});
+const taskStatusArray = computed(() => {
+  return Object.keys(taskStatuses.value).reverse().map((id) => ({
+    id,
+    status: taskStatuses.value[id]
+  }))
+});
+const visible = computed(() => {
+  return taskStatusArray.value.length > 0 && (_this.$focusedWindows.isMainWindow || _this.$focusedWindows.focused);
+});
+const closable = computed(() => {
+  return Object.values(taskStatuses.value).filter((status) => {
+    return status.status === "complete" || status.status === "failed";
+  }).length === taskStatusArray.value.length;
+});
+function close() {
+  Object.keys(taskStatuses.value)
+  .filter((id) => taskStatuses.value[id]?.status === "failed")
+  .forEach((key) => {
+    delete taskStatuses.value[key];
+  });
 }
 </script>
 
