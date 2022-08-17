@@ -25,44 +25,38 @@
   </t-dialog-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
-// Others
-@Options({
-  components: {
-  },
-})
-export default class VModal extends Vue {
-  @Prop()
-  zIndex = 0;
-  items: string[] = [];
-  label = "";
-  visible = false;
-  resolve: (index: number) => void = (index: number) => index;
-  async mounted() {
-    this.$components.dialog = this;
-  }
-  unmounted() {
-    //
-  }
-  select(index: number) {
-    this.resolve(index);
-    this.visible = false;
-  }
-  show(label: string, items: string[]) {
-    if (this.visible) {
-      this.resolve(-1);
-    }
-    this.visible = true;
-    this.label = label;
-    this.items = items;
-    return new Promise<number>((res) => {
-      this.resolve = res;
-    });
-  }
+import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
+
+const _this = getCurrentInstance()!.proxy!;
+defineProps<{
+  zIndex: number
+}>();
+
+const items = ref<string[]>([]);
+const label = ref("");
+const visible = ref(false);
+let resolve: (index: number) => void = (index: number) => index;
+onMounted(() => {
+  _this.$components.dialog = _this as any;
+});
+function select(index: number) {
+  resolve(index);
+  visible.value = false;
 }
+function show(_label: string, _items: string[]) {
+  if (visible.value) {
+    resolve(-1);
+  }
+  visible.value = true;
+  label.value = _label;
+  items.value = _items;
+  return new Promise<number>((res) => {
+    resolve = res;
+  });
+}
+// (_this as any).show = show;
 </script>
 
 <style lang="scss" scoped>
