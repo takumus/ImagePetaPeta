@@ -19,34 +19,18 @@
   </VModal>
 </template>
 
-<script lang="ts">
-// Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref } from "vue-property-decorator";
+<script setup lang="ts">
 // Components
 import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
-@Options({
-  components: {
-    VModal,
-    VProgressBar
-  }
-})
-export default class VBoardLoading extends Vue {
-  @Prop()
-  zIndex = 0;
-  @Prop()
-  extractProgress = 100;
-  @Prop()
-  loadProgress = 100;
-  @Prop()
-  log = "";
-  @Prop()
-  loading = false;
-  mounted() {
-    //
-  }
-}
+
+defineProps<{
+  zIndex: number,
+  extractProgress: number,
+  loadProgress: number,
+  log: string,
+  loading: boolean
+}>();
 </script>
 
 <style lang="scss" scoped>
