@@ -53,8 +53,8 @@ export async function create(component: Component, windowType: WindowType) {
     await appUse(GlobalStates);
     await appUse(GlobalAppInfo);
     await appUse(GlobalWindowIsFocused.createPlugin(windowType));
-    app.provide(darkModeStoreKey, createDarkModeStore());
-    app.provide(nsfwStoreKey, createNSFWStore());
+    app.provide(darkModeStoreKey, await createDarkModeStore());
+    app.provide(nsfwStoreKey, await createNSFWStore());
     app.mount("#app");
   }
   API.on("dataInitialized", () => {

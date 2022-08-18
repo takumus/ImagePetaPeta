@@ -2,12 +2,9 @@ import { InjectionKey, readonly, ref } from 'vue';
 import { API } from '../api';
 import { inject } from '../utils/vue';
 
-export function createDarkModeStore() {
-  const state = ref(false);
+export async function createDarkModeStore() {
+  const state = ref(await API.send("getIsDarkMode"));
   API.on("darkMode", (_, value) => {
-    state.value = value;
-  });
-  API.send("getIsDarkMode").then((value) => {
     state.value = value;
   });
   return {
@@ -17,5 +14,5 @@ export function createDarkModeStore() {
 export function useDarkModeStore() {
   return inject(darkModeStoreKey);
 }
-export type DarkModeStore = ReturnType<typeof createDarkModeStore>;
+export type DarkModeStore = Awaited<ReturnType<typeof createDarkModeStore>>;
 export const darkModeStoreKey: InjectionKey<DarkModeStore> = Symbol("darkModeStore");
