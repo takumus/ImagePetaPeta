@@ -36,3 +36,6 @@ src/test/sample_images/*
 !5.png
 src/@assets/licenses.ts
 licenses.json
+
+build/*
+!.keep
