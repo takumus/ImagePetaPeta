@@ -1,28 +1,21 @@
-import { reactive, InjectionKey, readonly, inject } from 'vue';
+import { InjectionKey, readonly, ref } from 'vue';
 import { API } from '../api';
-type DarkModeState = {
-  darkMode: boolean
-};
-export const createDarkModeState = () => {
-  const state = reactive<DarkModeState>({
-    darkMode: false,
-  });
-  API.on("darkMode", (event, value) => {
-    state.darkMode = value;
+import { inject } from '../utils/vue';
+
+export function createDarkModeStore() {
+  const state = ref(false);
+  API.on("darkMode", (_, value) => {
+    state.value = value;
   });
   API.send("getIsDarkMode").then((value) => {
-    state.darkMode = value;
+    state.value = value;
   });
   return {
-    state: readonly(state)
+    darkMode: readonly(state)
   }
-};
-export type DarkModeStateType = ReturnType<typeof createDarkModeState>;
-export const darkModeStateKey: InjectionKey<DarkModeStateType> = Symbol('darkModeState');
-export const useDarkModeState = () => {
-  const state = inject(darkModeStateKey);
-  if (state === undefined) {
-    throw new Error("state " + darkModeStateKey.toString() + " is not ready");
-  }
-  return state;
 }
+export function useDarkModeStore() {
+  return inject(darkModeStoreKey);
+}
+export type DarkModeStore = ReturnType<typeof createDarkModeStore>;
+export const darkModeStoreKey: InjectionKey<DarkModeStore> = Symbol('darkModeStore');
