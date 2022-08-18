@@ -30,7 +30,7 @@ import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Keyboards } from "../utils/keyboards";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
     VTitleBar,

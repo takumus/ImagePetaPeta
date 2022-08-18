@@ -2,7 +2,7 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif";
-import { getImage } from "./ImageLoader";
+import { getImage } from "@/rendererProcess/components/board/ppanels/ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";

@@ -48,13 +48,13 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { getImageURL } from "../utils/imageURL";
+import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
 import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { Keyboards } from "../utils/keyboards";
+import { Keyboards } from "@/rendererProcess/utils/keyboards";
 @Options({
   components: {
     VTasks,

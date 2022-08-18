@@ -58,7 +58,7 @@ import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
-import { PSelection } from "./PSelection";
+import { PSelection } from "@/rendererProcess/components/board/PSelection";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void;
 }>();

@@ -47,7 +47,7 @@ import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { SortHelper } from "../utils/sortHelper";
+import { SortHelper } from "@/rendererProcess/components/utils/sortHelper";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 type CellData = {
   data: PetaPanel;

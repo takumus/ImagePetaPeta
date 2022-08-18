@@ -13,8 +13,8 @@ import {
   WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
 import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
-import Config from "../storages/config";
-import { MainLogger } from "./mainLogger";
+import Config from "@/mainProcess/storages/config";
+import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import * as Path from "path";
 import { Vec2 } from "@/commons/utils/vec2";
 export class Windows {

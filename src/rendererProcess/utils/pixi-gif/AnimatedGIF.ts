@@ -3,8 +3,8 @@ import { Texture, Renderer } from "@pixi/core";
 import { settings } from "@pixi/settings";
 import { SCALE_MODES } from "@pixi/constants";
 import { Ticker, UPDATE_PRIORITY } from "@pixi/ticker";
-import DecompressWorker from "./decompress.worker";
-import { DecompressWorkerData } from "./decompressWorkerData";
+import DecompressWorker from "@/rendererProcess/utils/pixi-gif/decompress.worker";
+import { DecompressWorkerData } from "@/rendererProcess/utils/pixi-gif/decompressWorkerData";
 /**
  * Frame object.
  */

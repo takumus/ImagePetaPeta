@@ -1,4 +1,4 @@
-import { PetaTag } from "./petaTag";
+import { PetaTag } from "@/commons/datas/petaTag";
 
 export interface PetaTagInfo {
   petaTag: PetaTag;

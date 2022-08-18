@@ -20,7 +20,7 @@ import { computed, ref, onMounted, getCurrentInstance } from "vue";
 // Others
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";
-import { PropertyThumbnail } from "./propertyThumbnail";
+import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 const _this = getCurrentInstance()!.proxy!;
 const props = defineProps<{
   propertyThumbnail: PropertyThumbnail;

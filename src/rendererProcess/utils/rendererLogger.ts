@@ -1,4 +1,4 @@
-import { API } from "../api";
+import { API } from "@/rendererProcess/api";
 import { v4 as uuid } from "uuid";
 export function logChunk() {
   const uid = uuid().substring(0, 4);

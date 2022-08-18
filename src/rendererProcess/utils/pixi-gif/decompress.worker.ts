@@ -1,5 +1,5 @@
 import { parseGIF, decompressFrame, Frame } from "gifuct-js";
-import { DecompressWorkerData } from "./decompressWorkerData";
+import { DecompressWorkerData } from "@/rendererProcess/utils/pixi-gif/decompressWorkerData";
 const w: Worker = self as any;
 
 w.addEventListener("message", async (e) => {

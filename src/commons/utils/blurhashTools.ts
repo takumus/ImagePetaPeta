@@ -1,6 +1,6 @@
 import { rgbDiff } from "@/rendererProcess/utils/colorUtils";
-import { PetaColor } from "../datas/petaColor";
-import { PetaImage } from "../datas/petaImage";
+import { PetaColor } from "@/commons/datas/petaColor";
+import { PetaImage } from "@/commons/datas/petaImage";
 export function getSimilarityScore(hash1: string, hash2: string) {
   try {
     const cs1 = getColors(hash1);

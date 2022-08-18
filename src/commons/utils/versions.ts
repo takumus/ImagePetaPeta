@@ -1,5 +1,5 @@
-import { RemoteBinaryInfo } from "../datas/remoteBinaryInfo";
-import { PACKAGE_JSON_URL } from "../defines";
+import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
+import { PACKAGE_JSON_URL } from "@/commons/defines";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { app } from "electron";

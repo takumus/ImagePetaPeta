@@ -1,5 +1,5 @@
 import deepcopy from "deepcopy";
-import { PetaColor } from "./petaColor";
+import { PetaColor } from "@/commons/datas/petaColor";
 export interface PetaImage {
   file: {
     original: string;

@@ -6,8 +6,8 @@ import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { WindowType } from "../datas/windowType";
-import { RemoteBinaryInfo } from "../datas/remoteBinaryInfo";
+import { WindowType } from "@/commons/datas/windowType";
+import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
   importImageFiles: () => Promise<number>;

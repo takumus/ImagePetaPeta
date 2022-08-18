@@ -1,6 +1,6 @@
 import { LoaderResource } from "@pixi/loaders";
 import type { ILoaderPlugin } from "@pixi/loaders";
-import { AnimatedGIF } from "./AnimatedGIF";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 
 /** Default extension for GIF images */
 const GIF_EXTENSION = "gif";

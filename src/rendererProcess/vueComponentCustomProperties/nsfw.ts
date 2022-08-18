@@ -1,5 +1,5 @@
 import { reactive, App, ref, watch as _watch, ComponentCustomProperties } from "vue";
-import { API } from "../api";
+import { API } from "@/rendererProcess/api";
 const nsfw = reactive({
   showNSFW: false,
 });

@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { dbPetaPanelToPetaPanel, PetaPanel, petaPanelToDBPetaPanel } from "./petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
-import { PetaImages } from "./petaImage";
+import { PetaImages } from "@/commons/datas/petaImage";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
   BOARD_DARK_BACKGROUND_LINE_COLOR,

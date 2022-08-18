@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import * as file from "@/mainProcess/storages/file";
-import { getSimplePalette } from "./generatePalette";
+import { getSimplePalette } from "@/mainProcess/utils/generatePalette";
 export async function generateMetadata(params: {
   data: Buffer;
   outputFilePath: string;

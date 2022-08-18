@@ -1,5 +1,5 @@
 import { App, ref } from "vue";
-import { API } from "../api";
+import { API } from "@/rendererProcess/api";
 const darkMode = ref(false);
 export default {
   async install(app: App) {
