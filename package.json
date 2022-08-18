@@ -9,7 +9,7 @@
   "description": "image viewer",
   "lint-staged": {
     "*.{ts,js,vue}": [
-      "yarn fix",
+      "yarn prettier --write",
       "git add"
     ]
   },
