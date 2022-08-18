@@ -11,7 +11,7 @@ export function createDarkModeStore() {
     state.value = value;
   });
   return {
-    darkMode: readonly(state)
+    state: readonly(state)
   }
 }
 export function useDarkModeStore() {

@@ -21,6 +21,7 @@ import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProp
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 
 import { createDarkModeStore, darkModeStoreKey } from "@/rendererProcess/stores/darkModeStore";
+import { createNSFWStore, nsfwStoreKey } from "@/rendererProcess/stores/nsfwStore";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
@@ -53,6 +54,7 @@ export async function create(component: Component, windowType: WindowType) {
     await appUse(GlobalAppInfo);
     await appUse(GlobalWindowIsFocused.createPlugin(windowType));
     app.provide(darkModeStoreKey, createDarkModeStore());
+    app.provide(nsfwStoreKey, createNSFWStore());
     app.mount("#app");
   }
   API.on("dataInitialized", () => {

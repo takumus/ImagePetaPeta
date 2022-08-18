@@ -66,6 +66,7 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void
 }>();
@@ -74,6 +75,7 @@ const props = defineProps<{
   board?: PetaBoard,
   zIndex: number,
 }>();
+const nsfwStore = useNSFWStore();
 const _this = getCurrentInstance()!.proxy!;
 const panelsBackground = ref<HTMLElement>();
 const layer = ref<VLayer>();
@@ -695,7 +697,7 @@ async function load(params: {
         console.log(pPanel)
         pPanel.setZoomScale(props.board?.transform.scale || 1);
         await pPanel.init();
-        pPanel.showNSFW = _this.$nsfw.showNSFW;
+        pPanel.showNSFW = nsfwStore.state.value;
         pPanel.onUpdateGIF = onUpdateGif;
         panelsCenterWrapper.addChild(pPanel);
         pPanel.orderRender();
@@ -865,9 +867,9 @@ function unselectedPPanels() {
 // const unselectedPPanels = computed(() => {
 //   return pPanelsArray().filter((pPanel) => !pPanel.selected);
 // });
-watch(() => _this.$nsfw.showNSFW, () => {
+watch(() => nsfwStore.state.value, () => {
   pPanelsArray().forEach((pp) => {
-    pp.showNSFW = _this.$nsfw.showNSFW;
+    pp.showNSFW = nsfwStore.state.value;
   });
   orderPIXIRender();
 });

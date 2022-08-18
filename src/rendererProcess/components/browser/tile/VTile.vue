@@ -80,6 +80,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { BROWSER_FETCH_TAGS_DELAY, BROWSER_FETCH_TAGS_DELAY_RANDOM, BROWSER_LOAD_ORIGINAL_DELAY, BROWSER_LOAD_ORIGINAL_DELAY_RANDOM } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
+import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void
@@ -94,6 +95,7 @@ const props = defineProps<{
   parentAreaMinY: number,
   parentAreaMaxY: number
 }>();
+const nsfwStore = useNSFWStore();
 const _this = getCurrentInstance()!.proxy!;
 const imageURL = ref("");
 const loadingImage = ref(true);
@@ -164,7 +166,7 @@ const showNSFW = computed(() => {
   if (props.tile.petaImage === undefined) {
     return false;
   }
-  return props.tile.petaImage.nsfw && !_this.$nsfw.showNSFW;
+  return props.tile.petaImage.nsfw && !nsfwStore.state.value;
 });
 const placeholderColor = computed(() => {
   if (props.tile.petaImage === undefined) {

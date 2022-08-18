@@ -1,7 +1,7 @@
 <template>
   <t-property-root>
     <t-infos v-if="singlePetaImageInfo">
-      <p>{{$t("browser.property.infos.label")}}</p>
+      <p>{{$t("browser.property.infos.label")}}{{darkModeStore.state}}</p>
       <t-datas>
         <t-data>
           <t-name>{{$t("browser.property.infos.name")}}</t-name>
@@ -120,6 +120,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import dateFormat from "dateformat";
 import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
+import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void
@@ -133,6 +134,7 @@ const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
 const noteTextArea = ref<HTMLTextAreaElement>();
 const _this = getCurrentInstance()!.proxy!;
+const darkModeStore = useDarkModeStore();
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
   let petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === name)?.petaTag;

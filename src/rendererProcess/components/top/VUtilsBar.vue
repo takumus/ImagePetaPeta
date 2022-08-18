@@ -38,7 +38,7 @@
         tabindex="-1"
         @click="toggleNSFW"
       >
-        <t-icon :class="$nsfw.showNSFW ? 'nsfw' : 'sfw'"></t-icon>
+        <t-icon :class="nsfwClass"></t-icon>
       </button>
       <button
         tabindex="-1"
@@ -56,6 +56,8 @@ import { computed, getCurrentInstance } from "vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+const nsfwStore = useNSFWStore();
 const _this = getCurrentInstance()!.proxy!;
 function openBoard() {
   API.send("openWindow", WindowType.BOARD);
@@ -67,18 +69,20 @@ function openSettings() {
   API.send("openWindow", WindowType.SETTINGS);
 }
 async function toggleNSFW() {
-  const value = !_this.$nsfw.showNSFW;
-  if (value) {
+  if (!nsfwStore.state.value) {
     if (await _this.$components.dialog.show(_this.$t("utilsBar.nsfwConfirm"), [_this.$t("shared.yes"), _this.$t("shared.no")]) === 0) {
-      await API.send("setShowNSFW", true);
+      nsfwStore.update(true);
     }
   } else {
-    await API.send("setShowNSFW", false);
+    nsfwStore.update(false);
   }
 }
 const visible = computed(() => {
   return _this.$focusedWindows.isMainWindow || _this.$focusedWindows.focused;
 });
+const nsfwClass = computed(() => {
+  return nsfwStore.state.value ? "nsfw" : "sfw";
+})
 </script>
 
 <style lang="scss" scoped>
