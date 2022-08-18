@@ -1,23 +1,11 @@
 <template>
-  <VModal
-    :visible="visible"
-    :center="true"
-    :visibleCloseButton="false"
-  >
+  <VModal :visible="visible" :center="true" :visibleCloseButton="false">
     <t-tasks-root>
       <t-tasks>
-        <VTask
-          v-for="t in taskStatusArray"
-          :key="t.id"
-          :taskId="t.id"
-          :taskStatus="t.status"
-        />
+        <VTask v-for="t in taskStatusArray" :key="t.id" :taskId="t.id" :taskStatus="t.status" />
       </t-tasks>
-      <button
-        tabindex="-1"
-        @click="close"
-        v-if="closable">
-        {{$t("shared.closeButton")}}
+      <button tabindex="-1" @click="close" v-if="closable">
+        {{ $t("shared.closeButton") }}
       </button>
     </t-tasks-root>
   </VModal>
@@ -34,7 +22,7 @@ import { API } from "@/rendererProcess/api";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 
 const _this = getCurrentInstance()!.proxy!;
-const taskStatuses = ref<{[key: string]: TaskStatus}>({});
+const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {
   API.on("taskStatus", (e, id, task) => {
     taskStatuses.value[id] = task;
@@ -46,25 +34,29 @@ onMounted(() => {
   });
 });
 const taskStatusArray = computed(() => {
-  return Object.keys(taskStatuses.value).reverse().map((id) => ({
-    id,
-    status: taskStatuses.value[id]!
-  }))
+  return Object.keys(taskStatuses.value)
+    .reverse()
+    .map((id) => ({
+      id,
+      status: taskStatuses.value[id]!,
+    }));
 });
 const visible = computed(() => {
   return taskStatusArray.value.length > 0 && (_this.$focusedWindows.isMainWindow || _this.$focusedWindows.focused);
 });
 const closable = computed(() => {
-  return Object.values(taskStatuses.value).filter((status) => {
-    return status.status === "complete" || status.status === "failed";
-  }).length === taskStatusArray.value.length;
+  return (
+    Object.values(taskStatuses.value).filter((status) => {
+      return status.status === "complete" || status.status === "failed";
+    }).length === taskStatusArray.value.length
+  );
 });
 function close() {
   Object.keys(taskStatuses.value)
-  .filter((id) => taskStatuses.value[id]?.status === "failed")
-  .forEach((key) => {
-    delete taskStatuses.value[key];
-  });
+    .filter((id) => taskStatuses.value[id]?.status === "failed")
+    .forEach((key) => {
+      delete taskStatuses.value[key];
+    });
 }
 </script>
 
@@ -72,7 +64,7 @@ function close() {
 t-tasks-root {
   text-align: center;
   display: block;
-  >t-tasks {
+  > t-tasks {
     width: 100%;
     max-height: 512px;
     overflow-x: hidden;

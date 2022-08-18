@@ -6,7 +6,7 @@
     :style="{
       top: position.y + 'px',
       left: position.x + 'px',
-      zIndex: zIndex
+      zIndex: zIndex,
     }"
   >
     <li
@@ -16,10 +16,10 @@
       :class="{
         item: !item.separate,
         separate: item.separate,
-        disabled: item.disabled
+        disabled: item.disabled,
       }"
     >
-      {{item.label}}
+      {{ item.label }}
     </li>
   </ul>
 </template>
@@ -34,7 +34,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 import { v4 as uuid } from "uuid";
 import { ContextMenuItem } from "@/rendererProcess/components/utils/contextMenuItem";
 defineProps<{
-  zIndex: number
+  zIndex: number;
 }>();
 
 const _this = getCurrentInstance()!.proxy!;
@@ -42,7 +42,7 @@ const contextMenu = ref<HTMLElement>();
 const items = ref<ContextMenuItem[]>([]);
 const position = ref(new Vec2(0, 0));
 const show = ref(false);
-onMounted(()=> {
+onMounted(() => {
   window.addEventListener("pointerdown", (event) => {
     if ((event.target as HTMLElement).parentElement != contextMenu.value) {
       select();
@@ -54,7 +54,7 @@ function open(_items: ContextMenuItem[], _position: Vec2): void {
   if (show.value) {
     select();
   }
-  _items.forEach((i) => i.id = uuid());
+  _items.forEach((i) => (i.id = uuid()));
   position.value.x = _position.x + 8;
   position.value.y = _position.y + 8;
   items.value = _items;
@@ -85,10 +85,10 @@ const filteredItems = computed(() => {
   return items.value.filter((item) => item.skip != true);
 });
 _this.$components.contextMenu = {
-  open
+  open,
 };
 defineExpose({
-  open
+  open,
 });
 </script>
 
@@ -102,7 +102,7 @@ defineExpose({
   color: var(--color-font);
   border-radius: var(--rounded);
   overflow: hidden;
-  >.item {
+  > .item {
     word-break: break-word;
     list-style-type: none;
     min-width: 128px;
@@ -112,14 +112,14 @@ defineExpose({
     &:hover {
       background-color: var(--color-hover);
     }
-    >.disabled {
+    > .disabled {
       &:hover {
         background-color: var(--color-main);
       }
     }
   }
-  >.separate {
-    border-bottom: solid 1px #CCCCCC;
+  > .separate {
+    border-bottom: solid 1px #cccccc;
     margin: 4px 8px;
     height: 0px;
     overflow: hidden;

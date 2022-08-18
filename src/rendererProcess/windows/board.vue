@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value
+      dark: $darkMode.value,
     }"
   >
     <t-content>
@@ -18,40 +18,20 @@
           />
         </VTitleBar>
         <VUtilsBar>
-          <VBoardProperty
-            v-if="currentPetaBoard"
-            :board="currentPetaBoard"
-            @update="changePetaBoard"
-          />
+          <VBoardProperty v-if="currentPetaBoard" :board="currentPetaBoard" @update="changePetaBoard" />
         </VUtilsBar>
       </t-top>
       <t-browser>
-        <VBoard
-          :zIndex="1"
-          :board="currentPetaBoard"
-          :detailsMode="false"
-          ref="vPetaBoard"
-          @change="changePetaBoard"
-        />
+        <VBoard :zIndex="1" :board="currentPetaBoard" :detailsMode="false" ref="vPetaBoard" @change="changePetaBoard" />
       </t-browser>
     </t-content>
-    <t-modals
-      v-show="$components.modal.modalIds.length > 0"
-    >
-      <VImageImporter
-        @addPanelByDragAndDrop="addPanelByDragAndDrop"
-      />
+    <t-modals v-show="$components.modal.modalIds.length > 0">
+      <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop" />
       <VTasks />
     </t-modals>
-    <VDialog
-      :zIndex="6"
-    ></VDialog>
-    <VContextMenu
-      :zIndex="4"
-    />
-    <VComplement
-      :zIndex="5"
-    />
+    <VDialog :zIndex="6"></VDialog>
+    <VContextMenu :zIndex="4" />
+    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -72,11 +52,23 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
+import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
-import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_BOARD_NAME, DEFAULT_IMAGE_SIZE, DOWNLOAD_URL, SAVE_DELAY } from "@/commons/defines";
+import {
+  BOARD_ADD_MULTIPLE_OFFSET_X,
+  BOARD_ADD_MULTIPLE_OFFSET_Y,
+  DEFAULT_BOARD_NAME,
+  DEFAULT_IMAGE_SIZE,
+  DOWNLOAD_URL,
+  SAVE_DELAY,
+} from "@/commons/defines";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { PetaBoard, createPetaBoard, dbPetaBoardsToPetaBoards, petaBoardsToDBPetaBoards } from "@/commons/datas/petaBoard";
+import {
+  PetaBoard,
+  createPetaBoard,
+  dbPetaBoardsToPetaBoards,
+  petaBoardsToDBPetaBoards,
+} from "@/commons/datas/petaBoard";
 import { PetaPanel, createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
@@ -98,7 +90,7 @@ import { WindowType } from "@/commons/datas/windowType";
     VContextMenu,
     VComplement,
     VDialog,
-    VUtilsBar
+    VUtilsBar,
   },
 })
 export default class BoardIndex extends Vue {
@@ -108,7 +100,7 @@ export default class BoardIndex extends Vue {
   boards: PetaBoard[] = [];
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
-  boardUpdaters: {[key: string]: DelayUpdater<PetaBoard>} = {};
+  boardUpdaters: { [key: string]: DelayUpdater<PetaBoard> } = {};
   currentPetaBoardId = "";
   title = "";
   errorPetaBoardId = "";
@@ -128,16 +120,17 @@ export default class BoardIndex extends Vue {
             });
           });
           if (this.currentPetaBoard) {
-            changeCurrentBoard = this.currentPetaBoard.petaPanels.filter((petaPanel) => {
-              return petaPanel.petaImageId === petaImage.id;
-            }).length > 0;
+            changeCurrentBoard =
+              this.currentPetaBoard.petaPanels.filter((petaPanel) => {
+                return petaPanel.petaImageId === petaImage.id;
+              }).length > 0;
           }
           if (changeCurrentBoard) {
             this.vPetaBoard.load({
               reload: {
                 additions: petaImages.map((petaImage) => petaImage.id),
-                deletions: []
-              }
+                deletions: [],
+              },
             });
           }
         });
@@ -162,17 +155,18 @@ export default class BoardIndex extends Vue {
             });
           });
           if (this.currentPetaBoard) {
-            changeCurrentBoard = this.currentPetaBoard.petaPanels.filter((petaPanel) => {
-              return petaPanel.petaImageId === petaImage.id;
-            }).length > 0;
+            changeCurrentBoard =
+              this.currentPetaBoard.petaPanels.filter((petaPanel) => {
+                return petaPanel.petaImageId === petaImage.id;
+              }).length > 0;
           }
         });
         if (changeCurrentBoard) {
           this.vPetaBoard.load({
             reload: {
               additions: [],
-              deletions: petaImages.map((petaImage) => petaImage.id)
-            }
+              deletions: petaImages.map((petaImage) => petaImage.id),
+            },
           });
         }
       }
@@ -226,12 +220,14 @@ export default class BoardIndex extends Vue {
       if (!this.orderedAddPanelDragEvent) return;
       const panel = createPetaPanel(
         petaImage,
-        this.orderedAddPanelDragEvent.clone().add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
+        this.orderedAddPanelDragEvent
+          .clone()
+          .add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
         DEFAULT_IMAGE_SIZE,
-        petaImage.height * DEFAULT_IMAGE_SIZE
+        petaImage.height * DEFAULT_IMAGE_SIZE,
       );
       // if (!this.$components.browser.visible) {
-        this.addPanel(panel, offsetIndex++);
+      this.addPanel(panel, offsetIndex++);
       // }
     });
     if (this.orderedAddPanelIds.length > 0) {
@@ -240,8 +236,8 @@ export default class BoardIndex extends Vue {
         this.vPetaBoard.load({
           reload: {
             additions: [],
-            deletions: []
-          }
+            deletions: [],
+          },
         });
       }
     }
@@ -262,7 +258,12 @@ export default class BoardIndex extends Vue {
     this.$states.selectedPetaBoardId = board.id;
     this.$states.loadedPetaBoardId = "";
     if (this.errorPetaBoardId === board.id) {
-      if (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+      if (
+        (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [
+          this.$t("shared.yes"),
+          this.$t("shared.no"),
+        ])) != 0
+      ) {
         return;
       } else {
         this.errorPetaBoardId = "";
@@ -277,7 +278,12 @@ export default class BoardIndex extends Vue {
     }
   }
   async removePetaBoard(board: PetaBoard) {
-    if (await this.$components.dialog.show(this.$t("boards.removeDialog", [board.name]), [this.$t("shared.yes"), this.$t("shared.no")]) != 0) {
+    if (
+      (await this.$components.dialog.show(this.$t("boards.removeDialog", [board.name]), [
+        this.$t("shared.yes"),
+        this.$t("shared.no"),
+      ])) != 0
+    ) {
       return;
     }
     this.boardUpdaters[board.id]!.forceUpdate();
@@ -292,13 +298,12 @@ export default class BoardIndex extends Vue {
     }
   }
   async addPetaBoard() {
-    const name = getNameAvoidDuplication(DEFAULT_BOARD_NAME, this.boards.map((b) => b.name));
-    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$darkMode.value);
-    await API.send(
-      "updatePetaBoards",
-      [board],
-      UpdateMode.UPSERT
+    const name = getNameAvoidDuplication(
+      DEFAULT_BOARD_NAME,
+      this.boards.map((b) => b.name),
     );
+    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$darkMode.value);
+    await API.send("updatePetaBoards", [board], UpdateMode.UPSERT);
     logChunk().log("vIndex", "PetaBoard Added", minimId(board.id));
     await this.getPetaBoards();
     this.selectPetaBoard(board);
@@ -338,7 +343,8 @@ export default class BoardIndex extends Vue {
 t-root {
   background-color: var(--color-main);
   color: var(--color-font);
-  >t-content {
+
+  > t-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -347,12 +353,14 @@ t-root {
     width: 100%;
     flex-direction: column;
     z-index: 3;
-    >t-top {
+
+    > t-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    >t-browser {
+
+    > t-browser {
       display: block;
       overflow: hidden;
       background-color: var(--color-main);
@@ -360,7 +368,8 @@ t-root {
       z-index: 1;
     }
   }
-  >t-modals {
+
+  > t-modals {
     position: absolute;
     width: 100%;
     height: 100%;

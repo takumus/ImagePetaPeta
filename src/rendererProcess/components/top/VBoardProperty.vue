@@ -1,43 +1,28 @@
 <template>
   <t-board-property-root>
-    <button
-      tabindex="-1"
-      @click="scale = 1"
-    >
-      {{Math.floor(scale * 100)}}%
-    </button>
+    <button tabindex="-1" @click="scale = 1">{{ Math.floor(scale * 100) }}%</button>
     <button
       class="color"
       tabindex="-1"
       :style="{
-        backgroundColor: fillColor
+        backgroundColor: fillColor,
       }"
       @click="inputFillColor?.click()"
     >
       &nbsp;
     </button>
-    <input
-      type="color"
-      v-model="fillColor"
-      tabindex="-1"
-      ref="inputFillColor"
-    >
+    <input type="color" v-model="fillColor" tabindex="-1" ref="inputFillColor" />
     <button
       class="color"
       tabindex="-1"
       :style="{
-        backgroundColor: lineColor
+        backgroundColor: lineColor,
       }"
       @click="inputLineColor?.click()"
     >
       &nbsp;
     </button>
-    <input
-      type="color"
-      v-model="lineColor"
-      tabindex="-1"
-      ref="inputLineColor"
-    >
+    <input type="color" v-model="lineColor" tabindex="-1" ref="inputLineColor" />
   </t-board-property-root>
 </template>
 
@@ -47,10 +32,10 @@ import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, r
 // Others
 import { PetaBoard } from "@/commons/datas/petaBoard";
 const props = defineProps<{
-  board: PetaBoard
+  board: PetaBoard;
 }>();
 const emit = defineEmits<{
-  (e: "update", board: PetaBoard): void
+  (e: "update", board: PetaBoard): void;
 }>();
 const inputFillColor = ref<HTMLInputElement>();
 const inputLineColor = ref<HTMLInputElement>();
@@ -63,10 +48,10 @@ const fillColor = computed({
       ...props.board,
       background: {
         ...props.board.background,
-        fillColor: value
-      }
+        fillColor: value,
+      },
     });
-  }
+  },
 });
 const lineColor = computed({
   get() {
@@ -77,10 +62,10 @@ const lineColor = computed({
       ...props.board,
       background: {
         ...props.board.background,
-        lineColor: value
-      }
+        lineColor: value,
+      },
     });
-  }
+  },
 });
 const scale = computed({
   get() {
@@ -91,12 +76,11 @@ const scale = computed({
       ...props.board,
       transform: {
         ...props.board.transform,
-        scale: value
-      }
+        scale: value,
+      },
     });
-  }
+  },
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -108,7 +92,7 @@ t-board-property-root {
   width: 100%;
   padding: 4px;
   text-align: center;
-  >input {
+  > input {
     display: inline-block;
     width: 0px;
     height: 0px;
@@ -118,7 +102,7 @@ t-board-property-root {
     padding: 0px;
     border: none;
   }
-  >button {
+  > button {
     min-width: 24px;
     padding: 0px;
     height: 100%;

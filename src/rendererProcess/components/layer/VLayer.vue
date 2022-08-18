@@ -1,20 +1,14 @@
 <template>
   <t-layer-root
     :class="{
-      hide: !$states.visibleLayerPanel
+      hide: !$states.visibleLayerPanel,
     }"
-    :style=" {
-      zIndex: zIndex
+    :style="{
+      zIndex: zIndex,
     }"
   >
-    <t-header
-      @click.left="toggleVisible"
-    >
-    </t-header>
-    <t-layers-parent
-      v-show="$states.visibleLayerPanel"
-      ref="layersParent"
-    >
+    <t-header @click.left="toggleVisible"> </t-header>
+    <t-layers-parent v-show="$states.visibleLayerPanel" ref="layersParent">
       <t-layers ref="layers">
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
@@ -23,7 +17,7 @@
           :pPanel="layerCellData.data"
           :cellData="layerCellData"
           :style="{
-            visibility: draggingPPanel?.data === layerCellData.data ? 'hidden' : 'visible'
+            visibility: draggingPPanel?.data === layerCellData.data ? 'hidden' : 'visible',
           }"
           @startDrag="sortHelper.startDrag"
           @click.right="rightClick(layerCellData.data, $event)"
@@ -35,7 +29,7 @@
           :cellData="draggingPPanel"
           :drag="true"
           :style="{
-            visibility: !draggingPPanel ? 'hidden' : 'visible'
+            visibility: !draggingPPanel ? 'hidden' : 'visible',
           }"
         />
       </t-layers>
@@ -56,18 +50,14 @@ import { API } from "@/rendererProcess/api";
 import { SortHelper } from "../utils/sortHelper";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 type CellData = {
-  data: PetaPanel,
-  id: number
-}
+  data: PetaPanel;
+  id: number;
+};
 @Options({
   components: {
-    VLayerCell
+    VLayerCell,
   },
-  emits: [
-    "sortIndex",
-    "petaPanelMenu",
-    "update"
-  ]
+  emits: ["sortIndex", "petaPanelMenu", "update"],
 })
 export default class VLayer extends Vue {
   @Prop()
@@ -81,7 +71,7 @@ export default class VLayer extends Vue {
   @Ref()
   cellDrag!: VLayerCell;
   draggingPPanel: CellData | null = null;
-  vLayerCells: { [key: string]: VLayerCell} = {};
+  vLayerCells: { [key: string]: VLayerCell } = {};
   sortHelper: SortHelper<CellData> = new SortHelper(
     (data) => {
       return this.vLayerCells[data.data.id];
@@ -97,7 +87,7 @@ export default class VLayer extends Vue {
     },
     (draggingData) => {
       this.draggingPPanel = draggingData;
-    }
+    },
   );
   async mounted() {
     this.sortHelper.init(this.layers, this.layersParent, this.cellDrag);
@@ -118,7 +108,7 @@ export default class VLayer extends Vue {
   scrollTo(pPanel: PetaPanel) {
     this.sortHelper.scrollTo({
       id: 0,
-      data: pPanel
+      data: pPanel,
     });
   }
   rightClick(pPanel: PetaPanel, event: PointerEvent) {
@@ -146,15 +136,17 @@ export default class VLayer extends Vue {
     if (!this.pPanelsArray) {
       return [];
     }
-    return this.pPanelsArray.sort((a, b) => {
-      return b.index - a.index;
-    }).map((pPanel, i) => {
-      // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
-      return {
-        data: pPanel,
-        id: i
-      }
-    });
+    return this.pPanelsArray
+      .sort((a, b) => {
+        return b.index - a.index;
+      })
+      .map((pPanel, i) => {
+        // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
+        return {
+          data: pPanel,
+          id: i,
+        };
+      });
   }
 }
 </script>
@@ -177,11 +169,11 @@ t-layer-root {
   &.hide {
     top: unset;
     width: unset;
-    >t-header {
+    > t-header {
       margin: 0px;
     }
   }
-  >t-header {
+  > t-header {
     display: block;
     cursor: pointer;
     text-align: center;
@@ -195,13 +187,13 @@ t-layer-root {
     margin-bottom: 8px;
     filter: var(--filter-icon);
   }
-  >t-layers-parent {
+  > t-layers-parent {
     display: block;
     overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
     flex: 1;
-    >t-layers {
+    > t-layers {
       display: block;
       margin: 0px;
       padding: 0px;

@@ -1,5 +1,5 @@
 export function valueChecker() {
-  const values: {[key: string]: any} = {};
+  const values: { [key: string]: any } = {};
   function isSame(key: string, value: any) {
     if (values[key] != value) {
       values[key] = value;
@@ -20,6 +20,6 @@ export function valueChecker() {
   }
   return {
     isSame,
-    isSameAll
+    isSameAll,
   };
 }

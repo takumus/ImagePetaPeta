@@ -4,8 +4,7 @@ import dateFormat from "dateformat";
 export class Logger {
   private logFile: WriteStream | undefined;
   private date = "";
-  constructor(private path: string) {
-  }
+  constructor(private path: string) {}
   log(from: LogFrom, id: string, ...args: any[]) {
     try {
       this.open();
@@ -18,7 +17,7 @@ export class Logger {
         });
       }
       console.log(date, ...args);
-    } catch(error) {
+    } catch (error) {
       console.log("Could not write logfile", error);
     }
   }
@@ -53,5 +52,5 @@ export class Logger {
 }
 export enum LogFrom {
   MAIN = "MAIN",
-  RENDERER = "REND"
+  RENDERER = "REND",
 }

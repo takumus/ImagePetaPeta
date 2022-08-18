@@ -1,6 +1,6 @@
-import { InjectionKey, readonly, ref } from 'vue';
-import { API } from '../api';
-import { inject } from '../utils/vue';
+import { InjectionKey, readonly, ref } from "vue";
+import { API } from "../api";
+import { inject } from "../utils/vue";
 
 export async function createDarkModeStore() {
   const state = ref(await API.send("getIsDarkMode"));
@@ -8,8 +8,8 @@ export async function createDarkModeStore() {
     state.value = value;
   });
   return {
-    state: readonly(state)
-  }
+    state: readonly(state),
+  };
 }
 export function useDarkModeStore() {
   return inject(darkModeStoreKey);

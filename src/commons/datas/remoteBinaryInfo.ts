@@ -1,8 +1,8 @@
 export interface RemoteBinaryInfo {
-  isLatest: boolean
-  version: string,
+  isLatest: boolean;
+  version: string;
   sha256: {
-    win: string,
-    mac: string,
-  }
+    win: string;
+    mac: string;
+  };
 }

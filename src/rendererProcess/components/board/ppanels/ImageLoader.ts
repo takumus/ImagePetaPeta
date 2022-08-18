@@ -2,9 +2,9 @@ import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import * as PIXI from "pixi.js";
-import { AnimatedGIF, AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
+import { AnimatedGIF, AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { ILoaderMiddleware } from "pixi.js";
-let animatedGIFCache: {[key: string]: AnimatedGIF} = {};
+let animatedGIFCache: { [key: string]: AnimatedGIF } = {};
 export function clearAnimatedGIF() {
   Object.values(animatedGIFCache).forEach((cache) => {
     cache.destroy();
@@ -22,10 +22,10 @@ export function getImage(petaImage: PetaImage | undefined) {
   let canceled = false;
   let cancelAnimatedGIFLoader = () => {
     //
-  }
+  };
   let cancelResourcesLoader = (reason: string) => {
     //
-  }
+  };
   const loader = new PIXI.Loader(undefined);
   loader.use(async (resource, next) => {
     if (canceled) {
@@ -35,12 +35,14 @@ export function getImage(petaImage: PetaImage | undefined) {
     if (resource.extension === "gif") {
       const result = AnimatedGIF.fromBuffer(resource.data, undefined);
       cancelAnimatedGIFLoader = result.cancel;
-      result.promise.then((data) => {
-        resource.animation = data;
-        next();
-      }).catch((error) => {
-        next();
-      })
+      result.promise
+        .then((data) => {
+          resource.animation = data;
+          next();
+        })
+        .catch((error) => {
+          next();
+        });
       return;
     }
     next();
@@ -102,10 +104,10 @@ export function getImage(petaImage: PetaImage | undefined) {
       cancelResourcesLoader("canceled");
       loader.reset();
       loader.destroy();
-    }
-  }
+    },
+  };
 }
 export interface ImageLoaderResult {
-  texture?: PIXI.Texture,
-  animatedGIF?: AnimatedGIF,
+  texture?: PIXI.Texture;
+  animatedGIF?: AnimatedGIF;
 }

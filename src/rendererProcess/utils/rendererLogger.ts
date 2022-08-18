@@ -9,6 +9,6 @@ export function logChunk() {
     error: (...args: any[]) => {
       API.send("log", uid, "Error:", ...args);
     },
-    uid
-  }
+    uid,
+  };
 }

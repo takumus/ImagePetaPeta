@@ -1,12 +1,9 @@
 <template>
-  <t-crop-root
-    ref="cropRoot"
-    v-show="loaded"
-  >
+  <t-crop-root ref="cropRoot" v-show="loaded">
     <t-buttons>
-      <button @click="updateCrop">{{$t("boards.crop.apply")}}</button>
-      <button @click="resetCrop">{{$t("boards.crop.reset")}}</button>
-      <button @click="cancelCrop">{{$t("boards.crop.cancel")}}</button>
+      <button @click="updateCrop">{{ $t("boards.crop.apply") }}</button>
+      <button @click="resetCrop">{{ $t("boards.crop.reset") }}</button>
+      <button @click="cancelCrop">{{ $t("boards.crop.cancel") }}</button>
     </t-buttons>
   </t-crop-root>
 </template>
@@ -26,11 +23,8 @@ import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformerDashedLine } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerDashedLine";
 import { PTransformerControlPoint } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerControlPoint";
 @Options({
-  components: {
-  },
-  emits: [
-    "update"
-  ]
+  components: {},
+  emits: ["update"],
 })
 export default class VBoard extends Vue {
   @Ref("cropRoot")
@@ -62,7 +56,7 @@ export default class VBoard extends Vue {
     this.pixi = new PIXI.Application({
       resolution: window.devicePixelRatio,
       antialias: true,
-      backgroundAlpha: 0
+      backgroundAlpha: 0,
     });
     this.pixi.stage.on("pointerup", this.pointerup);
     this.pixi.stage.on("pointerupoutside", this.pointerup);
@@ -218,38 +212,20 @@ export default class VBoard extends Vue {
     this.blackMask.x = -this.rootContainer.x;
     this.blackMask.y = -this.rootContainer.y;
     const topLeft = new Vec2(this.selection.toGlobal(new Vec2(this.minX * this.width, this.minY * this.height)));
-    const bottomRight = new Vec2(topLeft).add(new Vec2((this.maxX - this.minX) * this.width, (this.maxY - this.minY) * this.height));
+    const bottomRight = new Vec2(topLeft).add(
+      new Vec2((this.maxX - this.minX) * this.width, (this.maxY - this.minY) * this.height),
+    );
     this.blackMask.clear();
     this.blackMask.beginFill(0x000000, 0.5);
-    this.blackMask.drawRect(
-      0,
-      0,
-      this.stageRect.x,
-      topLeft.y
-    );
-    this.blackMask.drawRect(
-      0,
-      bottomRight.y,
-      this.stageRect.x,
-      this.stageRect.y - bottomRight.y
-    );
-    this.blackMask.drawRect(
-      0,
-      topLeft.y,
-      topLeft.x,
-      bottomRight.y - topLeft.y
-    );
-    this.blackMask.drawRect(
-      bottomRight.x,
-      topLeft.y,
-      this.stageRect.x - bottomRight.x,
-      bottomRight.y - topLeft.y
-    );
+    this.blackMask.drawRect(0, 0, this.stageRect.x, topLeft.y);
+    this.blackMask.drawRect(0, bottomRight.y, this.stageRect.x, this.stageRect.y - bottomRight.y);
+    this.blackMask.drawRect(0, topLeft.y, topLeft.x, bottomRight.y - topLeft.y);
+    this.blackMask.drawRect(bottomRight.x, topLeft.y, this.stageRect.x - bottomRight.x, bottomRight.y - topLeft.y);
     this.selection.hitArea = new PIXI.Rectangle(
       this.minX * this.width,
       this.minY * this.height,
       (this.maxX - this.minX) * this.width,
-      (this.maxY - this.minY) * this.height
+      (this.maxY - this.minY) * this.height,
     );
   }
   orderPIXIRender() {
@@ -296,7 +272,7 @@ export default class VBoard extends Vue {
     let width = 0;
     let height = 0;
     const maxWidth = this.stageRect.x * 0.95;
-    const maxHeight = this.stageRect.y * 0.70;
+    const maxHeight = this.stageRect.y * 0.7;
     if (this.petaPanel._petaImage.height / this.petaPanel._petaImage.width < maxHeight / maxWidth) {
       width = maxWidth;
       height = maxWidth * this.petaPanel._petaImage.height;
@@ -317,10 +293,7 @@ export default class VBoard extends Vue {
       new Vec2(this.minX, this.maxY),
       new Vec2(this.minX, (this.maxY + this.minY) / 2),
     ];
-    return corners.map((p) => new Vec2(
-      p.x * this.width,
-      p.y * this.height
-    ));
+    return corners.map((p) => new Vec2(p.x * this.width, p.y * this.height));
   }
   @Watch("petaPanel")
   changePetaPanel() {
@@ -337,7 +310,7 @@ export default class VBoard extends Vue {
       this.pPanel = new PPanel(petaPanel);
       this.pPanel.onUpdateGIF = () => {
         this.orderPIXIRender();
-      }
+      };
       this.rootContainer.addChildAt(this.pPanel, 0);
     } else {
       this.pPanel.setPetaPanel(petaPanel);
@@ -374,7 +347,7 @@ t-crop-root {
   background-repeat: repeat;
   background-image: url("~@/@assets/transparentBackground.png");
   display: block;
-  >t-buttons {
+  > t-buttons {
     display: block;
     position: absolute;
     transform: translateX(-50%);

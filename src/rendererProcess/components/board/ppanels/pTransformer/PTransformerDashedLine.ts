@@ -39,9 +39,10 @@ export class PTransformerDashedLine extends PIXI.Container {
     this.graphics.clear();
     this.graphics.lineStyle(1, 0x00ff00, 1, undefined, true);
     this.graphics.drawPolygon(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
-    this.corners.reduce((p, c) => p.clone().add(c), new Vec2())
-    .div(this.corners.length)
-    .setTo(this.texture);
+    this.corners
+      .reduce((p, c) => p.clone().add(c), new Vec2())
+      .div(this.corners.length)
+      .setTo(this.texture);
     const diff = new Vec2(this.corners[0]).getDiff(this.corners[2]!);
     this.texture.width = diff.getLength() * 1.2;
     this.texture.height = new Vec2(this.corners[2]).getDistance(this.corners[4]!) * 1.2;

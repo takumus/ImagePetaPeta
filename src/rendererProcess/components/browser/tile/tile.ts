@@ -3,12 +3,12 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 
 export interface Tile {
-  petaImage?: PetaImage,
-  position: Vec2
-  width: number,
-  height: number,
-  visible: boolean,
-  preVisible: boolean,
+  petaImage?: PetaImage;
+  position: Vec2;
+  width: number;
+  height: number;
+  visible: boolean;
+  preVisible: boolean;
   group?: string;
   id: string;
 }

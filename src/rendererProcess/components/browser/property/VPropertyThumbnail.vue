@@ -4,17 +4,12 @@
       top: propertyThumbnail.position.y + 'px',
       left: propertyThumbnail.position.x + 'px',
       width: propertyThumbnail.width + 'px',
-      height: propertyThumbnail.height + 'px'
+      height: propertyThumbnail.height + 'px',
     }"
   >
     <t-image-wrapper>
-      <t-nsfw v-if="showNSFW">
-      </t-nsfw>
-      <img
-        draggable="false"
-        :src="imageURL"
-        v-if="loaded"
-      >
+      <t-nsfw v-if="showNSFW"> </t-nsfw>
+      <img draggable="false" :src="imageURL" v-if="loaded" />
     </t-image-wrapper>
   </t-property-thumbnail-root>
 </template>
@@ -28,7 +23,7 @@ import { ImageType } from "@/commons/datas/imageType";
 import { PropertyThumbnail } from "./propertyThumbnail";
 const _this = getCurrentInstance()!.proxy!;
 const props = defineProps<{
-  propertyThumbnail:  PropertyThumbnail,
+  propertyThumbnail: PropertyThumbnail;
 }>();
 const imageURL = ref("");
 onMounted(() => {
@@ -46,7 +41,7 @@ const showNSFW = computed(() => {
 t-property-thumbnail-root {
   display: block;
   position: absolute;
-  >t-image-wrapper {
+  > t-image-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -55,7 +50,7 @@ t-property-thumbnail-root {
     background-repeat: repeat;
     background-image: url("~@/@assets/transparentBackground.png");
     display: block;
-    >img {
+    > img {
       display: block;
       width: 100%;
       height: 100%;
@@ -64,7 +59,7 @@ t-property-thumbnail-root {
       top: 0px;
       left: 0px;
     }
-    >t-nsfw {
+    > t-nsfw {
       z-index: 2;
       position: relative;
       top: 0px;

@@ -1,16 +1,16 @@
 <template>
   <t-editable-label-root
     :style="{
-      width: growWidth ? '100%' : 'unset'
+      width: growWidth ? '100%' : 'unset',
     }"
     :class="{ editing: editing }"
   >
     <t-outline
       :class="{
-        'no-outline': noOutline
+        'no-outline': noOutline,
       }"
       :style="{
-        width: growWidth ? '100%' : 'unset'
+        width: growWidth ? '100%' : 'unset',
       }"
     >
       <t-editable-label
@@ -39,19 +39,19 @@ import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
 const __this = getCurrentInstance()!;
 const _this = __this.proxy!;
 const emit = defineEmits<{
-  (e: "change", value: string): void
-  (e: "focus", editableLabel: typeof _this): void,
-  (e: "input", value: string): void,
-  (e: "delete", editableLabel: typeof _this): void
+  (e: "change", value: string): void;
+  (e: "focus", editableLabel: typeof _this): void;
+  (e: "input", value: string): void;
+  (e: "delete", editableLabel: typeof _this): void;
 }>();
 const props = defineProps<{
-  label: string,
-  labelLook?: string,
-  growWidth?: boolean,
-  readonly?: boolean,
-  clickToEdit?: boolean,
-  noOutline?: boolean,
-  allowEmpty?: boolean
+  label: string;
+  labelLook?: string;
+  growWidth?: boolean;
+  readonly?: boolean;
+  clickToEdit?: boolean;
+  noOutline?: boolean;
+  allowEmpty?: boolean;
 }>();
 const labelInput = ref<HTMLElement>();
 const tempText = ref("Hello");
@@ -140,7 +140,7 @@ function focus(event: FocusEvent) {
     edit,
     tempText,
     apply,
-    labelInput
+    labelInput,
   } as any);
 }
 function changeLabel() {
@@ -151,7 +151,7 @@ defineExpose({
   edit,
   labelInput,
   tempText,
-  apply
+  apply,
 });
 </script>
 
@@ -161,11 +161,11 @@ t-editable-label-root {
   margin: 0px;
   display: inline-block;
   text-align: left;
-  >t-outline {
+  > t-outline {
     display: inline-block;
     // background-color: #ff0000;
     text-align: left;
-    >t-editable-label {
+    > t-editable-label {
       line-height: var(--size-2);
       text-align: left;
       padding: 0px;
@@ -186,14 +186,14 @@ t-editable-label-root {
     }
   }
   &.editing {
-    >t-outline {
+    > t-outline {
       border-radius: 4px;
       padding: 0px 4px;
       border: solid 1.2px var(--color-border);
       &.no-outline {
         border: none;
       }
-      >t-editable-label {
+      > t-editable-label {
         &:empty::after {
           content: "";
         }

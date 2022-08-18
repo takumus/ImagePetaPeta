@@ -18,15 +18,12 @@ export class DraggingPreviewWindow {
   }
   private followCursor = () => {
     const point = screen.getCursorScreenPoint();
-    if (this.isSameAll(
-      "position.x", point.x,
-      "position.y", point.y
-    )) {
+    if (this.isSameAll("position.x", point.x, "position.y", point.y)) {
       return;
     }
     // this.scale = screen.getDisplayNearestPoint(point).scaleFactor;
     this.move(point.x, point.y);
-  }
+  };
   createWindow() {
     try {
       this.destroy();
@@ -70,7 +67,7 @@ export class DraggingPreviewWindow {
         this.followCursorTimeoutHandler = setInterval(this.followCursor, 0);
       }
       this.draggingPreviewWindow?.moveTop();
-    } catch(error) {
+    } catch (error) {
       //
     }
   }
@@ -86,9 +83,9 @@ export class DraggingPreviewWindow {
         width: Math.floor(width),
         height: Math.floor(height),
         x: Math.floor(x - width / 2),
-        y: Math.floor(y - height / 2)
+        y: Math.floor(y - height / 2),
       });
-    } catch(error) {
+    } catch (error) {
       //
     }
   }
@@ -98,9 +95,10 @@ export class DraggingPreviewWindow {
       if (!first) {
         return;
       }
-      const element = first.nsfw && !showNSFW ? 
-        `<t-nsfw style="background-image: url(${NSFWImage})"></t-nsfw>`
-        :`<img src="${getImageURL(first, ImageType.THUMBNAIL)}">`;
+      const element =
+        first.nsfw && !showNSFW
+          ? `<t-nsfw style="background-image: url(${NSFWImage})"></t-nsfw>`
+          : `<img src="${getImageURL(first, ImageType.THUMBNAIL)}">`;
       this.draggingPreviewWindow?.loadURL(
         `data:text/html;charset=utf-8,
         <html>
@@ -125,16 +123,16 @@ export class DraggingPreviewWindow {
         <body>
         ${element}
         </body>
-        </html>`
+        </html>`,
       );
-    } catch(error) {
+    } catch (error) {
       //
     }
   }
   clearImages() {
     try {
       this.draggingPreviewWindow?.loadURL("data:text/html;charset=utf-8,<html><body></body></html>");
-    } catch(error) {
+    } catch (error) {
       //
     }
   }

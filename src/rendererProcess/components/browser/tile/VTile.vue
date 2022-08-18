@@ -3,7 +3,7 @@
     :style="{
       transform: `translate(${tile.position.x + 'px'}, ${tile.position.y + 'px'})`,
       width: tile.width + 'px',
-      height: tile.height + 'px'
+      height: tile.height + 'px',
     }"
   >
     <t-tile-wrapper v-if="tile.group === undefined">
@@ -13,54 +13,36 @@
         @dblclick="dblclick($event)"
         draggable="true"
         :class="{
-          'selected-image': tile.petaImage?._selected
+          'selected-image': tile.petaImage?._selected,
         }"
       >
-        <t-nsfw v-if="showNSFW">
-        </t-nsfw>
+        <t-nsfw v-if="showNSFW"> </t-nsfw>
         <t-placeholder
           class="placeholder"
           :class="{
-            loaded: !loadingImage
+            loaded: !loadingImage,
           }"
           :style="{
-            backgroundColor: placeholderColor
+            backgroundColor: placeholderColor,
           }"
         ></t-placeholder>
-        <img
-          draggable="false"
-          :src="imageURL"
-          v-show="!loadingImage"
-          
-          loading="lazy"
-          @load="loaded"
-        >
-        <t-background>
-        </t-background>
+        <img draggable="false" :src="imageURL" v-show="!loadingImage" loading="lazy" @load="loaded" />
+        <t-background> </t-background>
       </t-images>
       <t-tags v-if="$settings.showTagsOnTile">
-        <t-tag
-          v-for="petaTag in myPetaTags"
-          :key="petaTag.id"
-        >
-          {{petaTag.name}}
+        <t-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
+          {{ petaTag.name }}
         </t-tag>
-        <t-tag
-          v-if="myPetaTags.length === 0 && !loadingTags"
-        >
-          {{$t("browser.untagged")}}
+        <t-tag v-if="myPetaTags.length === 0 && !loadingTags">
+          {{ $t("browser.untagged") }}
         </t-tag>
       </t-tags>
-      <t-selected
-        v-show="tile.petaImage?._selected"
-      >
-        <t-icon>
-          ✔
-        </t-icon>
+      <t-selected v-show="tile.petaImage?._selected">
+        <t-icon> ✔ </t-icon>
       </t-selected>
     </t-tile-wrapper>
     <t-group v-else>
-      {{tile.group}}
+      {{ tile.group }}
     </t-group>
   </t-tile-root>
 </template>
@@ -78,22 +60,27 @@ import { ImageType } from "@/commons/datas/imageType";
 import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { BROWSER_FETCH_TAGS_DELAY, BROWSER_FETCH_TAGS_DELAY_RANDOM, BROWSER_LOAD_ORIGINAL_DELAY, BROWSER_LOAD_ORIGINAL_DELAY_RANDOM } from "@/commons/defines";
+import {
+  BROWSER_FETCH_TAGS_DELAY,
+  BROWSER_FETCH_TAGS_DELAY_RANDOM,
+  BROWSER_LOAD_ORIGINAL_DELAY,
+  BROWSER_LOAD_ORIGINAL_DELAY_RANDOM,
+} from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 
 const emit = defineEmits<{
-  (e: "select", tile: Tile): void
-  (e: "menu", tile: Tile, position: Vec2): void,
-  (e: "drag", petaImage: PetaImage): void,
-  (e: "dblclick", petaImage: PetaImage): void
+  (e: "select", tile: Tile): void;
+  (e: "menu", tile: Tile, position: Vec2): void;
+  (e: "drag", petaImage: PetaImage): void;
+  (e: "dblclick", petaImage: PetaImage): void;
 }>();
 const props = defineProps<{
-  tile: Tile,
-  original: boolean,
-  petaTagInfos: PetaTagInfo[],
-  parentAreaMinY: number,
-  parentAreaMaxY: number
+  tile: Tile;
+  original: boolean;
+  petaTagInfos: PetaTagInfo[];
+  parentAreaMinY: number;
+  parentAreaMaxY: number;
 }>();
 const nsfwStore = useNSFWStore();
 const _this = getCurrentInstance()!.proxy!;
@@ -144,7 +131,7 @@ function pointerup(event: PointerEvent) {
   window.removeEventListener("pointerup", pointerup);
   pressing = false;
   if (click.isClick) {
-    switch(event.button) {
+    switch (event.button) {
       case MouseButton.LEFT:
         emit("select", props.tile);
         break;
@@ -188,8 +175,8 @@ async function fetchPetaTags() {
   }
   const result = await API.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
   myPetaTags.value = props.petaTagInfos
-  .filter((petaTagInfo) => result.find((id) => id === petaTagInfo.petaTag.id))
-  .map((pti) => pti.petaTag);
+    .filter((petaTagInfo) => result.find((id) => id === petaTagInfo.petaTag.id))
+    .map((pti) => pti.petaTag);
   loadingTags.value = false;
 }
 function updateContent(tags = false) {
@@ -219,19 +206,10 @@ function updateContent(tags = false) {
 const visible = computed(() => {
   return props.tile.visible;
 });
-watch([
-  () => props.parentAreaMinY,
-  () => props.parentAreaMaxY,
-  () => props.original,
-  () => props.tile.width
-], () => {
+watch([() => props.parentAreaMinY, () => props.parentAreaMaxY, () => props.original, () => props.tile.width], () => {
   updateContent();
 });
-watch([
-  visible,
-  () => props.petaTagInfos,
-  () => _this.$settings.showTagsOnTile,
-], () => {
+watch([visible, () => props.petaTagInfos, () => _this.$settings.showTagsOnTile], () => {
   updateContent(true);
 });
 </script>
@@ -240,7 +218,7 @@ watch([
 t-tile-root {
   display: block;
   position: absolute;
-  >t-group {
+  > t-group {
     position: relative;
     width: 100%;
     height: 100%;
@@ -251,14 +229,14 @@ t-tile-root {
     font-weight: bold;
     font-size: var(--size-2);
   }
-  >t-tile-wrapper {
+  > t-tile-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
     display: block;
-    >t-images {
+    > t-images {
       display: block;
       width: 100%;
       height: 100%;
@@ -266,11 +244,11 @@ t-tile-root {
       filter: brightness(0.7);
       position: relative;
       &.selected-image {
-        filter: brightness(1.0);
+        filter: brightness(1);
         border-radius: var(--rounded);
         padding: 2px;
       }
-      >img {
+      > img {
         z-index: 1;
         position: absolute;
         top: 0px;
@@ -279,7 +257,7 @@ t-tile-root {
         width: 100%;
         height: 100%;
       }
-      >t-background {
+      > t-background {
         z-index: 0;
         position: absolute;
         top: 0px;
@@ -290,7 +268,7 @@ t-tile-root {
         background-repeat: repeat;
         background-image: url("~@/@assets/transparentBackground.png");
       }
-      >t-placeholder {
+      > t-placeholder {
         position: absolute;
         z-index: 2;
         top: 0px;
@@ -305,7 +283,7 @@ t-tile-root {
           opacity: 0;
         }
       }
-      >t-nsfw {
+      > t-nsfw {
         z-index: 2;
         position: absolute;
         top: 0px;
@@ -321,11 +299,11 @@ t-tile-root {
     }
     &:hover {
       box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-      >t-images {
-        filter: brightness(1.0);
+      > t-images {
+        filter: brightness(1);
       }
     }
-    >t-tags {
+    > t-tags {
       width: 100%;
       position: absolute;
       bottom: 0px;
@@ -339,7 +317,7 @@ t-tile-root {
       flex-direction: row;
       flex-wrap: wrap-reverse;
       justify-content: right;
-      >t-tag {
+      > t-tag {
         display: inline-block;
         margin: 1px 1px;
         border-radius: var(--rounded);
@@ -348,7 +326,7 @@ t-tile-root {
         font-size: var(--size-0);
       }
     }
-    >t-selected {
+    > t-selected {
       position: absolute;
       bottom: 0px;
       right: 0px;
@@ -359,7 +337,7 @@ t-tile-root {
       // background-color: rgba($color: #ffffff, $alpha: 0.4);
       border: solid 4px var(--color-font);
       display: block;
-      >t-icon {
+      > t-icon {
         border-radius: var(--rounded) 0px 0px 0px;
         background-color: var(--color-font);
         color: var(--color-main);

@@ -7,28 +7,23 @@
       top: position.y + 'px',
       left: position.x + 'px',
       height: height,
-      zIndex: zIndex
+      zIndex: zIndex,
     }"
   >
     <li
-      v-for="item, i in filteredItems"
+      v-for="(item, i) in filteredItems"
       :key="item"
       @pointerdown="select(item)"
       @pointermove="moveSelectionAbsolute(i)"
       @mouseleave="moveSelectionAbsolute(-1)"
       class="item"
       :class="{
-        selected: i === currentIndex
+        selected: i === currentIndex,
       }"
     >
-      {{item}}
+      {{ item }}
     </li>
-    <li
-      class="item close"
-      v-html="$texts.close"
-      v-if="filteredItems.length > 0"
-    >
-    </li>
+    <li class="item close" v-html="$texts.close" v-if="filteredItems.length > 0"></li>
   </ul>
 </template>
 
@@ -40,9 +35,9 @@ import { computed } from "@vue/reactivity";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import FuzzySearch from 'fuzzy-search';
+import FuzzySearch from "fuzzy-search";
 defineProps<{
-  zIndex: number
+  zIndex: number;
 }>();
 
 const _this = getCurrentInstance()!.proxy!;
@@ -114,7 +109,7 @@ function moveCursorToLast() {
     const range = document.createRange();
     if (target.value?.labelInput.firstChild) {
       range.setStart(target.value.labelInput.firstChild, target.value.tempText.length);
-      range.collapse(true)
+      range.collapse(true);
       const sel = window.getSelection();
       sel?.removeAllRanges();
       sel?.addRange(range);
@@ -139,7 +134,7 @@ function open(_input: any, items: string[]): void {
 function updateItems(_items: string[]) {
   items.value = _items;
   searcher = new FuzzySearch(_items, undefined, {
-    sort: true
+    sort: true,
   });
   input();
 }
@@ -192,11 +187,11 @@ function updatePosition() {
 }
 _this.$components.complement = {
   open,
-  updateItems
+  updateItems,
 };
 defineExpose({
   updateItems,
-  open
+  open,
 });
 </script>
 
@@ -211,7 +206,7 @@ defineExpose({
   border-radius: var(--rounded);
   overflow-y: auto;
   overflow-x: hidden;
-  >.item {
+  > .item {
     word-break: break-word;
     list-style-type: none;
     min-width: 128px;
@@ -220,15 +215,16 @@ defineExpose({
     // padding-left: 24px;
     font-size: var(--size-1);
     cursor: pointer;
-    &.selected, &.close:hover {
+    &.selected,
+    &.close:hover {
       background-color: var(--color-hover);
     }
     &.close {
       text-align: center;
     }
   }
-  >.separate {
-    border-bottom: solid 1px #CCCCCC;
+  > .separate {
+    border-bottom: solid 1px #cccccc;
     margin: 0px 8px;
     height: 0px;
     overflow: hidden;

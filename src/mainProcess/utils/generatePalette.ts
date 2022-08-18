@@ -1,6 +1,6 @@
 import { PetaColor } from "@/commons/datas/petaColor";
 import { rgbDiff } from "@/rendererProcess/utils/colorUtils";
-import quantize from 'quantize';
+import quantize from "quantize";
 function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
   for (let i = 0; i < pixelCount; i += 1) {
@@ -15,18 +15,12 @@ function createPixels(buffer: Buffer, pixelCount: number) {
   }
   return pixels;
 }
-export function getSimplePalette(
-  imageData: {
-    buffer: Buffer,
-    width: number,
-    height: number,
-  }
-) {
+export function getSimplePalette(imageData: { buffer: Buffer; width: number; height: number }) {
   const palette = getPalette({
     sample: 3000,
     mergeCIEDiff: 5,
     fixColorCIEDiff: 5,
-    ...imageData
+    ...imageData,
   });
   // allPalette.push(...palette);
   // cie94色差で色削除
@@ -59,16 +53,14 @@ export function getSimplePalette(
   // });
   return palette;
 }
-export function getPalette(
-  imageData: {
-    buffer: Buffer,
-    width: number,
-    height: number, 
-    sample: number,
-    mergeCIEDiff: number,
-    fixColorCIEDiff: number
-  }
-): PetaColor[] {
+export function getPalette(imageData: {
+  buffer: Buffer;
+  width: number;
+  height: number;
+  sample: number;
+  mergeCIEDiff: number;
+  fixColorCIEDiff: number;
+}): PetaColor[] {
   const pixelCount = imageData.width * imageData.height;
   const pixels = createPixels(imageData.buffer, imageData.width * imageData.height);
   const qPalette = quantize(pixels, 64).palette();
@@ -78,8 +70,8 @@ export function getPalette(
       g: color[1],
       b: color[2],
       population: 0,
-      positionSD: 0
-    }
+      positionSD: 0,
+    };
   });
   for (let i = 0; i < colors.length; i++) {
     for (let ii = i + 1; ii < colors.length; ii++) {
@@ -95,16 +87,13 @@ export function getPalette(
     resolution = 1;
   }
   colors.map((color) => {
-    const similars: {[key: string]: { count: number, color: [number, number, number] }} = {};
-    const positions: { x: number, y: number }[] = [];
+    const similars: { [key: string]: { count: number; color: [number, number, number] } } = {};
+    const positions: { x: number; y: number }[] = [];
     for (let i = 0; i < pixels.length; i += resolution) {
       const rc = pixels[i]!;
       const y = Math.floor(i / imageData.width);
       const x = i % imageData.width;
-      const cieDiff = rgbDiff(
-        rc,
-        [color.r, color.g, color.b]
-      );
+      const cieDiff = rgbDiff(rc, [color.r, color.g, color.b]);
       if (cieDiff < imageData.fixColorCIEDiff) {
         color.population++;
         positions.push({ x, y });
@@ -112,7 +101,7 @@ export function getPalette(
         if (similars[key] === undefined) {
           similars[key] = {
             count: 1,
-            color: rc
+            color: rc,
           };
         } else {
           similars[key]!.count++;
@@ -126,34 +115,39 @@ export function getPalette(
       color.r = similar.color[0];
       color.g = similar.color[1];
       color.b = similar.color[2];
-      const avgPos = positions.reduce((p, c) => {
-        return {
-          x: p.x + c.x,
-          y: p.y + c.y
-        };
-      }, { x: 0, y: 0 });
+      const avgPos = positions.reduce(
+        (p, c) => {
+          return {
+            x: p.x + c.x,
+            y: p.y + c.y,
+          };
+        },
+        { x: 0, y: 0 },
+      );
       avgPos.x /= color.population;
       avgPos.y /= color.population;
-      const sdPos = positions.reduce((p, c) => {
-        return {
-          x: p.x + Math.pow(c.x - avgPos.x, 2),
-          y: p.y + Math.pow(c.y - avgPos.y, 2)
-        };
-      }, { x: 0, y: 0 });
+      const sdPos = positions.reduce(
+        (p, c) => {
+          return {
+            x: p.x + Math.pow(c.x - avgPos.x, 2),
+            y: p.y + Math.pow(c.y - avgPos.y, 2),
+          };
+        },
+        { x: 0, y: 0 },
+      );
       sdPos.x /= color.population;
       sdPos.y /= color.population;
       color.positionSD = Math.floor(sdPos.x + sdPos.y);
     }
   });
-  return colors.filter((color) => {
-    return color.population > 0;
-  }).sort((a, b) => {
-    return b.population - a.population;
-  });
+  return colors
+    .filter((color) => {
+      return color.population > 0;
+    })
+    .sort((a, b) => {
+      return b.population - a.population;
+    });
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
-  return rgbDiff(
-    [color1.r, color1.g, color1.b],
-    [color2.r, color2.g, color2.b]
-  );
+  return rgbDiff([color1.r, color1.g, color1.b], [color2.r, color2.g, color2.b]);
 }

@@ -29,8 +29,8 @@ export function upgradePetaImage(petaImage: PetaImage) {
   if (petaImage.file === undefined) {
     petaImage.file = {
       original: (petaImage as any).fileName,
-      thumbnail: (petaImage as any).fileName + ".webp"
-    }
+      thumbnail: (petaImage as any).fileName + ".webp",
+    };
   }
   // v2.6.0
   if (petaImage.palette === undefined) {
@@ -78,7 +78,7 @@ export function upgradeSettings(settings: Settings) {
   if (settings.petaImageDirectory === undefined) {
     settings.petaImageDirectory = {
       default: defaultSettings.petaImageDirectory.default,
-      path: defaultSettings.petaImageDirectory.path
+      path: defaultSettings.petaImageDirectory.path,
     };
     changed = true;
   }
@@ -116,7 +116,7 @@ export function upgradeSettings(settings: Settings) {
   }
   return {
     data: settings,
-    changed
+    changed,
   };
 }
 export function upgradeStates(states: States) {
@@ -124,7 +124,7 @@ export function upgradeStates(states: States) {
   if (states.selectedPetaBoardId === undefined) {
     states.selectedPetaBoardId = "";
     changed = true;
-  } 
+  }
   // 2.6.0
   if (states.browserTileSize === undefined) {
     states.browserTileSize = defaultStates.browserTileSize;
@@ -147,28 +147,28 @@ export function upgradeStates(states: States) {
   }
   return {
     data: states,
-    changed
-  }
+    changed,
+  };
 }
 export function upgradeWindowStates(states: WindowStates) {
   let changed = false;
-  // 
+  //
   return {
     data: states,
-    changed
-  }
+    changed,
+  };
 }
 export function upgradePetaBoard(board: PetaBoard) {
   // v0.5.0
   if (board.background === undefined) {
     board.background = {
       fillColor: BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-      lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR
-    }
+      lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
+    };
   }
   board.petaPanels.forEach((petaPanel) => {
     upgradePetaPanel(petaPanel);
-  })
+  });
   return board;
 }
 // 1.8.0
@@ -176,13 +176,13 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
   const petaImagesArr = Object.values(petaImages);
   let upgraded = false;
   const addTags = async (petaImage: PetaImage, index: number) => {
-    const anyPetaImage = (petaImage as any);
+    const anyPetaImage = petaImage as any;
     await promiseSerial(async (tag) => {
       const anyPetaTag = ((await petaTags.find({ name: tag }))[0] || {
         name: tag,
         id: uuid(),
         index: 0,
-        petaImages: []
+        petaImages: [],
       }) as any;
       if (!anyPetaTag.petaImages) {
         anyPetaTag.petaImages = [];
@@ -191,10 +191,9 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
       anyPetaTag.petaImages = Array.from(new Set(anyPetaTag.petaImages));
       await petaTags.update({ id: anyPetaTag.id }, anyPetaTag, true);
       upgraded = true;
-    },
-    (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).promise;
+    }, (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).promise;
     anyPetaImage["tags"] = undefined;
-  }
+  };
   await promiseSerial(addTags, petaImagesArr).promise;
   return upgraded;
 }
@@ -204,8 +203,8 @@ export function upgradePetaPanel(petaPanel: PetaPanel) {
   if (petaPanel.gif === undefined) {
     petaPanel.gif = {
       stopped: false,
-      frame: 0
-    }
+      frame: 0,
+    };
   }
   // v2.5.0
   if (petaPanel.visible === undefined) {
@@ -218,11 +217,15 @@ export function upgradePetaPanel(petaPanel: PetaPanel) {
 }
 
 // 2.0.1
-export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImagesPetaTags: DB<PetaImagePetaTag>, petaImages: PetaImages) {
+export async function upgradePetaImagesPetaTags(
+  petaTags: DB<PetaTag>,
+  petaImagesPetaTags: DB<PetaImagePetaTag>,
+  petaImages: PetaImages,
+) {
   let changed = false;
   try {
     await promiseSerial(async (petaTag) => {
-      const petaImageIds = ((petaTag as any).petaImages) as string[] | undefined;
+      const petaImageIds = (petaTag as any).petaImages as string[] | undefined;
       if (!petaImageIds) {
         return;
       }
@@ -231,22 +234,14 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
           return;
         }
         const pipt = createPetaImagePetaTag(petaImageId, petaTag.id);
-        await petaImagesPetaTags.update(
-          { id: pipt.id },
-          pipt,
-          true
-        );
+        await petaImagesPetaTags.update({ id: pipt.id }, pipt, true);
         changed = true;
       }, petaImageIds).promise;
       // remove petaImages property
       (petaTag as any).petaImages = undefined;
       // update
-      await petaTags.update(
-        { id: petaTag.id },
-        petaTag,
-        false
-      );
-    }, (await petaTags.find({}))).promise;
+      await petaTags.update({ id: petaTag.id }, petaTag, false);
+    }, await petaTags.find({})).promise;
   } catch (error) {
     //
   }
@@ -256,7 +251,7 @@ export async function upgradePetaImagesPetaTags(petaTags: DB<PetaTag>, petaImage
       if (pipt.id.length > 64) {
         await petaImagesPetaTags.update(pipt, createPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId));
       }
-    }, (await petaImagesPetaTags.find({}))).promise;
+    }, await petaImagesPetaTags.find({})).promise;
   } catch (error) {
     //
   }
@@ -267,10 +262,7 @@ function migrate<T>(data: T, defaultData: T): T {
   Object.keys(defaultData).forEach((key) => {
     const dataType = typeof (data as any)[key];
     const defaultDataType = typeof (defaultData as any)[key];
-    if (dataType === defaultDataType
-      && !Array.isArray((defaultData as any)[key])
-      && defaultDataType === "object"
-    ) {
+    if (dataType === defaultDataType && !Array.isArray((defaultData as any)[key]) && defaultDataType === "object") {
       (data as any)[key] = migrate((data as any)[key], (defaultData as any)[key]);
     }
     if (dataType !== defaultDataType) {

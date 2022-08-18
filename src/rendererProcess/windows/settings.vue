@@ -1,27 +1,20 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value
+      dark: $darkMode.value,
     }"
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="$t('titles.settings')">
-        </VTitleBar>
+        <VTitleBar :title="$t('titles.settings')"> </VTitleBar>
       </t-top>
       <t-browser>
         <VSettings />
       </t-browser>
     </t-content>
-    <VDialog
-      :zIndex="6"
-    ></VDialog>
-    <VContextMenu
-      :zIndex="4"
-    />
-    <VComplement
-      :zIndex="5"
-    />
+    <VDialog :zIndex="6"></VDialog>
+    <VContextMenu :zIndex="4" />
+    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -44,7 +37,7 @@ import { Keyboards } from "../utils/keyboards";
     VContextMenu,
     VComplement,
     VSettings,
-    VDialog
+    VDialog,
   },
 })
 export default class SettingsIndex extends Vue {
@@ -69,7 +62,7 @@ export default class SettingsIndex extends Vue {
 t-root {
   background-color: var(--color-main);
   color: var(--color-font);
-  >t-content {
+  > t-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -77,12 +70,12 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    >t-top {
+    > t-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    >t-browser {
+    > t-browser {
       display: block;
       overflow: hidden;
       padding: 16px;
@@ -90,7 +83,7 @@ t-root {
       flex: 1;
       z-index: 1;
     }
-    >t-modals {
+    > t-modals {
       position: absolute;
       width: 100%;
       height: 100%;

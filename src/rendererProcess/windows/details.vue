@@ -1,48 +1,29 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value
+      dark: $darkMode.value,
     }"
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="$t('titles.details')">
-        </VTitleBar>
-        <VUtilsBar>
-        </VUtilsBar>
+        <VTitleBar :title="$t('titles.details')"> </VTitleBar>
+        <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
         <t-board>
-          <VBoard
-            :zIndex="1"
-            :board="board"
-            :detailsMode="true"
-            ref="vPetaBoard"
-          />
+          <VBoard :zIndex="1" :board="board" :detailsMode="true" ref="vPetaBoard" />
         </t-board>
         <t-property>
-          <VProperty
-            :petaImages="singlePetaImages"
-            :petaTagInfos="petaTagInfos"
-            @selectTag="() => {}"
-          />
+          <VProperty :petaImages="singlePetaImages" :petaTagInfos="petaTagInfos" @selectTag="() => {}" />
         </t-property>
       </t-browser>
     </t-content>
-    <t-modals
-      v-show="$components.modal.modalIds.length > 0"
-    >
+    <t-modals v-show="$components.modal.modalIds.length > 0">
       <VTasks />
     </t-modals>
-    <VDialog
-      :zIndex="6"
-    ></VDialog>
-    <VContextMenu
-      :zIndex="4"
-    />
-    <VComplement
-      :zIndex="5"
-    />
+    <VDialog :zIndex="6"></VDialog>
+    <VContextMenu :zIndex="4" />
+    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -60,7 +41,7 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 // Others
-import { AnimatedGIFLoader } from '@/rendererProcess/utils/pixi-gif';
+import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
@@ -83,7 +64,7 @@ import { Keyboards } from "../utils/keyboards";
     VDialog,
     VUtilsBar,
     VBoard,
-    VProperty
+    VProperty,
   },
 })
 export default class DetailsIndex extends Vue {
@@ -185,32 +166,32 @@ export default class DetailsIndex extends Vue {
       crop: {
         position: new Vec2(0, 0),
         width: 1,
-        height: 1
+        height: 1,
       },
       id: "petaImage",
       index: 0,
       gif: {
         stopped: false,
-        frame: 0
+        frame: 0,
       },
       visible: true,
       locked: true,
-      _petaImage: this.petaImage
-    }
+      _petaImage: this.petaImage,
+    };
     this.board = {
       petaPanels: [panel],
       id: "details",
       name: "details",
       transform: {
         scale: 1,
-        position: new Vec2(0, 0)
+        position: new Vec2(0, 0),
       },
       background: {
         fillColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
         lineColor: BOARD_DARK_BACKGROUND_LINE_COLOR,
       },
-      index: 0
-    }
+      index: 0,
+    };
   }
 }
 </script>
@@ -219,7 +200,7 @@ export default class DetailsIndex extends Vue {
 t-root {
   background-color: var(--color-main);
   color: var(--color-font);
-  >t-content {
+  > t-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -227,18 +208,18 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    >t-top {
+    > t-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    >t-browser {
+    > t-browser {
       display: flex;
       overflow: hidden;
       background-color: var(--color-main);
       flex: 1;
       z-index: 1;
-      >t-board {
+      > t-board {
         display: block;
         flex: 1;
         z-index: 1;
@@ -246,7 +227,7 @@ t-root {
         background-image: url("~@/@assets/transparentBackground.png");
         cursor: grab;
       }
-      >t-property {
+      > t-property {
         padding: 8px;
         display: block;
         background-color: var(--color-main);
@@ -254,7 +235,7 @@ t-root {
         width: 300px;
       }
     }
-    >t-modals {
+    > t-modals {
       position: absolute;
       width: 100%;
       height: 100%;

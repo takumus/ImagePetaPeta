@@ -2,7 +2,7 @@
   <t-progress-bar-root>
     <t-bar
       :style="{
-        width: `${progress}%`
+        width: `${progress}%`,
       }"
     >
     </t-bar>
@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 defineProps<{
-  progress: number
+  progress: number;
 }>();
 </script>
 
@@ -24,7 +24,7 @@ t-progress-bar-root {
   border-radius: var(--rounded);
   padding: 2px;
   display: block;
-  >t-bar {
+  > t-bar {
     width: 50%;
     height: 100%;
     border-radius: var(--rounded);

@@ -4,46 +4,24 @@
       <slot></slot>
     </t-property>
     <t-shared class="left" v-if="visible">
-      <button
-        v-if="$windowType === 'browser' || $windowType === 'details'"
-        tabindex="-1"
-        @click="openBoard()"
-      >
+      <button v-if="$windowType === 'browser' || $windowType === 'details'" tabindex="-1" @click="openBoard()">
         <t-icon class="board"></t-icon>
       </button>
-      <button
-        v-if="$windowType === 'board' || $windowType === 'details'"
-        tabindex="-1"
-        @click="openBrowser()"
-      >
+      <button v-if="$windowType === 'board' || $windowType === 'details'" tabindex="-1" @click="openBrowser()">
         <t-icon class="browser"></t-icon>
       </button>
-      <button
-        v-if="$windowType !== 'details'"
-        tabindex="-1"
-        @click="$api.send('importImageFiles')"
-      >
+      <button v-if="$windowType !== 'details'" tabindex="-1" @click="$api.send('importImageFiles')">
         <t-icon class="import-file"></t-icon>
       </button>
-      <button
-        v-if="$windowType !== 'details'"
-        tabindex="-1"
-        @click="$api.send('importImageDirectories')"
-      >
+      <button v-if="$windowType !== 'details'" tabindex="-1" @click="$api.send('importImageDirectories')">
         <t-icon class="import-folder"></t-icon>
       </button>
     </t-shared>
-    <t-shared class=" right" v-if="visible">
-      <button
-        tabindex="-1"
-        @click="toggleNSFW"
-      >
+    <t-shared class="right" v-if="visible">
+      <button tabindex="-1" @click="toggleNSFW">
         <t-icon :class="nsfwClass"></t-icon>
       </button>
-      <button
-        tabindex="-1"
-        @click="openSettings"
-      >
+      <button tabindex="-1" @click="openSettings">
         <t-icon class="settings"></t-icon>
       </button>
     </t-shared>
@@ -70,7 +48,12 @@ function openSettings() {
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {
-    if (await _this.$components.dialog.show(_this.$t("utilsBar.nsfwConfirm"), [_this.$t("shared.yes"), _this.$t("shared.no")]) === 0) {
+    if (
+      (await _this.$components.dialog.show(_this.$t("utilsBar.nsfwConfirm"), [
+        _this.$t("shared.yes"),
+        _this.$t("shared.no"),
+      ])) === 0
+    ) {
       nsfwStore.update(true);
     }
   } else {
@@ -82,7 +65,7 @@ const visible = computed(() => {
 });
 const nsfwClass = computed(() => {
   return nsfwStore.state.value ? "nsfw" : "sfw";
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -96,7 +79,7 @@ t-utils-bar-root {
   border-bottom: solid 1px var(--color-main);
   display: block;
   z-index: 2;
-  >t-shared {
+  > t-shared {
     position: absolute;
     top: 0px;
     height: 30px;
@@ -117,14 +100,15 @@ t-utils-bar-root {
         margin-left: 4px;
       }
     }
-    &.left, &.right {
-      >button {
+    &.left,
+    &.right {
+      > button {
         min-width: 24px;
         padding: 0px;
         height: 100%;
         margin: 0px;
         border: none;
-        >t-icon {
+        > t-icon {
           display: block;
           width: 100%;
           height: 100%;
@@ -160,7 +144,7 @@ t-utils-bar-root {
       }
     }
   }
-  >t-property {
+  > t-property {
     display: block;
   }
 }

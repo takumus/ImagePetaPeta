@@ -1,31 +1,15 @@
 <template>
   <t-property-root>
-    <t-previews
-      ref="previews"
-      v-show="!noImage"
-    >
-      <VPropertyThumbnail
-        v-for="(data) in propertyThumbnails"
-        :key="data.petaImage.id"
-        :propertyThumbnail="data"
-      />
+    <t-previews ref="previews" v-show="!noImage">
+      <VPropertyThumbnail v-for="data in propertyThumbnails" :key="data.petaImage.id" :propertyThumbnail="data" />
     </t-previews>
-    <p>{{$t("browser.property.selectedImage", [petaImages.length])}}</p>
-    <t-buttons
-      v-show="!noImage"
-    >
-      <button
-        tabindex="-1"
-        @click="clearSelection"
-      >
-        {{$t("browser.property.clearSelectionButton")}}
+    <p>{{ $t("browser.property.selectedImage", [petaImages.length]) }}</p>
+    <t-buttons v-show="!noImage">
+      <button tabindex="-1" @click="clearSelection">
+        {{ $t("browser.property.clearSelectionButton") }}
       </button>
-      <button
-        tabindex="-1"
-        v-if="propertyThumbnails.length === 1"
-        @click="openDetails"
-      >
-        {{$t("browser.property.openDetailsButton")}}
+      <button tabindex="-1" v-if="propertyThumbnails.length === 1" @click="openDetails">
+        {{ $t("browser.property.openDetailsButton") }}
       </button>
     </t-buttons>
   </t-property-root>
@@ -44,7 +28,7 @@ import { PropertyThumbnail } from "@/rendererProcess/components/browser/property
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 const props = defineProps<{
-  petaImages: PetaImage[],
+  petaImages: PetaImage[];
 }>();
 const previews = ref<HTMLElement>();
 const previewWidth = ref(0);
@@ -70,7 +54,7 @@ function resizePreviews(rect: DOMRectReadOnly) {
 function clearSelection() {
   props.petaImages.forEach((pi) => {
     pi._selected = false;
-  })
+  });
 }
 function openDetails() {
   const petaImage = props.petaImages[0];
@@ -98,15 +82,17 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
       petaImage: p,
       position: new Vec2(0, 0),
       width: width,
-      height: height
-    }
+      height: height,
+    };
   });
   const last = thumbnails[thumbnails.length - 1]!;
   thumbnails.forEach((thumb, i) => {
     thumb.position = new Vec2(
-      petaImages.length > 1 ? (previewWidth.value - last.width) * (i / (petaImages.length - 1)) : previewWidth.value / 2 - thumb.width / 2,
-      previewHeight.value / 2 - thumb.height / 2
-    )
+      petaImages.length > 1
+        ? (previewWidth.value - last.width) * (i / (petaImages.length - 1))
+        : previewWidth.value / 2 - thumb.width / 2,
+      previewHeight.value / 2 - thumb.height / 2,
+    );
   });
   return thumbnails;
 });
@@ -123,14 +109,14 @@ t-property-root {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  >t-previews {
+  > t-previews {
     position: relative;
     width: 100%;
     height: 150px;
     overflow: hidden;
     display: block;
   }
-  >t-buttons {
+  > t-buttons {
     text-align: center;
     display: block;
   }

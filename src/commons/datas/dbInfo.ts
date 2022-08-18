@@ -1,3 +1,3 @@
 export interface DBInfo {
-  version: string
+  version: string;
 }

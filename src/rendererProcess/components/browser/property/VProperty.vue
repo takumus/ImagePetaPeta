@@ -1,10 +1,10 @@
 <template>
   <t-property-root>
     <t-infos v-if="singlePetaImageInfo">
-      <p>{{$t("browser.property.infos.label")}}{{darkModeStore.state}}</p>
+      <p>{{ $t("browser.property.infos.label") }}{{ darkModeStore.state }}</p>
       <t-datas>
         <t-data>
-          <t-name>{{$t("browser.property.infos.name")}}</t-name>
+          <t-name>{{ $t("browser.property.infos.name") }}</t-name>
           <t-value>
             <VEditableLabel
               :label="singlePetaImageInfo.petaImage.name"
@@ -17,25 +17,19 @@
           </t-value>
         </t-data>
         <t-data>
-          <t-name>{{$t("browser.property.infos.note")}}</t-name>
+          <t-name>{{ $t("browser.property.infos.note") }}</t-name>
           <t-value>
-            <textarea
-              lock-keyboard
-              ref="noteTextArea"
-              v-model="note"
-              @blur="blurNoteTextarea"
-              @input="resizeNote"
-            >
+            <textarea lock-keyboard ref="noteTextArea" v-model="note" @blur="blurNoteTextarea" @input="resizeNote">
             </textarea>
           </t-value>
         </t-data>
         <t-data>
-          <t-name>{{$t("browser.property.infos.fileDate")}}</t-name>
-          <t-value>{{singlePetaImageInfo.fileDate}}</t-value>
+          <t-name>{{ $t("browser.property.infos.fileDate") }}</t-name>
+          <t-value>{{ singlePetaImageInfo.fileDate }}</t-value>
         </t-data>
         <t-data>
-          <t-name>{{$t("browser.property.infos.addDate")}}</t-name>
-          <t-value>{{singlePetaImageInfo.addDate}}</t-value>
+          <t-name>{{ $t("browser.property.infos.addDate") }}</t-name>
+          <t-value>{{ singlePetaImageInfo.addDate }}</t-value>
         </t-data>
       </t-datas>
       <t-palette>
@@ -45,7 +39,7 @@
             :key="color.id"
             :style="{
               backgroundColor: color.color,
-              flex: Math.floor(color.population * 80 + 20)
+              flex: Math.floor(color.population * 80 + 20),
             }"
           >
           </t-color>
@@ -53,12 +47,9 @@
       </t-palette>
     </t-infos>
     <t-tags v-show="!noImage">
-      <p>{{$t("browser.property.tags")}}</p>
+      <p>{{ $t("browser.property.tags") }}</p>
       <t-search-box v-if="!fetchingTags">
-        <t-tag
-          v-for="tag in sharedPetaTags"
-          :key="tag.id"
-        >
+        <t-tag v-for="tag in sharedPetaTags" :key="tag.id">
           <VEditableLabel
             :label="tag.name"
             :labelLook="tag.name"
@@ -84,7 +75,7 @@
       </t-search-box>
       <ul v-else>
         <li>
-          {{$t("browser.property.fetchingTags")}}
+          {{ $t("browser.property.fetchingTags") }}
         </li>
       </ul>
     </t-tags>
@@ -95,9 +86,9 @@
           tabindex="-1"
           :checked="nsfw"
           @change="changeNSFW(Boolean(($event.target as HTMLInputElement).checked))"
-        >
-          NSFW
-        </label>
+        />
+        NSFW
+      </label>
     </section>
   </t-property-root>
 </template>
@@ -123,11 +114,11 @@ import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 
 const emit = defineEmits<{
-  (e: "selectTag", tag: PetaTag): void
+  (e: "selectTag", tag: PetaTag): void;
 }>();
 const props = defineProps<{
-  petaImages: PetaImage[],
-  petaTagInfos: PetaTagInfo[],
+  petaImages: PetaImage[];
+  petaTagInfos: PetaTagInfo[];
 }>();
 const fetchingTags = ref(false);
 const note = ref("");
@@ -141,17 +132,13 @@ async function addTag(name: string) {
   // リクエスト2回飛ばさない
   if (!petaTag) {
     petaTag = createPetaTag(name);
-    await API.send(
-      "updatePetaTags",
-      [petaTag],
-      UpdateMode.UPSERT
-    );
+    await API.send("updatePetaTags", [petaTag], UpdateMode.UPSERT);
   }
   await API.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
     [petaTag.id],
-    UpdateMode.UPSERT
+    UpdateMode.UPSERT,
   );
 }
 async function removeTag(petaTag: PetaTag) {
@@ -159,7 +146,7 @@ async function removeTag(petaTag: PetaTag) {
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
     [petaTag.id],
-    UpdateMode.REMOVE
+    UpdateMode.REMOVE,
   );
 }
 function resizeNote() {
@@ -167,11 +154,11 @@ function resizeNote() {
     return;
   }
   const _noteTextArea = noteTextArea.value;
-  _noteTextArea.style.height = _noteTextArea.scrollHeight + 'px';//この行だけでOK？
+  _noteTextArea.style.height = _noteTextArea.scrollHeight + "px"; //この行だけでOK？
   _noteTextArea.style.height = "auto";
-  nextTick(()=>{
-    _noteTextArea.style.height = _noteTextArea.scrollHeight + 'px';
-  })
+  nextTick(() => {
+    _noteTextArea.style.height = _noteTextArea.scrollHeight + "px";
+  });
 }
 function changeName(name: string) {
   if (singlePetaImageInfo.value === undefined) {
@@ -203,24 +190,32 @@ function changeNSFW(value: boolean) {
 function clearSelection() {
   props.petaImages.forEach((pi) => {
     pi._selected = false;
-  })
+  });
 }
 function complementTag(editableLabel: any) {
-  _this.$components.complement.open(editableLabel, props.petaTagInfos.filter((pti) => {
-    return pti.petaTag.id !== UNTAGGED_ID;
-  }).map((pti) => {
-    return pti.petaTag.name;
-  }));
+  _this.$components.complement.open(
+    editableLabel,
+    props.petaTagInfos
+      .filter((pti) => {
+        return pti.petaTag.id !== UNTAGGED_ID;
+      })
+      .map((pti) => {
+        return pti.petaTag.name;
+      }),
+  );
 }
 function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
-  _this.$components.contextMenu.open([
-    {
-      label: _this.$t("browser.property.tagMenu.remove", [tag.name]),
-      click: () => {
-        removeTag(tag);
-      }
-    }
-  ], vec2FromPointerEvent(event));
+  _this.$components.contextMenu.open(
+    [
+      {
+        label: _this.$t("browser.property.tagMenu.remove", [tag.name]),
+        click: () => {
+          removeTag(tag);
+        },
+      },
+    ],
+    vec2FromPointerEvent(event),
+  );
 }
 function selectTag(tag: PetaTag) {
   emit("selectTag", tag);
@@ -232,8 +227,13 @@ async function fetchPetaTags() {
     fetchingTags.value = false;
     return;
   }
-  const result = await API.send("getPetaTagIdsByPetaImageIds", props.petaImages.map((petaImage) => petaImage.id));
-  sharedPetaTags.value = props.petaTagInfos.filter((pti) => result.find((id) => id === pti.petaTag.id)).map((pi) => pi.petaTag);
+  const result = await API.send(
+    "getPetaTagIdsByPetaImageIds",
+    props.petaImages.map((petaImage) => petaImage.id),
+  );
+  sharedPetaTags.value = props.petaTagInfos
+    .filter((pti) => result.find((id) => id === pti.petaTag.id))
+    .map((pi) => pi.petaTag);
   fetchingTags.value = false;
 }
 const singlePetaImageInfo = computed(() => {
@@ -251,10 +251,10 @@ const singlePetaImageInfo = computed(() => {
         return {
           color: `rgb(${color.r}, ${color.g}, ${color.b})`,
           population: color.population / all,
-          id: i
+          id: i,
         };
-      })
-    }
+      }),
+    };
   }
   return undefined;
 });
@@ -278,20 +278,26 @@ const nsfw = computed(() => {
   }
   return undefined;
 });
-watch(() => props.petaImages, () => {
-  fetchPetaTags();
-  if (singlePetaImageInfo.value) {
-    note.value = singlePetaImageInfo.value.petaImage.note;
-    nextTick(() => {
-      resizeNote();
-    })
-  } else {
-    note.value = "";
-  }
-});
-watch(() => props.petaTagInfos, () => {
-  fetchPetaTags();
-});
+watch(
+  () => props.petaImages,
+  () => {
+    fetchPetaTags();
+    if (singlePetaImageInfo.value) {
+      note.value = singlePetaImageInfo.value.petaImage.note;
+      nextTick(() => {
+        resizeNote();
+      });
+    } else {
+      note.value = "";
+    }
+  },
+);
+watch(
+  () => props.petaTagInfos,
+  () => {
+    fetchPetaTags();
+  },
+);
 </script>
 
 <style lang="scss" scoped>
@@ -304,17 +310,17 @@ t-property-root {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  >t-infos {
+  > t-infos {
     display: block;
-    >t-datas {
+    > t-datas {
       display: block;
-      >t-data {
+      > t-data {
         display: flex;
         margin-bottom: 8px;
         &:last-child {
           margin-bottom: 0px;
         }
-        >t-name {
+        > t-name {
           display: block;
           width: 40%;
           position: relative;
@@ -326,12 +332,12 @@ t-property-root {
             content: ":";
           }
         }
-        >t-value {
+        > t-value {
           padding: 0px 8px;
           display: block;
           width: 60%;
           word-break: break-word;
-          >textarea {
+          > textarea {
             width: 100%;
             height: 80px;
             resize: none;
@@ -345,31 +351,31 @@ t-property-root {
       }
     }
     display: block;
-    >t-palette {
+    > t-palette {
       pointer-events: none;
       padding: 8px;
       display: block;
       width: 100%;
-      >t-color-background {
+      > t-color-background {
         display: flex;
         border-radius: var(--rounded);
         height: 8px;
         width: 100%;
         overflow: hidden;
         box-shadow: 0px 0px 0px 1px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
-        >t-color {
+        > t-color {
           height: 100%;
           display: block;
         }
       }
     }
   }
-  >t-tags {
+  > t-tags {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    >t-search-box {
+    > t-search-box {
       outline: none;
       padding: 4px 4px 0px 0px;
       width: 100%;
@@ -380,7 +386,7 @@ t-property-root {
       flex-wrap: wrap;
       justify-content: center;
       overflow-y: auto;
-      >t-tag {
+      > t-tag {
         display: inline-block;
         margin: 0px 0px 4px 4px;
         border-radius: var(--rounded);

@@ -6,12 +6,12 @@ export default {
     Object.keys(defines).forEach((key) => {
       Object.defineProperty(app.config.globalProperties.$defines, key, {
         value: (defines as any)[key],
-        writable: false
+        writable: false,
       });
-    })
-  }
-}
-declare module '@vue/runtime-core' {
+    });
+  },
+};
+declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $defines: Readonly<typeof defines>;
   }

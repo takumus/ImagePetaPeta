@@ -6,7 +6,7 @@ type MessageEvents = {
   compactionError: (error: any) => void;
   beginCompaction: () => void;
   doneCompaction: () => void;
-}
+};
 export default class DB<T> extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   nedb: Nedb<T> | null = null;
   loaded = false;
@@ -27,10 +27,10 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
           }
           this.loaded = true;
           res(true);
-        }
+        },
       });
       this.nedb.stopAutocompaction();
-    })
+    });
   }
   orderCompaction() {
     clearTimeout(this.execCompationIntervalId);
@@ -39,14 +39,17 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
   compaction = () => {
     if (this.nedb && this.loaded) {
       this.emit("beginCompaction");
-      this.nedb.compactDatafileAsync().then(() => {
-        this.emit("doneCompaction");
-      }).catch((error) => {
-        this.emit("compactionError", error);
-        this.orderCompaction();
-      })
+      this.nedb
+        .compactDatafileAsync()
+        .then(() => {
+          this.emit("doneCompaction");
+        })
+        .catch((error) => {
+          this.emit("compactionError", error);
+          this.orderCompaction();
+        });
     }
-  }
+  };
   find(query: Partial<T> | any = {}): Promise<T[]> {
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
@@ -81,6 +84,6 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
         return;
       }
       this.nedb.ensureIndex(ensureIndexOptions, res);
-    })
+    });
   }
 }

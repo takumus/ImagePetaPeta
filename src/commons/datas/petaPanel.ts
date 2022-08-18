@@ -4,26 +4,26 @@ import { v4 as uuid } from "uuid";
 import deepcopy from "deepcopy";
 
 export interface PetaPanel {
-  petaImageId: string,
-  position: Vec2,
-  rotation: number,
-  width: number,
-  height: number,
+  petaImageId: string;
+  position: Vec2;
+  rotation: number;
+  width: number;
+  height: number;
   crop: {
-    position: Vec2,
-    width: number,
-    height: number
-  },
-  id: string,
-  index: number,
+    position: Vec2;
+    width: number;
+    height: number;
+  };
+  id: string;
+  index: number;
   gif: {
-    stopped: boolean,
-    frame: number
-  }
-  visible: boolean,
-  locked: boolean,
-  _petaImage?: PetaImage,
-  _selected?: boolean
+    stopped: boolean;
+    frame: number;
+  };
+  visible: boolean;
+  locked: boolean;
+  _petaImage?: PetaImage;
+  _selected?: boolean;
 }
 export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
   const panel: PetaPanel = {
@@ -35,19 +35,19 @@ export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: num
     crop: {
       position: new Vec2(0, 0),
       width: 1,
-      height: 1
+      height: 1,
     },
     id: uuid(),
     index: 0,
     gif: {
       stopped: false,
-      frame: 0
+      frame: 0,
     },
     visible: true,
     locked: false,
     _petaImage: petaImage,
-    _selected: false
-  }
+    _selected: false,
+  };
   return panel;
 }
 export function petaPanelToDBPetaPanel(petaPanel: PetaPanel, copy = true) {

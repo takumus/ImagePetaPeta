@@ -1,7 +1,7 @@
-import { ParsedFrame } from 'gifuct-js';
+import { ParsedFrame } from "gifuct-js";
 export interface DecompressWorkerData {
-  parsedFrame: ParsedFrame,
-  index: number,
-  length: number,
-  isLast: boolean,
+  parsedFrame: ParsedFrame;
+  index: number;
+  length: number;
+  isLast: boolean;
 }

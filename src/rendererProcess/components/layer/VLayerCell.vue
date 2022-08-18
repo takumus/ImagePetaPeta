@@ -3,7 +3,7 @@
     class="layer-cell-root"
     :class="{
       drag: drag,
-      selected: selected
+      selected: selected,
     }"
     @pointerdown.left="pointerdown($event)"
   >
@@ -11,7 +11,7 @@
       class="visible"
       ref="visibleIcon"
       :class="{
-        disabled: !visible
+        disabled: !visible,
       }"
     >
     </t-icon>
@@ -19,7 +19,7 @@
       class="lock"
       ref="lockedIcon"
       :class="{
-        disabled: !locked
+        disabled: !locked,
       }"
     >
     </t-icon>
@@ -31,7 +31,7 @@
     <t-thumb
       :v-if="url"
       :style="{
-        backgroundImage: `url(${url})`
+        backgroundImage: `url(${url})`,
       }"
     >
       <t-nsfw v-if="showNSFW"></t-nsfw>
@@ -53,15 +53,13 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
   components: {
     //
   },
-  emits: [
-    "startDrag"
-  ]
+  emits: ["startDrag"],
 })
 export default class VLayerCell extends Vue {
   @Prop()
   cellData: {
-    id: number,
-    data: PetaPanel
+    id: number;
+    data: PetaPanel;
   } | null = null;
   // @Prop()
   // pPanel: PPanel | null = null;
@@ -139,7 +137,8 @@ export default class VLayerCell extends Vue {
   &.selected {
     background-color: var(--color-hover) !important;
   }
-  &.drag, &:hover {
+  &.drag,
+  &:hover {
     background-color: var(--color-hover);
   }
   &.drag {
@@ -149,7 +148,7 @@ export default class VLayerCell extends Vue {
   &.hide {
     visibility: hidden;
   }
-  >t-icon {
+  > t-icon {
     padding: 0px 8px;
     height: 100%;
     width: 24px;
@@ -170,7 +169,7 @@ export default class VLayerCell extends Vue {
       opacity: 0.3;
     }
   }
-  >t-thumb {
+  > t-thumb {
     min-width: 32px;
     height: 100%;
     margin: 0px 8px;
@@ -179,7 +178,7 @@ export default class VLayerCell extends Vue {
     background-position: center center;
     background-size: contain;
     display: block;
-    >t-nsfw {
+    > t-nsfw {
       width: 100%;
       height: 100%;
       display: block;
@@ -189,7 +188,7 @@ export default class VLayerCell extends Vue {
       background-image: url("~@/@assets/nsfwBackground.png");
     }
   }
-  >.name {
+  > .name {
     flex: 1;
     overflow: hidden;
     max-height: 100%;

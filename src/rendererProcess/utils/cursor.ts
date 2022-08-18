@@ -20,5 +20,5 @@ export const cursors = {
   ROTATE_CURSOR: `-webkit-image-set(
     url('${RotateCursor1x}') 1x,
     url('${RotateCursor2x}') 2x
-  ) 11 11, auto`
-}
+  ) 11 11, auto`,
+};

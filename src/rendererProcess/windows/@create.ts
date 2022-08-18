@@ -35,10 +35,12 @@ export async function create(component: Component, windowType: WindowType) {
       return await plugin.install?.(app);
     }
     const platform = await API.send("getPlatform");
-    await appUse(createI18n({
-      locale: "ja",
-      messages: languages,
-    }));
+    await appUse(
+      createI18n({
+        locale: "ja",
+        messages: languages,
+      }),
+    );
     await appUse(GlobalWindowArgs);
     await appUse(GlobalWindowType.createPlugin(windowType));
     await appUse(GlobalSystemInfo.createPlugin(platform));
@@ -56,19 +58,23 @@ export async function create(component: Component, windowType: WindowType) {
     app.provide(darkModeStoreKey, await createDarkModeStore());
     app.provide(nsfwStoreKey, await createNSFWStore());
     app.mount("#app");
-  }
+  };
   API.on("dataInitialized", () => {
     initVue();
   });
   if (await API.send("getIsDataInitialized")) {
     initVue();
   }
-  document.body.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-  }, {
-    passive: false,
-    capture: false
-  });
+  document.body.addEventListener(
+    "touchstart",
+    (e) => {
+      e.preventDefault();
+    },
+    {
+      passive: false,
+      capture: false,
+    },
+  );
   new Keyboards().down(["KeyD"], () => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
       API.send("windowToggleDevTools");
@@ -76,5 +82,5 @@ export async function create(component: Component, windowType: WindowType) {
   }).enabled = true;
   window.onerror = (e) => {
     logChunk().log(`window "${windowType}" error:`, e);
-  }
+  };
 }

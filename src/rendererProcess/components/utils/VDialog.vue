@@ -1,23 +1,18 @@
 <template>
   <t-dialog-root
     v-show="visible"
-    :style=" {
-      zIndex: zIndex
+    :style="{
+      zIndex: zIndex,
     }"
   >
     <t-modal>
       <t-content>
         <p>
-          {{label}}
+          {{ label }}
         </p>
         <t-buttons>
-          <button
-            v-for="(item, index) in items"
-            :key="item"
-            @click="select(index)"
-            tabindex="-1"
-          >
-            {{item}}
+          <button v-for="(item, index) in items" :key="item" @click="select(index)" tabindex="-1">
+            {{ item }}
           </button>
         </t-buttons>
       </t-content>
@@ -30,7 +25,7 @@
 import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
 
 defineProps<{
-  zIndex: number
+  zIndex: number;
 }>();
 
 const _this = getCurrentInstance()!.proxy!;
@@ -54,10 +49,10 @@ function show(_label: string, _items: string[]) {
   });
 }
 _this.$components.dialog = {
-  show
-}
+  show,
+};
 defineExpose({
-  show
+  show,
 });
 </script>
 
@@ -75,7 +70,7 @@ t-dialog-root {
   &.no-background {
     background-color: transparent;
   }
-  >t-modal {
+  > t-modal {
     background-color: var(--color-main);
     padding: 16px;
     border-radius: var(--rounded);
@@ -86,17 +81,17 @@ t-dialog-root {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    >t-content {
+    > t-content {
       flex: 1;
       overflow: hidden;
       text-align: center;
       display: block;
-      >p {
+      > p {
         text-align: center;
         word-break: break-word;
         white-space: pre-wrap;
       }
-      >t-buttons {
+      > t-buttons {
         display: block;
       }
     }

@@ -6,7 +6,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
 (async () => {
   const files = await file.readdir("./src/test/sample_images");
   console.time("time");
-  const palettes: { palette: PetaColor[], allPalette: PetaColor[], path: string }[] = [];
+  const palettes: { palette: PetaColor[]; allPalette: PetaColor[]; path: string }[] = [];
   await promiseSerial(async (f) => {
     try {
       const label = f.substring(0, 10);
@@ -16,12 +16,12 @@ import { PetaColor } from "@/commons/datas/petaColor";
         data,
         outputFilePath: "./test_output/metadata_tile_" + f,
         size: BROWSER_THUMBNAIL_SIZE,
-        quality: BROWSER_THUMBNAIL_QUALITY
+        quality: BROWSER_THUMBNAIL_QUALITY,
       });
       palettes.push({
         palette: metadata.palette,
         allPalette: [...metadata.palette].sort((a, b) => b.positionSD - a.positionSD),
-        path: "./metadata_tile_" + f + ".webp"
+        path: "./metadata_tile_" + f + ".webp",
       });
       console.timeEnd(label);
     } catch (error) {
@@ -51,20 +51,23 @@ import { PetaColor } from "@/commons/datas/petaColor";
       </style>
       </head>
       <body>
-      ${palettes.map(
-        (p) => `<img src="${p.path}" width="256"><br><br>Compressed(${p.palette.length})<div>[`
-        + p.palette.map(
-          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`
-        ).join("")
-        + `]</div><br>All(${p.allPalette.length})<div>[`
-        + p.allPalette.map(
-          (c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`
-        ).join("")
-        + `]</div><br><br>`
-      ).join("")}
+      ${palettes
+        .map(
+          (p) =>
+            `<img src="${p.path}" width="256"><br><br>Compressed(${p.palette.length})<div>[` +
+            p.palette
+              .map((c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`)
+              .join("") +
+            `]</div><br>All(${p.allPalette.length})<div>[` +
+            p.allPalette
+              .map((c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`)
+              .join("") +
+            `]</div><br><br>`,
+        )
+        .join("")}
       </body>
       </html>`,
-      "utf-8"
-    )
+      "utf-8",
+    ),
   );
 })();

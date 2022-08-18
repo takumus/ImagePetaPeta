@@ -6,12 +6,16 @@ export default {
     // 初期設定取得
     app.config.globalProperties.$settings = reactive(await API.send("getSettings"));
     const watch = () => {
-      return _watch(app.config.globalProperties.$settings as Settings, (value) => {
-        API.send("updateSettings", value);
-      }, {
-        deep: true
-      });
-    }
+      return _watch(
+        app.config.globalProperties.$settings as Settings,
+        (value) => {
+          API.send("updateSettings", value);
+        },
+        {
+          deep: true,
+        },
+      );
+    };
     // watch開始。
     let unwatch = watch();
     API.on("updateSettings", (event, setting) => {
@@ -22,9 +26,9 @@ export default {
       // watch again
       unwatch = watch();
     });
-  }
-}
-declare module '@vue/runtime-core' {
+  },
+};
+declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $settings: Settings;
   }

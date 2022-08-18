@@ -19,14 +19,14 @@
 //     }
 //   }
 //   public undo(datas: Data[]) {
-//     if (this.nextIndex <= 1) return false; 
+//     if (this.nextIndex <= 1) return false;
 //     this.nextIndex--;
 //     const current = this.getCurrent();
 //     if (current) this.copyDatas(current, datas);
 //     console.log(`undo history (${this.nextIndex})`);
 //   }
 //   public redo(datas: Data[]) {
-//     if (this.nextIndex >= this.history.length) return false; 
+//     if (this.nextIndex >= this.history.length) return false;
 //     this.nextIndex++;
 //     const current = this.getCurrent();
 //     if (current) this.copyDatas(current, datas);

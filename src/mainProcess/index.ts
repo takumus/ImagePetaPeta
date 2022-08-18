@@ -17,7 +17,14 @@ import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import { defaultStates, States } from "@/commons/datas/states";
-import { upgradePetaImage, upgradePetaTag, upgradePetaImagesPetaTags, upgradeSettings, upgradeStates, upgradeWindowStates } from "@/mainProcess/utils/upgrader";
+import {
+  upgradePetaImage,
+  upgradePetaTag,
+  upgradePetaImagesPetaTags,
+  upgradeSettings,
+  upgradeStates,
+  upgradeWindowStates,
+} from "@/mainProcess/utils/upgrader";
 import { arrLast } from "@/commons/utils/utils";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
@@ -83,25 +90,27 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     configStates,
     configDBInfo,
     petaDatas,
-    windows
+    windows,
   } = constants;
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready前にやらないといけない事
   */
   //-------------------------------------------------------------------------------------------------//
-  protocol.registerSchemesAsPrivileged([{
-    scheme: "app",
-    privileges: {
-      secure: true,
-      standard: true
-    }
-  }]);
+  protocol.registerSchemesAsPrivileged([
+    {
+      scheme: "app",
+      privileges: {
+        secure: true,
+        standard: true,
+      },
+    },
+  ]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
     if (
-      (windows.windows.board === undefined || windows.windows.board.isDestroyed())
-      && (windows.windows.browser === undefined || windows.windows.browser.isDestroyed())
+      (windows.windows.board === undefined || windows.windows.board.isDestroyed()) &&
+      (windows.windows.browser === undefined || windows.windows.browser.isDestroyed())
     ) {
       windows.showWindows();
     }
@@ -113,23 +122,29 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     //
   });
   app.on("second-instance", () => {
-    const count = Object.values(windows.windows).filter((window) => {
-      return window !== undefined && !window.isDestroyed();
-    }).map((window) => {
-      window?.focus();
-    }).length;
+    const count = Object.values(windows.windows)
+      .filter((window) => {
+        return window !== undefined && !window.isDestroyed();
+      })
+      .map((window) => {
+        window?.focus();
+      }).length;
     if (count < 1) {
       windows.showWindows();
     }
   });
-  app.setAsDefaultProtocolClient("image-petapeta")
+  app.setAsDefaultProtocolClient("image-petapeta");
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready
   */
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
-    mainLogger.logChunk().log(`\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`);
+    mainLogger
+      .logChunk()
+      .log(
+        `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
+      );
     mainLogger.logChunk().log(`verison: ${app.getVersion()}`);
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -138,12 +153,12 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     //-------------------------------------------------------------------------------------------------//
     session.defaultSession.protocol.registerFileProtocol("image-original", async (req, res) => {
       res({
-        path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), ""))
+        path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
       });
     });
     session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (req, res) => {
       res({
-        path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), ""))
+        path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
       });
     });
     //-------------------------------------------------------------------------------------------------//
@@ -163,7 +178,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     createProtocol("app");
     nativeTheme.on("updated", () => {
       emitDarkMode();
-    })
+    });
     windows.showWindows();
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -173,22 +188,17 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     try {
       // 時間かかったときのテスト
       // await new Promise((res) => setTimeout(res, 5000));
-      await Promise.all([
-        dbPetaBoard.init(),
-        dbPetaImages.init(),
-        dbPetaTags.init(),
-        dbPetaImagesPetaTags.init()
-      ]);
+      await Promise.all([dbPetaBoard.init(), dbPetaImages.init(), dbPetaTags.init(), dbPetaImagesPetaTags.init()]);
       await dbPetaTags.ensureIndex({
         fieldName: "id",
-        unique: true
+        unique: true,
       });
     } catch (error) {
       showError({
         category: "M",
         code: 2,
         title: "Initialization Error",
-        message: String(error)
+        message: String(error),
       });
       return;
     }
@@ -221,7 +231,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         category: "M",
         code: 3,
         title: "Migration Error",
-        message: String(error)
+        message: String(error),
       });
       return;
     }
@@ -231,7 +241,10 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     */
     //-------------------------------------------------------------------------------------------------//
     function getMainFunctions(): {
-      [P in keyof MainFunctions]: (event: IpcMainInvokeEvent, ...args: Parameters<MainFunctions[P]>) => ReturnType<MainFunctions[P]>
+      [P in keyof MainFunctions]: (
+        event: IpcMainInvokeEvent,
+        ...args: Parameters<MainFunctions[P]>
+      ) => ReturnType<MainFunctions[P]>;
     } {
       return {
         async showMainWindow() {
@@ -243,7 +256,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const window = windows.getWindowByEvent(event);
           if (window) {
             const result = await dialog.showOpenDialog(window.window, {
-              properties: ["openFile", "multiSelections"]
+              properties: ["openFile", "multiSelections"],
             });
             if (result.canceled) {
               log.log("canceled");
@@ -262,7 +275,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const window = windows.getWindowByEvent(event);
           if (window) {
             const result = await dialog.showOpenDialog(window.window, {
-              properties: ["openDirectory"]
+              properties: ["openDirectory"],
             });
             if (result.canceled) {
               log.log("canceled");
@@ -284,13 +297,17 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Import Images From Clipboard");
-            return (await petaDatas.importImagesFromBuffers(buffers.map((buffer) => {
-              return {
-                buffer: buffer,
-                name: "clipboard",
-                note: ""
-              }
-            }))).map((petaImage) => petaImage.id);
+            return (
+              await petaDatas.importImagesFromBuffers(
+                buffers.map((buffer) => {
+                  return {
+                    buffer: buffer,
+                    name: "clipboard",
+                    note: "",
+                  };
+                }),
+              )
+            ).map((petaImage) => petaImage.id);
           } catch (error) {
             log.error(error);
           }
@@ -318,36 +335,40 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             const petaImages = await petaDatas.getPetaImages();
             log.log("return:", true);
             return petaImages;
-          } catch(e) {
+          } catch (e) {
             log.error(e);
             showError({
               category: "M",
               code: 100,
               title: "Get PetaImages Error",
-              message: String(e)
+              message: String(e),
             });
           }
           return {};
         },
         async updatePetaImages(event, datas, mode) {
-          return Tasks.spawn("UpdatePetaImages", async (handler) => {
-            const log = mainLogger.logChunk();
-            log.log("#Update PetaImages");
-            try {
-              await petaDatas.updatePetaImages(datas, mode);
-              log.log("return:", true);
-              return true;
-            } catch (err) {
-              log.error(err);
-              showError({
-                category: "M",
-                code: 200,
-                title: "Update PetaImages Error",
-                message: String(err)
-              });
-            }
-            return false;
-          }, {});
+          return Tasks.spawn(
+            "UpdatePetaImages",
+            async (handler) => {
+              const log = mainLogger.logChunk();
+              log.log("#Update PetaImages");
+              try {
+                await petaDatas.updatePetaImages(datas, mode);
+                log.log("return:", true);
+                return true;
+              } catch (err) {
+                log.error(err);
+                showError({
+                  category: "M",
+                  code: 200,
+                  title: "Update PetaImages Error",
+                  message: String(err),
+                });
+              }
+              return false;
+            },
+            {},
+          );
         },
         async getPetaBoards(event) {
           const log = mainLogger.logChunk();
@@ -362,13 +383,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             }
             log.log("return:", petaBoards.length);
             return petaBoards;
-          } catch(e) {
+          } catch (e) {
             log.error(e);
             showError({
               category: "M",
               code: 100,
               title: "Get PetaBoards Error",
-              message: String(e)
+              message: String(e),
             });
           }
           return [];
@@ -380,13 +401,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             await promiseSerial((board) => petaDatas.updatePetaBoard(board, mode), boards).promise;
             log.log("return:", true);
             return true;
-          } catch(e) {
+          } catch (e) {
             log.error(e);
             showError({
               category: "M",
               code: 200,
               title: "Update PetaBoards Error",
-              message: String(e)
+              message: String(e),
             });
           }
           return false;
@@ -405,7 +426,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
               category: "M",
               code: 200,
               title: "Update PetaTags Error",
-              message: String(error)
+              message: String(error),
             });
           }
           return false;
@@ -417,13 +438,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             await petaDatas.updatePetaImagesPetaTags(petaImageIds, petaTagIds, mode);
             log.log("return:", true);
             return true;
-          } catch(error) {
+          } catch (error) {
             log.error(error);
             showError({
               category: "M",
               code: 200,
               title: "Update PetaImagesPetaTags Error",
-              message: String(error)
+              message: String(error),
             });
           }
           return false;
@@ -435,13 +456,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             const ids = await petaDatas.getPetaImageIdsByPetaTagIds(petaTagIds);
             log.log("return:", ids.length);
             return ids;
-          } catch(error) {
+          } catch (error) {
             log.error(error);
             showError({
               category: "M",
               code: 100,
               title: "Get PetaImageIds By PetaTagIds Error",
-              message: String(error)
+              message: String(error),
             });
           }
           return [];
@@ -453,13 +474,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             const petaTagIds = await petaDatas.getPetaTagIdsByPetaImageIds(petaImageIds);
             // log.log("return:", petaTagIds.length);
             return petaTagIds;
-          } catch(error) {
+          } catch (error) {
             log.error(error);
             showError({
               category: "M",
               code: 100,
               title: "Get PetaTagIds By PetaImageIds Error",
-              message: String(error)
+              message: String(error),
             });
           }
           return [];
@@ -477,7 +498,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
               category: "M",
               code: 100,
               title: "Get PetaTagInfos Error",
-              message: String(error)
+              message: String(error),
             });
           }
           return [];
@@ -503,7 +524,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           log.log("#Get App Info");
           const info = {
             name: app.getName(),
-            version: app.getVersion()
+            version: app.getVersion(),
           };
           log.log("return:", info);
           return info;
@@ -544,13 +565,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             emitDarkMode();
             log.log("return:", configSettings.data);
             return true;
-          } catch(e) {
+          } catch (e) {
             log.error(e);
             showError({
               category: "M",
               code: 200,
               title: "Update Settings Error",
-              message: String(e)
+              message: String(e),
             });
           }
           return false;
@@ -622,7 +643,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
               category: "M",
               code: 200,
               title: "Regenerate Thumbnails Error",
-              message: String(err)
+              message: String(err),
             });
           }
           return;
@@ -633,7 +654,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const window = windows.getWindowByEvent(event);
           if (window) {
             const file = await dialog.showOpenDialog(window.window, {
-              properties: ["openDirectory"]
+              properties: ["openDirectory"],
             });
             if (file.canceled) {
               log.log("canceled");
@@ -671,7 +692,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             configSettings.save();
             relaunch();
             return true;
-          } catch(error) {
+          } catch (error) {
             log.error(error);
           }
           return false;
@@ -694,7 +715,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           return false;
         },
         async installUpdate(event) {
-          // 
+          //
           return false;
         },
         async startDrag(event, petaImages, iconSize, iconData) {
@@ -743,7 +764,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             windows.emitMainEvent("updateStates", states);
             log.log("return:", configStates.data);
             return true;
-          } catch(e) {
+          } catch (e) {
             log.error(e);
           }
           return false;
@@ -802,8 +823,8 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         },
         async getLatestVersion() {
           return getLatestVersion(configSettings.data.ignoreMinorUpdate);
-        }
-      }
+        },
+      };
     }
   });
   //-------------------------------------------------------------------------------------------------//
@@ -818,8 +839,8 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       DIR_LOG: "",
       DIR_IMAGES: "",
       DIR_THUMBNAILS: "",
-      DIR_TEMP: ""
-    }
+      DIR_TEMP: "",
+    };
     const files = {
       FILE_IMAGES_DB: "",
       FILE_BOARDS_DB: "",
@@ -828,8 +849,8 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       FILE_SETTINGS: "",
       FILE_STATES: "",
       FILE_WINDOW_STATES: "",
-      FILE_DBINFO: ""
-    }
+      FILE_DBINFO: "",
+    };
     let dataLogger: Logger;
     let dbPetaImages: DB<PetaImage>;
     let dbPetaBoard: DB<PetaBoard>;
@@ -863,7 +884,9 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         } catch (error) {
           configSettings.data.petaImageDirectory.default = true;
           configSettings.save();
-          throw new Error(`Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`);
+          throw new Error(
+            `Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`,
+          );
         }
       }
       dirs.DIR_IMAGES = file.initDirectory(true, dirs.DIR_ROOT, "images");
@@ -877,7 +900,11 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       files.FILE_WINDOW_STATES = file.initFile(dirs.DIR_APP, "windowStates.json");
       configDBInfo = new Config<DBInfo>(files.FILE_DBINFO, { version: app.getVersion() });
       if (!isLatest(app.getVersion(), configDBInfo.data.version, false)) {
-        throw new Error(`DB version is higher than App version. \nDB version:${configDBInfo.data.version}\nApp version:${app.getVersion()}`);
+        throw new Error(
+          `DB version is higher than App version. \nDB version:${
+            configDBInfo.data.version
+          }\nApp version:${app.getVersion()}`,
+        );
       }
       dbPetaImages = new DB<PetaImage>("petaImages", files.FILE_IMAGES_DB);
       dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
@@ -894,7 +921,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         });
         db.on("compactionError", (error) => {
           mainLogger.logChunk().error(`compaction error(${db.name})`, error);
-        })
+        });
       });
       windows = new Windows(mainLogger, configSettings, configWindowStates, isDarkMode);
       Tasks.onEmitStatus((id, status) => {
@@ -906,11 +933,11 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           dbPetaImages,
           dbPetaImagesPetaTags,
           dbPetaTags,
-          configSettings
-        }, 
-        dirs, 
+          configSettings,
+        },
+        dirs,
         windows.emitMainEvent.bind(windows),
-        mainLogger
+        mainLogger,
       );
     } catch (err) {
       //-------------------------------------------------------------------------------------------------//
@@ -923,7 +950,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         category: "M",
         code: 1,
         title: "Initialization Error",
-        message: String(err)
+        message: String(err),
       });
       return undefined;
     }
@@ -940,20 +967,25 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       configStates,
       configWindowStates,
       petaDatas,
-      windows
-    }
+      windows,
+    };
   }
   function showError(error: ErrorWindowParameters, quit = true) {
     try {
-      mainLogger.logChunk().log("$Show Error", `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`);
-    } catch { }
+      mainLogger
+        .logChunk()
+        .log(
+          "$Show Error",
+          `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`,
+        );
+    } catch {}
     try {
       Object.values(windows.windows).forEach((window) => {
         if (window !== undefined && !window.isDestroyed()) {
           window.loadURL("about:blank");
         }
       });
-    } catch { }
+    } catch {}
     showErrorWindow(error, quit);
   }
   async function checkUpdate() {

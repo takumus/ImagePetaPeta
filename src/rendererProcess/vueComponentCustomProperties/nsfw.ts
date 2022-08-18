@@ -1,8 +1,8 @@
 import { reactive, App, ref, watch as _watch, ComponentCustomProperties } from "vue";
 import { API } from "../api";
 const nsfw = reactive({
-  showNSFW: false
-})
+  showNSFW: false,
+});
 export default {
   async install(app: App) {
     app.config.globalProperties.$nsfw = nsfw;
@@ -10,9 +10,9 @@ export default {
     API.on("showNSFW", (event, value) => {
       nsfw.showNSFW = value;
     });
-  }
-}
-declare module '@vue/runtime-core' {
+  },
+};
+declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $nsfw: typeof nsfw;
   }

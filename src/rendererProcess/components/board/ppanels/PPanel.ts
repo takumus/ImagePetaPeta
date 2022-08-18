@@ -1,7 +1,7 @@
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
-import { AnimatedGIF } from '@/rendererProcess/utils/pixi-gif';
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif";
 import { getImage } from "./ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
@@ -28,7 +28,9 @@ export class PPanel extends PIXI.Sprite {
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
   private zoomScale = 1;
-  private _cancelLoading? = () => { return; }
+  private _cancelLoading? = () => {
+    return;
+  };
   public showNSFW = false;
   private static nsfwTexture?: PIXI.Texture;
   private static noImageTexture?: PIXI.Texture;
@@ -102,12 +104,18 @@ export class PPanel extends PIXI.Sprite {
     }
   }
   public setZoomScale(scale: number) {
-    if (this.needToScaling(
-      "scale", scale,
-      "nsfwTile", this.nsfwTile,
-      "noImageTile", this.noImageTile,
-      "loadingTile", this.loadingTile
-    )) {
+    if (
+      this.needToScaling(
+        "scale",
+        scale,
+        "nsfwTile",
+        this.nsfwTile,
+        "noImageTile",
+        this.noImageTile,
+        "loadingTile",
+        this.loadingTile,
+      )
+    ) {
       return;
     }
     this.zoomScale = scale;
@@ -118,28 +126,49 @@ export class PPanel extends PIXI.Sprite {
   public orderRender() {
     try {
       // 前回の描画時と値に変更があるかチェック
-      const showNSFW = (this.petaPanel._petaImage?.nsfw && !this.showNSFW) ? true : false;
-      if (this.needToRender(
-        "petaPanel.width", this.petaPanel.width,
-        "petaPanel.height", this.petaPanel.height,
-        "petaPanel.crop.width", this.petaPanel.crop.width,
-        "petaPanel.crop.height", this.petaPanel.crop.height,
-        "petaPanel.crop.position.x", this.petaPanel.crop.position.x,
-        "petaPanel.crop.position.y", this.petaPanel.crop.position.y,
-        "petaPanel.position.x", this.petaPanel.position.x,
-        "petaPanel.position.y", this.petaPanel.position.y,
-        "petaPanel.rotation", this.petaPanel.rotation,
-        "petaPanel.visible", this.petaPanel.visible,
-        "petaPanel.locked", this.petaPanel.locked,
-        "unselected", this.unselected,
-        "petaPanel._selected", this.petaPanel._selected,
-        "noImage", this.noImage,
-        "loading", this.loading,
-        "nsfw", showNSFW,
-        "nsfwTile", this.nsfwTile,
-        "noImageTile", this.noImageTile,
-        "loadingTile", this.loadingTile
-      )) {
+      const showNSFW = this.petaPanel._petaImage?.nsfw && !this.showNSFW ? true : false;
+      if (
+        this.needToRender(
+          "petaPanel.width",
+          this.petaPanel.width,
+          "petaPanel.height",
+          this.petaPanel.height,
+          "petaPanel.crop.width",
+          this.petaPanel.crop.width,
+          "petaPanel.crop.height",
+          this.petaPanel.crop.height,
+          "petaPanel.crop.position.x",
+          this.petaPanel.crop.position.x,
+          "petaPanel.crop.position.y",
+          this.petaPanel.crop.position.y,
+          "petaPanel.position.x",
+          this.petaPanel.position.x,
+          "petaPanel.position.y",
+          this.petaPanel.position.y,
+          "petaPanel.rotation",
+          this.petaPanel.rotation,
+          "petaPanel.visible",
+          this.petaPanel.visible,
+          "petaPanel.locked",
+          this.petaPanel.locked,
+          "unselected",
+          this.unselected,
+          "petaPanel._selected",
+          this.petaPanel._selected,
+          "noImage",
+          this.noImage,
+          "loading",
+          this.loading,
+          "nsfw",
+          showNSFW,
+          "nsfwTile",
+          this.nsfwTile,
+          "noImageTile",
+          this.noImageTile,
+          "loadingTile",
+          this.loadingTile,
+        )
+      ) {
         return;
       }
       this.visible = this.petaPanel.visible;
@@ -148,14 +177,8 @@ export class PPanel extends PIXI.Sprite {
       const panelHeight = this.absPanelHeight();
       const flippedX = this.petaPanel.width < 0;
       const flippedY = this.petaPanel.height < 0;
-      this.imageWrapper.scale.set(
-        flippedX ? -1 : 1,
-        flippedY ? -1 : 1
-      );
-      this.imageWrapper.anchor.set(
-        flippedX ? 1 : 0,
-        flippedY ? 1 : 0
-      );
+      this.imageWrapper.scale.set(flippedX ? -1 : 1, flippedY ? -1 : 1);
+      this.imageWrapper.anchor.set(flippedX ? 1 : 0, flippedY ? 1 : 0);
       if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
         this.imageWrapper.mask = this.masker;
         this.masker.visible = true;
@@ -179,22 +202,12 @@ export class PPanel extends PIXI.Sprite {
       if (this.imageWrapper.mask) {
         this.masker.clear();
         this.masker.beginFill(0xff0000);
-        this.masker.drawRect(
-          -panelWidth / 2,
-          -panelHeight / 2,
-          panelWidth,
-          panelHeight
-        );
+        this.masker.drawRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
       }
       this.selection.clear();
       if (this.unselected) {
         this.selection.beginFill(0x000000, 0.5);
-        this.selection.drawRect(
-          -panelWidth / 2,
-          -panelHeight / 2,
-          panelWidth,
-          panelHeight
-        );
+        this.selection.drawRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
       }
       if (this.nsfwTile) {
         this.nsfwTile.x = -panelWidth / 2;
@@ -220,7 +233,8 @@ export class PPanel extends PIXI.Sprite {
         this.loadingTile.tilePosition.set(panelWidth / 2, panelHeight / 2);
         this.loadingTile.visible = this.loading;
       }
-      this.cover.visible = (this.nsfwTile?.visible || this.noImageTile?.visible || this.loadingTile?.visible) ? true : false;
+      this.cover.visible =
+        this.nsfwTile?.visible || this.noImageTile?.visible || this.loadingTile?.visible ? true : false;
       this.x = this.petaPanel.position.x;
       this.y = this.petaPanel.position.y;
       this.rotation = this.petaPanel.rotation;
@@ -235,7 +249,7 @@ export class PPanel extends PIXI.Sprite {
       new Vec2(-w / 2 - offset, -h / 2 - offset),
       new Vec2(w / 2 + offset, -h / 2 - offset),
       new Vec2(w / 2 + offset, h / 2 + offset),
-      new Vec2(-w / 2 - offset, h / 2 + offset)
+      new Vec2(-w / 2 - offset, h / 2 + offset),
     ];
   }
   public getRect(offset = 0) {
@@ -244,8 +258,8 @@ export class PPanel extends PIXI.Sprite {
       leftTop: corners[0],
       rightTop: corners[1],
       rightBottom: corners[2],
-      leftBottom: corners[3]
-    }
+      leftBottom: corners[3],
+    };
   }
   public cancelLoading() {
     this._cancelLoading?.();

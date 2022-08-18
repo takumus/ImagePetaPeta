@@ -35,7 +35,7 @@ export function mkdir(path: string, recursive = false): Promise<string> {
       }
       res(path);
     });
-  })
+  });
 }
 export function mkdirSync(path: string, recursive = false) {
   try {
@@ -56,7 +56,7 @@ export function rm(path: string): Promise<boolean> {
       }
       res(true);
     });
-  })
+  });
 }
 export function stat(path: string): Promise<fs.Stats> {
   return new Promise((res, rej) => {
@@ -67,7 +67,7 @@ export function stat(path: string): Promise<fs.Stats> {
       }
       res(stats);
     });
-  })
+  });
 }
 export function initFile(...paths: string[]) {
   const res = Path.resolve(...paths);
@@ -94,37 +94,41 @@ export function writable(path: string, isDirectory: boolean) {
   }
   // 存在する場合はファイルの種類の確認
   if (stat.isDirectory() != isDirectory) {
-    throw new Error(`File type is incorrect. "${path}" is not ${ isDirectory ? "directory" : "file" }.`);
+    throw new Error(`File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`);
   }
   // 存在する場合はパスのアクセス権確認
   fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
 }
 export function readdir(path: string) {
-  return new Promise((res:(files: string[]) => void, rej) => {
+  return new Promise((res: (files: string[]) => void, rej) => {
     fs.readdir(path, {}, (err, files) => {
       if (err) {
         rej(err);
         return;
       }
       res(files as string[]);
-    })
-  })
+    });
+  });
 }
 export function readDirRecursive(path: string, onFile?: (filePaths: string[], count: number) => void) {
   let count = 0;
   const canceled = {
-    value: false
-  }
+    value: false,
+  };
   return {
-    files: _readDirRecursive(path, (filePaths: string[]) => {
-      if (onFile) {
-        onFile(filePaths, ++count);
-      }
-    }, canceled),
+    files: _readDirRecursive(
+      path,
+      (filePaths: string[]) => {
+        if (onFile) {
+          onFile(filePaths, ++count);
+        }
+      },
+      canceled,
+    ),
     cancel: () => {
       canceled.value = true;
-    }
-  }
+    },
+  };
 }
 async function _readDirRecursive(path: string, onFile: (filePaths: string[]) => void, canceled: { value: boolean }) {
   if (canceled.value) {
@@ -139,11 +143,11 @@ async function _readDirRecursive(path: string, onFile: (filePaths: string[]) => 
         const cPath = Path.resolve(path, files[i]!);
         const isDirectory = fs.statSync(cPath).isDirectory();
         if (isDirectory) {
-          _files.push(...await _readDirRecursive(cPath, onFile, canceled));
+          _files.push(...(await _readDirRecursive(cPath, onFile, canceled)));
         } else {
           _files.push(cPath);
         }
-      } catch(error) {
+      } catch (error) {
         if (error === "canceled") {
           throw "canceled";
         }

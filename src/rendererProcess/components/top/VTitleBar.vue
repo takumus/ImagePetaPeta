@@ -1,7 +1,7 @@
 <template>
   <t-titlebar-root>
     <t-title>
-      <t-icon>{{title}}</t-icon>
+      <t-icon>{{ title }}</t-icon>
     </t-title>
     <t-content>
       <t-top>
@@ -11,36 +11,22 @@
         <t-draggable
           class="left"
           :class="{
-            mac: $systemInfo.platform === 'darwin'
+            mac: $systemInfo.platform === 'darwin',
           }"
         >
         </t-draggable>
         <slot></slot>
-        <t-draggable
-          class="right"
-        >
-        </t-draggable>
+        <t-draggable class="right"> </t-draggable>
       </t-bottom>
     </t-content>
-    <t-window-buttons
-      v-if="!isMac"
-    >
-      <t-window-button
-        v-if="resizable"
-        @click="minimizeWindow"
-      >
+    <t-window-buttons v-if="!isMac">
+      <t-window-button v-if="resizable" @click="minimizeWindow">
         <t-icon>&#xe921;</t-icon>
       </t-window-button>
-      <t-window-button
-        v-if="resizable"
-        @click="maximizeWindow"
-      >
+      <t-window-button v-if="resizable" @click="maximizeWindow">
         <t-icon>&#xe922;</t-icon>
       </t-window-button>
-      <t-window-button
-        class="close"
-        @click="closeWindow"
-      >
+      <t-window-button class="close" @click="closeWindow">
         <t-icon>&#xe8bb;</t-icon>
       </t-window-button>
     </t-window-buttons>
@@ -56,7 +42,7 @@ import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 const _this = getCurrentInstance()!.proxy!;
 defineProps<{
-  title?: string
+  title?: string;
 }>();
 
 function minimizeWindow() {
@@ -84,35 +70,35 @@ t-titlebar-root {
   min-height: var(--tab-height);
   display: flex;
   position: relative;
-  >t-title {
+  > t-title {
     position: absolute;
     height: 100%;
     width: 100%;
     display: flex;
     align-items: center;
     pointer-events: none;
-    >t-icon {
+    > t-icon {
       width: 100%;
       text-align: center;
       display: inline-block;
       font-size: var(--size-0);
     }
   }
-  >t-content {
+  > t-content {
     flex-grow: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    >t-top {
+    > t-top {
       flex-grow: 1;
       -webkit-app-region: drag;
       display: block;
       height: var(--top-draggable-height);
     }
-    >t-bottom {
+    > t-bottom {
       display: flex;
       flex-direction: row;
-      >t-draggable {
+      > t-draggable {
         -webkit-app-region: drag;
         display: block;
         &.left {
@@ -129,13 +115,13 @@ t-titlebar-root {
       }
     }
   }
-  >t-window-buttons {
+  > t-window-buttons {
     display: flex;
-    >t-window-button {
+    > t-window-button {
       display: flex;
       padding: 0px 16px;
       align-items: center;
-      >t-icon {
+      > t-icon {
         display: inline-block;
         font-size: 6px;
         font-family: Segoe MDL2 Assets;

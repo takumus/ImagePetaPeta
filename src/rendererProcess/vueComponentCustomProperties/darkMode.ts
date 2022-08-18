@@ -8,9 +8,9 @@ export default {
     API.on("darkMode", (event, value) => {
       darkMode.value = value;
     });
-  }
-}
-declare module '@vue/runtime-core' {
+  },
+};
+declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $darkMode: typeof darkMode;
   }

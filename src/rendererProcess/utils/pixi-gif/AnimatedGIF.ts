@@ -1,10 +1,10 @@
-import { Sprite } from '@pixi/sprite';
-import { Texture, Renderer } from '@pixi/core';
-import { settings } from '@pixi/settings';
-import { SCALE_MODES } from '@pixi/constants';
-import { Ticker, UPDATE_PRIORITY } from '@pixi/ticker';
+import { Sprite } from "@pixi/sprite";
+import { Texture, Renderer } from "@pixi/core";
+import { settings } from "@pixi/settings";
+import { SCALE_MODES } from "@pixi/constants";
+import { Ticker, UPDATE_PRIORITY } from "@pixi/ticker";
 import DecompressWorker from "./decompress.worker";
-import { DecompressWorkerData } from './decompressWorkerData';
+import { DecompressWorkerData } from "./decompressWorkerData";
 /**
  * Frame object.
  */
@@ -46,8 +46,7 @@ interface AnimatedGIFOptions {
  * @memberof PIXI.gif
  * @see Thanks to {@link https://github.com/matt-way/gifuct-js/ gifuct-js}
  */
-class AnimatedGIF extends Sprite
-{
+class AnimatedGIF extends Sprite {
   /**
    * Default options for all AnimatedGIF objects.
    * @property [scaleMode=SCALE_MODES.LINEAR] {SCALE_MODES} - Scale mode to use for the texture.
@@ -68,7 +67,7 @@ class AnimatedGIF extends Sprite
     autoUpdate: true,
     onComplete: undefined,
     onFrameChange: undefined,
-    onLoop: undefined
+    onLoop: undefined,
   };
 
   /**
@@ -159,20 +158,18 @@ class AnimatedGIF extends Sprite
    * @param options - Options to use.
    * @returns
    */
-  static fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>)
-  {
-    if (!buffer || buffer.byteLength === 0)
-    {
-      throw new Error('Invalid buffer');
+  static fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {
+    if (!buffer || buffer.byteLength === 0) {
+      throw new Error("Invalid buffer");
     }
 
     const frames: FrameObject[] = [];
 
     // Temporary canvases required for compositing frames
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d')!;
-    const patchCanvas = document.createElement('canvas');
-    const patchContext = patchCanvas.getContext('2d')!;
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d")!;
+    const patchCanvas = document.createElement("canvas");
+    const patchContext = patchCanvas.getContext("2d")!;
 
     let time = 0;
 
@@ -184,7 +181,7 @@ class AnimatedGIF extends Sprite
     let first = true;
     let cancel = () => {
       //
-    }
+    };
     const worker = new (DecompressWorker as any)() as Worker;
     const promise = new Promise<AnimatedGIF>((res, rej) => {
       cancel = rej;
@@ -192,7 +189,7 @@ class AnimatedGIF extends Sprite
       worker.addEventListener("error", (e) => {
         rej(e.message);
       });
-      worker.addEventListener('message', (e) => {
+      worker.addEventListener("message", (e) => {
         const data = e.data as DecompressWorkerData;
         if (first) {
           canvas.width = data.parsedFrame.dims.width;
@@ -200,7 +197,12 @@ class AnimatedGIF extends Sprite
           first = false;
         }
         // Some GIF's omit the disposalType, so let's assume clear if missing
-        const { disposalType = 2, delay = defaultDelay, patch, dims: { width, height, left, top } } = data.parsedFrame;
+        const {
+          disposalType = 2,
+          delay = defaultDelay,
+          patch,
+          dims: { width, height, left, top },
+        } = data.parsedFrame;
 
         patchCanvas.width = width;
         patchCanvas.height = height;
@@ -213,8 +215,7 @@ class AnimatedGIF extends Sprite
         context.drawImage(patchCanvas, left, top);
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-        if (disposalType === 2)
-        {
+        if (disposalType === 2) {
           context.clearRect(0, 0, width, height);
         }
         console.log(`GIF(worker): converting (${data.index + 1}/${data.length})`);
@@ -232,15 +233,15 @@ class AnimatedGIF extends Sprite
           res(new AnimatedGIF(frames, options));
         }
       });
-    })
+    });
     return {
       promise,
       cancel: () => {
         console.log("GIF(worker): cancel converting");
         worker.terminate();
         cancel();
-      }
-    }
+      },
+    };
   }
 
   /**
@@ -255,18 +256,14 @@ class AnimatedGIF extends Sprite
    * @param [options.onFrameChange=null] - Function to call when the frame changes.
    * @param [options.onLoop=null] - Function to call when the animation loops.
    */
-  constructor(frames: FrameObject[], options?: Partial<AnimatedGIFOptions>)
-  {
+  constructor(frames: FrameObject[], options?: Partial<AnimatedGIFOptions>) {
     super();
     // Get the options, apply defaults
-    const { scaleMode, ...rest } = Object.assign({},
-      AnimatedGIF.defaultOptions,
-      options
-    );
+    const { scaleMode, ...rest } = Object.assign({}, AnimatedGIF.defaultOptions, options);
 
     // Create the texture
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
 
     canvas.width = frames[0]!.imageData.width;
     canvas.height = frames[0]!.imageData.height;
@@ -283,46 +280,38 @@ class AnimatedGIF extends Sprite
 
     // Draw the first frame
     this.currentFrame = 0;
-    if (this.autoPlay)
-    {
+    if (this.autoPlay) {
       this.play();
     }
   }
 
   /** Stops the animation. */
-  public stop(): void
-  {
-    if (!this._playing)
-    {
+  public stop(): void {
+    if (!this._playing) {
       return;
     }
 
     this._playing = false;
-    if (this._autoUpdate && this._isConnectedToTicker)
-    {
+    if (this._autoUpdate && this._isConnectedToTicker) {
       Ticker.shared.remove(this.update, this);
       this._isConnectedToTicker = false;
     }
   }
 
   /** Plays the animation. */
-  public play(): void
-  {
-    if (this._playing)
-    {
+  public play(): void {
+    if (this._playing) {
       return;
     }
 
     this._playing = true;
-    if (this._autoUpdate && !this._isConnectedToTicker)
-    {
+    if (this._autoUpdate && !this._isConnectedToTicker) {
       Ticker.shared.add(this.update, this, UPDATE_PRIORITY.HIGH);
       this._isConnectedToTicker = true;
     }
 
     // If were on the last frame and stopped, play should resume from beginning
-    if (!this.loop && this.currentFrame === this._frames.length - 1)
-    {
+    if (!this.loop && this.currentFrame === this._frames.length - 1) {
       this._currentTime = 0;
     }
   }
@@ -331,14 +320,12 @@ class AnimatedGIF extends Sprite
    * Get the current progress of the animation from 0 to 1.
    * @readonly
    */
-  public get progress(): number
-  {
+  public get progress(): number {
     return this._currentTime / this.duration;
   }
 
   /** `true` if the current animation is playing */
-  public get playing(): boolean
-  {
+  public get playing(): boolean {
     return this._playing;
   }
 
@@ -348,38 +335,29 @@ class AnimatedGIF extends Sprite
    *
    * @param deltaTime - Time since last tick.
    */
-  update(deltaTime: number): void
-  {
-    if (!this._playing)
-    {
+  update(deltaTime: number): void {
+    if (!this._playing) {
       return;
     }
 
-    const elapsed = this.animationSpeed * deltaTime / settings.TARGET_FPMS!;
+    const elapsed = (this.animationSpeed * deltaTime) / settings.TARGET_FPMS!;
     const currentTime = this._currentTime + elapsed;
     const localTime = currentTime % this.duration;
 
-    const localFrame = this._frames.findIndex((frame) =>
-      frame.start <= localTime && frame.end > localTime);
+    const localFrame = this._frames.findIndex((frame) => frame.start <= localTime && frame.end > localTime);
 
-    if (currentTime >= this.duration)
-    {
-      if (this.loop)
-      {
+    if (currentTime >= this.duration) {
+      if (this.loop) {
         this._currentTime = localTime;
         this.updateFrameIndex(localFrame);
         this.onLoop?.();
-      }
-      else
-      {
+      } else {
         this._currentTime = this.duration;
         this.updateFrameIndex(this._frames.length - 1);
         this.onComplete?.();
         this.stop();
       }
-    }
-    else
-    {
+    } else {
       this._currentTime = localTime;
       this.updateFrameIndex(localFrame);
     }
@@ -388,10 +366,8 @@ class AnimatedGIF extends Sprite
   /**
    * Redraw the current frame, is necessary for the animation to work when
    */
-  private updateFrame(): void
-  {
-    if (!this.dirty)
-    {
+  private updateFrame(): void {
+    if (!this.dirty) {
       return;
     }
 
@@ -402,7 +378,7 @@ class AnimatedGIF extends Sprite
       // Workaround hack for Safari & iOS
       // which fails to upload canvas after putImageData
       // See: https://bugs.webkit.org/show_bug.cgi?id=229986
-      this._context.fillStyle = 'transparent';
+      this._context.fillStyle = "transparent";
       this._context.fillRect(0, 0, 0, 1);
     }
 
@@ -418,8 +394,7 @@ class AnimatedGIF extends Sprite
    * @param {PIXI.Renderer} renderer - The renderer
    * @private
    */
-  _render(renderer: Renderer): void
-  {
+  _render(renderer: Renderer): void {
     this.updateFrame();
 
     super._render(renderer);
@@ -432,8 +407,7 @@ class AnimatedGIF extends Sprite
    * @private
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _renderCanvas(renderer: any): void
-  {
+  _renderCanvas(renderer: any): void {
     this.updateFrame();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -445,24 +419,18 @@ class AnimatedGIF extends Sprite
    * Whether to use PIXI.Ticker.shared to auto update animation time.
    * @default true
    */
-  get autoUpdate(): boolean
-  {
+  get autoUpdate(): boolean {
     return this._autoUpdate;
   }
 
-  set autoUpdate(value: boolean)
-  {
-    if (value !== this._autoUpdate)
-    {
+  set autoUpdate(value: boolean) {
+    if (value !== this._autoUpdate) {
       this._autoUpdate = value;
 
-      if (!this._autoUpdate && this._isConnectedToTicker)
-      {
+      if (!this._autoUpdate && this._isConnectedToTicker) {
         Ticker.shared.remove(this.update, this);
         this._isConnectedToTicker = false;
-      }
-      else if (this._autoUpdate && !this._isConnectedToTicker && this._playing)
-      {
+      } else if (this._autoUpdate && !this._isConnectedToTicker && this._playing) {
         Ticker.shared.add(this.update, this);
         this._isConnectedToTicker = true;
       }
@@ -470,25 +438,20 @@ class AnimatedGIF extends Sprite
   }
 
   /** Set the current frame number */
-  get currentFrame(): number
-  {
+  get currentFrame(): number {
     return this._currentFrame;
   }
-  set currentFrame(value: number)
-  {
+  set currentFrame(value: number) {
     this.updateFrameIndex(value);
     this._currentTime = this._frames[value]!.start;
   }
 
   /** Internally handle updating the frame index */
-  private updateFrameIndex(value: number): void
-  {
-    if (value < 0 || value >= this._frames.length)
-    {
+  private updateFrameIndex(value: number): void {
+    if (value < 0 || value >= this._frames.length) {
       throw new Error(`Frame index out of range, expecting 0 to ${this.totalFrames}, got ${value}`);
     }
-    if (this._currentFrame !== value)
-    {
+    if (this._currentFrame !== value) {
       this._currentFrame = value;
       this.dirty = true;
       this.onFrameChange?.(value);
@@ -498,14 +461,12 @@ class AnimatedGIF extends Sprite
   /**
    * Get the total number of frame in the GIF.
    */
-  get totalFrames(): number
-  {
+  get totalFrames(): number {
     return this._frames.length;
   }
 
   /** Destroy and don't use after this. */
-  destroy(): void
-  {
+  destroy(): void {
     this.stop();
     super.destroy(true);
     this._context = undefined;
@@ -522,8 +483,7 @@ class AnimatedGIF extends Sprite
    * If you want to create a simple copy, and not control independently,
    * then you can simply create a new Sprite, e.g. `const sprite = new Sprite(animation.texture)`.
    */
-  clone(): AnimatedGIF
-  {
+  clone(): AnimatedGIF {
     return new AnimatedGIF([...this._frames], {
       autoUpdate: this._autoUpdate,
       loop: this.loop,

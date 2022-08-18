@@ -1,11 +1,7 @@
 <template>
   <t-browser-root>
     <t-left>
-      <VTags
-        :petaImagesArray="petaImagesArray"
-        :petaTagInfos="petaTagInfos"
-        :selectedPetaTags="selectedPetaTags"
-      />
+      <VTags :petaImagesArray="petaImagesArray" :petaTagInfos="petaTagInfos" :selectedPetaTags="selectedPetaTags" />
     </t-left>
     <t-center>
       <t-content>
@@ -19,20 +15,22 @@
           </t-search>
           <t-buttons>
             <label>
-              <input type="checkbox" :checked="$states.groupingByDate" @change="$states.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)">
-              <span>{{$t("browser.grouping")}}</span>
+              <input
+                type="checkbox"
+                :checked="$states.groupingByDate"
+                @change="$states.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)"
+              />
+              <span>{{ $t("browser.grouping") }}</span>
             </label>
           </t-buttons>
         </t-top>
-        <t-tiles
-          ref="thumbnails"
-        >
+        <t-tiles ref="thumbnails">
           <t-tiles-content
             ref="thumbsWrapper"
-            :style="{height: scrollHeight + $defines.BROWSER_THUMBNAIL_MARGIN + 'px'}"
+            :style="{ height: scrollHeight + $defines.BROWSER_THUMBNAIL_MARGIN + 'px' }"
           >
             <VTile
-              v-for="(data) in visibleTiles"
+              v-for="data in visibleTiles"
               :key="data.id"
               :tile="data"
               :original="original"
@@ -50,11 +48,7 @@
     </t-center>
     <t-right>
       <VPreview :petaImages="selectedPetaImages" />
-      <VProperty
-        :petaImages="selectedPetaImages"
-        :petaTagInfos="petaTagInfos"
-        @selectTag="selectTag"
-      />
+      <VProperty :petaImages="selectedPetaImages" :petaTagInfos="petaTagInfos" @selectTag="selectTag" />
       <input
         type="range"
         v-model="thumbnailsSize"
@@ -63,7 +57,7 @@
         :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
         :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
         :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
-      >
+      />
     </t-right>
   </t-browser-root>
 </template>
@@ -82,7 +76,14 @@ import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
-import { BROWSER_THUMBNAIL_MARGIN, BROWSER_THUMBNAIL_SIZE, BROWSER_THUMBNAIL_ZOOM_MAX, BROWSER_THUMBNAIL_ZOOM_MIN, THUMBNAILS_SELECTION_PERCENT, UNTAGGED_ID } from "@/commons/defines";
+import {
+  BROWSER_THUMBNAIL_MARGIN,
+  BROWSER_THUMBNAIL_SIZE,
+  BROWSER_THUMBNAIL_ZOOM_MAX,
+  BROWSER_THUMBNAIL_ZOOM_MIN,
+  THUMBNAILS_SELECTION_PERCENT,
+  UNTAGGED_ID,
+} from "@/commons/defines";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
@@ -102,12 +103,9 @@ import deepcopy from "deepcopy";
     VPreview,
     VEditableLabel,
     VTags,
-    VSearch
+    VSearch,
   },
-  emits: [
-    "select",
-    "addPanel"
-  ]
+  emits: ["select", "addPanel"],
 })
 export default class VBrowser extends Vue {
   @Prop()
@@ -158,8 +156,8 @@ export default class VBrowser extends Vue {
           this.thumbnailsSize = BROWSER_THUMBNAIL_ZOOM_MAX;
         }
       }
-    })
-    this.$states.groupingByDate
+    });
+    this.$states.groupingByDate;
     this.thumbnailsResizer.observe(this.thumbsWrapper);
     this.scrollAreaResizer.observe(this.thumbnails);
 
@@ -230,7 +228,10 @@ export default class VBrowser extends Vue {
     this.thumbnailsWidth = rect.width - BROWSER_THUMBNAIL_MARGIN;
   }
   drag(petaImage: PetaImage) {
-    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") && !petaImage._selected) {
+    if (
+      !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") &&
+      !petaImage._selected
+    ) {
       this.clearSelectionAllImages();
     }
     const petaImages = petaImage._selected ? [] : [petaImage];
@@ -242,7 +243,10 @@ export default class VBrowser extends Vue {
     if (thumb.petaImage === undefined) {
       return;
     }
-    if (this.selectedPetaImages.length < 1 || (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight"))) {
+    if (
+      this.selectedPetaImages.length < 1 ||
+      !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")
+    ) {
       // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
       this.firstSelectedTile = thumb;
     }
@@ -260,18 +264,21 @@ export default class VBrowser extends Vue {
       // 最初の選択と、シフトキーが押されていれば、範囲選択。
       const topLeft = new Vec2(
         Math.min(this.firstSelectedTile.position.x, thumb.position.x),
-        Math.min(this.firstSelectedTile.position.y, thumb.position.y)
+        Math.min(this.firstSelectedTile.position.y, thumb.position.y),
       );
       const size = new Vec2(
         Math.max(this.firstSelectedTile.position.x + this.firstSelectedTile.width, thumb.position.x + thumb.width),
-        Math.max( this.firstSelectedTile.position.y + this.firstSelectedTile.height, thumb.position.y + thumb.height)
-      ).clone().sub(topLeft);
+        Math.max(this.firstSelectedTile.position.y + this.firstSelectedTile.height, thumb.position.y + thumb.height),
+      )
+        .clone()
+        .sub(topLeft);
       this.tiles.forEach((pt) => {
         if (pt.petaImage === undefined) {
           return;
         }
-        let widthDiff = pt.width / 2 + size.x / 2 - Math.abs((pt.position.x + pt.width / 2) - (topLeft.x + size.x / 2));
-        let heightDiff = pt.height / 2 + size.y / 2 - Math.abs((pt.position.y + pt.height / 2) - (topLeft.y + size.y / 2));
+        let widthDiff = pt.width / 2 + size.x / 2 - Math.abs(pt.position.x + pt.width / 2 - (topLeft.x + size.x / 2));
+        let heightDiff =
+          pt.height / 2 + size.y / 2 - Math.abs(pt.position.y + pt.height / 2 - (topLeft.y + size.y / 2));
         if (widthDiff > pt.width) {
           widthDiff = pt.width;
         }
@@ -280,7 +287,7 @@ export default class VBrowser extends Vue {
         }
         const hitArea = widthDiff * heightDiff;
         const ptArea = pt.width * pt.height;
-        if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea >  THUMBNAILS_SELECTION_PERCENT) {
+        if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
           pt.petaImage._selected = true;
         }
       });
@@ -299,41 +306,49 @@ export default class VBrowser extends Vue {
     if (!thumb.petaImage._selected) {
       this.selectTile(thumb, true);
     }
-    
-    this.$components.contextMenu.open([
-      {
-        label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
-        click: async () => {
-          if (await this.$components.dialog.show(this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]), [this.$t("shared.yes"), this.$t("shared.no")]) === 0) {
-            await updatePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
-          }
-        }
-      },
-      {
-        label: this.$t("browser.petaImageMenu.openImageFile"),
-        click: async () => {
-          await API.send("openImageFile", petaImage);
-        }
-      },
-      // {
-      //   label: this.$t("browser.petaImageMenu.similar"),
-      //   click: async () => {
-      //     this.targetPetaImage = thumb.petaImage;
-      //   }
-      // },
-      {
-        label: this.$t("browser.petaImageMenu.waifu2x"),
-        click: async () => {
-          await API.send("waifu2xConvert", this.selectedPetaImages);
-        }
-      },
-      {
-        label: this.$t("browser.petaImageMenu.searchImageByGoogle"),
-        click: async () => {
-          await API.send("searchImageByGoogle", petaImage);
-        }
-      },
-    ], position);
+
+    this.$components.contextMenu.open(
+      [
+        {
+          label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
+          click: async () => {
+            if (
+              (await this.$components.dialog.show(
+                this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]),
+                [this.$t("shared.yes"), this.$t("shared.no")],
+              )) === 0
+            ) {
+              await updatePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
+            }
+          },
+        },
+        {
+          label: this.$t("browser.petaImageMenu.openImageFile"),
+          click: async () => {
+            await API.send("openImageFile", petaImage);
+          },
+        },
+        // {
+        //   label: this.$t("browser.petaImageMenu.similar"),
+        //   click: async () => {
+        //     this.targetPetaImage = thumb.petaImage;
+        //   }
+        // },
+        {
+          label: this.$t("browser.petaImageMenu.waifu2x"),
+          click: async () => {
+            await API.send("waifu2xConvert", this.selectedPetaImages);
+          },
+        },
+        {
+          label: this.$t("browser.petaImageMenu.searchImageByGoogle"),
+          click: async () => {
+            await API.send("searchImageByGoogle", petaImage);
+          },
+        },
+      ],
+      position,
+    );
   }
   async openDetail(petaImage: PetaImage) {
     if (Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
@@ -355,7 +370,7 @@ export default class VBrowser extends Vue {
     this.$states.browserTileSize = value;
   }
   sort(a: PetaImage, b: PetaImage) {
-    switch(this.sortMode) {
+    switch (this.sortMode) {
       case SortMode.ADD_DATE: {
         if (a.addDate === b.addDate) {
           return b.fileDate - a.fileDate;
@@ -399,16 +414,22 @@ export default class VBrowser extends Vue {
       this.filteredPetaImages = [...this.petaImagesArray].sort(this.sort);
       return;
     }
-    const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === UNTAGGED_ID)
+    const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === UNTAGGED_ID);
     const results = await API.send(
       "getPetaImageIdsByPetaTagIds",
-      untagged ? [] : this.selectedPetaTags.map((petaTag) => petaTag.id)
+      untagged ? [] : this.selectedPetaTags.map((petaTag) => petaTag.id),
     );
-    this.filteredPetaImages = Array.from(new Set(results.map((id) => {
-      return this.petaImages[id]!;
-    }).filter((petaImage) => {
-      return petaImage;
-    }))).sort(this.sort);
+    this.filteredPetaImages = Array.from(
+      new Set(
+        results
+          .map((id) => {
+            return this.petaImages[id]!;
+          })
+          .filter((petaImage) => {
+            return petaImage;
+          }),
+      ),
+    ).sort(this.sort);
   }
   get thumbnailsRowCount() {
     let c = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
@@ -421,11 +442,13 @@ export default class VBrowser extends Vue {
     return this.thumbnailsWidth / this.thumbnailsRowCount;
   }
   get scrollHeight() {
-    return this.tiles.map((tile) => {
-      return tile.position.y + tile.height
-    }).reduce((a, b) => {
-      return a > b ? a : b;
-    }, 0);
+    return this.tiles
+      .map((tile) => {
+        return tile.position.y + tile.height;
+      })
+      .reduce((a, b) => {
+        return a > b ? a : b;
+      }, 0);
   }
   get tiles(): Tile[] {
     if (this.actualTileSize === 0) {
@@ -438,83 +461,89 @@ export default class VBrowser extends Vue {
     let prevDateString = "";
     const tiles: Tile[] = [];
     this.filteredPetaImages
-    // .map((pi) => {
-    //   if (!this.targetPetaImage) {
-    //     return {
-    //       petaImage: pi,
-    //       score: 0
-    //     }
-    //   }
-    //   return {
-    //     petaImage: pi,
-    //     score: getSimilarityScore2(this.targetPetaImage.palette, pi.palette)
-    //   }
-    // })
-    // .sort((a, b) => b.score - a.score)
-    // .map((p) => p.petaImage)
-    .map((p) => {
-      let minY = Number.MAX_VALUE;
-      let maxY = Number.MIN_VALUE;
-      let mvi = 0;
-      yList.forEach((y, vi) => {
-        if (minY > y) {
-          minY = y;
-          mvi = vi;
+      // .map((pi) => {
+      //   if (!this.targetPetaImage) {
+      //     return {
+      //       petaImage: pi,
+      //       score: 0
+      //     }
+      //   }
+      //   return {
+      //     petaImage: pi,
+      //     score: getSimilarityScore2(this.targetPetaImage.palette, pi.palette)
+      //   }
+      // })
+      // .sort((a, b) => b.score - a.score)
+      // .map((p) => p.petaImage)
+      .map((p) => {
+        let minY = Number.MAX_VALUE;
+        let maxY = Number.MIN_VALUE;
+        let mvi = 0;
+        yList.forEach((y, vi) => {
+          if (minY > y) {
+            minY = y;
+            mvi = vi;
+          }
+          if (maxY < y) {
+            maxY = y;
+          }
+        });
+        let newGroup = false;
+        const date = new Date(p.addDate);
+        const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+        if (prevDateString != currentDateString && this.$states.groupingByDate) {
+          prevDateString = currentDateString;
+          mvi = 0;
+          minY = maxY;
+          yList.fill(minY);
+          newGroup = true;
         }
-        if (maxY < y) {
-          maxY = y;
+        if (newGroup) {
+          const height = 32;
+          const position = new Vec2(0, yList[mvi]! + BROWSER_THUMBNAIL_MARGIN);
+          yList.fill(minY + height);
+          const tile: Tile = {
+            position: position,
+            width: this.thumbnailsWidth,
+            height: height,
+            visible: false,
+            preVisible: false,
+            group: currentDateString,
+            id: currentDateString,
+          };
+          this.updateVisibility(tile);
+          tiles.push(tile);
         }
-      });
-      let newGroup = false;
-      const date = new Date(p.addDate);
-      const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-      if (prevDateString != currentDateString && this.$states.groupingByDate) {
-        prevDateString = currentDateString;
-        mvi = 0;
-        minY = maxY;
-        yList.fill(minY);
-        newGroup = true;
-      }
-      if (newGroup) {
-        const height = 32;
-        const position = new Vec2(0, yList[mvi]! + BROWSER_THUMBNAIL_MARGIN);
-        yList.fill(minY + height);
+        const position = new Vec2(
+          mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN,
+          yList[mvi]! + BROWSER_THUMBNAIL_MARGIN,
+        );
+        const height = p.height * this.actualTileSize;
+        yList[mvi] += height;
         const tile: Tile = {
+          petaImage: p,
           position: position,
-          width: this.thumbnailsWidth,
-          height: height,
+          width: this.actualTileSize - BROWSER_THUMBNAIL_MARGIN,
+          height: height - BROWSER_THUMBNAIL_MARGIN,
           visible: false,
           preVisible: false,
-          group: currentDateString,
-          id: currentDateString
+          id: p.id,
         };
         this.updateVisibility(tile);
-        tiles.push(tile)
-      }
-      const position = new Vec2(mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN, yList[mvi]! + BROWSER_THUMBNAIL_MARGIN);
-      const height = p.height * this.actualTileSize;
-      yList[mvi] += height;
-      const tile: Tile = {
-        petaImage: p,
-        position: position,
-        width: this.actualTileSize - BROWSER_THUMBNAIL_MARGIN,
-        height: height - BROWSER_THUMBNAIL_MARGIN,
-        visible: false,
-        preVisible: false,
-        id: p.id
-      }
-      this.updateVisibility(tile);
-      tiles.push(tile);
-    });
+        tiles.push(tile);
+      });
     return tiles;
   }
   updateVisibility(tile: Tile) {
-    tile.visible = (this.areaMinY < tile.position.y && tile.position.y < this.areaMaxY)
-      ||(this.areaMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaMaxY)
-      ||(this.areaMinY > tile.position.y && tile.position.y + tile.height > this.areaMaxY);
-    tile.preVisible = (this.areaPreVisibleMinY < tile.position.y && tile.position.y < this.areaPreVisibleMaxY)
-      ||(this.areaPreVisibleMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaPreVisibleMaxY)
-      ||(this.areaPreVisibleMinY > tile.position.y && tile.position.y + tile.height > this.areaPreVisibleMaxY);
+    tile.visible =
+      (this.areaMinY < tile.position.y && tile.position.y < this.areaMaxY) ||
+      (this.areaMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaMaxY) ||
+      (this.areaMinY > tile.position.y && tile.position.y + tile.height > this.areaMaxY);
+    tile.preVisible =
+      (this.areaPreVisibleMinY < tile.position.y && tile.position.y < this.areaPreVisibleMaxY) ||
+      (this.areaPreVisibleMinY < tile.position.y + tile.height &&
+        tile.position.y + tile.height < this.areaPreVisibleMaxY) ||
+      (this.areaPreVisibleMinY > tile.position.y && tile.position.y + tile.height > this.areaPreVisibleMaxY);
   }
   get visibleTiles(): Tile[] {
     return this.tiles.filter((p) => p.preVisible);
@@ -546,19 +575,19 @@ t-browser-root {
   // display: flex;
   // flex: 1;
   overflow: hidden;
-  >t-left {
+  > t-left {
     padding: 8px;
     width: 200px;
     min-width: 180px;
     display: block;
   }
-  >t-center {
+  > t-center {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
     padding: 8px;
-    >t-content {
+    > t-content {
       width: 100%;
       height: 100%;
       position: relative;
@@ -566,45 +595,45 @@ t-browser-root {
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      >t-top {
+      > t-top {
         width: 100%;
         display: flex;
         padding: 0px 0px 8px 0px;
-        >t-search {
+        > t-search {
           display: block;
           flex: 1;
           padding: 0px 8px;
         }
-        >t-buttons {
+        > t-buttons {
           display: flex;
           align-items: center;
-          >label {
+          > label {
             display: flex;
             align-items: center;
           }
         }
       }
-      >t-tiles {
+      > t-tiles {
         width: 100%;
         position: relative;
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
         border-radius: 8px;
-        >t-tiles-content {
+        > t-tiles-content {
           display: block;
         }
       }
     }
   }
-  >t-right {
+  > t-right {
     width: 200px;
     min-width: 180px;
     padding: 8px;
     display: flex;
     flex-direction: column;
   }
-  >t-canvas-test {
+  > t-canvas-test {
     position: fixed;
     bottom: 100px;
     left: 100px;

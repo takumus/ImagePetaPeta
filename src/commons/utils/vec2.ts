@@ -1,7 +1,9 @@
-export type XYObject = Vec2 | {
-  x: number,
-  y: number
-}
+export type XYObject =
+  | Vec2
+  | {
+      x: number;
+      y: number;
+    };
 export class Vec2 {
   public x = 0;
   public y = 0;
@@ -83,8 +85,8 @@ export class Vec2 {
   public toJSON() {
     return {
       x: this.x,
-      y: this.y
-    }
+      y: this.y,
+    };
   }
   public toArray(): [number, number] {
     return [this.x, this.y];

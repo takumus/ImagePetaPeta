@@ -1,39 +1,25 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value
+      dark: $darkMode.value,
     }"
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="$t('titles.browser')">
-        </VTitleBar>
-        <VUtilsBar>
-        </VUtilsBar>
+        <VTitleBar :title="$t('titles.browser')"> </VTitleBar>
+        <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
-        <VBrowser
-          :petaImages="petaImages"
-          :petaTagInfos="petaTagInfos"
-          :selectedPetaTags="selectedPetaTags"
-        />
+        <VBrowser :petaImages="petaImages" :petaTagInfos="petaTagInfos" :selectedPetaTags="selectedPetaTags" />
       </t-browser>
     </t-content>
-    <t-modals
-      v-show="$components.modal.modalIds.length > 0"
-    >
+    <t-modals v-show="$components.modal.modalIds.length > 0">
       <VImageImporter />
       <VTasks />
     </t-modals>
-    <VDialog
-      :zIndex="6"
-    ></VDialog>
-    <VContextMenu
-      :zIndex="4"
-    />
-    <VComplement
-      :zIndex="5"
-    />
+    <VDialog :zIndex="6"></VDialog>
+    <VContextMenu :zIndex="4" />
+    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -66,7 +52,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
     VContextMenu,
     VComplement,
     VDialog,
-    VUtilsBar
+    VUtilsBar,
   },
 })
 export default class BrowserIndex extends Vue {
@@ -78,7 +64,10 @@ export default class BrowserIndex extends Vue {
     API.on("updatePetaImages", (e, petaImages, mode) => {
       if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
         petaImages.forEach((petaImage) => {
-          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage, Boolean(this.petaImages[petaImage.id]?._selected));
+          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(
+            petaImage,
+            Boolean(this.petaImages[petaImage.id]?._selected),
+          );
         });
       } else if (mode === UpdateMode.REMOVE) {
         petaImages.forEach((petaImage) => {
@@ -115,7 +104,7 @@ export default class BrowserIndex extends Vue {
 t-root {
   background-color: var(--color-main);
   color: var(--color-font);
-  >t-content {
+  > t-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -123,12 +112,12 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    >t-top {
+    > t-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    >t-browser {
+    > t-browser {
       display: block;
       overflow: hidden;
       padding: 8px;
@@ -136,7 +125,7 @@ t-root {
       flex: 1;
       z-index: 1;
     }
-    >t-modals {
+    > t-modals {
       position: absolute;
       width: 100%;
       height: 100%;

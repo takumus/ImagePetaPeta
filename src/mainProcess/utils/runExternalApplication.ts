@@ -1,8 +1,9 @@
 import { spawn } from "child_process";
 export function runExternalApplication(
-  cliToolPath: string, args: string[],
+  cliToolPath: string,
+  args: string[],
   encoding: BufferEncoding,
-  log: (value: string) => void
+  log: (value: string) => void,
 ) {
   const childProcess = spawn(cliToolPath, args);
   return {
@@ -15,7 +16,7 @@ export function runExternalApplication(
           res(false);
           return;
         }
-        log(`exit code: ${ code }`);
+        log(`exit code: ${code}`);
         res(code === 0);
       });
       childProcess.stdout.on("data", (chunk: Buffer) => {
@@ -31,6 +32,6 @@ export function runExternalApplication(
     }),
     kill: () => {
       childProcess.kill();
-    }
-  }
+    },
+  };
 }

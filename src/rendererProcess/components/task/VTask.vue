@@ -1,16 +1,11 @@
 <template>
   <t-task-root>
-    <p v-if="name !== ''">
-      {{$t(name)}}({{Math.floor(progress)}}%)
-    </p>
+    <p v-if="name !== ''">{{ $t(name) }}({{ Math.floor(progress) }}%)</p>
     <VProgressBar :progress="progress"></VProgressBar>
-    <pre class="log">{{log}}</pre>
+    <pre class="log">{{ log }}</pre>
     <t-cancel>
-      <button
-        tabindex="-1"
-        @click="cancel"
-        v-if="cancelable">
-        {{$t("imageImporter.cancel")}}
+      <button tabindex="-1" @click="cancel" v-if="cancelable">
+        {{ $t("imageImporter.cancel") }}
       </button>
     </t-cancel>
   </t-task-root>
@@ -27,8 +22,8 @@ import { Vec2 } from "@/commons/utils/vec2";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 const props = defineProps<{
-  taskId: string,
-  taskStatus: TaskStatus
+  taskId: string;
+  taskStatus: TaskStatus;
 }>();
 const _this = getCurrentInstance()!.proxy!;
 const progress = ref(100);
@@ -42,15 +37,19 @@ let closeWindowHandler = -1;
 onMounted(() => {
   changeTaskStatus();
 });
-watch(() => props.taskStatus, () => {
-  changeTaskStatus();
-}, { deep: true })
+watch(
+  () => props.taskStatus,
+  () => {
+    changeTaskStatus();
+  },
+  { deep: true },
+);
 function changeTaskStatus() {
   const task = props.taskStatus;
   currentTaskId.value = props.taskId;
   window.clearTimeout(closeWindowHandler);
   name.value = task.i18nKey + ".name";
-  progress.value = task.progress ? Math.floor(task.progress.current / task.progress.all * 100) : 0;
+  progress.value = task.progress ? Math.floor((task.progress.current / task.progress.all) * 100) : 0;
   cancelable.value = task.cancelable === true;
   status.value = task.status;
   const i18nKey = `${task.i18nKey}.logs.${task.status}`;
@@ -62,9 +61,11 @@ function changeTaskStatus() {
   if (task.status === "begin") {
     log.value = "";
   }
-  addLog(`[${task.status}]${
-    task.status === "progress" && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
-  }:${localized}`);
+  addLog(
+    `[${task.status}]${
+      task.status === "progress" && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
+    }:${localized}`,
+  );
   Cursor.setCursor("wait");
   if (task.status === "complete" || task.status === "failed") {
     progress.value = 100;
@@ -93,7 +94,7 @@ t-task-root {
     overflow-x: hidden;
     font-size: var(--size-0);
   }
-  >p {
+  > p {
     word-break: break-word;
   }
 }

@@ -37,9 +37,9 @@ export async function getLatestVersion(ignoreMinorUpdate: boolean): Promise<Remo
       sha256: {
         win: packageJSON["binary-sha256-win"],
         mac: packageJSON["binary-sha256-mac"],
-      }
-    }
-  } catch(e) {
+      },
+    };
+  } catch (e) {
     //
   }
   return {
@@ -48,6 +48,6 @@ export async function getLatestVersion(ignoreMinorUpdate: boolean): Promise<Remo
     sha256: {
       win: "",
       mac: "",
-    }
-  }
+    },
+  };
 }

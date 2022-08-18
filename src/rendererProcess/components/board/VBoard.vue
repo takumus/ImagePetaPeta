@@ -3,21 +3,12 @@
     ref="boardRoot"
     v-show="board"
     :style="{
-      zIndex: zIndex
+      zIndex: zIndex,
     }"
   >
-    <t-pixi-container
-      ref="panelsBackground"
-      class="panels-wrapper"
-    >
-    </t-pixi-container>
-    <t-crop
-      v-if="cropping"
-    >
-      <VCrop
-        :petaPanel="croppingPetaPanel"
-        @update="updateCrop"
-      />
+    <t-pixi-container ref="panelsBackground" class="panels-wrapper"> </t-pixi-container>
+    <t-crop v-if="cropping">
+      <VCrop :petaPanel="croppingPetaPanel" @update="updateCrop" />
     </t-crop>
     <VBoardLoading
       :zIndex="2"
@@ -69,12 +60,12 @@ import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "./PSelection";
 const emit = defineEmits<{
-  (e: "change", board: PetaBoard): void
+  (e: "change", board: PetaBoard): void;
 }>();
 const props = defineProps<{
-  detailsMode: boolean,
-  board?: PetaBoard,
-  zIndex: number,
+  detailsMode: boolean;
+  board?: PetaBoard;
+  zIndex: number;
 }>();
 const nsfwStore = useNSFWStore();
 const _this = getCurrentInstance()!.proxy!;
@@ -100,7 +91,7 @@ const backgroundSprite = new PIXI.Graphics();
 const selectingBackground = new PIXI.Graphics();
 const pSelection = new PSelection();
 const crossLine = new PIXI.Graphics();
-let pPanels: {[key: string]: PPanel} = {};
+let pPanels: { [key: string]: PPanel } = {};
 const pTransformer = new PTransformer(pPanels);
 // let draggingPanels = false;
 let mouseLeftPressing = false;
@@ -138,7 +129,7 @@ function construct() {
   pixi = new PIXI.Application({
     resolution: window.devicePixelRatio,
     antialias: true,
-    backgroundAlpha: 0
+    backgroundAlpha: 0,
   });
   pixi.view.addEventListener("dblclick", resetTransform);
   pixi.view.addEventListener("mousewheel", wheel as any);
@@ -222,12 +213,14 @@ function pointerdown(e: PIXI.InteractionEvent) {
   }
   const mouse = getMouseFromEvent(e);
   click.down(mouse);
-  if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE || (props.detailsMode && e.data.button === MouseButton.LEFT)) {
+  if (
+    e.data.button === MouseButton.RIGHT ||
+    e.data.button === MouseButton.MIDDLE ||
+    (props.detailsMode && e.data.button === MouseButton.LEFT)
+  ) {
     mouseRightPressing = true;
     dragging.value = true;
-    dragOffset
-    .set(props.board.transform.position)
-    .sub(mouse);
+    dragOffset.set(props.board.transform.position).sub(mouse);
   } else if (e.data.button === MouseButton.LEFT) {
     mouseLeftPressing = true;
     const pPanel = getPPanelFromObject(e.target);
@@ -255,26 +248,37 @@ function getPPanelFromObject(object: PIXI.DisplayObject) {
 }
 function pointerup(e: PIXI.InteractionEvent) {
   const mouse = getMouseFromEvent(e).add(mouseOffset);
-  if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE || (props.detailsMode && e.data.button === MouseButton.LEFT)) {
+  if (
+    e.data.button === MouseButton.RIGHT ||
+    e.data.button === MouseButton.MIDDLE ||
+    (props.detailsMode && e.data.button === MouseButton.LEFT)
+  ) {
     mouseRightPressing = false;
     if (click.isClick && e.data.button === MouseButton.RIGHT) {
       const pPanel = getPPanelFromObject(e.target);
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
-        selectedPPanels().forEach((pPanel) => pPanel.dragging = false);
+        selectedPPanels().forEach((pPanel) => (pPanel.dragging = false));
         petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
       } else if (!props.detailsMode) {
-        _this.$components.contextMenu.open([{
-          label: _this.$t("boards.menu.openBrowser"),
-          click: () => {
-            API.send("openWindow", WindowType.BROWSER);
-          }
-        }, { separate: true }, {
-          label: _this.$t("boards.menu.resetPosition"),
-          click: () => {
-            resetTransform();
-          }
-        }], new Vec2(mouse));
+        _this.$components.contextMenu.open(
+          [
+            {
+              label: _this.$t("boards.menu.openBrowser"),
+              click: () => {
+                API.send("openWindow", WindowType.BROWSER);
+              },
+            },
+            { separate: true },
+            {
+              label: _this.$t("boards.menu.resetPosition"),
+              click: () => {
+                resetTransform();
+              },
+            },
+          ],
+          new Vec2(mouse),
+        );
       }
     }
     dragging.value = false;
@@ -313,16 +317,14 @@ function wheel(event: WheelEvent) {
       ref(props.board).value.transform.scale = BOARD_ZOOM_MIN;
     }
     props.board.transform.position
-    .mult(-1)
-    .add(mouse)
-    .mult(props.board.transform.scale / currentZoom)
-    .sub(mouse)
-    .mult(-1);
+      .mult(-1)
+      .add(mouse)
+      .mult(props.board.transform.scale / currentZoom)
+      .sub(mouse)
+      .mult(-1);
   } else {
     props.board.transform.position.add(
-      new Vec2(event.deltaX, event.deltaY)
-      .mult(_this.$settings.moveSensitivity)
-      .mult(-0.01)
+      new Vec2(event.deltaX, event.deltaY).mult(_this.$settings.moveSensitivity).mult(-0.01),
     );
   }
   orderPIXIRender();
@@ -359,9 +361,7 @@ function animate() {
   pTransformer.update();
 
   if (dragging.value) {
-    props.board.transform.position
-    .set(mousePosition)
-    .add(dragOffset);
+    props.board.transform.position.set(mousePosition).add(dragOffset);
   }
   props.board.transform.position.setTo(rootContainer);
   new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(crossLine);
@@ -381,14 +381,12 @@ function animate() {
     pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
     pSelection.draw(props.board.transform.scale);
     pPanelsArray().forEach((pPanel) => {
-      const pPanelRect = pPanel.getRect()
+      const pPanelRect = pPanel.getRect();
       Object.values(pPanelRect).map((position) => {
-        position.set(rootContainer.toLocal(pPanel.toGlobal(position)))
-      })
-      pPanel.petaPanel._selected = hitTest(
-        pSelection.rect,
-        pPanelRect
-      ) && pPanel.petaPanel.visible && !pPanel.petaPanel.locked;
+        position.set(rootContainer.toLocal(pPanel.toGlobal(position)));
+      });
+      pPanel.petaPanel._selected =
+        hitTest(pSelection.rect, pPanelRect) && pPanel.petaPanel.visible && !pPanel.petaPanel.locked;
     });
   }
   pPanelsArray().forEach((pp) => {
@@ -417,7 +415,7 @@ function removeSelectedPanels() {
   }
   selectedPPanels().forEach((pPanel) => {
     removePPanel(pPanel);
-  })
+  });
   ref(props.board).value.petaPanels = pPanelsArray().map((pPanel) => pPanel.petaPanel);
   orderPIXIRender();
 }
@@ -432,103 +430,113 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
     return;
   }
   const isMultiple = selectedPPanels().length > 1;
-  _this.$components.contextMenu.open([
-    {
-      label: _this.$t("boards.panelMenu.toFront"),
-      click: () => {
-        selectedPPanels().forEach((pPanel) => {
-          pPanel.petaPanel.index += pPanelsArray().length;
-        });
-        sortIndex();
-      }
-    },
-    {
-      label: _this.$t("boards.panelMenu.toBack"),
-      click: () => {
-        selectedPPanels().forEach((pPanel) => {
-          pPanel.petaPanel.index -= pPanelsArray().length;
-        });
-        sortIndex();
-      }
-    },
-    {
-      separate: true
-    },
-    {
-      label: _this.$t("boards.panelMenu.details"),
-      click: () => {
-        if (pPanel._petaImage === undefined) {
-          return;
-        }
-        API.send("setDetailsPetaImage", pPanel._petaImage);
-        API.send("openWindow", WindowType.DETAILS);
-      }
-    },
-    {
-      separate: true
-    },
-    {
-      skip: isMultiple || !_pPanel?.isGIF,
-      label: _pPanel?.isPlayingGIF ? _this.$t("boards.panelMenu.stopGIF") : _this.$t("boards.panelMenu.playGIF"),
-      click: () => {
-        if (_pPanel?.isPlayingGIF) {
-          _pPanel.stopGIF();
-        } else {
-          _pPanel?.playGIF();
-        }
-      }
-    },
-    {
-      skip: isMultiple || !_pPanel?.isGIF,
-      separate: true
-    },
-    {
-      skip: isMultiple,
-      label: _this.$t("boards.panelMenu.crop"),
-      click: () => {
-        beginCrop(pPanel);
-      }
-    }, {
-      skip: isMultiple,
-      separate: true
-    }, {
-      label: _this.$t("boards.panelMenu.flipHorizontal"),
-      click: () => {
-        selectedPPanels().forEach((pPanel) => {
-          pPanel.petaPanel.width = -pPanel.petaPanel.width;
-        });
-      }
-    }, {
-      label: _this.$t("boards.panelMenu.flipVertical"),
-      click: () => {
-        selectedPPanels().forEach((pPanel) => {
-          pPanel.petaPanel.height = -pPanel.petaPanel.height;
-        });
-      }
-    }, {
-      separate: true
-    }, {
-      label: _this.$t("boards.panelMenu.reset"),
-      click: () => {
-        selectedPPanels().forEach((pPanel) => {
-          pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
-          pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
-          pPanel.petaPanel.crop.position.set(0, 0);
-          pPanel.petaPanel.crop.width = 1;
-          pPanel.petaPanel.crop.height = 1;
-          pPanel.petaPanel.rotation = 0;
-          updateCrop(pPanel.petaPanel);
-        });
-      }
-    }, { separate: true }, {
-      label: _this.$t("boards.panelMenu.remove"),
-      click: () => {
-        removeSelectedPanels();
-      }
-    }
-  ], position);
+  _this.$components.contextMenu.open(
+    [
+      {
+        label: _this.$t("boards.panelMenu.toFront"),
+        click: () => {
+          selectedPPanels().forEach((pPanel) => {
+            pPanel.petaPanel.index += pPanelsArray().length;
+          });
+          sortIndex();
+        },
+      },
+      {
+        label: _this.$t("boards.panelMenu.toBack"),
+        click: () => {
+          selectedPPanels().forEach((pPanel) => {
+            pPanel.petaPanel.index -= pPanelsArray().length;
+          });
+          sortIndex();
+        },
+      },
+      {
+        separate: true,
+      },
+      {
+        label: _this.$t("boards.panelMenu.details"),
+        click: () => {
+          if (pPanel._petaImage === undefined) {
+            return;
+          }
+          API.send("setDetailsPetaImage", pPanel._petaImage);
+          API.send("openWindow", WindowType.DETAILS);
+        },
+      },
+      {
+        separate: true,
+      },
+      {
+        skip: isMultiple || !_pPanel?.isGIF,
+        label: _pPanel?.isPlayingGIF ? _this.$t("boards.panelMenu.stopGIF") : _this.$t("boards.panelMenu.playGIF"),
+        click: () => {
+          if (_pPanel?.isPlayingGIF) {
+            _pPanel.stopGIF();
+          } else {
+            _pPanel?.playGIF();
+          }
+        },
+      },
+      {
+        skip: isMultiple || !_pPanel?.isGIF,
+        separate: true,
+      },
+      {
+        skip: isMultiple,
+        label: _this.$t("boards.panelMenu.crop"),
+        click: () => {
+          beginCrop(pPanel);
+        },
+      },
+      {
+        skip: isMultiple,
+        separate: true,
+      },
+      {
+        label: _this.$t("boards.panelMenu.flipHorizontal"),
+        click: () => {
+          selectedPPanels().forEach((pPanel) => {
+            pPanel.petaPanel.width = -pPanel.petaPanel.width;
+          });
+        },
+      },
+      {
+        label: _this.$t("boards.panelMenu.flipVertical"),
+        click: () => {
+          selectedPPanels().forEach((pPanel) => {
+            pPanel.petaPanel.height = -pPanel.petaPanel.height;
+          });
+        },
+      },
+      {
+        separate: true,
+      },
+      {
+        label: _this.$t("boards.panelMenu.reset"),
+        click: () => {
+          selectedPPanels().forEach((pPanel) => {
+            pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
+            pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
+            pPanel.petaPanel.crop.position.set(0, 0);
+            pPanel.petaPanel.crop.width = 1;
+            pPanel.petaPanel.crop.height = 1;
+            pPanel.petaPanel.rotation = 0;
+            updateCrop(pPanel.petaPanel);
+          });
+        },
+      },
+      { separate: true },
+      {
+        label: _this.$t("boards.panelMenu.remove"),
+        click: () => {
+          removeSelectedPanels();
+        },
+      },
+    ],
+    position,
+  );
 }
-async function addPanel(petaPanel: PetaPanel, offsetIndex: number){
+async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   if (!props.board) {
     return;
   }
@@ -564,7 +572,11 @@ function updateCrop(petaPanel: PetaPanel) {
     return;
   }
   const sign = 1;
-  petaPanel.height = Math.abs(petaPanel.width * ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width))) * sign;
+  petaPanel.height =
+    Math.abs(
+      petaPanel.width *
+        ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width)),
+    ) * sign;
   orderPIXIRender();
 }
 function clearSelectionAll(force = false) {
@@ -578,11 +590,11 @@ function sortIndex() {
   if (!props.board) {
     return;
   }
-  ref(props.board).value.petaPanels
-  .sort((a, b) => a.index - b.index)
-  .forEach((petaPanel, i) => {
-    petaPanel.index = i;
-  });
+  ref(props.board)
+    .value.petaPanels.sort((a, b) => a.index - b.index)
+    .forEach((petaPanel, i) => {
+      petaPanel.index = i;
+    });
   panelsCenterWrapper.children.sort((a, b) => {
     return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
   });
@@ -596,9 +608,9 @@ function getMaxIndex() {
 }
 async function load(params: {
   reload?: {
-    additions: string[],
-    deletions: string[]
-  }
+    additions: string[];
+    deletions: string[];
+  };
 }): Promise<void> {
   updateDetailsPetaPanel();
   const log = logChunk().log;
@@ -640,23 +652,24 @@ async function load(params: {
     if (props.board === undefined) {
       return;
     }
-    const progress =  `${index + 1}/${props.board.petaPanels.length}`;
+    const progress = `${index + 1}/${props.board.petaPanels.length}`;
     let loadResult = "";
     try {
       const onLoaded = (petaPanel: PetaPanel) => {
         loaded++;
         if (props.board) {
-          loadProgress.value = Math.floor(loaded / props.board.petaPanels.length * 100);
-          const progress =  `${loaded}/${props.board.petaPanels.length}`;
-          extractingLog.value = `load complete   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
+          loadProgress.value = Math.floor((loaded / props.board.petaPanels.length) * 100);
+          const progress = `${loaded}/${props.board.petaPanels.length}`;
+          extractingLog.value =
+            `load complete   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
           if (loaded == props.board.petaPanels.length) {
             loading.value = false;
           }
         }
-      }
+      };
       if (pPanels[petaPanel.id] === undefined) {
         // pPanelが無ければ作成。
-        const pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel);
+        const pPanel = (pPanels[petaPanel.id] = new PPanel(petaPanel));
         pPanel.setZoomScale(props.board?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
@@ -667,7 +680,7 @@ async function load(params: {
         (async () => {
           try {
             await pPanel.load();
-          } catch(error) {
+          } catch (error) {
             //
           }
           pPanel.orderRender();
@@ -683,12 +696,16 @@ async function load(params: {
         pPanels[petaPanel.id]!.noImage = true;
         loadResult = "delete";
         onLoaded(petaPanel);
-      } else if (params.reload && pPanels[petaPanel.id]!.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
+      } else if (
+        params.reload &&
+        pPanels[petaPanel.id]!.noImage &&
+        params.reload.additions.includes(petaPanel.petaImageId)
+      ) {
         // pPanelはあるが、noImageだったら再ロードトライ。
         (async () => {
           try {
             await pPanels[petaPanel.id]!.load();
-          } catch(error) {
+          } catch (error) {
             //
           }
           pPanels[petaPanel.id]!.orderRender();
@@ -704,13 +721,15 @@ async function load(params: {
         loadResult = "skip";
       }
       log("vBoard", `loaded[${loadResult}](${minimId(petaPanel._petaImage?.id)}):`, progress);
-      extractingLog.value = `extract complete(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
+      extractingLog.value =
+        `extract complete(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
     } catch (error) {
       log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, error);
-      extractingLog.value = `extract error   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
+      extractingLog.value =
+        `extract error   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
     }
     extractProgress.value = ((index + 1) / props.board.petaPanels.length) * 100;
-  }
+  };
   const extraction = promiseSerial(extract, [...props.board.petaPanels]);
   cancelExtract = extraction.cancel;
   try {
@@ -744,7 +763,10 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
   if (!props.board || props.detailsMode) {
     return;
   }
-  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") && (selectedPPanels().length <= 1 || !pPanel.petaPanel._selected)) {
+  if (
+    !Keyboards.pressedOR("ShiftLeft", "ShiftRight") &&
+    (selectedPPanels().length <= 1 || !pPanel.petaPanel._selected)
+  ) {
     // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
     // 最前にして選択リセット
     clearSelectionAll();
@@ -810,7 +832,9 @@ function pPanelsArray() {
   return Object.values(pPanels);
 }
 function selectedPPanels() {
-  return pPanelsArray().filter((pPanel) => pPanel.petaPanel._selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
+  return pPanelsArray().filter(
+    (pPanel) => pPanel.petaPanel._selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked,
+  );
 }
 function unselectedPPanels() {
   return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
@@ -838,19 +862,25 @@ function unselectedPPanels() {
 //   updateScale();
 //   emit("change", props.board!);
 // }, { deep: true });
-watch(() => props.board?.background, () => {
-  updateRect();
-  emit("change", props.board!);
-  orderPIXIRender();
-});
-watch(() => props.board?.id, () => {
-  load({});
-});
+watch(
+  () => props.board?.background,
+  () => {
+    updateRect();
+    emit("change", props.board!);
+    orderPIXIRender();
+  },
+);
+watch(
+  () => props.board?.id,
+  () => {
+    load({});
+  },
+);
 defineExpose({
   load,
   addPanel,
   orderPIXIRender,
-  clearSelectionAll
+  clearSelectionAll,
 });
 </script>
 
@@ -860,7 +890,7 @@ t-board-root {
   width: 100%;
   height: 100%;
   display: block;
-  >t-pixi-container {
+  > t-pixi-container {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -869,7 +899,7 @@ t-board-root {
     z-index: 1;
     display: block;
   }
-  >t-crop {
+  > t-crop {
     position: absolute;
     z-index: 3;
     top: 0px;

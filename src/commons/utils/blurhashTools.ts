@@ -37,10 +37,7 @@ export function getSimilarityScore2(palette1: PetaColor[], palette2: PetaColor[]
   }
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
-  return rgbDiff(
-    [color1.r, color1.g, color1.b],
-    [color2.r, color2.g, color2.b]
-  );
+  return rgbDiff([color1.r, color1.g, color1.b], [color2.r, color2.g, color2.b]);
 }
 // https://github.com/woltapp/blurhash
 export function getColors(hash: string) {
@@ -69,9 +66,7 @@ export function getColors(hash: string) {
       let b = 0;
       for (let j = 0; j < numY; j++) {
         for (let i = 0; i < numX; i++) {
-          const basis =
-            Math.cos((Math.PI * x * i) / width) *
-            Math.cos((Math.PI * y * j) / height);
+          const basis = Math.cos((Math.PI * x * i) / width) * Math.cos((Math.PI * y * j) / height);
           const color = colors[i + j * numX];
           r += color[0] * basis;
           g += color[1] * basis;
@@ -102,7 +97,7 @@ function linearTosRGB(value: number) {
 function sign(n: number) {
   return n < 0 ? -1 : 1;
 }
-function signPow (val: number, exp: number) {
+function signPow(val: number, exp: number) {
   return sign(val) * Math.pow(Math.abs(val), exp);
 }
 function decodeDC(value: number) {
@@ -118,7 +113,7 @@ function decodeAC(value: number, maximumValue: number) {
   const rgb = [
     signPow((quantR - 9) / 9, 2.0) * maximumValue,
     signPow((quantG - 9) / 9, 2.0) * maximumValue,
-    signPow((quantB - 9) / 9, 2.0) * maximumValue
+    signPow((quantB - 9) / 9, 2.0) * maximumValue,
   ];
   return rgb;
 }
@@ -205,7 +200,7 @@ const digitCharacters = [
   "{",
   "|",
   "}",
-  "~"
+  "~",
 ];
 function decode83(str: string) {
   let value = 0;

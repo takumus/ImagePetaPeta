@@ -11,29 +11,18 @@
     >
       <t-label-wrapper>
         <t-label>
-          <VEditableLabel
-            @change="(v) => changePetaBoardName(b, v)"
-            :label="b.name"
-          />
+          <VEditableLabel @change="(v) => changePetaBoardName(b, v)" :label="b.name" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
-    <t-tab
-      class="add"
-      @click="addPetaBoard()"
-    >
+    <t-tab class="add" @click="addPetaBoard()">
       <t-label-wrapper>
         <t-label>
-          <VEditableLabel :label="$texts.plus" :readonly="true"/>
+          <VEditableLabel :label="$texts.plus" :readonly="true" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
-    <t-tab
-      class="selected drag"
-      ref="draggingTab"
-      :style="{ display: dragging ? 'block' : 'none' }"
-      v-show="dragging"
-    >
+    <t-tab class="selected drag" ref="draggingTab" :style="{ display: dragging ? 'block' : 'none' }" v-show="dragging">
       <t-label-wrapper>
         <t-label>
           <VEditableLabel :label="board.name" v-if="board" />
@@ -57,15 +46,15 @@ import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
-  (e: "add"): void
-  (e: "remove", board: PetaBoard): void,
-  (e: "select", board: PetaBoard): void,
-  (e: "update:board", board: PetaBoard): void
+  (e: "add"): void;
+  (e: "remove", board: PetaBoard): void;
+  (e: "select", board: PetaBoard): void;
+  (e: "update:board", board: PetaBoard): void;
 }>();
 const props = defineProps<{
-  boards: PetaBoard[],
-  title: string,
-  currentPetaBoardId: string
+  boards: PetaBoard[];
+  title: string;
+  currentPetaBoardId: string;
 }>();
 const draggingTab = ref<HTMLElement>();
 const dragging = ref(false);
@@ -100,12 +89,17 @@ function pointerdown(event: PointerEvent, board: PetaBoard, index: number, targe
   beforeSortSelectedIndex.value = index;
 }
 function menu(event: PointerEvent, board: PetaBoard) {
-  _this.$components.contextMenu.open([{
-    label: _this.$t("tab.menu.remove", [board.name]),
-    click: () => {
-      removePetaBoard(board);
-    }
-  }], vec2FromPointerEvent(event));
+  _this.$components.contextMenu.open(
+    [
+      {
+        label: _this.$t("tab.menu.remove", [board.name]),
+        click: () => {
+          removePetaBoard(board);
+        },
+      },
+    ],
+    vec2FromPointerEvent(event),
+  );
 }
 function pointermove(event: PointerEvent) {
   if (!pressing.value) return;
@@ -119,26 +113,26 @@ function pointermove(event: PointerEvent) {
     const selectedPetaBoard = board.value;
     let newIndex = 0;
     props.boards
-    .map((b) => {
-      const elem: HTMLElement = b.id === draggingPetaBoardId.value ? _draggingTab : tabs.value[b.id]!;
-      return {
-        rect: elem.getBoundingClientRect(),
-        board: b
-      }
-    })
-    .sort((a, b) => (a.rect.x + a.rect.width / 2) - (b.rect.x + b.rect.width / 2))
-    .forEach((b, index) => {
-      if (b.board.index !== index) {
-        emit("update:board", {
-          ...b.board,
-          index
-        });
-      }
-      // 選択中ボードのインデックス復元。
-      if (b.board.id === selectedPetaBoard?.id) {
-        newIndex = index;
-      }
-    });
+      .map((b) => {
+        const elem: HTMLElement = b.id === draggingPetaBoardId.value ? _draggingTab : tabs.value[b.id]!;
+        return {
+          rect: elem.getBoundingClientRect(),
+          board: b,
+        };
+      })
+      .sort((a, b) => a.rect.x + a.rect.width / 2 - (b.rect.x + b.rect.width / 2))
+      .forEach((b, index) => {
+        if (b.board.index !== index) {
+          emit("update:board", {
+            ...b.board,
+            index,
+          });
+        }
+        // 選択中ボードのインデックス復元。
+        if (b.board.id === selectedPetaBoard?.id) {
+          newIndex = index;
+        }
+      });
     afterSortSelectedIndex.value = newIndex;
   }
   dragging.value = true;
@@ -163,7 +157,7 @@ function changePetaBoardName(board: PetaBoard, name: string) {
   }
   emit("update:board", {
     ...board,
-    name
+    name,
   });
 }
 async function removePetaBoard(board: PetaBoard) {
@@ -190,7 +184,7 @@ t-tab-root {
   color: var(--color-font);
   height: var(--tab-height);
   display: flex;
-  >t-tab {
+  > t-tab {
     display: block;
     margin: 0px;
     // border-right: solid 1px var(--color-border);
@@ -211,13 +205,13 @@ t-tab-root {
       min-width: 16px;
       border-right: none;
       flex-shrink: 0;
-      >t-label-wrapper t-label {
+      > t-label-wrapper t-label {
         padding: 0px 8px;
       }
     }
     &:not(.selected):not(:hover) + t-tab:not(.selected):not(:hover) {
       &::after {
-        content: '';
+        content: "";
         display: block;
         position: absolute;
         width: 0px;
@@ -240,8 +234,9 @@ t-tab-root {
       &:hover {
         background-color: var(--color-main);
       }
-      &::before, &::after {
-        content: '';
+      &::before,
+      &::after {
+        content: "";
         display: inline-block;
         position: absolute;
         bottom: 0;
@@ -261,8 +256,9 @@ t-tab-root {
       background-color: var(--color-hover);
       overflow: visible;
       flex-shrink: 0;
-      &::before, &::after {
-        content: '';
+      &::before,
+      &::after {
+        content: "";
         display: inline-block;
         position: absolute;
         bottom: 0;
@@ -278,11 +274,11 @@ t-tab-root {
         transform: scaleX(-1);
       }
     }
-    >t-label-wrapper {
+    > t-label-wrapper {
       display: flex;
       align-items: center;
       height: 100%;
-      >t-label {
+      > t-label {
         padding: 0px 8px;
         flex-shrink: 1;
       }

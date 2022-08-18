@@ -2,7 +2,16 @@ import { MainEvents } from "@/commons/api/mainEvents";
 import { Settings } from "@/commons/datas/settings";
 import { WindowStates } from "@/commons/datas/windowStates";
 import { WindowType } from "@/commons/datas/windowType";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_FILL_COLOR, WINDOW_DEFAULT_HEIGHT, WINDOW_DEFAULT_WIDTH, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_SETTINGS_HEIGHT, WINDOW_SETTINGS_WIDTH } from "@/commons/defines";
+import {
+  BOARD_DARK_BACKGROUND_FILL_COLOR,
+  BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+  WINDOW_DEFAULT_HEIGHT,
+  WINDOW_DEFAULT_WIDTH,
+  WINDOW_MIN_HEIGHT,
+  WINDOW_MIN_WIDTH,
+  WINDOW_SETTINGS_HEIGHT,
+  WINDOW_SETTINGS_WIDTH,
+} from "@/commons/defines";
 import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
 import Config from "../storages/config";
 import { MainLogger } from "./mainLogger";
@@ -11,7 +20,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 export class Windows {
   windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   activeWindows: { [key in WindowType]?: boolean } = {};
-  mainWindowType: WindowType | undefined; 
+  mainWindowType: WindowType | undefined;
   constructor(
     private mainLogger: MainLogger,
     private configSettings: Config<Settings>,
@@ -56,7 +65,7 @@ export class Windows {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        preload: Path.join(__dirname, "preload.js")
+        preload: Path.join(__dirname, "preload.js"),
       },
       backgroundColor: this.isDarkMode() ? BOARD_DARK_BACKGROUND_FILL_COLOR : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
       ...options,
@@ -81,11 +90,10 @@ export class Windows {
       }
       window.moveTop();
     });
-    const url = (
-      process.env.WEBPACK_DEV_SERVER_URL !== undefined
-      ?`${process.env.WEBPACK_DEV_SERVER_URL}${type}`
-      :`app://./${type}.html`
-    ) + `?args=${args}`;
+    const url =
+      (process.env.WEBPACK_DEV_SERVER_URL !== undefined
+        ? `${process.env.WEBPACK_DEV_SERVER_URL}${type}`
+        : `app://./${type}.html`) + `?args=${args}`;
     window.loadURL(url);
     return window;
   }
@@ -98,10 +106,10 @@ export class Windows {
     if (this.mainWindowType) {
       const mainWindow = this.windows[this.mainWindowType];
       if (
-        mainWindow  !== undefined
-        && !mainWindow.isDestroyed()
-        && this.windows.settings !== undefined
-        && !this.windows.settings.isDestroyed()
+        mainWindow !== undefined &&
+        !mainWindow.isDestroyed() &&
+        this.windows.settings !== undefined &&
+        !this.windows.settings.isDestroyed()
       ) {
         this.windows.settings.setParentWindow(mainWindow);
       }
@@ -113,30 +121,34 @@ export class Windows {
       height: this.configWindowStates.data.browser.height,
       trafficLightPosition: {
         x: 8,
-        y: 8
+        y: 8,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop
+      alwaysOnTop: this.configSettings.data.alwaysOnTop,
     });
   }
   initSettingsWindow(x?: number, y?: number, update: boolean = false) {
-    return this.createWindow(WindowType.SETTINGS, {
-      width: WINDOW_SETTINGS_WIDTH,
-      height: WINDOW_SETTINGS_HEIGHT,
-      minWidth: WINDOW_SETTINGS_WIDTH,
-      minHeight: WINDOW_SETTINGS_HEIGHT,
-      maximizable: false,
-      minimizable: false,
-      fullscreenable: false,
-      trafficLightPosition: {
-        x: 8,
-        y: 8
+    return this.createWindow(
+      WindowType.SETTINGS,
+      {
+        width: WINDOW_SETTINGS_WIDTH,
+        height: WINDOW_SETTINGS_HEIGHT,
+        minWidth: WINDOW_SETTINGS_WIDTH,
+        minHeight: WINDOW_SETTINGS_HEIGHT,
+        maximizable: false,
+        minimizable: false,
+        fullscreenable: false,
+        trafficLightPosition: {
+          x: 8,
+          y: 8,
+        },
+        x,
+        y,
+        alwaysOnTop: this.configSettings.data.alwaysOnTop,
       },
-      x,
-      y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop
-    }, update ? "update" : "none");
+      update ? "update" : "none",
+    );
   }
   initBoardWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.BOARD, {
@@ -144,11 +156,11 @@ export class Windows {
       height: this.configWindowStates.data.board.height,
       trafficLightPosition: {
         x: 13,
-        y: 13
+        y: 13,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop
+      alwaysOnTop: this.configSettings.data.alwaysOnTop,
     });
   }
   initDetailsWindow(x?: number, y?: number) {
@@ -157,11 +169,11 @@ export class Windows {
       height: this.configWindowStates.data.details.height,
       trafficLightPosition: {
         x: 8,
-        y: 8
+        y: 8,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop
+      alwaysOnTop: this.configSettings.data.alwaysOnTop,
     });
   }
   saveWindowSize(windowType: WindowType) {
@@ -179,18 +191,24 @@ export class Windows {
     this.configWindowStates.save();
   }
   getWindowByEvent(event: IpcMainInvokeEvent) {
-    const windowSet = Object.keys(this.windows).map((key) => {
-      return {
-        type: key as WindowType,
-        window: this.windows[key as WindowType]
-      }
-    }).find((window) => {
-      return window.window && !window.window.isDestroyed() && window.window.webContents.mainFrame === event.sender.mainFrame
-    });
+    const windowSet = Object.keys(this.windows)
+      .map((key) => {
+        return {
+          type: key as WindowType,
+          window: this.windows[key as WindowType],
+        };
+      })
+      .find((window) => {
+        return (
+          window.window &&
+          !window.window.isDestroyed() &&
+          window.window.webContents.mainFrame === event.sender.mainFrame
+        );
+      });
     if (windowSet && windowSet.window !== undefined) {
       return windowSet as {
-        type: WindowType,
-        window: BrowserWindow
+        type: WindowType;
+        window: BrowserWindow;
       };
     }
     return undefined;
@@ -202,7 +220,7 @@ export class Windows {
       if (parentWindowBounds) {
         const display = screen.getDisplayNearestPoint({
           x: parentWindowBounds.x + parentWindowBounds.width / 2,
-          y: parentWindowBounds.y + parentWindowBounds.height / 2
+          y: parentWindowBounds.y + parentWindowBounds.height / 2,
         });
         position.set(display.bounds);
       }

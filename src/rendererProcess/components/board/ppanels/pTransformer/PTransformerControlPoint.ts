@@ -8,7 +8,16 @@ export class PTransformerControlPoint extends PIXI.Container {
   public xPosition: -1 | 0 | 1 = 0;
   public yPosition: -1 | 0 | 1 = 0;
   public index = 0;
-  resizeCursors = [ "ns-resize", "nesw-resize", "ew-resize", "nwse-resize", "ns-resize", "nesw-resize", "ew-resize", "nwse-resize" ];
+  resizeCursors = [
+    "ns-resize",
+    "nesw-resize",
+    "ew-resize",
+    "nwse-resize",
+    "ns-resize",
+    "nesw-resize",
+    "ew-resize",
+    "nwse-resize",
+  ];
   constructor() {
     super();
     this.size.interactive = true;
@@ -63,7 +72,7 @@ export class PTransformerControlPoint extends PIXI.Container {
     });
     window.addEventListener("touchend", () => {
       // console.log("touchend")
-    })
+    });
     window.addEventListener("pointerup", () => {
       if (!sizing && !rotating) {
         return;
@@ -76,7 +85,7 @@ export class PTransformerControlPoint extends PIXI.Container {
     });
   }
   getResizeCursor(index: number) {
-    const rot = Math.floor(this.currentParentRotation / Math.PI * 180 + 45 / 2) % 360;
+    const rot = Math.floor((this.currentParentRotation / Math.PI) * 180 + 45 / 2) % 360;
     const offset = Math.floor((rot + (rot < 0 ? 360 : 0)) / 45) + 8;
     return this.resizeCursors[(offset + index - 1) % 8]!;
   }
@@ -85,8 +94,8 @@ export class PTransformerControlPoint extends PIXI.Container {
     this.size.lineStyle(1 * scale, 0x000000, 1, undefined, true);
     this.size.beginFill(0xffffff);
     this.size.drawRect(0, 0, 10 * scale, 10 * scale);
-    this.size.pivot.x = 10 * scale / 2;
-    this.size.pivot.y = 10 * scale / 2;
+    this.size.pivot.x = (10 * scale) / 2;
+    this.size.pivot.y = (10 * scale) / 2;
 
     const hitArea = 16;
     this.rotate.hitArea = new PIXI.Circle(0, 0, hitArea * scale);
@@ -94,7 +103,7 @@ export class PTransformerControlPoint extends PIXI.Container {
     // this.rotate.beginFill(0x00ff00);
     // this.rotate.drawCircle(0, 0, hitArea * scale);
     const r = this.currentRotation + Math.PI;
-    const radius = 30 * scale / 2;
+    const radius = (30 * scale) / 2;
 
     this.rotate.pivot.x = Math.cos(r) * radius;
     this.rotate.pivot.y = Math.sin(r) * radius;

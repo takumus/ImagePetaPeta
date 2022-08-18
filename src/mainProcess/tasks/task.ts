@@ -1,6 +1,6 @@
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import { v4 as uuid } from "uuid";
-const tasks: {[id: string]: TaskHandler} = {};
+const tasks: { [id: string]: TaskHandler } = {};
 let emitStatusCallback: ((taskId: string, status: TaskStatus) => void) | undefined;
 export async function spawn<T, K>(name: string, exec: (handler: TaskHandler, params: T) => Promise<K>, params: T) {
   const id = uuid();
@@ -19,8 +19,8 @@ export async function spawn<T, K>(name: string, exec: (handler: TaskHandler, par
       if (status.status === "failed" || status.status === "complete") {
         done = true;
       }
-    }
-  }
+    },
+  };
   addTask(handler);
   const result = await exec(handler, params);
   removeTask(handler);
@@ -50,9 +50,9 @@ export function onEmitStatus(callback: typeof emitStatusCallback) {
   emitStatusCallback = callback;
 }
 export interface TaskHandler {
-  name: string,
-  isCanceled: boolean,
-  onCancel?: () => void,
-  id: string,
-  emitStatus: (status: TaskStatus) => void
+  name: string;
+  isCanceled: boolean;
+  onCancel?: () => void;
+  id: string;
+  emitStatus: (status: TaskStatus) => void;
 }

@@ -1,6 +1,6 @@
-import { InjectionKey, readonly, ref } from 'vue';
-import { API } from '../api';
-import { inject } from '../utils/vue';
+import { InjectionKey, readonly, ref } from "vue";
+import { API } from "../api";
+import { inject } from "../utils/vue";
 
 export async function createNSFWStore() {
   const state = ref(await API.send("getShowNSFW"));
@@ -12,8 +12,8 @@ export async function createNSFWStore() {
   }
   return {
     state: readonly(state),
-    update
-  }
+    update,
+  };
 }
 export function useNSFWStore() {
   return inject(nsfwStoreKey);

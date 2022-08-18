@@ -3,9 +3,9 @@ const params = parse(location.search);
 export default {
   async install(app: App) {
     app.config.globalProperties.$windowArgs = params.args;
-  }
-}
-declare module '@vue/runtime-core' {
+  },
+};
+declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $windowArgs: any;
   }

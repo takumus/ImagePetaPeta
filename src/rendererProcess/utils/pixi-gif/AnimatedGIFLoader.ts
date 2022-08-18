@@ -1,9 +1,9 @@
-import { LoaderResource } from '@pixi/loaders';
-import type { ILoaderPlugin } from '@pixi/loaders';
-import { AnimatedGIF } from './AnimatedGIF';
+import { LoaderResource } from "@pixi/loaders";
+import type { ILoaderPlugin } from "@pixi/loaders";
+import { AnimatedGIF } from "./AnimatedGIF";
 
 /** Default extension for GIF images */
-const GIF_EXTENSION = 'gif';
+const GIF_EXTENSION = "gif";
 
 // Satsify the LoaderResource interface
 declare global {
@@ -29,16 +29,9 @@ declare global {
  */
 const AnimatedGIFLoader: ILoaderPlugin = {
   /** For loading methods */
-  add()
-  {
-    LoaderResource.setExtensionXhrType(
-      GIF_EXTENSION,
-      LoaderResource.XHR_RESPONSE_TYPE.BUFFER
-    );
-    LoaderResource.setExtensionLoadType(
-      GIF_EXTENSION,
-      LoaderResource.LOAD_TYPE.XHR
-    );
+  add() {
+    LoaderResource.setExtensionXhrType(GIF_EXTENSION, LoaderResource.XHR_RESPONSE_TYPE.BUFFER);
+    LoaderResource.setExtensionLoadType(GIF_EXTENSION, LoaderResource.LOAD_TYPE.XHR);
   },
   /** Implement loader */
   // use(resource: LoaderResource, next: (...args: any[]) => void): void

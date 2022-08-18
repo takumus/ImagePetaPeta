@@ -8,7 +8,7 @@ export function getURLFromImgTag(html: string) {
     if (!imgDom) return "";
     const attrs = imgDom.attributes;
     let srcset = "";
-    for (let i = 0; i < attrs.length; i ++) {
+    for (let i = 0; i < attrs.length; i++) {
       const key = attrs[i]!;
       const name = key.name.toLocaleLowerCase();
       if (name === "src") {
@@ -19,22 +19,25 @@ export function getURLFromImgTag(html: string) {
     }
     let maxSize = 0;
     let maxSizeSrc = "";
-    srcset.split(",").map((src) => {
-      return src.split(" ").filter((v) => {
-        return v.trim()!= "";
+    srcset
+      .split(",")
+      .map((src) => {
+        return src.split(" ").filter((v) => {
+          return v.trim() != "";
+        });
+      })
+      .forEach((params) => {
+        const url = params[0]!;
+        const sizeStr = params[1];
+        if (!sizeStr) return;
+        const result = /([0-9]+\.?[0-9]*)/.exec(sizeStr);
+        if (!result) return;
+        const size = Number(result[0]);
+        if (maxSize < size) {
+          maxSize = size;
+          maxSizeSrc = url;
+        }
       });
-    }).forEach((params) => {
-      const url = params[0]!;
-      const sizeStr = params[1];
-      if (!sizeStr) return;
-      const result = /([0-9]+\.?[0-9]*)/.exec(sizeStr);
-      if (!result) return;
-      const size = Number(result[0]);
-      if (maxSize < size) {
-        maxSize = size;
-        maxSizeSrc = url;
-      }
-    });
     return maxSizeSrc != "" ? maxSizeSrc : src;
   } catch (e) {
     throw e;

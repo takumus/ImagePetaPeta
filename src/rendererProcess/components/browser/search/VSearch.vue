@@ -57,14 +57,9 @@ function editSearchTag(tag: PetaTag, value: string) {
   _selectedPetaTags.splice(index, 1);
   emit("update:selectedPetaTags", _selectedPetaTags);
   if (value != "") {
-    const petaTag = props.petaTagInfos.find(
-      (pti) => pti.petaTag.name === value
-    )?.petaTag;
+    const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === value)?.petaTag;
     if (petaTag && !_selectedPetaTags.includes(petaTag)) {
-      emit(
-        "update:selectedPetaTags",
-        _selectedPetaTags.splice(index, 0, petaTag)
-      );
+      emit("update:selectedPetaTags", _selectedPetaTags.splice(index, 0, petaTag));
     }
   }
 }
@@ -79,12 +74,8 @@ function removeLastPetaTag() {
 }
 
 function addSelectedTag(tagName: string) {
-  const petaTag = props.petaTagInfos.find(
-    (pti) => pti.petaTag.name === tagName
-  )?.petaTag;
-  const untaggedId = props.selectedPetaTags.findIndex(
-    (petaTag) => petaTag.id === UNTAGGED_ID
-  );
+  const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === tagName)?.petaTag;
+  const untaggedId = props.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
 
   if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
     emit("update:selectedPetaTags", []);
@@ -117,7 +108,7 @@ watch(
   () => complementItems.value,
   () => {
     _this.$components.complement.updateItems(complementItems.value);
-  }
+  },
 );
 </script>
 
