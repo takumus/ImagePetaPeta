@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky install && yarn generate-licenses",
     "serve": "vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
     "lint": "vue-cli-service lint",
