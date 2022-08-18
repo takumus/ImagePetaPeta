@@ -32,8 +32,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, ref, onMounted, onUnmounted, watch, getCurrentInstance } from "vue";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { ref, onMounted, onUnmounted, watch, getCurrentInstance } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -69,6 +68,7 @@ const props = defineProps<{
   zIndex: number;
 }>();
 const nsfwStore = useNSFWStore();
+/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const _this = getCurrentInstance()!.proxy!;
 const panelsBackground = ref<HTMLElement>();
 const layer = ref<VLayer>();
@@ -132,7 +132,7 @@ function construct() {
     backgroundAlpha: 0,
   });
   pixi.view.addEventListener("dblclick", resetTransform);
-  pixi.view.addEventListener("mousewheel", wheel as any);
+  pixi.view.addEventListener("mousewheel", wheel as (e: Event) => void);
   pixi.view.addEventListener("pointerdown", preventWheelClick);
   pixi.stage.on("pointerdown", pointerdown);
   pixi.stage.on("pointerup", pointerup);
@@ -156,7 +156,10 @@ function construct() {
   pixi.stage.interactive = true;
   pixi.ticker.stop();
   resizer = new ResizeObserver((entries) => {
-    resize(entries[0]!.contentRect);
+    const rect = entries[0]?.contentRect;
+    if (rect) {
+      resize(rect);
+    }
   });
   if (panelsBackground.value) {
     resizer.observe(panelsBackground.value);
@@ -635,9 +638,10 @@ async function load(params: {
           }
         }
       };
-      if (pPanels[petaPanel.id] === undefined) {
+      let pPanel = pPanels[petaPanel.id];
+      if (pPanel === undefined) {
         // pPanelが無ければ作成。
-        const pPanel = (pPanels[petaPanel.id] = new PPanel(petaPanel));
+        pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel);
         pPanel.setZoomScale(props.board?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
@@ -661,22 +665,18 @@ async function load(params: {
         loadResult = "create";
       } else if (params.reload && params.reload.deletions.includes(petaPanel.petaImageId)) {
         // petaImageが無ければnoImageに。
-        pPanels[petaPanel.id]!.noImage = true;
+        pPanel.noImage = true;
         loadResult = "delete";
         onLoaded(petaPanel);
-      } else if (
-        params.reload &&
-        pPanels[petaPanel.id]!.noImage &&
-        params.reload.additions.includes(petaPanel.petaImageId)
-      ) {
+      } else if (params.reload && pPanel.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
         // pPanelはあるが、noImageだったら再ロードトライ。
         (async () => {
           try {
-            await pPanels[petaPanel.id]!.load();
+            await pPanel.load();
           } catch (error) {
             //
           }
-          pPanels[petaPanel.id]!.orderRender();
+          pPanel.orderRender();
           orderPIXIRender();
           onLoaded(petaPanel);
         })();
@@ -803,9 +803,11 @@ function unselectedPPanels() {
 watch(
   () => props.board?.background,
   () => {
-    updateRect();
-    emit("change", props.board!);
-    orderPIXIRender();
+    if (props.board) {
+      updateRect();
+      emit("change", props.board);
+      orderPIXIRender();
+    }
   },
 );
 watch(
