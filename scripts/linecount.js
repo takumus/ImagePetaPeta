@@ -7,7 +7,7 @@ const config = {
 function search(path) {
   path = Path.resolve(path);
   let lineCount = 0;
-  let files = [];
+  const files = [];
   fs.readdirSync(path).forEach((value) => {
     const cpath = Path.resolve(path, value);
     if (fs.statSync(cpath).isDirectory()) {
