@@ -25,8 +25,7 @@ pnpm-debug.log*
 #Electron-builder output
 /dist_electron
 
-test_output/*
-!.keep
+test_output
 
 src/test/sample_images/*
 !1.png
@@ -37,5 +36,4 @@ src/test/sample_images/*
 src/@assets/licenses.ts
 licenses.json
 
-build/*
-!.keep
+build
