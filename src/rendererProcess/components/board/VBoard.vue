@@ -59,6 +59,7 @@ import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
+import { clamp } from "@/commons/utils/matthew";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void;
 }>();
@@ -82,30 +83,29 @@ const dragging = ref(false);
 
 const dragOffset = new Vec2();
 const click = new ClickChecker();
-let resizer: ResizeObserver | undefined;
-let pixi: PIXI.Application | undefined;
 const rootContainer = new PIXI.Container();
 const centerWrapper = new PIXI.Container();
 const panelsCenterWrapper = new PIXI.Container();
 const backgroundSprite = new PIXI.Graphics();
-const selectingBackground = new PIXI.Graphics();
 const pSelection = new PSelection();
 const crossLine = new PIXI.Graphics();
+const stageRect = new Vec2();
+const mousePosition = new Vec2();
 let pPanels: { [key: string]: PPanel } = {};
 const pTransformer = new PTransformer(pPanels);
+const resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+const mouseOffset = new Vec2();
 // let draggingPanels = false;
+let resizer: ResizeObserver | undefined;
+let pixi: PIXI.Application | undefined;
 let mouseLeftPressing = false;
 let mouseRightPressing = false;
 let renderOrdered = false;
 let selecting = false;
 let requestAnimationFrameHandle = 0;
-const stageRect = new Vec2();
-const mousePosition = new Vec2();
 let keyboards: Keyboards | undefined = new Keyboards();
 let cancelExtract: (() => Promise<void[]>) | undefined;
 let resolution = -1;
-const resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
-const mouseOffset = new Vec2();
 onMounted(() => {
   setTimeout(() => {
     constructIfResolutionChanged();
@@ -139,10 +139,10 @@ function construct() {
   pixi.stage.on("pointerupoutside", pointerup);
   pixi.stage.on("pointermove", pointermove);
   pixi.stage.on("pointermoveoutside", pointermove);
-  pixi.stage.on("pointerup", (e) => pTransformer.pointerup(e));
-  pixi.stage.on("pointerupoutside", (e) => pTransformer.pointerup(e));
-  pixi.stage.on("pointermove", (e) => pTransformer.pointermove(e));
-  pixi.stage.on("pointermoveoutside", (e) => pTransformer.pointermove(e));
+  pixi.stage.on("pointerup", pTransformer.pointerup.bind(pTransformer));
+  pixi.stage.on("pointerupoutside", pTransformer.pointerup.bind(pTransformer));
+  pixi.stage.on("pointermove", pTransformer.pointermove.bind(pTransformer));
+  pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
   if (!props.detailsMode) {
     pixi.stage.addChild(backgroundSprite);
     pixi.stage.addChild(crossLine);
@@ -164,17 +164,14 @@ function construct() {
   renderPIXI();
   keyboards = new Keyboards();
   keyboards.enabled = !props.detailsMode;
-  keyboards.down(["Delete"], keyDelete);
-  keyboards.down(["Backspace"], keyBackspace);
+  keyboards.down(["Delete"], removeSelectedPanels);
+  keyboards.down(["Backspace"], removeSelectedPanels);
   keyboards.change(["ShiftLeft", "ShiftRight"], keyShift);
   PIXI.Ticker.shared.add(updateAnimatedGIF);
 }
 function destruct() {
   if (pixi) {
     logChunk().log("destruct PIXI");
-    pixi.view.removeEventListener("dblclick", resetTransform);
-    pixi.view.removeEventListener("mousewheel", wheel as any);
-    pixi.view.removeEventListener("pointerdown", preventWheelClick);
     pixi.destroy(true);
   }
   if (panelsBackground.value) {
@@ -200,7 +197,6 @@ function resize(rect: DOMRectReadOnly) {
   updateRect();
   orderPIXIRender();
   renderPIXI();
-  orderPIXIRender();
 }
 function preventWheelClick(event: PointerEvent) {
   if (event.button === MouseButton.MIDDLE) {
@@ -236,12 +232,7 @@ function pointerdown(e: PIXI.InteractionEvent) {
   orderPIXIRender();
 }
 function getPPanelFromObject(object: PIXI.DisplayObject) {
-  // console.log(object)
-  // if (pPanelsArray().find((c) => c === object)) {
-  //   return object as PPanel;
-  // }
-  // return null;
-  if ((object as PPanel).petaPanel !== undefined) {
+  if (props.board?.petaPanels.includes((object as PPanel).petaPanel)) {
     return object as PPanel;
   }
   return undefined;
@@ -329,14 +320,6 @@ function wheel(event: WheelEvent) {
   }
   orderPIXIRender();
 }
-function updateScale() {
-  if (props.board) {
-    const scale = props.board.transform.scale;
-    pPanelsArray().forEach((pp) => {
-      pp.setZoomScale(scale);
-    });
-  }
-}
 function updateRect() {
   if (!props.board) {
     return;
@@ -366,16 +349,8 @@ function animate() {
   props.board.transform.position.setTo(rootContainer);
   new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(crossLine);
   const offset = 0;
-  if (crossLine.x < offset) {
-    crossLine.x = offset;
-  } else if (crossLine.x > stageRect.x - offset) {
-    crossLine.x = stageRect.x - offset;
-  }
-  if (crossLine.y < offset) {
-    crossLine.y = offset;
-  } else if (crossLine.y > stageRect.y - offset) {
-    crossLine.y = stageRect.y - offset;
-  }
+  crossLine.x = clamp(crossLine.x, offset, stageRect.x - offset);
+  crossLine.y = clamp(crossLine.y, offset, stageRect.y - offset);
   pSelection.clear();
   if (selecting) {
     pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
@@ -549,8 +524,7 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   petaPanel.height *= 1 / props.board.transform.scale;
   petaPanel.position.sub(mouseOffset);
   petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-  const maxIndex = getMaxIndex();
-  petaPanel.index = maxIndex + 1;
+  petaPanel.index = Math.max(...props.board.petaPanels.map((petaPanel) => petaPanel.index)) + 1;
 }
 function beginCrop(petaPanel: PetaPanel) {
   croppingPetaPanel.value = petaPanel;
@@ -599,12 +573,6 @@ function sortIndex() {
     return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
   });
   orderPIXIRender();
-}
-function getMaxIndex() {
-  if (!props.board) {
-    return -1;
-  }
-  return Math.max(...props.board.petaPanels.map((petaPanel) => petaPanel.index));
 }
 async function load(params: {
   reload?: {
@@ -759,7 +727,6 @@ function onUpdateGif() {
   orderPIXIRender();
 }
 function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
-  const mouse = getMouseFromEvent(e);
   if (!props.board || props.detailsMode) {
     return;
   }
@@ -797,12 +764,6 @@ function updateAnimatedGIF(deltaTime: number) {
     }
   });
 }
-function keyDelete() {
-  removeSelectedPanels();
-}
-function keyBackspace() {
-  removeSelectedPanels();
-}
 function keyShift(pressed: boolean) {
   pTransformer.fit = pressed;
 }
@@ -839,29 +800,6 @@ function selectedPPanels() {
 function unselectedPPanels() {
   return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
 }
-// const pPanelsArray = computed(() => {
-//   return Object.values(pPanels.value);
-// });
-// const selectedPPanels = computed(() => {
-//   return pPanelsArray().filter((pPanel) => pPanel.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked);
-// });
-// const unselectedPPanels = computed(() => {
-//   return pPanelsArray().filter((pPanel) => !pPanel.selected);
-// });
-// watch(() => nsfwStore.state.value, () => {
-//   pPanelsArray().forEach((pp) => {
-//     pp.showNSFW = nsfwStore.state.value;
-//   });
-//   orderPIXIRender();
-// });
-// watch(() => props.board?.petaPanels, () => {
-//   emit("change", props.board!);
-// }, { deep: true });
-// watch(() => props.board?.transform, () => {
-//   updateRect();
-//   updateScale();
-//   emit("change", props.board!);
-// }, { deep: true });
 watch(
   () => props.board?.background,
   () => {
