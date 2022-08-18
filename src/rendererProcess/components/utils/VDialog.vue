@@ -38,9 +38,6 @@ const items = ref<string[]>([]);
 const label = ref("");
 const visible = ref(false);
 let resolve: (index: number) => void = (index: number) => index;
-onMounted(() => {
-  _this.$components.dialog = _this as any;
-});
 function select(index: number) {
   resolve(index);
   visible.value = false;
@@ -55,6 +52,9 @@ function show(_label: string, _items: string[]) {
   return new Promise<number>((res) => {
     resolve = res;
   });
+}
+_this.$components.dialog = {
+  show
 }
 defineExpose({
   show
