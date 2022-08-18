@@ -7,7 +7,14 @@
   "private": true,
   "author": "takumus",
   "description": "image viewer",
+  "lint-staged": {
+    "*.{ts,js,vue}": [
+      "yarn fix",
+      "git add"
+    ]
+  },
   "scripts": {
+    "prepare": "husky install",
     "serve": "vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
     "lint": "vue-cli-service lint",
@@ -70,7 +77,9 @@
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-vue": "^8.0.3",
+    "husky": "^8.0.1",
     "license-checker": "^25.0.1",
+    "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "sass": "^1.32.7",
