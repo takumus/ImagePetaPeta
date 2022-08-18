@@ -8,7 +8,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { WindowType } from "../datas/windowType";
 import { RemoteBinaryInfo } from "../datas/remoteBinaryInfo";
-
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
   importImageFiles: () => Promise<number>;
@@ -25,6 +24,7 @@ export interface MainFunctions {
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
   getPetaTagInfos: () => Promise<PetaTagInfo[]>;
   updatePetaImagesPetaTags: (petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) => Promise<boolean>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   log: (id: string, ...args: any[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;
