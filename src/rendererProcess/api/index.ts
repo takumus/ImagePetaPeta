@@ -8,7 +8,7 @@ interface API {
   on<U extends keyof MainEvents>(event: U, callback:(event: IpcRendererEvent, ...args: Parameters<MainEvents[U]>) => void): string;
   off(id: string): void;
 }
-export const API = {
+export const API: API = {
   send: (e: any, ...args: any[]) => {
     args = args.map((arg) => arg === undefined ? undefined : arg === null ? null : deepcopy(arg));
     return (window as any)[GLOBAL_API_NAME].send(e, ...args);
@@ -19,4 +19,4 @@ export const API = {
   off: (id: any) => {
     return (window as any)[GLOBAL_API_NAME].off(id);
   }
-} as API;
+};

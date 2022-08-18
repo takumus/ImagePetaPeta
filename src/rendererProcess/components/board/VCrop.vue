@@ -23,8 +23,8 @@ import * as PIXI from "pixi.js";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { createPetaPanel, PetaPanel } from "@/commons/datas/petaPanel";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
-import { PSelection } from "@/rendererProcess/components/board/ppanels/PSelection";
-import { PControlPoint } from "@/rendererProcess/components/board/ppanels/PControlPoint";
+import { PTransformerDashedLine } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerDashedLine";
+import { PTransformerControlPoint } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerControlPoint";
 @Options({
   components: {
   },
@@ -47,11 +47,11 @@ export default class VBoard extends Vue {
   mousePosition = new Vec2();
   prevMousePosition = new Vec2();
   keyboards = new Keyboards();
-  selection: PSelection = new PSelection();
+  selection: PTransformerDashedLine = new PTransformerDashedLine();
   pPanel: PPanel | undefined;
-  corners: PControlPoint[] = [];
+  corners: PTransformerControlPoint[] = [];
   blackMask = new PIXI.Graphics();
-  draggingControlPoint: PControlPoint | undefined;
+  draggingControlPoint: PTransformerControlPoint | undefined;
   minX = 0;
   maxX = 0;
   minY = 0;
@@ -77,7 +77,7 @@ export default class VBoard extends Vue {
     this.selection.interactive = true;
     this.selection.on("pointerdown", this.beginMoveSelection);
     for (let i = 0; i < 8; i++) {
-      const cp = new PControlPoint();
+      const cp = new PTransformerControlPoint();
       cp.rotate.interactive = false;
       cp.index = i;
       if (i != 3 && i != 7) {
@@ -113,7 +113,7 @@ export default class VBoard extends Vue {
     this.keyboards.enabled = true;
     this.changePetaPanel();
   }
-  startDrag(e: PIXI.InteractionEvent, controlPoint: PControlPoint) {
+  startDrag(e: PIXI.InteractionEvent, controlPoint: PTransformerControlPoint) {
     this.draggingControlPoint = controlPoint;
   }
   beginMoveSelection(e: PIXI.InteractionEvent) {

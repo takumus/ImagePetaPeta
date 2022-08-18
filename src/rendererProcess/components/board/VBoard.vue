@@ -55,7 +55,7 @@ import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import * as PIXI from "pixi.js";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
-import { PTransformer } from "@/rendererProcess/components/board/ppanels/PTransformer";
+import { PTransformer } from "@/rendererProcess/components/board/ppanels/pTransformer";
 import { hitTest } from "@/rendererProcess/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { minimId } from "@/commons/utils/utils";
@@ -67,6 +67,7 @@ import { Rectangle } from "pixi.js";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+import { PSelection } from "./PSelection";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void
 }>();
@@ -97,20 +98,16 @@ const centerWrapper = new PIXI.Container();
 const panelsCenterWrapper = new PIXI.Container();
 const backgroundSprite = new PIXI.Graphics();
 const selectingBackground = new PIXI.Graphics();
+const pSelection = new PSelection();
 const crossLine = new PIXI.Graphics();
 let pPanels: {[key: string]: PPanel} = {};
 const pTransformer = new PTransformer(pPanels);
-let draggingPanels = false;
+// let draggingPanels = false;
 let mouseLeftPressing = false;
 let mouseRightPressing = false;
 let renderOrdered = false;
 let selecting = false;
 let requestAnimationFrameHandle = 0;
-const selection = {
-  topLeft: new Vec2(),
-  bottomRight: new Vec2()
-}
-const selectionGraphics = new PIXI.Graphics();
 const stageRect = new Vec2();
 const mousePosition = new Vec2();
 let keyboards: Keyboards | undefined = new Keyboards();
@@ -163,7 +160,7 @@ function construct() {
   centerWrapper.addChild(rootContainer);
   rootContainer.addChild(panelsCenterWrapper);
   rootContainer.addChild(pTransformer);
-  rootContainer.addChild(selectionGraphics);
+  rootContainer.addChild(pSelection);
   panelsBackground.value?.appendChild(pixi.view);
   pixi.stage.interactive = true;
   pixi.ticker.stop();
@@ -239,8 +236,8 @@ function pointerdown(e: PIXI.InteractionEvent) {
     } else if (e.target.name != "transformer") {
       clearSelectionAll();
       selecting = true;
-      selection.topLeft = new Vec2(rootContainer.toLocal(mouse));
-      selection.bottomRight = selection.topLeft.clone();
+      pSelection.topLeft.set(rootContainer.toLocal(mouse));
+      pSelection.bottomRight.set(pSelection.topLeft);
     }
   }
   orderPIXIRender();
@@ -286,7 +283,6 @@ function pointerup(e: PIXI.InteractionEvent) {
     pPanelsArray().forEach((pPanel) => {
       pPanel.dragging = false;
     });
-    draggingPanels = false;
     selecting = false;
   }
   orderPIXIRender();
@@ -294,8 +290,9 @@ function pointerup(e: PIXI.InteractionEvent) {
 function pointermove(e: PIXI.InteractionEvent) {
   const mouse = getMouseFromEvent(e);
   mousePosition.set(mouse);
+  pTransformer.mousePosition.set(mouse);
   click.move(mousePosition);
-  if (mouseLeftPressing || mouseRightPressing || draggingPanels) {
+  if (mouseLeftPressing || mouseRightPressing) {
     orderPIXIRender();
   }
 }
@@ -357,16 +354,14 @@ function animate() {
   if (!props.board) {
     return;
   }
-  pPanelsArray().filter((pPanel) => pPanel.dragging).forEach((pPanel) => {
-    pPanel.petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(mousePosition)).add(pPanel.draggingOffset);
-  });
+  rootContainer.scale.set(props.board.transform.scale);
+  pTransformer.setScale(1 / props.board.transform.scale);
+  pTransformer.update();
+
   if (dragging.value) {
     props.board.transform.position
     .set(mousePosition)
     .add(dragOffset);
-  }
-  if (selecting) {
-    selection.bottomRight = new Vec2(rootContainer.toLocal(mousePosition));
   }
   props.board.transform.position.setTo(rootContainer);
   new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(crossLine);
@@ -381,48 +376,18 @@ function animate() {
   } else if (crossLine.y > stageRect.y - offset) {
     crossLine.y = stageRect.y - offset;
   }
-  rootContainer.scale.set(props.board.transform.scale);
-  pTransformer.setScale(1 / props.board.transform.scale);
-  selectionGraphics.clear();
+  pSelection.clear();
   if (selecting) {
-    const _selection = {
-      leftTop: new Vec2(
-        Math.min(selection.topLeft.x, selection.bottomRight.x),
-        Math.min(selection.topLeft.y, selection.bottomRight.y)
-      ),
-      rightTop: new Vec2(
-        Math.max(selection.topLeft.x, selection.bottomRight.x),
-        Math.min(selection.topLeft.y, selection.bottomRight.y)
-      ),
-      rightBottom: new Vec2(
-        Math.max(selection.topLeft.x, selection.bottomRight.x),
-        Math.max(selection.topLeft.y, selection.bottomRight.y)
-      ),
-      leftBottom: new Vec2(
-        Math.min(selection.topLeft.x, selection.bottomRight.x),
-        Math.max(selection.topLeft.y, selection.bottomRight.y)
-      ),
-    }
-    selectionGraphics.lineStyle(1 / props.board.transform.scale, 0x000000, 1, undefined, true);
-    selectionGraphics.beginFill(0xffffff, 0.1);
-    selectionGraphics.drawRect(
-      _selection.leftTop.x,
-      _selection.leftTop.y,
-      _selection.rightBottom.x - _selection.leftTop.x,
-      _selection.rightBottom.y - _selection.leftTop.y
-    );
+    pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
+    pSelection.draw(props.board.transform.scale);
     pPanelsArray().forEach((pPanel) => {
-      const pPanelCorners = pPanel.getCorners().map((c) => {
-        return new Vec2(rootContainer.toLocal(pPanel.toGlobal(c)));
+      const pPanelRect = pPanel.getRect()
+      Object.values(pPanelRect).map((position) => {
+        position.set(rootContainer.toLocal(pPanel.toGlobal(position)))
       })
       pPanel.petaPanel._selected = hitTest(
-        _selection,
-        {
-          leftTop: pPanelCorners[0]!,
-          rightTop: pPanelCorners[1]!,
-          rightBottom: pPanelCorners[2]!,
-          leftBottom: pPanelCorners[3]!
-        }
+        pSelection.rect,
+        pPanelRect
       ) && pPanel.petaPanel.visible && !pPanel.petaPanel.locked;
     });
   }
@@ -437,7 +402,6 @@ function animate() {
   pPanelsArray().forEach((pPanel) => {
     pPanel.orderRender();
   });
-  pTransformer.update();
 }
 function resetTransform() {
   if (!props.board) {
@@ -577,7 +541,6 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number){
   petaPanel.height *= 1 / props.board.transform.scale;
   petaPanel.position.sub(mouseOffset);
   petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-  draggingPanels = true;
   const maxIndex = getMaxIndex();
   petaPanel.index = maxIndex + 1;
 }
@@ -694,7 +657,6 @@ async function load(params: {
       if (pPanels[petaPanel.id] === undefined) {
         // pPanelが無ければ作成。
         const pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel);
-        console.log(pPanel)
         pPanel.setZoomScale(props.board?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
@@ -793,12 +755,7 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
   }
   pPanel.petaPanel._selected = true;
   layer.value?.scrollTo(pPanel.petaPanel);
-  draggingPanels = true;
-  selectedPPanels().forEach((pPanel) => {
-    const pos = new Vec2(mouse);
-    pPanel.draggingOffset = new Vec2(pPanel.position).sub(panelsCenterWrapper.toLocal(pos));
-    pPanel.dragging = true;
-  });
+  pTransformer.pointerdownPPanel(pPanel, e);
 }
 function orderPIXIRender() {
   renderOrdered = true;
@@ -867,20 +824,20 @@ function unselectedPPanels() {
 // const unselectedPPanels = computed(() => {
 //   return pPanelsArray().filter((pPanel) => !pPanel.selected);
 // });
-watch(() => nsfwStore.state.value, () => {
-  pPanelsArray().forEach((pp) => {
-    pp.showNSFW = nsfwStore.state.value;
-  });
-  orderPIXIRender();
-});
-watch(() => props.board?.petaPanels, () => {
-  emit("change", props.board!);
-}, { deep: true });
-watch(() => props.board?.transform, () => {
-  updateRect();
-  updateScale();
-  emit("change", props.board!);
-}, { deep: true });
+// watch(() => nsfwStore.state.value, () => {
+//   pPanelsArray().forEach((pp) => {
+//     pp.showNSFW = nsfwStore.state.value;
+//   });
+//   orderPIXIRender();
+// });
+// watch(() => props.board?.petaPanels, () => {
+//   emit("change", props.board!);
+// }, { deep: true });
+// watch(() => props.board?.transform, () => {
+//   updateRect();
+//   updateScale();
+//   emit("change", props.board!);
+// }, { deep: true });
 watch(() => props.board?.background, () => {
   updateRect();
   emit("change", props.board!);

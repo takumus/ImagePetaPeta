@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import * as Cursor from "@/rendererProcess/utils/cursor";
-export class PControlPoint extends PIXI.Container {
+export class PTransformerControlPoint extends PIXI.Container {
   public size = new PIXI.Graphics();
   public rotate = new PIXI.Graphics();
   public currentRotation = 0;

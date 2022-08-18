@@ -228,7 +228,7 @@ export class PPanel extends PIXI.Sprite {
       // console.log(error);
     }
   }
-  public getCorners(offset = 0): Vec2[] {
+  public getCorners(offset = 0): [Vec2, Vec2, Vec2, Vec2] {
     const w = this.absPanelWidth();
     const h = this.absPanelHeight();
     return [
@@ -237,6 +237,15 @@ export class PPanel extends PIXI.Sprite {
       new Vec2(w / 2 + offset, h / 2 + offset),
       new Vec2(-w / 2 - offset, h / 2 + offset)
     ];
+  }
+  public getRect(offset = 0) {
+    const corners = this.getCorners(offset);
+    return {
+      leftTop: corners[0],
+      rightTop: corners[1],
+      rightBottom: corners[2],
+      leftBottom: corners[3]
+    }
   }
   public cancelLoading() {
     this._cancelLoading?.();
