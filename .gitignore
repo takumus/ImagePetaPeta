@@ -1,7 +1,12 @@
 .DS_Store
-node_modules
+/node_modules
 /dist
+/dist_electron
+/test_output
+/build
 electron.config.appx.js
+src/@assets/licenses.ts
+licenses.json
 
 # local env files
 .env.local
@@ -22,18 +27,9 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-#Electron-builder output
-/dist_electron
-
-test_output
-
 src/test/sample_images/*
 !1.png
 !2.png
 !3.png
 !4.png
 !5.png
-src/@assets/licenses.ts
-licenses.json
-
-build
