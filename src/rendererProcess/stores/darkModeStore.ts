@@ -18,4 +18,4 @@ export function useDarkModeStore() {
   return inject(darkModeStoreKey);
 }
 export type DarkModeStore = ReturnType<typeof createDarkModeStore>;
-export const darkModeStoreKey: InjectionKey<DarkModeStore> = Symbol('darkModeStore');
+export const darkModeStoreKey: InjectionKey<DarkModeStore> = Symbol("darkModeStore");
