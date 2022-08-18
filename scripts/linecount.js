@@ -2,15 +2,18 @@ const fs = require("fs");
 const Path = require("path");
 const config = {
   types: ["ts", "vue"],
-  exclude: ["./src/@assets/licenses.ts"]
-}
+  exclude: ["./src/@assets/licenses.ts"],
+};
 function search(path) {
   path = Path.resolve(path);
-  let count = 0;
+  let lineCount = 0;
+  let files = [];
   fs.readdirSync(path).forEach((value) => {
     const cpath = Path.resolve(path, value);
     if (fs.statSync(cpath).isDirectory()) {
-      count += search(cpath);
+      const result = search(cpath);
+      lineCount += result.lineCount;
+      files.push(...result.files);
     } else {
       if (config.types.indexOf(Path.extname(value).toLocaleLowerCase().replace(/\./g, "")) >= 0) {
         for (let i = 0; i < config.exclude.length; i++) {
@@ -19,10 +22,14 @@ function search(path) {
           }
         }
         const c = fs.readFileSync(cpath).toString().split("\n").length;
-        count += c;
+        files.push(cpath);
+        lineCount += c;
       }
     }
   });
-  return count;
+  return { lineCount, files };
 }
-console.log(search("./src"), "lines");
+const result = search("./src");
+console.log(result.files.join("\n"));
+console.log(result.files.length, "files");
+console.log(result.lineCount, "lines");
