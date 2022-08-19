@@ -14,7 +14,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
       const data = await file.readFile("./src/test/sample_images/" + f);
       const metadata = await generateMetadata({
         data,
-        outputFilePath: "./test_output/metadata_tile_" + f,
+        outputFilePath: "./dist/test/metadata_tile_" + f,
         size: BROWSER_THUMBNAIL_SIZE,
         quality: BROWSER_THUMBNAIL_QUALITY,
       });
@@ -29,9 +29,9 @@ import { PetaColor } from "@/commons/datas/petaColor";
     }
   }, files).promise;
   console.timeEnd("time");
-  console.log("output:", "./test_output/metadata_color.html");
+  console.log("output:", "./dist/test/metadata_color.html");
   await file.writeFile(
-    "./test_output/metadata_color.html",
+    "./dist/test/metadata_color.html",
     Buffer.from(
       `<html>
       <head>

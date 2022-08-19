@@ -83,6 +83,7 @@ module.exports = defineConfig({
     electronBuilder: {
       preload: files.main.preload,
       mainProcessFile: files.main.main,
+      outputDir: "dist/electron",
       chainWebpackMainProcess: (config) => {
         config.module
           .rule("images")
@@ -95,15 +96,14 @@ module.exports = defineConfig({
         productName: packageJSON.productName,
         asar: true,
         directories: {
-          buildResources: "build",
-          output: "dist_electron",
+          buildResources: "dist/resources",
         },
         win: {
-          icon: "build/WindowsIcon.ico",
+          icon: "dist/resources/WindowsIcon.ico",
           target: ["nsis", ...(appxConfig ? ["appx"] : [])],
         },
         mac: {
-          icon: "build/MacIcon.png",
+          icon: "dist/resources/MacIcon.png",
         },
         nsis: {
           oneClick: false,

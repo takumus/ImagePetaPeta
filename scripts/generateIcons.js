@@ -4,11 +4,11 @@ const IconIco = require("@shockpkg/icon-encoder").IconIco;
 const sharp = require("sharp");
 
 task("generate icons", async (log) => {
-  log(await exportIcon("./rawAssets/icon/icon.png", "./build/WindowsIcon.ico", [16, 32, 48, 64, 128, 256]));
-  log(await exportImage("./rawAssets/icon/icon.png", "./build/Square44x44Logo.png", 44));
-  log(await exportImage("./rawAssets/icon/icon.png", "./build/Square150x150Logo.png", 150));
-  log(await exportImage("./rawAssets/icon/icon.png", "./build/StoreLogo.png", 50));
-  log(await exportImage("./rawAssets/icon/icon.png", "./build/MacIcon.png", 512));
+  log(await exportIcon("./rawAssets/icon/icon.png", "./dist/resources/WindowsIcon.ico", [16, 32, 48, 64, 128, 256]));
+  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/Square44x44Logo.png", 44));
+  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/Square150x150Logo.png", 150));
+  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/StoreLogo.png", 50));
+  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/MacIcon.png", 512));
 });
 
 async function exportImage(from, to, size) {
