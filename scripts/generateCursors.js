@@ -1,4 +1,4 @@
-const task = require("./task");
+const task = require("./@task");
 const sharp = require("sharp");
 
 task("generate cursors", async (log) => {

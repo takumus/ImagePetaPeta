@@ -1,4 +1,4 @@
-const task = require("./task");
+const task = require("./@task");
 const fs = require("fs");
 const licenseChecker = require("license-checker");
 const customLicenses = require("./customLicenses");
@@ -57,7 +57,7 @@ task("generate licenses", async (log) => {
   });
   log(
     Object.keys(licensesCounts)
-      .map((key) => `- ${key}: ${licensesCounts[key]}`)
+      .map((key) => `${key}: ${licensesCounts[key]}`)
       .join("\n"),
   );
 });

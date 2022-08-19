@@ -1,4 +1,4 @@
-const task = require("./task");
+const task = require("./@task");
 const fs = require("fs");
 const process = require("child_process");
 task("commit and add tag", async (log) => {
