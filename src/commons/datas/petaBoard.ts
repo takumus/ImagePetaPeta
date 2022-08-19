@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { dbPetaPanelToPetaPanel, PetaPanel, petaPanelToDBPetaPanel } from "./petaPanel";
+import { dbPetaPanelToPetaPanel, PetaPanel, petaPanelToDBPetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import { PetaImages } from "@/commons/datas/petaImage";
 import {

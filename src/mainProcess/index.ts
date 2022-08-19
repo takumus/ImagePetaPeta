@@ -37,11 +37,11 @@ import * as Tasks from "@/mainProcess/tasks/task";
 import { getLatestVersion, isLatest } from "@/commons/utils/versions";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
-import { DraggingPreviewWindow } from "./draggingPreviewWindow/draggingPreviewWindow";
+import { DraggingPreviewWindow } from "@/mainProcess/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
 import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
-import { searchImageByGoogle } from "./utils/searchImageByGoogle";
-import { Windows } from "./utils/windows";
+import { searchImageByGoogle } from "@/mainProcess/utils/searchImageByGoogle";
+import { Windows } from "@/mainProcess/utils/windows";
 import { DBInfo } from "@/commons/datas/dbInfo";
 (() => {
   /*------------------------------------
@@ -978,14 +978,18 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           "$Show Error",
           `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`,
         );
-    } catch {}
+    } catch {
+      //
+    }
     try {
       Object.values(windows.windows).forEach((window) => {
         if (window !== undefined && !window.isDestroyed()) {
           window.loadURL("about:blank");
         }
       });
-    } catch {}
+    } catch {
+      //
+    }
     showErrorWindow(error, quit);
   }
   async function checkUpdate() {

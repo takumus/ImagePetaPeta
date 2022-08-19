@@ -32,7 +32,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import * as Tasks from "@/mainProcess/tasks/task";
-import { generateMetadata } from "../utils/generateMetadata";
+import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
 import axios from "axios";
 import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
 import dataUriToBuffer from "data-uri-to-buffer";
@@ -63,9 +63,13 @@ export class PetaDatas {
       log.log("removed tags");
       await this.datas.dbPetaImages.remove({ id: petaImage.id });
       log.log("removed db");
-      await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch((e) => {});
+      await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch(() => {
+        //
+      });
       log.log("removed file");
-      await file.rm(this.getImagePath(petaImage, ImageType.THUMBNAIL)).catch((e) => {});
+      await file.rm(this.getImagePath(petaImage, ImageType.THUMBNAIL)).catch(() => {
+        //
+      });
       log.log("removed thumbnail");
       return true;
     }
