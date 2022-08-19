@@ -7,7 +7,7 @@ module.exports = async function (name, task) {
     });
     console.log(`${chalk.green("Complete")} ${chalk.yellow(name)}`);
   } catch (error) {
-    console.error(`${chalk.green("Failed")}   ${chalk.yellow(name)}\n${error}`);
+    console.error(`${chalk.red("Failed")}   ${chalk.yellow(name)}\n${error}`);
     process.exit(1);
   }
 };
