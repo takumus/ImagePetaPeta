@@ -1,9 +1,22 @@
 const task = require("./@task");
 const fs = require("fs");
-const rimraf = require("rimraf");
 task("generate dirs", async () => {
-  rimraf.sync("./dist/electron");
-  fs.mkdir("./dist", (err) => err);
-  fs.mkdir("./dist/resources", (err) => err);
-  fs.mkdir("./dist/test", (err) => err);
+  rm("./dist/electron");
+  mkdir("./dist");
+  mkdir("./dist/resources");
+  mkdir("./dist/test");
 });
+function mkdir(path) {
+  try {
+    fs.mkdirSync(path, { recursive: true });
+  } catch (err) {
+    //
+  }
+}
+function rm(path) {
+  try {
+    fs.rmSync(path, { recursive: true });
+  } catch (err) {
+    //
+  }
+}
