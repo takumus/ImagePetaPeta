@@ -21,7 +21,7 @@
     "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
     "generate-assets": "run-s generate-assets:*",
     "generate-assets:dirs": "node ./scripts/generateDirs.js",
-    "generate-assets:licenses": "license-checker --production --json > ./licenses.json && node ./scripts/generateLicenses.js",
+    "generate-assets:licenses": "node ./scripts/generateLicenses.js",
     "generate-assets:icons": "node ./scripts/generateIcons.js",
     "generate-assets:cursors": "node ./scripts/generateCursors.js",
     "postinstall": "electron-builder install-app-deps",

@@ -1,14 +1,30 @@
 const task = require("./task");
 const fs = require("fs");
+const licenseChecker = require("license-checker");
 const customLicenses = require("./customLicenses");
 task("generate licenses", async (log) => {
-  const datas = {
-    ...JSON.parse(fs.readFileSync("./licenses.json")),
+  const packages = {
+    ...(await new Promise((res, rej) => {
+      licenseChecker.init(
+        {
+          start: "./",
+          production: true,
+          excludePrivatePackages: true,
+        },
+        (err, result) => {
+          if (err) {
+            rej(err);
+            return;
+          }
+          res(result);
+        },
+      );
+    })),
     ...customLicenses,
   };
   const licensesCounts = {};
-  const newDatas = Object.keys(datas).map((name) => {
-    const data = datas[name];
+  const licenses = Object.keys(packages).map((name) => {
+    const data = packages[name];
     let licensesName = data.licenses;
     let licensesText = "";
     if (!data.customLicensesText) {
@@ -16,7 +32,6 @@ task("generate licenses", async (log) => {
         licensesText = fs.readFileSync(data.licenseFile).toString();
       } catch {
         licensesText = "";
-        // console.error("failed to load licenses:", name);
       }
     } else {
       licensesText = data.customLicensesText;
@@ -37,8 +52,7 @@ task("generate licenses", async (log) => {
         .replace(/\n$/, ""), // 最後の改行削除
     };
   });
-  fs.rmSync("./licenses.json");
-  fs.writeFileSync("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(newDatas, null, 2)}`, {
+  fs.writeFileSync("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(licenses, null, 2)}`, {
     encoding: "utf-8",
   });
   log(
