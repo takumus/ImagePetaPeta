@@ -3,6 +3,9 @@ import * as file from "@/mainProcess/storages/file";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 import { PetaColor } from "@/commons/datas/petaColor";
+import Path from "path";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fileConfig = require("../../files");
 (async () => {
   const files = await file.readdir("./src/test/sample_images");
   console.time("time");
@@ -14,7 +17,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
       const data = await file.readFile("./src/test/sample_images/" + f);
       const metadata = await generateMetadata({
         data,
-        outputFilePath: "./dist/test/metadata_tile_" + f,
+        outputFilePath: Path.resolve(fileConfig.out.testDir, "metadata_tile_" + f),
         size: BROWSER_THUMBNAIL_SIZE,
         quality: BROWSER_THUMBNAIL_QUALITY,
       });
@@ -29,9 +32,10 @@ import { PetaColor } from "@/commons/datas/petaColor";
     }
   }, files).promise;
   console.timeEnd("time");
-  console.log("output:", "./dist/test/metadata_color.html");
+  const htmlPath = Path.resolve(fileConfig.out.testDir, "metadata_color.html");
+  console.log("output:", htmlPath);
   await file.writeFile(
-    "./dist/test/metadata_color.html",
+    htmlPath,
     Buffer.from(
       `<html>
       <head>

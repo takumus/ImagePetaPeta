@@ -1,10 +1,10 @@
 const task = require("./@task");
 const fs = require("fs");
+const files = require("../files");
 task("generate dirs", async () => {
-  rm("./dist/electron");
-  mkdir("./dist");
-  mkdir("./dist/resources");
-  mkdir("./dist/test");
+  rm(files.out.electronDir);
+  mkdir(files.out.resourcesDir);
+  mkdir(files.out.testDir);
 });
 function mkdir(path) {
   try {

@@ -2,18 +2,7 @@ const packageJSON = require("./package.json");
 const { defineConfig } = require("@vue/cli-service");
 const fs = require("fs");
 const path = require("path");
-const files = {
-  windowTypes: "./src/commons/datas/windowType.ts",
-  renderer: {
-    windowsRoot: "./src/rendererProcess/windows/",
-    template: "./src/rendererProcess/template.html",
-  },
-  main: {
-    preload: "./src/mainProcess/preload.ts",
-    main: "./src/mainProcess/index.ts",
-  },
-  appxConfig: "./electron.config.appx.js",
-};
+const files = require("./files");
 const pages = fs
   .readdirSync(files.renderer.windowsRoot)
   .filter((name) => !name.startsWith("@") && name.endsWith(".ts"))
@@ -83,7 +72,7 @@ module.exports = defineConfig({
     electronBuilder: {
       preload: files.main.preload,
       mainProcessFile: files.main.main,
-      outputDir: "dist/electron",
+      outputDir: files.out.electronDir,
       chainWebpackMainProcess: (config) => {
         config.module
           .rule("images")
@@ -96,14 +85,14 @@ module.exports = defineConfig({
         productName: packageJSON.productName,
         asar: true,
         directories: {
-          buildResources: "dist/resources",
+          buildResources: files.out.resourcesDir,
         },
         win: {
-          icon: "dist/resources/WindowsIcon.ico",
+          icon: path.join(files.out.resourcesDir, "WindowsIcon.ico"),
           target: ["nsis", ...(appxConfig ? ["appx"] : [])],
         },
         mac: {
-          icon: "dist/resources/MacIcon.png",
+          icon: path.join(files.out.resourcesDir, "MacIcon.png"),
         },
         nsis: {
           oneClick: false,
