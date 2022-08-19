@@ -31,6 +31,7 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 @Options({
   components: {
     VTitleBar,
@@ -42,7 +43,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 })
 export default class SettingsIndex extends Vue {
   title = "";
-  keyboards: Keyboards = new Keyboards();
+  keyboards: Keyboards = useKeyboardsStore();
   async mounted() {
     this.title = `${this.$t("titles.settings")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
     document.title = this.title;

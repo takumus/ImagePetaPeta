@@ -34,8 +34,9 @@
 
 <script setup lang="ts">
 // Vue
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
+import { ref, watch, getCurrentInstance, onMounted, nextTick, onUnmounted } from "vue";
 const __this = getCurrentInstance()!;
 const _this = __this.proxy!;
 const emit = defineEmits<{
@@ -56,14 +57,18 @@ const props = defineProps<{
 const labelInput = ref<HTMLElement>();
 const tempText = ref("Hello");
 const editing = ref(false);
-const keyboards = new Keyboards(false);
+const keyboards = useKeyboardsStore(false);
 onMounted(() => {
+  console.log("mounted");
   changeLabel();
   keyboards.keys("Backspace", "Delete").down(() => {
     if (tempText.value === "") {
       emit("delete", _this);
     }
   });
+});
+onUnmounted(() => {
+  // keyboards.destroy();
 });
 function edit(dblclick = false) {
   if (props.readonly || editing.value) {

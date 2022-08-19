@@ -22,6 +22,7 @@ import { createPetaPanel, PetaPanel } from "@/commons/datas/petaPanel";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformerDashedLine } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerDashedLine";
 import { PTransformerControlPoint } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerControlPoint";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 @Options({
   components: {},
   emits: ["update"],
@@ -40,7 +41,7 @@ export default class VBoard extends Vue {
   stageRect = new Vec2();
   mousePosition = new Vec2();
   prevMousePosition = new Vec2();
-  keyboards = new Keyboards();
+  keyboards = useKeyboardsStore();
   selection: PTransformerDashedLine = new PTransformerDashedLine();
   pPanel: PPanel | undefined;
   corners: PTransformerControlPoint[] = [];

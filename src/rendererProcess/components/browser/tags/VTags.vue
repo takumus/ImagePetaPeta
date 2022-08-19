@@ -52,6 +52,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 @Options({
   components: {
     VEditableLabel,
@@ -66,7 +67,7 @@ export default class VTags extends Vue {
   @Prop()
   selectedPetaTags: PetaTag[] = [];
   tempSelectedTags = "";
-  keyboards = new Keyboards();
+  keyboards = useKeyboardsStore();
   mounted() {
     //
   }

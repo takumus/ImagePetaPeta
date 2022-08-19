@@ -38,6 +38,7 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from
 // Others
 import { v4 as uuid } from "uuid";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 
 const props = defineProps<{
   visible?: boolean;
@@ -64,7 +65,7 @@ const centerStyle = ref({
 });
 const modalId = uuid();
 const clickBackground = ref(false);
-const keyboards = new Keyboards();
+const keyboards = useKeyboardsStore();
 onMounted(() => {
   background.value?.addEventListener("pointerdown", pointerdown);
   background.value?.addEventListener("pointerup", pointerup);

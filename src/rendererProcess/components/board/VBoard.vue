@@ -59,6 +59,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void;
 }>();
@@ -103,7 +104,7 @@ let mouseRightPressing = false;
 let renderOrdered = false;
 let selecting = false;
 let requestAnimationFrameHandle = 0;
-let keyboards: Keyboards | undefined = new Keyboards();
+let keyboards: Keyboards = useKeyboardsStore();
 let cancelExtract: (() => Promise<void[]>) | undefined;
 let resolution = -1;
 onMounted(() => {
@@ -165,7 +166,6 @@ function construct() {
     resizer.observe(panelsBackground.value);
   }
   renderPIXI();
-  keyboards = new Keyboards();
   keyboards.enabled = !props.detailsMode;
   keyboards.keys("Delete").down(removeSelectedPanels);
   keyboards.keys("Backspace").down(removeSelectedPanels);

@@ -96,6 +96,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
 import { WindowType } from "@/commons/datas/windowType";
 import deepcopy from "deepcopy";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 @Options({
   components: {
     VTile,
@@ -134,7 +135,7 @@ export default class VBrowser extends Vue {
   thumbnailsSize = 0;
   currentScrollTileId = "";
   currentScrollTileOffset = 0;
-  keyboards = new Keyboards();
+  keyboards = useKeyboardsStore();
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
   ignoreScrollEvent = false;

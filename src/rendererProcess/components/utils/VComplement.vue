@@ -36,6 +36,7 @@ import { computed } from "@vue/reactivity";
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import FuzzySearch from "fuzzy-search";
+import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 defineProps<{
   zIndex: number;
 }>();
@@ -49,7 +50,7 @@ const show = ref(false);
 const target = ref<any>();
 const currentIndex = ref(0);
 const height = ref("unset");
-const keyboards = new Keyboards();
+const keyboards = useKeyboardsStore();
 let searcher: FuzzySearch<string>;
 onMounted(() => {
   keyboards.keys("ArrowUp").down(() => {
