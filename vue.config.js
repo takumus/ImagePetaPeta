@@ -4,33 +4,33 @@ const fs = require("fs");
 const path = require("path");
 const files = require("./files.config");
 const pages = fs
-  .readdirSync(files.renderer.windowsRoot)
+  .readdirSync(files.in.renderer.windowsRoot)
   .filter((name) => !name.startsWith("@") && name.endsWith(".ts"))
   .map((name) => name.replace(/\.ts/g, ""))
   .reduce((pages, name) => {
     return {
       ...pages,
       [name]: {
-        entry: path.join(files.renderer.windowsRoot, name + ".ts"),
-        template: files.renderer.template,
+        entry: path.join(files.in.renderer.windowsRoot, name + ".ts"),
+        template: files.in.renderer.template,
         filename: name + ".html",
       },
     };
   }, {});
 const windowTypes = fs
-  .readFileSync(files.windowTypes)
+  .readFileSync(files.in.renderer.windowTypes)
   .toString()
   .match(/"(.*?)"/g)
   .map((name) => name.replace(/"/g, ""));
 if (windowTypes.sort().join() !== Object.keys(pages).sort().join()) {
-  console.error(`Error: ${files.windowTypes} or ${files.renderer.windowsRoot} is wrong.`);
+  console.error(`Error: ${files.in.renderer.windowTypes} or ${files.in.renderer.windowsRoot} is wrong.`);
   process.kill(0);
 }
 let appxConfig = null;
 try {
-  appxConfig = require(files.appxConfig);
+  appxConfig = require(files.in.appxConfig);
 } catch (err) {
-  console.error(`Error: Could not build appx. '${files.appxConfig}' is not found.`);
+  console.error(`Error: Could not build appx. '${files.in.appxConfig}' is not found.`);
 }
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -70,8 +70,8 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      preload: files.main.preload,
-      mainProcessFile: files.main.main,
+      preload: files.in.main.preload,
+      mainProcessFile: files.in.main.index,
       outputDir: files.out.electronDir,
       chainWebpackMainProcess: (config) => {
         config.module
@@ -85,14 +85,14 @@ module.exports = defineConfig({
         productName: packageJSON.productName,
         asar: true,
         directories: {
-          buildResources: files.out.resourcesDir,
+          buildResources: files.out.electronResourcesDir,
         },
         win: {
-          icon: path.join(files.out.resourcesDir, "WindowsIcon.ico"),
+          icon: path.join(files.out.electronResourcesDir, "WindowsIcon.ico"),
           target: ["nsis", ...(appxConfig ? ["appx"] : [])],
         },
         mac: {
-          icon: path.join(files.out.resourcesDir, "MacIcon.png"),
+          icon: path.join(files.out.electronResourcesDir, "MacIcon.png"),
         },
         nsis: {
           oneClick: false,

@@ -1,11 +1,11 @@
 const task = require("./@task");
 const fs = require("fs");
 const files = require("../files.config");
-task("generate dirs", async () => {
-  rm(files.out.resourcesDir);
-  rm(files.out.electronDir);
-  mkdir(files.out.resourcesDir);
-  mkdir(files.out.testDir);
+task("generate dirs", async (log) => {
+  log(rm(files.out.electronResourcesDir));
+  log(rm(files.out.electronDir));
+  log(mkdir(files.out.electronResourcesDir));
+  log(mkdir(files.out.testDir));
 });
 function mkdir(path) {
   try {
@@ -13,6 +13,7 @@ function mkdir(path) {
   } catch (err) {
     //
   }
+  return "create: " + path;
 }
 function rm(path) {
   try {
@@ -20,4 +21,5 @@ function rm(path) {
   } catch (err) {
     //
   }
+  return "remove: " + path;
 }
