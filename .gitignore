@@ -6,7 +6,6 @@
 /build
 electron.config.appx.js
 src/@assets/licenses.ts
-licenses.json
 
 # local env files
 .env.local
