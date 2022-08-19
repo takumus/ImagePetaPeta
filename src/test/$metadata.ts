@@ -5,7 +5,7 @@ import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/def
 import { PetaColor } from "@/commons/datas/petaColor";
 import Path from "path";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const fileConfig = require("../../files");
+const fileConfig = require("../../files.config");
 (async () => {
   const files = await file.readdir("./src/test/sample_images");
   console.time("time");

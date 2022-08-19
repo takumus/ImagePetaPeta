@@ -2,7 +2,7 @@ const task = require("./@task");
 const fs = require("fs");
 const IconIco = require("@shockpkg/icon-encoder").IconIco;
 const sharp = require("sharp");
-const files = require("../files");
+const files = require("../files.config");
 const Path = require("path");
 task("generate icons", async (log) => {
   log(

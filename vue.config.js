@@ -2,7 +2,7 @@ const packageJSON = require("./package.json");
 const { defineConfig } = require("@vue/cli-service");
 const fs = require("fs");
 const path = require("path");
-const files = require("./files");
+const files = require("./files.config");
 const pages = fs
   .readdirSync(files.renderer.windowsRoot)
   .filter((name) => !name.startsWith("@") && name.endsWith(".ts"))

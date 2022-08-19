@@ -1,6 +1,6 @@
 const task = require("./@task");
 const fs = require("fs");
-const files = require("../files");
+const files = require("../files.config");
 task("generate dirs", async () => {
   rm(files.out.resourcesDir);
   rm(files.out.electronDir);

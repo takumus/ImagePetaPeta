@@ -31,5 +31,5 @@ function search(path) {
 }
 const result = search("./src");
 console.log(result.files.join("\n"));
-console.log(result.files.length, "files");
+console.log(result.files.length, "files.config");
 console.log(result.lineCount, "lines");
