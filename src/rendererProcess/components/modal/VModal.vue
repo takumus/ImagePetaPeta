@@ -69,7 +69,7 @@ onMounted(() => {
   background.value?.addEventListener("pointerdown", pointerdown);
   background.value?.addEventListener("pointerup", pointerup);
   keyboards.enabled = true;
-  keyboards.down(["Escape"], pressEscape);
+  keyboards.keys("Escape").down(pressEscape);
   zIndex.value = props.defaultZIndex || 0;
 });
 onUnmounted(() => {

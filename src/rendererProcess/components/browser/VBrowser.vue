@@ -163,7 +163,7 @@ export default class VBrowser extends Vue {
 
     this.thumbnailsSize = this.$states.browserTileSize;
     this.keyboards.enabled = true;
-    this.keyboards.down(["KeyA"], this.keyA);
+    this.keyboards.keys("KeyA").down(this.keyA);
   }
   unmounted() {
     this.thumbnails.removeEventListener("scroll", this.updateScrollArea);

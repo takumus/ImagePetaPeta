@@ -167,9 +167,9 @@ function construct() {
   renderPIXI();
   keyboards = new Keyboards();
   keyboards.enabled = !props.detailsMode;
-  keyboards.down(["Delete"], removeSelectedPanels);
-  keyboards.down(["Backspace"], removeSelectedPanels);
-  keyboards.change(["ShiftLeft", "ShiftRight"], keyShift);
+  keyboards.keys("Delete").down(removeSelectedPanels);
+  keyboards.keys("Backspace").down(removeSelectedPanels);
+  keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
   PIXI.Ticker.shared.add(updateAnimatedGIF);
 }
 function destruct() {

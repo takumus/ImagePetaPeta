@@ -56,10 +56,10 @@ const props = defineProps<{
 const labelInput = ref<HTMLElement>();
 const tempText = ref("Hello");
 const editing = ref(false);
-const keyboard = new Keyboards(false);
+const keyboards = new Keyboards(false);
 onMounted(() => {
   changeLabel();
-  keyboard.down(["Backspace", "Delete"], () => {
+  keyboards.keys("Backspace", "Delete").down(() => {
     if (tempText.value === "") {
       emit("delete", _this);
     }
@@ -73,7 +73,7 @@ function edit(dblclick = false) {
     // ワンクリック編集が有効じゃなかったら、ワンクリックで反応しない。
     return;
   }
-  keyboard.enabled = true;
+  keyboards.enabled = true;
   editing.value = true;
   tempText.value = props.label;
   nextTick(() => {
@@ -102,7 +102,7 @@ function apply(text?: string) {
     return;
   }
   editing.value = false;
-  keyboard.enabled = false;
+  keyboards.enabled = false;
   if (props.readonly) {
     return;
   }
@@ -128,7 +128,7 @@ function cancel() {
     tempText.value = props.label;
   }, 1);
   editing.value = false;
-  keyboard.enabled = false;
+  keyboards.enabled = false;
 }
 function input(event: InputEvent) {
   tempText.value = (event.target as HTMLElement).innerText;

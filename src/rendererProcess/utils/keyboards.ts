@@ -32,22 +32,27 @@ export class Keyboards {
     this.downListeners = {};
     this.upListeners = {};
   }
-  public down(keys: Keys[], callback: KeyboardsCallback) {
-    keys.forEach((key) => {
-      (this.downListeners[key] || (this.downListeners[key] = new Set())).add(callback);
-    });
-    return this;
-  }
-  public up(keys: Keys[], callback: KeyboardsCallback) {
-    keys.forEach((key) => {
-      (this.upListeners[key] || (this.upListeners[key] = new Set())).add(callback);
-    });
-    return this;
-  }
-  public change(keys: Keys[], callback: KeyboardsCallback) {
-    this.down(keys, callback);
-    this.up(keys, callback);
-    return this;
+  public keys(...keys: Keys[]) {
+    const handler = {
+      down: (callback: KeyboardsCallback) => {
+        keys.forEach((key) => {
+          (this.downListeners[key] || (this.downListeners[key] = new Set())).add(callback);
+        });
+        return handler;
+      },
+      up: (callback: KeyboardsCallback) => {
+        keys.forEach((key) => {
+          (this.upListeners[key] || (this.upListeners[key] = new Set())).add(callback);
+        });
+        return handler;
+      },
+      change: (callback: KeyboardsCallback) => {
+        handler.down(callback);
+        handler.up(callback);
+        return handler;
+      },
+    };
+    return handler;
   }
   private emit(key: Keys, pressed: boolean, event?: KeyboardEvent) {
     (pressed ? this.downListeners : this.upListeners)[key]?.forEach((callback) => {
@@ -112,7 +117,7 @@ export class Keyboards {
   }
   public static pressedOR(...keys: Keys[]) {
     for (let i = 0; i < keys.length; i++) {
-      if (Keyboards.pressed(keys[i]!)) {
+      if (Keyboards.pressed(keys[i])) {
         return true;
       }
     }
@@ -120,13 +125,16 @@ export class Keyboards {
   }
   public static pressedAND(...keys: Keys[]) {
     for (let i = 0; i < keys.length; i++) {
-      if (!Keyboards.pressed(keys[i]!)) {
+      if (!Keyboards.pressed(keys[i])) {
         return false;
       }
     }
     return true;
   }
-  public static pressed(key: Keys) {
+  public static pressed(key?: Keys) {
+    if (key === undefined) {
+      return false;
+    }
     return Keyboards.pressedKeys[key] ? true : false;
   }
 }

@@ -75,11 +75,13 @@ export async function create(component: Component, windowType: WindowType) {
       capture: false,
     },
   );
-  new Keyboards().down(["KeyD"], () => {
+  const keyboards = new Keyboards();
+  keyboards.keys("KeyD").down(() => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
       API.send("windowToggleDevTools");
     }
-  }).enabled = true;
+  });
+  keyboards.enabled = true;
   window.onerror = (e) => {
     logChunk().log(`window "${windowType}" error:`, e);
   };

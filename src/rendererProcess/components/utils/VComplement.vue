@@ -52,26 +52,26 @@ const height = ref("unset");
 const keyboards = new Keyboards();
 let searcher: FuzzySearch<string>;
 onMounted(() => {
-  keyboards.down(["ArrowUp"], () => {
+  keyboards.keys("ArrowUp").down(() => {
     if (!target.value) return;
     moveSelectionRelative(-1);
   });
-  keyboards.down(["ArrowDown"], () => {
+  keyboards.keys("ArrowDown").down(() => {
     if (!target.value) return;
     moveSelectionRelative(1);
   });
-  keyboards.down(["Tab"], () => {
+  keyboards.keys("Tab").down(() => {
     if (!target.value) return;
     moveSelectionRelative(Keyboards.pressedOR("ShiftLeft", "ShiftRight") ? -1 : 1);
   });
-  keyboards.down(["Enter"], () => {
+  keyboards.keys("Enter").down(() => {
     if (!target.value) return;
     const item = filteredItems.value[currentIndex.value];
     if (item) {
       select(item);
     }
   });
-  keyboards.down(["Escape"], () => {
+  keyboards.keys("Escape").down(() => {
     nextTick(() => {
       blur();
     });
