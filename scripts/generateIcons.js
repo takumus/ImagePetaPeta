@@ -2,13 +2,22 @@ const task = require("./@task");
 const fs = require("fs");
 const IconIco = require("@shockpkg/icon-encoder").IconIco;
 const sharp = require("sharp");
-
+const files = require("../files");
+const Path = require("path");
 task("generate icons", async (log) => {
-  log(await exportIcon("./rawAssets/icon/icon.png", "./dist/resources/WindowsIcon.ico", [16, 32, 48, 64, 128, 256]));
-  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/Square44x44Logo.png", 44));
-  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/Square150x150Logo.png", 150));
-  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/StoreLogo.png", 50));
-  log(await exportImage("./rawAssets/icon/icon.png", "./dist/resources/MacIcon.png", 512));
+  log(
+    await exportIcon(
+      "./rawAssets/icon/icon.png",
+      Path.resolve(files.out.resourcesDir, "WindowsIcon.ico"),
+      [16, 32, 48, 64, 128, 256],
+    ),
+  );
+  log(await exportImage("./rawAssets/icon/icon.png", Path.resolve(files.out.resourcesDir, "Square44x44Logo.png"), 44));
+  log(
+    await exportImage("./rawAssets/icon/icon.png", Path.resolve(files.out.resourcesDir, "Square150x150Logo.png"), 150),
+  );
+  log(await exportImage("./rawAssets/icon/icon.png", Path.resolve(files.out.resourcesDir, "StoreLogo.png"), 50));
+  log(await exportImage("./rawAssets/icon/icon.png", Path.resolve(files.out.resourcesDir, "MacIcon.png"), 512));
 });
 
 async function exportImage(from, to, size) {

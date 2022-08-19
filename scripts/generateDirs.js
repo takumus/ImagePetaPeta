@@ -2,6 +2,7 @@ const task = require("./@task");
 const fs = require("fs");
 const files = require("../files");
 task("generate dirs", async () => {
+  rm(files.out.resourcesDir);
   rm(files.out.electronDir);
   mkdir(files.out.resourcesDir);
   mkdir(files.out.testDir);

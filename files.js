@@ -9,7 +9,7 @@ module.exports = {
     main: "./src/mainProcess/index.ts",
   },
   out: {
-    resourcesDir: "./dist/resources",
+    resourcesDir: "./dist/electron_resources",
     electronDir: "./dist/electron",
     testDir: "./dist/test",
   },
