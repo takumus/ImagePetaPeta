@@ -3,12 +3,12 @@ const fs = require("fs");
 const files = require("../files.config");
 module.exports = {
   async run(name, task) {
-    console.log(`${chalk.green("Begin")}    ${chalk.yellow(name)}`);
+    console.log(`${chalk.green("BEGIN")} ${chalk.yellow(name)}`);
     try {
       await task();
-      console.log(`${chalk.green("Complete")} ${chalk.yellow(name)}`);
+      console.log(`${chalk.green("DONE")}`);
     } catch (error) {
-      console.error(`${chalk.red("Failed")}   ${chalk.yellow(name)}\n${error}`);
+      console.error(chalk.red(`Failed\n${error}`));
       process.exit(1);
     }
   },
