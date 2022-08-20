@@ -61,7 +61,7 @@ import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 const emit = defineEmits<{
-  (e: "change", board: PetaBoard): void;
+  (e: "update:board", board: PetaBoard): void;
 }>();
 const props = defineProps<{
   detailsMode: boolean;
@@ -833,7 +833,7 @@ function unselectedPPanels() {
 function updatePetaBoard() {
   if (currentBoard.value) {
     console.log("update board");
-    emit("change", currentBoard.value);
+    emit("update:board", currentBoard.value);
   }
 }
 function updatePetaPanels() {

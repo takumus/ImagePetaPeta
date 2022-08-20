@@ -14,15 +14,21 @@
             @remove="removePetaBoard"
             @add="addPetaBoard"
             @select="selectPetaBoard"
-            @update:board="changePetaBoard"
+            @update:board="updatePetaBoard"
           />
         </VTitleBar>
         <VUtilsBar>
-          <VBoardProperty v-if="currentPetaBoard" :board="currentPetaBoard" @update="changePetaBoard" />
+          <VBoardProperty v-if="currentPetaBoard" :board="currentPetaBoard" @update="updatePetaBoard" />
         </VUtilsBar>
       </t-top>
       <t-browser>
-        <VBoard :zIndex="1" :board="currentPetaBoard" :detailsMode="false" ref="vPetaBoard" @change="changePetaBoard" />
+        <VBoard
+          :zIndex="1"
+          :board="currentPetaBoard"
+          :detailsMode="false"
+          ref="vPetaBoard"
+          @update:board="updatePetaBoard"
+        />
       </t-browser>
     </t-content>
     <t-modals v-show="$components.modal.modalIds.length > 0">
@@ -313,7 +319,7 @@ export default class BoardIndex extends Vue {
   get sortedPetaBoards() {
     return this.boards.sort((a, b) => a.index - b.index);
   }
-  changePetaBoard(board: PetaBoard) {
+  updatePetaBoard(board: PetaBoard) {
     if (!board) {
       return;
     }
