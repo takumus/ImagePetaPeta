@@ -17,7 +17,7 @@ const fileConfig = require("../../files.config");
       const data = await file.readFile("./src/test/sample_images/" + f);
       const metadata = await generateMetadata({
         data,
-        outputFilePath: Path.resolve(fileConfig.out.testDir, "metadata_tile_" + f),
+        outputFilePath: Path.resolve(fileConfig.output.testDir, "metadata_tile_" + f),
         size: BROWSER_THUMBNAIL_SIZE,
         quality: BROWSER_THUMBNAIL_QUALITY,
       });
@@ -32,7 +32,7 @@ const fileConfig = require("../../files.config");
     }
   }, files).promise;
   console.timeEnd("time");
-  const htmlPath = Path.resolve(fileConfig.out.testDir, "metadata_color.html");
+  const htmlPath = Path.resolve(fileConfig.output.testDir, "metadata_color.html");
   console.log("output:", htmlPath);
   await file.writeFile(
     htmlPath,

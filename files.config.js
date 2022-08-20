@@ -1,5 +1,5 @@
 module.exports = {
-  in: {
+  input: {
     renderer: {
       windowTypes: "./src/commons/datas/windowType.ts",
       windowsRoot: "./src/rendererProcess/windows",
@@ -11,9 +11,19 @@ module.exports = {
     },
     appxConfig: "./electron.config.appx.js",
   },
-  out: {
-    electronResourcesDir: "./dist/electron_resources",
-    electronDir: "./dist/electron",
+  output: {
+    electron: {
+      appDir: "./dist/electron",
+      resources: {
+        dir: "./dist/electron_resources",
+        win: {
+          appIcon: "./dist/electron_resources/WindowsIcon.ico",
+        },
+        mac: {
+          appIcon: "./dist/electron_resources/MacIcon.png",
+        },
+      },
+    },
     testDir: "./dist/test",
   },
 };

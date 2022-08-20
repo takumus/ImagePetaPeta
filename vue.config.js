@@ -4,33 +4,33 @@ const fs = require("fs");
 const path = require("path");
 const files = require("./files.config");
 const pages = fs
-  .readdirSync(files.in.renderer.windowsRoot)
+  .readdirSync(files.input.renderer.windowsRoot)
   .filter((name) => !name.startsWith("@") && name.endsWith(".ts"))
   .map((name) => name.replace(/\.ts/g, ""))
   .reduce((pages, name) => {
     return {
       ...pages,
       [name]: {
-        entry: path.join(files.in.renderer.windowsRoot, name + ".ts"),
-        template: files.in.renderer.template,
+        entry: path.join(files.input.renderer.windowsRoot, name + ".ts"),
+        template: files.input.renderer.template,
         filename: name + ".html",
       },
     };
   }, {});
 const windowTypes = fs
-  .readFileSync(files.in.renderer.windowTypes)
+  .readFileSync(files.input.renderer.windowTypes)
   .toString()
   .match(/"(.*?)"/g)
   .map((name) => name.replace(/"/g, ""));
 if (windowTypes.sort().join() !== Object.keys(pages).sort().join()) {
-  console.error(`Error: ${files.in.renderer.windowTypes} or ${files.in.renderer.windowsRoot} is wrong.`);
+  console.error(`Error: ${files.input.renderer.windowTypes} or ${files.input.renderer.windowsRoot} is wrong.`);
   process.kill(0);
 }
 let appxConfig = null;
 try {
-  appxConfig = require(files.in.appxConfig);
+  appxConfig = require(files.input.appxConfig);
 } catch (err) {
-  console.error(`Error: Could not build appx. '${files.in.appxConfig}' is not found.`);
+  console.error(`Error: Could not build appx. '${files.input.appxConfig}' is not found.`);
 }
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -70,9 +70,9 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      preload: files.in.main.preload,
-      mainProcessFile: files.in.main.index,
-      outputDir: files.out.electronDir,
+      preload: files.input.main.preload,
+      mainProcessFile: files.input.main.index,
+      outputDir: files.output.electron.appDir,
       chainWebpackMainProcess: (config) => {
         config.module
           .rule("images")
@@ -85,14 +85,14 @@ module.exports = defineConfig({
         productName: packageJSON.productName,
         asar: true,
         directories: {
-          buildResources: files.out.electronResourcesDir,
+          buildResources: files.output.electron.resources.dir,
         },
         win: {
-          icon: path.join(files.out.electronResourcesDir, "WindowsIcon.ico"),
+          icon: path.join(files.output.electron.resources.win.appIcon),
           target: ["nsis", ...(appxConfig ? ["appx"] : [])],
         },
         mac: {
-          icon: path.join(files.out.electronResourcesDir, "MacIcon.png"),
+          icon: path.join(files.output.electron.resources.mac.appIcon),
         },
         nsis: {
           oneClick: false,

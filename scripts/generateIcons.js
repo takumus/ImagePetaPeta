@@ -8,28 +8,38 @@ task("generate icons", async (log) => {
   log(
     await exportIcon(
       "./rawAssets/icon/icon.png",
-      Path.resolve(files.out.electronResourcesDir, "WindowsIcon.ico"),
+      Path.resolve(files.output.electron.resources.dir, "WindowsIcon.ico"),
       [16, 32, 48, 64, 128, 256],
     ),
   );
   log(
     await exportImage(
       "./rawAssets/icon/icon.png",
-      Path.resolve(files.out.electronResourcesDir, "Square44x44Logo.png"),
+      Path.resolve(files.output.electron.resources.dir, "Square44x44Logo.png"),
       44,
     ),
   );
   log(
     await exportImage(
       "./rawAssets/icon/icon.png",
-      Path.resolve(files.out.electronResourcesDir, "Square150x150Logo.png"),
+      Path.resolve(files.output.electron.resources.dir, "Square150x150Logo.png"),
       150,
     ),
   );
   log(
-    await exportImage("./rawAssets/icon/icon.png", Path.resolve(files.out.electronResourcesDir, "StoreLogo.png"), 50),
+    await exportImage(
+      "./rawAssets/icon/icon.png",
+      Path.resolve(files.output.electron.resources.dir, "StoreLogo.png"),
+      50,
+    ),
   );
-  log(await exportImage("./rawAssets/icon/icon.png", Path.resolve(files.out.electronResourcesDir, "MacIcon.png"), 512));
+  log(
+    await exportImage(
+      "./rawAssets/icon/icon.png",
+      Path.resolve(files.output.electron.resources.dir, "MacIcon.png"),
+      512,
+    ),
+  );
 });
 
 async function exportImage(from, to, size) {
