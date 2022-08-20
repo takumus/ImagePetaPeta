@@ -1,5 +1,5 @@
 const script = require("./@script");
-script.run("generate icons", async (log) => {
+script.run("generate icons", async () => {
   const IconIco = require("@shockpkg/icon-encoder").IconIco;
   const sharp = require("sharp");
   const Path = require("path");
@@ -15,7 +15,7 @@ script.run("generate icons", async (log) => {
     }
     return script.utils.write(to, ico.encode());
   }
-  log(
+  script.utils.log(
     await exportIcon(
       "./rawAssets/icon/icon.png",
       Path.resolve(script.files.output.electron.resources.win.appIcon),
@@ -43,7 +43,7 @@ script.run("generate icons", async (log) => {
   //     50,
   //   ),
   // );
-  log(
+  script.utils.log(
     await exportImage(
       "./rawAssets/icon/icon.png",
       Path.resolve(script.files.output.electron.resources.mac.appIcon),

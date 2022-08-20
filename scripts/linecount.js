@@ -1,5 +1,5 @@
 const script = require("./@script");
-script.run("linecount", (log) => {
+script.run("linecount", () => {
   const Path = require("path");
   const config = {
     types: ["ts", "vue"],
@@ -31,7 +31,7 @@ script.run("linecount", (log) => {
     return { lineCount, files };
   }
   const result = search("./src");
-  log(result.files.join("\n"));
-  log(result.files.length, "files");
-  log(result.lineCount, "lines");
+  script.utils.log(result.files.join("\n"));
+  script.utils.log(result.files.length, "files");
+  script.utils.log(result.lineCount, "lines");
 });

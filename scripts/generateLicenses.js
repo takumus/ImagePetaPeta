@@ -1,5 +1,5 @@
 const script = require("./@script");
-script.run("generate licenses", async (log) => {
+script.run("generate licenses", async () => {
   const licenseChecker = require("license-checker");
   const customLicenses = require("./customLicenses");
   const packages = {
@@ -51,12 +51,12 @@ script.run("generate licenses", async (log) => {
         .replace(/\n$/, ""), // 最後の改行削除
     };
   });
-  log(
+  script.utils.log(
     script.utils.write("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(licenses, null, 2)}`, {
       encoding: "utf-8",
     }),
   );
-  log(
+  script.utils.log(
     Object.keys(licensesCounts)
       .map((key) => `${key}: ${licensesCounts[key]}`)
       .join("\n"),

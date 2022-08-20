@@ -5,9 +5,7 @@ module.exports = {
   async run(name, task) {
     console.log(`${chalk.green("Begin")}    ${chalk.yellow(name)}`);
     try {
-      await task((...args) => {
-        console.log(" " + chalk.gray(args.join(" ").replace(/\n/g, "\n ")));
-      });
+      await task();
       console.log(`${chalk.green("Complete")} ${chalk.yellow(name)}`);
     } catch (error) {
       console.error(`${chalk.red("Failed")}   ${chalk.yellow(name)}\n${error}`);
@@ -43,6 +41,9 @@ module.exports = {
     write(path, buffer) {
       fs.writeFileSync(path, buffer);
       return "write: " + path;
+    },
+    log(...args) {
+      console.log(" " + chalk.gray(args.join(" ").replace(/\n/g, "\n ")));
     },
   },
   files,
