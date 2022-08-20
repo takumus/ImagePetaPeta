@@ -7,7 +7,7 @@ export function lock() {
 export function unlock() {
   locked = false;
 }
-export function setCursor(cursor: string) {
+export function setCursor(cursor = "unset") {
   if (locked) {
     return;
   }
