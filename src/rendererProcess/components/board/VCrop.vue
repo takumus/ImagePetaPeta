@@ -72,9 +72,8 @@ export default class VBoard extends Vue {
     this.selection.interactive = true;
     this.selection.on("pointerdown", this.beginMoveSelection);
     for (let i = 0; i < 8; i++) {
-      const cp = new PTransformerControlPoint();
+      const cp = new PTransformerControlPoint(i);
       cp.rotate.interactive = false;
-      cp.index = i;
       if (i != 3 && i != 7) {
         if (i === 0 || i === 1 || i === 2) {
           cp.yPosition = -1;

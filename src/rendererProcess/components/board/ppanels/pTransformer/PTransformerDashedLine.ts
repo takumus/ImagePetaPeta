@@ -4,11 +4,12 @@ import { Vec2 } from "@/commons/utils/vec2";
 export class PTransformerDashedLine extends PIXI.Container {
   texture?: PIXI.TilingSprite;
   graphics: PIXI.Graphics = new PIXI.Graphics();
-  corners: Vec2[] = [];
+  corners: [Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2];
   dirty = false;
   renderScale = 1;
   constructor() {
     super();
+    this.corners = Array.from({ length: 8 }, () => new Vec2()) as typeof this.corners;
     this.init();
   }
   async init() {
@@ -22,7 +23,7 @@ export class PTransformerDashedLine extends PIXI.Container {
     if (this.corners.join(",") != corners.join(",")) {
       this.dirty = true;
     }
-    this.corners = corners;
+    this.corners = corners as typeof this.corners;
   }
   setScale(scale: number) {
     if (this.renderScale != scale) {
@@ -43,9 +44,9 @@ export class PTransformerDashedLine extends PIXI.Container {
       .reduce((p, c) => p.clone().add(c), new Vec2())
       .div(this.corners.length)
       .setTo(this.texture);
-    const diff = new Vec2(this.corners[0]).getDiff(this.corners[2]!);
+    const diff = new Vec2(this.corners[0]).getDiff(this.corners[2]);
     this.texture.width = diff.getLength() * 1.2;
-    this.texture.height = new Vec2(this.corners[2]).getDistance(this.corners[4]!) * 1.2;
+    this.texture.height = new Vec2(this.corners[2]).getDistance(this.corners[4]) * 1.2;
     this.texture.rotation = diff.atan2();
     this.dirty = false;
   }

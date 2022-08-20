@@ -7,7 +7,6 @@ export class PTransformerControlPoint extends PIXI.Container {
   public currentParentRotation = 0;
   public xPosition: -1 | 0 | 1 = 0;
   public yPosition: -1 | 0 | 1 = 0;
-  public index = 0;
   resizeCursors = [
     "ns-resize",
     "nesw-resize",
@@ -18,7 +17,7 @@ export class PTransformerControlPoint extends PIXI.Container {
     "ew-resize",
     "nwse-resize",
   ];
-  constructor() {
+  constructor(public index: number) {
     super();
     this.size.interactive = true;
     this.rotate.interactive = true;
@@ -87,7 +86,7 @@ export class PTransformerControlPoint extends PIXI.Container {
   getResizeCursor(index: number) {
     const rot = Math.floor((this.currentParentRotation / Math.PI) * 180 + 45 / 2) % 360;
     const offset = Math.floor((rot + (rot < 0 ? 360 : 0)) / 45) + 8;
-    return this.resizeCursors[(offset + index - 1) % 8]!;
+    return this.resizeCursors[(offset + index - 1) % 8];
   }
   setScale(scale: number) {
     this.size.clear();

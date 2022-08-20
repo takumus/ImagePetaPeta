@@ -45,7 +45,7 @@ export class PTransformer extends PIXI.Container {
   updatePetaPanels?: () => void;
   constructor(public pPanels: { [key: string]: PPanel }) {
     super();
-    this.corners = Array.from({ length: 8 }, () => new PTransformerControlPoint()) as typeof this.corners;
+    this.corners = Array.from({ length: 8 }, (_, id) => new PTransformerControlPoint(id)) as typeof this.corners;
     this.beginTransformCorners = Array.from({ length: 8 }, () => new Vec2()) as typeof this.beginTransformCorners;
     this.addChild(this.pMultipleSelection);
     this.corners.forEach((c, i) => {
