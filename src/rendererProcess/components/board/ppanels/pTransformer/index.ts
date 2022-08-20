@@ -15,12 +15,21 @@ enum ControlStatus {
   NONE = "none",
 }
 export class PTransformer extends PIXI.Container {
-  corners: PTransformerControlPoint[] = [];
+  corners: [
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+    PTransformerControlPoint,
+  ];
   dragOffset = new Vec2();
   controlStatus = ControlStatus.NONE;
   beginRotatingRotation = 0;
   rotatingRotation = 0;
-  beginTransformCorners: Vec2[] = [];
+  beginTransformCorners: [Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2];
   transformingPPanels: PPanel[] = [];
   sizingCornerIndex = -1;
   pairCorner = new Vec2();
@@ -36,11 +45,8 @@ export class PTransformer extends PIXI.Container {
   updatePetaPanels?: () => void;
   constructor(public pPanels: { [key: string]: PPanel }) {
     super();
-    for (let i = 0; i < 8; i++) {
-      const c = new PTransformerControlPoint();
-      c.index = i;
-      this.corners.push(c);
-    }
+    this.corners = Array.from({ length: 8 }, () => new PTransformerControlPoint()) as typeof this.corners;
+    this.beginTransformCorners = Array.from({ length: 8 }, () => new Vec2()) as typeof this.beginTransformCorners;
     this.addChild(this.pMultipleSelection);
     this.corners.forEach((c, i) => {
       c.size.on("pointerdown", (e) => {
@@ -74,7 +80,10 @@ export class PTransformer extends PIXI.Container {
       return p;
     });
     this.pairCorner = new Vec2(this.corners[(this.sizingCornerIndex + this.corners.length / 2) % this.corners.length]);
-    this.beginSizingDistance = this.pairCorner.getDistance(this.corners[this.sizingCornerIndex]!);
+    const sizingCorner = this.corners[this.sizingCornerIndex];
+    if (sizingCorner) {
+      this.beginSizingDistance = this.pairCorner.getDistance(sizingCorner);
+    }
   }
   beginRotating(index: number, e: PIXI.InteractionEvent) {
     this.mousePosition.set(e.data.global);
@@ -84,10 +93,7 @@ export class PTransformer extends PIXI.Container {
       delete p._petaImage;
       return p;
     });
-    this.beginTransformCorners = [];
-    this.corners.forEach((c) => {
-      this.beginTransformCorners.push(new Vec2(c));
-    });
+    this.beginTransformCorners = this.corners.map((corner) => new Vec2(corner)) as typeof this.beginTransformCorners;
     this.rotatingRotation = this.getRotatingCenter().getDiff(this.toLocal(e.data.global)).atan2();
     this.beginRotatingRotation = this.rotatingRotation;
     this.controlStatus = ControlStatus.PANEL_ROTATE;
@@ -126,6 +132,7 @@ export class PTransformer extends PIXI.Container {
     });
   }
   pointerup(e: PIXI.InteractionEvent) {
+    this.click.move(e.data.global);
     if (this.controlStatus === ControlStatus.PANEL_DRAG) {
       this.selectedPPanels.forEach((pPanel) => {
         pPanel.dragging = false;
@@ -149,11 +156,13 @@ export class PTransformer extends PIXI.Container {
     if (this.controlStatus === ControlStatus.PANEL_SIZE) {
       const scale = this.pairCorner.getDistance(this.toLocal(e.data.global)) / this.beginSizingDistance;
       this.selectedPPanels.forEach((pPanel, i) => {
-        pPanel.petaPanel.width = this.beginSizingPetaPanels[i]!.width * scale;
-        pPanel.petaPanel.height = this.beginSizingPetaPanels[i]!.height * scale;
-        const position = this.pairCorner.getDiff(
-          this.toLocal(pPanel.parent.toGlobal(this.beginSizingPetaPanels[i]!.position)),
-        );
+        const beginSizingPetaPanel = this.beginSizingPetaPanels[i];
+        if (beginSizingPetaPanel === undefined) {
+          return;
+        }
+        pPanel.petaPanel.width = beginSizingPetaPanel.width * scale;
+        pPanel.petaPanel.height = beginSizingPetaPanel.height * scale;
+        const position = this.pairCorner.getDiff(this.toLocal(pPanel.parent.toGlobal(beginSizingPetaPanel.position)));
         pPanel.petaPanel.position = new Vec2(
           pPanel.parent.toLocal(
             this.toGlobal(position.clone().normalize().mult(position.getLength()).mult(scale).add(this.pairCorner)),
@@ -164,7 +173,11 @@ export class PTransformer extends PIXI.Container {
       const center = this.getRotatingCenter();
       this.rotatingRotation = center.getDiff(this.toLocal(e.data.global)).atan2();
       if (this.fit) {
-        const diff = center.getDiff(this.beginTransformCorners[3]!);
+        const corner = this.beginTransformCorners[3];
+        if (corner === undefined) {
+          return;
+        }
+        const diff = center.getDiff(corner);
         const r = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
         const rot = Math.floor((r / Math.PI) * 180 + ROTATION_BLOCK_INCREMENT / 2) % 360;
         this.rotatingRotation =
@@ -174,9 +187,12 @@ export class PTransformer extends PIXI.Container {
           this.beginRotatingRotation;
       }
       this.selectedPPanels.forEach((pPanel, i) => {
-        pPanel.petaPanel.rotation =
-          this.beginSizingPetaPanels[i]!.rotation + this.rotatingRotation - this.beginRotatingRotation;
-        const diff = center.getDiff(this.toLocal(pPanel.parent.toGlobal(this.beginSizingPetaPanels[i]!.position)));
+        const beginSizingPetaPanel = this.beginSizingPetaPanels[i];
+        if (beginSizingPetaPanel === undefined) {
+          return;
+        }
+        pPanel.petaPanel.rotation = beginSizingPetaPanel.rotation + this.rotatingRotation - this.beginRotatingRotation;
+        const diff = center.getDiff(this.toLocal(pPanel.parent.toGlobal(beginSizingPetaPanel.position)));
         const rad = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
         pPanel.petaPanel.position.set(
           pPanel.parent.toLocal(
@@ -196,7 +212,11 @@ export class PTransformer extends PIXI.Container {
     } else if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.corners.forEach((c, i) => {
-        const diff = center.getDiff(this.beginTransformCorners[i]!);
+        const beginTransformCorner = this.beginTransformCorners[i];
+        if (beginTransformCorner === undefined) {
+          return;
+        }
+        const diff = center.getDiff(beginTransformCorner);
         const r = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
         const d = diff.getLength();
         c.x = Math.cos(r) * d + center.x;
@@ -205,11 +225,15 @@ export class PTransformer extends PIXI.Container {
       });
     }
     if (this.controlStatus != ControlStatus.PANEL_ROTATE) {
-      if (this.selectedPPanels.length === 1) {
-        this.selectedPPanels[0]!.getCorners().forEach((c, i) => {
-          const p = this.toLocal(this.selectedPPanels[0]!.toGlobal(c));
-          this.corners[i * 2]!.x = p.x;
-          this.corners[i * 2]!.y = p.y;
+      const singlePPanel = this.selectedPPanels[0];
+      if (this.selectedPPanels.length === 1 && singlePPanel !== undefined) {
+        singlePPanel.getCorners().forEach((c, i) => {
+          const p = this.toLocal(singlePPanel.toGlobal(c));
+          const corner = this.corners[i * 2];
+          if (corner) {
+            corner.x = p.x;
+            corner.y = p.y;
+          }
         });
       } else {
         let minX = Infinity;
@@ -217,7 +241,7 @@ export class PTransformer extends PIXI.Container {
         let maxX = -Infinity;
         let maxY = -Infinity;
         this.selectedPPanels.forEach((pPanel) => {
-          pPanel.getCorners().forEach((c, i) => {
+          pPanel.getCorners().forEach((c) => {
             const p = this.toLocal(pPanel.toGlobal(c));
             minX = Math.min(minX, p.x);
             minY = Math.min(minY, p.y);
@@ -225,26 +249,29 @@ export class PTransformer extends PIXI.Container {
             maxY = Math.max(maxY, p.y);
           });
         });
-        this.corners[0]!.x = minX;
-        this.corners[0]!.y = minY;
-        this.corners[2]!.x = maxX;
-        this.corners[2]!.y = minY;
-        this.corners[4]!.x = maxX;
-        this.corners[4]!.y = maxY;
-        this.corners[6]!.x = minX;
-        this.corners[6]!.y = maxY;
+        this.corners[0].x = minX;
+        this.corners[0].y = minY;
+        this.corners[2].x = maxX;
+        this.corners[2].y = minY;
+        this.corners[4].x = maxX;
+        this.corners[4].y = maxY;
+        this.corners[6].x = minX;
+        this.corners[6].y = maxY;
       }
       for (let i = 0; i < this.corners.length / 2; i++) {
-        const c = this.corners[i * 2 + 1]!;
+        const c = this.corners[i * 2 + 1];
         const pc = this.corners[i * 2];
-        const nc = this.corners[(i * 2 + 2) % this.corners.length]!;
+        const nc = this.corners[(i * 2 + 2) % this.corners.length];
+        if (c === undefined || pc === undefined || nc === undefined) {
+          continue;
+        }
         new Vec2(pc).add(nc).div(2).setTo(c);
       }
       const center = this.getCornersCenter();
       this.corners.forEach((c) => {
         const r = center.getDiff(c.position).atan2();
         c.currentRotation = r;
-        c.currentParentRotation = center.getDiff(this.corners[3]!).atan2();
+        c.currentParentRotation = center.getDiff(this.corners[3]).atan2();
       });
     }
     if (this.selectedPPanels.length > 0) {
