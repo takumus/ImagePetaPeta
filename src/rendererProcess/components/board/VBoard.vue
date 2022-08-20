@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw, computed } from "vue";
+import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -60,7 +60,6 @@ import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
-import deepcopy from "deepcopy";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void;
 }>();
