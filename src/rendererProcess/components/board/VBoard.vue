@@ -1,7 +1,7 @@
 <template>
   <t-board-root
     ref="boardRoot"
-    v-show="board"
+    v-show="currentBoard"
     :style="{
       zIndex: zIndex,
     }"
@@ -22,7 +22,7 @@
       v-show="!detailsMode"
       :zIndex="1"
       :visible="true"
-      :pPanelsArray="board?.petaPanels"
+      :pPanelsArray="currentBoard?.petaPanels"
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, getCurrentInstance } from "vue";
+import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw, computed } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -60,6 +60,7 @@ import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
+import deepcopy from "deepcopy";
 const emit = defineEmits<{
   (e: "change", board: PetaBoard): void;
 }>();
@@ -81,6 +82,7 @@ const loadProgress = ref(0);
 const croppingPetaPanel = ref<PetaPanel>();
 const cropping = ref(false);
 const dragging = ref(false);
+const dragged = ref(false);
 
 const dragOffset = new Vec2();
 const click = new ClickChecker();
@@ -107,11 +109,17 @@ let requestAnimationFrameHandle = 0;
 let keyboards: Keyboards = useKeyboardsStore();
 let cancelExtract: (() => Promise<void[]>) | undefined;
 let resolution = -1;
+let currentBoard = ref<PetaBoard>();
 onMounted(() => {
   setTimeout(() => {
     constructIfResolutionChanged();
   }, 200);
   resolutionMatchMedia.addEventListener("change", constructIfResolutionChanged);
+  pTransformer.updatePetaPanels = updatePetaPanels;
+  keyboards.enabled = !props.detailsMode;
+  keyboards.keys("Delete").down(removeSelectedPanels);
+  keyboards.keys("Backspace").down(removeSelectedPanels);
+  keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
 });
 onUnmounted(() => {
   destruct();
@@ -166,10 +174,6 @@ function construct() {
     resizer.observe(panelsBackground.value);
   }
   renderPIXI();
-  keyboards.enabled = !props.detailsMode;
-  keyboards.keys("Delete").down(removeSelectedPanels);
-  keyboards.keys("Backspace").down(removeSelectedPanels);
-  keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
   PIXI.Ticker.shared.add(updateAnimatedGIF);
 }
 function destruct() {
@@ -181,7 +185,6 @@ function destruct() {
     resizer?.unobserve(panelsBackground.value);
   }
   resizer?.disconnect();
-  keyboards?.destroy();
   PIXI.Ticker.shared.remove(updateAnimatedGIF);
   cancelAnimationFrame(requestAnimationFrameHandle);
 }
@@ -207,7 +210,7 @@ function preventWheelClick(event: PointerEvent) {
   }
 }
 function pointerdown(e: PIXI.InteractionEvent) {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
   const mouse = getMouseFromEvent(e);
@@ -219,7 +222,8 @@ function pointerdown(e: PIXI.InteractionEvent) {
   ) {
     mouseRightPressing = true;
     dragging.value = true;
-    dragOffset.set(props.board.transform.position).sub(mouse);
+    dragged.value = false;
+    dragOffset.set(currentBoard.value.transform.position).sub(mouse);
   } else if (e.data.button === MouseButton.LEFT) {
     mouseLeftPressing = true;
     const pPanel = getPPanelFromObject(e.target);
@@ -235,7 +239,7 @@ function pointerdown(e: PIXI.InteractionEvent) {
   orderPIXIRender();
 }
 function getPPanelFromObject(object: PIXI.DisplayObject) {
-  if (props.board?.petaPanels.includes((object as PPanel).petaPanel)) {
+  if (currentBoard.value?.petaPanels.includes((object as PPanel).petaPanel)) {
     return object as PPanel;
   }
   return undefined;
@@ -252,7 +256,7 @@ function pointerup(e: PIXI.InteractionEvent) {
       const pPanel = getPPanelFromObject(e.target);
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
-        selectedPPanels().forEach((pPanel) => (pPanel.dragging = false));
+        // selectedPPanels().forEach((pPanel) => (pPanel.dragging = false));
         petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
       } else if (!props.detailsMode) {
         _this.$components.contextMenu.open(
@@ -276,11 +280,14 @@ function pointerup(e: PIXI.InteractionEvent) {
       }
     }
     dragging.value = false;
+    if (!click.isClick) {
+      updatePetaBoard();
+    }
   } else if (e.data.button === MouseButton.LEFT) {
     mouseLeftPressing = false;
-    pPanelsArray().forEach((pPanel) => {
-      pPanel.dragging = false;
-    });
+    // pPanelsArray().forEach((pPanel) => {
+    //   pPanel.dragging = false;
+    // });
     selecting = false;
   }
   orderPIXIRender();
@@ -288,7 +295,7 @@ function pointerup(e: PIXI.InteractionEvent) {
 function pointermove(e: PIXI.InteractionEvent) {
   const mouse = getMouseFromEvent(e);
   mousePosition.set(mouse);
-  pTransformer.mousePosition.set(mouse);
+  // pTransformer.mousePosition.set(mouse);
   click.move(mousePosition);
   if (mouseLeftPressing || mouseRightPressing) {
     orderPIXIRender();
@@ -298,58 +305,67 @@ function getMouseFromEvent(e: PIXI.InteractionEvent) {
   return new Vec2(e.data.global);
 }
 function wheel(event: WheelEvent) {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
   const mouse = vec2FromPointerEvent(event).sub(mouseOffset).sub(stageRect.clone().div(2));
   if (event.ctrlKey || _this.$systemInfo.platform === "win32") {
-    const currentZoom = props.board.transform.scale;
-    ref(props.board).value.transform.scale *= 1 + -event.deltaY * _this.$settings.zoomSensitivity * 0.00001;
-    if (props.board.transform.scale > BOARD_ZOOM_MAX) {
-      ref(props.board).value.transform.scale = BOARD_ZOOM_MAX;
-    } else if (props.board.transform.scale < BOARD_ZOOM_MIN) {
-      ref(props.board).value.transform.scale = BOARD_ZOOM_MIN;
+    const currentZoom = currentBoard.value.transform.scale;
+    currentBoard.value.transform.scale *= 1 + -event.deltaY * _this.$settings.zoomSensitivity * 0.00001;
+    if (currentBoard.value.transform.scale > BOARD_ZOOM_MAX) {
+      currentBoard.value.transform.scale = BOARD_ZOOM_MAX;
+    } else if (currentBoard.value.transform.scale < BOARD_ZOOM_MIN) {
+      currentBoard.value.transform.scale = BOARD_ZOOM_MIN;
     }
-    props.board.transform.position
+    currentBoard.value.transform.position
       .mult(-1)
       .add(mouse)
-      .mult(props.board.transform.scale / currentZoom)
+      .mult(currentBoard.value.transform.scale / currentZoom)
       .sub(mouse)
       .mult(-1);
   } else {
-    props.board.transform.position.add(
+    currentBoard.value.transform.position.add(
       new Vec2(event.deltaX, event.deltaY).mult(_this.$settings.moveSensitivity).mult(-0.01),
     );
   }
+  updatePetaBoard();
   orderPIXIRender();
 }
 function updateRect() {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
   crossLine.clear();
-  crossLine.lineStyle(1, Number(props.board.background.lineColor.replace("#", "0x")), 1, undefined, true);
+  crossLine.lineStyle(1, Number(currentBoard.value.background.lineColor.replace("#", "0x")), 1, undefined, true);
   crossLine.moveTo(-stageRect.x, 0);
   crossLine.lineTo(stageRect.x, 0);
   crossLine.moveTo(0, -stageRect.y);
   crossLine.lineTo(0, stageRect.y);
   backgroundSprite.clear();
   backgroundSprite.hitArea = new Rectangle(0, 0, stageRect.x, stageRect.y);
-  backgroundSprite.beginFill(Number(props.board.background.fillColor.replace("#", "0x")));
+  backgroundSprite.beginFill(Number(currentBoard.value.background.fillColor.replace("#", "0x")));
   backgroundSprite.drawRect(0, 0, stageRect.x, stageRect.y);
 }
 function animate() {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
-  rootContainer.scale.set(props.board.transform.scale);
-  pTransformer.setScale(1 / props.board.transform.scale);
+  const boardScale = currentBoard.value.transform.scale;
+  rootContainer.scale.set(boardScale);
+  pPanelsArray().forEach((pp) => {
+    pp.setZoomScale(boardScale);
+  });
+  pTransformer.setScale(1 / boardScale);
   pTransformer.update();
 
   if (dragging.value) {
-    props.board.transform.position.set(mousePosition).add(dragOffset);
+    const prev = currentBoard.value.transform.position.clone();
+    currentBoard.value.transform.position.set(mousePosition).add(dragOffset);
+    if (!prev.equals(currentBoard.value.transform.position)) {
+      dragged.value = true;
+    }
   }
-  props.board.transform.position.setTo(rootContainer);
+  currentBoard.value.transform.position.setTo(rootContainer);
   new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(crossLine);
   const offset = 0;
   crossLine.x = clamp(crossLine.x, offset, stageRect.x - offset);
@@ -357,7 +373,7 @@ function animate() {
   pSelection.clear();
   if (selecting) {
     pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
-    pSelection.draw(props.board.transform.scale);
+    pSelection.draw(boardScale);
     pPanelsArray().forEach((pPanel) => {
       const pPanelRect = pPanel.getRect();
       Object.values(pPanelRect).map((position) => {
@@ -380,22 +396,24 @@ function animate() {
   });
 }
 function resetTransform() {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
-  ref(props.board).value.transform.scale = 1;
-  props.board.transform.position.set(0, 0);
+  currentBoard.value.transform.scale = 1;
+  currentBoard.value.transform.position.set(0, 0);
   orderPIXIRender();
+  updatePetaBoard();
 }
 function removeSelectedPanels() {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
   selectedPPanels().forEach((pPanel) => {
     removePPanel(pPanel);
   });
-  ref(props.board).value.petaPanels = pPanelsArray().map((pPanel) => pPanel.petaPanel);
+  currentBoard.value.petaPanels = pPanelsArray().map((pPanel) => pPanel.petaPanel);
   orderPIXIRender();
+  updatePetaBoard();
 }
 function removePPanel(pPanel: PPanel) {
   panelsCenterWrapper.removeChild(pPanel);
@@ -453,6 +471,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
           } else {
             _pPanel?.playGIF();
           }
+          updatePetaBoard();
         },
       },
       {
@@ -476,6 +495,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.width = -pPanel.petaPanel.width;
           });
+          updatePetaBoard();
         },
       },
       {
@@ -484,6 +504,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.height = -pPanel.petaPanel.height;
           });
+          updatePetaBoard();
         },
       },
       {
@@ -515,7 +536,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
   );
 }
 async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
   endCrop();
@@ -523,11 +544,13 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
     clearSelectionAll();
   }
   const offset = new Vec2(20, 20).mult(offsetIndex);
-  petaPanel.width *= 1 / props.board.transform.scale;
-  petaPanel.height *= 1 / props.board.transform.scale;
+  petaPanel.width *= 1 / currentBoard.value.transform.scale;
+  petaPanel.height *= 1 / currentBoard.value.transform.scale;
   petaPanel.position.sub(mouseOffset);
   petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-  petaPanel.index = Math.max(...props.board.petaPanels.map((petaPanel) => petaPanel.index)) + 1;
+  petaPanel.index = Math.max(...currentBoard.value.petaPanels.map((petaPanel) => petaPanel.index)) + 1;
+  currentBoard.value.petaPanels.push(petaPanel);
+  updatePetaBoard();
 }
 function beginCrop(petaPanel: PetaPanel) {
   croppingPetaPanel.value = petaPanel;
@@ -554,6 +577,7 @@ function updateCrop(petaPanel: PetaPanel) {
       petaPanel.width *
         ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width)),
     ) * sign;
+  updatePetaBoard();
   orderPIXIRender();
 }
 function clearSelectionAll(force = false) {
@@ -564,17 +588,24 @@ function clearSelectionAll(force = false) {
   }
 }
 function sortIndex() {
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
-  ref(props.board)
-    .value.petaPanels.sort((a, b) => a.index - b.index)
+  let updated = false;
+  currentBoard.value.petaPanels
+    .sort((a, b) => a.index - b.index)
     .forEach((petaPanel, i) => {
+      if (petaPanel.index !== i) {
+        updated = true;
+      }
       petaPanel.index = i;
     });
   panelsCenterWrapper.children.sort((a, b) => {
     return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
   });
+  if (updated) {
+    updatePetaBoard();
+  }
   orderPIXIRender();
 }
 async function load(params: {
@@ -607,33 +638,33 @@ async function load(params: {
     });
     pTransformer.pPanels = pPanels = {};
   }
-  if (!props.board) {
+  if (!currentBoard.value) {
     return;
   }
-  if (props.board.petaPanels.length === 0) {
+  if (currentBoard.value.petaPanels.length === 0) {
     extracting.value = false;
     loading.value = false;
     Cursor.setDefaultCursor();
-    _this.$states.loadedPetaBoardId = props.board.id;
+    _this.$states.loadedPetaBoardId = currentBoard.value.id;
     return;
   }
-  log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(props.board.id));
+  log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(currentBoard.value.id));
   let loaded = 0;
   const extract = async (petaPanel: PetaPanel, index: number) => {
-    if (props.board === undefined) {
+    if (currentBoard.value === undefined) {
       return;
     }
-    const progress = `${index + 1}/${props.board.petaPanels.length}`;
+    const progress = `${index + 1}/${currentBoard.value.petaPanels.length}`;
     let loadResult = "";
     try {
       const onLoaded = (petaPanel: PetaPanel) => {
         loaded++;
-        if (props.board) {
-          loadProgress.value = Math.floor((loaded / props.board.petaPanels.length) * 100);
-          const progress = `${loaded}/${props.board.petaPanels.length}`;
+        if (currentBoard.value) {
+          loadProgress.value = Math.floor((loaded / currentBoard.value.petaPanels.length) * 100);
+          const progress = `${loaded}/${currentBoard.value.petaPanels.length}`;
           extractingLog.value =
             `load complete   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
-          if (loaded == props.board.petaPanels.length) {
+          if (loaded == currentBoard.value.petaPanels.length) {
             loading.value = false;
           }
         }
@@ -642,7 +673,7 @@ async function load(params: {
       if (pPanel === undefined) {
         // pPanelが無ければ作成。
         pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel);
-        pPanel.setZoomScale(props.board?.transform.scale || 1);
+        pPanel.setZoomScale(currentBoard.value?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
         pPanel.onUpdateGIF = onUpdateGif;
@@ -696,9 +727,9 @@ async function load(params: {
       extractingLog.value =
         `extract error   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
     }
-    extractProgress.value = ((index + 1) / props.board.petaPanels.length) * 100;
+    extractProgress.value = ((index + 1) / currentBoard.value.petaPanels.length) * 100;
   };
-  const extraction = promiseSerial(extract, [...props.board.petaPanels]);
+  const extraction = promiseSerial(extract, [...currentBoard.value.petaPanels]);
   cancelExtract = extraction.cancel;
   try {
     await extraction.promise;
@@ -717,7 +748,7 @@ async function load(params: {
   });
   Cursor.setDefaultCursor();
   if (!props.detailsMode) {
-    _this.$states.loadedPetaBoardId = props.board.id;
+    _this.$states.loadedPetaBoardId = currentBoard.value.id;
   }
 }
 function onUpdateGif() {
@@ -727,7 +758,7 @@ function onUpdateGif() {
   orderPIXIRender();
 }
 function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
-  if (!props.board || props.detailsMode) {
+  if (!currentBoard.value || props.detailsMode) {
     return;
   }
   if (
@@ -771,7 +802,7 @@ function updateDetailsPetaPanel() {
   if (!props.detailsMode) {
     return;
   }
-  const petaPanel = props.board?.petaPanels[0];
+  const petaPanel = currentBoard.value?.petaPanels[0];
   const petaImage = petaPanel?._petaImage;
   if (petaPanel && petaImage) {
     let width = 0;
@@ -800,12 +831,39 @@ function selectedPPanels() {
 function unselectedPPanels() {
   return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
 }
+function updatePetaBoard() {
+  if (currentBoard.value) {
+    console.log("update board");
+    emit("change", currentBoard.value);
+  }
+}
+function updatePetaPanels() {
+  updatePetaBoard();
+}
+watch(
+  () => nsfwStore.state.value,
+  () => {
+    pPanelsArray().forEach((pp) => {
+      pp.showNSFW = nsfwStore.state.value;
+    });
+    orderPIXIRender();
+  },
+);
 watch(
   () => props.board?.background,
   () => {
-    if (props.board) {
+    if (props.board && currentBoard.value) {
+      currentBoard.value.background = toRaw(props.board.background);
       updateRect();
-      emit("change", props.board);
+      orderPIXIRender();
+    }
+  },
+);
+watch(
+  () => props.board?.transform,
+  () => {
+    if (props.board && currentBoard.value) {
+      currentBoard.value.transform = toRaw(props.board.transform);
       orderPIXIRender();
     }
   },
@@ -813,9 +871,11 @@ watch(
 watch(
   () => props.board?.id,
   () => {
+    currentBoard.value = toRaw(props.board);
     load({});
   },
 );
+
 defineExpose({
   load,
   addPanel,

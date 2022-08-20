@@ -29,7 +29,7 @@
      {{name}}
     </div> -->
     <t-thumb
-      :v-if="url"
+      v-if="url"
       :style="{
         backgroundImage: `url(${url})`,
       }"

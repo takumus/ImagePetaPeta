@@ -7,7 +7,6 @@ import { PTransformerDashedLine } from "@/rendererProcess/components/board/ppane
 import { PTransformerControlPoint } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerControlPoint";
 import deepcopy from "deepcopy";
 import { ROTATION_BLOCK_INCREMENT } from "@/commons/defines";
-import { Ref } from "vue";
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",
@@ -31,9 +30,10 @@ export class PTransformer extends PIXI.Container {
   click = new ClickChecker();
   pMultipleSelection: PTransformerDashedLine = new PTransformerDashedLine();
   draggingPanels = false;
-  mousePosition = new Vec2();
+  private mousePosition = new Vec2();
   _scale = 0;
   fit = false;
+  updatePetaPanels?: () => void;
   constructor(public pPanels: { [key: string]: PPanel }) {
     super();
     for (let i = 0; i < 8; i++) {
@@ -63,6 +63,8 @@ export class PTransformer extends PIXI.Container {
     });
   }
   beginSizing(index: number, e: PIXI.InteractionEvent) {
+    this.mousePosition.set(e.data.global);
+    this.click.down(e.data.global);
     this.controlStatus = ControlStatus.PANEL_SIZE;
     this.sizingCornerIndex = index;
     this.beginSizingPosition = new Vec2(e.data.global);
@@ -75,6 +77,8 @@ export class PTransformer extends PIXI.Container {
     this.beginSizingDistance = this.pairCorner.getDistance(this.corners[this.sizingCornerIndex]!);
   }
   beginRotating(index: number, e: PIXI.InteractionEvent) {
+    this.mousePosition.set(e.data.global);
+    this.click.down(e.data.global);
     this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
       const p = deepcopy(pPanel.petaPanel);
       delete p._petaImage;
@@ -111,6 +115,8 @@ export class PTransformer extends PIXI.Container {
     return Object.values(this.pPanels);
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
+    this.mousePosition.set(e.data.global);
+    this.click.down(e.data.global);
     this.controlStatus = ControlStatus.PANEL_DRAG;
     const mouse = new Vec2(e.data.global);
     this.selectedPPanels.forEach((pPanel) => {
@@ -120,10 +126,26 @@ export class PTransformer extends PIXI.Container {
     });
   }
   pointerup(e: PIXI.InteractionEvent) {
+    if (this.controlStatus === ControlStatus.PANEL_DRAG) {
+      this.selectedPPanels.forEach((pPanel) => {
+        pPanel.dragging = false;
+      });
+    }
+    if (this.controlStatus !== ControlStatus.NONE) {
+      if (!this.click.isClick) {
+        this.updatePetaPanels?.();
+      }
+    }
     this.controlStatus = ControlStatus.NONE;
   }
   pointermove(e: PIXI.InteractionEvent) {
-    this.click.move(e.data.global);
+    if (this.controlStatus !== ControlStatus.NONE) {
+      this.click.move(e.data.global);
+      if (this.click.isClick) {
+        return;
+      }
+      this.mousePosition.set(e.data.global);
+    }
     if (this.controlStatus === ControlStatus.PANEL_SIZE) {
       const scale = this.pairCorner.getDistance(this.toLocal(e.data.global)) / this.beginSizingDistance;
       this.selectedPPanels.forEach((pPanel, i) => {

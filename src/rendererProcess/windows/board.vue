@@ -198,9 +198,8 @@ export default class BoardIndex extends Vue {
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
         this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id]!.initData(petaBoardsToDBPetaBoards(board));
         this.boardUpdaters[board.id]!.onUpdate((board) => {
-          API.send("updatePetaBoards", [board], UpdateMode.UPDATE);
+          API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
         });
       }
     });
@@ -244,7 +243,6 @@ export default class BoardIndex extends Vue {
   }
   addPanel(petaPanel: PetaPanel, offsetIndex: number) {
     if (!this.currentPetaBoard) return;
-    this.currentPetaBoard.petaPanels.push(petaPanel);
     this.vPetaBoard.addPanel(petaPanel, offsetIndex);
   }
   async selectPetaBoard(board: PetaBoard | undefined) {
@@ -272,10 +270,7 @@ export default class BoardIndex extends Vue {
     this.currentPetaBoardId = board.id;
   }
   savePetaBoard(board: PetaBoard, immidiately: boolean) {
-    this.boardUpdaters[board.id]!.order(petaBoardsToDBPetaBoards(board));
-    if (immidiately) {
-      this.boardUpdaters[board.id]!.forceUpdate();
-    }
+    this.boardUpdaters[board.id]!.order(board);
   }
   async removePetaBoard(board: PetaBoard) {
     if (
@@ -286,7 +281,8 @@ export default class BoardIndex extends Vue {
     ) {
       return;
     }
-    this.boardUpdaters[board.id]!.forceUpdate();
+    this.boardUpdaters[board.id]!.destroy();
+    delete this.boardUpdaters[board.id];
     const leftBoardId = this.boards[this.boards.findIndex((b) => b.id === board.id) - 1]?.id;
     await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();

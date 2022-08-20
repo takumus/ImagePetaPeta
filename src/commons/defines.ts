@@ -1,7 +1,7 @@
 export const IMG_TAG_WIDTH = 10000;
 export const DEFAULT_BOARD_NAME = "noname";
 export const SAVE_DELAY = 500;
-export const CLICK_OFFSET = 8;
+export const CLICK_OFFSET = 4;
 export const DEFAULT_IMAGE_SIZE = 128;
 export const PACKAGE_JSON_URL = "http://18.183.141.141/ImagePetaPeta/package.json";
 export const DOWNLOAD_URL = "https://github.com/takumus/ImagePetaPeta/releases/tag/";

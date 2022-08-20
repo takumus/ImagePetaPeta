@@ -94,6 +94,9 @@ export class Vec2 {
   public toString() {
     return "(" + this.x.toFixed(4) + "," + this.y.toFixed(4) + ")";
   }
+  public equals(vec2: XYObject) {
+    return vec2.x === this.x && vec2.y === this.y;
+  }
 }
 export function vec2FromPointerEvent(event: MouseEvent | PointerEvent | WheelEvent | DragEvent) {
   return new Vec2(event.clientX, event.clientY);
