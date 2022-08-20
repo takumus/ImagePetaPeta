@@ -1,8 +1,7 @@
-const task = require("./@task");
-const fs = require("fs");
-const licenseChecker = require("license-checker");
-const customLicenses = require("./customLicenses");
-task("generate licenses", async (log) => {
+const script = require("./@script");
+script.run("generate licenses", async (log) => {
+  const licenseChecker = require("license-checker");
+  const customLicenses = require("./customLicenses");
   const packages = {
     ...(await new Promise((res, rej) => {
       licenseChecker.init(
@@ -29,7 +28,7 @@ task("generate licenses", async (log) => {
     let licensesText = "";
     if (!data.customLicensesText) {
       try {
-        licensesText = fs.readFileSync(data.licenseFile).toString();
+        licensesText = script.utils.read(data.licenseFile).toString();
       } catch {
         licensesText = "";
       }
@@ -52,9 +51,11 @@ task("generate licenses", async (log) => {
         .replace(/\n$/, ""), // 最後の改行削除
     };
   });
-  fs.writeFileSync("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(licenses, null, 2)}`, {
-    encoding: "utf-8",
-  });
+  log(
+    script.utils.write("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(licenses, null, 2)}`, {
+      encoding: "utf-8",
+    }),
+  );
   log(
     Object.keys(licensesCounts)
       .map((key) => `${key}: ${licensesCounts[key]}`)

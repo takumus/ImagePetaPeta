@@ -17,10 +17,10 @@ module.exports = {
       resources: {
         dir: "./dist/electron_resources",
         win: {
-          appIcon: "./dist/electron_resources/WindowsIcon.ico",
+          appIcon: "./dist/electron_resources/app_icon_win.ico",
         },
         mac: {
-          appIcon: "./dist/electron_resources/MacIcon.png",
+          appIcon: "./dist/electron_resources/app_icon_mac.png",
         },
       },
     },
