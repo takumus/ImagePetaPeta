@@ -200,11 +200,15 @@ export default class BoardIndex extends Vue {
     this.boards = await API.send("getPetaBoards");
     dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
     this.boards.forEach((board) => {
-      if (!this.boardUpdaters[board.id]) {
-        (this.boardUpdaters[board.id] = new DelayUpdater<PetaBoard>(SAVE_DELAY)).onUpdate((board) => {
-          API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
-        });
+      let updater = this.boardUpdaters[board.id];
+      if (updater) {
+        updater.destroy();
       }
+      updater = this.boardUpdaters[board.id] = new DelayUpdater<PetaBoard>(SAVE_DELAY);
+      updater.initData(board);
+      updater.onUpdate((board) => {
+        API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
+      });
     });
   }
   addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
@@ -228,25 +232,17 @@ export default class BoardIndex extends Vue {
         DEFAULT_IMAGE_SIZE,
         petaImage.height * DEFAULT_IMAGE_SIZE,
       );
-      // if (!this.$components.browser.visible) {
-      this.addPanel(panel, offsetIndex++);
-      // }
+      this.vPetaBoard.addPanel(panel, offsetIndex);
     });
-    if (this.orderedAddPanelIds.length > 0) {
-      this.orderedAddPanelIds = [];
-      if (this.currentPetaBoard) {
-        this.vPetaBoard.load({
-          reload: {
-            additions: [],
-            deletions: [],
-          },
-        });
-      }
+    if (this.currentPetaBoard && this.orderedAddPanelIds.length > 0) {
+      this.vPetaBoard.load({
+        reload: {
+          additions: this.orderedAddPanelIds,
+          deletions: [],
+        },
+      });
     }
-  }
-  addPanel(petaPanel: PetaPanel, offsetIndex: number) {
-    if (!this.currentPetaBoard) return;
-    this.vPetaBoard.addPanel(petaPanel, offsetIndex);
+    this.orderedAddPanelIds = [];
   }
   async selectPetaBoard(board: PetaBoard | undefined) {
     if (!board) {
@@ -324,12 +320,10 @@ export default class BoardIndex extends Vue {
     if (this.boards[index]) {
       this.boards[index] = board;
     }
-    // console.log(board.id);
     this.savePetaBoard(board);
   }
   @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {
-    // console.log(this.$focusedWindows.focused);
     if (!this.$focusedWindows.focused) {
       this.vPetaBoard.clearSelectionAll(true);
       this.vPetaBoard.orderPIXIRender();

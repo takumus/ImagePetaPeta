@@ -60,6 +60,7 @@ import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
+import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -105,7 +106,7 @@ let mouseRightPressing = false;
 let renderOrdered = false;
 let selecting = false;
 let requestAnimationFrameHandle = 0;
-let keyboards: Keyboards = useKeyboardsStore();
+let keyboards: Keyboards = useKeyboardsStore(true);
 let cancelExtract: (() => Promise<void[]>) | undefined;
 let resolution = -1;
 let currentBoard = ref<PetaBoard>();
@@ -407,6 +408,9 @@ function removeSelectedPanels() {
   if (!currentBoard.value) {
     return;
   }
+  if (isKeyboardLocked()) {
+    return;
+  }
   selectedPPanels().forEach((pPanel) => {
     removePPanel(pPanel);
   });
@@ -590,21 +594,15 @@ function sortIndex() {
   if (!currentBoard.value) {
     return;
   }
-  let updated = false;
   currentBoard.value.petaPanels
     .sort((a, b) => a.index - b.index)
     .forEach((petaPanel, i) => {
-      if (petaPanel.index !== i) {
-        updated = true;
-      }
       petaPanel.index = i;
     });
   panelsCenterWrapper.children.sort((a, b) => {
     return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
   });
-  if (updated) {
-    updatePetaBoard();
-  }
+  updatePetaBoard();
   orderPIXIRender();
 }
 async function load(params: {
@@ -616,6 +614,25 @@ async function load(params: {
   updateDetailsPetaPanel();
   const log = logChunk().log;
   endCrop();
+  // リロードじゃないならクリア。
+  if (params.reload === undefined) {
+    pPanelsArray().forEach((pPanel) => {
+      removePPanel(pPanel);
+    });
+    pTransformer.pPanels = pPanels = {};
+  }
+  if (currentBoard.value === undefined) {
+    return;
+  }
+  if (params.reload && params.reload.additions.length === 0 && params.reload.deletions.length === 0) {
+    currentBoard.value.petaPanels.forEach((petaPanel) => {
+      const pPanel = pPanels[petaPanel.id];
+      if (pPanel) {
+        pPanel.petaPanel = petaPanel;
+      }
+    });
+    return;
+  }
   Cursor.setCursor("wait");
   extracting.value = true;
   loading.value = true;
@@ -629,16 +646,6 @@ async function load(params: {
     await cancelExtract();
     log("vBoard", `canceled loading`);
     return load(params);
-  }
-  // リロードじゃないならクリア。
-  if (params.reload === undefined) {
-    pPanelsArray().forEach((pPanel) => {
-      removePPanel(pPanel);
-    });
-    pTransformer.pPanels = pPanels = {};
-  }
-  if (!currentBoard.value) {
-    return;
   }
   if (currentBoard.value.petaPanels.length === 0) {
     extracting.value = false;
@@ -832,7 +839,6 @@ function unselectedPPanels() {
 }
 function updatePetaBoard() {
   if (currentBoard.value) {
-    console.log("update board");
     emit("update:board", currentBoard.value);
   }
 }
@@ -848,30 +854,30 @@ watch(
     orderPIXIRender();
   },
 );
+// ボードの変更をウォッチ
 watch(
-  () => props.board?.background,
+  () => props.board,
   () => {
-    if (props.board && currentBoard.value) {
-      currentBoard.value.background = toRaw(props.board.background);
-      updateRect();
-      orderPIXIRender();
-    }
-  },
-);
-watch(
-  () => props.board?.transform,
-  () => {
-    if (props.board && currentBoard.value) {
-      currentBoard.value.transform = toRaw(props.board.transform);
-      orderPIXIRender();
-    }
-  },
-);
-watch(
-  () => props.board?.id,
-  () => {
+    // 現在のボードと同じか確認
+    const same = props.board && currentBoard.value?.id === props.board?.id;
+    // 新しいのにする
     currentBoard.value = toRaw(props.board);
-    load({});
+    // 背景色なども変わってるかもしれないので背景再描画
+    updateRect();
+    // レンダリング予約
+    orderPIXIRender();
+    if (!same) {
+      // 違ったらフルロード
+      load({});
+    } else {
+      // 同じならデータの参照のみ更新
+      load({
+        reload: {
+          additions: [],
+          deletions: [],
+        },
+      });
+    }
   },
 );
 
