@@ -200,16 +200,16 @@ export class PTransformer extends PIXI.Container {
           ),
         );
       });
-    }
-  }
-  update() {
-    if (this.controlStatus === ControlStatus.PANEL_DRAG) {
+    } else if (this.controlStatus === ControlStatus.PANEL_DRAG) {
       this.pPanelsArray
         .filter((pPanel) => pPanel.dragging)
         .forEach((pPanel) => {
           pPanel.petaPanel.position = new Vec2(pPanel.parent.toLocal(this.mousePosition)).add(pPanel.draggingOffset);
         });
-    } else if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
+    }
+  }
+  update() {
+    if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.corners.forEach((c, i) => {
         const beginTransformCorner = this.beginTransformCorners[i];
