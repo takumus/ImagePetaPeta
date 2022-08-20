@@ -65,7 +65,6 @@ import {
   BOARD_ADD_MULTIPLE_OFFSET_Y,
   DEFAULT_BOARD_NAME,
   DEFAULT_IMAGE_SIZE,
-  DOWNLOAD_URL,
   SAVE_DELAY,
 } from "@/commons/defines";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
@@ -80,7 +79,6 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
 import { Vec2 } from "@/commons/utils/vec2";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
 import { WindowType } from "@/commons/datas/windowType";
@@ -203,8 +201,7 @@ export default class BoardIndex extends Vue {
     dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
     this.boards.forEach((board) => {
       if (!this.boardUpdaters[board.id]) {
-        this.boardUpdaters[board.id] = new DelayUpdater(SAVE_DELAY);
-        this.boardUpdaters[board.id]!.onUpdate((board) => {
+        (this.boardUpdaters[board.id] = new DelayUpdater<PetaBoard>(SAVE_DELAY)).onUpdate((board) => {
           API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
         });
       }
@@ -275,8 +272,8 @@ export default class BoardIndex extends Vue {
     }
     this.currentPetaBoardId = board.id;
   }
-  savePetaBoard(board: PetaBoard, immidiately: boolean) {
-    this.boardUpdaters[board.id]!.order(board);
+  savePetaBoard(board: PetaBoard) {
+    this.boardUpdaters[board.id]?.order(board);
   }
   async removePetaBoard(board: PetaBoard) {
     if (
@@ -287,7 +284,7 @@ export default class BoardIndex extends Vue {
     ) {
       return;
     }
-    this.boardUpdaters[board.id]!.destroy();
+    this.boardUpdaters[board.id]?.destroy();
     delete this.boardUpdaters[board.id];
     const leftBoardId = this.boards[this.boards.findIndex((b) => b.id === board.id) - 1]?.id;
     await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
@@ -328,7 +325,7 @@ export default class BoardIndex extends Vue {
       this.boards[index] = board;
     }
     // console.log(board.id);
-    this.savePetaBoard(board, false);
+    this.savePetaBoard(board);
   }
   @Watch("$focusedWindows.focused")
   changeWindowIsFocused() {
