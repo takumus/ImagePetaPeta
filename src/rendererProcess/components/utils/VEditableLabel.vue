@@ -59,7 +59,6 @@ const tempText = ref("Hello");
 const editing = ref(false);
 const keyboards = useKeyboardsStore(false);
 onMounted(() => {
-  console.log("mounted");
   changeLabel();
   keyboards.keys("Backspace", "Delete").down(() => {
     if (tempText.value === "") {
