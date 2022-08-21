@@ -23,13 +23,12 @@
 <script setup lang="ts">
 // Vue
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
-import { ref, getCurrentInstance } from "vue";
+import { ref } from "vue";
 
 defineProps<{
   zIndex: number;
 }>();
 
-const _this = getCurrentInstance()!.proxy!;
 const items = ref<string[]>([]);
 const label = ref("");
 const visible = ref(false);

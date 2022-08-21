@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw } from "vue";
+import { ref, onMounted, onUnmounted, watch, toRaw } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -83,7 +83,6 @@ const settingsStore = useSettingsStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-const _this = getCurrentInstance()!.proxy!;
 const panelsBackground = ref<HTMLElement>();
 const layer = ref<typeof VLayer>();
 const extracting = ref(false);

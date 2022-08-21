@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 // Others
 import { v4 as uuid } from "uuid";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
@@ -43,8 +43,8 @@ import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
 const props = defineProps<{
   visible?: boolean;
-  parentStyle?: any;
-  childStyle?: any;
+  parentStyle?: CSSStyleDeclaration;
+  childStyle?: CSSStyleDeclaration;
   center?: boolean;
   visibleCloseButton?: boolean;
   ignore?: boolean;
@@ -54,9 +54,8 @@ const emit = defineEmits<{
   (e: "state", visible: boolean): void;
   (e: "close"): void;
 }>();
-const _this = getCurrentInstance()!.proxy!;
 const textsStore = useTextsStore();
-const { modal } = useComponentsStore();
+const components = useComponentsStore();
 const zIndex = ref(0);
 const noBackground = ref(false);
 const background = ref<HTMLElement>();
@@ -94,10 +93,10 @@ function pointerup(event: PointerEvent) {
   }
 }
 const isActive = computed(() => {
-  return modalId === modal.modalIds[modal.modalIds.length - 1];
+  return modalId === components.modal.modalIds[components.modal.modalIds.length - 1];
 });
 watch(
-  () => modal.modalIds,
+  () => components.modal.modalIds,
   () => {
     noBackground.value = !isActive.value;
   },
@@ -109,12 +108,12 @@ watch(
       return;
     }
     // 自分のidを除外
-    modal.modalIds = modal.modalIds.filter((id) => id != modalId);
+    components.modal.modalIds = components.modal.modalIds.filter((id) => id != modalId);
     if (props.visible) {
       // 自分のidを追加
-      modal.modalIds.push(modalId);
-      zIndex.value = modal.currentModalZIndex + 3;
-      modal.currentModalZIndex++;
+      components.modal.modalIds.push(modalId);
+      zIndex.value = components.modal.currentModalZIndex + 3;
+      components.modal.currentModalZIndex++;
     }
   },
 );

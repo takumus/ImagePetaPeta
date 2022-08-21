@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, getCurrentInstance, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { computed } from "@vue/reactivity";
 
 // Others
@@ -38,7 +38,6 @@ defineProps<{
   zIndex: number;
 }>();
 
-const _this = getCurrentInstance()!.proxy!;
 const contextMenu = ref<HTMLElement>();
 const items = ref<ContextMenuItem[]>([]);
 const position = ref(new Vec2(0, 0));

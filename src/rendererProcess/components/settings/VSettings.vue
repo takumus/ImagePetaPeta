@@ -161,7 +161,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
@@ -174,7 +174,6 @@ import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
-const _this = getCurrentInstance()!.proxy!;
 const settingsStore = useSettingsStore();
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();

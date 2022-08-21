@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 // Components
 import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
@@ -98,7 +98,6 @@ import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
-const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();

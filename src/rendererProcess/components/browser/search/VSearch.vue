@@ -36,11 +36,10 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import { ref } from "@vue/reactivity";
-import { computed, getCurrentInstance, nextTick } from "@vue/runtime-core";
+import { computed, nextTick } from "@vue/runtime-core";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
-const _this = getCurrentInstance()!.proxy!;
 const searchInput = ref<typeof VEditableLabel>();
 const textsStore = useTextsStore();
 const components = useComponentsStore();

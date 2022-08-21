@@ -109,7 +109,7 @@ import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import dateFormat from "dateformat";
-import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
@@ -129,7 +129,6 @@ const fetchingTags = ref(false);
 const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
 const noteTextArea = ref<HTMLTextAreaElement>();
-const _this = getCurrentInstance()!.proxy!;
 const darkModeStore = useDarkModeStore();
 async function addTag(name: string) {
   // タグを探す。なかったら作る。

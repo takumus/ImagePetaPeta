@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance } from "vue";
+import { computed } from "vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
@@ -44,7 +44,6 @@ const components = useComponentsStore();
 const { t } = useI18n();
 const { windowType } = useWindowTypeStore();
 const windowStatusStore = useWindowStatusStore();
-const _this = getCurrentInstance()!.proxy!;
 function openBoard() {
   API.send("openWindow", WindowType.BOARD);
 }

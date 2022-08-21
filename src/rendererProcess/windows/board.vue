@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 // Components
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
@@ -84,7 +84,6 @@ import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
-const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();

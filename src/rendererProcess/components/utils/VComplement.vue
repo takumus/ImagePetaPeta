@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, getCurrentInstance, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
@@ -42,7 +42,6 @@ defineProps<{
   zIndex: number;
 }>();
 
-const _this = getCurrentInstance()!.proxy!;
 const complement = ref<HTMLElement>();
 const items = ref<string[]>([]);
 const filteredItems = ref<string[]>([]);

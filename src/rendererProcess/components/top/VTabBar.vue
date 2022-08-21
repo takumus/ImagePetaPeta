@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
+import { computed, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
@@ -46,7 +46,6 @@ import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
-const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
   (e: "add"): void;
   (e: "remove", board: PetaBoard): void;
