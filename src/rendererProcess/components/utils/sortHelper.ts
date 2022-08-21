@@ -1,4 +1,3 @@
-import { Vue } from "vue-class-component";
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export class SortHelper<T extends { data: any; id: number }, C extends { $el: HTMLElement }> {
   layers!: HTMLElement;
