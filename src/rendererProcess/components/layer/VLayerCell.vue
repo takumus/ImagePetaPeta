@@ -41,14 +41,13 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ImageType } from "@/commons/datas/imageType";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
-import { prop } from "vue-class-component";
 // Others
 const emit = defineEmits<{
   (e: "startDrag", cellData: { id: number; data: PetaPanel }, event: PointerEvent): void;
@@ -97,9 +96,9 @@ const locked = computed(() => {
 const visible = computed(() => {
   return props.cellData?.data.visible;
 });
-const name = computed(() => {
-  return props.cellData?.data._petaImage?.name || "";
-});
+// const name = computed(() => {
+//   return props.cellData?.data._petaImage?.name || "";
+// });
 const showNSFW = computed(() => {
   return props.cellData?.data._petaImage?.nsfw && !nsfwStore.state.value;
 });
@@ -138,7 +137,9 @@ function pointermove(event: PointerEvent) {
   click.move(vec2FromPointerEvent(event));
   if (!click.isClick) {
     mouseIsDown = false;
-    emit("startDrag", props.cellData, event);
+    if (props.cellData) {
+      emit("startDrag", props.cellData, event);
+    }
   }
 }
 </script>

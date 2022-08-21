@@ -13,7 +13,7 @@
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
           :key="layerCellData.id"
-          :ref="(element) => setVLayerCellRef(element, layerCellData.data.id)"
+          :ref="(element) => setVLayerCellRef(element as any as VLayerCellInstance, layerCellData.data.id)"
           :pPanel="layerCellData.data"
           :cellData="layerCellData"
           :style="{
@@ -22,7 +22,7 @@
           @startDrag="sortHelper.startDrag"
           @update:cellData="updateCellData"
           @click.right="rightClick(layerCellData.data, $event)"
-          @click.left="leftClick(layerCellData.data, $event)"
+          @click.left="leftClick(layerCellData.data)"
         />
         <VLayerCell
           ref="cellDrag"
@@ -38,139 +38,136 @@
   </t-layer-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, ref, watch } from "vue";
 // Components
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { API } from "@/rendererProcess/api";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { SortHelper } from "@/rendererProcess/components/utils/sortHelper";
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { toRaw } from "vue";
-import { emit } from "process";
 type CellData = {
   data: PetaPanel;
   id: number;
 };
-@Options({
-  components: {
-    VLayerCell,
+type VLayerCellInstance = InstanceType<typeof VLayerCell>;
+const _this = getCurrentInstance()!.proxy!;
+const emit = defineEmits<{
+  (e: "sortIndex"): void;
+  (e: "petaPanelMenu", petaPanel: PetaPanel, position: Vec2): void;
+  (e: "update:petaPanels", updates: PetaPanel[]): void;
+}>();
+const props = defineProps<{
+  zIndex: number;
+  pPanelsArray: PetaPanel[];
+}>();
+const layers = ref<HTMLElement>();
+const layersParent = ref<HTMLElement>();
+const cellDrag = ref<VLayerCellInstance>();
+const draggingPPanelId = ref<string>();
+const vLayerCells = ref<{ [key: string]: VLayerCellInstance }>({});
+const sortHelper: SortHelper<CellData, VLayerCellInstance> = new SortHelper(
+  (data) => {
+    return vLayerCells.value[data.data.id];
   },
-  emits: ["sortIndex", "petaPanelMenu", "update", "update:petaPanels"],
-})
-export default class VLayer extends Vue {
-  @Prop()
-  zIndex = 0;
-  @Prop()
-  pPanelsArray!: PetaPanel[];
-  @Ref()
-  layers!: HTMLElement;
-  @Ref()
-  layersParent!: HTMLElement;
-  @Ref()
-  cellDrag!: typeof VLayerCell;
-  draggingPPanelId: string | null = null;
-  vLayerCells: { [key: string]: typeof VLayerCell } = {};
-  sortHelper: SortHelper<CellData> = new SortHelper(
-    (data) => {
-      return this.vLayerCells[data.data.id] as any;
-    },
-    (data) => {
-      return data.data.index;
-    },
-    (changes) => {
-      this.$emit(
-        "update:petaPanels",
-        changes.map((change) => {
-          return {
-            ...change.data.data,
-            index: change.index,
-          };
-        }),
-      );
-      this.$emit("sortIndex");
-    },
-    (draggingData) => {
-      this.draggingPPanelId = draggingData as string;
-    },
-    (data) => {
-      return data.data.id;
-    },
-  );
-  async mounted() {
-    this.sortHelper.init(this.layers, this.layersParent, this.cellDrag as any);
+  (data) => {
+    return data.data.index;
+  },
+  (changes) => {
+    emit(
+      "update:petaPanels",
+      changes.map((change) => {
+        return {
+          ...change.data.data,
+          index: change.index,
+        };
+      }),
+    );
+    emit("sortIndex");
+  },
+  (draggingData) => {
+    draggingPPanelId.value = draggingData as string;
+  },
+  (data) => {
+    return data.data.id;
+  },
+);
+onMounted(() => {
+  if (layers.value && layersParent.value && cellDrag.value) {
+    sortHelper.init(layers.value, layersParent.value, cellDrag.value);
   }
-  unmounted() {
-    this.sortHelper.destroy();
+});
+onUnmounted(() => {
+  sortHelper.destroy();
+});
+function changeLayerCellDatas() {
+  sortHelper.layerCellDatas = layerCellDatas.value;
+}
+onBeforeUpdate(() => {
+  vLayerCells.value = {};
+});
+function setVLayerCellRef(element: VLayerCellInstance, id: string) {
+  vLayerCells.value[id] = element;
+}
+function scrollTo(pPanel: PetaPanel) {
+  sortHelper.scrollTo({
+    id: 0,
+    data: pPanel,
+  });
+}
+function rightClick(pPanel: PetaPanel, event: PointerEvent | MouseEvent) {
+  if (!pPanel._selected) {
+    clearSelectionAll();
   }
-  @Watch("layerCellDatas")
-  changeLayerCellDatas() {
-    this.sortHelper.layerCellDatas = this.layerCellDatas;
-  }
-  beforeUpdate() {
-    this.vLayerCells = {};
-  }
-  setVLayerCellRef(element: typeof VLayerCell, id: string) {
-    this.vLayerCells[id] = element;
-  }
-  scrollTo(pPanel: PetaPanel) {
-    this.sortHelper.scrollTo({
-      id: 0,
-      data: pPanel,
+  pPanel._selected = true;
+  emit("petaPanelMenu", pPanel, vec2FromPointerEvent(event));
+}
+function leftClick(pPanel: PetaPanel) {
+  clearSelectionAll();
+  pPanel._selected = true;
+}
+function clearSelectionAll(force = false) {
+  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
+    props.pPanelsArray.forEach((p) => {
+      p._selected = false;
     });
   }
-  rightClick(pPanel: PetaPanel, event: PointerEvent) {
-    if (!pPanel._selected) {
-      this.clearSelectionAll();
-    }
-    pPanel._selected = true;
-    this.$emit("petaPanelMenu", pPanel, vec2FromPointerEvent(event));
-  }
-  leftClick(pPanel: PetaPanel, event: PointerEvent) {
-    this.clearSelectionAll();
-    pPanel._selected = true;
-  }
-  clearSelectionAll(force = false) {
-    if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
-      this.pPanelsArray.forEach((p) => {
-        p._selected = false;
-      });
-    }
-  }
-  toggleVisible() {
-    this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
-  }
-  updateCellData(cellData: CellData) {
-    this.$emit("update:petaPanels", [
-      {
-        ...cellData.data,
-      },
-    ]);
-  }
-  get draggingPPanel() {
-    return this.layerCellDatas.find((cd) => cd.data.id === this.draggingPPanelId);
-  }
-  get layerCellDatas(): CellData[] {
-    if (!this.pPanelsArray) {
-      return [];
-    }
-    return [...this.pPanelsArray]
-      .sort((a, b) => {
-        return b.index - a.index;
-      })
-      .map((pPanel, i) => {
-        // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
-        return {
-          data: pPanel,
-          id: i,
-        };
-      });
-  }
 }
+function toggleVisible() {
+  _this.$states.visibleLayerPanel = !_this.$states.visibleLayerPanel;
+}
+function updateCellData(cellData: CellData) {
+  emit("update:petaPanels", [
+    {
+      ...cellData.data,
+    },
+  ]);
+}
+const draggingPPanel = computed(() => {
+  return layerCellDatas.value.find((cd) => cd.data.id === draggingPPanelId.value);
+});
+const layerCellDatas = computed((): CellData[] => {
+  if (!props.pPanelsArray) {
+    return [];
+  }
+  return [...props.pPanelsArray]
+    .sort((a, b) => {
+      return b.index - a.index;
+    })
+    .map((pPanel, i) => {
+      // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
+      return {
+        data: pPanel,
+        id: i,
+      };
+    });
+});
+watch(() => layerCellDatas.value, changeLayerCellDatas);
+defineExpose({
+  scrollTo,
+});
 </script>
 
 <style lang="scss" scoped>

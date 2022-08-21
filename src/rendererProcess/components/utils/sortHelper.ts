@@ -1,16 +1,16 @@
 import { Vue } from "vue-class-component";
-
-export class SortHelper<T extends { data: any; id: number }> {
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export class SortHelper<T extends { data: any; id: number }, C extends { $el: HTMLElement }> {
   layers!: HTMLElement;
   layersParent!: HTMLElement;
-  cellDrag!: Vue;
+  cellDrag!: C;
   draggingDataId: number | string | null = null;
   autoScrollVY = 0;
   mouseY = 0;
   fixedHeight = 0;
   layerCellDatas: T[] = [];
   constructor(
-    private dataToComponent: (data: T) => Vue | undefined,
+    private dataToComponent: (data: T) => C | undefined,
     private dataToIndex: (data: T) => number,
     private sortIndex: (change: { data: T; index: number }[]) => void,
     private changeDraggingData: (draggingData: string | number | null) => void,
@@ -18,7 +18,7 @@ export class SortHelper<T extends { data: any; id: number }> {
   ) {
     //
   }
-  init(layers: HTMLElement, layersParent: HTMLElement, cellDrag: Vue) {
+  init(layers: HTMLElement, layersParent: HTMLElement, cellDrag: C) {
     this.layers = layers;
     this.layersParent = layersParent;
     this.cellDrag = cellDrag;
@@ -116,7 +116,7 @@ export class SortHelper<T extends { data: any; id: number }> {
     const offset = this.cellDrag.$el.getBoundingClientRect().height / 2;
     this.cellDrag.$el.style.top = `${absolute ? y : y + this.layersParent.scrollTop - offset}px`;
   };
-  pointerup = (event: PointerEvent) => {
+  pointerup = () => {
     this.draggingDataId = null;
     this.changeDraggingData(this.draggingDataId);
     this.autoScrollVY = 0;

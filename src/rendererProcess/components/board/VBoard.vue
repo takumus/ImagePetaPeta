@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw, reactive } from "vue";
+import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -75,7 +75,7 @@ const nsfwStore = useNSFWStore();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const _this = getCurrentInstance()!.proxy!;
 const panelsBackground = ref<HTMLElement>();
-const layer = ref<VLayer>();
+const layer = ref<typeof VLayer>();
 const extracting = ref(false);
 const loading = ref(false);
 const extractingLog = ref("");
@@ -867,7 +867,7 @@ function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
 }
 const petaPanelsArray = computed(() => {
   if (!currentBoard.value) {
-    return undefined;
+    return [];
   }
   return Object.values(currentBoard.value?.petaPanels);
 });
