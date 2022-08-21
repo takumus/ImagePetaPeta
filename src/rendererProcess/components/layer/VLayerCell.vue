@@ -39,87 +39,106 @@
   </li>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
+import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
 import { ImageType } from "@/commons/datas/imageType";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaPanel } from "@/commons/datas/petaPanel";
+import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+import { prop } from "vue-class-component";
 // Others
-@Options({
-  components: {
-    //
-  },
-  emits: ["startDrag"],
-})
-export default class VLayerCell extends Vue {
-  @Prop()
-  cellData: {
+const emit = defineEmits<{
+  (e: "startDrag", cellData: { id: number; data: PetaPanel }, event: PointerEvent): void;
+  (e: "update:cellData", cellData: { id: number; data: PetaPanel }): void;
+}>();
+const props = defineProps<{
+  cellData?: {
     id: number;
     data: PetaPanel;
-  } | null = null;
-  // @Prop()
-  // pPanel: PPanel | null = null;
-  @Prop()
-  drag = false;
-  @Ref()
-  visibleIcon!: HTMLElement;
-  @Ref()
-  lockedIcon!: HTMLElement;
-  click: ClickChecker = new ClickChecker();
+  };
+  drag?: boolean;
+}>();
+const visibleIcon = ref<HTMLElement>();
+const lockedIcon = ref<HTMLElement>();
+const nsfwStore = useNSFWStore();
+// @Prop()
+// cellData: {
+//   id: number;
+//   data: PetaPanel;
+// } | null = null;
+// @Prop()
+// drag = false;
+// @Ref()
+// visibleIcon!: HTMLElement;
+// @Ref()
+// lockedIcon!: HTMLElement;
+const click = new ClickChecker();
+let mouseIsDown = false;
+onMounted(() => {
+  window.addEventListener("pointerup", pointerup);
+  window.addEventListener("pointermove", pointermove);
+});
+onUnmounted(() => {
+  window.removeEventListener("pointerup", pointerup);
+  window.removeEventListener("pointermove", pointermove);
+});
+const url = computed(() => {
+  return props.cellData ? getImageURL(props.cellData.data._petaImage, ImageType.THUMBNAIL) : undefined;
+});
+const selected = computed(() => {
+  return props.cellData?.data._selected;
+});
+const locked = computed(() => {
+  return props.cellData?.data.locked;
+});
+const visible = computed(() => {
+  return props.cellData?.data.visible;
+});
+const name = computed(() => {
+  return props.cellData?.data._petaImage?.name || "";
+});
+const showNSFW = computed(() => {
+  return props.cellData?.data._petaImage?.nsfw && !nsfwStore.state.value;
+});
+function pointerdown(event: PointerEvent) {
+  click.down(vec2FromPointerEvent(event));
+  mouseIsDown = true;
+}
+function pointerup(event: PointerEvent) {
   mouseIsDown = false;
-  async mounted() {
-    window.addEventListener("pointerup", this.pointerup);
-    window.addEventListener("pointermove", this.pointermove);
-  }
-  unmounted() {
-    window.removeEventListener("pointerup", this.pointerup);
-    window.removeEventListener("pointermove", this.pointermove);
-  }
-  get url() {
-    return this.cellData ? getImageURL(this.cellData.data._petaImage, ImageType.THUMBNAIL) : undefined;
-  }
-  get selected() {
-    return this.cellData?.data._selected;
-  }
-  get locked() {
-    return this.cellData?.data.locked;
-  }
-  get visible() {
-    return this.cellData?.data.visible;
-  }
-  get name() {
-    return this.cellData?.data._petaImage?.name || "";
-  }
-  get showNSFW() {
-    return this.cellData?.data._petaImage?.nsfw && !this.$nsfw.showNSFW;
-  }
-  pointerdown(event: PointerEvent) {
-    this.click.down(vec2FromPointerEvent(event));
-    this.mouseIsDown = true;
-  }
-  pointerup(event: PointerEvent) {
-    this.mouseIsDown = false;
-    if (this.click.isClick && this.cellData) {
-      if (event.target === this.visibleIcon) {
-        this.cellData.data.visible = !this.cellData.data?.visible;
-      } else if (event.target === this.lockedIcon) {
-        this.cellData.data.locked = !this.cellData.data?.locked;
-      }
+  if (click.isClick && props.cellData) {
+    if (event.target === visibleIcon.value) {
+      // props.cellData.data.visible = !props.cellData.data?.visible;
+      emit("update:cellData", {
+        ...props.cellData,
+        data: {
+          ...props.cellData.data,
+          visible: !props.cellData.data.visible,
+        },
+      });
+    } else if (event.target === lockedIcon.value) {
+      // props.cellData.data.locked = !props.cellData.data?.locked;
+      emit("update:cellData", {
+        ...props.cellData,
+        data: {
+          ...props.cellData.data,
+          locked: !props.cellData.data.locked,
+        },
+      });
     }
   }
-  pointermove(event: PointerEvent) {
-    if (!this.mouseIsDown) {
-      return;
-    }
-    this.click.move(vec2FromPointerEvent(event));
-    if (!this.click.isClick) {
-      this.mouseIsDown = false;
-      this.$emit("startDrag", this.cellData, event);
-    }
+}
+function pointermove(event: PointerEvent) {
+  if (!mouseIsDown) {
+    return;
+  }
+  click.move(vec2FromPointerEvent(event));
+  if (!click.isClick) {
+    mouseIsDown = false;
+    emit("startDrag", props.cellData, event);
   }
 }
 </script>

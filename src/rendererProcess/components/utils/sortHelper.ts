@@ -4,7 +4,7 @@ export class SortHelper<T extends { data: any; id: number }> {
   layers!: HTMLElement;
   layersParent!: HTMLElement;
   cellDrag!: Vue;
-  draggingData: T | null = null;
+  draggingDataId: number | string | null = null;
   autoScrollVY = 0;
   mouseY = 0;
   fixedHeight = 0;
@@ -12,9 +12,9 @@ export class SortHelper<T extends { data: any; id: number }> {
   constructor(
     private dataToComponent: (data: T) => Vue | undefined,
     private dataToIndex: (data: T) => number,
-    private setIndex: (data: T, index: number) => void,
-    private sortIndex: () => void,
-    private changeDraggingData: (draggingData: T | null) => void,
+    private sortIndex: (change: { data: T; index: number }[]) => void,
+    private changeDraggingData: (draggingData: string | number | null) => void,
+    private dataToId: (data: T) => string | number,
   ) {
     //
   }
@@ -25,7 +25,7 @@ export class SortHelper<T extends { data: any; id: number }> {
     window.addEventListener("pointermove", this.pointermove);
     window.addEventListener("pointerup", this.pointerup);
     setInterval(() => {
-      if (this.draggingData) {
+      if (this.draggingDataId !== null) {
         this.layersParent.scrollTop += this.autoScrollVY;
         this.updateDragCell(this.mouseY);
         this.sort();
@@ -55,8 +55,8 @@ export class SortHelper<T extends { data: any; id: number }> {
         : this.fixedHeight;
     this.layers.style.height = this.fixedHeight + "px";
     this.layers.style.overflow = "hidden";
-    this.draggingData = data;
-    this.changeDraggingData(this.draggingData);
+    this.draggingDataId = this.dataToId(data);
+    this.changeDraggingData(this.draggingDataId);
     this.updateDragCell(this.mouseY);
     // this.clearSelectionAll(true);
     // pPanel.selected = true;
@@ -65,7 +65,7 @@ export class SortHelper<T extends { data: any; id: number }> {
   };
   pointermove = (event: PointerEvent) => {
     // console.log(this.draggingData)
-    if (!this.draggingData) {
+    if (this.draggingDataId === null) {
       return;
     }
     this.mouseY = event.clientY - this.layersParent.getBoundingClientRect().y;
@@ -74,10 +74,11 @@ export class SortHelper<T extends { data: any; id: number }> {
     this.autoScroll(this.mouseY);
   };
   sort = () => {
-    let changed = false;
+    const change: { data: T; index: number }[] = [];
     this.layerCellDatas
       .map((cellData) => {
-        const layerCell = cellData.data === this.draggingData?.data ? this.cellDrag : this.dataToComponent(cellData);
+        const layerCell =
+          this.dataToId(cellData) === this.draggingDataId ? this.cellDrag : this.dataToComponent(cellData);
         const layerCellData = cellData;
         return {
           layerCell,
@@ -90,12 +91,14 @@ export class SortHelper<T extends { data: any; id: number }> {
       })
       .forEach((v, index) => {
         if (this.dataToIndex(v.layerCellData) != index) {
-          changed = true;
-          this.setIndex(v.layerCellData, index);
+          change.push({
+            data: v.layerCellData,
+            index,
+          });
         }
       });
-    if (changed) {
-      this.sortIndex();
+    if (change.length > 0) {
+      this.sortIndex(change);
     }
   };
   autoScroll = (mouseY: number) => {
@@ -114,8 +117,8 @@ export class SortHelper<T extends { data: any; id: number }> {
     this.cellDrag.$el.style.top = `${absolute ? y : y + this.layersParent.scrollTop - offset}px`;
   };
   pointerup = (event: PointerEvent) => {
-    this.draggingData = null;
-    this.changeDraggingData(this.draggingData);
+    this.draggingDataId = null;
+    this.changeDraggingData(this.draggingDataId);
     this.autoScrollVY = 0;
     this.layers.style.height = "unset";
     this.layers.style.overflow = "unset";

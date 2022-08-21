@@ -26,13 +26,14 @@
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
+      @update:petaPanels="updatePetaPanelsFromLayer"
     />
   </t-board-root>
 </template>
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw } from "vue";
+import { ref, onMounted, onUnmounted, watch, getCurrentInstance, toRaw, reactive } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -844,6 +845,24 @@ function updatePetaBoard() {
 }
 function updatePetaPanels() {
   updatePetaBoard();
+}
+function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
+  petaPanels.forEach((petaPanel) => {
+    if (currentBoard.value === undefined) {
+      return;
+    }
+    const id = currentBoard.value.petaPanels.findIndex((v) => v.id === petaPanel.id);
+    if (currentBoard.value.petaPanels[id]) {
+      currentBoard.value.petaPanels[id] = petaPanel;
+    }
+  });
+  load({
+    reload: {
+      additions: [],
+      deletions: [],
+    },
+  });
+  updatePetaPanels();
 }
 watch(
   () => nsfwStore.state.value,

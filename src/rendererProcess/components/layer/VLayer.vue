@@ -20,6 +20,7 @@
             visibility: draggingPPanel?.data === layerCellData.data ? 'hidden' : 'visible',
           }"
           @startDrag="sortHelper.startDrag"
+          @update:cellData="updateCellData"
           @click.right="rightClick(layerCellData.data, $event)"
           @click.left="leftClick(layerCellData.data, $event)"
         />
@@ -49,6 +50,8 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import { SortHelper } from "@/rendererProcess/components/utils/sortHelper";
 import { PetaPanel } from "@/commons/datas/petaPanel";
+import { toRaw } from "vue";
+import { emit } from "process";
 type CellData = {
   data: PetaPanel;
   id: number;
@@ -57,7 +60,7 @@ type CellData = {
   components: {
     VLayerCell,
   },
-  emits: ["sortIndex", "petaPanelMenu", "update"],
+  emits: ["sortIndex", "petaPanelMenu", "update", "update:petaPanels"],
 })
 export default class VLayer extends Vue {
   @Prop()
@@ -69,28 +72,37 @@ export default class VLayer extends Vue {
   @Ref()
   layersParent!: HTMLElement;
   @Ref()
-  cellDrag!: VLayerCell;
-  draggingPPanel: CellData | null = null;
-  vLayerCells: { [key: string]: VLayerCell } = {};
+  cellDrag!: typeof VLayerCell;
+  draggingPPanelId: string | null = null;
+  vLayerCells: { [key: string]: typeof VLayerCell } = {};
   sortHelper: SortHelper<CellData> = new SortHelper(
     (data) => {
-      return this.vLayerCells[data.data.id];
+      return this.vLayerCells[data.data.id] as any;
     },
     (data) => {
       return data.data.index;
     },
-    (data, index) => {
-      data.data.index = index;
-    },
-    () => {
+    (changes) => {
+      this.$emit(
+        "update:petaPanels",
+        changes.map((change) => {
+          return {
+            ...change.data.data,
+            index: change.index,
+          };
+        }),
+      );
       this.$emit("sortIndex");
     },
     (draggingData) => {
-      this.draggingPPanel = draggingData;
+      this.draggingPPanelId = draggingData as string;
+    },
+    (data) => {
+      return data.data.id;
     },
   );
   async mounted() {
-    this.sortHelper.init(this.layers, this.layersParent, this.cellDrag);
+    this.sortHelper.init(this.layers, this.layersParent, this.cellDrag as any);
   }
   unmounted() {
     this.sortHelper.destroy();
@@ -102,7 +114,7 @@ export default class VLayer extends Vue {
   beforeUpdate() {
     this.vLayerCells = {};
   }
-  setVLayerCellRef(element: VLayerCell, id: string) {
+  setVLayerCellRef(element: typeof VLayerCell, id: string) {
     this.vLayerCells[id] = element;
   }
   scrollTo(pPanel: PetaPanel) {
@@ -132,11 +144,21 @@ export default class VLayer extends Vue {
   toggleVisible() {
     this.$states.visibleLayerPanel = !this.$states.visibleLayerPanel;
   }
+  updateCellData(cellData: CellData) {
+    this.$emit("update:petaPanels", [
+      {
+        ...cellData.data,
+      },
+    ]);
+  }
+  get draggingPPanel() {
+    return this.layerCellDatas.find((cd) => cd.data.id === this.draggingPPanelId);
+  }
   get layerCellDatas(): CellData[] {
     if (!this.pPanelsArray) {
       return [];
     }
-    return this.pPanelsArray
+    return [...this.pPanelsArray]
       .sort((a, b) => {
         return b.index - a.index;
       })
