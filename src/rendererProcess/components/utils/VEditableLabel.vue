@@ -35,13 +35,21 @@
 <script setup lang="ts">
 // Vue
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
-import { ref, watch, getCurrentInstance, onMounted, nextTick, onUnmounted } from "vue";
-const _this = getCurrentInstance()!.proxy!;
+import { ref, watch, onMounted, nextTick, onUnmounted } from "vue";
 const emit = defineEmits<{
   (e: "change", value: string): void;
-  (e: "focus", editableLabel: typeof _this): void;
+  (
+    e: "focus",
+    editableLabel: {
+      $el?: HTMLElement;
+      edit: typeof edit;
+      tempText: typeof tempText;
+      apply: typeof apply;
+      labelInput: typeof labelInput;
+    },
+  ): void;
   (e: "input", value: string): void;
-  (e: "delete", editableLabel: typeof _this): void;
+  (e: "delete"): void;
 }>();
 const props = defineProps<{
   label: string;
@@ -60,7 +68,7 @@ onMounted(() => {
   changeLabel();
   keyboards.keys("Backspace", "Delete").down(() => {
     if (tempText.value === "") {
-      emit("delete", _this);
+      emit("delete");
     }
   });
 });
@@ -143,7 +151,7 @@ function focus() {
     tempText,
     apply,
     labelInput,
-  } as any);
+  });
 }
 function changeLabel() {
   tempText.value = props.label.trim().replace(/\r?\n/g, "");
