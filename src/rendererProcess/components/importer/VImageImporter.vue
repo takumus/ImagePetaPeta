@@ -10,7 +10,6 @@ import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Buffer } from "buffer";
-// const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
   (e: "addPanelByDragAndDrop", ids: string[], position: Vec2, fromBrowser: boolean): void;
 }>();

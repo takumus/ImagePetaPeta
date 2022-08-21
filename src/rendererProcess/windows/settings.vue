@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 // Vue
-import { getCurrentInstance, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
@@ -33,7 +33,6 @@ import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
-const _this = getCurrentInstance()!.proxy!;
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();

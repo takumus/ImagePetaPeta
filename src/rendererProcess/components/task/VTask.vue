@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 // Vue
-import { getCurrentInstance, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 // Components
 import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 // Others
@@ -26,7 +26,6 @@ const props = defineProps<{
   taskStatus: TaskStatus;
 }>();
 const { t } = useI18n();
-const _this = getCurrentInstance()!.proxy!;
 const progress = ref(100);
 const status = ref<TaskStatusCode>("complete");
 const currentTaskId = ref("");

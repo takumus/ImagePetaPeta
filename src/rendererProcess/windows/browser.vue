@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 // Vue
-import { getCurrentInstance, nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 // Components
 import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
@@ -43,7 +43,6 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
-const _this = getCurrentInstance()!.proxy!;
 const appInfoStore = useAppInfoStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();

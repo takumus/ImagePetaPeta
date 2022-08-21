@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 // Components
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
@@ -53,7 +53,6 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
-const _this = getCurrentInstance()!.proxy!;
 const appInfoStore = useAppInfoStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
