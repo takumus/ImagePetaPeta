@@ -29,7 +29,7 @@
         <img draggable="false" :src="imageURL" v-show="!loadingImage" loading="lazy" @load="loaded" />
         <t-background> </t-background>
       </t-images>
-      <t-tags v-if="$settings.showTagsOnTile">
+      <t-tags v-if="settingsStore.state.value.showTagsOnTile">
         <t-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
           {{ petaTag.name }}
         </t-tag>
@@ -68,6 +68,7 @@ import {
 } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
@@ -83,6 +84,7 @@ const props = defineProps<{
   parentAreaMaxY: number;
 }>();
 const nsfwStore = useNSFWStore();
+const settingsStore = useSettingsStore();
 const _this = getCurrentInstance()!.proxy!;
 const imageURL = ref("");
 const loadingImage = ref(true);
@@ -167,7 +169,7 @@ const placeholderColor = computed(() => {
 });
 async function fetchPetaTags() {
   myPetaTags.value = [];
-  if (!_this.$settings.showTagsOnTile) {
+  if (!settingsStore.state.value.showTagsOnTile) {
     return;
   }
   if (props.tile.petaImage === undefined) {
@@ -209,7 +211,7 @@ const visible = computed(() => {
 watch([() => props.parentAreaMinY, () => props.parentAreaMaxY, () => props.original, () => props.tile.width], () => {
   updateContent();
 });
-watch([visible, () => props.petaTagInfos, () => _this.$settings.showTagsOnTile], () => {
+watch([visible, () => props.petaTagInfos, () => settingsStore.state.value.showTagsOnTile], () => {
   updateContent(true);
 });
 </script>

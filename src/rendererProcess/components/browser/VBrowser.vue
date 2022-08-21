@@ -17,8 +17,8 @@
             <label>
               <input
                 type="checkbox"
-                :checked="$states.groupingByDate"
-                @change="$states.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)"
+                :checked="statesStore.state.value.groupingByDate"
+                @change="statesStore.state.value.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)"
               />
               <span>{{ $t("browser.grouping") }}</span>
             </label>
@@ -62,15 +62,13 @@
   </t-browser-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 // Components
 import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 import VPreview from "@/rendererProcess/components/browser/property/VPreview.vue";
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 // Others
@@ -93,474 +91,462 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
 import { WindowType } from "@/commons/datas/windowType";
-import deepcopy from "deepcopy";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useDefinesStore } from "@/rendererProcess/stores/definesStore";
-@Options({
-  components: {
-    VTile,
-    VProperty,
-    VPreview,
-    VEditableLabel,
-    VTags,
-    VSearch,
-  },
-  emits: ["select", "addPanel"],
-})
-export default class VBrowser extends Vue {
-  @Prop()
-  petaImages: PetaImages = {};
-  @Prop()
-  petaTagInfos: PetaTagInfo[] = [];
-  visible = false;
-  @Ref("thumbnails")
-  thumbnails!: HTMLDivElement;
-  @Ref("thumbsWrapper")
-  thumbsWrapper!: HTMLDivElement;
-  @Ref()
-  testCanvas!: HTMLCanvasElement;
-  selectedPetaTags: PetaTag[] = [];
-  thumbnailsWidth = 0;
-  areaMaxY = 0;
-  areaMinY = 0;
-  areaPreVisibleMaxY = 0;
-  areaPreVisibleMinY = 0;
-  scrollAreaHeight = 0;
-  sortMode = SortMode.ADD_DATE;
-  thumbnailsResizer?: ResizeObserver;
-  scrollAreaResizer?: ResizeObserver;
-  firstSelectedTile: Tile | null = null;
-  thumbnailsSize = 0;
-  currentScrollTileId = "";
-  currentScrollTileOffset = 0;
-  keyboards = useKeyboardsStore();
-  defines = useDefinesStore().defines;
-  filteredPetaImages: PetaImage[] = [];
-  targetPetaImage: PetaImage | null = null;
-  ignoreScrollEvent = false;
-  mounted() {
-    this.thumbnailsResizer = new ResizeObserver((entries) => {
-      this.resizeImages(entries[0]!.contentRect);
-    });
-    this.scrollAreaResizer = new ResizeObserver((entries) => {
-      this.resizeScrollArea(entries[0]!.contentRect);
-    });
-    this.thumbnails.addEventListener("scroll", this.updateScrollArea);
-    this.thumbnails.addEventListener("wheel", (e) => {
-      if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-        this.thumbnailsSize -= e.deltaY * this.$settings.zoomSensitivity * 0.001;
-        this.thumbnailsSize = Math.floor(this.thumbnailsSize);
-        if (this.thumbnailsSize < BROWSER_THUMBNAIL_ZOOM_MIN) {
-          this.thumbnailsSize = BROWSER_THUMBNAIL_ZOOM_MIN;
-        } else if (this.thumbnailsSize > BROWSER_THUMBNAIL_ZOOM_MAX) {
-          this.thumbnailsSize = BROWSER_THUMBNAIL_ZOOM_MAX;
-        }
+import { useStateStore } from "@/rendererProcess/stores/statesStore";
+import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
+const _this = getCurrentInstance()!.proxy!;
+const statesStore = useStateStore();
+const settingsStore = useSettingsStore();
+const props = defineProps<{
+  petaImages: PetaImages;
+  petaTagInfos: PetaTagInfo[];
+}>();
+const thumbnails = ref<HTMLDivElement>();
+const thumbsWrapper = ref<HTMLDivElement>();
+const selectedPetaTags = ref<PetaTag[]>([]);
+const thumbnailsWidth = ref(0);
+const areaMaxY = ref(0);
+const areaMinY = ref(0);
+const areaPreVisibleMaxY = ref(0);
+const areaPreVisibleMinY = ref(0);
+const scrollAreaHeight = ref(0);
+const sortMode = ref<SortMode>(SortMode.ADD_DATE);
+let thumbnailsResizer: ResizeObserver | undefined;
+let scrollAreaResizer: ResizeObserver | undefined;
+const firstSelectedTile = ref<Tile>();
+const thumbnailsSize = ref(0);
+const currentScrollTileId = ref("");
+const currentScrollTileOffset = ref(0);
+const keyboards = useKeyboardsStore();
+const defines = useDefinesStore().defines;
+const filteredPetaImages = ref<PetaImage[]>([]);
+const ignoreScrollEvent = ref(false);
+onMounted(() => {
+  thumbnailsResizer = new ResizeObserver((entries) => {
+    const rect = entries[0]?.contentRect;
+    if (rect) {
+      resizeImages(rect);
+    }
+  });
+  scrollAreaResizer = new ResizeObserver((entries) => {
+    const rect = entries[0]?.contentRect;
+    if (rect) {
+      resizeScrollArea(rect);
+    }
+  });
+  thumbnails.value?.addEventListener("scroll", updateScrollArea);
+  thumbnails.value?.addEventListener("wheel", (e) => {
+    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+      thumbnailsSize.value -= e.deltaY * settingsStore.state.value.zoomSensitivity * 0.001;
+      thumbnailsSize.value = Math.floor(thumbnailsSize.value);
+      if (thumbnailsSize.value < BROWSER_THUMBNAIL_ZOOM_MIN) {
+        thumbnailsSize.value = BROWSER_THUMBNAIL_ZOOM_MIN;
+      } else if (thumbnailsSize.value > BROWSER_THUMBNAIL_ZOOM_MAX) {
+        thumbnailsSize.value = BROWSER_THUMBNAIL_ZOOM_MAX;
       }
-    });
-    this.$states.groupingByDate;
-    this.thumbnailsResizer.observe(this.thumbsWrapper);
-    this.scrollAreaResizer.observe(this.thumbnails);
+    }
+  });
+  if (thumbsWrapper.value && thumbnails.value) {
+    thumbnailsResizer.observe(thumbsWrapper.value);
+    scrollAreaResizer.observe(thumbnails.value);
+  }
 
-    this.thumbnailsSize = this.$states.browserTileSize;
-    this.keyboards.enabled = true;
-    this.keyboards.keys("KeyA").down(this.keyA);
+  thumbnailsSize.value = statesStore.state.value.browserTileSize;
+  keyboards.enabled = true;
+  keyboards.keys("KeyA").down(keyA);
+});
+onUnmounted(() => {
+  thumbnails.value?.removeEventListener("scroll", updateScrollArea);
+  if (thumbsWrapper.value && thumbnails.value) {
+    thumbnailsResizer?.unobserve(thumbsWrapper.value);
+    scrollAreaResizer?.unobserve(thumbnails.value);
   }
-  unmounted() {
-    this.thumbnails.removeEventListener("scroll", this.updateScrollArea);
-    this.thumbnailsResizer?.unobserve(this.thumbsWrapper);
-    this.scrollAreaResizer?.unobserve(this.thumbnails);
-    this.thumbnailsResizer?.disconnect();
-    this.scrollAreaResizer?.disconnect();
-    this.keyboards.destroy();
+  thumbnailsResizer?.disconnect();
+  scrollAreaResizer?.disconnect();
+  keyboards.destroy();
+});
+function saveScrollPosition() {
+  let minDistance = Infinity;
+  tiles.value.forEach((t) => {
+    if (t.petaImage === undefined || thumbnails.value === undefined) {
+      return;
+    }
+    const offset = thumbnails.value.scrollTop - t.position.y;
+    const distance = Math.abs(offset);
+    if (distance < minDistance) {
+      minDistance = distance;
+      currentScrollTileOffset.value = offset;
+      currentScrollTileId.value = t.petaImage.id;
+    }
+  });
+}
+
+function restoreScrollPosition() {
+  const current = tiles.value.find((bt) => bt.petaImage?.id === currentScrollTileId.value);
+  if (current) {
+    ignoreScrollEvent.value = true;
+    thumbnails.value?.scrollTo(0, current.position.y + currentScrollTileOffset.value);
   }
-  saveScrollPosition() {
-    let minDistance = Infinity;
-    this.tiles.forEach((t) => {
-      if (t.petaImage === undefined) {
+}
+function updateScrollArea(event?: Event, resize = false) {
+  const preVisibleOffset = scrollAreaHeight.value * 1;
+  const visibleOffset = scrollAreaHeight.value * 0.2;
+  if (thumbnails.value === undefined) {
+    return;
+  }
+  areaMinY.value = thumbnails.value.scrollTop - visibleOffset;
+  areaMaxY.value = scrollAreaHeight.value + thumbnails.value.scrollTop + visibleOffset;
+  areaPreVisibleMinY.value = thumbnails.value.scrollTop - preVisibleOffset;
+  areaPreVisibleMaxY.value = scrollAreaHeight.value + thumbnails.value.scrollTop + preVisibleOffset;
+  if (resize) {
+    return;
+  }
+  if (ignoreScrollEvent.value) {
+    ignoreScrollEvent.value = false;
+    return;
+  }
+  if (scrollAreaHeight.value && event) {
+    saveScrollPosition();
+  }
+}
+function resizeScrollArea(rect: DOMRectReadOnly) {
+  const areaHeight = rect.height;
+  scrollAreaHeight.value = areaHeight;
+  restoreScrollPosition();
+  updateScrollArea(undefined, true);
+}
+function resizeImages(rect: DOMRectReadOnly) {
+  thumbnailsWidth.value = rect.width - BROWSER_THUMBNAIL_MARGIN;
+}
+function drag(petaImage: PetaImage) {
+  if (
+    !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") &&
+    !petaImage._selected
+  ) {
+    clearSelectionAllImages();
+  }
+  const petaImages = petaImage._selected ? [] : [petaImage];
+  petaImages.push(...selectedPetaImages.value);
+  API.send("startDrag", petaImages, actualTileSize.value, "");
+}
+function selectTile(thumb: Tile, force = false) {
+  if (thumb.petaImage === undefined) {
+    return;
+  }
+  if (
+    selectedPetaImages.value.length < 1 ||
+    !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")
+  ) {
+    // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
+    firstSelectedTile.value = thumb;
+  }
+  if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+    // 選択サムネイルを反転
+    thumb.petaImage._selected = !thumb.petaImage._selected || force;
+  } else {
+    // コントロールキーが押されていなければ選択をリセット
+    thumb.petaImage._selected = true;
+    petaImagesArray.value.forEach((pi) => {
+      pi._selected = thumb.petaImage === pi;
+    });
+  }
+  if (firstSelectedTile.value && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
+    // 最初の選択と、シフトキーが押されていれば、範囲選択。
+    const topLeft = new Vec2(
+      Math.min(firstSelectedTile.value.position.x, thumb.position.x),
+      Math.min(firstSelectedTile.value.position.y, thumb.position.y),
+    );
+    const size = new Vec2(
+      Math.max(firstSelectedTile.value.position.x + firstSelectedTile.value.width, thumb.position.x + thumb.width),
+      Math.max(firstSelectedTile.value.position.y + firstSelectedTile.value.height, thumb.position.y + thumb.height),
+    )
+      .clone()
+      .sub(topLeft);
+    tiles.value.forEach((pt) => {
+      if (pt.petaImage === undefined) {
         return;
       }
-      const offset = this.thumbnails.scrollTop - t.position.y;
-      const distance = Math.abs(offset);
-      if (distance < minDistance) {
-        minDistance = distance;
-        this.currentScrollTileOffset = offset;
-        this.currentScrollTileId = t.petaImage.id;
+      let widthDiff = pt.width / 2 + size.x / 2 - Math.abs(pt.position.x + pt.width / 2 - (topLeft.x + size.x / 2));
+      let heightDiff = pt.height / 2 + size.y / 2 - Math.abs(pt.position.y + pt.height / 2 - (topLeft.y + size.y / 2));
+      if (widthDiff > pt.width) {
+        widthDiff = pt.width;
+      }
+      if (heightDiff > pt.height) {
+        heightDiff = pt.height;
+      }
+      const hitArea = widthDiff * heightDiff;
+      const ptArea = pt.width * pt.height;
+      if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
+        pt.petaImage._selected = true;
       }
     });
   }
+}
+function clearSelectionAllImages() {
+  petaImagesArray.value.forEach((pi) => {
+    pi._selected = false;
+  });
+}
+function petaImageMenu(thumb: Tile, position: Vec2) {
+  if (thumb.petaImage === undefined) {
+    return;
+  }
+  const petaImage = thumb.petaImage;
+  if (!thumb.petaImage._selected) {
+    selectTile(thumb, true);
+  }
 
-  restoreScrollPosition() {
-    const current = this.tiles.find((bt) => bt.petaImage?.id === this.currentScrollTileId);
-    if (current) {
-      this.ignoreScrollEvent = true;
-      this.thumbnails.scrollTo(0, current.position.y + this.currentScrollTileOffset);
-    }
-  }
-  updateScrollArea(event?: Event, resize = false) {
-    const preVisibleOffset = this.scrollAreaHeight * 1;
-    const visibleOffset = this.scrollAreaHeight * 0.2;
-    this.areaMinY = this.thumbnails.scrollTop - visibleOffset;
-    this.areaMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + visibleOffset;
-    this.areaPreVisibleMinY = this.thumbnails.scrollTop - preVisibleOffset;
-    this.areaPreVisibleMaxY = this.scrollAreaHeight + this.thumbnails.scrollTop + preVisibleOffset;
-    if (resize) {
-      return;
-    }
-    if (this.ignoreScrollEvent) {
-      this.ignoreScrollEvent = false;
-      return;
-    }
-    if (this.scrollAreaHeight && event) {
-      this.saveScrollPosition();
-    }
-  }
-  resizeScrollArea(rect: DOMRectReadOnly) {
-    const areaHeight = rect.height;
-    this.scrollAreaHeight = areaHeight;
-    this.restoreScrollPosition();
-    this.updateScrollArea(undefined, true);
-  }
-  resizeImages(rect: DOMRectReadOnly) {
-    this.thumbnailsWidth = rect.width - BROWSER_THUMBNAIL_MARGIN;
-  }
-  drag(petaImage: PetaImage) {
-    if (
-      !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") &&
-      !petaImage._selected
-    ) {
-      this.clearSelectionAllImages();
-    }
-    const petaImages = petaImage._selected ? [] : [petaImage];
-    petaImages.push(...this.selectedPetaImages);
-    API.send("startDrag", petaImages, this.actualTileSize, "");
-    this.close();
-  }
-  selectTile(thumb: Tile, force = false) {
-    if (thumb.petaImage === undefined) {
-      return;
-    }
-    if (
-      this.selectedPetaImages.length < 1 ||
-      !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")
-    ) {
-      // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
-      this.firstSelectedTile = thumb;
-    }
-    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      // 選択サムネイルを反転
-      thumb.petaImage._selected = !thumb.petaImage._selected || force;
-    } else {
-      // コントロールキーが押されていなければ選択をリセット
-      thumb.petaImage._selected = true;
-      this.petaImagesArray.forEach((pi) => {
-        pi._selected = thumb.petaImage === pi;
-      });
-    }
-    if (this.firstSelectedTile && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
-      // 最初の選択と、シフトキーが押されていれば、範囲選択。
-      const topLeft = new Vec2(
-        Math.min(this.firstSelectedTile.position.x, thumb.position.x),
-        Math.min(this.firstSelectedTile.position.y, thumb.position.y),
-      );
-      const size = new Vec2(
-        Math.max(this.firstSelectedTile.position.x + this.firstSelectedTile.width, thumb.position.x + thumb.width),
-        Math.max(this.firstSelectedTile.position.y + this.firstSelectedTile.height, thumb.position.y + thumb.height),
-      )
-        .clone()
-        .sub(topLeft);
-      this.tiles.forEach((pt) => {
-        if (pt.petaImage === undefined) {
-          return;
-        }
-        let widthDiff = pt.width / 2 + size.x / 2 - Math.abs(pt.position.x + pt.width / 2 - (topLeft.x + size.x / 2));
-        let heightDiff =
-          pt.height / 2 + size.y / 2 - Math.abs(pt.position.y + pt.height / 2 - (topLeft.y + size.y / 2));
-        if (widthDiff > pt.width) {
-          widthDiff = pt.width;
-        }
-        if (heightDiff > pt.height) {
-          heightDiff = pt.height;
-        }
-        const hitArea = widthDiff * heightDiff;
-        const ptArea = pt.width * pt.height;
-        if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
-          pt.petaImage._selected = true;
-        }
-      });
-    }
-  }
-  clearSelectionAllImages() {
-    this.petaImagesArray.forEach((pi) => {
-      pi._selected = false;
-    });
-  }
-  petaImageMenu(thumb: Tile, position: Vec2) {
-    if (thumb.petaImage === undefined) {
-      return;
-    }
-    const petaImage = thumb.petaImage;
-    if (!thumb.petaImage._selected) {
-      this.selectTile(thumb, true);
-    }
-
-    this.$components.contextMenu.open(
-      [
-        {
-          label: this.$t("browser.petaImageMenu.remove", [this.selectedPetaImages.length]),
-          click: async () => {
-            if (
-              (await this.$components.dialog.show(
-                this.$t("browser.removeImageDialog", [this.selectedPetaImages.length]),
-                [this.$t("shared.yes"), this.$t("shared.no")],
-              )) === 0
-            ) {
-              await updatePetaImages(this.selectedPetaImages, UpdateMode.REMOVE);
-            }
-          },
+  _this.$components.contextMenu.open(
+    [
+      {
+        label: _this.$t("browser.petaImageMenu.remove", [selectedPetaImages.value.length]),
+        click: async () => {
+          if (
+            (await _this.$components.dialog.show(
+              _this.$t("browser.removeImageDialog", [selectedPetaImages.value.length]),
+              [_this.$t("shared.yes"), _this.$t("shared.no")],
+            )) === 0
+          ) {
+            await updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);
+          }
         },
-        {
-          label: this.$t("browser.petaImageMenu.openImageFile"),
-          click: async () => {
-            await API.send("openImageFile", petaImage);
-          },
+      },
+      {
+        label: _this.$t("browser.petaImageMenu.openImageFile"),
+        click: async () => {
+          await API.send("openImageFile", petaImage);
         },
-        // {
-        //   label: this.$t("browser.petaImageMenu.similar"),
-        //   click: async () => {
-        //     this.targetPetaImage = thumb.petaImage;
-        //   }
-        // },
-        {
-          label: this.$t("browser.petaImageMenu.waifu2x"),
-          click: async () => {
-            await API.send("waifu2xConvert", this.selectedPetaImages);
-          },
+      },
+      // {
+      //   label: this.$t("browser.petaImageMenu.similar"),
+      //   click: async () => {
+      //     this.targetPetaImage = thumb.petaImage;
+      //   }
+      // },
+      {
+        label: _this.$t("browser.petaImageMenu.waifu2x"),
+        click: async () => {
+          await API.send("waifu2xConvert", selectedPetaImages.value);
         },
-        {
-          label: this.$t("browser.petaImageMenu.searchImageByGoogle"),
-          click: async () => {
-            await API.send("searchImageByGoogle", petaImage);
-          },
+      },
+      {
+        label: _this.$t("browser.petaImageMenu.searchImageByGoogle"),
+        click: async () => {
+          await API.send("searchImageByGoogle", petaImage);
         },
-      ],
-      position,
-    );
+      },
+    ],
+    position,
+  );
+}
+async function openDetail(petaImage: PetaImage) {
+  if (Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+    return;
   }
-  async openDetail(petaImage: PetaImage) {
-    if (Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      return;
-    }
-    await API.send("setDetailsPetaImage", petaImage);
-    await API.send("openWindow", WindowType.DETAILS);
-  }
-  open() {
-    this.visible = false;
-    this.$nextTick(() => {
-      this.visible = true;
-    });
-  }
-  close() {
-    this.visible = false;
-  }
-  updateTileSize(value: number) {
-    this.$states.browserTileSize = value;
-  }
-  sort(a: PetaImage, b: PetaImage) {
-    switch (this.sortMode) {
-      case SortMode.ADD_DATE: {
-        if (a.addDate === b.addDate) {
-          return b.fileDate - a.fileDate;
-        }
-        return b.addDate - a.addDate;
+  await API.send("setDetailsPetaImage", petaImage);
+  await API.send("openWindow", WindowType.DETAILS);
+}
+function updateTileSize(value: number) {
+  statesStore.state.value.browserTileSize = value;
+}
+function sort(a: PetaImage, b: PetaImage) {
+  switch (sortMode.value) {
+    case SortMode.ADD_DATE: {
+      if (a.addDate === b.addDate) {
+        return b.fileDate - a.fileDate;
       }
+      return b.addDate - a.addDate;
     }
   }
-  selectTag(tag: PetaTag) {
-    this.selectedPetaTags.length = 0;
-    this.selectedPetaTags.push(tag);
+}
+async function fetchFilteredPetaImages() {
+  if (selectedPetaTags.value.length === 0) {
+    filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
+    return;
   }
-  @Watch("selectedPetaTags", { deep: true })
-  changeSelectedTags() {
-    this.currentScrollTileId = "";
-    this.$nextTick(() => {
-      this.thumbnails.scrollTop = 0;
-    });
-    this.fetchFilteredPetaImages();
-  }
-  @Watch("petaImagesArray")
-  changePetaImagesArray() {
-    this.fetchFilteredPetaImages();
-  }
-  @Watch("petaTagInfos")
-  changePetaTagInfos() {
-    this.fetchFilteredPetaImages();
-  }
-  @Watch("thumbnailsSize")
-  changeTilesSize() {
-    this.restoreScrollPosition();
-  }
-  get petaImagesArray() {
-    return Object.values(this.petaImages);
-  }
-  get selectedPetaImages() {
-    return this.petaImagesArray.filter((pi) => pi._selected);
-  }
-  async fetchFilteredPetaImages() {
-    if (this.selectedPetaTags.length === 0) {
-      this.filteredPetaImages = [...this.petaImagesArray].sort(this.sort);
-      return;
-    }
-    const untagged = this.selectedPetaTags.find((petaTag) => petaTag.id === UNTAGGED_ID);
-    const results = await API.send(
-      "getPetaImageIdsByPetaTagIds",
-      untagged ? [] : this.selectedPetaTags.map((petaTag) => petaTag.id),
-    );
-    this.filteredPetaImages = Array.from(
+  const untagged = selectedPetaTags.value.find((petaTag) => petaTag.id === UNTAGGED_ID);
+  const results = await API.send(
+    "getPetaImageIdsByPetaTagIds",
+    untagged ? [] : selectedPetaTags.value.map((petaTag) => petaTag.id),
+  );
+  filteredPetaImages.value = (
+    Array.from(
       new Set(
         results
           .map((id) => {
-            return this.petaImages[id]!;
+            return props.petaImages[id];
           })
           .filter((petaImage) => {
             return petaImage;
           }),
       ),
-    ).sort(this.sort);
+    ) as PetaImage[]
+  ).sort(sort);
+}
+function selectTag(tag: PetaTag) {
+  selectedPetaTags.value.length = 0;
+  selectedPetaTags.value.push(tag);
+}
+function updateVisibility(tile: Tile) {
+  tile.visible =
+    (areaMinY.value < tile.position.y && tile.position.y < areaMaxY.value) ||
+    (areaMinY.value < tile.position.y + tile.height && tile.position.y + tile.height < areaMaxY.value) ||
+    (areaMinY.value > tile.position.y && tile.position.y + tile.height > areaMaxY.value);
+  tile.preVisible =
+    (areaPreVisibleMinY.value < tile.position.y && tile.position.y < areaPreVisibleMaxY.value) ||
+    (areaPreVisibleMinY.value < tile.position.y + tile.height &&
+      tile.position.y + tile.height < areaPreVisibleMaxY.value) ||
+    (areaPreVisibleMinY.value > tile.position.y && tile.position.y + tile.height > areaPreVisibleMaxY.value);
+}
+function keyA() {
+  if (isKeyboardLocked()) {
+    return;
   }
-  get thumbnailsRowCount() {
-    let c = Math.floor(this.thumbnailsWidth / this.thumbnailsSize);
-    if (c < 1) {
-      return 1;
-    }
-    return c;
-  }
-  get actualTileSize() {
-    return this.thumbnailsWidth / this.thumbnailsRowCount;
-  }
-  get scrollHeight() {
-    return this.tiles
-      .map((tile) => {
-        return tile.position.y + tile.height;
-      })
-      .reduce((a, b) => {
-        return a > b ? a : b;
-      }, 0);
-  }
-  get tiles(): Tile[] {
-    if (this.actualTileSize === 0) {
-      return [];
-    }
-    const yList: number[] = [];
-    for (let i = 0; i < this.thumbnailsRowCount; i++) {
-      yList.push(0);
-    }
-    let prevDateString = "";
-    const tiles: Tile[] = [];
-    this.filteredPetaImages
-      // .map((pi) => {
-      //   if (!this.targetPetaImage) {
-      //     return {
-      //       petaImage: pi,
-      //       score: 0
-      //     }
-      //   }
-      //   return {
-      //     petaImage: pi,
-      //     score: getSimilarityScore2(this.targetPetaImage.palette, pi.palette)
-      //   }
-      // })
-      // .sort((a, b) => b.score - a.score)
-      // .map((p) => p.petaImage)
-      .map((p) => {
-        let minY = Number.MAX_VALUE;
-        let maxY = Number.MIN_VALUE;
-        let mvi = 0;
-        yList.forEach((y, vi) => {
-          if (minY > y) {
-            minY = y;
-            mvi = vi;
-          }
-          if (maxY < y) {
-            maxY = y;
-          }
-        });
-        let newGroup = false;
-        const date = new Date(p.addDate);
-        const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-        if (prevDateString != currentDateString && this.$states.groupingByDate) {
-          prevDateString = currentDateString;
-          mvi = 0;
-          minY = maxY;
-          yList.fill(minY);
-          newGroup = true;
-        }
-        if (newGroup) {
-          const height = 32;
-          const position = new Vec2(0, yList[mvi]! + BROWSER_THUMBNAIL_MARGIN);
-          yList.fill(minY + height);
-          const tile: Tile = {
-            position: position,
-            width: this.thumbnailsWidth,
-            height: height,
-            visible: false,
-            preVisible: false,
-            group: currentDateString,
-            id: currentDateString,
-          };
-          this.updateVisibility(tile);
-          tiles.push(tile);
-        }
-        const position = new Vec2(
-          mvi * this.actualTileSize + BROWSER_THUMBNAIL_MARGIN,
-          yList[mvi]! + BROWSER_THUMBNAIL_MARGIN,
-        );
-        const height = p.height * this.actualTileSize;
-        yList[mvi] += height;
-        const tile: Tile = {
-          petaImage: p,
-          position: position,
-          width: this.actualTileSize - BROWSER_THUMBNAIL_MARGIN,
-          height: height - BROWSER_THUMBNAIL_MARGIN,
-          visible: false,
-          preVisible: false,
-          id: p.id,
-        };
-        this.updateVisibility(tile);
-        tiles.push(tile);
-      });
-    return tiles;
-  }
-  updateVisibility(tile: Tile) {
-    tile.visible =
-      (this.areaMinY < tile.position.y && tile.position.y < this.areaMaxY) ||
-      (this.areaMinY < tile.position.y + tile.height && tile.position.y + tile.height < this.areaMaxY) ||
-      (this.areaMinY > tile.position.y && tile.position.y + tile.height > this.areaMaxY);
-    tile.preVisible =
-      (this.areaPreVisibleMinY < tile.position.y && tile.position.y < this.areaPreVisibleMaxY) ||
-      (this.areaPreVisibleMinY < tile.position.y + tile.height &&
-        tile.position.y + tile.height < this.areaPreVisibleMaxY) ||
-      (this.areaPreVisibleMinY > tile.position.y && tile.position.y + tile.height > this.areaPreVisibleMaxY);
-  }
-  get visibleTiles(): Tile[] {
-    return this.tiles.filter((p) => p.preVisible);
-  }
-  get original() {
-    return this.$settings.loadTilesInOriginal && this.actualTileSize > BROWSER_THUMBNAIL_SIZE;
-  }
-  keyA() {
-    if (isKeyboardLocked()) {
-      return;
-    }
-    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      this.clearSelectionAllImages();
-      this.filteredPetaImages.forEach((pi) => {
-        pi._selected = true;
-      });
-    }
+  if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+    clearSelectionAllImages();
+    filteredPetaImages.value.forEach((pi) => {
+      pi._selected = true;
+    });
   }
 }
+const petaImagesArray = computed(() => {
+  return Object.values(props.petaImages);
+});
+const selectedPetaImages = computed(() => {
+  return petaImagesArray.value.filter((pi) => pi._selected);
+});
+const thumbnailsRowCount = computed(() => {
+  let c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);
+  if (c < 1) {
+    return 1;
+  }
+  return c;
+});
+const actualTileSize = computed(() => {
+  return thumbnailsWidth.value / thumbnailsRowCount.value;
+});
+const scrollHeight = computed(() => {
+  return tiles.value
+    .map((tile) => {
+      return tile.position.y + tile.height;
+    })
+    .reduce((a, b) => {
+      return a > b ? a : b;
+    }, 0);
+});
+const tiles = computed((): Tile[] => {
+  if (actualTileSize.value === 0) {
+    return [];
+  }
+  const yList: number[] = [];
+  for (let i = 0; i < thumbnailsRowCount.value; i++) {
+    yList.push(0);
+  }
+  let prevDateString = "";
+  const tiles: Tile[] = [];
+  filteredPetaImages.value
+    // .map((pi) => {
+    //   if (!this.targetPetaImage) {
+    //     return {
+    //       petaImage: pi,
+    //       score: 0
+    //     }
+    //   }
+    //   return {
+    //     petaImage: pi,
+    //     score: getSimilarityScore2(this.targetPetaImage.palette, pi.palette)
+    //   }
+    // })
+    // .sort((a, b) => b.score - a.score)
+    // .map((p) => p.petaImage)
+    .map((p) => {
+      let minY = Number.MAX_VALUE;
+      let maxY = Number.MIN_VALUE;
+      let mvi = 0;
+      yList.forEach((y, vi) => {
+        if (minY > y) {
+          minY = y;
+          mvi = vi;
+        }
+        if (maxY < y) {
+          maxY = y;
+        }
+      });
+      let newGroup = false;
+      const date = new Date(p.addDate);
+      const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+      if (prevDateString != currentDateString && statesStore.state.value.groupingByDate) {
+        prevDateString = currentDateString;
+        mvi = 0;
+        minY = maxY;
+        yList.fill(minY);
+        newGroup = true;
+      }
+      if (newGroup) {
+        const height = 32;
+        const position = new Vec2(0, (yList[mvi] || 0) + BROWSER_THUMBNAIL_MARGIN);
+        yList.fill(minY + height);
+        const tile: Tile = {
+          position: position,
+          width: thumbnailsWidth.value,
+          height: height,
+          visible: false,
+          preVisible: false,
+          group: currentDateString,
+          id: currentDateString,
+        };
+        updateVisibility(tile);
+        tiles.push(tile);
+      }
+      const position = new Vec2(
+        mvi * actualTileSize.value + BROWSER_THUMBNAIL_MARGIN,
+        (yList[mvi] || 0) + BROWSER_THUMBNAIL_MARGIN,
+      );
+      const height = p.height * actualTileSize.value;
+      yList[mvi] += height;
+      const tile: Tile = {
+        petaImage: p,
+        position: position,
+        width: actualTileSize.value - BROWSER_THUMBNAIL_MARGIN,
+        height: height - BROWSER_THUMBNAIL_MARGIN,
+        visible: false,
+        preVisible: false,
+        id: p.id,
+      };
+      updateVisibility(tile);
+      tiles.push(tile);
+    });
+  return tiles;
+});
+const visibleTiles = computed((): Tile[] => {
+  return tiles.value.filter((p) => p.preVisible);
+});
+const original = computed(() => {
+  return settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE;
+});
+watch(selectedPetaTags, () => {
+  currentScrollTileId.value = "";
+  nextTick(() => {
+    if (thumbnails.value) {
+      thumbnails.value.scrollTop = 0;
+    }
+  });
+  fetchFilteredPetaImages();
+});
+watch(petaImagesArray, () => {
+  fetchFilteredPetaImages();
+});
+watch(
+  () => props.petaTagInfos,
+  () => {
+    fetchFilteredPetaImages();
+  },
+);
+watch(thumbnailsSize, () => {
+  restoreScrollPosition();
+});
 </script>
 
 <style lang="scss" scoped>

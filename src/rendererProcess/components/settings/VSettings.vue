@@ -18,22 +18,26 @@
       -->
       <t-content v-show="currentTab === 'general'">
         <label>
-          <input type="checkbox" v-model="$settings.darkMode" :disabled="$settings.autoDarkMode" />
+          <input
+            type="checkbox"
+            v-model="settingsStore.state.value.darkMode"
+            :disabled="settingsStore.state.value.autoDarkMode"
+          />
           {{ $t("settings.darkMode") }}
         </label>
         <br />
         <label>
-          <input type="checkbox" v-model="$settings.autoDarkMode" />
+          <input type="checkbox" v-model="settingsStore.state.value.autoDarkMode" />
           {{ $t("settings.autoDarkMode") }}
         </label>
         <p>{{ $t("settings.autoDarkModeDescriptions") }}</p>
         <label>
-          <input type="checkbox" v-model="$settings.alwaysOnTop" />
+          <input type="checkbox" v-model="settingsStore.state.value.alwaysOnTop" />
           {{ $t("settings.alwaysOnTop") }}
         </label>
         <p>{{ $t("settings.alwaysOnTopDescriptions") }}</p>
         <label>
-          <select v-model="$settings.show">
+          <select v-model="settingsStore.state.value.show">
             <option value="board">{{ $t("settings.showBoard") }}</option>
             <option value="browser">{{ $t("settings.showBrowser") }}</option>
             <option value="both">{{ $t("settings.showBoth") }}</option>
@@ -47,10 +51,10 @@
       -->
       <t-content v-show="currentTab === 'control'">
         <label> {{ $t("settings.zoomSensitivity") }}: </label>
-        <input type="number" v-model="$settings.zoomSensitivity" />
+        <input type="number" v-model="settingsStore.state.value.zoomSensitivity" />
         <p>{{ $t("settings.zoomSensitivityDescriptions") }}</p>
         <label> {{ $t("settings.moveSensitivity") }}: </label>
-        <input type="number" v-model="$settings.moveSensitivity" />
+        <input type="number" v-model="settingsStore.state.value.moveSensitivity" />
         <p>{{ $t("settings.moveSensitivityDescriptions") }}</p>
       </t-content>
       <!--
@@ -65,12 +69,12 @@
         </label>
         <p>{{ $t("settings.regenerateMetadatasDescriptions") }}</p>
         <label>
-          <input type="checkbox" v-model="$settings.loadTilesInOriginal" />
+          <input type="checkbox" v-model="settingsStore.state.value.loadTilesInOriginal" />
           {{ $t("settings.loadTilesInOriginal") }}
         </label>
         <p>{{ $t("settings.loadTilesInOriginalDescriptions") }}</p>
         <label>
-          <input type="checkbox" v-model="$settings.showTagsOnTile" />
+          <input type="checkbox" v-model="settingsStore.state.value.showTagsOnTile" />
           {{ $t("settings.showTagsOnTile") }}
         </label>
         <p>{{ $t("settings.showTagsOnTileDescriptions") }}</p>
@@ -98,12 +102,12 @@
       -->
       <t-content v-show="currentTab === 'others'">
         <label>
-          <input type="checkbox" v-model="$settings.alwaysShowNSFW" />
+          <input type="checkbox" v-model="settingsStore.state.value.alwaysShowNSFW" />
           {{ $t("settings.alwaysShowNSFW") }} </label
         ><br />
         <p>{{ $t("settings.alwaysShowNSFWDescriptions") }}</p>
         <label>
-          <input type="checkbox" v-model="$settings.showFPS" />
+          <input type="checkbox" v-model="settingsStore.state.value.showFPS" />
           {{ $t("settings.showFPS") }} </label
         ><br />
         <p>{{ $t("settings.showFPSDescriptions") }}</p>
@@ -166,9 +170,10 @@ import { Settings } from "@/commons/datas/settings";
 import { LICENSES } from "@/@assets/licenses";
 import { DOWNLOAD_URL, SUPPORT_URL } from "@/commons/defines";
 import { DEBUGGERS } from "@/@assets/debuggers";
+import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 
 const _this = getCurrentInstance()!.proxy!;
-
+const settingsStore = useSettingsStore();
 const regenerateMetadatasCompleted = ref(true);
 const regenerateMetadatasDone = ref(0);
 const regenerateMetadatasCount = ref(0);
@@ -195,7 +200,7 @@ onMounted(async () => {
     updateAvailable.value = true;
     currentTab.value = "update";
   });
-  tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
+  tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
   const remoteBinaryInfo = await API.send("getLatestVersion");
   if (!remoteBinaryInfo.isLatest) {
     currentTab.value = "update";
@@ -223,10 +228,10 @@ async function changePetaImageDirectory() {
           _this.$t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
           [_this.$t("shared.yes")],
         );
-        tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
+        tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
       }
     } else {
-      tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
+      tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
     }
   }
 }

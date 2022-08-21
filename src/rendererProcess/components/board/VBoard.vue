@@ -64,6 +64,8 @@ import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { computed } from "@vue/reactivity";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
+import { useStateStore } from "@/rendererProcess/stores/statesStore";
+import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -74,6 +76,8 @@ const props = defineProps<{
 }>();
 const { systemInfo } = useSystemInfoStore();
 const nsfwStore = useNSFWStore();
+const statesStore = useStateStore();
+const settingsStore = useSettingsStore();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const _this = getCurrentInstance()!.proxy!;
 const panelsBackground = ref<HTMLElement>();
@@ -315,7 +319,7 @@ function wheel(event: WheelEvent) {
   const mouse = vec2FromPointerEvent(event).sub(mouseOffset).sub(stageRect.clone().div(2));
   if (event.ctrlKey || systemInfo.value.platform === "win32") {
     const currentZoom = currentBoard.value.transform.scale;
-    currentBoard.value.transform.scale *= 1 + -event.deltaY * _this.$settings.zoomSensitivity * 0.00001;
+    currentBoard.value.transform.scale *= 1 + -event.deltaY * settingsStore.state.value.zoomSensitivity * 0.00001;
     if (currentBoard.value.transform.scale > BOARD_ZOOM_MAX) {
       currentBoard.value.transform.scale = BOARD_ZOOM_MAX;
     } else if (currentBoard.value.transform.scale < BOARD_ZOOM_MIN) {
@@ -329,7 +333,7 @@ function wheel(event: WheelEvent) {
       .mult(-1);
   } else {
     currentBoard.value.transform.position.add(
-      new Vec2(event.deltaX, event.deltaY).mult(_this.$settings.moveSensitivity).mult(-0.01),
+      new Vec2(event.deltaX, event.deltaY).mult(settingsStore.state.value.moveSensitivity).mult(-0.01),
     );
   }
   updatePetaBoard();
@@ -658,7 +662,7 @@ async function load(params: {
     extracting.value = false;
     loading.value = false;
     Cursor.setDefaultCursor();
-    _this.$states.loadedPetaBoardId = currentBoard.value.id;
+    statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
     return;
   }
   log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(currentBoard.value.id));
@@ -761,7 +765,7 @@ async function load(params: {
   });
   Cursor.setDefaultCursor();
   if (!props.detailsMode) {
-    _this.$states.loadedPetaBoardId = currentBoard.value.id;
+    statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
   }
 }
 function onUpdateGif() {

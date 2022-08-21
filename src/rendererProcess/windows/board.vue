@@ -80,7 +80,9 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
+import { useStateStore } from "@/rendererProcess/stores/statesStore";
 const _this = getCurrentInstance()!.proxy!;
+const statesStore = useStateStore();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
@@ -233,8 +235,8 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
     return;
   }
   logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
-  _this.$states.selectedPetaBoardId = board.id;
-  _this.$states.loadedPetaBoardId = "";
+  statesStore.state.value.selectedPetaBoardId = board.id;
+  statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {
     if (
       (await _this.$components.dialog.show(_this.$t("boards.selectErrorBoardDialog", [board.name]), [

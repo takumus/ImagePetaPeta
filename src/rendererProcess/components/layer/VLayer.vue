@@ -1,14 +1,14 @@
 <template>
   <t-layer-root
     :class="{
-      hide: !$states.visibleLayerPanel,
+      hide: !statesStore.state.value.visibleLayerPanel,
     }"
     :style="{
       zIndex: zIndex,
     }"
   >
     <t-header @click.left="toggleVisible"> </t-header>
-    <t-layers-parent v-show="$states.visibleLayerPanel" ref="layersParent">
+    <t-layers-parent v-show="statesStore.state.value.visibleLayerPanel" ref="layersParent">
       <t-layers ref="layers">
         <VLayerCell
           v-for="layerCellData in layerCellDatas"
@@ -48,12 +48,14 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { SortHelper } from "@/rendererProcess/components/utils/sortHelper";
 import { PetaPanel } from "@/commons/datas/petaPanel";
+import { useStateStore } from "@/rendererProcess/stores/statesStore";
 type CellData = {
   data: PetaPanel;
   id: number;
 };
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
 const _this = getCurrentInstance()!.proxy!;
+const statesStore = useStateStore();
 const emit = defineEmits<{
   (e: "sortIndex"): void;
   (e: "petaPanelMenu", petaPanel: PetaPanel, position: Vec2): void;
@@ -136,7 +138,7 @@ function clearSelectionAll(force = false) {
   }
 }
 function toggleVisible() {
-  _this.$states.visibleLayerPanel = !_this.$states.visibleLayerPanel;
+  statesStore.state.value.visibleLayerPanel = !statesStore.state.value.visibleLayerPanel;
 }
 function updateCellData(cellData: CellData) {
   emit("update:petaPanels", [
