@@ -42,9 +42,13 @@ export function createPetaBoard(name: string, index = 0, dark: boolean) {
   };
   return board;
 }
-export function dbPetaBoardsToPetaBoards(dbBoards: PetaBoard[], petaImages: PetaImages, copy = true) {
+export function dbPetaBoardsToPetaBoards(
+  dbBoards: { [petaBoardId: string]: PetaBoard },
+  petaImages: PetaImages,
+  copy = true,
+) {
   const boards = copy ? deepcopy(dbBoards) : dbBoards;
-  return boards.forEach((board) => {
+  return Object.values(boards).forEach((board) => {
     board.transform.position = new Vec2(board.transform.position);
     Object.values(board.petaPanels).forEach((pp) => {
       dbPetaPanelToPetaPanel(pp, petaImages, false);

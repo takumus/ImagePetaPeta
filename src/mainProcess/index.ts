@@ -375,11 +375,11 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           try {
             log.log("#Get PetaBoards");
             const petaBoards = await petaDatas.getPetaBoards();
-            if (petaBoards.length === 0) {
+            if (Object.keys(petaBoards).length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
               await petaDatas.updatePetaBoard(board, UpdateMode.UPSERT);
-              petaBoards.push(board);
+              petaBoards[board.id] = board;
             }
             log.log("return:", petaBoards.length);
             return petaBoards;
@@ -392,7 +392,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
               message: String(e),
             });
           }
-          return [];
+          return {};
         },
         async updatePetaBoards(event, boards, mode) {
           const log = mainLogger.logChunk();

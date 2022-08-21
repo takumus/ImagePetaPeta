@@ -17,7 +17,7 @@ export interface MainFunctions {
   cancelTasks: (ids: string[]) => Promise<void>;
   getPetaImages: () => Promise<PetaImages>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
-  getPetaBoards: () => Promise<PetaBoard[]>;
+  getPetaBoards: () => Promise<{ [petaBoardId: string]: PetaBoard }>;
   updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
   getPetaImageIdsByPetaTagIds: (petaTagIds?: string[]) => Promise<string[]>;

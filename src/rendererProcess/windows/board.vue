@@ -101,7 +101,7 @@ export default class BoardIndex extends Vue {
   @Ref("vPetaBoard")
   vPetaBoard!: typeof VBoard;
   petaImages: PetaImages = {};
-  boards: PetaBoard[] = [];
+  boards: { [petaBoardId: string]: PetaBoard } = {};
   orderedAddPanelIds: string[] = [];
   orderedAddPanelDragEvent = new Vec2();
   boardUpdaters: { [key: string]: DelayUpdater<PetaBoard> } = {};
@@ -116,7 +116,7 @@ export default class BoardIndex extends Vue {
         let changeCurrentBoard = false;
         petaImages.forEach((petaImage) => {
           this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-          this.boards.forEach((board) => {
+          Object.values(this.boards).forEach((board) => {
             Object.values(board.petaPanels).forEach((petaPanel) => {
               if (petaPanel.petaImageId === petaImage.id) {
                 petaPanel._petaImage = this.petaImages[petaImage.id];
@@ -151,7 +151,7 @@ export default class BoardIndex extends Vue {
         let changeCurrentBoard = false;
         petaImages.forEach((petaImage) => {
           delete this.petaImages[petaImage.id];
-          this.boards.forEach((board) => {
+          Object.values(this.boards).forEach((board) => {
             Object.values(board.petaPanels).forEach((petaPanel) => {
               if (petaPanel.petaImageId === petaImage.id) {
                 petaPanel._petaImage = undefined;
@@ -187,10 +187,10 @@ export default class BoardIndex extends Vue {
   async restoreBoard() {
     const states = await API.send("getStates");
     this.errorPetaBoardId = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
-    const lastBoard = this.boards.find((board) => board.id === states.selectedPetaBoardId);
+    const lastBoard = this.boards[states.selectedPetaBoardId];
     this.selectPetaBoard(lastBoard);
     if (!lastBoard) {
-      this.selectPetaBoard(this.boards[0]);
+      this.selectPetaBoard(this.sortedPetaBoards[0]);
     }
   }
   async getPetaImages() {
@@ -199,7 +199,7 @@ export default class BoardIndex extends Vue {
   async getPetaBoards() {
     this.boards = await API.send("getPetaBoards");
     dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
-    this.boards.forEach((board) => {
+    Object.values(this.boards).forEach((board) => {
       let updater = this.boardUpdaters[board.id];
       if (updater) {
         updater.destroy();
@@ -281,23 +281,24 @@ export default class BoardIndex extends Vue {
       return;
     }
     this.boardUpdaters[board.id]?.destroy();
+    const index = this.sortedPetaBoards.indexOf(board);
     delete this.boardUpdaters[board.id];
-    const leftBoardId = this.boards[this.boards.findIndex((b) => b.id === board.id) - 1]?.id;
+    const rightBoardId = this.sortedPetaBoards[index + 1]?.id || "";
+    const leftBoardId = this.sortedPetaBoards[index - 1]?.id || "";
     await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
     await this.getPetaBoards();
-    const leftBoard = this.boards.find((board) => board.id === leftBoardId);
-    if (leftBoard) {
-      this.selectPetaBoard(leftBoard);
-    } else {
-      this.selectPetaBoard(this.boards[0]);
-    }
+    this.selectPetaBoard(this.boards[rightBoardId] || this.boards[leftBoardId] || this.sortedPetaBoards[0]);
   }
   async addPetaBoard() {
     const name = getNameAvoidDuplication(
       DEFAULT_BOARD_NAME,
-      this.boards.map((b) => b.name),
+      Object.values(this.boards).map((b) => b.name),
     );
-    const board = createPetaBoard(name, Math.max(...this.boards.map((b) => b.index), 0) + 1, this.$darkMode.value);
+    const board = createPetaBoard(
+      name,
+      Math.max(...Object.values(this.boards).map((b) => b.index), 0) + 1,
+      this.$darkMode.value,
+    );
     await API.send("updatePetaBoards", [board], UpdateMode.UPSERT);
     logChunk().log("vIndex", "PetaBoard Added", minimId(board.id));
     await this.getPetaBoards();
@@ -307,19 +308,18 @@ export default class BoardIndex extends Vue {
     if (this.errorPetaBoardId === this.currentPetaBoardId) {
       return undefined;
     }
-    return this.boards.find((board) => board.id === this.currentPetaBoardId);
+    return this.boards[this.currentPetaBoardId];
   }
   get sortedPetaBoards() {
-    return this.boards.sort((a, b) => a.index - b.index);
+    return Object.values(this.boards).sort((a, b) => {
+      return a.index - b.index;
+    });
   }
   updatePetaBoard(board: PetaBoard) {
     if (!board) {
       return;
     }
-    const index = this.boards.findIndex((_board) => _board.id === board.id);
-    if (this.boards[index]) {
-      this.boards[index] = board;
-    }
+    this.boards[board.id] = board;
     this.savePetaBoard(board);
   }
   @Watch("$focusedWindows.focused")

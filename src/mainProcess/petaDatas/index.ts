@@ -515,12 +515,13 @@ export class PetaDatas {
   }
   async getPetaBoards() {
     const log = this.mainLogger.logChunk();
-    const data = await this.datas.dbPetaBoard.find({});
-    data.forEach((board) => {
+    const boards: { [id: string]: PetaBoard } = {};
+    (await this.datas.dbPetaBoard.find({})).forEach((board) => {
       // バージョンアップ時のプロパティ更新
       upgradePetaBoard(board);
+      boards[board.id] = board;
     });
-    return data;
+    return boards;
   }
   async waifu2x(petaImages: PetaImage[]) {
     return Tasks.spawn(
