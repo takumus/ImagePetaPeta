@@ -579,9 +579,9 @@ function endCrop() {
     keyboards.enabled = true;
   }
 }
-function updateCrop(petaPanel: PetaPanel) {
+function updateCrop(petaPanel?: PetaPanel) {
   endCrop();
-  if (!petaPanel._petaImage) {
+  if (!petaPanel?._petaImage || currentBoard.value === undefined) {
     return;
   }
   const sign = 1;
@@ -590,6 +590,13 @@ function updateCrop(petaPanel: PetaPanel) {
       petaPanel.width *
         ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width)),
     ) * sign;
+  currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
+  load({
+    reload: {
+      additions: [],
+      deletions: [],
+    },
+  });
   updatePetaBoard();
   orderPIXIRender();
 }
