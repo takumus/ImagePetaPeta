@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function valueChecker() {
   const values: { [key: string]: any } = {};
   function isSame(key: string, value: any) {

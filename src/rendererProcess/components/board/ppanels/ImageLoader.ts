@@ -2,8 +2,7 @@ import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import * as PIXI from "pixi.js";
-import { AnimatedGIF, AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
-import { ILoaderMiddleware } from "pixi.js";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif";
 let animatedGIFCache: { [key: string]: AnimatedGIF } = {};
 export function clearAnimatedGIF() {
   Object.values(animatedGIFCache).forEach((cache) => {
@@ -24,6 +23,7 @@ export function getImage(petaImage: PetaImage | undefined) {
     //
   };
   let cancelResourcesLoader = (reason: string) => {
+    reason;
     //
   };
   const loader = new PIXI.Loader(undefined);
@@ -40,7 +40,7 @@ export function getImage(petaImage: PetaImage | undefined) {
           resource.animation = data;
           next();
         })
-        .catch((error) => {
+        .catch(() => {
           next();
         });
       return;

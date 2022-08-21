@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { parseGIF, decompressFrame, Frame } from "gifuct-js";
 import { DecompressWorkerData } from "@/rendererProcess/utils/pixi-gif/decompressWorkerData";
 const w: Worker = self as any;

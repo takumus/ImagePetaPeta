@@ -16,13 +16,12 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, ref, onMounted, getCurrentInstance } from "vue";
+import { computed, ref, onMounted } from "vue";
 // Others
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
-const _this = getCurrentInstance()!.proxy!;
 const nsfwStore = useNSFWStore();
 const props = defineProps<{
   propertyThumbnail: PropertyThumbnail;

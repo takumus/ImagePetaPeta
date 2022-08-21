@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onBeforeUpdate, onMounted, onUnmounted, ref, watch } from "vue";
 // Components
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
@@ -54,7 +54,6 @@ type CellData = {
   id: number;
 };
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
-const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
 const emit = defineEmits<{
   (e: "sortIndex"): void;

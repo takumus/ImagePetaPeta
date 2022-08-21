@@ -21,8 +21,8 @@ import { computed, ref, onMounted, onUnmounted } from "vue";
 // Components
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
-import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { MAX_PREVIEW_COUNT, UNTAGGED_ID } from "@/commons/defines";
+import { Vec2 } from "@/commons/utils/vec2";
+import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { API } from "@/rendererProcess/api";

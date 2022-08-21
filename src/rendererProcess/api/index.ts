@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { IpcRendererEvent } from "electron/main";

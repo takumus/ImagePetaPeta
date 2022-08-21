@@ -11,8 +11,8 @@ export function isLatest(meVersion: string, remoteVersion: string) {
   const remoteNumbers = remoteVersion.split(".");
   const length = Math.min(meNumbers.length, remoteNumbers.length);
   for (let i = 0; i < length; i++) {
-    const meNumber = parseInt(meNumbers[i]!.replace(/[^0-9]/g, ""));
-    const remoteNumber = parseInt(remoteNumbers[i]!.replace(/[^0-9]/g, ""));
+    const meNumber = parseInt(meNumbers[i]?.replace(/[^0-9]/g, "") || "0");
+    const remoteNumber = parseInt(remoteNumbers[i]?.replace(/[^0-9]/g, "") || "0");
     // A.B.C のC以降をマイナーとする。
     if (meNumber < remoteNumber) return false;
     if (meNumber > remoteNumber) return true;

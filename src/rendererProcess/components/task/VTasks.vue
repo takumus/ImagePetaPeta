@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 // Components
 import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VTask from "@/rendererProcess/components/task/VTask.vue";
@@ -22,7 +22,6 @@ import { API } from "@/rendererProcess/api";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 
-const _this = getCurrentInstance()!.proxy!;
 const windowStatus = useWindowStatusStore();
 const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {

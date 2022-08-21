@@ -1,3 +1,4 @@
+/* eslint-disable */
 //
 // https://github.com/wise9/enchant.js/blob/master/dev/src/Entity.js
 

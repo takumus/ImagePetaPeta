@@ -17,7 +17,6 @@ import { Prop, Ref, Watch } from "vue-property-decorator";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { createPetaPanel, PetaPanel } from "@/commons/datas/petaPanel";
 import { PPanel } from "@/rendererProcess/components/board/ppanels/PPanel";
 import { PTransformerDashedLine } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerDashedLine";
@@ -133,7 +132,7 @@ export default class VBoard extends Vue {
     this.rootContainer.y = rect.height / 2;
     this.orderPIXIRender();
   }
-  pointerup(e: PIXI.InteractionEvent) {
+  pointerup() {
     this.draggingControlPoint = undefined;
     this.dragging = false;
   }
@@ -280,6 +279,7 @@ export default class VBoard extends Vue {
       height = maxHeight;
       width = maxHeight / this.petaPanel._petaImage.height;
     }
+    height;
     return width;
   }
   get sevenCorners() {

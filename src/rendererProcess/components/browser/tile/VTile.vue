@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, ref, watch, getCurrentInstance, onMounted, onUnmounted } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 // Others
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
@@ -85,7 +85,6 @@ const props = defineProps<{
 }>();
 const nsfwStore = useNSFWStore();
 const settingsStore = useSettingsStore();
-const _this = getCurrentInstance()!.proxy!;
 const imageURL = ref("");
 const loadingImage = ref(true);
 const loadingTags = ref(true);

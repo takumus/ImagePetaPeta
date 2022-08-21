@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Sprite } from "@pixi/sprite";
 import { Texture, Renderer } from "@pixi/core";
 import { settings } from "@pixi/settings";

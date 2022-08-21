@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance } from "vue";
+import { computed } from "vue";
 // Components
 // Others
 import { API } from "@/rendererProcess/api";
@@ -44,7 +44,6 @@ import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
 const { windowType } = useWindowTypeStore();
 const { systemInfo } = useSystemInfoStore();
-const _this = getCurrentInstance()!.proxy!;
 defineProps<{
   title?: string;
 }>();
