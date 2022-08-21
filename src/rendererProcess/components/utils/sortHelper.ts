@@ -91,8 +91,8 @@ export class SortHelper<T extends { data: any; id: number }> {
       .forEach((v, index) => {
         if (this.dataToIndex(v.layerCellData) != index) {
           changed = true;
+          this.setIndex(v.layerCellData, index);
         }
-        this.setIndex(v.layerCellData, index);
       });
     if (changed) {
       this.sortIndex();
