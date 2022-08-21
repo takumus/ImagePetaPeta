@@ -117,7 +117,7 @@ export default class BoardIndex extends Vue {
         petaImages.forEach((petaImage) => {
           this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
           this.boards.forEach((board) => {
-            board.petaPanels.forEach((petaPanel) => {
+            Object.values(board.petaPanels).forEach((petaPanel) => {
               if (petaPanel.petaImageId === petaImage.id) {
                 petaPanel._petaImage = this.petaImages[petaImage.id];
               }
@@ -125,7 +125,7 @@ export default class BoardIndex extends Vue {
           });
           if (this.currentPetaBoard) {
             changeCurrentBoard =
-              this.currentPetaBoard.petaPanels.filter((petaPanel) => {
+              Object.values(this.currentPetaBoard.petaPanels).filter((petaPanel) => {
                 return petaPanel.petaImageId === petaImage.id;
               }).length > 0;
           }
@@ -152,7 +152,7 @@ export default class BoardIndex extends Vue {
         petaImages.forEach((petaImage) => {
           delete this.petaImages[petaImage.id];
           this.boards.forEach((board) => {
-            board.petaPanels.forEach((petaPanel) => {
+            Object.values(board.petaPanels).forEach((petaPanel) => {
               if (petaPanel.petaImageId === petaImage.id) {
                 petaPanel._petaImage = undefined;
               }
@@ -160,7 +160,7 @@ export default class BoardIndex extends Vue {
           });
           if (this.currentPetaBoard) {
             changeCurrentBoard =
-              this.currentPetaBoard.petaPanels.filter((petaPanel) => {
+              Object.values(this.currentPetaBoard.petaPanels).filter((petaPanel) => {
                 return petaPanel.petaImageId === petaImage.id;
               }).length > 0;
           }

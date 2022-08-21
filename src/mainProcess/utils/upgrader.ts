@@ -151,7 +151,7 @@ export function upgradeStates(states: States) {
   };
 }
 export function upgradeWindowStates(states: WindowStates) {
-  let changed = false;
+  const changed = false;
   //
   return {
     data: states,
@@ -166,9 +166,24 @@ export function upgradePetaBoard(board: PetaBoard) {
       lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
     };
   }
-  board.petaPanels.forEach((petaPanel) => {
+  // board.petaPanels.forEach((petaPanel) => {
+  //   upgradePetaPanel(petaPanel);
+  // });
+
+  // v3.0.0
+  if (Array.isArray(board.petaPanels)) {
+    const petaPanels = board.petaPanels as PetaPanel[];
+    const newPetaPanels: { [id: string]: PetaPanel } = {};
+    petaPanels.forEach((petaPanel) => {
+      newPetaPanels[petaPanel.id] = petaPanel;
+    });
+    board.petaPanels = newPetaPanels;
+  }
+
+  Object.values(board.petaPanels).forEach((petaPanel) => {
     upgradePetaPanel(petaPanel);
   });
+
   return board;
 }
 // 1.8.0

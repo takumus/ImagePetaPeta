@@ -11,7 +11,7 @@ import {
 import deepcopy from "deepcopy";
 
 export interface PetaBoard {
-  petaPanels: PetaPanel[];
+  petaPanels: { [petaPanelId: string]: PetaPanel };
   id: string;
   name: string;
   transform: PetaBoardTransform;
@@ -27,7 +27,7 @@ export interface PetaBoardTransform {
 }
 export function createPetaBoard(name: string, index = 0, dark: boolean) {
   const board: PetaBoard = {
-    petaPanels: [],
+    petaPanels: {},
     id: uuid(),
     name: name,
     transform: {
@@ -46,15 +46,14 @@ export function dbPetaBoardsToPetaBoards(dbBoards: PetaBoard[], petaImages: Peta
   const boards = copy ? deepcopy(dbBoards) : dbBoards;
   return boards.forEach((board) => {
     board.transform.position = new Vec2(board.transform.position);
-    board.petaPanels.forEach((pp) => {
+    Object.values(board.petaPanels).forEach((pp) => {
       dbPetaPanelToPetaPanel(pp, petaImages, false);
     });
-    // board.petaPanels = board.petaPanels.filter((pp) => pp._petaImage);
   });
 }
 export function petaBoardsToDBPetaBoards(board: PetaBoard, copy = true) {
   const b = copy ? deepcopy(board) : board;
-  b.petaPanels.forEach((pp) => {
+  Object.values(b.petaPanels).forEach((pp) => {
     petaPanelToDBPetaPanel(pp, false);
   });
   return b;

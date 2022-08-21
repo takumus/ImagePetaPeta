@@ -83,7 +83,10 @@ export default class DetailsIndex extends Vue {
       if (mode === UpdateMode.UPSERT) {
         petaImages.forEach((petaImage) => {
           this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-          this.board?.petaPanels.forEach((petaPanel) => {
+          if (!this.board) {
+            return;
+          }
+          Object.values(this.board.petaPanels).forEach((petaPanel) => {
             if (petaPanel.petaImageId === petaImage.id) {
               petaPanel._petaImage = this.petaImages[petaImage.id];
               this.vPetaBoard.load({});
@@ -101,7 +104,10 @@ export default class DetailsIndex extends Vue {
       } else if (mode === UpdateMode.REMOVE) {
         petaImages.forEach((petaImage) => {
           delete this.petaImages[petaImage.id];
-          this.board?.petaPanels.forEach((petaPanel) => {
+          if (!this.board) {
+            return;
+          }
+          Object.values(this.board.petaPanels).forEach((petaPanel) => {
             if (petaPanel.petaImageId === petaImage.id) {
               API.send("windowClose");
             }
@@ -179,7 +185,7 @@ export default class DetailsIndex extends Vue {
       _petaImage: this.petaImage,
     };
     this.board = {
-      petaPanels: [panel],
+      petaPanels: { [panel.id]: panel },
       id: "details",
       name: "details",
       transform: {

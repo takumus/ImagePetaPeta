@@ -22,7 +22,7 @@
       v-show="!detailsMode"
       :zIndex="1"
       :visible="true"
-      :pPanelsArray="currentBoard?.petaPanels"
+      :pPanelsArray="petaPanelsArray"
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
       @update="orderPIXIRender"
@@ -62,6 +62,7 @@ import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
+import { computed } from "@vue/reactivity";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -240,7 +241,7 @@ function pointerdown(e: PIXI.InteractionEvent) {
   orderPIXIRender();
 }
 function getPPanelFromObject(object: PIXI.DisplayObject) {
-  if (currentBoard.value?.petaPanels.includes((object as PPanel).petaPanel)) {
+  if (currentBoard.value?.petaPanels[(object as PPanel).petaPanel?.id]) {
     return object as PPanel;
   }
   return undefined;
@@ -414,8 +415,10 @@ function removeSelectedPanels() {
   }
   selectedPPanels().forEach((pPanel) => {
     removePPanel(pPanel);
+    if (currentBoard.value) {
+      delete currentBoard.value.petaPanels[pPanel.petaPanel.id];
+    }
   });
-  currentBoard.value.petaPanels = pPanelsArray().map((pPanel) => pPanel.petaPanel);
   orderPIXIRender();
   updatePetaBoard();
 }
@@ -552,8 +555,8 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   petaPanel.height *= 1 / currentBoard.value.transform.scale;
   petaPanel.position.sub(mouseOffset);
   petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-  petaPanel.index = Math.max(...currentBoard.value.petaPanels.map((petaPanel) => petaPanel.index)) + 1;
-  currentBoard.value.petaPanels.push(petaPanel);
+  petaPanel.index = Math.max(...Object.values(currentBoard.value.petaPanels).map((petaPanel) => petaPanel.index)) + 1;
+  currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   updatePetaBoard();
 }
 function beginCrop(petaPanel: PetaPanel) {
@@ -595,7 +598,7 @@ function sortIndex() {
   if (!currentBoard.value) {
     return;
   }
-  currentBoard.value.petaPanels
+  Object.values(currentBoard.value.petaPanels)
     .sort((a, b) => a.index - b.index)
     .forEach((petaPanel, i) => {
       petaPanel.index = i;
@@ -625,8 +628,9 @@ async function load(params: {
   if (currentBoard.value === undefined) {
     return;
   }
+  const petaPanels = Object.values(currentBoard.value.petaPanels);
   if (params.reload && params.reload.additions.length === 0 && params.reload.deletions.length === 0) {
-    currentBoard.value.petaPanels.forEach((petaPanel) => {
+    petaPanels.forEach((petaPanel) => {
       const pPanel = pPanels[petaPanel.id];
       if (pPanel) {
         pPanel.petaPanel = petaPanel;
@@ -648,7 +652,7 @@ async function load(params: {
     log("vBoard", `canceled loading`);
     return load(params);
   }
-  if (currentBoard.value.petaPanels.length === 0) {
+  if (petaPanels.length === 0) {
     extracting.value = false;
     loading.value = false;
     Cursor.setDefaultCursor();
@@ -661,17 +665,17 @@ async function load(params: {
     if (currentBoard.value === undefined) {
       return;
     }
-    const progress = `${index + 1}/${currentBoard.value.petaPanels.length}`;
+    const progress = `${index + 1}/${petaPanels.length}`;
     let loadResult = "";
     try {
       const onLoaded = (petaPanel: PetaPanel) => {
         loaded++;
         if (currentBoard.value) {
-          loadProgress.value = Math.floor((loaded / currentBoard.value.petaPanels.length) * 100);
-          const progress = `${loaded}/${currentBoard.value.petaPanels.length}`;
+          loadProgress.value = Math.floor((loaded / petaPanels.length) * 100);
+          const progress = `${loaded}/${petaPanels.length}`;
           extractingLog.value =
             `load complete   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
-          if (loaded == currentBoard.value.petaPanels.length) {
+          if (loaded == petaPanels.length) {
             loading.value = false;
           }
         }
@@ -734,9 +738,9 @@ async function load(params: {
       extractingLog.value =
         `extract error   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
     }
-    extractProgress.value = ((index + 1) / currentBoard.value.petaPanels.length) * 100;
+    extractProgress.value = ((index + 1) / petaPanels.length) * 100;
   };
-  const extraction = promiseSerial(extract, [...currentBoard.value.petaPanels]);
+  const extraction = promiseSerial(extract, [...petaPanels]);
   cancelExtract = extraction.cancel;
   try {
     await extraction.promise;
@@ -851,10 +855,7 @@ function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
     if (currentBoard.value === undefined) {
       return;
     }
-    const id = currentBoard.value.petaPanels.findIndex((v) => v.id === petaPanel.id);
-    if (currentBoard.value.petaPanels[id]) {
-      currentBoard.value.petaPanels[id] = petaPanel;
-    }
+    currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   });
   load({
     reload: {
@@ -864,6 +865,12 @@ function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
   });
   updatePetaPanels();
 }
+const petaPanelsArray = computed(() => {
+  if (!currentBoard.value) {
+    return undefined;
+  }
+  return Object.values(currentBoard.value?.petaPanels);
+});
 watch(
   () => nsfwStore.state.value,
   () => {
