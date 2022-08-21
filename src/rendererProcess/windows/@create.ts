@@ -6,8 +6,6 @@ import { API } from "@/rendererProcess/api";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { WindowType } from "@/commons/datas/windowType";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
-import GlobalDarkMode from "@/rendererProcess/vueComponentCustomProperties/darkMode";
-import GlobalNSFW from "@/rendererProcess/vueComponentCustomProperties/nsfw";
 
 import { createDarkModeStore, darkModeStoreKey } from "@/rendererProcess/stores/darkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/rendererProcess/stores/nsfwStore";
@@ -39,8 +37,6 @@ export async function create(component: Component, windowType: WindowType) {
       }),
     );
     await appUse(GlobalComponents);
-    await appUse(GlobalDarkMode);
-    await appUse(GlobalNSFW);
     app.provide(darkModeStoreKey, await createDarkModeStore());
     app.provide(nsfwStoreKey, await createNSFWStore());
     app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType));

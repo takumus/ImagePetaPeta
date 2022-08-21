@@ -46,9 +46,7 @@
     "sharp": "^0.30.6",
     "uuid": "^8.3.2",
     "vue": "^3.2.37",
-    "vue-class-component": "8.0.0-rc.1",
-    "vue-i18n": "9.2.0-beta.36",
-    "vue-property-decorator": "^9.1.2"
+    "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
     "@shockpkg/icon-encoder": "^1.3.1",

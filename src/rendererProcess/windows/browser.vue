@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value,
+      dark: darkModeStore.state.value,
     }"
   >
     <t-content>
@@ -41,8 +41,10 @@ import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 const _this = getCurrentInstance()!.proxy!;
 const appInfoStore = useAppInfoStore();
+const darkModeStore = useDarkModeStore();
 const petaImages = ref<PetaImages>({});
 const petaTagInfos = ref<PetaTagInfo[]>([]);
 const title = ref("");

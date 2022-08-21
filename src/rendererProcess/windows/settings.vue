@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value,
+      dark: darkModeStore.state.value,
     }"
   >
     <t-content>
@@ -31,8 +31,10 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import { API } from "@/rendererProcess/api";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 const _this = getCurrentInstance()!.proxy!;
 const appInfoStore = useAppInfoStore();
+const darkModeStore = useDarkModeStore();
 const title = ref("");
 const keyboards = useKeyboardsStore();
 onMounted(() => {
