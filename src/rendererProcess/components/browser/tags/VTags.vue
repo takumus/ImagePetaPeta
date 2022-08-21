@@ -2,7 +2,7 @@
   <t-tags-root>
     <t-tags>
       <t-tag @click="selectPetaTag()" :class="{ selected: selectedAll }">
-        <VEditableLabel :label="`${$t('browser.all')}(${petaImagesArray.length})`" :readonly="true" />
+        <VEditableLabel :label="`${t('browser.all')}(${petaImagesArray.length})`" :readonly="true" />
       </t-tag>
       <t-tag
         v-for="c in browserTags"
@@ -52,6 +52,7 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
+import { useI18n } from "vue-i18n";
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
   (e: "update:selectedPetaTags", selectedPetaTags: PetaTag[]): void;
@@ -62,6 +63,7 @@ const props = defineProps<{
   selectedPetaTags: PetaTag[];
 }>();
 const textsStore = useTextsStore();
+const { t } = useI18n();
 function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   if (tag.readonly) {
     return;
@@ -69,7 +71,7 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   _this.$components.contextMenu.open(
     [
       {
-        label: _this.$t("browser.tagMenu.remove", [tag.petaTag.name]),
+        label: t("browser.tagMenu.remove", [tag.petaTag.name]),
         click: () => {
           removeTag(tag.petaTag);
         },
@@ -86,9 +88,9 @@ async function addTag(name: string) {
 }
 async function removeTag(petaTag: PetaTag) {
   if (
-    (await _this.$components.dialog.show(_this.$t("browser.removeTagDialog", [petaTag.name]), [
-      _this.$t("shared.yes"),
-      _this.$t("shared.no"),
+    (await _this.$components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [
+      t("shared.yes"),
+      t("shared.no"),
     ])) === 0
   ) {
     await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
@@ -106,7 +108,7 @@ async function changeTag(petaTag: PetaTag, newName: string) {
     return;
   }
   if (browserTags.value.find((c) => c.petaTag.name === newName)) {
-    _this.$components.dialog.show(_this.$t("browser.tagAlreadyExistsDialog", [newName]), [_this.$t("shared.yes")]);
+    _this.$components.dialog.show(t("browser.tagAlreadyExistsDialog", [newName]), [t("shared.yes")]);
     return;
   }
   petaTag.name = newName;

@@ -1,10 +1,10 @@
 <template>
   <t-property-root>
     <t-infos v-if="singlePetaImageInfo">
-      <p>{{ $t("browser.property.infos.label") }}{{ darkModeStore.state }}</p>
+      <p>{{ t("browser.property.infos.label") }}{{ darkModeStore.state }}</p>
       <t-datas>
         <t-data>
-          <t-name>{{ $t("browser.property.infos.name") }}</t-name>
+          <t-name>{{ t("browser.property.infos.name") }}</t-name>
           <t-value>
             <VEditableLabel
               :label="singlePetaImageInfo.petaImage.name"
@@ -17,18 +17,18 @@
           </t-value>
         </t-data>
         <t-data>
-          <t-name>{{ $t("browser.property.infos.note") }}</t-name>
+          <t-name>{{ t("browser.property.infos.note") }}</t-name>
           <t-value>
             <textarea lock-keyboard ref="noteTextArea" v-model="note" @blur="blurNoteTextarea" @input="resizeNote">
             </textarea>
           </t-value>
         </t-data>
         <t-data>
-          <t-name>{{ $t("browser.property.infos.fileDate") }}</t-name>
+          <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
           <t-value>{{ singlePetaImageInfo.fileDate }}</t-value>
         </t-data>
         <t-data>
-          <t-name>{{ $t("browser.property.infos.addDate") }}</t-name>
+          <t-name>{{ t("browser.property.infos.addDate") }}</t-name>
           <t-value>{{ singlePetaImageInfo.addDate }}</t-value>
         </t-data>
       </t-datas>
@@ -47,7 +47,7 @@
       </t-palette>
     </t-infos>
     <t-tags v-show="!noImage">
-      <p>{{ $t("browser.property.tags") }}</p>
+      <p>{{ t("browser.property.tags") }}</p>
       <t-search-box v-if="!fetchingTags">
         <t-tag v-for="tag in sharedPetaTags" :key="tag.id">
           <VEditableLabel
@@ -75,7 +75,7 @@
       </t-search-box>
       <ul v-else>
         <li>
-          {{ $t("browser.property.fetchingTags") }}
+          {{ t("browser.property.fetchingTags") }}
         </li>
       </ul>
     </t-tags>
@@ -112,6 +112,7 @@ import dateFormat from "dateformat";
 import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -121,6 +122,7 @@ const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
 }>();
 const textsStore = useTextsStore();
+const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
@@ -204,7 +206,7 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
   _this.$components.contextMenu.open(
     [
       {
-        label: _this.$t("browser.property.tagMenu.remove", [tag.name]),
+        label: t("browser.property.tagMenu.remove", [tag.name]),
         click: () => {
           removeTag(tag);
         },

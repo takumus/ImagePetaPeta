@@ -82,8 +82,10 @@ import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+import { useI18n } from "vue-i18n";
 const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
+const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
@@ -161,9 +163,7 @@ onMounted(async () => {
       }
     }
   });
-  document.title = `${_this.$t("titles.boards")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
+  document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
   await getPetaImages();
   await getPetaBoards();
   await restoreBoard();
@@ -243,9 +243,9 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
   statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {
     if (
-      (await _this.$components.dialog.show(_this.$t("boards.selectErrorBoardDialog", [board.name]), [
-        _this.$t("shared.yes"),
-        _this.$t("shared.no"),
+      (await _this.$components.dialog.show(t("boards.selectErrorBoardDialog", [board.name]), [
+        t("shared.yes"),
+        t("shared.no"),
       ])) != 0
     ) {
       return;
@@ -260,10 +260,8 @@ function savePetaBoard(board: PetaBoard) {
 }
 async function removePetaBoard(board: PetaBoard) {
   if (
-    (await _this.$components.dialog.show(_this.$t("boards.removeDialog", [board.name]), [
-      _this.$t("shared.yes"),
-      _this.$t("shared.no"),
-    ])) != 0
+    (await _this.$components.dialog.show(t("boards.removeDialog", [board.name]), [t("shared.yes"), t("shared.no")])) !=
+    0
   ) {
     return;
   }

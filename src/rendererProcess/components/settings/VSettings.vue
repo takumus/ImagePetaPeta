@@ -9,7 +9,7 @@
         }"
         @click="currentTab = tab"
       >
-        {{ $t("settings." + tab) }}
+        {{ t("settings." + tab) }}
       </li>
     </ul>
     <t-contents>
@@ -23,68 +23,68 @@
             v-model="settingsStore.state.value.darkMode"
             :disabled="settingsStore.state.value.autoDarkMode"
           />
-          {{ $t("settings.darkMode") }}
+          {{ t("settings.darkMode") }}
         </label>
         <br />
         <label>
           <input type="checkbox" v-model="settingsStore.state.value.autoDarkMode" />
-          {{ $t("settings.autoDarkMode") }}
+          {{ t("settings.autoDarkMode") }}
         </label>
-        <p>{{ $t("settings.autoDarkModeDescriptions") }}</p>
+        <p>{{ t("settings.autoDarkModeDescriptions") }}</p>
         <label>
           <input type="checkbox" v-model="settingsStore.state.value.alwaysOnTop" />
-          {{ $t("settings.alwaysOnTop") }}
+          {{ t("settings.alwaysOnTop") }}
         </label>
-        <p>{{ $t("settings.alwaysOnTopDescriptions") }}</p>
+        <p>{{ t("settings.alwaysOnTopDescriptions") }}</p>
         <label>
           <select v-model="settingsStore.state.value.show">
-            <option value="board">{{ $t("settings.showBoard") }}</option>
-            <option value="browser">{{ $t("settings.showBrowser") }}</option>
-            <option value="both">{{ $t("settings.showBoth") }}</option>
+            <option value="board">{{ t("settings.showBoard") }}</option>
+            <option value="browser">{{ t("settings.showBrowser") }}</option>
+            <option value="both">{{ t("settings.showBoth") }}</option>
           </select>
-          {{ $t("settings.show") }}
+          {{ t("settings.show") }}
         </label>
-        <p>{{ $t("settings.showDescriptions") }}</p>
+        <p>{{ t("settings.showDescriptions") }}</p>
       </t-content>
       <!--
         Control
       -->
       <t-content v-show="currentTab === 'control'">
-        <label> {{ $t("settings.zoomSensitivity") }}: </label>
+        <label> {{ t("settings.zoomSensitivity") }}: </label>
         <input type="number" v-model="settingsStore.state.value.zoomSensitivity" />
-        <p>{{ $t("settings.zoomSensitivityDescriptions") }}</p>
-        <label> {{ $t("settings.moveSensitivity") }}: </label>
+        <p>{{ t("settings.zoomSensitivityDescriptions") }}</p>
+        <label> {{ t("settings.moveSensitivity") }}: </label>
         <input type="number" v-model="settingsStore.state.value.moveSensitivity" />
-        <p>{{ $t("settings.moveSensitivityDescriptions") }}</p>
+        <p>{{ t("settings.moveSensitivityDescriptions") }}</p>
       </t-content>
       <!--
         Browser
       -->
       <t-content v-show="currentTab === 'browser'">
         <button v-show="regenerateMetadatasCompleted" @click="regenerateMetadatas">
-          {{ $t("settings.regenerateMetadatasButton") }}
+          {{ t("settings.regenerateMetadatasButton") }}
         </button>
         <label v-show="!regenerateMetadatasCompleted">
           {{ regenerateMetadatasDone }}/{{ regenerateMetadatasCount }}
         </label>
-        <p>{{ $t("settings.regenerateMetadatasDescriptions") }}</p>
+        <p>{{ t("settings.regenerateMetadatasDescriptions") }}</p>
         <label>
           <input type="checkbox" v-model="settingsStore.state.value.loadTilesInOriginal" />
-          {{ $t("settings.loadTilesInOriginal") }}
+          {{ t("settings.loadTilesInOriginal") }}
         </label>
-        <p>{{ $t("settings.loadTilesInOriginalDescriptions") }}</p>
+        <p>{{ t("settings.loadTilesInOriginalDescriptions") }}</p>
         <label>
           <input type="checkbox" v-model="settingsStore.state.value.showTagsOnTile" />
-          {{ $t("settings.showTagsOnTile") }}
+          {{ t("settings.showTagsOnTile") }}
         </label>
-        <p>{{ $t("settings.showTagsOnTileDescriptions") }}</p>
+        <p>{{ t("settings.showTagsOnTileDescriptions") }}</p>
       </t-content>
       <!--
         Datas
       -->
       <t-content v-show="currentTab === 'datas'">
         <button @click="browsePetaImageDirectory">
-          {{ $t("settings.browsePetaImageDirectoryButton") }}</button
+          {{ t("settings.browsePetaImageDirectoryButton") }}</button
         ><br />
         <VEditableLabel
           :label="tempPetaImageDirectory"
@@ -93,9 +93,9 @@
         />
         <br />
         <button @click="changePetaImageDirectory" :disabled="tempPetaImageDirectory === ''">
-          {{ $t("settings.changePetaImageDirectoryButton") }}
+          {{ t("settings.changePetaImageDirectoryButton") }}
         </button>
-        <p>{{ $t("settings.changePetaImageDirectoryDescriptions") }}</p>
+        <p>{{ t("settings.changePetaImageDirectoryDescriptions") }}</p>
       </t-content>
       <!--
         Others
@@ -103,14 +103,14 @@
       <t-content v-show="currentTab === 'others'">
         <label>
           <input type="checkbox" v-model="settingsStore.state.value.alwaysShowNSFW" />
-          {{ $t("settings.alwaysShowNSFW") }} </label
+          {{ t("settings.alwaysShowNSFW") }} </label
         ><br />
-        <p>{{ $t("settings.alwaysShowNSFWDescriptions") }}</p>
+        <p>{{ t("settings.alwaysShowNSFWDescriptions") }}</p>
         <label>
           <input type="checkbox" v-model="settingsStore.state.value.showFPS" />
-          {{ $t("settings.showFPS") }} </label
+          {{ t("settings.showFPS") }} </label
         ><br />
-        <p>{{ $t("settings.showFPSDescriptions") }}</p>
+        <p>{{ t("settings.showFPSDescriptions") }}</p>
       </t-content>
       <!--
         Update
@@ -118,15 +118,15 @@
       <t-content v-show="currentTab === 'update'" class="update">
         <t-strong>
           <p v-if="updateAvailable">
-            {{ $t("settings.updateAvailable") }}<br />
-            {{ $t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
-            {{ $t("settings.latestVersion") }}: {{ latestVersion }}<br />
-            <button @click="downloadUpdate">{{ $t("settings.updateButton") }}</button>
+            {{ t("settings.updateAvailable") }}<br />
+            {{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
+            {{ t("settings.latestVersion") }}: {{ latestVersion }}<br />
+            <button @click="downloadUpdate">{{ t("settings.updateButton") }}</button>
           </p>
           <p v-else>
-            {{ $t("settings.thisIsLatest") }}<br />
-            {{ $t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
-            <button @click="releaseNote">{{ $t("settings.releaseNoteButton") }}</button>
+            {{ t("settings.thisIsLatest") }}<br />
+            {{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
+            <button @click="releaseNote">{{ t("settings.releaseNoteButton") }}</button>
           </p>
         </t-strong>
       </t-content>
@@ -136,23 +136,23 @@
       <t-content v-show="currentTab === 'info'" class="info">
         <p>{{ appInfoStore.state.value.name }} {{ appInfoStore.state.value.version }}</p>
         <button tabindex="-1" @click="gotoGithub">
-          {{ $t("info.githubButton") }}
+          {{ t("info.githubButton") }}
         </button>
         <button tabindex="-1" @click="gotoIssues">
-          {{ $t("info.issuesButton") }}
+          {{ t("info.issuesButton") }}
         </button>
         <p></p>
         <button tabindex="-1" @click="showDBFolder">
-          {{ $t("info.dbFolderButton") }}
+          {{ t("info.dbFolderButton") }}
         </button>
         <button tabindex="-1" @click="showConfigFolder">
-          {{ $t("info.configFolderButton") }}
+          {{ t("info.configFolderButton") }}
         </button>
-        <p>{{ $t("info.assets") }}</p>
+        <p>{{ t("info.assets") }}</p>
         <button tabindex="-1" @click="gotoIcons8">Icons8.com</button>
-        <p>{{ $t("info.debuggers") }}</p>
+        <p>{{ t("info.debuggers") }}</p>
         <pre class="debuggers">{{ debuggers }}</pre>
-        <p>{{ $t("info.licenses") }}</p>
+        <p>{{ t("info.licenses") }}</p>
         <pre class="licenses">{{ licenses }}</pre>
       </t-content>
     </t-contents>
@@ -171,10 +171,12 @@ import { DOWNLOAD_URL, SUPPORT_URL } from "@/commons/defines";
 import { DEBUGGERS } from "@/@assets/debuggers";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+import { useI18n } from "vue-i18n";
 
 const _this = getCurrentInstance()!.proxy!;
 const settingsStore = useSettingsStore();
 const appInfoStore = useAppInfoStore();
+const { t } = useI18n();
 const regenerateMetadatasCompleted = ref(true);
 const regenerateMetadatasDone = ref(0);
 const regenerateMetadatasCount = ref(0);
@@ -220,14 +222,14 @@ async function browsePetaImageDirectory() {
 async function changePetaImageDirectory() {
   if (tempPetaImageDirectory.value) {
     const result = await _this.$components.dialog.show(
-      _this.$t("settings.changePetaImageDirectoryDialog", [tempPetaImageDirectory.value]),
-      [_this.$t("shared.yes"), _this.$t("shared.no")],
+      t("settings.changePetaImageDirectoryDialog", [tempPetaImageDirectory.value]),
+      [t("shared.yes"), t("shared.no")],
     );
     if (result === 0) {
       if (!(await API.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
         await _this.$components.dialog.show(
-          _this.$t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
-          [_this.$t("shared.yes")],
+          t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
+          [t("shared.yes")],
         );
         tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
       }

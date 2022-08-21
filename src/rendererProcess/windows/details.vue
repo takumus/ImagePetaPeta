@@ -6,7 +6,7 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="$t('titles.details')"> </VTitleBar>
+        <VTitleBar :title="t('titles.details')"> </VTitleBar>
         <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
@@ -52,8 +52,10 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
+import { useI18n } from "vue-i18n";
 const _this = getCurrentInstance()!.proxy!;
 const appInfoStore = useAppInfoStore();
+const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
 const board = ref<PetaBoard>();
@@ -107,7 +109,7 @@ onMounted(async () => {
     petaImageId.value = petaImage.id;
   });
   petaImageId.value = (await API.send("getDetailsPetaImage"))?.id;
-  title.value = `${_this.$t("titles.details")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  title.value = `${t("titles.details")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
   document.title = title.value;
   await getPetaImages();
   await getPetaTagInfos();

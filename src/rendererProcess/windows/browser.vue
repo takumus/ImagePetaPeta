@@ -6,7 +6,7 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="$t('titles.browser')"> </VTitleBar>
+        <VTitleBar :title="t('titles.browser')"> </VTitleBar>
         <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
@@ -42,8 +42,10 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
+import { useI18n } from "vue-i18n";
 const _this = getCurrentInstance()!.proxy!;
 const appInfoStore = useAppInfoStore();
+const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const petaImages = ref<PetaImages>({});
 const petaTagInfos = ref<PetaTagInfo[]>([]);
@@ -66,7 +68,7 @@ onMounted(async () => {
   API.on("updatePetaTags", () => {
     getPetaTagInfos();
   });
-  title.value = `${_this.$t("titles.browser")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  title.value = `${t("titles.browser")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
   document.title = title.value;
   await getPetaImages();
   await getPetaTagInfos();

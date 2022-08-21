@@ -37,7 +37,9 @@ import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
+import { useI18n } from "vue-i18n";
 const nsfwStore = useNSFWStore();
+const { t } = useI18n();
 const { windowType } = useWindowTypeStore();
 const windowStatusStore = useWindowStatusStore();
 const _this = getCurrentInstance()!.proxy!;
@@ -58,12 +60,7 @@ function importImageDirectories() {
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {
-    if (
-      (await _this.$components.dialog.show(_this.$t("utilsBar.nsfwConfirm"), [
-        _this.$t("shared.yes"),
-        _this.$t("shared.no"),
-      ])) === 0
-    ) {
+    if ((await _this.$components.dialog.show(t("utilsBar.nsfwConfirm"), [t("shared.yes"), t("shared.no")])) === 0) {
       nsfwStore.update(true);
     }
   } else {

@@ -66,6 +66,7 @@ import { computed } from "@vue/reactivity";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
+import { useI18n } from "vue-i18n";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -78,6 +79,7 @@ const { systemInfo } = useSystemInfoStore();
 const nsfwStore = useNSFWStore();
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
+const { t } = useI18n();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const _this = getCurrentInstance()!.proxy!;
 const panelsBackground = ref<HTMLElement>();
@@ -270,14 +272,14 @@ function pointerup(e: PIXI.InteractionEvent) {
         _this.$components.contextMenu.open(
           [
             {
-              label: _this.$t("boards.menu.openBrowser"),
+              label: t("boards.menu.openBrowser"),
               click: () => {
                 API.send("openWindow", WindowType.BROWSER);
               },
             },
             { separate: true },
             {
-              label: _this.$t("boards.menu.resetPosition"),
+              label: t("boards.menu.resetPosition"),
               click: () => {
                 resetTransform();
               },
@@ -442,7 +444,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
   _this.$components.contextMenu.open(
     [
       {
-        label: _this.$t("boards.panelMenu.toFront"),
+        label: t("boards.panelMenu.toFront"),
         click: () => {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.index += pPanelsArray().length;
@@ -451,7 +453,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
         },
       },
       {
-        label: _this.$t("boards.panelMenu.toBack"),
+        label: t("boards.panelMenu.toBack"),
         click: () => {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.index -= pPanelsArray().length;
@@ -463,7 +465,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
         separate: true,
       },
       {
-        label: _this.$t("boards.panelMenu.details"),
+        label: t("boards.panelMenu.details"),
         click: () => {
           if (pPanel._petaImage === undefined) {
             return;
@@ -477,7 +479,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
       },
       {
         skip: isMultiple || !_pPanel?.isGIF,
-        label: _pPanel?.isPlayingGIF ? _this.$t("boards.panelMenu.stopGIF") : _this.$t("boards.panelMenu.playGIF"),
+        label: _pPanel?.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
         click: () => {
           if (_pPanel?.isPlayingGIF) {
             _pPanel.stopGIF();
@@ -493,7 +495,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
       },
       {
         skip: isMultiple,
-        label: _this.$t("boards.panelMenu.crop"),
+        label: t("boards.panelMenu.crop"),
         click: () => {
           beginCrop(pPanel);
         },
@@ -503,7 +505,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
         separate: true,
       },
       {
-        label: _this.$t("boards.panelMenu.flipHorizontal"),
+        label: t("boards.panelMenu.flipHorizontal"),
         click: () => {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.width = -pPanel.petaPanel.width;
@@ -512,7 +514,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
         },
       },
       {
-        label: _this.$t("boards.panelMenu.flipVertical"),
+        label: t("boards.panelMenu.flipVertical"),
         click: () => {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.height = -pPanel.petaPanel.height;
@@ -524,7 +526,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
         separate: true,
       },
       {
-        label: _this.$t("boards.panelMenu.reset"),
+        label: t("boards.panelMenu.reset"),
         click: () => {
           selectedPPanels().forEach((pPanel) => {
             pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
@@ -539,7 +541,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
       },
       { separate: true },
       {
-        label: _this.$t("boards.panelMenu.remove"),
+        label: t("boards.panelMenu.remove"),
         click: () => {
           removeSelectedPanels();
         },

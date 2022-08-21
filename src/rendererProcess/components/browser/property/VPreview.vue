@@ -3,13 +3,13 @@
     <t-previews ref="previews" v-show="!noImage">
       <VPropertyThumbnail v-for="data in propertyThumbnails" :key="data.petaImage.id" :propertyThumbnail="data" />
     </t-previews>
-    <p>{{ $t("browser.property.selectedImage", [petaImages.length]) }}</p>
+    <p>{{ t("browser.property.selectedImage", [petaImages.length]) }}</p>
     <t-buttons v-show="!noImage">
       <button tabindex="-1" @click="clearSelection">
-        {{ $t("browser.property.clearSelectionButton") }}
+        {{ t("browser.property.clearSelectionButton") }}
       </button>
       <button tabindex="-1" v-if="propertyThumbnails.length === 1" @click="openDetails">
-        {{ $t("browser.property.openDetailsButton") }}
+        {{ t("browser.property.openDetailsButton") }}
       </button>
     </t-buttons>
   </t-property-root>
@@ -27,9 +27,11 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+import { useI18n } from "vue-i18n";
 const props = defineProps<{
   petaImages: PetaImage[];
 }>();
+const { t } = useI18n();
 const previews = ref<HTMLElement>();
 const previewWidth = ref(0);
 const previewHeight = ref(0);

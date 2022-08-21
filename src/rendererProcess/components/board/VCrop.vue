@@ -1,9 +1,9 @@
 <template>
   <t-crop-root ref="cropRoot" v-show="loaded">
     <t-buttons>
-      <button @click="updateCrop">{{ $t("boards.crop.apply") }}</button>
-      <button @click="resetCrop">{{ $t("boards.crop.reset") }}</button>
-      <button @click="cancelCrop">{{ $t("boards.crop.cancel") }}</button>
+      <button @click="updateCrop">{{ t("boards.crop.apply") }}</button>
+      <button @click="resetCrop">{{ t("boards.crop.reset") }}</button>
+      <button @click="cancelCrop">{{ t("boards.crop.cancel") }}</button>
     </t-buttons>
   </t-crop-root>
 </template>
@@ -22,6 +22,7 @@ import { PTransformerDashedLine } from "@/rendererProcess/components/board/ppane
 import { PTransformerControlPoint } from "@/rendererProcess/components/board/ppanels/pTransformer/PTransformerControlPoint";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+import { useI18n } from "vue-i18n";
 const props = defineProps<{
   petaPanel?: PetaPanel;
 }>();
@@ -29,6 +30,7 @@ const emit = defineEmits<{
   (e: "update", petaPanel?: PetaPanel): void;
 }>();
 const nsfwStore = useNSFWStore();
+const { t } = useI18n();
 const cropRoot = ref<HTMLElement>();
 let resizer: ResizeObserver;
 let pixi: PIXI.Application;

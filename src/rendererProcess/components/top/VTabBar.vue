@@ -43,6 +43,7 @@ import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
+import { useI18n } from "vue-i18n";
 
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
@@ -56,6 +57,7 @@ const props = defineProps<{
   currentPetaBoardId: string;
 }>();
 const textsStore = useTextsStore();
+const { t } = useI18n();
 const draggingTab = ref<HTMLElement>();
 const dragging = ref(false);
 const pressing = ref(false);
@@ -91,7 +93,7 @@ function menu(event: PointerEvent, board: PetaBoard) {
   _this.$components.contextMenu.open(
     [
       {
-        label: _this.$t("tab.menu.remove", [board.name]),
+        label: t("tab.menu.remove", [board.name]),
         click: () => {
           removePetaBoard(board);
         },

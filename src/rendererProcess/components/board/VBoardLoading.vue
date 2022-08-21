@@ -1,9 +1,9 @@
 <template>
   <VModal :visible="loading" :center="true" :defaultZIndex="zIndex" :ignore="true">
     <t-board-loading-root>
-      <p>{{ $t("boards.extracting") }}{{ Math.floor(extractProgress) }}%</p>
+      <p>{{ t("boards.extracting") }}{{ Math.floor(extractProgress) }}%</p>
       <VProgressBar :progress="extractProgress"></VProgressBar>
-      <p>{{ $t("boards.loading") }}{{ Math.floor(loadProgress) }}%</p>
+      <p>{{ t("boards.loading") }}{{ Math.floor(loadProgress) }}%</p>
       <VProgressBar :progress="loadProgress"></VProgressBar>
       <pre class="log">{{ log }}</pre>
     </t-board-loading-root>
@@ -14,6 +14,8 @@
 // Components
 import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 defineProps<{
   zIndex: number;

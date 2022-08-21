@@ -34,7 +34,7 @@
           {{ petaTag.name }}
         </t-tag>
         <t-tag v-if="myPetaTags.length === 0 && !loadingTags">
-          {{ $t("browser.untagged") }}
+          {{ t("browser.untagged") }}
         </t-tag>
       </t-tags>
       <t-selected v-show="tile.petaImage?._selected">
@@ -69,6 +69,7 @@ import {
 import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
@@ -85,6 +86,7 @@ const props = defineProps<{
 }>();
 const nsfwStore = useNSFWStore();
 const settingsStore = useSettingsStore();
+const { t } = useI18n();
 const imageURL = ref("");
 const loadingImage = ref(true);
 const loadingTags = ref(true);

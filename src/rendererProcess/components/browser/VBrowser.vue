@@ -20,7 +20,7 @@
                 :checked="statesStore.state.value.groupingByDate"
                 @change="statesStore.state.value.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)"
               />
-              <span>{{ $t("browser.grouping") }}</span>
+              <span>{{ t("browser.grouping") }}</span>
             </label>
           </t-buttons>
         </t-top>
@@ -96,9 +96,11 @@ import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useDefinesStore } from "@/rendererProcess/stores/definesStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
+import { useI18n } from "vue-i18n";
 const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
+const { t } = useI18n();
 const props = defineProps<{
   petaImages: PetaImages;
   petaTagInfos: PetaTagInfo[];
@@ -301,38 +303,38 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
   _this.$components.contextMenu.open(
     [
       {
-        label: _this.$t("browser.petaImageMenu.remove", [selectedPetaImages.value.length]),
+        label: t("browser.petaImageMenu.remove", [selectedPetaImages.value.length]),
         click: async () => {
           if (
-            (await _this.$components.dialog.show(
-              _this.$t("browser.removeImageDialog", [selectedPetaImages.value.length]),
-              [_this.$t("shared.yes"), _this.$t("shared.no")],
-            )) === 0
+            (await _this.$components.dialog.show(t("browser.removeImageDialog", [selectedPetaImages.value.length]), [
+              t("shared.yes"),
+              t("shared.no"),
+            ])) === 0
           ) {
             await updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);
           }
         },
       },
       {
-        label: _this.$t("browser.petaImageMenu.openImageFile"),
+        label: t("browser.petaImageMenu.openImageFile"),
         click: async () => {
           await API.send("openImageFile", petaImage);
         },
       },
       // {
-      //   label: this.$t("browser.petaImageMenu.similar"),
+      //   label: this.t("browser.petaImageMenu.similar"),
       //   click: async () => {
       //     this.targetPetaImage = thumb.petaImage;
       //   }
       // },
       {
-        label: _this.$t("browser.petaImageMenu.waifu2x"),
+        label: t("browser.petaImageMenu.waifu2x"),
         click: async () => {
           await API.send("waifu2xConvert", selectedPetaImages.value);
         },
       },
       {
-        label: _this.$t("browser.petaImageMenu.searchImageByGoogle"),
+        label: t("browser.petaImageMenu.searchImageByGoogle"),
         click: async () => {
           await API.send("searchImageByGoogle", petaImage);
         },

@@ -6,7 +6,7 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="$t('titles.settings')"> </VTitleBar>
+        <VTitleBar :title="t('titles.settings')"> </VTitleBar>
       </t-top>
       <t-browser>
         <VSettings />
@@ -32,13 +32,15 @@ import { API } from "@/rendererProcess/api";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
+import { useI18n } from "vue-i18n";
 const _this = getCurrentInstance()!.proxy!;
+const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();
 const title = ref("");
 const keyboards = useKeyboardsStore();
 onMounted(() => {
-  title.value = `${_this.$t("titles.settings")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  title.value = `${t("titles.settings")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
   document.title = title.value;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {

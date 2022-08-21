@@ -5,7 +5,7 @@
         <VTask v-for="t in taskStatusArray" :key="t.id" :taskId="t.id" :taskStatus="t.status" />
       </t-tasks>
       <button tabindex="-1" @click="close" v-if="closable">
-        {{ $t("shared.closeButton") }}
+        {{ t("shared.closeButton") }}
       </button>
     </t-tasks-root>
   </VModal>
@@ -21,8 +21,10 @@ import VTask from "@/rendererProcess/components/task/VTask.vue";
 import { API } from "@/rendererProcess/api";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
+import { useI18n } from "vue-i18n";
 
 const windowStatus = useWindowStatusStore();
+const { t } = useI18n();
 const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {
   API.on("taskStatus", (e, id, task) => {

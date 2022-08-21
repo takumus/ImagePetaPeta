@@ -32,6 +32,7 @@ export async function create(component: Component, windowType: WindowType) {
     const platform = await API.send("getPlatform");
     await appUse(
       createI18n({
+        legacy: false,
         locale: "ja",
         messages: languages,
       }),

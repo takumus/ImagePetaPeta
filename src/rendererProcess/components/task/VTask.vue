@@ -1,11 +1,11 @@
 <template>
   <t-task-root>
-    <p v-if="name !== ''">{{ $t(name) }}({{ Math.floor(progress) }}%)</p>
+    <p v-if="name !== ''">{{ t(name) }}({{ Math.floor(progress) }}%)</p>
     <VProgressBar :progress="progress"></VProgressBar>
     <pre class="log">{{ log }}</pre>
     <t-cancel>
       <button tabindex="-1" @click="cancel" v-if="cancelable">
-        {{ $t("imageImporter.cancel") }}
+        {{ t("imageImporter.cancel") }}
       </button>
     </t-cancel>
   </t-task-root>
@@ -20,10 +20,12 @@ import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 import { API } from "@/rendererProcess/api";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
+import { useI18n } from "vue-i18n";
 const props = defineProps<{
   taskId: string;
   taskStatus: TaskStatus;
 }>();
+const { t } = useI18n();
 const _this = getCurrentInstance()!.proxy!;
 const progress = ref(100);
 const status = ref<TaskStatusCode>("complete");
@@ -51,7 +53,7 @@ function changeTaskStatus() {
   cancelable.value = task.cancelable === true;
   status.value = task.status;
   const i18nKey = `${task.i18nKey}.logs.${task.status}`;
-  const localized = _this.$t(i18nKey, task.log || []);
+  const localized = t(i18nKey, task.log || []);
   if (localized.indexOf("undefined") >= 0) {
     console.warn(i18nKey, "にundefinedが含まれています。怪しい。");
     console.warn(localized);
