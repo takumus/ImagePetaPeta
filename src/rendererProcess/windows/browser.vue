@@ -10,7 +10,7 @@
         <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
-        <VBrowser :petaImages="petaImages" :petaTagInfos="petaTagInfos" :selectedPetaTags="selectedPetaTags" />
+        <VBrowser :petaImages="petaImages" :petaTagInfos="petaTagInfos" />
       </t-browser>
     </t-content>
     <t-modals v-show="$components.modal.modalIds.length > 0">
@@ -58,7 +58,6 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 export default class BrowserIndex extends Vue {
   petaImages: PetaImages = {};
   petaTagInfos: PetaTagInfo[] = [];
-  selectedPetaTags: PetaTag[] = [];
   title = "";
   async mounted() {
     API.on("updatePetaImages", (e, petaImages, mode) => {

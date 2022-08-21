@@ -34,10 +34,9 @@
   </t-tags-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Prop, Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance } from "vue";
 
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
@@ -52,106 +51,97 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
-import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
-@Options({
-  components: {
-    VEditableLabel,
-  },
-  emits: [],
-})
-export default class VTags extends Vue {
-  @Prop()
-  petaImagesArray: PetaImage[] = [];
-  @Prop()
-  petaTagInfos: PetaTagInfo[] = [];
-  @Prop()
-  selectedPetaTags: PetaTag[] = [];
-  tempSelectedTags = "";
-  keyboards = useKeyboardsStore();
-  mounted() {
-    //
+const _this = getCurrentInstance()!.proxy!;
+const emit = defineEmits<{
+  (e: "update:selectedPetaTags", selectedPetaTags: PetaTag[]): void;
+}>();
+const props = defineProps<{
+  petaImagesArray: PetaImage[];
+  petaTagInfos: PetaTagInfo[];
+  selectedPetaTags: PetaTag[];
+}>();
+function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
+  if (tag.readonly) {
+    return;
   }
-  unmounted() {
-    //
-  }
-  tagMenu(event: PointerEvent, tag: BrowserTag) {
-    if (tag.readonly) {
-      return;
-    }
-    this.$components.contextMenu.open(
-      [
-        {
-          label: this.$t("browser.tagMenu.remove", [tag.petaTag.name]),
-          click: () => {
-            this.removeTag(tag.petaTag);
-          },
+  _this.$components.contextMenu.open(
+    [
+      {
+        label: _this.$t("browser.tagMenu.remove", [tag.petaTag.name]),
+        click: () => {
+          removeTag(tag.petaTag);
         },
-      ],
-      vec2FromPointerEvent(event),
-    );
+      },
+    ],
+    vec2FromPointerEvent(event),
+  );
+}
+async function addTag(name: string) {
+  if (props.petaTagInfos.find((pi) => pi.petaTag.name === name)) {
+    return;
   }
-  async addTag(name: string) {
-    if (this.petaTagInfos.find((pi) => pi.petaTag.name === name)) {
-      return;
+  API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.UPSERT);
+}
+async function removeTag(petaTag: PetaTag) {
+  if (
+    (await _this.$components.dialog.show(_this.$t("browser.removeTagDialog", [petaTag.name]), [
+      _this.$t("shared.yes"),
+      _this.$t("shared.no"),
+    ])) === 0
+  ) {
+    await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
+    const index = props.selectedPetaTags.findIndex((pt) => pt === petaTag);
+    if (index >= 0) {
+      // props.selectedPetaTags.splice(index, 1);
+      const newData = [...props.selectedPetaTags];
+      newData.splice(index, 1);
+      emit("update:selectedPetaTags", newData);
     }
-    API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.UPSERT);
-  }
-  async removeTag(petaTag: PetaTag) {
-    if (
-      (await this.$components.dialog.show(this.$t("browser.removeTagDialog", [petaTag.name]), [
-        this.$t("shared.yes"),
-        this.$t("shared.no"),
-      ])) === 0
-    ) {
-      await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
-      const index = this.selectedPetaTags.findIndex((pt) => pt === petaTag);
-      if (index >= 0) {
-        this.selectedPetaTags.splice(index, 1);
-      }
-    }
-  }
-  async changeTag(petaTag: PetaTag, newName: string) {
-    if (petaTag.name === newName) {
-      return;
-    }
-    if (this.browserTags.find((c) => c.petaTag.name === newName)) {
-      this.$components.dialog.show(this.$t("browser.tagAlreadyExistsDialog", [newName]), [this.$t("shared.yes")]);
-      return;
-    }
-    petaTag.name = newName;
-    await API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
-    this.selectPetaTag(petaTag);
-  }
-  selectPetaTag(petaTag?: PetaTag, single = false) {
-    if (
-      !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") ||
-      single
-    ) {
-      this.selectedPetaTags.length = 0;
-    }
-    const untaggedId = this.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
-    if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
-      this.selectedPetaTags.length = 0;
-    }
-    if (petaTag && !this.selectedPetaTags.includes(petaTag)) {
-      this.selectedPetaTags.push(petaTag);
-    }
-  }
-  get browserTags(): BrowserTag[] {
-    const browserTags = this.petaTagInfos.map((petaTagInfo): BrowserTag => {
-      return {
-        petaTag: petaTagInfo.petaTag,
-        count: petaTagInfo.count,
-        selected: this.selectedPetaTags.find((spt) => spt.id === petaTagInfo.petaTag.id) !== undefined,
-        readonly: petaTagInfo.petaTag.id === UNTAGGED_ID,
-      };
-    });
-    return browserTags;
-  }
-  get selectedAll() {
-    return this.selectedPetaTags.length === 0;
   }
 }
+async function changeTag(petaTag: PetaTag, newName: string) {
+  if (petaTag.name === newName) {
+    return;
+  }
+  if (browserTags.value.find((c) => c.petaTag.name === newName)) {
+    _this.$components.dialog.show(_this.$t("browser.tagAlreadyExistsDialog", [newName]), [_this.$t("shared.yes")]);
+    return;
+  }
+  petaTag.name = newName;
+  await API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
+  selectPetaTag(petaTag);
+}
+function selectPetaTag(petaTag?: PetaTag, single = false) {
+  const newData = [...props.selectedPetaTags];
+  if (
+    !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") ||
+    single
+  ) {
+    newData.length = 0;
+  }
+  const untaggedId = props.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
+  if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
+    newData.length = 0;
+  }
+  if (petaTag && !props.selectedPetaTags.includes(petaTag)) {
+    newData.push(petaTag);
+  }
+  emit("update:selectedPetaTags", newData);
+}
+const browserTags = computed((): BrowserTag[] => {
+  const browserTags = props.petaTagInfos.map((petaTagInfo): BrowserTag => {
+    return {
+      petaTag: petaTagInfo.petaTag,
+      count: petaTagInfo.count,
+      selected: props.selectedPetaTags.find((spt) => spt.id === petaTagInfo.petaTag.id) !== undefined,
+      readonly: petaTagInfo.petaTag.id === UNTAGGED_ID,
+    };
+  });
+  return browserTags;
+});
+const selectedAll = computed(() => {
+  return props.selectedPetaTags.length === 0;
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,17 +1,17 @@
 <template>
   <t-browser-root>
     <t-left>
-      <VTags :petaImagesArray="petaImagesArray" :petaTagInfos="petaTagInfos" :selectedPetaTags="selectedPetaTags" />
+      <VTags
+        :petaImagesArray="petaImagesArray"
+        :petaTagInfos="petaTagInfos"
+        v-model:selectedPetaTags="selectedPetaTags"
+      />
     </t-left>
     <t-center>
       <t-content>
         <t-top>
           <t-search>
-            <VSearch
-              :petaTagInfos="petaTagInfos"
-              :selectedPetaTags="selectedPetaTags"
-              @update:selectedPetaTags="updateSelectedPetaTags"
-            />
+            <VSearch :petaTagInfos="petaTagInfos" v-model:selectedPetaTags="selectedPetaTags" />
           </t-search>
           <t-buttons>
             <label>
@@ -114,8 +114,6 @@ export default class VBrowser extends Vue {
   petaImages: PetaImages = {};
   @Prop()
   petaTagInfos: PetaTagInfo[] = [];
-  @Prop()
-  selectedPetaTags: PetaTag[] = [];
   visible = false;
   @Ref("thumbnails")
   thumbnails!: HTMLDivElement;
@@ -123,6 +121,7 @@ export default class VBrowser extends Vue {
   thumbsWrapper!: HTMLDivElement;
   @Ref()
   testCanvas!: HTMLCanvasElement;
+  selectedPetaTags: PetaTag[] = [];
   thumbnailsWidth = 0;
   areaMaxY = 0;
   areaMinY = 0;
@@ -190,10 +189,6 @@ export default class VBrowser extends Vue {
         this.currentScrollTileId = t.petaImage.id;
       }
     });
-  }
-  updateSelectedPetaTags(ev: PetaTag[]) {
-    this.selectedPetaTags.length = 0;
-    this.selectedPetaTags.push(...ev);
   }
 
   restoreScrollPosition() {
