@@ -67,6 +67,7 @@ import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -79,6 +80,7 @@ const { systemInfo } = useSystemInfoStore();
 const nsfwStore = useNSFWStore();
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const _this = getCurrentInstance()!.proxy!;
@@ -269,7 +271,7 @@ function pointerup(e: PIXI.InteractionEvent) {
         // selectedPPanels().forEach((pPanel) => (pPanel.dragging = false));
         petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
       } else if (!props.detailsMode) {
-        _this.$components.contextMenu.open(
+        components.contextMenu.open(
           [
             {
               label: t("boards.menu.openBrowser"),
@@ -441,7 +443,7 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
     return;
   }
   const isMultiple = selectedPPanels().length > 1;
-  _this.$components.contextMenu.open(
+  components.contextMenu.open(
     [
       {
         label: t("boards.panelMenu.toFront"),

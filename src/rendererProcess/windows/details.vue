@@ -18,7 +18,7 @@
         </t-property>
       </t-browser>
     </t-content>
-    <t-modals v-show="$components.modal.modalIds.length > 0">
+    <t-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
     </t-modals>
     <VDialog :zIndex="6"></VDialog>
@@ -53,7 +53,9 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 const appInfoStore = useAppInfoStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();

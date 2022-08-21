@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 // Vue
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { ref, getCurrentInstance } from "vue";
 
 defineProps<{
@@ -48,7 +49,7 @@ function show(_label: string, _items: string[]) {
     resolve = res;
   });
 }
-_this.$components.dialog = {
+useComponentsStore().dialog = {
   show,
 };
 defineExpose({

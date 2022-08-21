@@ -5,7 +5,6 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { API } from "@/rendererProcess/api";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { WindowType } from "@/commons/datas/windowType";
-import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 
 import { createDarkModeStore, darkModeStoreKey } from "@/rendererProcess/stores/darkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/rendererProcess/stores/nsfwStore";
@@ -17,6 +16,7 @@ import { createStatesStore, statesStoreKey } from "@/rendererProcess/stores/stat
 import { settingsStoreKey, createSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { appInfoStoreKey, createAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { textsStoreKey, createTextsStore } from "@/rendererProcess/stores/textsStore";
+import { componentsStoreKey, createComponentsStore } from "@/rendererProcess/stores/componentsStore";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
@@ -37,7 +37,6 @@ export async function create(component: Component, windowType: WindowType) {
         messages: languages,
       }),
     );
-    await appUse(GlobalComponents);
     app.provide(darkModeStoreKey, await createDarkModeStore());
     app.provide(nsfwStoreKey, await createNSFWStore());
     app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType));
@@ -48,6 +47,7 @@ export async function create(component: Component, windowType: WindowType) {
     app.provide(settingsStoreKey, await createSettingsStore());
     app.provide(appInfoStoreKey, await createAppInfoStore());
     app.provide(textsStoreKey, await createTextsStore());
+    app.provide(componentsStoreKey, await createComponentsStore());
     app.mount("#app");
   };
   API.on("dataInitialized", () => {

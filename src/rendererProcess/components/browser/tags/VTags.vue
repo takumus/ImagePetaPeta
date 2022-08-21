@@ -53,6 +53,7 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
   (e: "update:selectedPetaTags", selectedPetaTags: PetaTag[]): void;
@@ -63,12 +64,13 @@ const props = defineProps<{
   selectedPetaTags: PetaTag[];
 }>();
 const textsStore = useTextsStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   if (tag.readonly) {
     return;
   }
-  _this.$components.contextMenu.open(
+  components.contextMenu.open(
     [
       {
         label: t("browser.tagMenu.remove", [tag.petaTag.name]),
@@ -88,10 +90,8 @@ async function addTag(name: string) {
 }
 async function removeTag(petaTag: PetaTag) {
   if (
-    (await _this.$components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [
-      t("shared.yes"),
-      t("shared.no"),
-    ])) === 0
+    (await components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [t("shared.yes"), t("shared.no")])) ===
+    0
   ) {
     await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
     const index = props.selectedPetaTags.findIndex((pt) => pt === petaTag);
@@ -108,7 +108,7 @@ async function changeTag(petaTag: PetaTag, newName: string) {
     return;
   }
   if (browserTags.value.find((c) => c.petaTag.name === newName)) {
-    _this.$components.dialog.show(t("browser.tagAlreadyExistsDialog", [newName]), [t("shared.yes")]);
+    components.dialog.show(t("browser.tagAlreadyExistsDialog", [newName]), [t("shared.yes")]);
     return;
   }
   petaTag.name = newName;

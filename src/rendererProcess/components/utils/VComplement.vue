@@ -37,6 +37,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import FuzzySearch from "fuzzy-search";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 defineProps<{
   zIndex: number;
 }>();
@@ -187,7 +188,7 @@ function updatePosition() {
     }
   }
 }
-_this.$components.complement = {
+useComponentsStore().complement = {
   open,
   updateItems,
 };

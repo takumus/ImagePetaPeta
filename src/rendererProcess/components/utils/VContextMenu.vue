@@ -33,6 +33,7 @@ import { computed } from "@vue/reactivity";
 import { Vec2 } from "@/commons/utils/vec2";
 import { v4 as uuid } from "uuid";
 import { ContextMenuItem } from "@/rendererProcess/components/utils/contextMenuItem";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 defineProps<{
   zIndex: number;
 }>();
@@ -84,7 +85,7 @@ function select(item?: ContextMenuItem) {
 const filteredItems = computed(() => {
   return items.value.filter((item) => item.skip != true);
 });
-_this.$components.contextMenu = {
+useComponentsStore().contextMenu = {
   open,
 };
 defineExpose({

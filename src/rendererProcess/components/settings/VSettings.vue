@@ -172,10 +172,12 @@ import { DEBUGGERS } from "@/@assets/debuggers";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
 const _this = getCurrentInstance()!.proxy!;
 const settingsStore = useSettingsStore();
 const appInfoStore = useAppInfoStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const regenerateMetadatasCompleted = ref(true);
 const regenerateMetadatasDone = ref(0);
@@ -221,13 +223,13 @@ async function browsePetaImageDirectory() {
 }
 async function changePetaImageDirectory() {
   if (tempPetaImageDirectory.value) {
-    const result = await _this.$components.dialog.show(
+    const result = await components.dialog.show(
       t("settings.changePetaImageDirectoryDialog", [tempPetaImageDirectory.value]),
       [t("shared.yes"), t("shared.no")],
     );
     if (result === 0) {
       if (!(await API.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
-        await _this.$components.dialog.show(
+        await components.dialog.show(
           t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
           [t("shared.yes")],
         );

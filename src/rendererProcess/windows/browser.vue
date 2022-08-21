@@ -13,7 +13,7 @@
         <VBrowser :petaImages="petaImages" :petaTagInfos="petaTagInfos" />
       </t-browser>
     </t-content>
-    <t-modals v-show="$components.modal.modalIds.length > 0">
+    <t-modals v-show="components.modal.modalIds.length > 0">
       <VImageImporter />
       <VTasks />
     </t-modals>
@@ -43,7 +43,9 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 const appInfoStore = useAppInfoStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const petaImages = ref<PetaImages>({});

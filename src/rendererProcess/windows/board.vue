@@ -30,7 +30,7 @@
         />
       </t-browser>
     </t-content>
-    <t-modals v-show="$components.modal.modalIds.length > 0">
+    <t-modals v-show="components.modal.modalIds.length > 0">
       <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop" />
       <VTasks />
     </t-modals>
@@ -83,8 +83,10 @@ import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
@@ -243,7 +245,7 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
   statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {
     if (
-      (await _this.$components.dialog.show(t("boards.selectErrorBoardDialog", [board.name]), [
+      (await components.dialog.show(t("boards.selectErrorBoardDialog", [board.name]), [
         t("shared.yes"),
         t("shared.no"),
       ])) != 0
@@ -259,10 +261,7 @@ function savePetaBoard(board: PetaBoard) {
   boardUpdaters.value[board.id]?.order(board);
 }
 async function removePetaBoard(board: PetaBoard) {
-  if (
-    (await _this.$components.dialog.show(t("boards.removeDialog", [board.name]), [t("shared.yes"), t("shared.no")])) !=
-    0
-  ) {
+  if ((await components.dialog.show(t("boards.removeDialog", [board.name]), [t("shared.yes"), t("shared.no")])) != 0) {
     return;
   }
   boardUpdaters.value[board.id]?.destroy();

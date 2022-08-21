@@ -39,6 +39,7 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from
 import { v4 as uuid } from "uuid";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
 const props = defineProps<{
   visible?: boolean;
@@ -55,6 +56,7 @@ const emit = defineEmits<{
 }>();
 const _this = getCurrentInstance()!.proxy!;
 const textsStore = useTextsStore();
+const { modal } = useComponentsStore();
 const zIndex = ref(0);
 const noBackground = ref(false);
 const background = ref<HTMLElement>();
@@ -92,10 +94,10 @@ function pointerup(event: PointerEvent) {
   }
 }
 const isActive = computed(() => {
-  return modalId === _this.$components.modal.modalIds[_this.$components.modal.modalIds.length - 1];
+  return modalId === modal.modalIds[modal.modalIds.length - 1];
 });
 watch(
-  () => _this.$components.modal.modalIds,
+  () => modal.modalIds,
   () => {
     noBackground.value = !isActive.value;
   },
@@ -107,12 +109,12 @@ watch(
       return;
     }
     // 自分のidを除外
-    _this.$components.modal.modalIds = _this.$components.modal.modalIds.filter((id) => id != modalId);
+    modal.modalIds = modal.modalIds.filter((id) => id != modalId);
     if (props.visible) {
       // 自分のidを追加
-      _this.$components.modal.modalIds.push(modalId);
-      zIndex.value = _this.$components.modal.currentModalZIndex + 3;
-      _this.$components.modal.currentModalZIndex++;
+      modal.modalIds.push(modalId);
+      zIndex.value = modal.currentModalZIndex + 3;
+      modal.currentModalZIndex++;
     }
   },
 );

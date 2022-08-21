@@ -44,6 +44,7 @@ import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
@@ -57,6 +58,7 @@ const props = defineProps<{
   currentPetaBoardId: string;
 }>();
 const textsStore = useTextsStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const draggingTab = ref<HTMLElement>();
 const dragging = ref(false);
@@ -90,7 +92,7 @@ function pointerdown(event: PointerEvent, board: PetaBoard, index: number) {
   beforeSortSelectedIndex.value = index;
 }
 function menu(event: PointerEvent, board: PetaBoard) {
-  _this.$components.contextMenu.open(
+  components.contextMenu.open(
     [
       {
         label: t("tab.menu.remove", [board.name]),

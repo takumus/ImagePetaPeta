@@ -113,6 +113,7 @@ import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -122,6 +123,7 @@ const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
 }>();
 const textsStore = useTextsStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
@@ -191,7 +193,7 @@ function changeNSFW(value: boolean) {
   updatePetaImages(props.petaImages, UpdateMode.UPDATE);
 }
 function complementTag(editableLabel: any) {
-  _this.$components.complement.open(
+  components.complement.open(
     editableLabel,
     props.petaTagInfos
       .filter((pti) => {
@@ -203,7 +205,7 @@ function complementTag(editableLabel: any) {
   );
 }
 function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
-  _this.$components.contextMenu.open(
+  components.contextMenu.open(
     [
       {
         label: t("browser.property.tagMenu.remove", [tag.name]),

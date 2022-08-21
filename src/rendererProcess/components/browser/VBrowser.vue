@@ -97,9 +97,11 @@ import { useDefinesStore } from "@/rendererProcess/stores/definesStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
+const components = useComponentsStore();
 const { t } = useI18n();
 const props = defineProps<{
   petaImages: PetaImages;
@@ -299,14 +301,13 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
   if (!thumb.petaImage._selected) {
     selectTile(thumb, true);
   }
-
-  _this.$components.contextMenu.open(
+  components.contextMenu.open(
     [
       {
         label: t("browser.petaImageMenu.remove", [selectedPetaImages.value.length]),
         click: async () => {
           if (
-            (await _this.$components.dialog.show(t("browser.removeImageDialog", [selectedPetaImages.value.length]), [
+            (await components.dialog.show(t("browser.removeImageDialog", [selectedPetaImages.value.length]), [
               t("shared.yes"),
               t("shared.no"),
             ])) === 0
