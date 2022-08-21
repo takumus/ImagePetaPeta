@@ -38,11 +38,11 @@ import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, r
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
-import { API } from "@/rendererProcess/api";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
+import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
 
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
@@ -53,9 +53,9 @@ const emit = defineEmits<{
 }>();
 const props = defineProps<{
   boards: PetaBoard[];
-  title: string;
   currentPetaBoardId: string;
 }>();
+const { systemInfo } = useSystemInfoStore();
 const draggingTab = ref<HTMLElement>();
 const dragging = ref(false);
 const pressing = ref(false);
@@ -170,7 +170,7 @@ const board = computed(() => {
   return props.boards.find((board) => board.id === props.currentPetaBoardId);
 });
 const isMac = computed(() => {
-  return _this.$systemInfo.platform === "darwin";
+  return systemInfo.value.platform === "darwin";
 });
 </script>
 

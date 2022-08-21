@@ -1,7 +1,7 @@
 <template>
   <t-root
     :class="{
-      dark: $darkMode.value,
+      dark: darkModeStore.state.value,
     }"
   >
     <t-content>
@@ -9,7 +9,6 @@
         <VTitleBar>
           <VTabBar
             :boards="sortedPetaBoards"
-            :title="title"
             :currentPetaBoardId="currentPetaBoardId"
             @remove="removePetaBoard"
             @add="addPetaBoard"
@@ -41,12 +40,10 @@
   </t-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
 // Components
-import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
@@ -74,262 +71,247 @@ import {
   dbPetaBoardsToPetaBoards,
   petaBoardsToDBPetaBoards,
 } from "@/commons/datas/petaBoard";
-import { PetaPanel, createPetaPanel } from "@/commons/datas/petaPanel";
+import { createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { DelayUpdater } from "@/rendererProcess/utils/delayUpdater";
 import { Vec2 } from "@/commons/utils/vec2";
 import getNameAvoidDuplication from "@/rendererProcess/utils/getNameAvoidDuplication";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
-import { WindowType } from "@/commons/datas/windowType";
-@Options({
-  components: {
-    VBrowser,
-    VBoard,
-    VImageImporter,
-    VTasks,
-    VTabBar,
-    VBoardProperty,
-    VTitleBar,
-    VContextMenu,
-    VComplement,
-    VDialog,
-    VUtilsBar,
-  },
-})
-export default class BoardIndex extends Vue {
-  @Ref("vPetaBoard")
-  vPetaBoard!: typeof VBoard;
-  petaImages: PetaImages = {};
-  boards: { [petaBoardId: string]: PetaBoard } = {};
-  orderedAddPanelIds: string[] = [];
-  orderedAddPanelDragEvent = new Vec2();
-  boardUpdaters: { [key: string]: DelayUpdater<PetaBoard> } = {};
-  currentPetaBoardId = "";
-  title = "";
-  errorPetaBoardId = "";
-  async mounted() {
-    AnimatedGIFLoader.add?.();
-    this.$windowType = WindowType.BOARD;
-    API.on("updatePetaImages", async (e, petaImages, mode) => {
-      if (mode === UpdateMode.UPSERT) {
-        let changeCurrentBoard = false;
-        petaImages.forEach((petaImage) => {
-          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-          Object.values(this.boards).forEach((board) => {
-            Object.values(board.petaPanels).forEach((petaPanel) => {
-              if (petaPanel.petaImageId === petaImage.id) {
-                petaPanel._petaImage = this.petaImages[petaImage.id];
-              }
-            });
+import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
+import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
+const _this = getCurrentInstance()!.proxy!;
+const darkModeStore = useDarkModeStore();
+const windowStatusStore = useWindowStatusStore();
+const vPetaBoard = ref<InstanceType<typeof VBoard>>();
+const petaImages = ref<PetaImages>({});
+const boards = ref<{ [petaBoardId: string]: PetaBoard }>({});
+const orderedAddPanelIds = ref<string[]>([]);
+const orderedAddPanelDragEvent = ref(new Vec2());
+const boardUpdaters = ref<{ [key: string]: DelayUpdater<PetaBoard> }>({});
+const currentPetaBoardId = ref("");
+const errorPetaBoardId = ref("");
+onMounted(async () => {
+  AnimatedGIFLoader.add?.();
+  API.on("updatePetaImages", async (e, newPetaImages, mode) => {
+    if (mode === UpdateMode.UPSERT) {
+      let changeCurrentBoard = false;
+      newPetaImages.forEach((petaImage) => {
+        petaImages.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
+        Object.values(boards.value).forEach((board) => {
+          Object.values(board.petaPanels).forEach((petaPanel) => {
+            if (petaPanel.petaImageId === petaImage.id) {
+              petaPanel._petaImage = petaImages.value[petaImage.id];
+            }
           });
-          if (this.currentPetaBoard) {
-            changeCurrentBoard =
-              Object.values(this.currentPetaBoard.petaPanels).filter((petaPanel) => {
-                return petaPanel.petaImageId === petaImage.id;
-              }).length > 0;
-          }
-          if (changeCurrentBoard) {
-            this.vPetaBoard.load({
-              reload: {
-                additions: petaImages.map((petaImage) => petaImage.id),
-                deletions: [],
-              },
-            });
-          }
         });
-        this.addOrderedPetaPanels();
-      } else if (mode === UpdateMode.UPDATE) {
-        petaImages.forEach((newPetaImage) => {
-          const petaImage = this.petaImages[newPetaImage.id];
-          if (petaImage) {
-            Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
-          }
-        });
-        this.vPetaBoard.orderPIXIRender();
-      } else if (mode === UpdateMode.REMOVE) {
-        let changeCurrentBoard = false;
-        petaImages.forEach((petaImage) => {
-          delete this.petaImages[petaImage.id];
-          Object.values(this.boards).forEach((board) => {
-            Object.values(board.petaPanels).forEach((petaPanel) => {
-              if (petaPanel.petaImageId === petaImage.id) {
-                petaPanel._petaImage = undefined;
-              }
-            });
-          });
-          if (this.currentPetaBoard) {
-            changeCurrentBoard =
-              Object.values(this.currentPetaBoard.petaPanels).filter((petaPanel) => {
-                return petaPanel.petaImageId === petaImage.id;
-              }).length > 0;
-          }
-        });
+        if (currentPetaBoard.value) {
+          changeCurrentBoard =
+            Object.values(currentPetaBoard.value.petaPanels).filter((petaPanel) => {
+              return petaPanel.petaImageId === petaImage.id;
+            }).length > 0;
+        }
         if (changeCurrentBoard) {
-          this.vPetaBoard.load({
+          vPetaBoard.value?.load({
             reload: {
-              additions: [],
-              deletions: petaImages.map((petaImage) => petaImage.id),
+              additions: newPetaImages.map((petaImage) => petaImage.id),
+              deletions: [],
             },
           });
         }
-      }
-    });
-    this.title = `${this.$t("titles.boards")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
-    document.title = this.title;
-    await this.getPetaImages();
-    await this.getPetaBoards();
-    await this.restoreBoard();
-    this.$nextTick(() => {
-      API.send("showMainWindow");
-    });
-  }
-  async restoreBoard() {
-    const states = await API.send("getStates");
-    this.errorPetaBoardId = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
-    const lastBoard = this.boards[states.selectedPetaBoardId];
-    this.selectPetaBoard(lastBoard);
-    if (!lastBoard) {
-      this.selectPetaBoard(this.sortedPetaBoards[0]);
-    }
-  }
-  async getPetaImages() {
-    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-  }
-  async getPetaBoards() {
-    this.boards = await API.send("getPetaBoards");
-    dbPetaBoardsToPetaBoards(this.boards, this.petaImages, false);
-    Object.values(this.boards).forEach((board) => {
-      let updater = this.boardUpdaters[board.id];
-      if (updater) {
-        updater.destroy();
-      }
-      updater = this.boardUpdaters[board.id] = new DelayUpdater<PetaBoard>(SAVE_DELAY);
-      updater.initData(board);
-      updater.onUpdate((board) => {
-        API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
       });
-    });
-  }
-  addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
-    this.orderedAddPanelIds = ids;
-    this.orderedAddPanelDragEvent = mouse;
-    if (fromBrowser) {
-      this.addOrderedPetaPanels();
-    }
-  }
-  addOrderedPetaPanels() {
-    let offsetIndex = 0;
-    this.orderedAddPanelIds.forEach((id, i) => {
-      const petaImage = this.petaImages[id];
-      if (!petaImage) return;
-      if (!this.orderedAddPanelDragEvent) return;
-      const panel = createPetaPanel(
-        petaImage,
-        this.orderedAddPanelDragEvent
-          .clone()
-          .add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
-        DEFAULT_IMAGE_SIZE,
-        petaImage.height * DEFAULT_IMAGE_SIZE,
-      );
-      this.vPetaBoard.addPanel(panel, offsetIndex);
-    });
-    if (this.currentPetaBoard && this.orderedAddPanelIds.length > 0) {
-      this.vPetaBoard.load({
-        reload: {
-          additions: this.orderedAddPanelIds,
-          deletions: [],
-        },
+      addOrderedPetaPanels();
+    } else if (mode === UpdateMode.UPDATE) {
+      newPetaImages.forEach((newPetaImage) => {
+        const petaImage = petaImages.value[newPetaImage.id];
+        if (petaImage) {
+          Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
+        }
       });
-    }
-    this.orderedAddPanelIds = [];
-  }
-  async selectPetaBoard(board: PetaBoard | undefined) {
-    if (!board) {
-      return;
-    }
-    if (this.currentPetaBoard?.id === board.id) {
-      return;
-    }
-    logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
-    this.$states.selectedPetaBoardId = board.id;
-    this.$states.loadedPetaBoardId = "";
-    if (this.errorPetaBoardId === board.id) {
-      if (
-        (await this.$components.dialog.show(this.$t("boards.selectErrorBoardDialog", [board.name]), [
-          this.$t("shared.yes"),
-          this.$t("shared.no"),
-        ])) != 0
-      ) {
-        return;
-      } else {
-        this.errorPetaBoardId = "";
+      vPetaBoard.value?.orderPIXIRender();
+    } else if (mode === UpdateMode.REMOVE) {
+      let changeCurrentBoard = false;
+      newPetaImages.forEach((petaImage) => {
+        delete petaImages.value[petaImage.id];
+        Object.values(boards.value).forEach((board) => {
+          Object.values(board.petaPanels).forEach((petaPanel) => {
+            if (petaPanel.petaImageId === petaImage.id) {
+              petaPanel._petaImage = undefined;
+            }
+          });
+        });
+        if (currentPetaBoard.value) {
+          changeCurrentBoard =
+            Object.values(currentPetaBoard.value.petaPanels).filter((petaPanel) => {
+              return petaPanel.petaImageId === petaImage.id;
+            }).length > 0;
+        }
+      });
+      if (changeCurrentBoard) {
+        vPetaBoard.value?.load({
+          reload: {
+            additions: [],
+            deletions: newPetaImages.map((petaImage) => petaImage.id),
+          },
+        });
       }
     }
-    this.currentPetaBoardId = board.id;
+  });
+  document.title = `${_this.$t("titles.boards")} - ${_this.$appInfo.name} ${_this.$appInfo.version}`;
+  await getPetaImages();
+  await getPetaBoards();
+  await restoreBoard();
+  nextTick(() => {
+    API.send("showMainWindow");
+  });
+});
+async function restoreBoard() {
+  const states = await API.send("getStates");
+  errorPetaBoardId.value = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
+  const lastBoard = boards.value[states.selectedPetaBoardId];
+  selectPetaBoard(lastBoard);
+  if (!lastBoard) {
+    selectPetaBoard(sortedPetaBoards.value[0]);
   }
-  savePetaBoard(board: PetaBoard) {
-    this.boardUpdaters[board.id]?.order(board);
+}
+async function getPetaImages() {
+  petaImages.value = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
+}
+async function getPetaBoards() {
+  boards.value = await API.send("getPetaBoards");
+  dbPetaBoardsToPetaBoards(boards.value, petaImages.value, false);
+  Object.values(boards.value).forEach((board) => {
+    let updater = boardUpdaters.value[board.id];
+    if (updater) {
+      updater.destroy();
+    }
+    updater = boardUpdaters.value[board.id] = new DelayUpdater<PetaBoard>(SAVE_DELAY);
+    updater.initData(board);
+    updater.onUpdate((board) => {
+      API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
+    });
+  });
+}
+function addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
+  orderedAddPanelIds.value = ids;
+  orderedAddPanelDragEvent.value = mouse;
+  if (fromBrowser) {
+    addOrderedPetaPanels();
   }
-  async removePetaBoard(board: PetaBoard) {
+}
+function addOrderedPetaPanels() {
+  let offsetIndex = 0;
+  orderedAddPanelIds.value.forEach((id, i) => {
+    const petaImage = petaImages.value[id];
+    if (!petaImage) return;
+    if (!orderedAddPanelDragEvent.value) return;
+    const panel = createPetaPanel(
+      petaImage,
+      orderedAddPanelDragEvent.value
+        .clone()
+        .add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
+      DEFAULT_IMAGE_SIZE,
+      petaImage.height * DEFAULT_IMAGE_SIZE,
+    );
+    vPetaBoard.value?.addPanel(panel, offsetIndex);
+  });
+  if (currentPetaBoard.value && orderedAddPanelIds.value.length > 0) {
+    vPetaBoard.value?.load({
+      reload: {
+        additions: orderedAddPanelIds.value,
+        deletions: [],
+      },
+    });
+  }
+  orderedAddPanelIds.value = [];
+}
+async function selectPetaBoard(board: PetaBoard | undefined) {
+  if (!board) {
+    return;
+  }
+  if (currentPetaBoard.value?.id === board.id) {
+    return;
+  }
+  logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
+  _this.$states.selectedPetaBoardId = board.id;
+  _this.$states.loadedPetaBoardId = "";
+  if (errorPetaBoardId.value === board.id) {
     if (
-      (await this.$components.dialog.show(this.$t("boards.removeDialog", [board.name]), [
-        this.$t("shared.yes"),
-        this.$t("shared.no"),
+      (await _this.$components.dialog.show(_this.$t("boards.selectErrorBoardDialog", [board.name]), [
+        _this.$t("shared.yes"),
+        _this.$t("shared.no"),
       ])) != 0
     ) {
       return;
-    }
-    this.boardUpdaters[board.id]?.destroy();
-    const index = this.sortedPetaBoards.indexOf(board);
-    delete this.boardUpdaters[board.id];
-    const rightBoardId = this.sortedPetaBoards[index + 1]?.id || "";
-    const leftBoardId = this.sortedPetaBoards[index - 1]?.id || "";
-    await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
-    await this.getPetaBoards();
-    this.selectPetaBoard(this.boards[rightBoardId] || this.boards[leftBoardId] || this.sortedPetaBoards[0]);
-  }
-  async addPetaBoard() {
-    const name = getNameAvoidDuplication(
-      DEFAULT_BOARD_NAME,
-      Object.values(this.boards).map((b) => b.name),
-    );
-    const board = createPetaBoard(
-      name,
-      Math.max(...Object.values(this.boards).map((b) => b.index), 0) + 1,
-      this.$darkMode.value,
-    );
-    await API.send("updatePetaBoards", [board], UpdateMode.UPSERT);
-    logChunk().log("vIndex", "PetaBoard Added", minimId(board.id));
-    await this.getPetaBoards();
-    this.selectPetaBoard(board);
-  }
-  get currentPetaBoard(): PetaBoard | undefined {
-    if (this.errorPetaBoardId === this.currentPetaBoardId) {
-      return undefined;
-    }
-    return this.boards[this.currentPetaBoardId];
-  }
-  get sortedPetaBoards() {
-    return Object.values(this.boards).sort((a, b) => {
-      return a.index - b.index;
-    });
-  }
-  updatePetaBoard(board: PetaBoard) {
-    if (!board) {
-      return;
-    }
-    this.boards[board.id] = board;
-    this.savePetaBoard(board);
-  }
-  @Watch("$focusedWindows.focused")
-  changeWindowIsFocused() {
-    if (!this.$focusedWindows.focused) {
-      this.vPetaBoard.clearSelectionAll(true);
-      this.vPetaBoard.orderPIXIRender();
+    } else {
+      errorPetaBoardId.value = "";
     }
   }
+  currentPetaBoardId.value = board.id;
 }
+function savePetaBoard(board: PetaBoard) {
+  boardUpdaters.value[board.id]?.order(board);
+}
+async function removePetaBoard(board: PetaBoard) {
+  if (
+    (await _this.$components.dialog.show(_this.$t("boards.removeDialog", [board.name]), [
+      _this.$t("shared.yes"),
+      _this.$t("shared.no"),
+    ])) != 0
+  ) {
+    return;
+  }
+  boardUpdaters.value[board.id]?.destroy();
+  const index = sortedPetaBoards.value.indexOf(board);
+  delete boardUpdaters.value[board.id];
+  const rightBoardId = sortedPetaBoards.value[index + 1]?.id || "";
+  const leftBoardId = sortedPetaBoards.value[index - 1]?.id || "";
+  await API.send("updatePetaBoards", [board], UpdateMode.REMOVE);
+  await getPetaBoards();
+  selectPetaBoard(boards.value[rightBoardId] || boards.value[leftBoardId] || sortedPetaBoards.value[0]);
+}
+async function addPetaBoard() {
+  const name = getNameAvoidDuplication(
+    DEFAULT_BOARD_NAME,
+    Object.values(boards.value).map((b) => b.name),
+  );
+  const board = createPetaBoard(
+    name,
+    Math.max(...Object.values(boards.value).map((b) => b.index), 0) + 1,
+    darkModeStore.state.value,
+  );
+  await API.send("updatePetaBoards", [board], UpdateMode.UPSERT);
+  logChunk().log("vIndex", "PetaBoard Added", minimId(board.id));
+  await getPetaBoards();
+  selectPetaBoard(board);
+}
+function updatePetaBoard(board: PetaBoard) {
+  if (!board) {
+    return;
+  }
+  boards.value[board.id] = board;
+  savePetaBoard(board);
+}
+const currentPetaBoard = computed((): PetaBoard | undefined => {
+  if (errorPetaBoardId.value === currentPetaBoardId.value) {
+    return undefined;
+  }
+  return boards.value[currentPetaBoardId.value];
+});
+const sortedPetaBoards = computed(() => {
+  return Object.values(boards.value).sort((a, b) => {
+    return a.index - b.index;
+  });
+});
+watch(
+  () => windowStatusStore.state.value.focused,
+  () => {
+    if (!windowStatusStore.state.value.focused) {
+      vPetaBoard.value?.clearSelectionAll(true);
+      vPetaBoard.value?.orderPIXIRender();
+    }
+  },
+);
 </script>
 
 <style lang="scss" scoped>

@@ -93,10 +93,6 @@ export default class BrowserIndex extends Vue {
   async getPetaTagInfos() {
     this.petaTagInfos = await API.send("getPetaTagInfos");
   }
-  @Watch("$focusedWindows.focused")
-  changeWindowIsFocused() {
-    // console.log(this.$focusedWindows.focused);
-  }
 }
 </script>
 

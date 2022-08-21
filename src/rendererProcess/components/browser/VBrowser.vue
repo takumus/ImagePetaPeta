@@ -27,7 +27,7 @@
         <t-tiles ref="thumbnails">
           <t-tiles-content
             ref="thumbsWrapper"
-            :style="{ height: scrollHeight + $defines.BROWSER_THUMBNAIL_MARGIN + 'px' }"
+            :style="{ height: scrollHeight + defines.BROWSER_THUMBNAIL_MARGIN + 'px' }"
           >
             <VTile
               v-for="data in visibleTiles"
@@ -54,9 +54,9 @@
         v-model="thumbnailsSize"
         tabindex="-1"
         @change="updateTileSize(Number(($event.target as HTMLInputElement).value))"
-        :min="$defines.BROWSER_THUMBNAIL_ZOOM_MIN"
-        :max="$defines.BROWSER_THUMBNAIL_ZOOM_MAX"
-        :step="$defines.BROWSER_THUMBNAIL_ZOOM_STEP"
+        :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
+        :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX"
+        :step="defines.BROWSER_THUMBNAIL_ZOOM_STEP"
       />
     </t-right>
   </t-browser-root>
@@ -97,6 +97,7 @@ import { getColors, getSimilarityScore2 } from "@/commons/utils/blurhashTools";
 import { WindowType } from "@/commons/datas/windowType";
 import deepcopy from "deepcopy";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
+import { useDefinesStore } from "@/rendererProcess/stores/definesStore";
 @Options({
   components: {
     VTile,
@@ -136,6 +137,7 @@ export default class VBrowser extends Vue {
   currentScrollTileId = "";
   currentScrollTileOffset = 0;
   keyboards = useKeyboardsStore();
+  defines = useDefinesStore().defines;
   filteredPetaImages: PetaImage[] = [];
   targetPetaImage: PetaImage | null = null;
   ignoreScrollEvent = false;

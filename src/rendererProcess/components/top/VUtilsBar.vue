@@ -4,16 +4,16 @@
       <slot></slot>
     </t-property>
     <t-shared class="left" v-if="visible">
-      <button v-if="$windowType === 'browser' || $windowType === 'details'" tabindex="-1" @click="openBoard()">
+      <button v-if="windowType === 'browser' || windowType === 'details'" tabindex="-1" @click="openBoard()">
         <t-icon class="board"></t-icon>
       </button>
-      <button v-if="$windowType === 'board' || $windowType === 'details'" tabindex="-1" @click="openBrowser()">
+      <button v-if="windowType === 'board' || windowType === 'details'" tabindex="-1" @click="openBrowser()">
         <t-icon class="browser"></t-icon>
       </button>
-      <button v-if="$windowType !== 'details'" tabindex="-1" @click="$api.send('importImageFiles')">
+      <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageFiles()">
         <t-icon class="import-file"></t-icon>
       </button>
-      <button v-if="$windowType !== 'details'" tabindex="-1" @click="$api.send('importImageDirectories')">
+      <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
         <t-icon class="import-folder"></t-icon>
       </button>
     </t-shared>
@@ -35,7 +35,11 @@ import { computed, getCurrentInstance } from "vue";
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 const nsfwStore = useNSFWStore();
+const { windowType } = useWindowTypeStore();
+const windowStatusStore = useWindowStatusStore();
 const _this = getCurrentInstance()!.proxy!;
 function openBoard() {
   API.send("openWindow", WindowType.BOARD);
@@ -45,6 +49,12 @@ function openBrowser() {
 }
 function openSettings() {
   API.send("openWindow", WindowType.SETTINGS);
+}
+function importImageFiles() {
+  API.send("importImageFiles");
+}
+function importImageDirectories() {
+  API.send("importImageDirectories");
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {
@@ -61,7 +71,7 @@ async function toggleNSFW() {
   }
 }
 const visible = computed(() => {
-  return _this.$focusedWindows.isMainWindow || _this.$focusedWindows.focused;
+  return windowStatusStore.state.value.isMainWindow || windowStatusStore.state.value.focused;
 });
 const nsfwClass = computed(() => {
   return nsfwStore.state.value ? "nsfw" : "sfw";

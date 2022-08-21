@@ -63,6 +63,7 @@ import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { computed } from "@vue/reactivity";
+import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -71,6 +72,7 @@ const props = defineProps<{
   board?: PetaBoard;
   zIndex: number;
 }>();
+const { systemInfo } = useSystemInfoStore();
 const nsfwStore = useNSFWStore();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const _this = getCurrentInstance()!.proxy!;
@@ -311,7 +313,7 @@ function wheel(event: WheelEvent) {
     return;
   }
   const mouse = vec2FromPointerEvent(event).sub(mouseOffset).sub(stageRect.clone().div(2));
-  if (event.ctrlKey || _this.$systemInfo.platform === "win32") {
+  if (event.ctrlKey || systemInfo.value.platform === "win32") {
     const currentZoom = currentBoard.value.transform.scale;
     currentBoard.value.transform.scale *= 1 + -event.deltaY * _this.$settings.zoomSensitivity * 0.00001;
     if (currentBoard.value.transform.scale > BOARD_ZOOM_MAX) {

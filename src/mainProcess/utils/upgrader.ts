@@ -88,10 +88,10 @@ export function upgradeSettings(settings: Settings) {
   //   changed = true;
   // }
   // v2.4.0
-  if (settings.ignoreMinorUpdate === undefined) {
-    settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
-    changed = true;
-  }
+  // if (settings.ignoreMinorUpdate === undefined) {
+  //   settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
+  //   changed = true;
+  // }
   // v2.5.0 (move to states v2.6.0)
   // if (settings.visibleLayerPanel === undefined) {
   //   settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;

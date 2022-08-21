@@ -822,7 +822,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           return isDataInitialized;
         },
         async getLatestVersion() {
-          return getLatestVersion(configSettings.data.ignoreMinorUpdate);
+          return getLatestVersion();
         },
       };
     }
@@ -899,7 +899,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       files.FILE_DBINFO = file.initFile(dirs.DIR_ROOT, "dbInfo.json");
       files.FILE_WINDOW_STATES = file.initFile(dirs.DIR_APP, "windowStates.json");
       configDBInfo = new Config<DBInfo>(files.FILE_DBINFO, { version: app.getVersion() });
-      if (!isLatest(app.getVersion(), configDBInfo.data.version, false)) {
+      if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
         throw new Error(
           `DB version is higher than App version. \nDB version:${
             configDBInfo.data.version
@@ -1001,7 +1001,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     }
     const log = mainLogger.logChunk();
     log.log("$Check Update");
-    const remote: RemoteBinaryInfo = await getLatestVersion(configSettings.data.ignoreMinorUpdate);
+    const remote: RemoteBinaryInfo = await getLatestVersion();
     log.log(remote);
     if (!remote.isLatest) {
       log.log("this version is old");

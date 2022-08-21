@@ -14,7 +14,6 @@ const defaultSettings = {
     default: true,
     path: "",
   },
-  ignoreMinorUpdate: true,
   waifu2x: {
     execFilePath: "",
     parameters: ["-i", "$$INPUT$$", "-o", "$$OUTPUT$$", "-n", "1", "--scale_ratio", "2"],

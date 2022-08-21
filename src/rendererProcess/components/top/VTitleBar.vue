@@ -11,7 +11,7 @@
         <t-draggable
           class="left"
           :class="{
-            mac: $systemInfo.platform === 'darwin',
+            mac: systemInfo.platform === 'darwin',
           }"
         >
         </t-draggable>
@@ -40,6 +40,10 @@ import { computed, getCurrentInstance } from "vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
+const { windowType } = useWindowTypeStore();
+const { systemInfo } = useSystemInfoStore();
 const _this = getCurrentInstance()!.proxy!;
 defineProps<{
   title?: string;
@@ -55,10 +59,10 @@ function closeWindow() {
   API.send("windowClose");
 }
 const resizable = computed(() => {
-  return _this.$windowType !== WindowType.SETTINGS;
+  return windowType.value !== WindowType.SETTINGS;
 });
 const isMac = computed(() => {
-  return _this.$systemInfo.platform === "darwin";
+  return systemInfo.value.platform === "darwin";
 });
 </script>
 

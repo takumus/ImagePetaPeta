@@ -7,21 +7,18 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { WindowType } from "@/commons/datas/windowType";
 import GlobalSettings from "@/rendererProcess/vueComponentCustomProperties/settings";
 import GlobalStates from "@/rendererProcess/vueComponentCustomProperties/states";
-import GlobalDefines from "@/rendererProcess/vueComponentCustomProperties/defines";
-import GlobalAPI from "@/rendererProcess/vueComponentCustomProperties/api";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
-import GlobalSystemDarkMode from "@/rendererProcess/vueComponentCustomProperties/systemDarkMode";
 import GlobalDarkMode from "@/rendererProcess/vueComponentCustomProperties/darkMode";
 import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
 import GlobalNSFW from "@/rendererProcess/vueComponentCustomProperties/nsfw";
-import GlobalWindowArgs from "@/rendererProcess/vueComponentCustomProperties/windowArgs";
-import * as GlobalSystemInfo from "@/rendererProcess/vueComponentCustomProperties/systemInfo";
-import * as GlobalWindowType from "@/rendererProcess/vueComponentCustomProperties/windowType";
-import * as GlobalWindowIsFocused from "@/rendererProcess/vueComponentCustomProperties/windowIsFocused";
 import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 
 import { createDarkModeStore, darkModeStoreKey } from "@/rendererProcess/stores/darkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/rendererProcess/stores/nsfwStore";
+import { createWindowTypeStore, windowTypeStoreKey } from "@/rendererProcess/stores/windowTypeStore";
+import { createDefinesStore, definesStoreKey } from "@/rendererProcess/stores/definesStore";
+import { createSystemInfoStore, systemInfoStoreKey } from "@/rendererProcess/stores/systemInfoStore";
+import { createWindowStatusStore, windowStatusStoreKey } from "@/rendererProcess/stores/windowStatusStore";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
@@ -41,22 +38,19 @@ export async function create(component: Component, windowType: WindowType) {
         messages: languages,
       }),
     );
-    await appUse(GlobalWindowArgs);
-    await appUse(GlobalWindowType.createPlugin(windowType));
-    await appUse(GlobalSystemInfo.createPlugin(platform));
-    await appUse(GlobalDefines);
-    await appUse(GlobalAPI);
     await appUse(GlobalComponents);
-    await appUse(GlobalSystemDarkMode);
     await appUse(GlobalTexts.createPlugin(platform));
     await appUse(GlobalDarkMode);
     await appUse(GlobalSettings);
     await appUse(GlobalNSFW);
     await appUse(GlobalStates);
     await appUse(GlobalAppInfo);
-    await appUse(GlobalWindowIsFocused.createPlugin(windowType));
     app.provide(darkModeStoreKey, await createDarkModeStore());
     app.provide(nsfwStoreKey, await createNSFWStore());
+    app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType));
+    app.provide(definesStoreKey, await createDefinesStore());
+    app.provide(systemInfoStoreKey, await createSystemInfoStore(platform));
+    app.provide(windowStatusStoreKey, await createWindowStatusStore(windowType));
     app.mount("#app");
   };
   API.on("dataInitialized", () => {

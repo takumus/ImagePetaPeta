@@ -10,5 +10,5 @@ for (let i = 0; i < 100; i++) {
     "." +
     Math.floor(Math.random() * 10) +
     "-beta";
-  console.log(v1, v2, isLatest(v1, v2, true), isLatest(v1, v2, false));
+  console.log(v1, v2, isLatest(v1, v2));
 }

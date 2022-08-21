@@ -20,8 +20,10 @@ import VTask from "@/rendererProcess/components/task/VTask.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { TaskStatus } from "@/commons/api/interfaces/task";
+import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 
 const _this = getCurrentInstance()!.proxy!;
+const windowStatus = useWindowStatusStore();
 const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {
   API.on("taskStatus", (e, id, task) => {
@@ -42,7 +44,9 @@ const taskStatusArray = computed(() => {
     }));
 });
 const visible = computed(() => {
-  return taskStatusArray.value.length > 0 && (_this.$focusedWindows.isMainWindow || _this.$focusedWindows.focused);
+  return (
+    taskStatusArray.value.length > 0 && (windowStatus.state.value.isMainWindow || windowStatus.state.value.focused)
+  );
 });
 const closable = computed(() => {
   return (

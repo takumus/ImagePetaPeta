@@ -21,7 +21,9 @@ import { computed, ref, onMounted, getCurrentInstance } from "vue";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
+import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 const _this = getCurrentInstance()!.proxy!;
+const nsfwStore = useNSFWStore();
 const props = defineProps<{
   propertyThumbnail: PropertyThumbnail;
 }>();
@@ -33,7 +35,7 @@ const loaded = computed(() => {
   return imageURL.value != "";
 });
 const showNSFW = computed(() => {
-  return props.propertyThumbnail.petaImage.nsfw && !_this.$nsfw.showNSFW;
+  return props.propertyThumbnail.petaImage.nsfw && !nsfwStore.state.value;
 });
 </script>
 

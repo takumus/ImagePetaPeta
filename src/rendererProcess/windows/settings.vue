@@ -52,10 +52,6 @@ export default class SettingsIndex extends Vue {
       API.send("windowClose");
     });
   }
-  @Watch("$focusedWindows.focused")
-  changeWindowIsFocused() {
-    // console.log(this.$focusedWindows.focused);
-  }
 }
 </script>
 

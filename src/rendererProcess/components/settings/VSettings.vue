@@ -125,12 +125,6 @@
             <button @click="releaseNote">{{ $t("settings.releaseNoteButton") }}</button>
           </p>
         </t-strong>
-        <label>
-          <input type="checkbox" v-model="$settings.ignoreMinorUpdate" />
-          {{ $t("settings.ignoreMinorUpdate") }} </label
-        ><br />
-        <p>{{ $t("settings.ignoreMinorUpdateDescriptions") }}</p>
-        <!-- <button @click="downloadUpdate">{{$t("settings.updateButton")}}</button> -->
       </t-content>
       <!--
         Info
@@ -202,10 +196,10 @@ onMounted(async () => {
     currentTab.value = "update";
   });
   tempPetaImageDirectory.value = _this.$settings.petaImageDirectory.path;
-  if (_this.$windowArgs === "update") {
+  const remoteBinaryInfo = await API.send("getLatestVersion");
+  if (!remoteBinaryInfo.isLatest) {
     currentTab.value = "update";
     updateAvailable.value = true;
-    latestVersion.value = (await API.send("getLatestVersion")).version;
   }
 });
 function regenerateMetadatas() {
