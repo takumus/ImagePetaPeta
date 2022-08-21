@@ -1,5 +1,5 @@
 # ImagePetaPeta-beta
-<img src="./.readme_assets/app.png" width="512px">  
+<img src="./.readme_assets/app.png" width="100%">  
 
 写真やイラスト資料を閲覧、管理するソフトです。
 ## インストール
@@ -7,8 +7,8 @@
 下記よりzipファイル **(ImagePetaPeta-beta.Setup.X.X.X-beta.zip)** をダウンロードしてインストールしてください。  
 <https://github.com/takumus/ImagePetaPeta/releases/>  
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
-<img src="./.readme_assets/install01.png" width="256px">
-<img src="./.readme_assets/install02.png" width="256px">
+<img src="./.readme_assets/install01.png" width="40%">
+<img src="./.readme_assets/install02.png" width="40%">
 ### Mac
 1. `package.json`の`volta`のバージョンを参考に`node`, `yarn`の環境を整えてください。  
 1. [Volta](https://docs.volta.sh/guide/getting-started)をインストールでもOKです。  
