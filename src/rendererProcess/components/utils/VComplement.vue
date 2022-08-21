@@ -23,20 +23,20 @@
     >
       {{ item }}
     </li>
-    <li class="item close" v-html="$texts.close" v-if="filteredItems.length > 0"></li>
+    <li class="item close" v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></li>
   </ul>
 </template>
 
 <script setup lang="ts">
 // Vue
-import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
-import { computed } from "@vue/reactivity";
+import { ref, getCurrentInstance, onMounted, nextTick } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import FuzzySearch from "fuzzy-search";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
+import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 defineProps<{
   zIndex: number;
 }>();
@@ -51,6 +51,7 @@ const target = ref<any>();
 const currentIndex = ref(0);
 const height = ref("unset");
 const keyboards = useKeyboardsStore();
+const textsStore = useTextsStore();
 let searcher: FuzzySearch<string>;
 onMounted(() => {
   keyboards.keys("ArrowUp").down(() => {

@@ -23,7 +23,7 @@
       "
     >
       <t-buttons v-if="visibleCloseButton">
-        <t-button @click="close" v-html="$texts.close"></t-button>
+        <t-button @click="close" v-html="textsStore.state.value.close"></t-button>
       </t-buttons>
       <t-content>
         <slot></slot>
@@ -37,8 +37,8 @@
 import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
 // Others
 import { v4 as uuid } from "uuid";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
+import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 
 const props = defineProps<{
   visible?: boolean;
@@ -54,6 +54,7 @@ const emit = defineEmits<{
   (e: "close"): void;
 }>();
 const _this = getCurrentInstance()!.proxy!;
+const textsStore = useTextsStore();
 const zIndex = ref(0);
 const noBackground = ref(false);
 const background = ref<HTMLElement>();
@@ -99,9 +100,6 @@ watch(
     noBackground.value = !isActive.value;
   },
 );
-function changeModal() {
-  noBackground.value = !isActive.value;
-}
 watch(
   () => props.visible,
   () => {
@@ -124,7 +122,7 @@ watch(
     emit("state", isActive.value);
   },
 );
-function pressEscape(pressed: boolean) {
+function pressEscape() {
   if (isActive.value) {
     close();
   }

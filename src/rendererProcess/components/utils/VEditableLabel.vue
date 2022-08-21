@@ -19,7 +19,7 @@
         placeholder=""
         :contenteditable="editing"
         @blur="cancel"
-        @focus="focus($event)"
+        @focus="focus"
         @dblclick="edit(true)"
         @click="edit()"
         @input="input"
@@ -35,10 +35,8 @@
 <script setup lang="ts">
 // Vue
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { ref, watch, getCurrentInstance, onMounted, nextTick, onUnmounted } from "vue";
-const __this = getCurrentInstance()!;
-const _this = __this.proxy!;
+const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
   (e: "change", value: string): void;
   (e: "focus", editableLabel: typeof _this): void;
@@ -138,7 +136,7 @@ function input(event: InputEvent) {
   tempText.value = (event.target as HTMLElement).innerText;
   emit("input", tempText.value);
 }
-function focus(event: FocusEvent) {
+function focus() {
   emit("focus", {
     $el: labelInput.value,
     edit,

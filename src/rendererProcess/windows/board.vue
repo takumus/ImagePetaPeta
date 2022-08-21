@@ -81,10 +81,12 @@ import { minimId } from "@/commons/utils/utils";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 const _this = getCurrentInstance()!.proxy!;
 const statesStore = useStateStore();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
+const appInfoStore = useAppInfoStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
 const petaImages = ref<PetaImages>({});
 const boards = ref<{ [petaBoardId: string]: PetaBoard }>({});
@@ -159,7 +161,9 @@ onMounted(async () => {
       }
     }
   });
-  document.title = `${_this.$t("titles.boards")} - ${_this.$appInfo.name} ${_this.$appInfo.version}`;
+  document.title = `${_this.$t("titles.boards")} - ${appInfoStore.state.value.name} ${
+    appInfoStore.state.value.version
+  }`;
   await getPetaImages();
   await getPetaBoards();
   await restoreBoard();

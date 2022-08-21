@@ -64,7 +64,7 @@
         <t-tag class="last">
           <VEditableLabel
             :label="''"
-            :labelLook="$texts.plus + '       '"
+            :labelLook="textsStore.state.value.plus + '       '"
             :clickToEdit="true"
             @change="(name) => addTag(name)"
             @focus="complementTag"
@@ -101,17 +101,17 @@
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { MAX_PREVIEW_COUNT, UNTAGGED_ID } from "@/commons/defines";
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
+import { UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
 import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import dateFormat from "dateformat";
 import { computed, nextTick, ref, watch, getCurrentInstance } from "vue";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
+import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -120,6 +120,7 @@ const props = defineProps<{
   petaImages: PetaImage[];
   petaTagInfos: PetaTagInfo[];
 }>();
+const textsStore = useTextsStore();
 const fetchingTags = ref(false);
 const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
@@ -182,15 +183,10 @@ function changeNote(note: string) {
   API.send("updatePetaImages", [singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
 }
 function changeNSFW(value: boolean) {
-  props.petaImages.forEach((pi, i) => {
+  props.petaImages.forEach((pi) => {
     pi.nsfw = value;
   });
   updatePetaImages(props.petaImages, UpdateMode.UPDATE);
-}
-function clearSelection() {
-  props.petaImages.forEach((pi) => {
-    pi._selected = false;
-  });
 }
 function complementTag(editableLabel: any) {
   _this.$components.complement.open(
@@ -238,7 +234,10 @@ async function fetchPetaTags() {
 }
 const singlePetaImageInfo = computed(() => {
   if (props.petaImages.length === 1) {
-    const petaImage = props.petaImages[0]!;
+    const petaImage = props.petaImages[0];
+    if (petaImage === undefined) {
+      return undefined;
+    }
     const all = petaImage.palette.reduce((p, c) => {
       return p + c.population;
     }, 0);

@@ -13,12 +13,11 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onMounted, ref, watch } from "vue";
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 // Components
 import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Vec2 } from "@/commons/utils/vec2";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 const props = defineProps<{
@@ -30,7 +29,6 @@ const progress = ref(100);
 const status = ref<TaskStatusCode>("complete");
 const currentTaskId = ref("");
 const log = ref("");
-const currentMousePosition = ref(new Vec2());
 const cancelable = ref(false);
 const name = ref("");
 let closeWindowHandler = -1;

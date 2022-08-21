@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onBeforeUpdate, onMounted, onUnmounted, reactive, ref, unref } from "vue";
+import { computed, ref } from "vue";
 // Others
 import { PetaBoard } from "@/commons/datas/petaBoard";
 const props = defineProps<{

@@ -27,10 +27,9 @@
   </t-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Ref, Watch } from "vue-property-decorator";
+import { computed, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
 // Components
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
@@ -43,163 +42,142 @@ import VProperty from "@/rendererProcess/components/browser/property/VProperty.v
 // Others
 import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
-import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { logChunk } from "@/rendererProcess/utils/rendererLogger";
-import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { ImageType } from "@/commons/datas/imageType";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
 import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR } from "@/commons/defines";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-@Options({
-  components: {
-    VTasks,
-    VTitleBar,
-    VContextMenu,
-    VComplement,
-    VDialog,
-    VUtilsBar,
-    VBoard,
-    VProperty,
-  },
-})
-export default class DetailsIndex extends Vue {
-  @Ref("vPetaBoard")
-  vPetaBoard!: typeof VBoard;
-  board: PetaBoard | null = null;
-  petaImages: PetaImages = {};
-  petaTagInfos: PetaTagInfo[] = [];
-  selectedPetaTags: PetaTag[] = [];
-  title = "";
-  petaImageId? = "";
-  keyboards: Keyboards = new Keyboards();
-  async mounted() {
-    AnimatedGIFLoader.add?.();
-    API.on("updatePetaImages", async (e, petaImages, mode) => {
-      if (mode === UpdateMode.UPSERT) {
-        petaImages.forEach((petaImage) => {
-          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-          if (!this.board) {
-            return;
-          }
-          Object.values(this.board.petaPanels).forEach((petaPanel) => {
-            if (petaPanel.petaImageId === petaImage.id) {
-              petaPanel._petaImage = this.petaImages[petaImage.id];
-              this.vPetaBoard.load({});
-            }
-          });
-        });
-      } else if (mode === UpdateMode.UPDATE) {
-        petaImages.forEach((newPetaImage) => {
-          const petaImage = this.petaImages[newPetaImage.id];
-          if (petaImage) {
-            Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+const _this = getCurrentInstance()!.proxy!;
+const appInfoStore = useAppInfoStore();
+const vPetaBoard = ref<InstanceType<typeof VBoard>>();
+const board = ref<PetaBoard>();
+const petaImages = ref<PetaImages>({});
+const petaTagInfos = ref<PetaTagInfo[]>([]);
+const title = ref("");
+const petaImageId = ref<string>();
+const keyboards = new Keyboards();
+onMounted(async () => {
+  AnimatedGIFLoader.add?.();
+  API.on("updatePetaImages", async (e, newPetaImages, mode) => {
+    if (mode === UpdateMode.UPSERT) {
+      newPetaImages.forEach((petaImage) => {
+        petaImages.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
+        if (!board.value) {
+          return;
+        }
+        Object.values(board.value.petaPanels).forEach((petaPanel) => {
+          if (petaPanel.petaImageId === petaImage.id) {
+            petaPanel._petaImage = petaImages.value[petaImage.id];
+            vPetaBoard.value?.load({});
           }
         });
-        this.vPetaBoard.orderPIXIRender();
-      } else if (mode === UpdateMode.REMOVE) {
-        petaImages.forEach((petaImage) => {
-          delete this.petaImages[petaImage.id];
-          if (!this.board) {
-            return;
+      });
+    } else if (mode === UpdateMode.UPDATE) {
+      newPetaImages.forEach((newPetaImage) => {
+        const petaImage = petaImages.value[newPetaImage.id];
+        if (petaImage) {
+          Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
+        }
+      });
+      vPetaBoard.value?.orderPIXIRender();
+    } else if (mode === UpdateMode.REMOVE) {
+      newPetaImages.forEach((petaImage) => {
+        delete petaImages.value[petaImage.id];
+        if (!board.value) {
+          return;
+        }
+        Object.values(board.value.petaPanels).forEach((petaPanel) => {
+          if (petaPanel.petaImageId === petaImage.id) {
+            API.send("windowClose");
           }
-          Object.values(this.board.petaPanels).forEach((petaPanel) => {
-            if (petaPanel.petaImageId === petaImage.id) {
-              API.send("windowClose");
-            }
-          });
         });
-      }
-    });
-    API.on("updatePetaTags", (e) => {
-      this.getPetaTagInfos();
-    });
-    API.on("detailsPetaImage", (event, petaImage) => {
-      this.petaImageId = petaImage.id;
-    });
-    this.petaImageId = (await API.send("getDetailsPetaImage"))?.id;
-    this.title = `${this.$t("titles.details")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
-    document.title = this.title;
-    await this.getPetaImages();
-    await this.getPetaTagInfos();
-    this.$nextTick(() => {
-      API.send("showMainWindow");
-    });
-    this.keyboards.enabled = true;
-    this.keyboards.keys("Escape").up(() => {
-      API.send("windowClose");
-    });
-  }
-  get petaImage() {
-    if (this.petaImageId === undefined) {
-      return undefined;
+      });
     }
-    return this.petaImages[this.petaImageId];
+  });
+  API.on("updatePetaTags", () => {
+    getPetaTagInfos();
+  });
+  API.on("detailsPetaImage", (event, petaImage) => {
+    petaImageId.value = petaImage.id;
+  });
+  petaImageId.value = (await API.send("getDetailsPetaImage"))?.id;
+  title.value = `${_this.$t("titles.details")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  document.title = title.value;
+  await getPetaImages();
+  await getPetaTagInfos();
+  nextTick(() => {
+    API.send("showMainWindow");
+  });
+  keyboards.enabled = true;
+  keyboards.keys("Escape").up(() => {
+    API.send("windowClose");
+  });
+});
+const petaImage = computed(() => {
+  if (petaImageId.value === undefined) {
+    return undefined;
   }
-  get singlePetaImages() {
-    if (this.petaImage === undefined) {
-      return [];
-    }
-    return [this.petaImage];
+  return petaImages.value[petaImageId.value];
+});
+const singlePetaImages = computed(() => {
+  if (petaImage.value === undefined) {
+    return [];
   }
-  async getPetaImages() {
-    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-    // this.addOrderedPetaPanels();
-  }
-  async getPetaTagInfos() {
-    this.petaTagInfos = await API.send("getPetaTagInfos");
-  }
-  get petaImageURL() {
-    return getImageURL(this.petaImage, ImageType.ORIGINAL);
-  }
-  @Watch("petaImage")
-  changePetaImage() {
-    if (this.petaImage === undefined) {
-      this.board = null;
-      return;
-    }
-    const width = 256;
-    const panel: PetaPanel = {
-      petaImageId: this.petaImage.id,
-      position: new Vec2(),
-      rotation: 0,
-      width: width,
-      height: this.petaImage.height * width,
-      crop: {
-        position: new Vec2(0, 0),
-        width: 1,
-        height: 1,
-      },
-      id: "petaImage",
-      index: 0,
-      gif: {
-        stopped: false,
-        frame: 0,
-      },
-      visible: true,
-      locked: true,
-      _petaImage: this.petaImage,
-    };
-    this.board = {
-      petaPanels: { [panel.id]: panel },
-      id: "details",
-      name: "details",
-      transform: {
-        scale: 1,
-        position: new Vec2(0, 0),
-      },
-      background: {
-        fillColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
-        lineColor: BOARD_DARK_BACKGROUND_LINE_COLOR,
-      },
-      index: 0,
-    };
-  }
+  return [petaImage.value];
+});
+async function getPetaImages() {
+  petaImages.value = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
+  // this.addOrderedPetaPanels();
 }
+async function getPetaTagInfos() {
+  petaTagInfos.value = await API.send("getPetaTagInfos");
+}
+watch(petaImage, () => {
+  if (petaImage.value === undefined) {
+    board.value = undefined;
+    return;
+  }
+  const width = 256;
+  const panel: PetaPanel = {
+    petaImageId: petaImage.value.id,
+    position: new Vec2(),
+    rotation: 0,
+    width: width,
+    height: petaImage.value.height * width,
+    crop: {
+      position: new Vec2(0, 0),
+      width: 1,
+      height: 1,
+    },
+    id: "petaImage",
+    index: 0,
+    gif: {
+      stopped: false,
+      frame: 0,
+    },
+    visible: true,
+    locked: true,
+    _petaImage: petaImage.value,
+  };
+  board.value = {
+    petaPanels: { [panel.id]: panel },
+    id: "details",
+    name: "details",
+    transform: {
+      scale: 1,
+      position: new Vec2(0, 0),
+    },
+    background: {
+      fillColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
+      lineColor: BOARD_DARK_BACKGROUND_LINE_COLOR,
+    },
+    index: 0,
+  };
+});
 </script>
 
 <style lang="scss" scoped>

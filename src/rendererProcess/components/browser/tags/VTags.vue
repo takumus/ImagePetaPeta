@@ -23,7 +23,7 @@
       <t-tag>
         <VEditableLabel
           :label="''"
-          :labelLook="$texts.plus + '       '"
+          :labelLook="textsStore.state.value.plus + '       '"
           :clickToEdit="true"
           @change="(name) => addTag(name)"
           :growWidth="true"
@@ -51,6 +51,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
+import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
   (e: "update:selectedPetaTags", selectedPetaTags: PetaTag[]): void;
@@ -60,6 +61,7 @@ const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
   selectedPetaTags: PetaTag[];
 }>();
+const textsStore = useTextsStore();
 function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   if (tag.readonly) {
     return;

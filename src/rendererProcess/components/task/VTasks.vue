@@ -40,7 +40,7 @@ const taskStatusArray = computed(() => {
     .reverse()
     .map((id) => ({
       id,
-      status: taskStatuses.value[id]!,
+      status: taskStatuses.value[id] as TaskStatus,
     }));
 });
 const visible = computed(() => {

@@ -119,13 +119,13 @@
         <t-strong>
           <p v-if="updateAvailable">
             {{ $t("settings.updateAvailable") }}<br />
-            {{ $t("settings.currentVersion") }}: {{ $appInfo.version }}<br />
+            {{ $t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
             {{ $t("settings.latestVersion") }}: {{ latestVersion }}<br />
             <button @click="downloadUpdate">{{ $t("settings.updateButton") }}</button>
           </p>
           <p v-else>
             {{ $t("settings.thisIsLatest") }}<br />
-            {{ $t("settings.currentVersion") }}: {{ $appInfo.version }}<br />
+            {{ $t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
             <button @click="releaseNote">{{ $t("settings.releaseNoteButton") }}</button>
           </p>
         </t-strong>
@@ -134,7 +134,7 @@
         Info
       -->
       <t-content v-show="currentTab === 'info'" class="info">
-        <p>{{ $appInfo.name }} {{ $appInfo.version }}</p>
+        <p>{{ appInfoStore.state.value.name }} {{ appInfoStore.state.value.version }}</p>
         <button tabindex="-1" @click="gotoGithub">
           {{ $t("info.githubButton") }}
         </button>
@@ -161,19 +161,20 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, getCurrentInstance, onMounted, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, ref } from "vue";
 // Components
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Settings } from "@/commons/datas/settings";
 import { LICENSES } from "@/@assets/licenses";
 import { DOWNLOAD_URL, SUPPORT_URL } from "@/commons/defines";
 import { DEBUGGERS } from "@/@assets/debuggers";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 
 const _this = getCurrentInstance()!.proxy!;
 const settingsStore = useSettingsStore();
+const appInfoStore = useAppInfoStore();
 const regenerateMetadatasCompleted = ref(true);
 const regenerateMetadatasDone = ref(0);
 const regenerateMetadatasCount = ref(0);
@@ -189,10 +190,10 @@ onMounted(async () => {
     regenerateMetadatasCount.value = count;
     regenerateMetadatasCompleted.value = false;
   });
-  API.on("regenerateMetadatasBegin", (_) => {
+  API.on("regenerateMetadatasBegin", () => {
     regenerateMetadatasCompleted.value = false;
   });
-  API.on("regenerateMetadatasComplete", (_) => {
+  API.on("regenerateMetadatasComplete", () => {
     regenerateMetadatasCompleted.value = true;
   });
   API.on("foundLatestVersion", async (event, remote) => {
@@ -245,7 +246,10 @@ function gotoGithub() {
   API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
 }
 function gotoIssues() {
-  API.send("openURL", `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(_this.$appInfo.version)}`);
+  API.send(
+    "openURL",
+    `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(appInfoStore.state.value.version)}`,
+  );
 }
 function gotoIcons8() {
   API.send("openURL", "https://icons8.com/");
@@ -260,7 +264,7 @@ function downloadUpdate() {
   API.send("openURL", `${DOWNLOAD_URL}${latestVersion.value}`);
 }
 function releaseNote() {
-  API.send("openURL", `${DOWNLOAD_URL}${_this.$appInfo.version}`);
+  API.send("openURL", `${DOWNLOAD_URL}${appInfoStore.state.value.version}`);
 }
 </script>
 

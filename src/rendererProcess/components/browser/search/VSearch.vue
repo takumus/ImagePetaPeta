@@ -15,7 +15,7 @@
       <t-tag class="last">
         <VEditableLabel
           :label="''"
-          :labelLook="$texts.plus + '       '"
+          :labelLook="textsStore.state.value.plus + '       '"
           :clickToEdit="true"
           @change="addSelectedTag"
           @focus="complementTag"
@@ -37,10 +37,11 @@ import { UNTAGGED_ID } from "@/commons/defines";
 import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import { ref } from "@vue/reactivity";
 import { computed, getCurrentInstance, nextTick } from "@vue/runtime-core";
+import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 
 const _this = getCurrentInstance()!.proxy!;
 const searchInput = ref<typeof VEditableLabel>();
-
+const textsStore = useTextsStore();
 const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
   selectedPetaTags: PetaTag[];

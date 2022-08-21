@@ -7,9 +7,7 @@ import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { WindowType } from "@/commons/datas/windowType";
 import GlobalComponents from "@/rendererProcess/vueComponentCustomProperties/components";
 import GlobalDarkMode from "@/rendererProcess/vueComponentCustomProperties/darkMode";
-import GlobalAppInfo from "@/rendererProcess/vueComponentCustomProperties/appInfo";
 import GlobalNSFW from "@/rendererProcess/vueComponentCustomProperties/nsfw";
-import * as GlobalTexts from "@/rendererProcess/vueComponentCustomProperties/texts";
 
 import { createDarkModeStore, darkModeStoreKey } from "@/rendererProcess/stores/darkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/rendererProcess/stores/nsfwStore";
@@ -19,6 +17,8 @@ import { createSystemInfoStore, systemInfoStoreKey } from "@/rendererProcess/sto
 import { createWindowStatusStore, windowStatusStoreKey } from "@/rendererProcess/stores/windowStatusStore";
 import { createStatesStore, statesStoreKey } from "@/rendererProcess/stores/statesStore";
 import { settingsStoreKey, createSettingsStore } from "@/rendererProcess/stores/settingsStore";
+import { appInfoStoreKey, createAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+import { textsStoreKey, createTextsStore } from "@/rendererProcess/stores/textsStore";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
@@ -39,10 +39,8 @@ export async function create(component: Component, windowType: WindowType) {
       }),
     );
     await appUse(GlobalComponents);
-    await appUse(GlobalTexts.createPlugin(platform));
     await appUse(GlobalDarkMode);
     await appUse(GlobalNSFW);
-    await appUse(GlobalAppInfo);
     app.provide(darkModeStoreKey, await createDarkModeStore());
     app.provide(nsfwStoreKey, await createNSFWStore());
     app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType));
@@ -51,6 +49,8 @@ export async function create(component: Component, windowType: WindowType) {
     app.provide(windowStatusStoreKey, await createWindowStatusStore(windowType));
     app.provide(statesStoreKey, await createStatesStore());
     app.provide(settingsStoreKey, await createSettingsStore());
+    app.provide(appInfoStoreKey, await createAppInfoStore());
+    app.provide(textsStoreKey, await createTextsStore());
     app.mount("#app");
   };
   API.on("dataInitialized", () => {

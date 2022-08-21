@@ -10,7 +10,7 @@
       <t-images
         @pointerdown="pointerdown($event)"
         @dragstart="dragstart($event)"
-        @dblclick="dblclick($event)"
+        @dblclick="dblclick"
         draggable="true"
         :class="{
           'selected-image': tile.petaImage?._selected,
@@ -143,7 +143,7 @@ function pointerup(event: PointerEvent) {
     }
   }
 }
-function dblclick(event: PointerEvent) {
+function dblclick() {
   if (props.tile.petaImage) {
     emit("dblclick", props.tile.petaImage);
   }

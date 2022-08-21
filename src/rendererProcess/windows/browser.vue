@@ -23,10 +23,9 @@
   </t-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Ref, Watch } from "vue-property-decorator";
+import { getCurrentInstance, nextTick, onMounted, ref } from "vue";
 // Components
 import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
@@ -40,58 +39,45 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import { API } from "@/rendererProcess/api";
 import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { logChunk } from "@/rendererProcess/utils/rendererLogger";
-import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-@Options({
-  components: {
-    VBrowser,
-    VImageImporter,
-    VTasks,
-    VTitleBar,
-    VContextMenu,
-    VComplement,
-    VDialog,
-    VUtilsBar,
-  },
-})
-export default class BrowserIndex extends Vue {
-  petaImages: PetaImages = {};
-  petaTagInfos: PetaTagInfo[] = [];
-  title = "";
-  async mounted() {
-    API.on("updatePetaImages", (e, petaImages, mode) => {
-      if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
-        petaImages.forEach((petaImage) => {
-          this.petaImages[petaImage.id] = dbPetaImageToPetaImage(
-            petaImage,
-            Boolean(this.petaImages[petaImage.id]?._selected),
-          );
-        });
-      } else if (mode === UpdateMode.REMOVE) {
-        petaImages.forEach((petaImage) => {
-          delete this.petaImages[petaImage.id];
-        });
-      }
-    });
-    API.on("updatePetaTags", (e) => {
-      this.getPetaTagInfos();
-    });
-    this.title = `${this.$t("titles.browser")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
-    document.title = this.title;
-    await this.getPetaImages();
-    await this.getPetaTagInfos();
-    this.$nextTick(() => {
-      API.send("showMainWindow");
-    });
-  }
-  async getPetaImages() {
-    this.petaImages = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-    // this.addOrderedPetaPanels();
-  }
-  async getPetaTagInfos() {
-    this.petaTagInfos = await API.send("getPetaTagInfos");
-  }
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+const _this = getCurrentInstance()!.proxy!;
+const appInfoStore = useAppInfoStore();
+const petaImages = ref<PetaImages>({});
+const petaTagInfos = ref<PetaTagInfo[]>([]);
+const title = ref("");
+onMounted(async () => {
+  API.on("updatePetaImages", (e, newPetaImages, mode) => {
+    if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
+      newPetaImages.forEach((petaImage) => {
+        petaImages.value[petaImage.id] = dbPetaImageToPetaImage(
+          petaImage,
+          Boolean(petaImages.value[petaImage.id]?._selected),
+        );
+      });
+    } else if (mode === UpdateMode.REMOVE) {
+      newPetaImages.forEach((petaImage) => {
+        delete petaImages.value[petaImage.id];
+      });
+    }
+  });
+  API.on("updatePetaTags", () => {
+    getPetaTagInfos();
+  });
+  title.value = `${_this.$t("titles.browser")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  document.title = title.value;
+  await getPetaImages();
+  await getPetaTagInfos();
+  nextTick(() => {
+    API.send("showMainWindow");
+  });
+});
+async function getPetaImages() {
+  petaImages.value = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
+  // this.addOrderedPetaPanels();
+}
+async function getPetaTagInfos() {
+  petaTagInfos.value = await API.send("getPetaTagInfos");
 }
 </script>
 

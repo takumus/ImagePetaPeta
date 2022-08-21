@@ -34,7 +34,10 @@ const previews = ref<HTMLElement>();
 const previewWidth = ref(0);
 const previewHeight = ref(0);
 const previewsResizer: ResizeObserver = new ResizeObserver((entries) => {
-  resizePreviews(entries[0]!.contentRect);
+  const rect = entries[0]?.contentRect;
+  if (rect) {
+    resizePreviews(rect);
+  }
 });
 onMounted(() => {
   if (previews.value) {
@@ -68,7 +71,7 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
   const petaImages = [...props.petaImages];
   // プレビュー数の最大を抑える。
   petaImages.splice(0, petaImages.length - MAX_PREVIEW_COUNT);
-  const thumbnails = petaImages.map((p, i): PropertyThumbnail => {
+  const thumbnails = petaImages.map((p): PropertyThumbnail => {
     let width = 0;
     let height = 0;
     if (p.height / p.width < previewHeight.value / maxWidth) {
@@ -85,7 +88,10 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
       height: height,
     };
   });
-  const last = thumbnails[thumbnails.length - 1]!;
+  const last = thumbnails[thumbnails.length - 1];
+  if (last === undefined) {
+    return [];
+  }
   thumbnails.forEach((thumb, i) => {
     thumb.position = new Vec2(
       petaImages.length > 1

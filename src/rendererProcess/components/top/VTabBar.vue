@@ -4,7 +4,7 @@
       :class="{ selected: b === board }"
       :style="{ opacity: b === board && dragging ? 0 : 1 }"
       v-for="(b, index) in boards"
-      @pointerdown="pointerdown($event, b, index, $event.target)"
+      @pointerdown="pointerdown($event, b, index)"
       @contextmenu="menu($event, b)"
       :key="b.id"
       :ref="(element) => setTabRef(element as HTMLElement, b.id)"
@@ -18,7 +18,7 @@
     <t-tab class="add" @click="addPetaBoard()">
       <t-label-wrapper>
         <t-label>
-          <VEditableLabel :label="$texts.plus" :readonly="true" />
+          <VEditableLabel :label="textsStore.state.value.plus" :readonly="true" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
@@ -42,7 +42,7 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
-import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
+import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 
 const _this = getCurrentInstance()!.proxy!;
 const emit = defineEmits<{
@@ -55,12 +55,11 @@ const props = defineProps<{
   boards: PetaBoard[];
   currentPetaBoardId: string;
 }>();
-const { systemInfo } = useSystemInfoStore();
+const textsStore = useTextsStore();
 const draggingTab = ref<HTMLElement>();
 const dragging = ref(false);
 const pressing = ref(false);
 const pointerdownOffsetX = ref(0);
-const editName = ref(false);
 const beforeSortSelectedIndex = ref(0);
 const afterSortSelectedIndex = ref(0);
 const draggingPetaBoardId = ref<string>();
@@ -73,7 +72,7 @@ onUnmounted(() => {
   window.removeEventListener("pointermove", pointermove);
   window.removeEventListener("pointerup", pointerup);
 });
-function pointerdown(event: PointerEvent, board: PetaBoard, index: number, target: HTMLElement) {
+function pointerdown(event: PointerEvent, board: PetaBoard, index: number) {
   if (isKeyboardLocked()) return;
   if (event.button != MouseButton.LEFT) return;
   selectPetaBoard(board);
@@ -114,9 +113,9 @@ function pointermove(event: PointerEvent) {
     let newIndex = 0;
     props.boards
       .map((b) => {
-        const elem: HTMLElement = b.id === draggingPetaBoardId.value ? _draggingTab : tabs.value[b.id]!;
+        const elem = b.id === draggingPetaBoardId.value ? _draggingTab : tabs.value[b.id];
         return {
-          rect: elem.getBoundingClientRect(),
+          rect: elem?.getBoundingClientRect() || { x: 0, y: 0, height: 0, width: 0 },
           board: b,
         };
       })
@@ -168,9 +167,6 @@ async function addPetaBoard() {
 }
 const board = computed(() => {
   return props.boards.find((board) => board.id === props.currentPetaBoardId);
-});
-const isMac = computed(() => {
-  return systemInfo.value.platform === "darwin";
 });
 </script>
 

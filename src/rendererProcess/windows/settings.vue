@@ -18,10 +18,9 @@
   </t-root>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // Vue
-import { Options, Vue } from "vue-class-component";
-import { Ref, Watch } from "vue-property-decorator";
+import { getCurrentInstance, onMounted, ref } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
@@ -30,29 +29,20 @@ import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
-@Options({
-  components: {
-    VTitleBar,
-    VContextMenu,
-    VComplement,
-    VSettings,
-    VDialog,
-  },
-})
-export default class SettingsIndex extends Vue {
-  title = "";
-  keyboards: Keyboards = useKeyboardsStore();
-  async mounted() {
-    this.title = `${this.$t("titles.settings")} - ${this.$appInfo.name} ${this.$appInfo.version}`;
-    document.title = this.title;
-    this.keyboards.enabled = true;
-    this.keyboards.keys("Escape").up(() => {
-      API.send("windowClose");
-    });
-  }
-}
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
+const _this = getCurrentInstance()!.proxy!;
+const appInfoStore = useAppInfoStore();
+const title = ref("");
+const keyboards = useKeyboardsStore();
+onMounted(() => {
+  title.value = `${_this.$t("titles.settings")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  document.title = title.value;
+  keyboards.enabled = true;
+  keyboards.keys("Escape").up(() => {
+    API.send("windowClose");
+  });
+});
 </script>
 
 <style lang="scss" scoped>

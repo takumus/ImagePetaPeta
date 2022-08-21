@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, watch, getCurrentInstance, onMounted, nextTick } from "vue";
+import { ref, getCurrentInstance } from "vue";
 
 defineProps<{
   zIndex: number;
