@@ -55,7 +55,7 @@ export class Windows {
       this.windows.board = this.initBoardWindow();
     }
   }
-  createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions, args?: any) {
+  createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -91,9 +91,9 @@ export class Windows {
       window.moveTop();
     });
     const url =
-      (process.env.WEBPACK_DEV_SERVER_URL !== undefined
+      process.env.WEBPACK_DEV_SERVER_URL !== undefined
         ? `${process.env.WEBPACK_DEV_SERVER_URL}${type}`
-        : `app://./${type}.html`) + `?args=${args}`;
+        : `app://./${type}.html`;
     window.loadURL(url);
     return window;
   }
@@ -128,27 +128,23 @@ export class Windows {
       alwaysOnTop: this.configSettings.data.alwaysOnTop,
     });
   }
-  initSettingsWindow(x?: number, y?: number, update: boolean = false) {
-    return this.createWindow(
-      WindowType.SETTINGS,
-      {
-        width: WINDOW_SETTINGS_WIDTH,
-        height: WINDOW_SETTINGS_HEIGHT,
-        minWidth: WINDOW_SETTINGS_WIDTH,
-        minHeight: WINDOW_SETTINGS_HEIGHT,
-        maximizable: false,
-        minimizable: false,
-        fullscreenable: false,
-        trafficLightPosition: {
-          x: 8,
-          y: 8,
-        },
-        x,
-        y,
-        alwaysOnTop: this.configSettings.data.alwaysOnTop,
+  initSettingsWindow(x?: number, y?: number) {
+    return this.createWindow(WindowType.SETTINGS, {
+      width: WINDOW_SETTINGS_WIDTH,
+      height: WINDOW_SETTINGS_HEIGHT,
+      minWidth: WINDOW_SETTINGS_WIDTH,
+      minHeight: WINDOW_SETTINGS_HEIGHT,
+      maximizable: false,
+      minimizable: false,
+      fullscreenable: false,
+      trafficLightPosition: {
+        x: 8,
+        y: 8,
       },
-      update ? "update" : "none",
-    );
+      x,
+      y,
+      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+    });
   }
   initBoardWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.BOARD, {

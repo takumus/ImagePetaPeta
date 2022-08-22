@@ -128,6 +128,7 @@
             {{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
             <button @click="releaseNote">{{ t("settings.releaseNoteButton") }}</button>
           </p>
+          <button @click="checkUpdate">{{ t("settings.checkUpdateButton") }}</button>
         </t-strong>
       </t-content>
       <!--
@@ -173,6 +174,7 @@ import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 
 const settingsStore = useSettingsStore();
 const appInfoStore = useAppInfoStore();
@@ -200,17 +202,22 @@ onMounted(async () => {
     regenerateMetadatasCompleted.value = true;
   });
   API.on("foundLatestVersion", async (event, remote) => {
-    latestVersion.value = remote.version;
-    updateAvailable.value = true;
-    currentTab.value = "update";
+    notifyUpdate(remote);
   });
   tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
+  checkUpdate();
+});
+function notifyUpdate(remote: RemoteBinaryInfo) {
+  latestVersion.value = remote.version;
+  updateAvailable.value = true;
+  currentTab.value = "update";
+}
+async function checkUpdate() {
   const remoteBinaryInfo = await API.send("getLatestVersion");
   if (!remoteBinaryInfo.isLatest) {
-    currentTab.value = "update";
-    updateAvailable.value = true;
+    notifyUpdate(remoteBinaryInfo);
   }
-});
+}
 function regenerateMetadatas() {
   API.send("regenerateMetadatas");
 }

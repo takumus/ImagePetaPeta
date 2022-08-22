@@ -1006,7 +1006,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     if (!remote.isLatest) {
       log.log("this version is old");
       if (windows.windows.settings === undefined || windows.windows.settings.isDestroyed()) {
-        windows.windows.settings = windows.initSettingsWindow(0, 0, true);
+        windows.windows.settings = windows.initSettingsWindow(0, 0);
       }
       windows.moveSettingsWindowToTop();
       windows.emitMainEvent("foundLatestVersion", remote);

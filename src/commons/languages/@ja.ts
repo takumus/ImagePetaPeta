@@ -176,6 +176,7 @@ const ja = {
     latestVersion: "最新バージョン",
     currentVersion: "現在のバージョン",
     updateButton: "アップデートする",
+    checkUpdateButton: "アップデート確認",
     releaseNoteButton: "リリースノートを確認",
     changePetaImageDirectoryDialog: (ctx: any) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;

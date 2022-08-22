@@ -29,14 +29,10 @@ export async function getLatestVersion(): Promise<RemoteBinaryInfo> {
   try {
     const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
     const packageJSON = (await axios.get(url, { responseType: "json" })).data;
-    // packageJSON.version = "3.0.0";
+    // packageJSON.version = "4.0.0";
     return {
       isLatest: isLatest(app.getVersion(), packageJSON.version),
       version: packageJSON.version,
-      sha256: {
-        win: packageJSON["binary-sha256-win"],
-        mac: packageJSON["binary-sha256-mac"],
-      },
     };
   } catch (e) {
     //
@@ -44,9 +40,5 @@ export async function getLatestVersion(): Promise<RemoteBinaryInfo> {
   return {
     isLatest: true,
     version: app.getVersion(),
-    sha256: {
-      win: "",
-      mac: "",
-    },
   };
 }
