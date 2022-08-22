@@ -4,12 +4,12 @@ import { GLOBAL_API_NAME } from "@/commons/defines";
 const listeners: { [key: string]: { key: string; cb: (...argv: any) => void } } = {};
 webFrame.setZoomLevel(1);
 contextBridge.exposeInMainWorld(GLOBAL_API_NAME, {
-  send: (key: string, ...args: any) => {
+  send: (key: string, ...args: unknown[]) => {
     return ipcRenderer.invoke(key, ...args);
   },
-  on: (key: string, callback: (...argv: any) => void) => {
+  on: (key: string, callback: (...argv: unknown[]) => void) => {
     const listenerId = uuid();
-    const cb = (event: any, ...argv: any[]) => {
+    const cb = (event: unknown, ...argv: unknown[]) => {
       return callback(event, ...argv);
     };
     listeners[listenerId] = {

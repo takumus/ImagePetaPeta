@@ -5,7 +5,7 @@ export class Logger {
   private logFile: WriteStream | undefined;
   private date = "";
   constructor(private path: string) {}
-  log(from: LogFrom, id: string, ...args: any[]) {
+  log(from: LogFrom, id: string, ...args: unknown[]) {
     try {
       this.open();
       const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})`;

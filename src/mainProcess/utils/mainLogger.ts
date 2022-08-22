@@ -8,10 +8,10 @@ export class MainLogger {
     const uid = uuid().substring(0, 4);
     const id = label ? `${label}(${uid})` : uid;
     return {
-      log: (...args: any[]) => {
+      log: (...args: unknown[]) => {
         this.logger?.log(LogFrom.MAIN, id, ...args);
       },
-      error: (...args: any[]) => {
+      error: (...args: unknown[]) => {
         this.logger?.log(LogFrom.MAIN, id, "Error:", ...args);
       },
       uid,

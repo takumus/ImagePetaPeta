@@ -24,8 +24,7 @@ export interface MainFunctions {
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
   getPetaTagInfos: () => Promise<PetaTagInfo[]>;
   updatePetaImagesPetaTags: (petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) => Promise<boolean>;
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  log: (id: string, ...args: any[]) => Promise<boolean>;
+  log: (id: string, ...args: unknown[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;

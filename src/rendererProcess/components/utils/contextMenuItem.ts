@@ -1,6 +1,6 @@
 export interface ContextMenuItem {
   label?: string;
-  click?: () => any;
+  click?: () => void;
   id?: string;
   separate?: boolean;
   disabled?: boolean;

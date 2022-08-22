@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function valueChecker() {
-  const values: { [key: string]: any } = {};
-  function isSame(key: string, value: any) {
+  const values: { [key: string]: unknown } = {};
+  function isSame(key: string, value: unknown) {
     if (values[key] != value) {
       values[key] = value;
       return false;
     }
     return true;
   }
-  function isSameAll(...pairs: any[]) {
+  function isSameAll(...pairs: unknown[]) {
     let result = true;
     for (let i = 0; i < pairs.length / 2; i++) {
       const key = pairs[i * 2] as string;

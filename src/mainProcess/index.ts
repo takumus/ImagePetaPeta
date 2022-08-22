@@ -168,7 +168,8 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     //-------------------------------------------------------------------------------------------------//
     const mainFunctions = getMainFunctions();
     Object.keys(mainFunctions).forEach((key) => {
-      ipcMain.handle(key, (e: IpcMainInvokeEvent, ...args) => (mainFunctions as any)[key](e, ...args));
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      ipcMain.handle(key, (mainFunctions as any)[key] as any);
     });
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -503,7 +504,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           return [];
         },
-        async log(event, id: string, ...args: any) {
+        async log(event, id: string, ...args: unknown[]) {
           dataLogger.log(LogFrom.RENDERER, id, ...args);
           return true;
         },
@@ -908,7 +909,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", files.FILE_IMAGES_TAGS_DB);
       configStates = new Config<States>(files.FILE_STATES, defaultStates, upgradeStates);
       configWindowStates = new Config<WindowStates>(files.FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
-      ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<any>[]).forEach((db) => {
+      ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach((db) => {
         db.on("beginCompaction", () => {
           mainLogger.logChunk().log(`begin compaction(${db.name})`);
         });

@@ -3,12 +3,10 @@ import { v4 as uuid } from "uuid";
 export function logChunk() {
   const uid = uuid().substring(0, 4);
   return {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    log: (...args: any[]) => {
+    log: (...args: unknown[]) => {
       API.send("log", uid, ...args);
     },
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    error: (...args: any[]) => {
+    error: (...args: unknown[]) => {
       API.send("log", uid, "Error:", ...args);
     },
     uid,
