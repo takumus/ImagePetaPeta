@@ -714,10 +714,6 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           return false;
         },
-        async installUpdate(event) {
-          //
-          return false;
-        },
         async startDrag(event, petaImages, iconSize, iconData) {
           const first = petaImages[0];
           if (!first) {
