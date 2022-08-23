@@ -13,16 +13,10 @@ export async function createPetaImagesStore() {
     update: (changes: PetaImage[], mode: UpdateMode) => void;
   }>;
   API.on("updatePetaImages", async (e, newPetaImages, mode) => {
-    if (mode === UpdateMode.UPSERT) {
+    if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
       newPetaImages.forEach((petaImage) => {
-        states.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-      });
-    } else if (mode === UpdateMode.UPDATE) {
-      newPetaImages.forEach((newPetaImage) => {
-        const petaImage = states.value[newPetaImage.id];
-        if (petaImage) {
-          Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
-        }
+        // restore selected
+        states.value[petaImage.id] = dbPetaImageToPetaImage(petaImage, states.value[petaImage.id]?._selected);
       });
     } else if (mode === UpdateMode.REMOVE) {
       newPetaImages.forEach((petaImage) => {
