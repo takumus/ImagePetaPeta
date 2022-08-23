@@ -101,38 +101,29 @@ const errorPetaBoardId = ref("");
 onMounted(async () => {
   AnimatedGIFLoader.add?.();
   petaImagesStore.events.on("update", async (newPetaImages, mode) => {
+    const needReload = newPetaImages.reduce((need, petaImage) => {
+      return need
+        ? true
+        : currentPetaBoard.value
+        ? Object.values(currentPetaBoard.value.petaPanels).find(
+            (petaPanel) => petaPanel.petaImageId === petaImage.id,
+          ) !== undefined
+        : false;
+    }, false);
     if (mode === UpdateMode.UPSERT) {
-      let changeCurrentBoard = false;
-      newPetaImages.forEach((petaImage) => {
-        if (currentPetaBoard.value) {
-          changeCurrentBoard =
-            Object.values(currentPetaBoard.value.petaPanels).filter((petaPanel) => {
-              return petaPanel.petaImageId === petaImage.id;
-            }).length > 0;
-        }
-        if (changeCurrentBoard) {
-          vPetaBoard.value?.load({
-            reload: {
-              additions: newPetaImages.map((petaImage) => petaImage.id),
-              deletions: [],
-            },
-          });
-        }
-      });
+      if (needReload) {
+        vPetaBoard.value?.load({
+          reload: {
+            additions: newPetaImages.map((petaImage) => petaImage.id),
+            deletions: [],
+          },
+        });
+      }
       addOrderedPetaPanels();
     } else if (mode === UpdateMode.UPDATE) {
       vPetaBoard.value?.orderPIXIRender();
     } else if (mode === UpdateMode.REMOVE) {
-      let changeCurrentBoard = false;
-      newPetaImages.forEach((petaImage) => {
-        if (currentPetaBoard.value) {
-          changeCurrentBoard =
-            Object.values(currentPetaBoard.value.petaPanels).filter((petaPanel) => {
-              return petaPanel.petaImageId === petaImage.id;
-            }).length > 0;
-        }
-      });
-      if (changeCurrentBoard) {
+      if (needReload) {
         vPetaBoard.value?.load({
           reload: {
             additions: [],
