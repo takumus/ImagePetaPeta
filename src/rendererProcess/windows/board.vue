@@ -84,6 +84,7 @@ import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { hasPetaImages } from "@/commons/utils/board";
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();
@@ -101,36 +102,21 @@ const errorPetaBoardId = ref("");
 onMounted(async () => {
   AnimatedGIFLoader.add?.();
   petaImagesStore.events.on("update", async (newPetaImages, mode) => {
-    const needReload = newPetaImages.reduce((need, petaImage) => {
-      return need
-        ? true
-        : currentPetaBoard.value
-        ? Object.values(currentPetaBoard.value.petaPanels).find(
-            (petaPanel) => petaPanel.petaImageId === petaImage.id,
-          ) !== undefined
-        : false;
-    }, false);
-    if (mode === UpdateMode.UPSERT) {
+    const needReload =
+      currentPetaBoard.value === undefined ? false : hasPetaImages(currentPetaBoard.value, newPetaImages);
+    if (mode === UpdateMode.UPSERT || mode === UpdateMode.REMOVE) {
       if (needReload) {
+        const ids = newPetaImages.map((petaImage) => petaImage.id);
         vPetaBoard.value?.load({
           reload: {
-            additions: newPetaImages.map((petaImage) => petaImage.id),
-            deletions: [],
+            additions: mode === UpdateMode.UPSERT ? ids : [],
+            deletions: mode === UpdateMode.REMOVE ? ids : [],
           },
         });
       }
       addOrderedPetaPanels();
     } else if (mode === UpdateMode.UPDATE) {
       vPetaBoard.value?.orderPIXIRender();
-    } else if (mode === UpdateMode.REMOVE) {
-      if (needReload) {
-        vPetaBoard.value?.load({
-          reload: {
-            additions: [],
-            deletions: newPetaImages.map((petaImage) => petaImage.id),
-          },
-        });
-      }
     }
   });
   document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
@@ -176,7 +162,6 @@ function addOrderedPetaPanels() {
   orderedAddPanelIds.value.forEach((id, i) => {
     const petaImage = petaImagesStore.getPetaImage(id);
     if (!petaImage) return;
-    if (!orderedAddPanelDragEvent.value) return;
     const panel = createPetaPanel(
       petaImage,
       orderedAddPanelDragEvent.value
