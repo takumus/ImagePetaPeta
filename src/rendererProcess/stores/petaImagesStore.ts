@@ -8,8 +8,6 @@ import TypedEmitter from "typed-emitter";
 export async function createPetaImagesStore() {
   const states = ref(dbPetaImagesToPetaImages(await API.send("getPetaImages"), false));
   const eventEmitter = new EventEmitter() as TypedEmitter<{
-    // error: (error: Error) => void,
-    // message: (body: string, from: string) => void
     update: (changes: PetaImage[], mode: UpdateMode) => void;
   }>;
   API.on("updatePetaImages", async (e, newPetaImages, mode) => {
