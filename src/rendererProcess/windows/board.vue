@@ -64,7 +64,6 @@ import {
   DEFAULT_IMAGE_SIZE,
   SAVE_DELAY,
 } from "@/commons/defines";
-import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import {
   PetaBoard,
   createPetaBoard,
@@ -84,14 +83,15 @@ import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
+const petaImagesStore = usePetaImagesStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
-const petaImages = ref<PetaImages>({});
 const boards = ref<{ [petaBoardId: string]: PetaBoard }>({});
 const orderedAddPanelIds = ref<string[]>([]);
 const orderedAddPanelDragEvent = ref(new Vec2());
@@ -100,18 +100,10 @@ const currentPetaBoardId = ref("");
 const errorPetaBoardId = ref("");
 onMounted(async () => {
   AnimatedGIFLoader.add?.();
-  API.on("updatePetaImages", async (e, newPetaImages, mode) => {
+  petaImagesStore.events.on("update", async (newPetaImages, mode) => {
     if (mode === UpdateMode.UPSERT) {
       let changeCurrentBoard = false;
       newPetaImages.forEach((petaImage) => {
-        petaImages.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-        Object.values(boards.value).forEach((board) => {
-          Object.values(board.petaPanels).forEach((petaPanel) => {
-            if (petaPanel.petaImageId === petaImage.id) {
-              petaPanel._petaImage = petaImages.value[petaImage.id];
-            }
-          });
-        });
         if (currentPetaBoard.value) {
           changeCurrentBoard =
             Object.values(currentPetaBoard.value.petaPanels).filter((petaPanel) => {
@@ -129,24 +121,10 @@ onMounted(async () => {
       });
       addOrderedPetaPanels();
     } else if (mode === UpdateMode.UPDATE) {
-      newPetaImages.forEach((newPetaImage) => {
-        const petaImage = petaImages.value[newPetaImage.id];
-        if (petaImage) {
-          Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
-        }
-      });
       vPetaBoard.value?.orderPIXIRender();
     } else if (mode === UpdateMode.REMOVE) {
       let changeCurrentBoard = false;
       newPetaImages.forEach((petaImage) => {
-        delete petaImages.value[petaImage.id];
-        Object.values(boards.value).forEach((board) => {
-          Object.values(board.petaPanels).forEach((petaPanel) => {
-            if (petaPanel.petaImageId === petaImage.id) {
-              petaPanel._petaImage = undefined;
-            }
-          });
-        });
         if (currentPetaBoard.value) {
           changeCurrentBoard =
             Object.values(currentPetaBoard.value.petaPanels).filter((petaPanel) => {
@@ -165,7 +143,6 @@ onMounted(async () => {
     }
   });
   document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
-  await getPetaImages();
   await getPetaBoards();
   await restoreBoard();
   nextTick(() => {
@@ -181,12 +158,9 @@ async function restoreBoard() {
     selectPetaBoard(sortedPetaBoards.value[0]);
   }
 }
-async function getPetaImages() {
-  petaImages.value = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-}
 async function getPetaBoards() {
   boards.value = await API.send("getPetaBoards");
-  dbPetaBoardsToPetaBoards(boards.value, petaImages.value, false);
+  dbPetaBoardsToPetaBoards(boards.value, false);
   Object.values(boards.value).forEach((board) => {
     let updater = boardUpdaters.value[board.id];
     if (updater) {
@@ -209,7 +183,7 @@ function addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean)
 function addOrderedPetaPanels() {
   let offsetIndex = 0;
   orderedAddPanelIds.value.forEach((id, i) => {
-    const petaImage = petaImages.value[id];
+    const petaImage = petaImagesStore.getPetaImage(id);
     if (!petaImage) return;
     if (!orderedAddPanelDragEvent.value) return;
     const panel = createPetaPanel(

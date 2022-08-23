@@ -42,7 +42,6 @@ import VProperty from "@/rendererProcess/components/browser/property/VProperty.v
 // Others
 import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
-import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
@@ -54,44 +53,25 @@ import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
+const petaImagesStore = usePetaImagesStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
 const board = ref<PetaBoard>();
-const petaImages = ref<PetaImages>({});
 const petaTagInfos = ref<PetaTagInfo[]>([]);
 const title = ref("");
 const petaImageId = ref<string>();
 const keyboards = new Keyboards();
 onMounted(async () => {
   AnimatedGIFLoader.add?.();
-  API.on("updatePetaImages", async (e, newPetaImages, mode) => {
-    if (mode === UpdateMode.UPSERT) {
-      newPetaImages.forEach((petaImage) => {
-        petaImages.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
-        if (!board.value) {
-          return;
-        }
-        Object.values(board.value.petaPanels).forEach((petaPanel) => {
-          if (petaPanel.petaImageId === petaImage.id) {
-            petaPanel._petaImage = petaImages.value[petaImage.id];
-            vPetaBoard.value?.load({});
-          }
-        });
-      });
-    } else if (mode === UpdateMode.UPDATE) {
-      newPetaImages.forEach((newPetaImage) => {
-        const petaImage = petaImages.value[newPetaImage.id];
-        if (petaImage) {
-          Object.assign(petaImage, dbPetaImageToPetaImage(newPetaImage));
-        }
-      });
+  petaImagesStore.events.on("update", async (newPetaImages, mode) => {
+    if (mode === UpdateMode.UPDATE) {
       vPetaBoard.value?.orderPIXIRender();
     } else if (mode === UpdateMode.REMOVE) {
       newPetaImages.forEach((petaImage) => {
-        delete petaImages.value[petaImage.id];
         if (!board.value) {
           return;
         }
@@ -112,7 +92,6 @@ onMounted(async () => {
   petaImageId.value = (await API.send("getDetailsPetaImage"))?.id;
   title.value = `${t("titles.details")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
   document.title = title.value;
-  await getPetaImages();
   await getPetaTagInfos();
   nextTick(() => {
     API.send("showMainWindow");
@@ -123,10 +102,7 @@ onMounted(async () => {
   });
 });
 const petaImage = computed(() => {
-  if (petaImageId.value === undefined) {
-    return undefined;
-  }
-  return petaImages.value[petaImageId.value];
+  return petaImagesStore.getPetaImage(petaImageId.value);
 });
 const singlePetaImages = computed(() => {
   if (petaImage.value === undefined) {
@@ -134,10 +110,6 @@ const singlePetaImages = computed(() => {
   }
   return [petaImage.value];
 });
-async function getPetaImages() {
-  petaImages.value = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-  // this.addOrderedPetaPanels();
-}
 async function getPetaTagInfos() {
   petaTagInfos.value = await API.send("getPetaTagInfos");
 }
@@ -166,7 +138,6 @@ watch(petaImage, () => {
     },
     visible: true,
     locked: true,
-    _petaImage: petaImage.value,
   };
   board.value = {
     petaPanels: { [panel.id]: panel },
@@ -182,6 +153,7 @@ watch(petaImage, () => {
     },
     index: 0,
   };
+  vPetaBoard.value?.load({});
 });
 </script>
 

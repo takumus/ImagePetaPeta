@@ -1,7 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { dbPetaPanelToPetaPanel, PetaPanel, petaPanelToDBPetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
-import { PetaImages } from "@/commons/datas/petaImage";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
   BOARD_DARK_BACKGROUND_LINE_COLOR,
@@ -42,16 +41,12 @@ export function createPetaBoard(name: string, index = 0, dark: boolean) {
   };
   return board;
 }
-export function dbPetaBoardsToPetaBoards(
-  dbBoards: { [petaBoardId: string]: PetaBoard },
-  petaImages: PetaImages,
-  copy = true,
-) {
+export function dbPetaBoardsToPetaBoards(dbBoards: { [petaBoardId: string]: PetaBoard }, copy = true) {
   const boards = copy ? deepcopy(dbBoards) : dbBoards;
   return Object.values(boards).forEach((board) => {
     board.transform.position = new Vec2(board.transform.position);
     Object.values(board.petaPanels).forEach((pp) => {
-      dbPetaPanelToPetaPanel(pp, petaImages, false);
+      dbPetaPanelToPetaPanel(pp, false);
     });
   });
 }

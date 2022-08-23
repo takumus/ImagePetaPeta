@@ -68,6 +68,7 @@ import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -81,6 +82,7 @@ const nsfwStore = useNSFWStore();
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
+const petaImagesStore = usePetaImagesStore();
 const { t } = useI18n();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const panelsBackground = ref<HTMLElement>();
@@ -468,10 +470,11 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
       {
         label: t("boards.panelMenu.details"),
         click: () => {
-          if (pPanel._petaImage === undefined) {
+          const petaImage = petaImagesStore.getPetaImage(pPanel.petaImageId);
+          if (petaImage === undefined) {
             return;
           }
-          API.send("setDetailsPetaImage", pPanel._petaImage);
+          API.send("setDetailsPetaImage", petaImage);
           API.send("openWindow", WindowType.DETAILS);
         },
       },
@@ -584,14 +587,14 @@ function endCrop() {
 }
 function updateCrop(petaPanel?: PetaPanel) {
   endCrop();
-  if (!petaPanel?._petaImage || currentBoard.value === undefined) {
+  const petaImage = petaImagesStore.getPetaImage(petaPanel?.petaImageId);
+  if (petaImage === undefined || currentBoard.value === undefined || petaPanel === undefined) {
     return;
   }
   const sign = 1;
   petaPanel.height =
     Math.abs(
-      petaPanel.width *
-        ((petaPanel.crop.height * petaPanel._petaImage.height) / (petaPanel.crop.width * petaPanel._petaImage.width)),
+      petaPanel.width * ((petaPanel.crop.height * petaImage.height) / (petaPanel.crop.width * petaImage.width)),
     ) * sign;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   load({
@@ -690,7 +693,7 @@ async function load(params: {
           loadProgress.value = Math.floor((loaded / petaPanels.length) * 100);
           const progress = `${loaded}/${petaPanels.length}`;
           extractingLog.value =
-            `load complete   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
+            `load complete   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
           if (loaded == petaPanels.length) {
             loading.value = false;
           }
@@ -699,7 +702,7 @@ async function load(params: {
       let pPanel = pPanels[petaPanel.id];
       if (pPanel === undefined) {
         // pPanelが無ければ作成。
-        pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel);
+        pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel, petaImagesStore);
         pPanel.setZoomScale(currentBoard.value?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
@@ -746,13 +749,11 @@ async function load(params: {
         onLoaded(petaPanel);
         loadResult = "skip";
       }
-      log("vBoard", `loaded[${loadResult}](${minimId(petaPanel._petaImage?.id)}):`, progress);
-      extractingLog.value =
-        `extract complete(${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
+      log("vBoard", `loaded[${loadResult}](${minimId(petaPanel.petaImageId)}):`, progress);
+      extractingLog.value = `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
     } catch (error) {
-      log("vBoard", `loderr(${minimId(petaPanel._petaImage?.id)}):`, progress, error);
-      extractingLog.value =
-        `extract error   (${minimId(petaPanel._petaImage?.id)}):${progress}\n` + extractingLog.value;
+      log("vBoard", `loderr(${minimId(petaPanel.petaImageId)}):`, progress, error);
+      extractingLog.value = `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
     }
     extractProgress.value = ((index + 1) / petaPanels.length) * 100;
   };
@@ -830,7 +831,7 @@ function updateDetailsPetaPanel() {
     return;
   }
   const petaPanel = currentBoard.value?.petaPanels[0];
-  const petaImage = petaPanel?._petaImage;
+  const petaImage = petaImagesStore.getPetaImage(petaPanel?.petaImageId);
   if (petaPanel && petaImage) {
     let width = 0;
     let height = 0;

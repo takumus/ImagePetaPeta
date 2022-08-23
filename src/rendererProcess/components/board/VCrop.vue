@@ -23,6 +23,7 @@ import { PTransformerControlPoint } from "@/rendererProcess/components/board/ppa
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useI18n } from "vue-i18n";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 const props = defineProps<{
   petaPanel?: PetaPanel;
 }>();
@@ -30,6 +31,7 @@ const emit = defineEmits<{
   (e: "update", petaPanel?: PetaPanel): void;
 }>();
 const nsfwStore = useNSFWStore();
+const petaImagesStore = usePetaImagesStore();
 const { t } = useI18n();
 const cropRoot = ref<HTMLElement>();
 let resizer: ResizeObserver;
@@ -275,17 +277,18 @@ function resetCrop() {
   orderPIXIRender();
 }
 function changePetaPanel() {
-  if (!props.petaPanel?._petaImage) {
+  const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
+  if (petaImage === undefined || props.petaPanel === undefined) {
     cancelCrop();
     return;
   }
-  const petaPanel = createPetaPanel(props.petaPanel._petaImage, new Vec2(0, 0), 400);
+  const petaPanel = createPetaPanel(petaImage, new Vec2(0, 0), 400);
   minX.value = props.petaPanel.crop.position.x;
   minY.value = props.petaPanel.crop.position.y;
   maxX.value = props.petaPanel.crop.width + props.petaPanel.crop.position.x;
   maxY.value = props.petaPanel.crop.height + props.petaPanel.crop.position.y;
   if (!pPanel) {
-    pPanel = new PPanel(petaPanel);
+    pPanel = new PPanel(petaPanel, petaImagesStore);
     pPanel.onUpdateGIF = () => {
       orderPIXIRender();
     };
@@ -308,22 +311,23 @@ const height = computed(() => {
   if (!props.petaPanel) {
     return 0;
   }
-  return width.value * (props.petaPanel._petaImage?.height || 0);
+  return width.value * (petaImagesStore.getPetaImage(props.petaPanel.petaImageId)?.height || 0);
 });
 const width = computed(() => {
-  if (!pPanel || !props.petaPanel?._petaImage) {
+  const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
+  if (pPanel === undefined || petaImage === undefined || props.petaPanel === undefined) {
     return 0;
   }
   let width = 0;
   let height = 0;
   const maxWidth = stageRect.x * 0.95;
   const maxHeight = stageRect.y * 0.7;
-  if (props.petaPanel._petaImage.height / props.petaPanel._petaImage.width < maxHeight / maxWidth) {
+  if (petaImage.height / petaImage.width < maxHeight / maxWidth) {
     width = maxWidth;
-    height = maxWidth * props.petaPanel._petaImage.height;
+    height = maxWidth * petaImage.height;
   } else {
     height = maxHeight;
-    width = maxHeight / props.petaPanel._petaImage.height;
+    width = maxHeight / petaImage.height;
   }
   height;
   return width;

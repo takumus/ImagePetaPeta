@@ -76,7 +76,6 @@ export class PTransformer extends PIXI.Container {
     this.beginSizingPosition = new Vec2(e.data.global);
     this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
       const p = deepcopy(pPanel.petaPanel);
-      delete p._petaImage;
       return p;
     });
     this.pairCorner = new Vec2(this.corners[(this.sizingCornerIndex + this.corners.length / 2) % this.corners.length]);
@@ -90,7 +89,6 @@ export class PTransformer extends PIXI.Container {
     this.click.down(e.data.global);
     this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
       const p = deepcopy(pPanel.petaPanel);
-      delete p._petaImage;
       return p;
     });
     this.beginTransformCorners = this.corners.map((corner) => new Vec2(corner)) as typeof this.beginTransformCorners;

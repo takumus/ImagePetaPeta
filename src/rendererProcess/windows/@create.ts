@@ -17,6 +17,7 @@ import { settingsStoreKey, createSettingsStore } from "@/rendererProcess/stores/
 import { appInfoStoreKey, createAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { textsStoreKey, createTextsStore } from "@/rendererProcess/stores/textsStore";
 import { componentsStoreKey, createComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { createPetaImagesStore, petaImagesStoreKey } from "@/rendererProcess/stores/petaImagesStore";
 export async function create(component: Component, windowType: WindowType) {
   let initialized = false;
   const initVue = async () => {
@@ -48,6 +49,7 @@ export async function create(component: Component, windowType: WindowType) {
     app.provide(appInfoStoreKey, await createAppInfoStore());
     app.provide(textsStoreKey, await createTextsStore());
     app.provide(componentsStoreKey, await createComponentsStore());
+    app.provide(petaImagesStoreKey, await createPetaImagesStore());
     app.mount("#app");
   };
   API.on("dataInitialized", () => {

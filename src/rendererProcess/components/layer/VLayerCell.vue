@@ -48,6 +48,7 @@ import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 // Others
 const emit = defineEmits<{
   (e: "startDrag", cellData: { id: number; data: PetaPanel }, event: PointerEvent): void;
@@ -60,6 +61,7 @@ const props = defineProps<{
   };
   drag?: boolean;
 }>();
+const petaImagesStore = usePetaImagesStore();
 const visibleIcon = ref<HTMLElement>();
 const lockedIcon = ref<HTMLElement>();
 const nsfwStore = useNSFWStore();
@@ -85,7 +87,9 @@ onUnmounted(() => {
   window.removeEventListener("pointermove", pointermove);
 });
 const url = computed(() => {
-  return props.cellData ? getImageURL(props.cellData.data._petaImage, ImageType.THUMBNAIL) : undefined;
+  return props.cellData
+    ? getImageURL(petaImagesStore.getPetaImage(props.cellData.data.petaImageId), ImageType.THUMBNAIL)
+    : undefined;
 });
 const selected = computed(() => {
   return props.cellData?.data._selected;
@@ -96,11 +100,8 @@ const locked = computed(() => {
 const visible = computed(() => {
   return props.cellData?.data.visible;
 });
-// const name = computed(() => {
-//   return props.cellData?.data._petaImage?.name || "";
-// });
 const showNSFW = computed(() => {
-  return props.cellData?.data._petaImage?.nsfw && !nsfwStore.state.value;
+  return petaImagesStore.getPetaImage(props.cellData?.data.petaImageId)?.nsfw && !nsfwStore.state.value;
 });
 function pointerdown(event: PointerEvent) {
   click.down(vec2FromPointerEvent(event));

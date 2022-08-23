@@ -10,7 +10,7 @@
         <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
-        <VBrowser :petaImages="petaImages" :petaTagInfos="petaTagInfos" />
+        <VBrowser :petaTagInfos="petaTagInfos" />
       </t-browser>
     </t-content>
     <t-modals v-show="components.modal.modalIds.length > 0">
@@ -37,9 +37,7 @@ import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
-import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
@@ -48,39 +46,19 @@ const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
-const petaImages = ref<PetaImages>({});
 const petaTagInfos = ref<PetaTagInfo[]>([]);
 const title = ref("");
 onMounted(async () => {
-  API.on("updatePetaImages", (e, newPetaImages, mode) => {
-    if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
-      newPetaImages.forEach((petaImage) => {
-        petaImages.value[petaImage.id] = dbPetaImageToPetaImage(
-          petaImage,
-          Boolean(petaImages.value[petaImage.id]?._selected),
-        );
-      });
-    } else if (mode === UpdateMode.REMOVE) {
-      newPetaImages.forEach((petaImage) => {
-        delete petaImages.value[petaImage.id];
-      });
-    }
-  });
   API.on("updatePetaTags", () => {
     getPetaTagInfos();
   });
   title.value = `${t("titles.browser")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
   document.title = title.value;
-  await getPetaImages();
   await getPetaTagInfos();
   nextTick(() => {
     API.send("showMainWindow");
   });
 });
-async function getPetaImages() {
-  petaImages.value = dbPetaImagesToPetaImages(await API.send("getPetaImages"), false);
-  // this.addOrderedPetaPanels();
-}
 async function getPetaTagInfos() {
   petaTagInfos.value = await API.send("getPetaTagInfos");
 }

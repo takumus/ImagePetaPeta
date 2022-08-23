@@ -82,7 +82,7 @@ import {
   THUMBNAILS_SELECTION_PERCENT,
   UNTAGGED_ID,
 } from "@/commons/defines";
-import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaImage } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
@@ -98,12 +98,13 @@ import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
+const petaImagesStore = usePetaImagesStore();
 const { t } = useI18n();
 const props = defineProps<{
-  petaImages: PetaImages;
   petaTagInfos: PetaTagInfo[];
 }>();
 const thumbnails = ref<HTMLDivElement>();
@@ -378,7 +379,7 @@ async function fetchFilteredPetaImages() {
       new Set(
         results
           .map((id) => {
-            return props.petaImages[id];
+            return petaImages.value[id];
           })
           .filter((petaImage) => {
             return petaImage;
@@ -413,8 +414,11 @@ function keyA() {
     });
   }
 }
+const petaImages = computed(() => {
+  return petaImagesStore.state.value;
+});
 const petaImagesArray = computed(() => {
-  return Object.values(props.petaImages);
+  return Object.values(petaImages.value);
 });
 const selectedPetaImages = computed(() => {
   return petaImagesArray.value.filter((pi) => pi._selected);
