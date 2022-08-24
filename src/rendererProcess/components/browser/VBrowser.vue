@@ -47,7 +47,7 @@
       </t-content>
     </t-center>
     <t-right>
-      <VPreview :petaImages="selectedPetaImages" />
+      <VPreview :petaImages="selectedPetaImages" @clearSelectionAll="clearSelectionAll" />
       <VProperty :petaImages="selectedPetaImages" :petaTagInfos="petaTagInfos" @selectTag="selectTag" />
       <input
         type="range"
@@ -227,11 +227,11 @@ function resizeImages(rect: DOMRectReadOnly) {
 function drag(petaImage: PetaImage) {
   if (
     !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") &&
-    !petaImage._selected
+    !petaImagesStore.getSelected(petaImage)
   ) {
-    clearSelectionAllImages();
+    clearSelectionAll();
   }
-  const petaImages = petaImage._selected ? [] : [petaImage];
+  const petaImages = petaImagesStore.getSelected(petaImage) ? [] : [petaImage];
   petaImages.push(...selectedPetaImages.value);
   API.send("startDrag", petaImages, actualTileSize.value, "");
 }
@@ -248,12 +248,12 @@ function selectTile(thumb: Tile, force = false) {
   }
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     // 選択サムネイルを反転
-    thumb.petaImage._selected = !thumb.petaImage._selected || force;
+    petaImagesStore.setSelected(thumb.petaImage, !petaImagesStore.getSelected(thumb.petaImage) || force);
   } else {
     // コントロールキーが押されていなければ選択をリセット
-    thumb.petaImage._selected = true;
+    petaImagesStore.setSelected(thumb.petaImage, true);
     petaImagesArray.value.forEach((pi) => {
-      pi._selected = thumb.petaImage === pi;
+      petaImagesStore.setSelected(pi, thumb.petaImage === pi);
     });
   }
   if (firstSelectedTile.value && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
@@ -283,14 +283,14 @@ function selectTile(thumb: Tile, force = false) {
       const hitArea = widthDiff * heightDiff;
       const ptArea = pt.width * pt.height;
       if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
-        pt.petaImage._selected = true;
+        petaImagesStore.setSelected(pt.petaImage, true);
       }
     });
   }
 }
-function clearSelectionAllImages() {
+function clearSelectionAll() {
   petaImagesArray.value.forEach((pi) => {
-    pi._selected = false;
+    petaImagesStore.setSelected(pi, false);
   });
 }
 function petaImageMenu(thumb: Tile, position: Vec2) {
@@ -298,7 +298,7 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
     return;
   }
   const petaImage = thumb.petaImage;
-  if (!thumb.petaImage._selected) {
+  if (!petaImagesStore.getSelected(thumb.petaImage)) {
     selectTile(thumb, true);
   }
   components.contextMenu.open(
@@ -408,9 +408,9 @@ function keyA() {
     return;
   }
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-    clearSelectionAllImages();
+    clearSelectionAll();
     filteredPetaImages.value.forEach((pi) => {
-      pi._selected = true;
+      petaImagesStore.setSelected(pi, true);
     });
   }
 }
@@ -421,7 +421,7 @@ const petaImagesArray = computed(() => {
   return Object.values(petaImages.value);
 });
 const selectedPetaImages = computed(() => {
-  return petaImagesArray.value.filter((pi) => pi._selected);
+  return petaImagesArray.value.filter((pi) => petaImagesStore.getSelected(pi));
 });
 const thumbnailsRowCount = computed(() => {
   let c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);

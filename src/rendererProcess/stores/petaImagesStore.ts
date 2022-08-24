@@ -7,6 +7,7 @@ import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
 export async function createPetaImagesStore() {
   const states = ref(dbPetaImagesToPetaImages(await API.send("getPetaImages"), false));
+  const selection = ref<{ [key: string]: boolean }>({});
   const eventEmitter = new EventEmitter() as TypedEmitter<{
     update: (changes: PetaImage[], mode: UpdateMode) => void;
   }>;
@@ -14,7 +15,7 @@ export async function createPetaImagesStore() {
     if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
       newPetaImages.forEach((petaImage) => {
         // restore selected
-        states.value[petaImage.id] = dbPetaImageToPetaImage(petaImage, states.value[petaImage.id]?._selected);
+        states.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
       });
     } else if (mode === UpdateMode.REMOVE) {
       newPetaImages.forEach((petaImage) => {
@@ -30,6 +31,12 @@ export async function createPetaImagesStore() {
         return undefined;
       }
       return states.value[petaImageId];
+    },
+    setSelected(petaImage: PetaImage, selected: boolean) {
+      selection.value[petaImage.id] = selected;
+    },
+    getSelected(petaImage: PetaImage) {
+      return selection.value[petaImage.id] === true;
     },
     events: eventEmitter,
   };

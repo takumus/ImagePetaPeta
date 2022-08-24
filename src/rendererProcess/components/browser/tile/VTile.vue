@@ -6,14 +6,14 @@
       height: tile.height + 'px',
     }"
   >
-    <t-tile-wrapper v-if="tile.group === undefined">
+    <t-tile-wrapper v-if="tile.group === undefined && tile.petaImage !== undefined">
       <t-images
         @pointerdown="pointerdown($event)"
         @dragstart="dragstart($event)"
         @dblclick="dblclick"
         draggable="true"
         :class="{
-          'selected-image': tile.petaImage?._selected,
+          'selected-image': petaImagesStore.getSelected(tile.petaImage),
         }"
       >
         <t-nsfw v-if="showNSFW"> </t-nsfw>
@@ -37,7 +37,7 @@
           {{ t("browser.untagged") }}
         </t-tag>
       </t-tags>
-      <t-selected v-show="tile.petaImage?._selected">
+      <t-selected v-show="petaImagesStore.getSelected(tile.petaImage)">
         <t-icon> ✔ </t-icon>
       </t-selected>
     </t-tile-wrapper>
@@ -70,6 +70,7 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
@@ -86,6 +87,7 @@ const props = defineProps<{
 }>();
 const nsfwStore = useNSFWStore();
 const settingsStore = useSettingsStore();
+const petaImagesStore = usePetaImagesStore();
 const { t } = useI18n();
 const imageURL = ref("");
 const loadingImage = ref(true);

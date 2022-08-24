@@ -15,12 +15,10 @@ export interface PetaImage {
   palette: PetaColor[];
   note: string;
   nsfw: boolean;
-  _selected?: boolean;
   metadataVersion: number;
 }
 export type PetaImages = { [id: string]: PetaImage };
-export function dbPetaImageToPetaImage(petaImage: PetaImage, selected = false) {
-  petaImage._selected = selected;
+export function dbPetaImageToPetaImage(petaImage: PetaImage) {
   return petaImage;
 }
 export function dbPetaImagesToPetaImages(dbImages: PetaImages, copy = true) {
@@ -32,15 +30,9 @@ export function dbPetaImagesToPetaImages(dbImages: PetaImages, copy = true) {
 }
 export function petaImagesToDBPetaImages(images: PetaImages, copy = true) {
   const dbImages = copy ? deepcopy(images) : images;
-  Object.values(dbImages).forEach((dbImage) => {
-    dbImage._selected = undefined;
-  });
   return dbImages;
 }
 export function petaImagesArrayToDBPetaImagesArray(images: PetaImage[], copy = true) {
   const dbImages = copy ? deepcopy(images) : images;
-  dbImages.forEach((dbImage) => {
-    dbImage._selected = undefined;
-  });
   return dbImages;
 }

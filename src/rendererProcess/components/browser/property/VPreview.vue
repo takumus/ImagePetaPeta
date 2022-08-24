@@ -28,6 +28,9 @@ import { PropertyThumbnail } from "@/rendererProcess/components/browser/property
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useI18n } from "vue-i18n";
+const emit = defineEmits<{
+  (e: "clearSelectionAll"): void;
+}>();
 const props = defineProps<{
   petaImages: PetaImage[];
 }>();
@@ -57,9 +60,7 @@ function resizePreviews(rect: DOMRectReadOnly) {
   previewHeight.value = rect.height;
 }
 function clearSelection() {
-  props.petaImages.forEach((pi) => {
-    pi._selected = false;
-  });
+  emit("clearSelectionAll");
 }
 function openDetails() {
   const petaImage = props.petaImages[0];
