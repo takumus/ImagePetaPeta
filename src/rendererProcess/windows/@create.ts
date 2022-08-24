@@ -1,4 +1,4 @@
-import { Component, createApp, Plugin } from "vue";
+import { Component, createApp, InjectionKey, Plugin } from "vue";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
@@ -17,8 +17,11 @@ import { settingsStoreKey, createSettingsStore } from "@/rendererProcess/stores/
 import { appInfoStoreKey, createAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { textsStoreKey, createTextsStore } from "@/rendererProcess/stores/textsStore";
 import { componentsStoreKey, createComponentsStore } from "@/rendererProcess/stores/componentsStore";
-import { createPetaImagesStore, petaImagesStoreKey } from "@/rendererProcess/stores/petaImagesStore";
-export async function create(component: Component, windowType: WindowType) {
+export async function create(
+  component: Component,
+  windowType: WindowType,
+  stores?: { key: InjectionKey<unknown> | string; value: () => Promise<unknown> }[],
+) {
   let initialized = false;
   const initVue = async () => {
     if (initialized) {
@@ -38,18 +41,20 @@ export async function create(component: Component, windowType: WindowType) {
         messages: languages,
       }),
     );
-    app.provide(darkModeStoreKey, await createDarkModeStore());
-    app.provide(nsfwStoreKey, await createNSFWStore());
-    app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType));
-    app.provide(definesStoreKey, await createDefinesStore());
-    app.provide(systemInfoStoreKey, await createSystemInfoStore(platform));
-    app.provide(windowStatusStoreKey, await createWindowStatusStore(windowType));
-    app.provide(statesStoreKey, await createStatesStore());
-    app.provide(settingsStoreKey, await createSettingsStore());
-    app.provide(appInfoStoreKey, await createAppInfoStore());
-    app.provide(textsStoreKey, await createTextsStore());
-    app.provide(componentsStoreKey, await createComponentsStore());
-    app.provide(petaImagesStoreKey, await createPetaImagesStore());
+    await Promise.all([
+      (async () => app.provide(darkModeStoreKey, await createDarkModeStore()))(),
+      (async () => app.provide(nsfwStoreKey, await createNSFWStore()))(),
+      (async () => app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType)))(),
+      (async () => app.provide(definesStoreKey, await createDefinesStore()))(),
+      (async () => app.provide(systemInfoStoreKey, await createSystemInfoStore(platform)))(),
+      (async () => app.provide(windowStatusStoreKey, await createWindowStatusStore(windowType)))(),
+      (async () => app.provide(statesStoreKey, await createStatesStore()))(),
+      (async () => app.provide(settingsStoreKey, await createSettingsStore()))(),
+      (async () => app.provide(appInfoStoreKey, await createAppInfoStore()))(),
+      (async () => app.provide(textsStoreKey, await createTextsStore()))(),
+      (async () => app.provide(componentsStoreKey, await createComponentsStore()))(),
+      ...(stores?.map(async (store) => app.provide(store.key, await store.value())) || []),
+    ]);
     app.mount("#app");
   };
   API.on("dataInitialized", () => {
