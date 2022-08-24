@@ -61,7 +61,7 @@ export async function createPetaBoardsStore() {
   }
   await getPetaBoards();
   return {
-    state: readonly(states),
+    state: states,
     getPetaBoard,
     savePetaBoard,
     removePetaBoard,
