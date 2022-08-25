@@ -70,7 +70,7 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
     this.orderCompaction();
     return result;
   }
-  async update(query: Partial<T>, data: T, upsert: boolean = false) {
+  async update(query: Partial<T>, data: T, upsert = false) {
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
     }
