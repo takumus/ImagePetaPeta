@@ -10,24 +10,40 @@
         :class="{ selected: c.selected }"
         @click="selectPetaTag(c.petaTag)"
       >
-        <VEditableLabel
+        <!-- <VEditableLabel
           :label="c.petaTag.name"
           :labelLook="`${c.petaTag.name}(${c.count})`"
           :readonly="c.readonly"
           @change="(name) => changeTag(c.petaTag, name)"
+          @contextmenu="tagMenu($event, c)"
+        /> -->
+        <VTextarea
+          :value="c.petaTag.name"
+          :look="`${c.petaTag.name}(${c.count})`"
+          :type="'single'"
+          :trim="true"
+          @update:value="(name) => changeTag(c.petaTag, name)"
           @contextmenu="tagMenu($event, c)"
         />
       </t-tag>
     </t-tags>
     <t-tag-add>
       <t-tag>
-        <VEditableLabel
+        <!-- <VEditableLabel
           :label="''"
           :labelLook="textsStore.state.value.plus + '       '"
           :clickToEdit="true"
           @change="(name) => addTag(name)"
           :growWidth="true"
           :noOutline="true"
+        /> -->
+        <VTextarea
+          :value="''"
+          :look="textsStore.state.value.plus + '       '"
+          :type="'single'"
+          :trim="true"
+          :clickToEdit="true"
+          @update:value="addTag"
         />
       </t-tag>
     </t-tag-add>
@@ -54,6 +70,7 @@ import { UNTAGGED_ID } from "@/commons/defines";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 const emit = defineEmits<{
   (e: "update:selectedPetaTags", selectedPetaTags: PetaTag[]): void;
 }>();
@@ -114,20 +131,25 @@ async function changeTag(petaTag: PetaTag, newName: string) {
   await API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
   selectPetaTag(petaTag);
 }
-function selectPetaTag(petaTag?: PetaTag, single = false) {
+function selectPetaTag(petaTag?: PetaTag) {
   const newData = [...props.selectedPetaTags];
-  if (
-    !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") ||
-    single
-  ) {
+  let single = false;
+  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     newData.length = 0;
+    single = true;
   }
   const untaggedId = props.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
   if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
     newData.length = 0;
   }
-  if (petaTag && !props.selectedPetaTags.includes(petaTag)) {
-    newData.push(petaTag);
+  if (petaTag) {
+    if (!single) {
+      if (!props.selectedPetaTags.includes(petaTag)) {
+        newData.push(petaTag);
+      }
+    } else {
+      newData.push(petaTag);
+    }
   }
   emit("update:selectedPetaTags", newData);
 }
