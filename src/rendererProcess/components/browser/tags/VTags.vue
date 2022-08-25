@@ -15,7 +15,7 @@
           :look="`${c.petaTag.name}(${c.count})`"
           :type="'single'"
           :trim="true"
-          :readonly="true"
+          :readonly="c.readonly"
           @update:value="(name) => changeTag(c.petaTag, name)"
           @contextmenu="tagMenu($event, c)"
         />
