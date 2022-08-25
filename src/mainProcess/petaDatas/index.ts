@@ -179,15 +179,14 @@ export class PetaDatas {
     return ids;
   }
   async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
-    const log = this.mainLogger.logChunk();
+    // const log = this.mainLogger.logChunk();
     let pipts: PetaImagePetaTag[] = [];
-    // console.time(log.uid);
-    pipts = await this.datas.dbPetaImagesPetaTags.find({
-      $or: petaImageIds.map((petaImageId) => {
-        return { petaImageId };
-      }),
-    });
-    // console.timeEnd(log.uid);
+    pipts =
+      petaImageIds.length === 1
+        ? await this.datas.dbPetaImagesPetaTags.find({ petaImageId: petaImageIds[0] })
+        : (await this.datas.dbPetaImagesPetaTags.find()).filter((pipt) => {
+            return petaImageIds.includes(pipt.petaImageId);
+          });
     const ids = Array.from(
       new Set(
         pipts.map((pipt) => {
