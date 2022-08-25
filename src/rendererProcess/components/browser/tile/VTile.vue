@@ -185,12 +185,9 @@ async function fetchPetaTags() {
   loadingTags.value = false;
 }
 function updateContent(tags = false) {
-  if (tags) {
-    window.clearTimeout(fetchTagsTimeoutHandler);
-  }
-  window.clearTimeout(loadOriginalTimeoutHandler);
   if (props.tile.visible) {
     if (tags) {
+      window.clearTimeout(fetchTagsTimeoutHandler);
       fetchTagsTimeoutHandler = window.setTimeout(() => {
         fetchPetaTags();
       }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
@@ -198,6 +195,7 @@ function updateContent(tags = false) {
     if (!loadedOriginal.value) {
       imageURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
       if (props.original) {
+        window.clearTimeout(loadOriginalTimeoutHandler);
         loadOriginalTimeoutHandler = window.setTimeout(() => {
           imageURL.value = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
           loadedOriginal.value = true;
@@ -206,6 +204,8 @@ function updateContent(tags = false) {
     }
   } else {
     loadedOriginal.value = false;
+    window.clearTimeout(fetchTagsTimeoutHandler);
+    window.clearTimeout(loadOriginalTimeoutHandler);
   }
 }
 const visible = computed(() => {
