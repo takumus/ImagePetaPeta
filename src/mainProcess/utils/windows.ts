@@ -179,10 +179,8 @@ export class Windows {
     if (window === undefined || window.isDestroyed()) {
       return;
     }
-    if (!window.isMaximized()) {
-      state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-      state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
-    }
+    state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+    state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
     state.maximized = window.isMaximized();
     this.configWindowStates.save();
   }
