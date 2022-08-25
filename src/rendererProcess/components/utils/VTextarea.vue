@@ -26,8 +26,10 @@ const props = defineProps<{
   look?: string;
   type: "single" | "multi";
   trim?: boolean;
-  style?: CSSStyleDeclaration;
+  style?: Partial<CSSStyleDeclaration>;
+  allowEmpty?: boolean;
   clickToEdit?: boolean;
+  readonly?: boolean;
 }>();
 const emit = defineEmits<{
   (e: "update:value", value: string): void;
@@ -39,16 +41,24 @@ onMounted(() => {
   forceResetValue();
 });
 function input(value: string) {
+  if (props.readonly) {
+    return;
+  }
   rawValue.value = format(value);
 }
 function click(type: "single" | "double") {
+  if (props.readonly) {
+    return;
+  }
   if (editing.value) {
     return;
   }
   if (props.clickToEdit === true && type === "single") {
     editing.value = true;
+    forceResetValue();
   } else if (type === "double") {
     editing.value = true;
+    forceResetValue();
     nextTick(() => {
       if (textArea.value) {
         textArea.value.focus();
@@ -62,6 +72,9 @@ function click(type: "single" | "double") {
   }
 }
 function paste(e: ClipboardEvent) {
+  if (props.readonly) {
+    return;
+  }
   e.preventDefault();
   const value = e.clipboardData?.getData("text/plain");
   if (value !== undefined) {
@@ -69,6 +82,9 @@ function paste(e: ClipboardEvent) {
   }
 }
 function blur() {
+  if (props.readonly) {
+    return;
+  }
   if (!editing.value) {
     return;
   }
@@ -77,6 +93,9 @@ function blur() {
   textArea.value?.blur();
 }
 function enter(e: KeyboardEvent) {
+  if (props.readonly) {
+    return;
+  }
   if (props.type === "single") {
     e.preventDefault();
     textArea.value?.blur();
@@ -102,6 +121,12 @@ const value = computed({
     return format(props.look !== undefined ? props.look : props.value);
   },
   set(value: string) {
+    value = format(value);
+    console.log("will-emit", value);
+    if (value === format(props.value) || (value === "" && props.allowEmpty !== true)) {
+      return;
+    }
+    console.log("do-emit", value);
     emit("update:value", value);
   },
 });
@@ -115,6 +140,7 @@ watch(
 
 <style lang="scss" scoped>
 t-textarea-root {
+  line-height: var(--size-2);
   cursor: pointer;
   min-width: 16px;
   display: inline-block;
@@ -123,6 +149,7 @@ t-textarea-root {
   overflow: hidden;
   &.editing {
     cursor: unset;
+    padding-left: 3px;
   }
 }
 </style>

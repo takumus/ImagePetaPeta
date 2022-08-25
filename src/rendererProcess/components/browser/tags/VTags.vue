@@ -2,7 +2,7 @@
   <t-tags-root>
     <t-tags>
       <t-tag @click="selectPetaTag()" :class="{ selected: selectedAll }">
-        <VEditableLabel :label="`${t('browser.all')}(${petaImagesArray.length})`" :readonly="true" />
+        <VTextarea :value="`${t('browser.all')}(${petaImagesArray.length})`" :type="'single'" :readonly="true" />
       </t-tag>
       <t-tag
         v-for="c in browserTags"
@@ -10,18 +10,12 @@
         :class="{ selected: c.selected }"
         @click="selectPetaTag(c.petaTag)"
       >
-        <!-- <VEditableLabel
-          :label="c.petaTag.name"
-          :labelLook="`${c.petaTag.name}(${c.count})`"
-          :readonly="c.readonly"
-          @change="(name) => changeTag(c.petaTag, name)"
-          @contextmenu="tagMenu($event, c)"
-        /> -->
         <VTextarea
           :value="c.petaTag.name"
           :look="`${c.petaTag.name}(${c.count})`"
           :type="'single'"
           :trim="true"
+          :readonly="true"
           @update:value="(name) => changeTag(c.petaTag, name)"
           @contextmenu="tagMenu($event, c)"
         />
@@ -29,20 +23,13 @@
     </t-tags>
     <t-tag-add>
       <t-tag>
-        <!-- <VEditableLabel
-          :label="''"
-          :labelLook="textsStore.state.value.plus + '       '"
-          :clickToEdit="true"
-          @change="(name) => addTag(name)"
-          :growWidth="true"
-          :noOutline="true"
-        /> -->
         <VTextarea
           :value="''"
-          :look="textsStore.state.value.plus + '       '"
+          :look="textsStore.state.value.plus"
           :type="'single'"
           :trim="true"
           :clickToEdit="true"
+          :style="{ width: '100%' }"
           @update:value="addTag"
         />
       </t-tag>
@@ -53,11 +40,6 @@
 <script setup lang="ts">
 // Vue
 import { computed } from "vue";
-
-// Components
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
-
-// Others
 import { PetaImage } from "@/commons/datas/petaImage";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
@@ -172,7 +154,6 @@ const selectedAll = computed(() => {
 <style lang="scss" scoped>
 t-tags-root {
   flex-direction: column;
-  text-align: center;
   display: flex;
   width: 100%;
   height: 100%;
