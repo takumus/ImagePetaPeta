@@ -183,7 +183,7 @@ export class Windows {
       state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
       state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
     }
-    state.maximized = window.isMaximized();
+    state.maximized = false; //window.isMaximized();
     this.configWindowStates.save();
   }
   getWindowByEvent(event: IpcMainInvokeEvent) {
