@@ -4,14 +4,14 @@
       <VTags
         :petaImagesArray="petaImagesArray"
         :petaTagInfos="petaTagInfos"
-        v-model:selectedPetaTags="selectedPetaTags"
+        v-model:selectedPetaTagIds="selectedPetaTagIds"
       />
     </t-left>
     <t-center>
       <t-content>
         <t-top>
           <t-search>
-            <VSearch :petaTagInfos="petaTagInfos" v-model:selectedPetaTags="selectedPetaTags" />
+            <VSearch :petaTagInfos="petaTagInfos" v-model:selectedPetaTagIds="selectedPetaTagIds" />
           </t-search>
           <t-buttons>
             <label>
@@ -117,7 +117,7 @@ const props = defineProps<{
 }>();
 const thumbnails = ref<HTMLDivElement>();
 const thumbsWrapper = ref<HTMLDivElement>();
-const selectedPetaTags = ref<PetaTag[]>([]);
+const selectedPetaTagIds = ref<string[]>([]);
 const thumbnailsWidth = ref(0);
 const areaMaxY = ref(0);
 const areaMinY = ref(0);
@@ -411,14 +411,14 @@ function sort(a: PetaImage, b: PetaImage) {
   }
 }
 async function fetchFilteredPetaImages() {
-  if (selectedPetaTags.value.length === 0) {
+  if (selectedPetaTagIds.value.length === 0) {
     filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
     return;
   }
-  const untagged = selectedPetaTags.value.find((petaTag) => petaTag.id === UNTAGGED_ID);
+  const untagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
   const results = await API.send(
     "getPetaImageIdsByPetaTagIds",
-    untagged ? [] : selectedPetaTags.value.map((petaTag) => petaTag.id),
+    untagged ? [] : selectedPetaTagIds.value,
   );
   filteredPetaImages.value = (
     Array.from(
@@ -436,7 +436,7 @@ async function fetchFilteredPetaImages() {
 }
 function selectTag(tag: PetaTag) {
   console.log(tag);
-  selectedPetaTags.value = [tag];
+  selectedPetaTagIds.value = [tag.id];
 }
 function updateVisibility(tile: Tile) {
   tile.visible =
@@ -583,8 +583,8 @@ const original = computed(() => {
     settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE
   );
 });
-watch(selectedPetaTags, () => {
-  console.log(selectedPetaTags);
+watch(selectedPetaTagIds, () => {
+  console.log(selectedPetaTagIds);
   currentScrollTileId.value = "";
   nextTick(() => {
     if (thumbnails.value) {

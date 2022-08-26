@@ -47,31 +47,34 @@ const searchInput = ref<InstanceType<typeof VTextarea>>();
 const textsStore = useTextsStore();
 const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
-  selectedPetaTags: PetaTag[];
+  selectedPetaTagIds: string[];
 }>();
 
 const emit = defineEmits<{
-  (e: "update:selectedPetaTags", value: PetaTag[]): void;
+  (e: "update:selectedPetaTagIds", value: string[]): void;
 }>();
 
 function editSearchTag(tag: PetaTag, value: string) {
   console.log("edit:", tag.name, "->", value);
-  const index = props.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
-  const _selectedPetaTags = [...props.selectedPetaTags];
-  _selectedPetaTags.splice(index, 1);
+  const index = props.selectedPetaTagIds.findIndex((id) => id === tag.id);
+  const _selectedPetaTagIds = [...props.selectedPetaTagIds];
+  _selectedPetaTagIds.splice(index, 1);
   if (value != "") {
     const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === value)?.petaTag;
-    if (petaTag && !_selectedPetaTags.includes(petaTag)) {
-      _selectedPetaTags.splice(index, 0, petaTag);
+    if (petaTag && !_selectedPetaTagIds.includes(petaTag.id)) {
+      _selectedPetaTagIds.splice(index, 0, petaTag.id);
     }
   }
-  emit("update:selectedPetaTags", _selectedPetaTags);
+  emit("update:selectedPetaTagIds", _selectedPetaTagIds);
 }
 
 function removeLastPetaTag() {
-  const last = props.selectedPetaTags[props.selectedPetaTags.length - 1];
+  const last = props.selectedPetaTagIds[props.selectedPetaTagIds.length - 1];
   if (last) {
-    editSearchTag(last, "");
+    const petaTag = props.petaTagInfos.find((tag) => tag.petaTag.id === last)?.petaTag;
+    if (petaTag !== undefined) {
+      editSearchTag(petaTag, "");
+    }
   } else {
     // blur();
   }
@@ -79,14 +82,14 @@ function removeLastPetaTag() {
 
 function addSelectedTag(tagName: string) {
   const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === tagName)?.petaTag;
-  const untaggedId = props.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
+  const untaggedId = props.selectedPetaTagIds.findIndex((id) => id === UNTAGGED_ID);
 
   if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
-    emit("update:selectedPetaTags", []);
+    emit("update:selectedPetaTagIds", []);
   }
 
-  if (petaTag && !props.selectedPetaTags.includes(petaTag)) {
-    emit("update:selectedPetaTags", [...props.selectedPetaTags, petaTag]);
+  if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
+    emit("update:selectedPetaTagIds", [...props.selectedPetaTagIds, petaTag.id]);
   }
 
   setTimeout(() => {
@@ -97,11 +100,19 @@ function addSelectedTag(tagName: string) {
 const complementItems = computed(() => {
   return props.petaTagInfos
     .filter((pti) => {
-      return !props.selectedPetaTags.includes(pti.petaTag);
+      return !props.selectedPetaTagIds.includes(pti.petaTag.id);
     })
     .map((pti) => {
       return pti.petaTag.name;
     });
+});
+
+const selectedPetaTags = computed(() => {
+  return props.selectedPetaTagIds
+    .map((id) => {
+      return props.petaTagInfos.find((tag) => tag.petaTag.id === id)?.petaTag;
+    })
+    .filter((petaTag) => petaTag !== undefined) as PetaTag[];
 });
 </script>
 

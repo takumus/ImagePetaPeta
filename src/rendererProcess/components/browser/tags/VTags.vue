@@ -59,12 +59,12 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 const emit = defineEmits<{
-  (e: "update:selectedPetaTags", selectedPetaTags: PetaTag[]): void;
+  (e: "update:selectedPetaTagIds", selectedPetaTagIds: string[]): void;
 }>();
 const props = defineProps<{
   petaImagesArray: PetaImage[];
   petaTagInfos: PetaTagInfo[];
-  selectedPetaTags: PetaTag[];
+  selectedPetaTagIds: string[];
 }>();
 const textsStore = useTextsStore();
 const components = useComponentsStore();
@@ -99,12 +99,12 @@ async function removeTag(petaTag: PetaTag) {
     ])) === 0
   ) {
     await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
-    const index = props.selectedPetaTags.findIndex((pt) => pt === petaTag);
+    const index = props.selectedPetaTagIds.findIndex((pt) => pt === petaTag.id);
     if (index >= 0) {
       // props.selectedPetaTags.splice(index, 1);
-      const newData = [...props.selectedPetaTags];
+      const newData = [...props.selectedPetaTagIds];
       newData.splice(index, 1);
-      emit("update:selectedPetaTags", newData);
+      emit("update:selectedPetaTagIds", newData);
     }
   }
 }
@@ -121,7 +121,8 @@ async function changeTag(petaTag: PetaTag, newName: string) {
   selectPetaTag(petaTag);
 }
 function selectPetaTag(petaTag?: PetaTag) {
-  const newData = [...props.selectedPetaTags];
+  const newData = [...props.selectedPetaTagIds];
+  const prevTags = props.selectedPetaTagIds.join(",");
   let single = false;
   if (
     !Keyboards.pressedOR(
@@ -136,35 +137,38 @@ function selectPetaTag(petaTag?: PetaTag) {
     newData.length = 0;
     single = true;
   }
-  const untaggedId = props.selectedPetaTags.findIndex((petaTag) => petaTag.id === UNTAGGED_ID);
+  const untaggedId = props.selectedPetaTagIds.findIndex((id) => id === UNTAGGED_ID);
   if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
     newData.length = 0;
   }
   if (petaTag) {
     if (!single) {
-      if (!props.selectedPetaTags.includes(petaTag)) {
-        newData.push(petaTag);
+      if (!props.selectedPetaTagIds.includes(petaTag.id)) {
+        newData.push(petaTag.id);
       }
     } else {
-      newData.push(petaTag);
+      newData.push(petaTag.id);
     }
   }
-  emit("update:selectedPetaTags", newData);
+  const newTags = newData.join(",");
+  if (prevTags === newTags) {
+    return;
+  }
+  emit("update:selectedPetaTagIds", newData);
 }
 const browserTags = computed((): BrowserTag[] => {
   const browserTags = props.petaTagInfos.map((petaTagInfo): BrowserTag => {
     return {
       petaTag: petaTagInfo.petaTag,
       count: petaTagInfo.count,
-      selected:
-        props.selectedPetaTags.find((spt) => spt.id === petaTagInfo.petaTag.id) !== undefined,
+      selected: props.selectedPetaTagIds.find((id) => id === petaTagInfo.petaTag.id) !== undefined,
       readonly: petaTagInfo.petaTag.id === UNTAGGED_ID,
     };
   });
   return browserTags;
 });
 const selectedAll = computed(() => {
-  return props.selectedPetaTags.length === 0;
+  return props.selectedPetaTagIds.length === 0;
 });
 </script>
 
