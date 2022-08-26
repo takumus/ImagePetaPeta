@@ -10,7 +10,7 @@
         <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
-        <VBrowser :petaTagInfos="petaTagInfos" />
+        <VBrowser />
       </t-browser>
     </t-content>
     <t-modals v-show="components.modal.modalIds.length > 0">
@@ -35,7 +35,6 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
@@ -44,24 +43,16 @@ const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
-const petaTagInfos = ref<PetaTagInfo[]>([]);
 const title = ref("");
 onMounted(async () => {
-  API.on("updatePetaTags", () => {
-    getPetaTagInfos();
-  });
   title.value = `${t("titles.browser")} - ${appInfoStore.state.value.name} ${
     appInfoStore.state.value.version
   }`;
   document.title = title.value;
-  await getPetaTagInfos();
   nextTick(() => {
     API.send("showMainWindow");
   });
 });
-async function getPetaTagInfos() {
-  petaTagInfos.value = await API.send("getPetaTagInfos");
-}
 </script>
 
 <style lang="scss" scoped>

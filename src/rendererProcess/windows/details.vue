@@ -16,7 +16,7 @@
         <t-property>
           <VProperty
             :petaImages="singlePetaImages"
-            :petaTagInfos="petaTagInfos"
+            :petaTagInfos="petaTagsStore.state.value"
             @selectTag="() => {}"
           />
         </t-property>
@@ -44,7 +44,6 @@ import VProperty from "@/rendererProcess/components/browser/property/VProperty.v
 // Others
 import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -59,14 +58,15 @@ import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const petaImagesStore = usePetaImagesStore();
+const petaTagsStore = usePetaTagsStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
 const board = ref<PetaBoard>();
-const petaTagInfos = ref<PetaTagInfo[]>([]);
 const title = ref("");
 const petaImageId = ref<string>();
 const keyboards = new Keyboards();
@@ -88,9 +88,6 @@ onMounted(async () => {
       });
     }
   });
-  API.on("updatePetaTags", () => {
-    getPetaTagInfos();
-  });
   API.on("detailsPetaImage", (event, petaImage) => {
     petaImageId.value = petaImage.id;
   });
@@ -99,7 +96,6 @@ onMounted(async () => {
     appInfoStore.state.value.version
   }`;
   document.title = title.value;
-  await getPetaTagInfos();
   nextTick(() => {
     API.send("showMainWindow");
   });
@@ -117,9 +113,6 @@ const singlePetaImages = computed(() => {
   }
   return [petaImage.value];
 });
-async function getPetaTagInfos() {
-  petaTagInfos.value = await API.send("getPetaTagInfos");
-}
 watch(petaImage, () => {
   if (petaImage.value === undefined) {
     board.value = undefined;

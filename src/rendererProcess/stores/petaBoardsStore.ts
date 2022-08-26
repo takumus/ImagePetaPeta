@@ -1,4 +1,4 @@
-import { InjectionKey, readonly, ref } from "vue";
+import { InjectionKey, ref } from "vue";
 import { API } from "@/rendererProcess/api";
 import { inject } from "@/rendererProcess/utils/vue";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
@@ -50,7 +50,11 @@ export async function createPetaBoardsStore() {
       DEFAULT_BOARD_NAME,
       Object.values(states.value).map((b) => b.name),
     );
-    const board = createPetaBoard(name, Math.max(...Object.values(states.value).map((b) => b.index), 0) + 1, dark);
+    const board = createPetaBoard(
+      name,
+      Math.max(...Object.values(states.value).map((b) => b.index), 0) + 1,
+      dark,
+    );
     await API.send("updatePetaBoards", [board], UpdateMode.UPSERT);
     await getPetaBoards();
     const addedBoard = states.value[board.id];

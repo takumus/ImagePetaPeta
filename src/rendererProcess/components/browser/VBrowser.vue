@@ -3,7 +3,7 @@
     <t-left>
       <VTags
         :petaImagesArray="petaImagesArray"
-        :petaTagInfos="petaTagInfos"
+        :petaTagInfos="petaTagsStore.state.value"
         v-model:selectedPetaTagIds="selectedPetaTagIds"
       />
     </t-left>
@@ -11,7 +11,10 @@
       <t-content>
         <t-top>
           <t-search>
-            <VSearch :petaTagInfos="petaTagInfos" v-model:selectedPetaTagIds="selectedPetaTagIds" />
+            <VSearch
+              :petaTagInfos="petaTagsStore.state.value"
+              v-model:selectedPetaTagIds="selectedPetaTagIds"
+            />
           </t-search>
           <t-buttons>
             <label>
@@ -38,7 +41,7 @@
               :key="data.id"
               :tile="data"
               :original="original"
-              :petaTagInfos="petaTagInfos"
+              :petaTagInfos="petaTagsStore.state.value"
               :parentAreaMinY="areaMinY"
               :parentAreaMaxY="areaMaxY"
               @select="selectTile"
@@ -54,7 +57,7 @@
       <VPreview :petaImages="selectedPetaImages" @clearSelectionAll="clearSelectionAll" />
       <VProperty
         :petaImages="selectedPetaImages"
-        :petaTagInfos="petaTagInfos"
+        :petaTagInfos="petaTagsStore.state.value"
         @selectTag="selectTag"
       />
       <input
@@ -98,7 +101,6 @@ import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { WindowType } from "@/commons/datas/windowType";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useDefinesStore } from "@/rendererProcess/stores/definesStore";
@@ -107,14 +109,13 @@ import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
 const petaImagesStore = usePetaImagesStore();
+const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
-const props = defineProps<{
-  petaTagInfos: PetaTagInfo[];
-}>();
 const thumbnails = ref<HTMLDivElement>();
 const thumbsWrapper = ref<HTMLDivElement>();
 const selectedPetaTagIds = ref<string[]>([]);
@@ -168,6 +169,7 @@ onMounted(() => {
   thumbnailsSize.value = statesStore.state.value.browserTileSize;
   keyboards.enabled = true;
   keyboards.keys("KeyA").down(keyA);
+  fetchFilteredPetaImages();
 });
 onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
@@ -596,12 +598,9 @@ watch(selectedPetaTagIds, () => {
 watch(petaImagesArray, () => {
   fetchFilteredPetaImages();
 });
-watch(
-  () => props.petaTagInfos,
-  () => {
-    fetchFilteredPetaImages();
-  },
-);
+watch(petaTagsStore.state, () => {
+  fetchFilteredPetaImages();
+});
 watch(thumbnailsSize, () => {
   restoreScrollPosition();
 });
