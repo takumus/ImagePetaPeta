@@ -13,45 +13,24 @@
       </li>
     </ul>
     <t-contents>
-      <!--
-        General
-      -->
       <t-content v-if="currentTab === 'general'">
         <VSettingsGeneral />
       </t-content>
-      <!--
-        Control
-      -->
       <t-content v-if="currentTab === 'control'">
         <VSettingsControl />
       </t-content>
-      <!--
-        Browser
-      -->
       <t-content v-if="currentTab === 'browser'">
         <VSettingsBrowser />
       </t-content>
-      <!--
-        Datas
-      -->
       <t-content v-if="currentTab === 'datas'">
         <VSettingsDatas />
       </t-content>
-      <!--
-        Others
-      -->
       <t-content v-if="currentTab === 'others'">
         <VSettingsOthers />
       </t-content>
-      <!--
-        Update
-      -->
       <t-content v-if="currentTab === 'update'">
         <VSettingsUpdate />
       </t-content>
-      <!--
-        Info
-      -->
       <t-content v-if="currentTab === 'info'">
         <VSettingsInfo />
       </t-content>
