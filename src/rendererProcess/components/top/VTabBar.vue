@@ -11,21 +11,21 @@
     >
       <t-label-wrapper>
         <t-label>
-          <VEditableLabel @change="(v) => changePetaBoardName(b, v)" :label="b.name" />
+          <VTextarea :type="'single'" :trim="true" :value="b.name" @update:value="(v) => changePetaBoardName(b, v)" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
     <t-tab class="add" @click="addPetaBoard()">
       <t-label-wrapper>
         <t-label>
-          <VEditableLabel :label="textsStore.state.value.plus" :readonly="true" />
+          <VTextarea :type="'single'" :trim="true" :readonly="true" :value="textsStore.state.value.plus" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
     <t-tab class="selected drag" ref="draggingTab" :style="{ display: dragging ? 'block' : 'none' }" v-show="dragging">
       <t-label-wrapper>
         <t-label>
-          <VEditableLabel :label="board.name" v-if="board" />
+          <VTextarea :type="'single'" :trim="true" :readonly="true" :value="board.name" v-if="board" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
@@ -35,8 +35,6 @@
 <script setup lang="ts">
 // Vue
 import { computed, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
-// Components
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
@@ -45,6 +43,7 @@ import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 
 const emit = defineEmits<{
   (e: "add"): void;

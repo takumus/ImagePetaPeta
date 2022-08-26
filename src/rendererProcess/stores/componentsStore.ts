@@ -7,7 +7,6 @@ export async function createComponentsStore() {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const components: any = {
     contextMenu: {},
-    complement: {},
     dialog: {},
     modal: {
       modalIds: [],
@@ -24,11 +23,6 @@ export const componentsStoreKey: InjectionKey<ComponentsStore> = Symbol("compone
 interface Components {
   contextMenu: {
     open: (items: ContextMenuItem[], position: Vec2) => void;
-  };
-  complement: {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    open: (element: any, items: string[]) => void;
-    updateItems: (items: string[]) => void;
   };
   dialog: {
     show: (label: string, items: string[]) => Promise<number>;

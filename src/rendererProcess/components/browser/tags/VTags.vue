@@ -2,7 +2,12 @@
   <t-tags-root>
     <t-tags>
       <t-tag @click="selectPetaTag()" :class="{ selected: selectedAll }">
-        <VTextarea :value="`${t('browser.all')}(${petaImagesArray.length})`" :type="'single'" :readonly="true" />
+        <VTextarea
+          :type="'single'"
+          :readonly="true"
+          :trim="true"
+          :value="`${t('browser.all')}(${petaImagesArray.length})`"
+        />
       </t-tag>
       <t-tag
         v-for="c in browserTags"
@@ -11,11 +16,11 @@
         @click="selectPetaTag(c.petaTag)"
       >
         <VTextarea
-          :value="c.petaTag.name"
-          :look="`${c.petaTag.name}(${c.count})`"
           :type="'single'"
           :trim="true"
           :readonly="c.readonly"
+          :value="c.petaTag.name"
+          :look="`${c.petaTag.name}(${c.count})`"
           @update:value="(name) => changeTag(c.petaTag, name)"
           @contextmenu="tagMenu($event, c)"
         />
@@ -24,12 +29,12 @@
     <t-tag-add>
       <t-tag>
         <VTextarea
-          :value="''"
-          :look="textsStore.state.value.plus"
           :type="'single'"
           :trim="true"
           :clickToEdit="true"
-          :style="{ width: '100%' }"
+          :textAreaStyle="{ width: '100%' }"
+          :outerStyle="{ width: '100%' }"
+          :look="textsStore.state.value.plus"
           @update:value="addTag"
         />
       </t-tag>

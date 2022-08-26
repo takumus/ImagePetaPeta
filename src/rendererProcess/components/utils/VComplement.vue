@@ -1,6 +1,6 @@
 <template>
   <ul
-    v-show="show"
+    v-show="props.editing"
     class="complement-root"
     ref="complement"
     :style="{
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
@@ -37,49 +37,49 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import FuzzySearch from "fuzzy-search";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
-import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
-defineProps<{
+const props = defineProps<{
   zIndex: number;
+  value: string;
+  items: string[];
+  editing: boolean;
+  textArea?: HTMLElement;
 }>();
-
+const emit = defineEmits<{
+  (e: "select", value: string): void;
+  (e: "cancel"): void;
+}>();
 const complement = ref<HTMLElement>();
-const items = ref<string[]>([]);
 const filteredItems = ref<string[]>([]);
 const position = ref(new Vec2(0, 0));
-const show = ref(false);
-const target = ref<any>();
 const currentIndex = ref(0);
 const height = ref("unset");
 const keyboards = useKeyboardsStore();
 const textsStore = useTextsStore();
-let searcher: FuzzySearch<string>;
+let searcher: FuzzySearch<string> = new FuzzySearch([], undefined, {
+  sort: true,
+});
 onMounted(() => {
   keyboards.keys("ArrowUp").down(() => {
-    if (!target.value) return;
+    if (!props.editing) return;
     moveSelectionRelative(-1);
   });
   keyboards.keys("ArrowDown").down(() => {
-    if (!target.value) return;
+    if (!props.editing) return;
     moveSelectionRelative(1);
   });
   keyboards.keys("Tab").down(() => {
-    if (!target.value) return;
+    if (!props.editing) return;
     moveSelectionRelative(Keyboards.pressedOR("ShiftLeft", "ShiftRight") ? -1 : 1);
   });
   keyboards.keys("Enter").down(() => {
-    if (!target.value) return;
+    if (!props.editing) return;
     const item = filteredItems.value[currentIndex.value];
     if (item) {
       select(item);
     }
   });
-  keyboards.keys("Escape").down(() => {
-    nextTick(() => {
-      blur();
-    });
-  });
   setInterval(() => {
-    if (show.value) {
+    if (props.editing) {
       updatePosition();
     }
   }, 50);
@@ -107,71 +107,25 @@ function moveSelectionRelative(index: number) {
   moveCursorToLast();
 }
 function moveCursorToLast() {
-  setTimeout(() => {
-    const range = document.createRange();
-    if (target.value?.labelInput.firstChild) {
-      range.setStart(target.value.labelInput.firstChild, target.value.tempText.length);
-      range.collapse(true);
-      const sel = window.getSelection();
-      sel?.removeAllRanges();
-      sel?.addRange(range);
-    }
-  }, 1);
-}
-function open(_input: any, items: string[]): void {
-  if (_input === target.value && show.value) {
-    return;
-  }
-  updateItems(items);
-  target.value = _input;
-  filteredItems.value = [];
-  target.value.labelInput.addEventListener("blur", blur);
-  target.value.labelInput.addEventListener("input", input);
-  show.value = true;
-  input();
-  keyboards.enabled = true;
-  keyboards.lock();
-  updatePosition();
-}
-function updateItems(_items: string[]) {
-  items.value = _items;
-  searcher = new FuzzySearch(_items, undefined, {
-    sort: true,
-  });
-  input();
-}
-function blur() {
-  show.value = false;
-  keyboards.enabled = false;
-  keyboards.unlock();
-  if (target.value) {
-    target.value.labelInput.removeEventListener("blur", blur);
-    target.value.labelInput.removeEventListener("input", input);
-    target.value.labelInput.blur();
-    target.value = undefined;
-  }
+  //
 }
 function input() {
-  if (!show.value || !target.value) {
+  if (!props.editing) {
     return;
   }
   currentIndex.value = -1;
-  const value = target.value.tempText.trim();
+  const value = props.value.trim();
   // -Fuzzy
-  if (searcher) {
-    filteredItems.value = searcher?.search(value);
-  }
+  searcher.haystack = props.items;
+  filteredItems.value = searcher.search(value);
   updatePosition();
 }
 function select(item: string) {
-  if (target.value) {
-    target.value.apply(item);
-    blur();
-  }
+  emit("select", item);
 }
 function updatePosition() {
-  if (target.value && target.value.$el) {
-    const inputRect = (target.value.$el as HTMLElement).getBoundingClientRect();
+  if (props.textArea) {
+    const inputRect = props.textArea.getBoundingClientRect();
     position.value.x = inputRect.x;
     position.value.y = inputRect.y + inputRect.height;
     height.value = "unset";
@@ -187,14 +141,30 @@ function updatePosition() {
     }
   }
 }
-useComponentsStore().complement = {
-  open,
-  updateItems,
-};
-defineExpose({
-  updateItems,
-  open,
+watch(
+  () => props.editing,
+  () => {
+    if (props.editing) {
+      console.log("open");
+      input();
+    }
+  },
+);
+watch(filteredItems, () => {
+  keyboards.enabled = filteredItems.value.length > 0;
 });
+watch(
+  () => props.items,
+  () => {
+    input();
+  },
+);
+watch(
+  () => props.value,
+  () => {
+    input();
+  },
+);
 </script>
 
 <style lang="scss" scoped>

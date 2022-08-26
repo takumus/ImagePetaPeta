@@ -2,26 +2,31 @@
   <t-search-root>
     <t-search-box>
       <t-tag v-for="tag in selectedPetaTags" :key="tag.id">
-        <VEditableLabel
-          :label="tag.name"
-          :labelLook="tag.name"
+        <VTextarea
+          :type="'single'"
+          :trim="true"
           :clickToEdit="true"
           :allowEmpty="true"
-          @focus="complementTag"
-          @change="(value) => editSearchTag(tag, value)"
-          @delete="editSearchTag(tag, '')"
+          :complements="complementItems"
+          :blurToReset="true"
+          :value="tag.name"
+          :look="tag.name"
+          @update:value="(value) => editSearchTag(tag, value)"
+          @deleteOfEmpty="editSearchTag(tag, '')"
         />
       </t-tag>
       <t-tag class="last">
-        <VEditableLabel
-          :label="''"
-          :labelLook="textsStore.state.value.plus + '       '"
+        <VTextarea
+          :type="'single'"
+          :trim="true"
           :clickToEdit="true"
-          @change="addSelectedTag"
-          @focus="complementTag"
-          @delete="removeLastPetaTag()"
-          :growWidth="true"
-          :noOutline="true"
+          :complements="complementItems"
+          :textAreaStyle="{ width: '100%' }"
+          :outerStyle="{ width: '100%' }"
+          :blurToReset="true"
+          :look="textsStore.state.value.plus"
+          @update:value="addSelectedTag"
+          @deleteOfEmpty="removeLastPetaTag()"
           ref="searchInput"
         />
       </t-tag>
@@ -30,19 +35,16 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from "vue";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 import { ref } from "@vue/reactivity";
-import { computed, nextTick } from "@vue/runtime-core";
+import { computed } from "@vue/runtime-core";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
-import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 
-const searchInput = ref<typeof VEditableLabel>();
+const searchInput = ref<InstanceType<typeof VTextarea>>();
 const textsStore = useTextsStore();
-const components = useComponentsStore();
 const props = defineProps<{
   petaTagInfos: PetaTagInfo[];
   selectedPetaTags: PetaTag[];
@@ -53,17 +55,17 @@ const emit = defineEmits<{
 }>();
 
 function editSearchTag(tag: PetaTag, value: string) {
-  value = value.trim().replace(/\r?\n/g, "");
+  console.log("edit:", tag.name, "->", value);
   const index = props.selectedPetaTags.findIndex((petaTag) => petaTag === tag);
   const _selectedPetaTags = [...props.selectedPetaTags];
   _selectedPetaTags.splice(index, 1);
-  emit("update:selectedPetaTags", _selectedPetaTags);
   if (value != "") {
     const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === value)?.petaTag;
     if (petaTag && !_selectedPetaTags.includes(petaTag)) {
-      emit("update:selectedPetaTags", _selectedPetaTags.splice(index, 0, petaTag));
+      _selectedPetaTags.splice(index, 0, petaTag);
     }
   }
+  emit("update:selectedPetaTags", _selectedPetaTags);
 }
 
 function removeLastPetaTag() {
@@ -87,13 +89,9 @@ function addSelectedTag(tagName: string) {
     emit("update:selectedPetaTags", [...props.selectedPetaTags, petaTag]);
   }
 
-  nextTick(() => {
+  setTimeout(() => {
     searchInput.value?.edit();
-  });
-}
-
-function complementTag(editableLabel: any) {
-  components.complement.open(editableLabel, complementItems.value);
+  }, 100);
 }
 
 const complementItems = computed(() => {
@@ -105,13 +103,6 @@ const complementItems = computed(() => {
       return pti.petaTag.name;
     });
 });
-
-watch(
-  () => complementItems.value,
-  () => {
-    components.complement.updateItems(complementItems.value);
-  },
-);
 </script>
 
 <style lang="scss" scoped>

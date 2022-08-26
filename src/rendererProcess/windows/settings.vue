@@ -14,7 +14,6 @@
     </t-content>
     <VDialog :zIndex="6"></VDialog>
     <VContextMenu :zIndex="4" />
-    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -24,7 +23,6 @@ import { onMounted, ref } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
-import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others

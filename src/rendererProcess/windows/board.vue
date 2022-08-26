@@ -36,7 +36,6 @@
     </t-modals>
     <VDialog :zIndex="6"></VDialog>
     <VContextMenu :zIndex="4" />
-    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -52,7 +51,6 @@ import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VBoardProperty from "@/rendererProcess/components/top/VBoardProperty.vue";
 import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
-import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";

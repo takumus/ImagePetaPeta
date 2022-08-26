@@ -6,21 +6,30 @@
         <t-data>
           <t-name>{{ t("browser.property.infos.name") }}</t-name>
           <t-value>
-            <VEditableLabel
-              :label="singlePetaImageInfo.petaImage.name"
-              :labelLook="singlePetaImageInfo.petaImage.name"
+            <VTextarea
+              :type="'single'"
               :clickToEdit="true"
               :allowEmpty="true"
-              :growWidth="true"
-              @change="changeName"
+              :textAreaStyle="{ width: '100%' }"
+              :outerStyle="{ width: '100%' }"
+              :value="singlePetaImageInfo.petaImage.name"
+              :look="singlePetaImageInfo.petaImage.name"
+              @update:value="changeName"
             />
           </t-value>
         </t-data>
         <t-data>
           <t-name>{{ t("browser.property.infos.note") }}</t-name>
           <t-value>
-            <textarea lock-keyboard ref="noteTextArea" v-model="note" @blur="blurNoteTextarea" @input="resizeNote">
-            </textarea>
+            <VTextarea
+              :type="'multi'"
+              :clickToEdit="true"
+              :allowEmpty="true"
+              :textAreaStyle="{ width: '100%' }"
+              :outerStyle="{ width: '100%' }"
+              :value="note"
+              @update:value="changeNote"
+            />
           </t-value>
         </t-data>
         <t-data>
@@ -50,26 +59,31 @@
       <p>{{ t("browser.property.tags") }}</p>
       <t-search-box v-if="!fetchingTags">
         <t-tag v-for="tag in sharedPetaTags" :key="tag.id">
-          <VEditableLabel
-            :label="tag.name"
-            :labelLook="tag.name"
+          <VTextarea
+            :type="'single'"
+            :trim="true"
             :clickToEdit="true"
             :allowEmpty="true"
             :readonly="true"
-            @focus="complementTag"
+            :blurToReset="true"
+            :complements="complements"
+            :value="tag.name"
+            :look="tag.name"
             @click="selectTag(tag)"
             @contextmenu="tagMenu($event, tag)"
           />
         </t-tag>
         <t-tag class="last">
-          <VEditableLabel
-            :label="''"
-            :labelLook="textsStore.state.value.plus + '       '"
+          <VTextarea
+            :type="'single'"
+            :trim="true"
+            :look="textsStore.state.value.plus + '       '"
             :clickToEdit="true"
-            @change="(name) => addTag(name)"
-            @focus="complementTag"
-            :growWidth="true"
-            :noOutline="true"
+            :blurToReset="true"
+            :complements="complements"
+            :textAreaStyle="{ width: '100%' }"
+            :outerStyle="{ width: '100%' }"
+            @update:value="addTag"
           />
         </t-tag>
       </t-search-box>
@@ -98,7 +112,6 @@
 // import { Options, Vue } from "vue-class-component";
 // import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
-import VEditableLabel from "@/rendererProcess/components/utils/VEditableLabel.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
@@ -109,11 +122,12 @@ import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import dateFormat from "dateformat";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -128,7 +142,6 @@ const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
-const noteTextArea = ref<HTMLTextAreaElement>();
 const darkModeStore = useDarkModeStore();
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
@@ -153,17 +166,6 @@ async function removeTag(petaTag: PetaTag) {
     UpdateMode.REMOVE,
   );
 }
-function resizeNote() {
-  if (noteTextArea.value === undefined) {
-    return;
-  }
-  const _noteTextArea = noteTextArea.value;
-  _noteTextArea.style.height = _noteTextArea.scrollHeight + "px"; //この行だけでOK？
-  _noteTextArea.style.height = "auto";
-  nextTick(() => {
-    _noteTextArea.style.height = _noteTextArea.scrollHeight + "px";
-  });
-}
 function changeName(name: string) {
   if (singlePetaImageInfo.value === undefined) {
     return;
@@ -171,15 +173,8 @@ function changeName(name: string) {
   singlePetaImageInfo.value.petaImage.name = name;
   API.send("updatePetaImages", [singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
 }
-function blurNoteTextarea(e: FocusEvent) {
-  const textarea = e.target as HTMLTextAreaElement;
-  changeNote(textarea.value);
-}
 function changeNote(note: string) {
   if (singlePetaImageInfo.value === undefined) {
-    return;
-  }
-  if (singlePetaImageInfo.value.petaImage.note === note) {
     return;
   }
   singlePetaImageInfo.value.petaImage.note = note;
@@ -190,18 +185,6 @@ function changeNSFW(value: boolean) {
     pi.nsfw = value;
   });
   updatePetaImages(props.petaImages, UpdateMode.UPDATE);
-}
-function complementTag(editableLabel: any) {
-  components.complement.open(
-    editableLabel,
-    props.petaTagInfos
-      .filter((pti) => {
-        return pti.petaTag.id !== UNTAGGED_ID;
-      })
-      .map((pti) => {
-        return pti.petaTag.name;
-      }),
-  );
 }
 function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
   components.contextMenu.open(
@@ -280,15 +263,21 @@ const nsfw = computed(() => {
   }
   return undefined;
 });
+const complements = computed(() => {
+  return props.petaTagInfos
+    .filter((pti) => {
+      return pti.petaTag.id !== UNTAGGED_ID;
+    })
+    .map((pti) => {
+      return pti.petaTag.name;
+    });
+});
 watch(
   () => props.petaImages,
   () => {
     fetchPetaTags();
     if (singlePetaImageInfo.value) {
       note.value = singlePetaImageInfo.value.petaImage.note;
-      nextTick(() => {
-        resizeNote();
-      });
     } else {
       note.value = "";
     }

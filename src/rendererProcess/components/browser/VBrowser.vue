@@ -389,8 +389,8 @@ async function fetchFilteredPetaImages() {
   ).sort(sort);
 }
 function selectTag(tag: PetaTag) {
-  selectedPetaTags.value.length = 0;
-  selectedPetaTags.value.push(tag);
+  console.log(tag);
+  selectedPetaTags.value = [tag];
 }
 function updateVisibility(tile: Tile) {
   tile.visible =
@@ -533,6 +533,7 @@ const original = computed(() => {
   return settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE;
 });
 watch(selectedPetaTags, () => {
+  console.log(selectedPetaTags);
   currentScrollTileId.value = "";
   nextTick(() => {
     if (thumbnails.value) {

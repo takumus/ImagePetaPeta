@@ -19,7 +19,6 @@
     </t-modals>
     <VDialog :zIndex="6"></VDialog>
     <VContextMenu :zIndex="4" />
-    <VComplement :zIndex="5" />
   </t-root>
 </template>
 
@@ -33,7 +32,6 @@ import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
-import VComplement from "@/rendererProcess/components/utils/VComplement.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
