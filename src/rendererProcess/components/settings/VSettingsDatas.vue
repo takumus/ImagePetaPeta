@@ -43,9 +43,10 @@ async function changePetaImageDirectory() {
   );
   if (result === 0) {
     if (!(await API.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
-      await components.dialog.show(t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]), [
-        t("shared.yes"),
-      ]);
+      await components.dialog.show(
+        t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
+        [t("shared.yes")],
+      );
       restorePetaImageDirectory();
     }
   } else {

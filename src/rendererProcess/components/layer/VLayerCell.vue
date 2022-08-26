@@ -88,7 +88,10 @@ onUnmounted(() => {
 });
 const url = computed(() => {
   return props.cellData
-    ? getImageURL(petaImagesStore.getPetaImage(props.cellData.data.petaImageId), ImageType.THUMBNAIL)
+    ? getImageURL(
+        petaImagesStore.getPetaImage(props.cellData.data.petaImageId),
+        ImageType.THUMBNAIL,
+      )
     : undefined;
 });
 const selected = computed(() => {
@@ -101,7 +104,9 @@ const visible = computed(() => {
   return props.cellData?.data.visible;
 });
 const showNSFW = computed(() => {
-  return petaImagesStore.getPetaImage(props.cellData?.data.petaImageId)?.nsfw && !nsfwStore.state.value;
+  return (
+    petaImagesStore.getPetaImage(props.cellData?.data.petaImageId)?.nsfw && !nsfwStore.state.value
+  );
 });
 function pointerdown(event: PointerEvent) {
   click.down(vec2FromPointerEvent(event));

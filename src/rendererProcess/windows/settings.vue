@@ -37,7 +37,9 @@ const darkModeStore = useDarkModeStore();
 const title = ref("");
 const keyboards = useKeyboardsStore();
 onMounted(() => {
-  title.value = `${t("titles.settings")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  title.value = `${t("titles.settings")} - ${appInfoStore.state.value.name} ${
+    appInfoStore.state.value.version
+  }`;
   document.title = title.value;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {

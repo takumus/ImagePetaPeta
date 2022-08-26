@@ -46,7 +46,9 @@ function gotoGithub() {
 function gotoIssues() {
   API.send(
     "openURL",
-    `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(appInfoStore.state.value.version)}`,
+    `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(
+      appInfoStore.state.value.version,
+    )}`,
   );
 }
 function gotoIcons8() {

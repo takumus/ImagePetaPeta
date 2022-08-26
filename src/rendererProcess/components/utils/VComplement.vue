@@ -23,7 +23,11 @@
     >
       {{ item }}
     </li>
-    <li class="item close" v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></li>
+    <li
+      class="item close"
+      v-html="textsStore.state.value.close"
+      v-if="filteredItems.length > 0"
+    ></li>
   </ul>
 </template>
 

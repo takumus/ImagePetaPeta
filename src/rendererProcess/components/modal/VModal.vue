@@ -156,8 +156,8 @@ t-modal-root {
       text-align: right;
       display: block;
       > t-button {
-        font-family: Segoe MDL2 Assets, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
-          sans-serif;
+        font-family: Segoe MDL2 Assets, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+          "Hiragino Sans", Meiryo, sans-serif;
         cursor: pointer;
       }
     }

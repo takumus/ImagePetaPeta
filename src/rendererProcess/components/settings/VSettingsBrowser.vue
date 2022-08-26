@@ -3,7 +3,9 @@
     <button v-show="regenerateMetadatasCompleted" @click="regenerateMetadatas">
       {{ t("settings.regenerateMetadatasButton") }}
     </button>
-    <label v-show="!regenerateMetadatasCompleted"> {{ regenerateMetadatasDone }}/{{ regenerateMetadatasCount }} </label>
+    <label v-show="!regenerateMetadatasCompleted">
+      {{ regenerateMetadatasDone }}/{{ regenerateMetadatasCount }}
+    </label>
     <p>{{ t("settings.regenerateMetadatasDescriptions") }}</p>
     <label>
       <input type="checkbox" v-model="settingsStore.state.value.loadTilesInOriginal" />

@@ -4,10 +4,18 @@
       <slot></slot>
     </t-property>
     <t-shared class="left" v-if="visible">
-      <button v-if="windowType === 'browser' || windowType === 'details'" tabindex="-1" @click="openBoard()">
+      <button
+        v-if="windowType === 'browser' || windowType === 'details'"
+        tabindex="-1"
+        @click="openBoard()"
+      >
         <t-icon class="board"></t-icon>
       </button>
-      <button v-if="windowType === 'board' || windowType === 'details'" tabindex="-1" @click="openBrowser()">
+      <button
+        v-if="windowType === 'board' || windowType === 'details'"
+        tabindex="-1"
+        @click="openBrowser()"
+      >
         <t-icon class="browser"></t-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageFiles()">
@@ -61,7 +69,12 @@ function importImageDirectories() {
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {
-    if ((await components.dialog.show(t("utilsBar.nsfwConfirm"), [t("shared.yes"), t("shared.no")])) === 0) {
+    if (
+      (await components.dialog.show(t("utilsBar.nsfwConfirm"), [
+        t("shared.yes"),
+        t("shared.no"),
+      ])) === 0
+    ) {
       nsfwStore.update(true);
     }
   } else {

@@ -50,7 +50,9 @@ onMounted(async () => {
   API.on("updatePetaTags", () => {
     getPetaTagInfos();
   });
-  title.value = `${t("titles.browser")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  title.value = `${t("titles.browser")} - ${appInfoStore.state.value.name} ${
+    appInfoStore.state.value.version
+  }`;
   document.title = title.value;
   await getPetaTagInfos();
   nextTick(() => {

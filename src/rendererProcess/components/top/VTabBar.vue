@@ -11,21 +11,42 @@
     >
       <t-label-wrapper>
         <t-label>
-          <VTextarea :type="'single'" :trim="true" :value="b.name" @update:value="(v) => changePetaBoardName(b, v)" />
+          <VTextarea
+            :type="'single'"
+            :trim="true"
+            :value="b.name"
+            @update:value="(v) => changePetaBoardName(b, v)"
+          />
         </t-label>
       </t-label-wrapper>
     </t-tab>
     <t-tab class="add" @click="addPetaBoard()">
       <t-label-wrapper>
         <t-label>
-          <VTextarea :type="'single'" :trim="true" :readonly="true" :value="textsStore.state.value.plus" />
+          <VTextarea
+            :type="'single'"
+            :trim="true"
+            :readonly="true"
+            :value="textsStore.state.value.plus"
+          />
         </t-label>
       </t-label-wrapper>
     </t-tab>
-    <t-tab class="selected drag" ref="draggingTab" :style="{ display: dragging ? 'block' : 'none' }" v-show="dragging">
+    <t-tab
+      class="selected drag"
+      ref="draggingTab"
+      :style="{ display: dragging ? 'block' : 'none' }"
+      v-show="dragging"
+    >
       <t-label-wrapper>
         <t-label>
-          <VTextarea :type="'single'" :trim="true" :readonly="true" :value="board.name" v-if="board" />
+          <VTextarea
+            :type="'single'"
+            :trim="true"
+            :readonly="true"
+            :value="board.name"
+            v-if="board"
+          />
         </t-label>
       </t-label-wrapper>
     </t-tab>
@@ -242,7 +263,8 @@ t-tab-root {
         width: var(--rounded);
         height: var(--rounded);
         border-radius: 0 0 100% 0;
-        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--color-main);
+        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2)
+          var(--color-main);
       }
       &::after {
         left: unset;
@@ -264,7 +286,8 @@ t-tab-root {
         width: var(--rounded);
         height: var(--rounded);
         border-radius: 0 0 100% 0;
-        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2) var(--color-hover);
+        box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2)
+          var(--color-hover);
       }
       &::after {
         left: unset;

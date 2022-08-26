@@ -220,7 +220,9 @@ function animate() {
   });
   blackMask.x = -rootContainer.x;
   blackMask.y = -rootContainer.y;
-  const topLeft = new Vec2(selection.toGlobal(new Vec2(minX.value * width.value, minY.value * height.value)));
+  const topLeft = new Vec2(
+    selection.toGlobal(new Vec2(minX.value * width.value, minY.value * height.value)),
+  );
   const bottomRight = new Vec2(topLeft).add(
     new Vec2((maxX.value - minX.value) * width.value, (maxY.value - minY.value) * height.value),
   );
@@ -229,7 +231,12 @@ function animate() {
   blackMask.drawRect(0, 0, stageRect.x, topLeft.y);
   blackMask.drawRect(0, bottomRight.y, stageRect.x, stageRect.y - bottomRight.y);
   blackMask.drawRect(0, topLeft.y, topLeft.x, bottomRight.y - topLeft.y);
-  blackMask.drawRect(bottomRight.x, topLeft.y, stageRect.x - bottomRight.x, bottomRight.y - topLeft.y);
+  blackMask.drawRect(
+    bottomRight.x,
+    topLeft.y,
+    stageRect.x - bottomRight.x,
+    bottomRight.y - topLeft.y,
+  );
   selection.hitArea = new PIXI.Rectangle(
     minX.value * width.value,
     minY.value * height.value,

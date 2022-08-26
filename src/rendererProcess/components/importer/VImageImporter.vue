@@ -44,7 +44,12 @@ onMounted(() => {
             }, fileList).promise;
       const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
       if (dropFromBrowserPetaImageIds) {
-        emit("addPanelByDragAndDrop", dropFromBrowserPetaImageIds, vec2FromPointerEvent(event), true);
+        emit(
+          "addPanelByDragAndDrop",
+          dropFromBrowserPetaImageIds,
+          vec2FromPointerEvent(event),
+          true,
+        );
         return;
       }
       const ids = await API.send("importImagesByDragAndDrop", htmls, arrayBuffers, filePaths);

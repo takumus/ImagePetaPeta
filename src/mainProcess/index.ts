@@ -1,4 +1,14 @@
-import { app, ipcMain, dialog, IpcMainInvokeEvent, shell, session, protocol, nativeImage, nativeTheme } from "electron";
+import {
+  app,
+  ipcMain,
+  dialog,
+  IpcMainInvokeEvent,
+  shell,
+  session,
+  protocol,
+  nativeImage,
+  nativeTheme,
+} from "electron";
 import * as Path from "path";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
@@ -189,7 +199,12 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     try {
       // 時間かかったときのテスト
       // await new Promise((res) => setTimeout(res, 5000));
-      await Promise.all([dbPetaBoard.init(), dbPetaImages.init(), dbPetaTags.init(), dbPetaImagesPetaTags.init()]);
+      await Promise.all([
+        dbPetaBoard.init(),
+        dbPetaImages.init(),
+        dbPetaTags.init(),
+        dbPetaImagesPetaTags.init(),
+      ]);
       await dbPetaTags.ensureIndex({
         fieldName: "id",
         unique: true,
@@ -218,7 +233,10 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       });
       if (await upgradePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
-        await promiseSerial((pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE), petaImagesArray).promise;
+        await promiseSerial(
+          (pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE),
+          petaImagesArray,
+        ).promise;
       }
       if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
@@ -725,7 +743,9 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
-          const files = petaImages.map((petaImage) => Path.resolve(DIR_IMAGES, petaImage.file.original));
+          const files = petaImages.map((petaImage) =>
+            Path.resolve(DIR_IMAGES, petaImage.file.original),
+          );
           if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
             windows.windows.board.moveTop();
           }
@@ -771,7 +791,11 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           try {
             log.log("#ImportImagesByDragAndDrop");
             log.log(htmls.length, arrayBuffers.length, filePaths.length);
-            const petaImages = await petaDatas.importImagesByDragAndDrop(htmls, arrayBuffers, filePaths);
+            const petaImages = await petaDatas.importImagesByDragAndDrop(
+              htmls,
+              arrayBuffers,
+              filePaths,
+            );
             log.log("return:", petaImages.length);
             return petaImages;
           } catch (e) {
@@ -868,7 +892,11 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       dirs.DIR_APP = file.initDirectory(false, app.getPath("userData"));
       dirs.DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
       files.FILE_SETTINGS = file.initFile(dirs.DIR_APP, "settings.json");
-      configSettings = new Config<Settings>(files.FILE_SETTINGS, getDefaultSettings(), upgradeSettings);
+      configSettings = new Config<Settings>(
+        files.FILE_SETTINGS,
+        getDefaultSettings(),
+        upgradeSettings,
+      );
       if (configSettings.data.petaImageDirectory.default) {
         dirs.DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
         configSettings.data.petaImageDirectory.path = dirs.DIR_ROOT;
@@ -906,20 +934,29 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       dbPetaImages = new DB<PetaImage>("petaImages", files.FILE_IMAGES_DB);
       dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
       dbPetaTags = new DB<PetaTag>("petaTags", files.FILE_TAGS_DB);
-      dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", files.FILE_IMAGES_TAGS_DB);
+      dbPetaImagesPetaTags = new DB<PetaImagePetaTag>(
+        "petaImagePetaTag",
+        files.FILE_IMAGES_TAGS_DB,
+      );
       configStates = new Config<States>(files.FILE_STATES, defaultStates, upgradeStates);
-      configWindowStates = new Config<WindowStates>(files.FILE_WINDOW_STATES, defaultWindowStates, upgradeWindowStates);
-      ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach((db) => {
-        db.on("beginCompaction", () => {
-          mainLogger.logChunk().log(`begin compaction(${db.name})`);
-        });
-        db.on("doneCompaction", () => {
-          mainLogger.logChunk().log(`done compaction(${db.name})`);
-        });
-        db.on("compactionError", (error) => {
-          mainLogger.logChunk().error(`compaction error(${db.name})`, error);
-        });
-      });
+      configWindowStates = new Config<WindowStates>(
+        files.FILE_WINDOW_STATES,
+        defaultWindowStates,
+        upgradeWindowStates,
+      );
+      ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach(
+        (db) => {
+          db.on("beginCompaction", () => {
+            mainLogger.logChunk().log(`begin compaction(${db.name})`);
+          });
+          db.on("doneCompaction", () => {
+            mainLogger.logChunk().log(`done compaction(${db.name})`);
+          });
+          db.on("compactionError", (error) => {
+            mainLogger.logChunk().error(`compaction error(${db.name})`, error);
+          });
+        },
+      );
       windows = new Windows(mainLogger, configSettings, configWindowStates, isDarkMode);
       Tasks.onEmitStatus((id, status) => {
         windows.emitMainEvent("taskStatus", id, status);
@@ -973,7 +1010,9 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         .logChunk()
         .log(
           "$Show Error",
-          `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${error.message}`,
+          `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${
+            error.message
+          }`,
         );
     } catch {
       //

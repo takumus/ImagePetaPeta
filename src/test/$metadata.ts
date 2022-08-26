@@ -60,11 +60,17 @@ const fileConfig = require("../../files.config");
           (p) =>
             `<img src="${p.path}" width="256"><br><br>Compressed(${p.palette.length})<div>[` +
             p.palette
-              .map((c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`)
+              .map(
+                (c) =>
+                  `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`,
+              )
               .join("") +
             `]</div><br>All(${p.allPalette.length})<div>[` +
             p.allPalette
-              .map((c) => `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`)
+              .map(
+                (c) =>
+                  `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`,
+              )
               .join("") +
             `]</div><br><br>`,
         )

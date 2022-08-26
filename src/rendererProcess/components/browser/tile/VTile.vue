@@ -26,7 +26,13 @@
             backgroundColor: placeholderColor,
           }"
         ></t-placeholder>
-        <img draggable="false" :src="imageURL" v-show="!loadingImage" loading="lazy" @load="loaded" />
+        <img
+          draggable="false"
+          :src="imageURL"
+          v-show="!loadingImage"
+          loading="lazy"
+          @load="loaded"
+        />
         <t-background> </t-background>
       </t-images>
       <t-tags v-if="settingsStore.state.value.showTagsOnTile">
@@ -211,9 +217,17 @@ function updateContent(tags = false) {
 const visible = computed(() => {
   return props.tile.visible;
 });
-watch([() => props.parentAreaMinY, () => props.parentAreaMaxY, () => props.original, () => props.tile.width], () => {
-  updateContent();
-});
+watch(
+  [
+    () => props.parentAreaMinY,
+    () => props.parentAreaMaxY,
+    () => props.original,
+    () => props.tile.width,
+  ],
+  () => {
+    updateContent();
+  },
+);
 watch([visible, () => props.petaTagInfos, () => settingsStore.state.value.showTagsOnTile], () => {
   updateContent(true);
 });

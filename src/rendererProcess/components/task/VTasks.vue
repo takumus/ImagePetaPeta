@@ -46,7 +46,8 @@ const taskStatusArray = computed(() => {
 });
 const visible = computed(() => {
   return (
-    taskStatusArray.value.length > 0 && (windowStatus.state.value.isMainWindow || windowStatus.state.value.focused)
+    taskStatusArray.value.length > 0 &&
+    (windowStatus.state.value.isMainWindow || windowStatus.state.value.focused)
   );
 });
 const closable = computed(() => {

@@ -173,7 +173,9 @@ const value = computed({
     if (editing.value) {
       return format(props.value || "");
     }
-    return format(props.look !== undefined ? props.look : props.value !== undefined ? props.value : "");
+    return format(
+      props.look !== undefined ? props.look : props.value !== undefined ? props.value : "",
+    );
   },
   set(value: string) {
     value = format(value);

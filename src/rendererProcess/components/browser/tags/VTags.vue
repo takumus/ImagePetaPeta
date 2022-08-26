@@ -93,8 +93,10 @@ async function addTag(name: string) {
 }
 async function removeTag(petaTag: PetaTag) {
   if (
-    (await components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [t("shared.yes"), t("shared.no")])) ===
-    0
+    (await components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [
+      t("shared.yes"),
+      t("shared.no"),
+    ])) === 0
   ) {
     await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
     const index = props.selectedPetaTags.findIndex((pt) => pt === petaTag);
@@ -121,7 +123,16 @@ async function changeTag(petaTag: PetaTag, newName: string) {
 function selectPetaTag(petaTag?: PetaTag) {
   const newData = [...props.selectedPetaTags];
   let single = false;
-  if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+  if (
+    !Keyboards.pressedOR(
+      "ShiftLeft",
+      "ShiftRight",
+      "ControlLeft",
+      "ControlRight",
+      "MetaLeft",
+      "MetaRight",
+    )
+  ) {
     newData.length = 0;
     single = true;
   }
@@ -145,7 +156,8 @@ const browserTags = computed((): BrowserTag[] => {
     return {
       petaTag: petaTagInfo.petaTag,
       count: petaTagInfo.count,
-      selected: props.selectedPetaTags.find((spt) => spt.id === petaTagInfo.petaTag.id) !== undefined,
+      selected:
+        props.selectedPetaTags.find((spt) => spt.id === petaTagInfo.petaTag.id) !== undefined,
       readonly: petaTagInfo.petaTag.id === UNTAGGED_ID,
     };
   });

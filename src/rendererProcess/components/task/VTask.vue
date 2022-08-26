@@ -48,7 +48,9 @@ function changeTaskStatus() {
   currentTaskId.value = props.taskId;
   window.clearTimeout(closeWindowHandler);
   name.value = task.i18nKey + ".name";
-  progress.value = task.progress ? Math.floor((task.progress.current / task.progress.all) * 100) : 0;
+  progress.value = task.progress
+    ? Math.floor((task.progress.current / task.progress.all) * 100)
+    : 0;
   cancelable.value = task.cancelable === true;
   status.value = task.status;
   const i18nKey = `${task.i18nKey}.logs.${task.status}`;
@@ -62,7 +64,9 @@ function changeTaskStatus() {
   }
   addLog(
     `[${task.status}]${
-      task.status === "progress" && task.progress ? `(${task.progress.current}/${task.progress.all})` : ""
+      task.status === "progress" && task.progress
+        ? `(${task.progress.current}/${task.progress.all})`
+        : ""
     }:${localized}`,
   );
   Cursor.setCursor("wait");

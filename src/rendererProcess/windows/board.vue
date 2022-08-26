@@ -17,7 +17,11 @@
           />
         </VTitleBar>
         <VUtilsBar>
-          <VBoardProperty v-if="currentPetaBoard" :board="currentPetaBoard" @update="updatePetaBoard" />
+          <VBoardProperty
+            v-if="currentPetaBoard"
+            :board="currentPetaBoard"
+            @update="updatePetaBoard"
+          />
         </VUtilsBar>
       </t-top>
       <t-browser>
@@ -55,7 +59,11 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
-import { BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y, DEFAULT_IMAGE_SIZE } from "@/commons/defines";
+import {
+  BOARD_ADD_MULTIPLE_OFFSET_X,
+  BOARD_ADD_MULTIPLE_OFFSET_Y,
+  DEFAULT_IMAGE_SIZE,
+} from "@/commons/defines";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { createPetaPanel } from "@/commons/datas/petaPanel";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
@@ -88,7 +96,9 @@ onMounted(async () => {
   AnimatedGIFLoader.add?.();
   petaImagesStore.events.on("update", async (newPetaImages, mode) => {
     const needReload =
-      currentPetaBoard.value === undefined ? false : hasPetaImages(currentPetaBoard.value, newPetaImages);
+      currentPetaBoard.value === undefined
+        ? false
+        : hasPetaImages(currentPetaBoard.value, newPetaImages);
     if (mode === UpdateMode.UPSERT || mode === UpdateMode.REMOVE) {
       if (needReload) {
         const ids = newPetaImages.map((petaImage) => petaImage.id);
@@ -104,7 +114,9 @@ onMounted(async () => {
       vPetaBoard.value?.orderPIXIRender();
     }
   });
-  document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${
+    appInfoStore.state.value.version
+  }`;
   await petaBoardsStore.getPetaBoards();
   await restoreBoard();
   nextTick(() => {
@@ -113,7 +125,8 @@ onMounted(async () => {
 });
 async function restoreBoard() {
   const states = await API.send("getStates");
-  errorPetaBoardId.value = states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
+  errorPetaBoardId.value =
+    states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
   const lastBoard = petaBoardsStore.state.value[states.selectedPetaBoardId];
   selectPetaBoard(lastBoard);
   if (!lastBoard) {
@@ -177,7 +190,12 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
   currentPetaBoardId.value = board.id;
 }
 async function removePetaBoard(board: PetaBoard) {
-  if ((await components.dialog.show(t("boards.removeDialog", [board.name]), [t("shared.yes"), t("shared.no")])) != 0) {
+  if (
+    (await components.dialog.show(t("boards.removeDialog", [board.name]), [
+      t("shared.yes"),
+      t("shared.no"),
+    ])) != 0
+  ) {
     return;
   }
   const index = sortedPetaBoards.value.indexOf(board);
@@ -185,7 +203,9 @@ async function removePetaBoard(board: PetaBoard) {
   const leftBoardId = sortedPetaBoards.value[index - 1]?.id || "";
   await petaBoardsStore.removePetaBoard(board);
   selectPetaBoard(
-    petaBoardsStore.state.value[rightBoardId] || petaBoardsStore.state.value[leftBoardId] || sortedPetaBoards.value[0],
+    petaBoardsStore.state.value[rightBoardId] ||
+      petaBoardsStore.state.value[leftBoardId] ||
+      sortedPetaBoards.value[0],
   );
 }
 async function addPetaBoard() {

@@ -1,7 +1,11 @@
 <template>
   <t-property-root>
     <t-previews ref="previews" v-show="!noImage">
-      <VPropertyThumbnail v-for="data in propertyThumbnails" :key="data.petaImage.id" :propertyThumbnail="data" />
+      <VPropertyThumbnail
+        v-for="data in propertyThumbnails"
+        :key="data.petaImage.id"
+        :propertyThumbnail="data"
+      />
     </t-previews>
     <p>{{ t("browser.property.selectedImage", [petaImages.length]) }}</p>
     <t-buttons v-show="!noImage">

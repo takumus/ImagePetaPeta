@@ -18,7 +18,11 @@
               <input
                 type="checkbox"
                 :checked="statesStore.state.value.groupingByDate"
-                @change="statesStore.state.value.groupingByDate = Boolean(($event.target as HTMLInputElement).checked)"
+                @change="
+                  statesStore.state.value.groupingByDate = Boolean(
+                    ($event.target as HTMLInputElement).checked,
+                  )
+                "
               />
               <span>{{ t("browser.grouping") }}</span>
             </label>
@@ -48,7 +52,11 @@
     </t-center>
     <t-right>
       <VPreview :petaImages="selectedPetaImages" @clearSelectionAll="clearSelectionAll" />
-      <VProperty :petaImages="selectedPetaImages" :petaTagInfos="petaTagInfos" @selectTag="selectTag" />
+      <VProperty
+        :petaImages="selectedPetaImages"
+        :petaTagInfos="petaTagInfos"
+        @selectTag="selectTag"
+      />
       <input
         type="range"
         v-model="thumbnailsSize"
@@ -226,7 +234,14 @@ function resizeImages(rect: DOMRectReadOnly) {
 }
 function drag(petaImage: PetaImage) {
   if (
-    !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight") &&
+    !Keyboards.pressedOR(
+      "ShiftLeft",
+      "ShiftRight",
+      "ControlLeft",
+      "ControlRight",
+      "MetaLeft",
+      "MetaRight",
+    ) &&
     !petaImagesStore.getSelected(petaImage)
   ) {
     clearSelectionAll();
@@ -241,14 +256,24 @@ function selectTile(thumb: Tile, force = false) {
   }
   if (
     selectedPetaImages.value.length < 1 ||
-    !Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")
+    !Keyboards.pressedOR(
+      "ShiftLeft",
+      "ShiftRight",
+      "ControlLeft",
+      "ControlRight",
+      "MetaLeft",
+      "MetaRight",
+    )
   ) {
     // 最初の選択、又は修飾キーなしの場合、最初の選択を保存する
     firstSelectedTile.value = thumb;
   }
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     // 選択サムネイルを反転
-    petaImagesStore.setSelected(thumb.petaImage, !petaImagesStore.getSelected(thumb.petaImage) || force);
+    petaImagesStore.setSelected(
+      thumb.petaImage,
+      !petaImagesStore.getSelected(thumb.petaImage) || force,
+    );
   } else {
     // コントロールキーが押されていなければ選択をリセット
     petaImagesStore.setSelected(thumb.petaImage, true);
@@ -263,8 +288,14 @@ function selectTile(thumb: Tile, force = false) {
       Math.min(firstSelectedTile.value.position.y, thumb.position.y),
     );
     const size = new Vec2(
-      Math.max(firstSelectedTile.value.position.x + firstSelectedTile.value.width, thumb.position.x + thumb.width),
-      Math.max(firstSelectedTile.value.position.y + firstSelectedTile.value.height, thumb.position.y + thumb.height),
+      Math.max(
+        firstSelectedTile.value.position.x + firstSelectedTile.value.width,
+        thumb.position.x + thumb.width,
+      ),
+      Math.max(
+        firstSelectedTile.value.position.y + firstSelectedTile.value.height,
+        thumb.position.y + thumb.height,
+      ),
     )
       .clone()
       .sub(topLeft);
@@ -272,8 +303,14 @@ function selectTile(thumb: Tile, force = false) {
       if (pt.petaImage === undefined) {
         return;
       }
-      let widthDiff = pt.width / 2 + size.x / 2 - Math.abs(pt.position.x + pt.width / 2 - (topLeft.x + size.x / 2));
-      let heightDiff = pt.height / 2 + size.y / 2 - Math.abs(pt.position.y + pt.height / 2 - (topLeft.y + size.y / 2));
+      let widthDiff =
+        pt.width / 2 +
+        size.x / 2 -
+        Math.abs(pt.position.x + pt.width / 2 - (topLeft.x + size.x / 2));
+      let heightDiff =
+        pt.height / 2 +
+        size.y / 2 -
+        Math.abs(pt.position.y + pt.height / 2 - (topLeft.y + size.y / 2));
       if (widthDiff > pt.width) {
         widthDiff = pt.width;
       }
@@ -307,10 +344,10 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
         label: t("browser.petaImageMenu.remove", [selectedPetaImages.value.length]),
         click: async () => {
           if (
-            (await components.dialog.show(t("browser.removeImageDialog", [selectedPetaImages.value.length]), [
-              t("shared.yes"),
-              t("shared.no"),
-            ])) === 0
+            (await components.dialog.show(
+              t("browser.removeImageDialog", [selectedPetaImages.value.length]),
+              [t("shared.yes"), t("shared.no")],
+            )) === 0
           ) {
             await updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);
           }
@@ -345,7 +382,16 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
   );
 }
 async function openDetail(petaImage: PetaImage) {
-  if (Keyboards.pressedOR("ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+  if (
+    Keyboards.pressedOR(
+      "ShiftLeft",
+      "ShiftRight",
+      "ControlLeft",
+      "ControlRight",
+      "MetaLeft",
+      "MetaRight",
+    )
+  ) {
     return;
   }
   await API.send("setDetailsPetaImage", petaImage);
@@ -395,13 +441,15 @@ function selectTag(tag: PetaTag) {
 function updateVisibility(tile: Tile) {
   tile.visible =
     (areaMinY.value < tile.position.y && tile.position.y < areaMaxY.value) ||
-    (areaMinY.value < tile.position.y + tile.height && tile.position.y + tile.height < areaMaxY.value) ||
+    (areaMinY.value < tile.position.y + tile.height &&
+      tile.position.y + tile.height < areaMaxY.value) ||
     (areaMinY.value > tile.position.y && tile.position.y + tile.height > areaMaxY.value);
   tile.preVisible =
     (areaPreVisibleMinY.value < tile.position.y && tile.position.y < areaPreVisibleMaxY.value) ||
     (areaPreVisibleMinY.value < tile.position.y + tile.height &&
       tile.position.y + tile.height < areaPreVisibleMaxY.value) ||
-    (areaPreVisibleMinY.value > tile.position.y && tile.position.y + tile.height > areaPreVisibleMaxY.value);
+    (areaPreVisibleMinY.value > tile.position.y &&
+      tile.position.y + tile.height > areaPreVisibleMaxY.value);
 }
 function keyA() {
   if (isKeyboardLocked()) {
@@ -482,7 +530,8 @@ const tiles = computed((): Tile[] => {
       });
       let newGroup = false;
       const date = new Date(p.addDate);
-      const currentDateString = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+      const currentDateString =
+        date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
       if (prevDateString != currentDateString && statesStore.state.value.groupingByDate) {
         prevDateString = currentDateString;
         mvi = 0;
@@ -530,7 +579,9 @@ const visibleTiles = computed((): Tile[] => {
   return tiles.value.filter((p) => p.preVisible);
 });
 const original = computed(() => {
-  return settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE;
+  return (
+    settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE
+  );
 });
 watch(selectedPetaTags, () => {
   console.log(selectedPetaTags);

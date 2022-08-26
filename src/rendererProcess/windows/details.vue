@@ -14,7 +14,11 @@
           <VBoard :zIndex="1" :board="board" :detailsMode="true" ref="vPetaBoard" />
         </t-board>
         <t-property>
-          <VProperty :petaImages="singlePetaImages" :petaTagInfos="petaTagInfos" @selectTag="() => {}" />
+          <VProperty
+            :petaImages="singlePetaImages"
+            :petaTagInfos="petaTagInfos"
+            @selectTag="() => {}"
+          />
         </t-property>
       </t-browser>
     </t-content>
@@ -44,7 +48,10 @@ import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
-import { BOARD_DARK_BACKGROUND_FILL_COLOR, BOARD_DARK_BACKGROUND_LINE_COLOR } from "@/commons/defines";
+import {
+  BOARD_DARK_BACKGROUND_FILL_COLOR,
+  BOARD_DARK_BACKGROUND_LINE_COLOR,
+} from "@/commons/defines";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
@@ -88,7 +95,9 @@ onMounted(async () => {
     petaImageId.value = petaImage.id;
   });
   petaImageId.value = (await API.send("getDetailsPetaImage"))?.id;
-  title.value = `${t("titles.details")} - ${appInfoStore.state.value.name} ${appInfoStore.state.value.version}`;
+  title.value = `${t("titles.details")} - ${appInfoStore.state.value.name} ${
+    appInfoStore.state.value.version
+  }`;
   document.title = title.value;
   await getPetaTagInfos();
   nextTick(() => {

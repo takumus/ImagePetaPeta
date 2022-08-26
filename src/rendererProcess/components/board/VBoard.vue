@@ -324,7 +324,8 @@ function wheel(event: WheelEvent) {
   const mouse = vec2FromPointerEvent(event).sub(mouseOffset).sub(stageRect.clone().div(2));
   if (event.ctrlKey || systemInfo.value.platform === "win32") {
     const currentZoom = currentBoard.value.transform.scale;
-    currentBoard.value.transform.scale *= 1 + -event.deltaY * settingsStore.state.value.zoomSensitivity * 0.00001;
+    currentBoard.value.transform.scale *=
+      1 + -event.deltaY * settingsStore.state.value.zoomSensitivity * 0.00001;
     if (currentBoard.value.transform.scale > BOARD_ZOOM_MAX) {
       currentBoard.value.transform.scale = BOARD_ZOOM_MAX;
     } else if (currentBoard.value.transform.scale < BOARD_ZOOM_MIN) {
@@ -338,7 +339,9 @@ function wheel(event: WheelEvent) {
       .mult(-1);
   } else {
     currentBoard.value.transform.position.add(
-      new Vec2(event.deltaX, event.deltaY).mult(settingsStore.state.value.moveSensitivity).mult(-0.01),
+      new Vec2(event.deltaX, event.deltaY)
+        .mult(settingsStore.state.value.moveSensitivity)
+        .mult(-0.01),
     );
   }
   updatePetaBoard();
@@ -349,7 +352,13 @@ function updateRect() {
     return;
   }
   crossLine.clear();
-  crossLine.lineStyle(1, Number(currentBoard.value.background.lineColor.replace("#", "0x")), 1, undefined, true);
+  crossLine.lineStyle(
+    1,
+    Number(currentBoard.value.background.lineColor.replace("#", "0x")),
+    1,
+    undefined,
+    true,
+  );
   crossLine.moveTo(-stageRect.x, 0);
   crossLine.lineTo(stageRect.x, 0);
   crossLine.moveTo(0, -stageRect.y);
@@ -393,7 +402,9 @@ function animate() {
         position.set(rootContainer.toLocal(pPanel.toGlobal(position)));
       });
       pPanel.petaPanel._selected =
-        hitTest(pSelection.rect, pPanelRect) && pPanel.petaPanel.visible && !pPanel.petaPanel.locked;
+        hitTest(pSelection.rect, pPanelRect) &&
+        pPanel.petaPanel.visible &&
+        !pPanel.petaPanel.locked;
     });
   }
   pPanelsArray().forEach((pp) => {
@@ -483,7 +494,9 @@ function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
       },
       {
         skip: isMultiple || !_pPanel?.isGIF,
-        label: _pPanel?.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
+        label: _pPanel?.isPlayingGIF
+          ? t("boards.panelMenu.stopGIF")
+          : t("boards.panelMenu.playGIF"),
         click: () => {
           if (_pPanel?.isPlayingGIF) {
             _pPanel.stopGIF();
@@ -566,8 +579,12 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   petaPanel.width *= 1 / currentBoard.value.transform.scale;
   petaPanel.height *= 1 / currentBoard.value.transform.scale;
   petaPanel.position.sub(mouseOffset);
-  petaPanel.position = new Vec2(panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)));
-  petaPanel.index = Math.max(...Object.values(currentBoard.value.petaPanels).map((petaPanel) => petaPanel.index)) + 1;
+  petaPanel.position = new Vec2(
+    panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)),
+  );
+  petaPanel.index =
+    Math.max(...Object.values(currentBoard.value.petaPanels).map((petaPanel) => petaPanel.index)) +
+    1;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   updatePetaBoard();
 }
@@ -594,7 +611,8 @@ function updateCrop(petaPanel?: PetaPanel) {
   const sign = 1;
   petaPanel.height =
     Math.abs(
-      petaPanel.width * ((petaPanel.crop.height * petaImage.height) / (petaPanel.crop.width * petaImage.width)),
+      petaPanel.width *
+        ((petaPanel.crop.height * petaImage.height) / (petaPanel.crop.width * petaImage.width)),
     ) * sign;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   load({
@@ -648,7 +666,11 @@ async function load(params: {
     return;
   }
   const petaPanels = Object.values(currentBoard.value.petaPanels);
-  if (params.reload && params.reload.additions.length === 0 && params.reload.deletions.length === 0) {
+  if (
+    params.reload &&
+    params.reload.additions.length === 0 &&
+    params.reload.deletions.length === 0
+  ) {
     petaPanels.forEach((petaPanel) => {
       const pPanel = pPanels[petaPanel.id];
       if (pPanel) {
@@ -693,7 +715,8 @@ async function load(params: {
           loadProgress.value = Math.floor((loaded / petaPanels.length) * 100);
           const progress = `${loaded}/${petaPanels.length}`;
           extractingLog.value =
-            `load complete   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
+            `load complete   (${minimId(petaPanel.petaImageId)}):${progress}\n` +
+            extractingLog.value;
           if (loaded == petaPanels.length) {
             loading.value = false;
           }
@@ -729,7 +752,11 @@ async function load(params: {
         pPanel.noImage = true;
         loadResult = "delete";
         onLoaded(petaPanel);
-      } else if (params.reload && pPanel.noImage && params.reload.additions.includes(petaPanel.petaImageId)) {
+      } else if (
+        params.reload &&
+        pPanel.noImage &&
+        params.reload.additions.includes(petaPanel.petaImageId)
+      ) {
         // pPanelはあるが、noImageだったら再ロードトライ。
         (async () => {
           try {
@@ -750,10 +777,12 @@ async function load(params: {
         loadResult = "skip";
       }
       log("vBoard", `loaded[${loadResult}](${minimId(petaPanel.petaImageId)}):`, progress);
-      extractingLog.value = `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
+      extractingLog.value =
+        `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
     } catch (error) {
       log("vBoard", `loderr(${minimId(petaPanel.petaImageId)}):`, progress, error);
-      extractingLog.value = `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
+      extractingLog.value =
+        `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
     }
     extractProgress.value = ((index + 1) / petaPanels.length) * 100;
   };
