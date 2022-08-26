@@ -1,5 +1,5 @@
 <template>
-  <t-settings-general-root>
+  <t-settings-content-root>
     <label>
       <input
         type="checkbox"
@@ -28,7 +28,7 @@
       {{ t("settings.show") }}
     </label>
     <p>{{ t("settings.showDescriptions") }}</p>
-  </t-settings-general-root>
+  </t-settings-content-root>
 </template>
 
 <script setup lang="ts">
@@ -40,14 +40,7 @@ const settingsStore = useSettingsStore();
 const { t } = useI18n();
 </script>
 
+<style lang="scss" scoped></style>
 <style lang="scss" scoped>
-t-settings-general-root {
-  text-align: left;
-  display: block;
-  > p {
-    font-size: var(--size-0);
-    margin-left: 16px;
-    word-break: break-word;
-  }
-}
+@import "@/rendererProcess/components/settings/index.scss";
 </style>

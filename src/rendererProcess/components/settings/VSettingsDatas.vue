@@ -1,5 +1,5 @@
 <template>
-  <t-settings-datas-root>
+  <t-settings-content-root>
     <button @click="browsePetaImageDirectory">
       {{ t("settings.browsePetaImageDirectoryButton") }}</button
     ><br />
@@ -17,7 +17,7 @@
       {{ t("settings.changePetaImageDirectoryButton") }}
     </button>
     <p>{{ t("settings.changePetaImageDirectoryDescriptions") }}</p>
-  </t-settings-datas-root>
+  </t-settings-content-root>
 </template>
 
 <script setup lang="ts">
@@ -70,14 +70,7 @@ watch(
 );
 </script>
 
+<style lang="scss" scoped></style>
 <style lang="scss" scoped>
-t-settings-datas-root {
-  text-align: left;
-  display: block;
-  > p {
-    font-size: var(--size-0);
-    margin-left: 16px;
-    word-break: break-word;
-  }
-}
+@import "@/rendererProcess/components/settings/index.scss";
 </style>

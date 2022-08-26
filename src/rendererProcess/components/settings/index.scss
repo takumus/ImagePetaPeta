@@ -1,0 +1,9 @@
+t-settings-content-root {
+  text-align: left;
+  display: block;
+  > p {
+    font-size: var(--size-0);
+    margin-left: 16px;
+    word-break: break-word;
+  }
+}

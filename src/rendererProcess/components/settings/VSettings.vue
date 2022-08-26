@@ -108,7 +108,7 @@ t-settings-root {
   }
   > t-contents {
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     display: block;
     > t-content {

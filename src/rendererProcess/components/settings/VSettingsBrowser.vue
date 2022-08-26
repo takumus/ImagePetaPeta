@@ -1,5 +1,5 @@
 <template>
-  <t-settings-browser-root>
+  <t-settings-content-root>
     <button v-show="regenerateMetadatasCompleted" @click="regenerateMetadatas">
       {{ t("settings.regenerateMetadatasButton") }}
     </button>
@@ -17,7 +17,7 @@
       {{ t("settings.showTagsOnTile") }}
     </label>
     <p>{{ t("settings.showTagsOnTileDescriptions") }}</p>
-  </t-settings-browser-root>
+  </t-settings-content-root>
 </template>
 
 <script setup lang="ts">
@@ -50,14 +50,7 @@ function regenerateMetadatas() {
 }
 </script>
 
+<style lang="scss" scoped></style>
 <style lang="scss" scoped>
-t-settings-browser-root {
-  text-align: left;
-  display: block;
-  > p {
-    font-size: var(--size-0);
-    margin-left: 16px;
-    word-break: break-word;
-  }
-}
+@import "@/rendererProcess/components/settings/index.scss";
 </style>
