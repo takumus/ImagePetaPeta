@@ -55,7 +55,6 @@ const emit = defineEmits<{
 }>();
 
 function editSearchTag(tag: PetaTag, value: string) {
-  console.log("edit:", tag.name, "->", value);
   const index = props.selectedPetaTagIds.findIndex((id) => id === tag.id);
   const _selectedPetaTagIds = [...props.selectedPetaTagIds];
   _selectedPetaTagIds.splice(index, 1);

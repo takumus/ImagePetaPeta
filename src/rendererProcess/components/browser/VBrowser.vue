@@ -437,7 +437,6 @@ async function fetchFilteredPetaImages() {
   ).sort(sort);
 }
 function selectTag(tag: PetaTag) {
-  console.log(tag);
   selectedPetaTagIds.value = [tag.id];
 }
 function updateVisibility(tile: Tile) {
@@ -586,7 +585,6 @@ const original = computed(() => {
   );
 });
 watch(selectedPetaTagIds, () => {
-  console.log(selectedPetaTagIds);
   currentScrollTileId.value = "";
   nextTick(() => {
     if (thumbnails.value) {

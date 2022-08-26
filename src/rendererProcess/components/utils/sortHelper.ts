@@ -63,7 +63,6 @@ export class SortHelper<T extends { data: any; id: number }, C extends { $el: HT
     // this.$emit("update");
   };
   pointermove = (event: PointerEvent) => {
-    // console.log(this.draggingData)
     if (this.draggingDataId === null) {
       return;
     }
@@ -77,7 +76,9 @@ export class SortHelper<T extends { data: any; id: number }, C extends { $el: HT
     this.layerCellDatas
       .map((cellData) => {
         const layerCell =
-          this.dataToId(cellData) === this.draggingDataId ? this.cellDrag : this.dataToComponent(cellData);
+          this.dataToId(cellData) === this.draggingDataId
+            ? this.cellDrag
+            : this.dataToComponent(cellData);
         const layerCellData = cellData;
         return {
           layerCell,

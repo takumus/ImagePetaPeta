@@ -37,7 +37,10 @@ export class PPanel extends PIXI.Sprite {
   private static nsfwTexture?: PIXI.Texture;
   private static noImageTexture?: PIXI.Texture;
   private static loadingTexture?: PIXI.Texture;
-  constructor(public petaPanel: PetaPanel, private petaImagesStore: ReturnType<typeof usePetaImagesStore>) {
+  constructor(
+    public petaPanel: PetaPanel,
+    private petaImagesStore: ReturnType<typeof usePetaImagesStore>,
+  ) {
     super();
     this.anchor.set(0.5, 0.5);
     this.imageWrapper.mask = this.masker;
@@ -96,7 +99,7 @@ export class PPanel extends PIXI.Sprite {
         try {
           this.image.texture = image.texture;
         } catch (error) {
-          // console.log(error);
+          //
         }
         this.noImage = false;
       }
@@ -237,12 +240,14 @@ export class PPanel extends PIXI.Sprite {
         this.loadingTile.visible = this.loading;
       }
       this.cover.visible =
-        this.nsfwTile?.visible || this.noImageTile?.visible || this.loadingTile?.visible ? true : false;
+        this.nsfwTile?.visible || this.noImageTile?.visible || this.loadingTile?.visible
+          ? true
+          : false;
       this.x = this.petaPanel.position.x;
       this.y = this.petaPanel.position.y;
       this.rotation = this.petaPanel.rotation;
     } catch (error) {
-      // console.log(error);
+      //
     }
   }
   public getCorners(offset = 0): [Vec2, Vec2, Vec2, Vec2] {

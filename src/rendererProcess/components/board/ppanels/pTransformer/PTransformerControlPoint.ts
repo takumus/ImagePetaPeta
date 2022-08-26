@@ -69,9 +69,6 @@ export class PTransformerControlPoint extends PIXI.Container {
     this.size.on("pointerdown", () => {
       sizing = true;
     });
-    window.addEventListener("touchend", () => {
-      // console.log("touchend")
-    });
     window.addEventListener("pointerup", () => {
       if (!sizing && !rotating) {
         return;

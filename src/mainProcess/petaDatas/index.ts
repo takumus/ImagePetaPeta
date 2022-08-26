@@ -50,7 +50,10 @@ export class PetaDatas {
       DIR_THUMBNAILS: string;
       DIR_TEMP: string;
     },
-    private emitMainEvent: <U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>) => void,
+    private emitMainEvent: <U extends keyof MainEvents>(
+      key: U,
+      ...args: Parameters<MainEvents[U]>
+    ) => void,
     private mainLogger: MainLogger,
   ) {}
   async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
@@ -73,7 +76,11 @@ export class PetaDatas {
       log.log("removed thumbnail");
       return true;
     }
-    await this.datas.dbPetaImages.update({ id: petaImage.id }, petaImage, mode === UpdateMode.UPSERT);
+    await this.datas.dbPetaImages.update(
+      { id: petaImage.id },
+      petaImage,
+      mode === UpdateMode.UPSERT,
+    );
     log.log("updated");
     return true;
   }
@@ -346,7 +353,11 @@ export class PetaDatas {
       return Path.resolve(this.paths.DIR_THUMBNAILS, petaImage.file.thumbnail);
     }
   }
-  async importImagesByDragAndDrop(htmls: string[], arrayBuffers: ArrayBuffer[], filePaths: string[]) {
+  async importImagesByDragAndDrop(
+    htmls: string[],
+    arrayBuffers: ArrayBuffer[],
+    filePaths: string[],
+  ) {
     let petaImages: PetaImage[] = [];
     const urls: string[] = [];
     const log2 = this.mainLogger.logChunk();
@@ -439,8 +450,8 @@ export class PetaDatas {
           for (let i = 0; i < filePaths.length; i++) {
             const filePath = filePaths[i];
             if (!filePath) continue;
-            const readDirResult = file.readDirRecursive(filePath, (filePaths) => {
-              // console.log(filePaths);
+            const readDirResult = file.readDirRecursive(filePath, () => {
+              //
             });
             handler.onCancel = readDirResult.cancel;
             _filePaths.push(...(await readDirResult.files));
@@ -606,8 +617,12 @@ export class PetaDatas {
             }, pipts).promise;
             log.log(`add "before waifu2x" tag to old petaImage`);
             const name = "before waifu2x";
-            const datePetaTag = (await this.datas.dbPetaTags.find({ name: name }))[0] || createPetaTag(name);
-            await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImage.id, datePetaTag.id), UpdateMode.UPSERT);
+            const datePetaTag =
+              (await this.datas.dbPetaTags.find({ name: name }))[0] || createPetaTag(name);
+            await this.updatePetaImagePetaTag(
+              createPetaImagePetaTag(petaImage.id, datePetaTag.id),
+              UpdateMode.UPSERT,
+            );
             await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
             this.emitMainEvent("updatePetaTags");
           } else {
@@ -646,7 +661,10 @@ export class PetaDatas {
         log.log("buffers:", datas.length);
         let addedFileCount = 0;
         const petaImages: PetaImage[] = [];
-        const importImage = async (data: { buffer: Buffer; name: string; note: string }, index: number) => {
+        const importImage = async (
+          data: { buffer: Buffer; name: string; note: string },
+          index: number,
+        ) => {
           log.log("import:", index + 1, "/", datas.length);
           let result = ImportImageResult.SUCCESS;
           try {

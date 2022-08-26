@@ -63,20 +63,17 @@ onMounted(() => {
   }
 });
 function input(value: string) {
-  console.log("input:", value);
   if (props.readonly) {
     return;
   }
   rawValue.value = format(value);
 }
 function inputFromComplement(value: string) {
-  console.log("complement:", value);
   input(value);
   end(false);
 }
 function backspace() {
   if (rawValue.value === "") {
-    console.log("delete of empty");
     emit("deleteOfEmpty");
   }
 }
@@ -111,10 +108,8 @@ function end(blur: boolean) {
     return;
   }
   if (props.blurToReset && blur) {
-    console.log("end: reset:", value.value);
     restore();
   } else {
-    console.log("end: apply:", rawValue.value);
     value.value = rawValue.value;
   }
   editing.value = false;
@@ -124,7 +119,6 @@ function escape() {
   end(true);
 }
 function edit() {
-  console.log("edit:", value.value);
   editing.value = true;
   forceResetValue();
   textArea.value?.focus();
@@ -189,7 +183,6 @@ const value = computed({
       restore();
       return;
     }
-    console.log("emit:", value);
     emit("update:value", value);
   },
 });

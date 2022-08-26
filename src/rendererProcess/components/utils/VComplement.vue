@@ -149,7 +149,6 @@ watch(
   () => props.editing,
   () => {
     if (props.editing) {
-      console.log("open");
       input();
     }
   },
