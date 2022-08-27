@@ -14,9 +14,9 @@ const ja = {
   },
   utils: {
     downloadUpdateDialog: (ctx: any) => {
-      return `新しいアップデートを発見しました!!!\n現在のバージョン: ${ctx.list(0)}\n最新のバージョン: ${ctx.list(
-        1,
-      )}\n手動でダウンロードしますか?`;
+      return `新しいアップデートを発見しました!!!\n現在のバージョン: ${ctx.list(
+        0,
+      )}\n最新のバージョン: ${ctx.list(1)}\n手動でダウンロードしますか?`;
     },
   },
   utilsBar: {
@@ -34,7 +34,9 @@ const ja = {
       return `ボード"${ctx.list(0)}"を削除しますか?`;
     },
     selectErrorBoardDialog: (ctx: any) => {
-      return `前回、ボード"${ctx.list(0)}"をロード中にアプリが終了されました。\nもう一度読み込みますか?`;
+      return `前回、ボード"${ctx.list(
+        0,
+      )}"をロード中にアプリが終了されました。\nもう一度読み込みますか?`;
     },
     menu: {
       openBrowser: "ブラウザを開く",
@@ -141,7 +143,8 @@ const ja = {
     update: "アップデート",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
-    autoDarkModeDescriptions: "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
+    autoDarkModeDescriptions:
+      "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
     alwaysOnTop: "常に手前に表示",
     show: "を起動時に表示する。",
     showBoard: "ボードのみ",
@@ -182,13 +185,26 @@ const ja = {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;
     },
     changePetaImageDirectoryErrorDialog: (ctx: any) => {
-      return `データの保存先を\n"${ctx.list(0)}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`;
+      return `データの保存先を\n"${ctx.list(
+        0,
+      )}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`;
     },
   },
   imageImporter: {
     cancel: "中止",
   },
   tasks: {
+    error: {
+      name: "エラー",
+      logs: {
+        begin: "",
+        progress: "",
+        complete: "",
+        failed: (ctx: any) => {
+          return `エラー: ${ctx.list(0)}`;
+        },
+      },
+    },
     updateDatas: {
       name: "データを更新しています。",
       logs: {
@@ -212,7 +228,9 @@ const ja = {
       logs: {
         begin: "開始",
         progress: (ctx: any) => {
-          return `${ctx.list(0) === "error" ? "エラー" : ctx.list(0) === "exists" ? "重複" : "追加"}:${ctx.list(1)}`;
+          return `${
+            ctx.list(0) === "error" ? "エラー" : ctx.list(0) === "exists" ? "重複" : "追加"
+          }:${ctx.list(1)}`;
         },
         complete: (ctx: any) => {
           return `${ctx.list(1)}件中${ctx.list(0)}件のインポートに成功しました。`;

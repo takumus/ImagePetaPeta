@@ -24,7 +24,7 @@ export async function generateMetadata(params: {
   console.timeEnd(" rsz");
   const thumbWidth = resizedData.info.width;
   const thumbHeight = resizedData.info.height;
-  const [_, palette] = await Promise.all([
+  const [, palette] = await Promise.all([
     (async () => {
       if (format === "gif") {
         await file.writeFile(params.outputFilePath + ".gif", params.data);
@@ -35,7 +35,10 @@ export async function generateMetadata(params: {
     })(),
     (async () => {
       console.time(" srp");
-      const raw = await sharp(resizedData.data).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      const raw = await sharp(resizedData.data)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
       console.timeEnd(" srp");
       console.time(" plt");
       const palette =

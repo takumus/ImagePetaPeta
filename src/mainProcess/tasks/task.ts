@@ -2,7 +2,11 @@ import { TaskStatus } from "@/commons/api/interfaces/task";
 import { v4 as uuid } from "uuid";
 const tasks: { [id: string]: TaskHandler } = {};
 let emitStatusCallback: ((taskId: string, status: TaskStatus) => void) | undefined;
-export async function spawn<T, K>(name: string, exec: (handler: TaskHandler, params: T) => Promise<K>, params: T) {
+export async function spawn<T, K>(
+  name: string,
+  exec: (handler: TaskHandler, params: T) => Promise<K>,
+  params: T,
+) {
   const id = uuid();
   let done = false;
   const handler: TaskHandler = {
@@ -22,9 +26,19 @@ export async function spawn<T, K>(name: string, exec: (handler: TaskHandler, par
     },
   };
   addTask(handler);
-  const result = await exec(handler, params);
-  removeTask(handler);
-  return result;
+  try {
+    const result = await exec(handler, params);
+    removeTask(handler);
+    return result;
+  } catch (error) {
+    //
+    handler.emitStatus({
+      i18nKey: "tasks.error",
+      log: [String(error)],
+      status: "failed",
+    });
+    throw error;
+  }
 }
 function addTask(task: TaskHandler) {
   tasks[task.id] = task;
