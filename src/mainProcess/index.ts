@@ -10,12 +10,11 @@ import {
   nativeTheme,
 } from "electron";
 import * as Path from "path";
-import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
-import { DEFAULT_BOARD_NAME, PACKAGE_JSON_URL, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import DB from "@/mainProcess/storages/db";
 import { Logger, LogFrom } from "@/mainProcess/storages/logger";
@@ -125,7 +124,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       windows.showWindows();
     }
   });
-  app.on("before-quit", (event) => {
+  app.on("before-quit", () => {
     draggingPreviewWindow.destroy();
   });
   app.on("window-all-closed", () => {
@@ -233,10 +232,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       });
       if (await upgradePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
-        await promiseSerial(
-          (pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE),
-          petaImagesArray,
-        ).promise;
+        await petaDatas.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE);
       }
       if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
@@ -347,11 +343,11 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           return;
         },
-        async getPetaImages(event) {
+        async getPetaImages() {
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImages");
-            const petaImages = await petaDatas.getPetaImages();
+            const petaImages = await petaDatas.petaImages.getPetaImages();
             log.log("return:", true);
             return petaImages;
           } catch (e) {
@@ -366,38 +362,32 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           return {};
         },
         async updatePetaImages(event, datas, mode) {
-          return Tasks.spawn(
-            "UpdatePetaImages",
-            async (handler) => {
-              const log = mainLogger.logChunk();
-              log.log("#Update PetaImages");
-              try {
-                await petaDatas.updatePetaImages(datas, mode);
-                log.log("return:", true);
-                return true;
-              } catch (err) {
-                log.error(err);
-                showError({
-                  category: "M",
-                  code: 200,
-                  title: "Update PetaImages Error",
-                  message: String(err),
-                });
-              }
-              return false;
-            },
-            {},
-          );
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Update PetaImages");
+            await petaDatas.petaImages.updatePetaImages(datas, mode);
+            log.log("return:", true);
+            return true;
+          } catch (err) {
+            log.error(err);
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update PetaImages Error",
+              message: String(err),
+            });
+          }
+          return false;
         },
-        async getPetaBoards(event) {
+        async getPetaBoards() {
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaBoards");
-            const petaBoards = await petaDatas.getPetaBoards();
+            const petaBoards = await petaDatas.petaBoards.getPetaBoards();
             if (Object.keys(petaBoards).length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
-              await petaDatas.updatePetaBoard(board, UpdateMode.UPSERT);
+              await petaDatas.petaBoards.updatePetaBoard(board, UpdateMode.UPSERT);
               petaBoards[board.id] = board;
             }
             log.log("return:", petaBoards.length);
@@ -417,7 +407,10 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaBoards");
-            await promiseSerial((board) => petaDatas.updatePetaBoard(board, mode), boards).promise;
+            await promiseSerial(
+              (board) => petaDatas.petaBoards.updatePetaBoard(board, mode),
+              boards,
+            ).promise;
             log.log("return:", true);
             return true;
           } catch (e) {
@@ -435,8 +428,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaTags");
-            await promiseSerial((tag) => petaDatas.updatePetaTag(tag, mode), tags).promise;
-            windows.emitMainEvent("updatePetaTags");
+            await petaDatas.petaTags.updatePetaTags(tags, mode);
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -454,7 +446,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
-            await petaDatas.updatePetaImagesPetaTags(petaImageIds, petaTagIds, mode);
+            await petaDatas.petaTags.updatePetaImagesPetaTags(petaImageIds, petaTagIds, mode);
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -472,7 +464,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImageIds By PetaTagIds");
-            const ids = await petaDatas.getPetaImageIdsByPetaTagIds(petaTagIds);
+            const ids = await petaDatas.petaTags.getPetaImageIdsByPetaTagIds(petaTagIds);
             log.log("return:", ids.length);
             return ids;
           } catch (error) {
@@ -490,7 +482,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             // log.log("#Get PetaTagIds By PetaImageIds");
-            const petaTagIds = await petaDatas.getPetaTagIdsByPetaImageIds(petaImageIds);
+            const petaTagIds = await petaDatas.petaTags.getPetaTagIdsByPetaImageIds(petaImageIds);
             // log.log("return:", petaTagIds.length);
             return petaTagIds;
           } catch (error) {
@@ -508,7 +500,9 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagInfos");
-            const petaTagInfos = await petaDatas.getPetaTagInfos(i18n.global.t("browser.untagged"));
+            const petaTagInfos = await petaDatas.petaTags.getPetaTagInfos(
+              i18n.global.t("browser.untagged"),
+            );
             log.log("return:", petaTagInfos.length);
             return petaTagInfos;
           } catch (error) {
@@ -536,9 +530,9 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         async openImageFile(event, petaImage) {
           const log = mainLogger.logChunk();
           log.log("#Open Image File");
-          shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
+          shell.showItemInFolder(petaDatas.petaImages.getImagePath(petaImage, ImageType.ORIGINAL));
         },
-        async getAppInfo(event) {
+        async getAppInfo() {
           const log = mainLogger.logChunk();
           log.log("#Get App Info");
           const info = {
@@ -548,13 +542,13 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           log.log("return:", info);
           return info;
         },
-        async showDBFolder(event) {
+        async showDBFolder() {
           const log = mainLogger.logChunk();
           log.log("#Show DB Folder");
           shell.showItemInFolder(DIR_ROOT);
           return true;
         },
-        async showConfigFolder(event) {
+        async showConfigFolder() {
           const log = mainLogger.logChunk();
           log.log("#Show Config Folder");
           shell.showItemInFolder(DIR_APP);
@@ -563,7 +557,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
         async showImageInFolder(event, petaImage) {
           const log = mainLogger.logChunk();
           log.log("#Show Image In Folder");
-          shell.showItemInFolder(petaDatas.getImagePath(petaImage, ImageType.ORIGINAL));
+          shell.showItemInFolder(petaDatas.petaImages.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
         async updateSettings(event, settings) {
@@ -595,7 +589,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           return false;
         },
-        async getSettings(event) {
+        async getSettings() {
           const log = mainLogger.logChunk();
           log.log("#Get Settings");
           log.log("return:", configSettings.data);
@@ -644,17 +638,17 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           log.log("#Toggle Dev Tools");
           windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
         },
-        async getPlatform(event) {
+        async getPlatform() {
           const log = mainLogger.logChunk();
           log.log("#Get Platform");
           log.log("return:", process.platform);
           return process.platform;
         },
-        async regenerateMetadatas(event) {
+        async regenerateMetadatas() {
           const log = mainLogger.logChunk();
           try {
             log.log("#Regenerate Thumbnails");
-            await petaDatas.regenerateMetadatas();
+            await petaDatas.petaImages.regenerateMetadatas();
             return;
           } catch (err) {
             log.error(err);
@@ -716,7 +710,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           return false;
         },
-        async getStates(event) {
+        async getStates() {
           const log = mainLogger.logChunk();
           log.log("#Get States");
           return configStates.data;
@@ -733,11 +727,12 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           return false;
         },
-        async startDrag(event, petaImages, iconSize, iconData) {
+        async startDrag(event, petaImages, iconSize) {
           const first = petaImages[0];
           if (!first) {
             return;
           }
+          const firstPath = Path.resolve(DIR_IMAGES, first.file.original);
           draggingPreviewWindow.createWindow();
           draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
           draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
@@ -751,7 +746,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           }
           draggingPreviewWindow.window?.moveTop();
           event.sender.startDrag({
-            file: files[0]!,
+            file: firstPath,
             files: files,
             icon: nativeImage.createFromDataURL(Transparent),
           });
