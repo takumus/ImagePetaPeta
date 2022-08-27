@@ -37,6 +37,7 @@ export async function spawn<T, K>(
       log: [String(error)],
       status: "failed",
     });
+    removeTask(handler);
     throw error;
   }
 }
