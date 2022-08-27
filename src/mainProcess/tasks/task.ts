@@ -15,14 +15,13 @@ export async function spawn<T, K>(
     isCanceled: false,
     id,
     emitStatus: (status) => {
-      if (silent) {
-        return;
-      }
       if (done) {
         return;
       }
       if (emitStatusCallback) {
-        emitStatusCallback(id, status);
+        if (!silent) {
+          emitStatusCallback(id, status);
+        }
       }
       if (status.status === "failed" || status.status === "complete") {
         done = true;
