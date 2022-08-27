@@ -233,10 +233,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       });
       if (await upgradePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
-        await promiseSerial(
-          (pi) => petaDatas.updatePetaImage(pi, UpdateMode.UPDATE),
-          petaImagesArray,
-        ).promise;
+        await petaDatas.updatePetaImages(petaImagesArray, UpdateMode.UPDATE);
       }
       if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
@@ -435,8 +432,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaTags");
-            await promiseSerial((tag) => petaDatas.updatePetaTag(tag, mode), tags).promise;
-            windows.emitMainEvent("updatePetaTags");
+            await petaDatas.updatePetaTags(tags, mode);
             log.log("return:", true);
             return true;
           } catch (error) {

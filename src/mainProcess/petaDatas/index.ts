@@ -56,7 +56,7 @@ export class PetaDatas {
     ) => void,
     private mainLogger: MainLogger,
   ) {}
-  async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
+  private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaImage");
     log.log("mode:", mode);
@@ -270,14 +270,14 @@ export class PetaDatas {
       image.palette = result.palette;
       image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
       image.metadataVersion = PETAIMAGE_METADATA_VERSION;
-      await this.updatePetaImage(image, UpdateMode.UPDATE);
+      await this.updatePetaImages([image], UpdateMode.UPDATE);
       log.log(`thumbnail (${i + 1} / ${images.length})`);
       this.emitMainEvent("regenerateMetadatasProgress", i + 1, images.length);
     };
     await promiseSerial(generate, images).promise;
     this.emitMainEvent("regenerateMetadatasComplete");
   }
-  async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
+  private async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaTag");
     log.log("mode:", mode);
@@ -291,6 +291,11 @@ export class PetaDatas {
     // tag.petaImages = Array.from(new Set(tag.petaImages));
     await this.datas.dbPetaTags.update({ id: tag.id }, tag, mode === UpdateMode.UPSERT);
     log.log("updated");
+    return true;
+  }
+  async updatePetaTags(tags: PetaTag[], mode: UpdateMode) {
+    await promiseSerial((tag) => this.updatePetaTag(tag, mode), tags).promise;
+    this.emitMainEvent("updatePetaTags");
     return true;
   }
   async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
@@ -328,7 +333,7 @@ export class PetaDatas {
       {},
     );
   }
-  async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
+  private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
     const log = this.mainLogger.logChunk();
     log.log("##Update PetaImagePetaTag");
     log.log("mode:", mode);
@@ -619,12 +624,12 @@ export class PetaDatas {
             const name = "before waifu2x";
             const datePetaTag =
               (await this.datas.dbPetaTags.find({ name: name }))[0] || createPetaTag(name);
-            await this.updatePetaImagePetaTag(
-              createPetaImagePetaTag(petaImage.id, datePetaTag.id),
+            await this.updatePetaTags([datePetaTag], UpdateMode.UPSERT);
+            await this.updatePetaImagesPetaTags(
+              [petaImage.id],
+              [datePetaTag.id],
               UpdateMode.UPSERT,
             );
-            await this.updatePetaTag(datePetaTag, UpdateMode.UPSERT);
-            this.emitMainEvent("updatePetaTags");
           } else {
             success = false;
           }
