@@ -63,6 +63,7 @@ export class PetaDataPetaTags {
         }
       },
       {},
+      false,
     );
   }
   private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {

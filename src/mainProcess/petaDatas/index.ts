@@ -216,6 +216,7 @@ export class PetaDatas {
         return petaImages;
       },
       {},
+      false,
     );
   }
   async waifu2x(petaImages: PetaImage[]) {
@@ -322,6 +323,7 @@ export class PetaDatas {
         return success;
       },
       {},
+      false,
     );
   }
   async importImagesFromBuffers(datas: { buffer: Buffer; name: string; note: string }[]) {
@@ -385,6 +387,7 @@ export class PetaDatas {
         return petaImages;
       },
       {},
+      false,
     );
   }
 }

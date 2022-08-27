@@ -6,6 +6,7 @@ export async function spawn<T, K>(
   name: string,
   exec: (handler: TaskHandler, params: T) => Promise<K>,
   params: T,
+  silent: boolean,
 ) {
   const id = uuid();
   let done = false;
@@ -14,6 +15,9 @@ export async function spawn<T, K>(
     isCanceled: false,
     id,
     emitStatus: (status) => {
+      if (silent) {
+        return;
+      }
       if (done) {
         return;
       }

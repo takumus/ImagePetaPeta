@@ -232,7 +232,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       });
       if (await upgradePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
-        await petaDatas.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE);
+        await petaDatas.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
       }
       if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");

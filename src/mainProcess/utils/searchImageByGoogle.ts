@@ -99,5 +99,6 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
       return true;
     },
     petaImage,
+    false,
   );
 }
