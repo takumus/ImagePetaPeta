@@ -257,11 +257,9 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"],
             });
-            log.log("return:", result.filePaths.length);
             petaDatas.importImagesFromFilePaths(result.filePaths);
             return result.filePaths.length;
           }
-          log.log("window is not ready");
           return 0;
         },
         async importImageDirectories(event) {
@@ -269,19 +267,14 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           log.log("#Browse Image Directories");
           const window = windows.getWindowByEvent(event);
           if (window) {
-            const result = await dialog.showOpenDialog(window.window, {
-              properties: ["openDirectory"],
-            });
-            const filePath = result.filePaths[0];
-            if (!filePath) {
-              log.error("filePath is empty");
-              return 0;
-            }
-            // log.log("return:", files.length);
-            petaDatas.importImagesFromFilePaths([filePath]);
-            return filePath.length;
+            const filePaths = (
+              await dialog.showOpenDialog(window.window, {
+                properties: ["openDirectory"],
+              })
+            ).filePaths;
+            petaDatas.importImagesFromFilePaths(filePaths);
+            return filePaths.length;
           }
-          log.log("window is not ready");
           return 0;
         },
         async importImagesFromClipboard(event, buffers) {
@@ -639,11 +632,12 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           log.log("#Browse PetaImage Directory");
           const window = windows.getWindowByEvent(event);
           if (window) {
-            const file = await dialog.showOpenDialog(window.window, {
-              properties: ["openDirectory"],
-            });
-            const filePath = file.filePaths[0];
-            if (file.canceled || filePath === undefined) {
+            const filePath = (
+              await dialog.showOpenDialog(window.window, {
+                properties: ["openDirectory"],
+              })
+            ).filePaths[0];
+            if (filePath === undefined) {
               return null;
             }
             let path = Path.resolve(filePath);

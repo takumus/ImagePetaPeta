@@ -123,6 +123,9 @@ export class PetaDatas {
     return petaImages.map((petaImage) => petaImage.id);
   }
   async importImagesFromFilePaths(filePaths: string[]) {
+    if (filePaths.length == 0) {
+      return [];
+    }
     return Tasks.spawn(
       "ImportImagesFromFilePaths",
       async (handler) => {
