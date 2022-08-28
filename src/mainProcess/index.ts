@@ -10,48 +10,32 @@ import {
   nativeTheme,
 } from "electron";
 import * as Path from "path";
-import { v4 as uuid } from "uuid";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { DEFAULT_BOARD_NAME, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
-import DB from "@/mainProcess/storages/db";
-import { Logger, LogFrom } from "@/mainProcess/storages/logger";
-import Config from "@/mainProcess/storages/config";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
+import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
-import { defaultStates, States } from "@/commons/datas/states";
 import {
   upgradePetaImage,
   upgradePetaTag,
   upgradePetaImagesPetaTags,
-  upgradeSettings,
-  upgradeStates,
-  upgradeWindowStates,
 } from "@/mainProcess/utils/upgrader";
 import { arrLast } from "@/commons/utils/utils";
-import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
-import { PetaTag } from "@/commons/datas/petaTag";
-import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
-import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
-import { getLatestVersion, isLatest } from "@/commons/utils/versions";
+import { getLatestVersion } from "@/commons/utils/versions";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
 import { DraggingPreviewWindow } from "@/mainProcess/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
-import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
 import { searchImageByGoogle } from "@/mainProcess/utils/searchImageByGoogle";
-import { Windows } from "@/mainProcess/utils/windows";
-import { DBInfo } from "@/commons/datas/dbInfo";
+import { getConstants } from "@/mainProcess/constants";
+import { LogFrom } from "@/mainProcess/storages/logger";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -65,7 +49,6 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  const mainLogger = new MainLogger();
   const draggingPreviewWindow = new DraggingPreviewWindow();
   const i18n = createI18n({
     locale: "ja",
@@ -81,7 +64,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     ファイルパスとDBの、検証・読み込み・作成
   */
   //-------------------------------------------------------------------------------------------------//
-  const constants = getConstants();
+  const constants = getConstants(showError);
   if (constants === undefined) {
     return;
   }
@@ -100,6 +83,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     configDBInfo,
     petaDatas,
     windows,
+    mainLogger,
   } = constants;
   //-------------------------------------------------------------------------------------------------//
   /*
@@ -187,7 +171,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
     nativeTheme.on("updated", () => {
-      emitDarkMode();
+      windows.emitMainEvent("darkMode", isDarkMode());
     });
     windows.showWindows();
     //-------------------------------------------------------------------------------------------------//
@@ -273,10 +257,6 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"],
             });
-            if (result.canceled) {
-              log.log("canceled");
-              return 0;
-            }
             log.log("return:", result.filePaths.length);
             petaDatas.importImagesFromFilePaths(result.filePaths);
             return result.filePaths.length;
@@ -292,10 +272,6 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"],
             });
-            if (result.canceled) {
-              log.log("canceled");
-              return 0;
-            }
             const filePath = result.filePaths[0];
             if (!filePath) {
               log.error("filePath is empty");
@@ -407,10 +383,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaBoards");
-            await promiseSerial(
-              (board) => petaDatas.petaBoards.updatePetaBoard(board, mode),
-              boards,
-            ).promise;
+            await petaDatas.petaBoards.updatePetaBoards(boards, mode);
             log.log("return:", true);
             return true;
           } catch (e) {
@@ -575,7 +548,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             configSettings.save();
             windows.emitMainEvent("updateSettings", settings);
             windows.emitMainEvent("showNSFW", getShowNSFW());
-            emitDarkMode();
+            windows.emitMainEvent("darkMode", isDarkMode());
             log.log("return:", configSettings.data);
             return true;
           } catch (e) {
@@ -669,12 +642,8 @@ import { DBInfo } from "@/commons/datas/dbInfo";
             const file = await dialog.showOpenDialog(window.window, {
               properties: ["openDirectory"],
             });
-            if (file.canceled) {
-              log.log("canceled");
-              return null;
-            }
             const filePath = file.filePaths[0];
-            if (!filePath) {
+            if (file.canceled || filePath === undefined) {
               return null;
             }
             let path = Path.resolve(filePath);
@@ -848,170 +817,7 @@ import { DBInfo } from "@/commons/datas/dbInfo";
     色々な関数
   */
   //-------------------------------------------------------------------------------------------------//
-  function getConstants() {
-    const dirs = {
-      DIR_ROOT: "",
-      DIR_APP: "",
-      DIR_LOG: "",
-      DIR_IMAGES: "",
-      DIR_THUMBNAILS: "",
-      DIR_TEMP: "",
-    };
-    const files = {
-      FILE_IMAGES_DB: "",
-      FILE_BOARDS_DB: "",
-      FILE_TAGS_DB: "",
-      FILE_IMAGES_TAGS_DB: "",
-      FILE_SETTINGS: "",
-      FILE_STATES: "",
-      FILE_WINDOW_STATES: "",
-      FILE_DBINFO: "",
-    };
-    let dataLogger: Logger;
-    let dbPetaImages: DB<PetaImage>;
-    let dbPetaBoard: DB<PetaBoard>;
-    let dbPetaTags: DB<PetaTag>;
-    let dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
-    let configDBInfo: Config<DBInfo>;
-    let configSettings: Config<Settings>;
-    let configStates: Config<States>;
-    let configWindowStates: Config<WindowStates>;
-    let petaDatas: PetaDatas;
-    let windows: Windows;
-    try {
-      // ログは最優先で初期化
-      dirs.DIR_LOG = file.initDirectory(false, app.getPath("logs"));
-      dataLogger = new Logger(dirs.DIR_LOG);
-      mainLogger.logger = dataLogger;
-      // その他の初期化
-      dirs.DIR_APP = file.initDirectory(false, app.getPath("userData"));
-      dirs.DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
-      files.FILE_SETTINGS = file.initFile(dirs.DIR_APP, "settings.json");
-      configSettings = new Config<Settings>(
-        files.FILE_SETTINGS,
-        getDefaultSettings(),
-        upgradeSettings,
-      );
-      if (configSettings.data.petaImageDirectory.default) {
-        dirs.DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
-        configSettings.data.petaImageDirectory.path = dirs.DIR_ROOT;
-      } else {
-        try {
-          if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
-            throw new Error();
-          }
-          dirs.DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
-        } catch (error) {
-          configSettings.data.petaImageDirectory.default = true;
-          configSettings.save();
-          throw new Error(
-            `Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`,
-          );
-        }
-      }
-      dirs.DIR_IMAGES = file.initDirectory(true, dirs.DIR_ROOT, "images");
-      dirs.DIR_THUMBNAILS = file.initDirectory(true, dirs.DIR_ROOT, "thumbnails");
-      files.FILE_IMAGES_DB = file.initFile(dirs.DIR_ROOT, "images.db");
-      files.FILE_BOARDS_DB = file.initFile(dirs.DIR_ROOT, "boards.db");
-      files.FILE_TAGS_DB = file.initFile(dirs.DIR_ROOT, "tags.db");
-      files.FILE_IMAGES_TAGS_DB = file.initFile(dirs.DIR_ROOT, "images_tags.db");
-      files.FILE_STATES = file.initFile(dirs.DIR_APP, "states.json");
-      files.FILE_DBINFO = file.initFile(dirs.DIR_ROOT, "dbInfo.json");
-      files.FILE_WINDOW_STATES = file.initFile(dirs.DIR_APP, "windowStates.json");
-      configDBInfo = new Config<DBInfo>(files.FILE_DBINFO, { version: app.getVersion() });
-      if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
-        throw new Error(
-          `DB version is higher than App version. \nDB version:${
-            configDBInfo.data.version
-          }\nApp version:${app.getVersion()}`,
-        );
-      }
-      dbPetaImages = new DB<PetaImage>("petaImages", files.FILE_IMAGES_DB);
-      dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
-      dbPetaTags = new DB<PetaTag>("petaTags", files.FILE_TAGS_DB);
-      dbPetaImagesPetaTags = new DB<PetaImagePetaTag>(
-        "petaImagePetaTag",
-        files.FILE_IMAGES_TAGS_DB,
-      );
-      configStates = new Config<States>(files.FILE_STATES, defaultStates, upgradeStates);
-      configWindowStates = new Config<WindowStates>(
-        files.FILE_WINDOW_STATES,
-        defaultWindowStates,
-        upgradeWindowStates,
-      );
-      ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach(
-        (db) => {
-          db.on("beginCompaction", () => {
-            mainLogger.logChunk().log(`begin compaction(${db.name})`);
-          });
-          db.on("doneCompaction", () => {
-            mainLogger.logChunk().log(`done compaction(${db.name})`);
-          });
-          db.on("compactionError", (error) => {
-            mainLogger.logChunk().error(`compaction error(${db.name})`, error);
-          });
-        },
-      );
-      windows = new Windows(mainLogger, configSettings, configWindowStates, isDarkMode);
-      Tasks.onEmitStatus((id, status) => {
-        windows.emitMainEvent("taskStatus", id, status);
-      });
-      petaDatas = new PetaDatas(
-        {
-          dbPetaBoard,
-          dbPetaImages,
-          dbPetaImagesPetaTags,
-          dbPetaTags,
-          configSettings,
-        },
-        dirs,
-        windows.emitMainEvent.bind(windows),
-        mainLogger,
-      );
-    } catch (err) {
-      //-------------------------------------------------------------------------------------------------//
-      /*
-        何らかの原因でファイルとディレクトリの準備が失敗した場合
-        エラー画面を出してアプリ終了
-      */
-      //-------------------------------------------------------------------------------------------------//
-      showError({
-        category: "M",
-        code: 1,
-        title: "Initialization Error",
-        message: String(err),
-      });
-      return undefined;
-    }
-    return {
-      ...dirs,
-      ...files,
-      dataLogger,
-      dbPetaImages,
-      dbPetaBoard,
-      dbPetaTags,
-      dbPetaImagesPetaTags,
-      configDBInfo,
-      configSettings,
-      configStates,
-      configWindowStates,
-      petaDatas,
-      windows,
-    };
-  }
   function showError(error: ErrorWindowParameters, quit = true) {
-    try {
-      mainLogger
-        .logChunk()
-        .log(
-          "$Show Error",
-          `code:${error.code}\ntitle: ${error.title}\nversion: ${app.getVersion()}\nmessage: ${
-            error.message
-          }`,
-        );
-    } catch {
-      //
-    }
     try {
       Object.values(windows.windows).forEach((window) => {
         if (window !== undefined && !window.isDestroyed()) {
@@ -1051,9 +857,6 @@ import { DBInfo } from "@/commons/datas/dbInfo";
       return nativeTheme.shouldUseDarkColors;
     }
     return configSettings.data.darkMode;
-  }
-  function emitDarkMode() {
-    windows.emitMainEvent("darkMode", isDarkMode());
   }
   function getShowNSFW() {
     return temporaryShowNSFW || configSettings.data.alwaysShowNSFW;
