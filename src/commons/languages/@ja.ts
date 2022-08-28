@@ -103,13 +103,19 @@ const ja = {
       clearSelectionButton: "選択解除",
       openDetailsButton: "詳細",
       clearSelectionDialog: "選択解除しますか?",
-      tags: "タグ一覧",
+      tags: "タグ",
       infos: {
-        label: "情報",
+        label: "基本情報",
         addDate: "追加日",
         fileDate: "変更日",
         note: "ノート",
         name: "名前",
+      },
+      colors: {
+        label: "色",
+      },
+      nsfw: {
+        label: "NSFW",
       },
     },
     untagged: "未分類",

@@ -29,6 +29,15 @@
               />
               <span>{{ t("browser.grouping") }}</span>
             </label>
+            <input
+              type="range"
+              v-model="thumbnailsSize"
+              tabindex="-1"
+              @change="updateTileSize(Number(($event.target as HTMLInputElement).value))"
+              :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
+              :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX"
+              :step="defines.BROWSER_THUMBNAIL_ZOOM_STEP"
+            />
           </t-buttons>
         </t-top>
         <t-tiles ref="thumbnails">
@@ -59,15 +68,6 @@
         :petaImages="selectedPetaImages"
         :petaTagInfos="petaTagsStore.state.value"
         @selectTag="selectTag"
-      />
-      <input
-        type="range"
-        v-model="thumbnailsSize"
-        tabindex="-1"
-        @change="updateTileSize(Number(($event.target as HTMLInputElement).value))"
-        :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
-        :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX"
-        :step="defines.BROWSER_THUMBNAIL_ZOOM_STEP"
       />
     </t-right>
   </t-browser-root>

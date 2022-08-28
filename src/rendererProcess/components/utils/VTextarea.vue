@@ -201,6 +201,7 @@ defineExpose({
 t-textarea-root {
   display: inline-block;
   min-width: 16px;
+  position: relative;
   > t-textarea {
     line-height: var(--size-2);
     min-height: var(--size-2);
@@ -209,10 +210,24 @@ t-textarea-root {
     white-space: pre-wrap;
     word-break: break-word;
     overflow: hidden;
+    outline: none;
+    border-radius: 2px;
     &.editing {
       cursor: unset;
-      padding: 0px 3px;
+      outline: solid 2px var(--color-font);
+      outline-offset: 1px;
     }
   }
+  // &::before {
+  //   content: "";
+  //   position: absolute;
+  //   top: 0px;
+  //   left: 0px;
+  //   width: 100%;
+  //   height: 100%;
+  //   border-radius: var(--rounded);
+  //   pointer-events: none;
+  //   background-color: rgba($color: #ff0000, $alpha: 0.5);
+  // }
 }
 </style>

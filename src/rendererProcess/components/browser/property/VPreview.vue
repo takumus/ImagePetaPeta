@@ -1,5 +1,5 @@
 <template>
-  <t-property-root>
+  <t-previews-root>
     <t-previews ref="previews" v-show="!noImage">
       <VPropertyThumbnail
         v-for="data in propertyThumbnails"
@@ -16,7 +16,7 @@
         {{ t("browser.property.openDetailsButton") }}
       </button>
     </t-buttons>
-  </t-property-root>
+  </t-previews-root>
 </template>
 
 <script setup lang="ts">
@@ -115,13 +115,14 @@ const noImage = computed<boolean>(() => {
 </script>
 
 <style lang="scss" scoped>
-t-property-root {
+t-previews-root {
   width: 100%;
   // color: #333333;
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  flex-shrink: 2;
+  // overflow-y: auto;
   > t-previews {
     position: relative;
     width: 100%;

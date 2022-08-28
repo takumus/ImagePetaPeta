@@ -1,7 +1,7 @@
 <template>
   <t-property-root>
-    <t-infos v-if="singlePetaImageInfo">
-      <p>{{ t("browser.property.infos.label") }}{{ darkModeStore.state }}</p>
+    <t-infos v-if="singlePetaImageInfo" class="content">
+      <p>{{ t("browser.property.infos.label") }}</p>
       <t-datas>
         <t-data>
           <t-name>{{ t("browser.property.infos.name") }}</t-name>
@@ -41,6 +41,9 @@
           <t-value>{{ singlePetaImageInfo.addDate }}</t-value>
         </t-data>
       </t-datas>
+    </t-infos>
+    <t-colors v-if="singlePetaImageInfo" class="content">
+      <p>{{ t("browser.property.colors.label") }}</p>
       <t-palette>
         <t-color-background>
           <t-color
@@ -54,8 +57,8 @@
           </t-color>
         </t-color-background>
       </t-palette>
-    </t-infos>
-    <t-tags v-show="!noImage">
+    </t-colors>
+    <t-tags v-show="!noImage" class="content">
       <p>{{ t("browser.property.tags") }}</p>
       <t-search-box v-if="!fetchingTags">
         <t-tag v-for="tag in sharedPetaTags" :key="tag.id">
@@ -93,7 +96,8 @@
         </li>
       </ul>
     </t-tags>
-    <section v-show="!noImage">
+    <t-nsfw v-show="!noImage" class="content">
+      <p>{{ t("browser.property.nsfw.label") }}</p>
       <label>
         <input
           type="checkbox"
@@ -101,9 +105,8 @@
           :checked="nsfw"
           @change="changeNSFW(Boolean(($event.target as HTMLInputElement).checked))"
         />
-        NSFW
       </label>
-    </section>
+    </t-nsfw>
   </t-property-root>
 </template>
 
@@ -123,7 +126,6 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
-import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
@@ -142,7 +144,6 @@ const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
-const darkModeStore = useDarkModeStore();
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
   let petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === name)?.petaTag;
@@ -293,24 +294,29 @@ watch(
 
 <style lang="scss" scoped>
 t-property-root {
-  flex: 1;
   width: 100%;
-  height: 100%;
   // color: #333333;
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  > .content {
+    > p {
+      text-decoration: underline;
+      font-weight: bold;
+    }
+  }
   > t-infos {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     > t-datas {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
       > t-data {
         display: flex;
-        margin-bottom: 8px;
-        &:last-child {
-          margin-bottom: 0px;
-        }
+        margin: 4px 0px;
         > t-name {
           display: block;
           width: 40%;
@@ -341,7 +347,8 @@ t-property-root {
         }
       }
     }
-    display: block;
+  }
+  > t-colors {
     > t-palette {
       pointer-events: none;
       padding: 8px;
@@ -362,10 +369,10 @@ t-property-root {
     }
   }
   > t-tags {
-    flex-grow: 1;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    min-height: 128px;
     > t-search-box {
       outline: none;
       padding: 4px 4px 0px 0px;
@@ -389,6 +396,9 @@ t-property-root {
           flex: 1 1 64px;
         }
       }
+    }
+    > t-nsfw {
+      display: block;
     }
   }
   p {
