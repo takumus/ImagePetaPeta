@@ -209,7 +209,6 @@ t-textarea-root {
     display: inline-block;
     white-space: pre-wrap;
     word-break: break-word;
-    overflow: hidden;
     outline: none;
     border-radius: 2px;
     &.editing {
