@@ -130,15 +130,16 @@ import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
+import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
 }>();
 const props = defineProps<{
   petaImages: PetaImage[];
-  petaTagInfos: PetaTagInfo[];
 }>();
 const textsStore = useTextsStore();
+const petaTagsStore = usePetaTagsStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const fetchingTags = ref(false);
@@ -146,7 +147,7 @@ const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
-  let petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === name)?.petaTag;
+  let petaTag = petaTagsStore.state.value.find((pti) => pti.petaTag.name === name)?.petaTag;
   // リクエスト2回飛ばさない
   if (!petaTag) {
     petaTag = createPetaTag(name);
@@ -214,7 +215,7 @@ async function fetchPetaTags() {
     "getPetaTagIdsByPetaImageIds",
     props.petaImages.map((petaImage) => petaImage.id),
   );
-  sharedPetaTags.value = props.petaTagInfos
+  sharedPetaTags.value = petaTagsStore.state.value
     .filter((pti) => result.find((id) => id === pti.petaTag.id))
     .map((pi) => pi.petaTag);
   fetchingTags.value = false;
@@ -265,7 +266,7 @@ const nsfw = computed(() => {
   return undefined;
 });
 const complements = computed(() => {
-  return props.petaTagInfos
+  return petaTagsStore.state.value
     .filter((pti) => {
       return pti.petaTag.id !== UNTAGGED_ID;
     })
@@ -284,12 +285,15 @@ watch(
     }
   },
 );
-watch(
-  () => props.petaTagInfos,
-  () => {
+petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
+  if (
+    petaImageIds.find((id) => props.petaImages.find((petaImage) => petaImage.id === id)) ||
+    petaTagIds.find((id) => sharedPetaTags.value.find((petaTag) => petaTag.id === id)) ||
+    fetchingTags.value
+  ) {
     fetchPetaTags();
-  },
-);
+  }
+});
 </script>
 
 <style lang="scss" scoped>

@@ -70,7 +70,11 @@ export class PetaDataPetaImages {
         };
         await promiseSerial(update, datas).promise;
         if (mode === UpdateMode.REMOVE) {
-          this.parent.emitMainEvent("updatePetaTags");
+          // Tileの更新対象なし
+          this.parent.emitMainEvent("updatePetaTags", {
+            petaImageIds: [],
+            petaTagIds: [],
+          });
         }
         this.parent.emitMainEvent("updatePetaImages", datas, mode);
         handler.emitStatus({

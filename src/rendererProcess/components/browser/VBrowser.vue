@@ -50,7 +50,6 @@
               :key="data.id"
               :tile="data"
               :original="original"
-              :petaTagInfos="petaTagsStore.state.value"
               :parentAreaMinY="areaMinY"
               :parentAreaMaxY="areaMaxY"
               @select="selectTile"
@@ -64,11 +63,7 @@
     </t-center>
     <t-right>
       <VPreview :petaImages="selectedPetaImages" @clearSelectionAll="clearSelectionAll" />
-      <VProperty
-        :petaImages="selectedPetaImages"
-        :petaTagInfos="petaTagsStore.state.value"
-        @selectTag="selectTag"
-      />
+      <VProperty :petaImages="selectedPetaImages" @selectTag="selectTag" />
     </t-right>
   </t-browser-root>
 </template>

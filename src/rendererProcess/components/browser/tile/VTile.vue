@@ -65,7 +65,6 @@ import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
 import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import {
   BROWSER_FETCH_TAGS_DELAY,
   BROWSER_FETCH_TAGS_DELAY_RANDOM,
@@ -77,6 +76,7 @@ import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
@@ -87,13 +87,13 @@ const emit = defineEmits<{
 const props = defineProps<{
   tile: Tile;
   original: boolean;
-  petaTagInfos: PetaTagInfo[];
   parentAreaMinY: number;
   parentAreaMaxY: number;
 }>();
 const nsfwStore = useNSFWStore();
 const settingsStore = useSettingsStore();
 const petaImagesStore = usePetaImagesStore();
+const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const imageURL = ref("");
 const loadingImage = ref(true);
@@ -104,8 +104,10 @@ const click: ClickChecker = new ClickChecker();
 let loadOriginalTimeoutHandler = -1;
 let fetchTagsTimeoutHandler = -1;
 let pressing = false;
+const fetchingPetaTags = ref(false);
 onMounted(() => {
-  updateContent(true);
+  delayedUpdateImage();
+  delayedFetchPetaTags();
 });
 onUnmounted(() => {
   window.removeEventListener("pointermove", pointermove);
@@ -185,33 +187,31 @@ async function fetchPetaTags() {
     return;
   }
   const result = await API.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
-  myPetaTags.value = props.petaTagInfos
+  myPetaTags.value = petaTagsStore.state.value
     .filter((petaTagInfo) => result.find((id) => id === petaTagInfo.petaTag.id))
     .map((pti) => pti.petaTag);
   loadingTags.value = false;
 }
-function updateContent(tags = false) {
-  if (props.tile.visible) {
-    if (tags) {
-      window.clearTimeout(fetchTagsTimeoutHandler);
-      fetchTagsTimeoutHandler = window.setTimeout(() => {
-        fetchPetaTags();
-      }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
+function delayedFetchPetaTags() {
+  window.clearTimeout(fetchTagsTimeoutHandler);
+  fetchingPetaTags.value = true;
+  fetchTagsTimeoutHandler = window.setTimeout(() => {
+    if (props.tile.visible) {
+      fetchPetaTags();
     }
-    if (!loadedOriginal.value) {
-      imageURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
-      if (props.original) {
-        window.clearTimeout(loadOriginalTimeoutHandler);
-        loadOriginalTimeoutHandler = window.setTimeout(() => {
-          imageURL.value = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
-          loadedOriginal.value = true;
-        }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
+    fetchingPetaTags.value = false;
+  }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
+}
+function delayedUpdateImage() {
+  window.clearTimeout(loadOriginalTimeoutHandler);
+  imageURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
+  if (props.original) {
+    loadOriginalTimeoutHandler = window.setTimeout(() => {
+      if (props.tile.visible) {
+        imageURL.value = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
+        loadedOriginal.value = true;
       }
-    }
-  } else {
-    loadedOriginal.value = false;
-    window.clearTimeout(fetchTagsTimeoutHandler);
-    window.clearTimeout(loadOriginalTimeoutHandler);
+    }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
   }
 }
 const visible = computed(() => {
@@ -225,11 +225,20 @@ watch(
     () => props.tile.width,
   ],
   () => {
-    updateContent();
+    delayedUpdateImage();
   },
 );
-watch([visible, () => props.petaTagInfos, () => settingsStore.state.value.showTagsOnTile], () => {
-  updateContent(true);
+watch([visible, () => settingsStore.state.value.showTagsOnTile], () => {
+  delayedFetchPetaTags();
+});
+petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
+  if (
+    petaImageIds.find((id) => id === props.tile.petaImage?.id) ||
+    petaTagIds.find((id) => myPetaTags.value.find((petaTag) => petaTag.id === id)) ||
+    fetchingPetaTags.value
+  ) {
+    delayedFetchPetaTags();
+  }
 });
 </script>
 

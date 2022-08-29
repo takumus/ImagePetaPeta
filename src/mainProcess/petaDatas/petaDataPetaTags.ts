@@ -27,7 +27,11 @@ export class PetaDataPetaTags {
   }
   async updatePetaTags(tags: PetaTag[], mode: UpdateMode) {
     await promiseSerial((tag) => this.updatePetaTag(tag, mode), tags).promise;
-    this.parent.emitMainEvent("updatePetaTags");
+    // Tileの更新対象は、PetaTagIdsのみ。
+    this.parent.emitMainEvent("updatePetaTags", {
+      petaTagIds: tags.map((tag) => tag.id),
+      petaImageIds: [],
+    });
     return true;
   }
   async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
@@ -58,9 +62,11 @@ export class PetaDataPetaTags {
           status: "complete",
           log: [],
         });
-        if (mode != UpdateMode.UPDATE) {
-          this.parent.emitMainEvent("updatePetaTags");
-        }
+        // Tileの更新対象はPetaImageIdsのみ。
+        this.parent.emitMainEvent("updatePetaTags", {
+          petaTagIds: [],
+          petaImageIds,
+        });
       },
       {},
       false,
