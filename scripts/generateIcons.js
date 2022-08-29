@@ -3,8 +3,20 @@ script.run("generate icons", async () => {
   const IconIco = require("@shockpkg/icon-encoder").IconIco;
   const sharp = require("sharp");
   const Path = require("path");
-  async function exportImage(from, to, size) {
-    return script.utils.write(to, await sharp(from).resize(size).toBuffer());
+  async function exportImageWithMargin(from, to, size, margin) {
+    const withYMargin = await sharp(from)
+      .resize(size - margin * 2, size, {
+        fit: "contain",
+        background: "#00000000",
+      })
+      .toBuffer();
+    const withXMargin = await sharp(withYMargin)
+      .resize(size, size, {
+        fit: "contain",
+        background: "#00000000",
+      })
+      .toBuffer();
+    return script.utils.write(to, withXMargin);
   }
   async function exportIcon(from, to, sizes) {
     const ico = new IconIco();
@@ -22,32 +34,12 @@ script.run("generate icons", async () => {
       [16, 32, 48, 64, 128, 256],
     ),
   );
-  // log(
-  //   await exportImage(
-  //     "./rawAssets/icon/icon.png",
-  //     Path.resolve(files.output.electron.resources.dir, "Square44x44Logo.png"),
-  //     44,
-  //   ),
-  // );
-  // log(
-  //   await exportImage(
-  //     "./rawAssets/icon/icon.png",
-  //     Path.resolve(files.output.electron.resources.dir, "Square150x150Logo.png"),
-  //     150,
-  //   ),
-  // );
-  // log(
-  //   await exportImage(
-  //     "./rawAssets/icon/icon.png",
-  //     Path.resolve(files.output.electron.resources.dir, "StoreLogo.png"),
-  //     50,
-  //   ),
-  // );
   script.utils.log(
-    await exportImage(
+    await exportImageWithMargin(
       "./rawAssets/icon/icon.png",
       Path.resolve(script.files.output.electron.resources.mac.appIcon),
       512,
+      50,
     ),
   );
 });
