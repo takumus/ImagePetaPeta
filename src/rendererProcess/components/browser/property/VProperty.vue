@@ -146,7 +146,7 @@ const note = ref("");
 const sharedPetaTags = ref<PetaTag[]>([]);
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
-  let petaTag = petaTagsStore.state.value.find((pti) => pti.petaTag.name === name)?.petaTag;
+  let petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === name);
   // リクエスト2回飛ばさない
   if (!petaTag) {
     petaTag = createPetaTag(name);
@@ -214,9 +214,9 @@ async function fetchPetaTags() {
     "getPetaTagIdsByPetaImageIds",
     props.petaImages.map((petaImage) => petaImage.id),
   );
-  sharedPetaTags.value = petaTagsStore.state.value
-    .filter((pti) => result.find((id) => id === pti.petaTag.id))
-    .map((pi) => pi.petaTag);
+  sharedPetaTags.value = petaTagsStore.state.petaTags.value
+    .filter((pti) => result.find((id) => id === pti.id))
+    .map((pi) => pi);
   fetchingTags.value = false;
 }
 const singlePetaImageInfo = computed(() => {
@@ -265,12 +265,12 @@ const nsfw = computed(() => {
   return undefined;
 });
 const complements = computed(() => {
-  return petaTagsStore.state.value
+  return petaTagsStore.state.petaTags.value
     .filter((pti) => {
-      return pti.petaTag.id !== UNTAGGED_ID;
+      return pti.id !== UNTAGGED_ID;
     })
     .map((pti) => {
-      return pti.petaTag.name;
+      return pti.name;
     });
 });
 watch(

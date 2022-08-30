@@ -52,22 +52,22 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { API } from "@/rendererProcess/api";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
+import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 const emit = defineEmits<{
   (e: "update:selectedPetaTagIds", selectedPetaTagIds: string[]): void;
 }>();
 const props = defineProps<{
   petaImagesArray: PetaImage[];
-  petaTagInfos: PetaTagInfo[];
   selectedPetaTagIds: string[];
 }>();
 const textsStore = useTextsStore();
 const components = useComponentsStore();
+const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   if (tag.readonly) {
@@ -86,7 +86,7 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   );
 }
 async function addTag(name: string) {
-  if (props.petaTagInfos.find((pi) => pi.petaTag.name === name)) {
+  if (petaTagsStore.state.petaTags.value.find((pi) => pi.name === name)) {
     return;
   }
   API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.UPSERT);
@@ -157,12 +157,13 @@ function selectPetaTag(petaTag?: PetaTag) {
   emit("update:selectedPetaTagIds", newData);
 }
 const browserTags = computed((): BrowserTag[] => {
-  const browserTags = props.petaTagInfos.map((petaTagInfo): BrowserTag => {
+  const browserTags = petaTagsStore.state.petaTags.value.map((petaTag): BrowserTag => {
+    const count = petaTagsStore.state.petaTagCounts.value[petaTag.id];
     return {
-      petaTag: petaTagInfo.petaTag,
-      count: petaTagInfo.count,
-      selected: props.selectedPetaTagIds.find((id) => id === petaTagInfo.petaTag.id) !== undefined,
-      readonly: petaTagInfo.petaTag.id === UNTAGGED_ID,
+      petaTag: petaTag,
+      count: count !== undefined ? count : -1,
+      selected: props.selectedPetaTagIds.find((id) => id === petaTag.id) !== undefined,
+      readonly: petaTag.id === UNTAGGED_ID,
     };
   });
   return browserTags;

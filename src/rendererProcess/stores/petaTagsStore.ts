@@ -3,20 +3,25 @@ import { API } from "@/rendererProcess/api";
 import { inject } from "@/rendererProcess/utils/vue";
 import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 export async function createPetaTagsStore() {
-  const states = ref<PetaTagInfo[]>(await API.send("getPetaTagInfos"));
+  const petaTags = ref(await API.send("getPetaTags"));
+  const petaTagCounts = ref(await API.send("getPetaTagCounts"));
   const eventEmitter = new EventEmitter() as TypedEmitter<{
     update: (petaImageIds: string[], petaTagIds: string[]) => void;
   }>;
   eventEmitter.setMaxListeners(100000);
   API.on("updatePetaTags", async (event, { petaTagIds, petaImageIds }) => {
-    states.value = await API.send("getPetaTagInfos");
+    petaTags.value = await API.send("getPetaTags");
     eventEmitter.emit("update", petaTagIds, petaImageIds);
   });
-
+  API.on("updatePetaTagCounts", async (event, _petaTagCounts) => {
+    petaTagCounts.value = _petaTagCounts;
+  });
   return {
-    state: states,
+    state: {
+      petaTags,
+      petaTagCounts,
+    },
     onUpdate: (callback: (petaTagIds: string[], petaImageIds: string[]) => void) => {
       eventEmitter.on("update", callback);
       onUnmounted(() => {

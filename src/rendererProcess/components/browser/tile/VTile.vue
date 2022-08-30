@@ -187,9 +187,9 @@ async function fetchPetaTags() {
     return;
   }
   const result = await API.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
-  myPetaTags.value = petaTagsStore.state.value
-    .filter((petaTagInfo) => result.find((id) => id === petaTagInfo.petaTag.id))
-    .map((pti) => pti.petaTag);
+  myPetaTags.value = petaTagsStore.state.petaTags.value.filter((petaTag) =>
+    result.find((id) => id === petaTag.id),
+  );
   loadingTags.value = false;
 }
 function delayedFetchPetaTags() {

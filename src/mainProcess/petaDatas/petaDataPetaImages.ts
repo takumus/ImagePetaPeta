@@ -75,6 +75,10 @@ export class PetaDataPetaImages {
             petaImageIds: [],
             petaTagIds: [],
           });
+          this.parent.emitMainEvent(
+            "updatePetaTagCounts",
+            await this.parent.petaTags.getPetaTagCounts(),
+          );
         }
         this.parent.emitMainEvent("updatePetaImages", datas, mode);
         handler.emitStatus({

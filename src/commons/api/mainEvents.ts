@@ -9,6 +9,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 export interface MainEvents {
   updatePetaImages: (petaImages: PetaImage[], mode: UpdateMode) => void;
   updatePetaTags: (updates: { petaTagIds: string[]; petaImageIds: string[] }) => void;
+  updatePetaTagCounts: (petaTagCounts: { [petaTagId: string]: number }) => void;
   taskStatus: (id: string, task: TaskStatus) => void;
   foundLatestVersion: (remote: RemoteBinaryInfo) => void;
   windowFocused: (focused: boolean, windowType: WindowType) => void;

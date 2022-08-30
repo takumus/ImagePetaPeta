@@ -4,7 +4,6 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { UNTAGGED_ID } from "@/commons/defines";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 export class PetaDataPetaTags {
@@ -32,6 +31,7 @@ export class PetaDataPetaTags {
       petaTagIds: tags.map((tag) => tag.id),
       petaImageIds: [],
     });
+    this.parent.emitMainEvent("updatePetaTagCounts", await this.getPetaTagCounts());
     return true;
   }
   async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
@@ -67,6 +67,10 @@ export class PetaDataPetaTags {
           petaTagIds: [],
           petaImageIds,
         });
+        this.parent.emitMainEvent(
+          "updatePetaTagCounts",
+          await this.parent.petaTags.getPetaTagCounts(),
+        );
       },
       {},
       false,
@@ -167,8 +171,7 @@ export class PetaDataPetaTags {
     });
     return petaTagIds;
   }
-  async getPetaTagInfos(untaggedName: string) {
-    const log = this.parent.mainLogger.logChunk();
+  async getPetaTagCounts() {
     const petaTags = await this.parent.datas.dbPetaTags.find({});
     const taggedIds = Array.from(
       new Set(
@@ -182,29 +185,31 @@ export class PetaDataPetaTags {
         $nin: taggedIds,
       },
     });
-    const petaTagInfos = await promiseSerial(async (petaTag) => {
-      const info = {
-        petaTag,
-        count: await this.parent.datas.dbPetaImagesPetaTags.count({ petaTagId: petaTag.id }),
-      } as PetaTagInfo;
-      return info;
+    const petaTagCounts: { [id: string]: number } = {};
+    await promiseSerial(async (petaTag) => {
+      petaTagCounts[petaTag.id] = await this.parent.datas.dbPetaImagesPetaTags.count({
+        petaTagId: petaTag.id,
+      });
     }, petaTags).promise;
-    log.log("return:", petaTagInfos.length);
-    petaTagInfos.sort((a, b) => {
-      if (a.petaTag.name < b.petaTag.name) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-    petaTagInfos.unshift({
-      petaTag: {
+    petaTagCounts[UNTAGGED_ID] = count;
+    return petaTagCounts;
+  }
+  async getPetaTags(untaggedName: string) {
+    // const log = this.parent.mainLogger.logChunk();
+    const petaTags = await this.parent.datas.dbPetaTags.find({});
+    return [
+      {
         index: 0,
         id: UNTAGGED_ID,
         name: untaggedName,
       },
-      count: count,
-    });
-    return petaTagInfos;
+      ...petaTags.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }),
+    ];
   }
 }

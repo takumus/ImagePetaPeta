@@ -3,7 +3,7 @@
     <t-left>
       <VTags
         :petaImagesArray="petaImagesArray"
-        :petaTagInfos="petaTagsStore.state.value"
+        :petaTags="petaTagsStore.state.petaTags.value"
         v-model:selectedPetaTagIds="selectedPetaTagIds"
       />
     </t-left>
@@ -12,7 +12,7 @@
         <t-top>
           <t-search>
             <VSearch
-              :petaTagInfos="petaTagsStore.state.value"
+              :petaTags="petaTagsStore.state.petaTags.value"
               v-model:selectedPetaTagIds="selectedPetaTagIds"
             />
           </t-search>
@@ -591,7 +591,7 @@ watch(selectedPetaTagIds, () => {
 watch(petaImagesArray, () => {
   fetchFilteredPetaImages();
 });
-watch(petaTagsStore.state, () => {
+watch(petaTagsStore.state.petaTags, () => {
   fetchFilteredPetaImages();
 });
 watch(thumbnailsSize, () => {

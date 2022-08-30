@@ -462,25 +462,43 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
           return [];
         },
-        async getPetaTagInfos() {
+        async getPetaTags() {
           const log = mainLogger.logChunk();
           try {
-            log.log("#Get PetaTagInfos");
-            const petaTagInfos = await petaDatas.petaTags.getPetaTagInfos(
+            log.log("#Get PetaTags");
+            const petaTags = await petaDatas.petaTags.getPetaTags(
               i18n.global.t("browser.untagged"),
             );
-            log.log("return:", petaTagInfos.length);
-            return petaTagInfos;
+            log.log("return:", petaTags.length);
+            return petaTags;
           } catch (error) {
             log.error(error);
             showError({
               category: "M",
               code: 100,
-              title: "Get PetaTagInfos Error",
+              title: "Get PetaTags Error",
               message: String(error),
             });
           }
           return [];
+        },
+        async getPetaTagCounts() {
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Get PetaTagCounts");
+            const petaTagCounts = await petaDatas.petaTags.getPetaTagCounts();
+            log.log("return:", Object.values(petaTagCounts).length);
+            return petaTagCounts;
+          } catch (error) {
+            log.error(error);
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaTagCounts Error",
+              message: String(error),
+            });
+          }
+          return {};
         },
         async log(event, id: string, ...args: unknown[]) {
           dataLogger.log(LogFrom.RENDERER, id, ...args);

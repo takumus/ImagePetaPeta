@@ -36,7 +36,6 @@
 
 <script lang="ts" setup>
 import { PetaTag } from "@/commons/datas/petaTag";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { ref } from "@vue/reactivity";
 import { computed } from "@vue/runtime-core";
@@ -46,7 +45,7 @@ import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 const searchInput = ref<InstanceType<typeof VTextarea>>();
 const textsStore = useTextsStore();
 const props = defineProps<{
-  petaTagInfos: PetaTagInfo[];
+  petaTags: PetaTag[];
   selectedPetaTagIds: string[];
 }>();
 
@@ -59,7 +58,7 @@ function editSearchTag(tag: PetaTag, value: string) {
   const _selectedPetaTagIds = [...props.selectedPetaTagIds];
   _selectedPetaTagIds.splice(index, 1);
   if (value != "") {
-    const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === value)?.petaTag;
+    const petaTag = props.petaTags.find((pti) => pti.name === value);
     if (petaTag && !_selectedPetaTagIds.includes(petaTag.id)) {
       _selectedPetaTagIds.splice(index, 0, petaTag.id);
     }
@@ -70,7 +69,7 @@ function editSearchTag(tag: PetaTag, value: string) {
 function removeLastPetaTag() {
   const last = props.selectedPetaTagIds[props.selectedPetaTagIds.length - 1];
   if (last) {
-    const petaTag = props.petaTagInfos.find((tag) => tag.petaTag.id === last)?.petaTag;
+    const petaTag = props.petaTags.find((tag) => tag.id === last);
     if (petaTag !== undefined) {
       editSearchTag(petaTag, "");
     }
@@ -80,7 +79,7 @@ function removeLastPetaTag() {
 }
 
 function addSelectedTag(tagName: string) {
-  const petaTag = props.petaTagInfos.find((pti) => pti.petaTag.name === tagName)?.petaTag;
+  const petaTag = props.petaTags.find((pti) => pti.name === tagName);
   const untaggedId = props.selectedPetaTagIds.findIndex((id) => id === UNTAGGED_ID);
 
   if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
@@ -97,19 +96,19 @@ function addSelectedTag(tagName: string) {
 }
 
 const complementItems = computed(() => {
-  return props.petaTagInfos
+  return props.petaTags
     .filter((pti) => {
-      return !props.selectedPetaTagIds.includes(pti.petaTag.id);
+      return !props.selectedPetaTagIds.includes(pti.id);
     })
     .map((pti) => {
-      return pti.petaTag.name;
+      return pti.name;
     });
 });
 
 const selectedPetaTags = computed(() => {
   return props.selectedPetaTagIds
     .map((id) => {
-      return props.petaTagInfos.find((tag) => tag.petaTag.id === id)?.petaTag;
+      return props.petaTags.find((tag) => tag.id === id);
     })
     .filter((petaTag) => petaTag !== undefined) as PetaTag[];
 });

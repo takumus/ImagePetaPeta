@@ -5,7 +5,6 @@ import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { PetaTagInfo } from "@/commons/datas/petaTagInfo";
 import { WindowType } from "@/commons/datas/windowType";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 export interface MainFunctions {
@@ -13,7 +12,11 @@ export interface MainFunctions {
   importImageFiles: () => Promise<number>;
   importImageDirectories: () => Promise<number>;
   importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
-  importImagesByDragAndDrop: (htmls: string[], buffers: ArrayBuffer[], filePaths: string[]) => Promise<string[]>;
+  importImagesByDragAndDrop: (
+    htmls: string[],
+    buffers: ArrayBuffer[],
+    filePaths: string[],
+  ) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
   getPetaImages: () => Promise<PetaImages>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
@@ -22,8 +25,13 @@ export interface MainFunctions {
   updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
   getPetaImageIdsByPetaTagIds: (petaTagIds?: string[]) => Promise<string[]>;
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
-  getPetaTagInfos: () => Promise<PetaTagInfo[]>;
-  updatePetaImagesPetaTags: (petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) => Promise<boolean>;
+  getPetaTagCounts: () => Promise<{ [petaTagId: string]: number }>;
+  getPetaTags: () => Promise<PetaTag[]>;
+  updatePetaImagesPetaTags: (
+    petaImageIds: string[],
+    petaTagIds: string[],
+    mode: UpdateMode,
+  ) => Promise<boolean>;
   log: (id: string, ...args: unknown[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
   openImageFile: (petaImage: PetaImage) => Promise<void>;

@@ -16,7 +16,7 @@
         <t-property>
           <VProperty
             :petaImages="singlePetaImages"
-            :petaTagInfos="petaTagsStore.state.value"
+            :petaTags="petaTagsStore.state.petaTags.value"
             @selectTag="() => {}"
           />
         </t-property>
