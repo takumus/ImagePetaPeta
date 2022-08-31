@@ -200,8 +200,8 @@ function restoreScrollPosition() {
   }
 }
 function updateScrollArea(event?: Event, resize = false) {
-  const preVisibleOffset = scrollAreaHeight.value * 1;
-  const visibleOffset = scrollAreaHeight.value * 0.2;
+  const preVisibleOffset = scrollAreaHeight.value * 0.5;
+  const visibleOffset = scrollAreaHeight.value * 0;
   if (thumbnails.value === undefined) {
     return;
   }

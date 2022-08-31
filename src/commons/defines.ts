@@ -38,8 +38,8 @@ export const SUPPORT_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSfMVEzYwdC09SrM6ipTtHyk_wTC1n08pB2eeZIVZifIRW7ojQ/viewform";
 export const PLACEHOLDER_SIZE = 32;
 export const PLACEHOLDER_COMPONENT = 4;
-export const BROWSER_LOAD_ORIGINAL_DELAY = 400;
-export const BROWSER_LOAD_ORIGINAL_DELAY_RANDOM = 100;
+export const BROWSER_LOAD_ORIGINAL_DELAY = 300;
+export const BROWSER_LOAD_ORIGINAL_DELAY_RANDOM = 300;
 export const BROWSER_FETCH_TAGS_DELAY = 200;
 export const BROWSER_FETCH_TAGS_DELAY_RANDOM = 100;
 export const PETAIMAGE_METADATA_VERSION = 1.6;

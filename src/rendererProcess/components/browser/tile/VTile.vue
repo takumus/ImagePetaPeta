@@ -20,7 +20,7 @@
         <t-placeholder
           class="placeholder"
           :class="{
-            loaded: !loadingImage,
+            loaded: !loadingThumbnail,
           }"
           :style="{
             backgroundColor: placeholderColor,
@@ -28,11 +28,12 @@
         ></t-placeholder>
         <img
           draggable="false"
-          :src="imageURL"
-          v-show="!loadingImage"
-          loading="lazy"
-          @load="loaded"
+          :src="thumbnailURL"
+          @load="loadingThumbnail = false"
+          v-if="loadingOriginal"
+          decoding="async"
         />
+        <img ref="image" draggable="false" v-show="!loadingOriginal" />
         <t-background> </t-background>
       </t-images>
       <t-tags v-if="settingsStore.state.value.showTagsOnTile">
@@ -95,10 +96,12 @@ const settingsStore = useSettingsStore();
 const petaImagesStore = usePetaImagesStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
-const imageURL = ref("");
-const loadingImage = ref(true);
+const thumbnailURL = ref("");
+const originalURL = ref("");
+const image = ref<HTMLImageElement>();
+const loadingThumbnail = ref(true);
+const loadingOriginal = ref(true);
 const loadingTags = ref(true);
-const loadedOriginal = ref(false);
 const myPetaTags = ref<PetaTag[]>([]);
 const click: ClickChecker = new ClickChecker();
 let loadOriginalTimeoutHandler = -1;
@@ -159,9 +162,6 @@ function dblclick() {
     emit("dblclick", props.tile.petaImage);
   }
 }
-function loaded() {
-  loadingImage.value = false;
-}
 const showNSFW = computed(() => {
   if (props.tile.petaImage === undefined) {
     return false;
@@ -204,18 +204,31 @@ function delayedFetchPetaTags() {
 }
 function delayedUpdateImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
-  imageURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
+  // imageURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
+  thumbnailURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
   if (props.original) {
     loadOriginalTimeoutHandler = window.setTimeout(() => {
       if (props.tile.visible) {
-        imageURL.value = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
-        loadedOriginal.value = true;
+        originalURL.value = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
       }
     }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
   }
 }
 const visible = computed(() => {
   return props.tile.visible;
+});
+watch(originalURL, (url) => {
+  const img = image.value;
+  if (img === undefined) {
+    return;
+  }
+  if (img.src !== url) {
+    loadingOriginal.value = true;
+    img.src = url;
+    img.decode().then(() => {
+      loadingOriginal.value = false;
+    });
+  }
 });
 watch(
   [
