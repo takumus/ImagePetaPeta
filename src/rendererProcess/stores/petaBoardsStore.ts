@@ -55,7 +55,7 @@ export async function createPetaBoardsStore() {
       Math.max(...Object.values(states.value).map((b) => b.index), 0) + 1,
       dark,
     );
-    await API.send("updatePetaBoards", [board], UpdateMode.UPSERT);
+    await API.send("updatePetaBoards", [board], UpdateMode.INSERT);
     await getPetaBoards();
     const addedBoard = states.value[board.id];
     if (addedBoard === undefined) {

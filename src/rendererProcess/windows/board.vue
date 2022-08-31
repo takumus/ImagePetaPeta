@@ -99,12 +99,12 @@ onMounted(async () => {
       currentPetaBoard.value === undefined
         ? false
         : hasPetaImages(currentPetaBoard.value, newPetaImages);
-    if (mode === UpdateMode.UPSERT || mode === UpdateMode.REMOVE) {
+    if (mode === UpdateMode.INSERT || mode === UpdateMode.REMOVE) {
       if (needReload) {
         const ids = newPetaImages.map((petaImage) => petaImage.id);
         vPetaBoard.value?.load({
           reload: {
-            additions: mode === UpdateMode.UPSERT ? ids : [],
+            additions: mode === UpdateMode.INSERT ? ids : [],
             deletions: mode === UpdateMode.REMOVE ? ids : [],
           },
         });

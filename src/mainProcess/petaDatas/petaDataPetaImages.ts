@@ -37,14 +37,14 @@ export class PetaDataPetaImages {
         //
       });
       log.log("removed thumbnail");
-      return true;
+      log.log("removed");
+    } else if (mode === UpdateMode.UPDATE) {
+      await this.parent.datas.dbPetaImages.update({ id: petaImage.id }, petaImage);
+      log.log("updated");
+    } else {
+      await this.parent.datas.dbPetaImages.insert(petaImage);
+      log.log("inserted");
     }
-    await this.parent.datas.dbPetaImages.update(
-      { id: petaImage.id },
-      petaImage,
-      mode === UpdateMode.UPSERT,
-    );
-    log.log("updated");
     return true;
   }
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -163,8 +163,7 @@ export class PetaDataPetaImages {
       metadataVersion: PETAIMAGE_METADATA_VERSION,
     };
     await file.writeFile(Path.resolve(this.parent.paths.DIR_IMAGES, originalFileName), param.data);
-    await this.updatePetaImages([petaImage], UpdateMode.UPSERT, true);
-    // await this.parent.datas.dbPetaImages.update({ id: petaImage.id }, petaImage, true);
+    await this.updatePetaImages([petaImage], UpdateMode.INSERT, true);
     return {
       petaImage: petaImage,
       exists: false,

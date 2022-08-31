@@ -6,7 +6,10 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
-import { BOARD_DEFAULT_BACKGROUND_FILL_COLOR, BOARD_DEFAULT_BACKGROUND_LINE_COLOR } from "@/commons/defines";
+import {
+  BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+  BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
+} from "@/commons/defines";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import DB from "@/mainProcess/storages/db";
 import deepcopy from "deepcopy";
@@ -204,7 +207,7 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
       }
       anyPetaTag.petaImages.push(petaImage.id);
       anyPetaTag.petaImages = Array.from(new Set(anyPetaTag.petaImages));
-      await petaTags.update({ id: anyPetaTag.id }, anyPetaTag, true);
+      await petaTags.insert(anyPetaTag);
       upgraded = true;
     }, (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).promise;
     anyPetaImage["tags"] = undefined;
@@ -249,13 +252,13 @@ export async function upgradePetaImagesPetaTags(
           return;
         }
         const pipt = createPetaImagePetaTag(petaImageId, petaTag.id);
-        await petaImagesPetaTags.update({ id: pipt.id }, pipt, true);
+        await petaImagesPetaTags.insert(pipt);
         changed = true;
       }, petaImageIds).promise;
       // remove petaImages property
       (petaTag as any).petaImages = undefined;
       // update
-      await petaTags.update({ id: petaTag.id }, petaTag, false);
+      await petaTags.update({ id: petaTag.id }, petaTag);
     }, await petaTags.find({})).promise;
   } catch (error) {
     //
@@ -264,7 +267,10 @@ export async function upgradePetaImagesPetaTags(
   try {
     await promiseSerial(async (pipt) => {
       if (pipt.id.length > 64) {
-        await petaImagesPetaTags.update(pipt, createPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId));
+        await petaImagesPetaTags.update(
+          pipt,
+          createPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId),
+        );
       }
     }, await petaImagesPetaTags.find({})).promise;
   } catch (error) {
@@ -277,7 +283,11 @@ function migrate<T>(data: T, defaultData: T): T {
   Object.keys(defaultData).forEach((key) => {
     const dataType = typeof (data as any)[key];
     const defaultDataType = typeof (defaultData as any)[key];
-    if (dataType === defaultDataType && !Array.isArray((defaultData as any)[key]) && defaultDataType === "object") {
+    if (
+      dataType === defaultDataType &&
+      !Array.isArray((defaultData as any)[key]) &&
+      defaultDataType === "object"
+    ) {
       (data as any)[key] = migrate((data as any)[key], (defaultData as any)[key]);
     }
     if (dataType !== defaultDataType) {

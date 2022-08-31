@@ -1,7 +1,11 @@
 import { InjectionKey, ref } from "vue";
 import { API } from "@/rendererProcess/api";
 import { inject } from "@/rendererProcess/utils/vue";
-import { dbPetaImagesToPetaImages, dbPetaImageToPetaImage, PetaImage } from "@/commons/datas/petaImage";
+import {
+  dbPetaImagesToPetaImages,
+  dbPetaImageToPetaImage,
+  PetaImage,
+} from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
@@ -12,7 +16,7 @@ export async function createPetaImagesStore() {
     update: (changes: PetaImage[], mode: UpdateMode) => void;
   }>;
   API.on("updatePetaImages", async (e, newPetaImages, mode) => {
-    if (mode === UpdateMode.UPSERT || mode === UpdateMode.UPDATE) {
+    if (mode === UpdateMode.INSERT || mode === UpdateMode.UPDATE) {
       newPetaImages.forEach((petaImage) => {
         // restore selected
         states.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);

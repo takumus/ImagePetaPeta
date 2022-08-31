@@ -89,7 +89,7 @@ async function addTag(name: string) {
   if (petaTagsStore.state.petaTags.value.find((pi) => pi.name === name)) {
     return;
   }
-  API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.UPSERT);
+  API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.INSERT);
 }
 async function removeTag(petaTag: PetaTag) {
   if (

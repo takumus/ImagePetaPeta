@@ -14,10 +14,13 @@ export class PetaDataPetaBoards {
     if (mode === UpdateMode.REMOVE) {
       await this.parent.datas.dbPetaBoard.remove({ id: board.id });
       log.log("removed");
-      return true;
+    } else if (mode === UpdateMode.UPDATE) {
+      await this.parent.datas.dbPetaBoard.update({ id: board.id }, board);
+      log.log("updated");
+    } else {
+      await this.parent.datas.dbPetaBoard.insert(board);
+      log.log("inserted");
     }
-    await this.parent.datas.dbPetaBoard.update({ id: board.id }, board, mode === UpdateMode.UPSERT);
-    log.log("updated");
     return true;
   }
   async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {

@@ -215,7 +215,7 @@ export class PetaDatas {
           log: [addedFileCount.toString(), _filePaths.length.toString()],
           status: addedFileCount === _filePaths.length ? "complete" : "failed",
         });
-        this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
+        this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.INSERT);
         return petaImages;
       },
       {},
@@ -302,17 +302,17 @@ export class PetaDatas {
             await promiseSerial(async (pipt, index) => {
               log.log("copy tag: (", index, "/", pipts.length, ")");
               const newPIPT = createPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-              await this.datas.dbPetaImagesPetaTags.update({ id: newPIPT.id }, newPIPT, true);
+              await this.datas.dbPetaImagesPetaTags.insert(newPIPT);
             }, pipts).promise;
             log.log(`add "before waifu2x" tag to old petaImage`);
             const name = "before waifu2x";
             const datePetaTag =
               (await this.datas.dbPetaTags.find({ name: name }))[0] || createPetaTag(name);
-            await this.petaTags.updatePetaTags([datePetaTag], UpdateMode.UPSERT);
+            await this.petaTags.updatePetaTags([datePetaTag], UpdateMode.INSERT);
             await this.petaTags.updatePetaImagesPetaTags(
               [petaImage.id],
               [datePetaTag.id],
-              UpdateMode.UPSERT,
+              UpdateMode.INSERT,
             );
           } else {
             success = false;
@@ -386,7 +386,7 @@ export class PetaDatas {
           log: [addedFileCount.toString(), datas.length.toString()],
           status: addedFileCount === datas.length ? "complete" : "failed",
         });
-        this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.UPSERT);
+        this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.INSERT);
         return petaImages;
       },
       {},

@@ -150,13 +150,13 @@ async function addTag(name: string) {
   // リクエスト2回飛ばさない
   if (!petaTag) {
     petaTag = createPetaTag(name);
-    await API.send("updatePetaTags", [petaTag], UpdateMode.UPSERT);
+    await API.send("updatePetaTags", [petaTag], UpdateMode.INSERT);
   }
   await API.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
     [petaTag.id],
-    UpdateMode.UPSERT,
+    UpdateMode.INSERT,
   );
 }
 async function removeTag(petaTag: PetaTag) {

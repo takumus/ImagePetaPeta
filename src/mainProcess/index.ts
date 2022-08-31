@@ -188,10 +188,24 @@ import { LogFrom } from "@/mainProcess/storages/logger";
         dbPetaTags.init(),
         dbPetaImagesPetaTags.init(),
       ]);
-      await dbPetaTags.ensureIndex({
-        fieldName: "id",
-        unique: true,
-      });
+      await Promise.all([
+        dbPetaTags.ensureIndex({
+          fieldName: "id",
+          unique: true,
+        }),
+        dbPetaImages.ensureIndex({
+          fieldName: "id",
+          unique: true,
+        }),
+        dbPetaTags.ensureIndex({
+          fieldName: "id",
+          unique: true,
+        }),
+        dbPetaImagesPetaTags.ensureIndex({
+          fieldName: "id",
+          unique: true,
+        }),
+      ]);
     } catch (error) {
       showError({
         category: "M",
@@ -356,7 +370,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             if (Object.keys(petaBoards).length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
-              await petaDatas.petaBoards.updatePetaBoard(board, UpdateMode.UPSERT);
+              await petaDatas.petaBoards.updatePetaBoard(board, UpdateMode.INSERT);
               petaBoards[board.id] = board;
             }
             log.log("return:", petaBoards.length);
