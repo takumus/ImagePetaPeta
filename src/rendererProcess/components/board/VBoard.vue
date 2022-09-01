@@ -608,7 +608,7 @@ function updateCrop(petaPanel?: PetaPanel) {
   if (petaImage === undefined || currentBoard.value === undefined || petaPanel === undefined) {
     return;
   }
-  const sign = 1;
+  const sign = petaPanel.height < 0 ? -1 : 1;
   petaPanel.height =
     Math.abs(
       petaPanel.width *

@@ -320,7 +320,6 @@ const height = computed(() => {
   if (!petaImage) {
     return 0;
   }
-  petaImage;
   return width.value * (petaImage.height / petaImage.width);
 });
 const width = computed(() => {
