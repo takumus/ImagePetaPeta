@@ -42,6 +42,6 @@ export const BROWSER_LOAD_ORIGINAL_DELAY = 300;
 export const BROWSER_LOAD_ORIGINAL_DELAY_RANDOM = 300;
 export const BROWSER_FETCH_TAGS_DELAY = 200;
 export const BROWSER_FETCH_TAGS_DELAY_RANDOM = 100;
-export const PETAIMAGE_METADATA_VERSION = 1.6;
+export const PETAIMAGE_METADATA_VERSION = 1.7;
 export const SEARCH_IMAGE_BY_GOOGLE_TIMEOUT = 10 * 1000;
 export const SEARCH_IMAGE_BY_GOOGLE_URL = "https://images.google.com/imghp?sbi=1";

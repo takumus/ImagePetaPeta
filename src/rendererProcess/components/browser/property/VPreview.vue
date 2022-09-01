@@ -32,6 +32,7 @@ import { PropertyThumbnail } from "@/rendererProcess/components/browser/property
 import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useI18n } from "vue-i18n";
+import { resizeImage } from "@/commons/utils/resizeImage";
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
 }>();
@@ -82,11 +83,13 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
     let width = 0;
     let height = 0;
     if (p.height / p.width < previewHeight.value / maxWidth) {
-      width = maxWidth;
-      height = maxWidth * p.height;
+      const size = resizeImage(p.width, p.height, maxWidth, "width");
+      width = size.width;
+      height = size.height;
     } else {
-      height = previewHeight.value;
-      width = previewHeight.value / p.height;
+      const size = resizeImage(p.width, p.height, previewHeight.value, "height");
+      height = size.height;
+      width = size.width;
     }
     return {
       petaImage: p,

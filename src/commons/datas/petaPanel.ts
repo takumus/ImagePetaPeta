@@ -24,13 +24,18 @@ export interface PetaPanel {
   locked: boolean;
   _selected?: boolean;
 }
-export function createPetaPanel(petaImage: PetaImage, position: Vec2, width: number, height?: number) {
+export function createPetaPanel(
+  petaImage: PetaImage,
+  position: Vec2,
+  width: number,
+  height?: number,
+) {
   const panel: PetaPanel = {
     petaImageId: petaImage.id,
     position: position,
     rotation: 0,
     width: width,
-    height: height || petaImage.height * width,
+    height: height || (petaImage.height / petaImage.width) * width,
     crop: {
       position: new Vec2(0, 0),
       width: 1,

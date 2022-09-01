@@ -730,7 +730,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           const firstPath = Path.resolve(DIR_IMAGES, first.file.original);
           draggingPreviewWindow.createWindow();
           draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
-          draggingPreviewWindow.setSize(iconSize, first.height * iconSize);
+          draggingPreviewWindow.setSize(iconSize, (first.height / first.width) * iconSize);
           draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) =>

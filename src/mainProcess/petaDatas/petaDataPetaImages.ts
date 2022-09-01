@@ -154,8 +154,8 @@ export class PetaDataPetaImages {
       note: param.note,
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
-      width: 1,
-      height: petaMetaData.original.height / petaMetaData.original.width,
+      width: petaMetaData.original.width,
+      height: petaMetaData.original.height,
       placeholder: petaMetaData.placeholder,
       palette: petaMetaData.palette,
       id: id,
@@ -189,6 +189,8 @@ export class PetaDataPetaImages {
       });
       image.placeholder = result.placeholder;
       image.palette = result.palette;
+      image.width = result.original.width;
+      image.height = result.original.height;
       image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
       image.metadataVersion = PETAIMAGE_METADATA_VERSION;
       await this.updatePetaImages([image], UpdateMode.UPDATE, true);

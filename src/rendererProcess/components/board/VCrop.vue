@@ -24,6 +24,7 @@ import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { resizeImage } from "@/commons/utils/resizeImage";
 const props = defineProps<{
   petaPanel?: PetaPanel;
 }>();
@@ -315,10 +316,12 @@ function changePetaPanel() {
   })();
 }
 const height = computed(() => {
-  if (!props.petaPanel) {
+  const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
+  if (!petaImage) {
     return 0;
   }
-  return width.value * (petaImagesStore.getPetaImage(props.petaPanel.petaImageId)?.height || 0);
+  petaImage;
+  return width.value * (petaImage.height / petaImage.width);
 });
 const width = computed(() => {
   const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
@@ -330,11 +333,13 @@ const width = computed(() => {
   const maxWidth = stageRect.x * 0.95;
   const maxHeight = stageRect.y * 0.7;
   if (petaImage.height / petaImage.width < maxHeight / maxWidth) {
-    width = maxWidth;
-    height = maxWidth * petaImage.height;
+    const size = resizeImage(petaImage.width, petaImage.height, maxWidth, "width");
+    width = size.width;
+    height = size.height;
   } else {
-    height = maxHeight;
-    width = maxHeight / petaImage.height;
+    const size = resizeImage(petaImage.width, petaImage.height, maxHeight, "height");
+    height = size.height;
+    width = size.width;
   }
   height;
   return width;

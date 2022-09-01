@@ -555,7 +555,7 @@ const tiles = computed((): Tile[] => {
         mvi * actualTileSize.value + BROWSER_THUMBNAIL_MARGIN,
         (yList[mvi] || 0) + BROWSER_THUMBNAIL_MARGIN,
       );
-      const height = p.height * actualTileSize.value;
+      const height = (p.height / p.width) * actualTileSize.value;
       yList[mvi] += height;
       const tile: Tile = {
         petaImage: p,

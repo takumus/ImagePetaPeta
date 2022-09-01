@@ -124,7 +124,7 @@ watch(petaImage, () => {
     position: new Vec2(),
     rotation: 0,
     width: width,
-    height: petaImage.value.height * width,
+    height: (petaImage.value.height / petaImage.value.width) * width,
     crop: {
       position: new Vec2(0, 0),
       width: 1,
