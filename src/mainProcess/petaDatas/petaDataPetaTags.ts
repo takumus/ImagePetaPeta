@@ -198,14 +198,14 @@ export class PetaDataPetaTags {
     petaTagCounts[UNTAGGED_ID] = count;
     return petaTagCounts;
   }
-  async getPetaTags(untaggedName: string) {
+  async getPetaTags() {
     // const log = this.parent.mainLogger.logChunk();
     const petaTags = await this.parent.datas.dbPetaTags.find({});
     return [
       {
         index: 0,
         id: UNTAGGED_ID,
-        name: untaggedName,
+        name: this.parent.datas.i18n.global.t("browser.untagged"),
       },
       ...petaTags.sort((a, b) => {
         if (a.name < b.name) {

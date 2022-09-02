@@ -11,8 +11,6 @@ import {
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { createI18n } from "vue-i18n";
-import languages from "@/commons/languages";
 import { DEFAULT_BOARD_NAME, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
@@ -50,10 +48,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
   */
   //-------------------------------------------------------------------------------------------------//
   const draggingPreviewWindow = new DraggingPreviewWindow();
-  const i18n = createI18n({
-    locale: "ja",
-    messages: languages,
-  });
   let temporaryShowNSFW = false;
   let isDataInitialized = false;
   let detailsPetaImage: PetaImage | undefined;
@@ -480,9 +474,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTags");
-            const petaTags = await petaDatas.petaTags.getPetaTags(
-              i18n.global.t("browser.untagged"),
-            );
+            const petaTags = await petaDatas.petaTags.getPetaTags();
             log.log("return:", petaTags.length);
             return petaTags;
           } catch (error) {

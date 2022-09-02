@@ -20,6 +20,8 @@ import * as Tasks from "@/mainProcess/tasks/task";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { v4 as uuid } from "uuid";
 import { ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
+import { createI18n } from "vue-i18n";
+import languages from "@/commons/languages";
 export function getConstants(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
   const dirs = {
     DIR_ROOT: "",
@@ -50,6 +52,10 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
   let configWindowStates: Config<WindowStates>;
   let petaDatas: PetaDatas;
   let windows: Windows;
+  const i18n = createI18n({
+    locale: "ja",
+    messages: languages,
+  });
   const mainLogger = new MainLogger();
   try {
     // ログは最優先で初期化
@@ -139,6 +145,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
         dbPetaImagesPetaTags,
         dbPetaTags,
         configSettings,
+        i18n,
       },
       dirs,
       windows.emitMainEvent.bind(windows),
@@ -174,5 +181,6 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     configWindowStates,
     petaDatas,
     windows,
+    i18n,
   };
 }

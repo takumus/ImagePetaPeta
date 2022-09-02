@@ -21,6 +21,9 @@ import dataUriToBuffer from "data-uri-to-buffer";
 import { PetaDataPetaImages } from "@/mainProcess/petaDatas/petaDataPetaImages";
 import { PetaDataPetaBoards } from "@/mainProcess/petaDatas/petaDataPetaBoards";
 import { PetaDataPetaTags } from "@/mainProcess/petaDatas/petaDataPetaTags";
+import { I18n } from "vue-i18n";
+import languages from "@/commons/languages";
+import { DateTimeFormat, NumberFormat } from "@intlify/core-base";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -32,6 +35,7 @@ export class PetaDatas {
       dbPetaTags: DB<PetaTag>;
       dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
       configSettings: Config<Settings>;
+      i18n: I18n<typeof languages, DateTimeFormat, NumberFormat, string, true>;
     },
     public paths: {
       DIR_IMAGES: string;
@@ -306,12 +310,14 @@ export class PetaDatas {
             }, pipts).promise;
             log.log(`add "before waifu2x" tag to old petaImage`);
             const name = "before waifu2x";
-            const datePetaTag =
-              (await this.datas.dbPetaTags.find({ name: name }))[0] || createPetaTag(name);
-            await this.petaTags.updatePetaTags([datePetaTag], UpdateMode.INSERT);
+            let petaTag = (await this.datas.dbPetaTags.find({ name: name }))[0];
+            if (petaTag === undefined) {
+              petaTag = createPetaTag(name);
+              await this.petaTags.updatePetaTags([petaTag], UpdateMode.INSERT);
+            }
             await this.petaTags.updatePetaImagesPetaTags(
               [petaImage.id],
-              [datePetaTag.id],
+              [petaTag.id],
               UpdateMode.INSERT,
             );
           } else {
