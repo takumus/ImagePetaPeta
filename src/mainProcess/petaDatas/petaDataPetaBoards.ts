@@ -6,7 +6,19 @@ import { upgradePetaBoard } from "@/mainProcess/utils/upgrader";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 export class PetaDataPetaBoards {
   constructor(private parent: PetaDatas) {}
-  async updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
+  async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {
+    return await promiseSerial((board) => this.updatePetaBoard(board, mode), boards).promise;
+  }
+  async getPetaBoards() {
+    const boards: { [id: string]: PetaBoard } = {};
+    (await this.parent.datas.dbPetaBoard.find({})).forEach((board) => {
+      // バージョンアップ時のプロパティ更新
+      upgradePetaBoard(board);
+      boards[board.id] = board;
+    });
+    return boards;
+  }
+  private async updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
     const log = this.parent.mainLogger.logChunk();
     log.log("##Update PetaBoard");
     log.log("mode:", mode);
@@ -22,17 +34,5 @@ export class PetaDataPetaBoards {
       log.log("inserted");
     }
     return true;
-  }
-  async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {
-    return await promiseSerial((board) => this.updatePetaBoard(board, mode), boards).promise;
-  }
-  async getPetaBoards() {
-    const boards: { [id: string]: PetaBoard } = {};
-    (await this.parent.datas.dbPetaBoard.find({})).forEach((board) => {
-      // バージョンアップ時のプロパティ更新
-      upgradePetaBoard(board);
-      boards[board.id] = board;
-    });
-    return boards;
   }
 }

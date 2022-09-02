@@ -8,42 +8,53 @@ import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaIm
 import { PetaTag } from "@/commons/datas/petaTag";
 export class PetaDataPetaTags {
   constructor(private parent: PetaDatas) {}
-  private async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
-    const log = this.parent.mainLogger.logChunk();
-    log.log("##Update PetaTag");
-    log.log("mode:", mode);
-    log.log("tag:", minimId(tag.id));
-    if (mode === UpdateMode.REMOVE) {
-      await this.parent.datas.dbPetaImagesPetaTags.remove({ petaTagId: tag.id });
-      await this.parent.datas.dbPetaTags.remove({ id: tag.id });
-      log.log("removed");
-    } else if (mode === UpdateMode.UPDATE) {
-      await this.parent.datas.dbPetaTags.update({ id: tag.id }, tag);
-      log.log("updated");
-    } else {
-      await this.parent.datas.dbPetaTags.insert(tag);
-      log.log("inserted");
-    }
-    return true;
+  async updatePetaTags(tags: PetaTag[], mode: UpdateMode, silent = false) {
+    return Tasks.spawn(
+      "UpdatePetaTags",
+      async (handler) => {
+        handler.emitStatus({
+          i18nKey: "tasks.updateDatas",
+          status: "begin",
+        });
+        await promiseSerial(async (tag, index) => {
+          await this.updatePetaTag(tag, mode);
+          handler.emitStatus({
+            i18nKey: "tasks.updateDatas",
+            progress: {
+              all: tags.length,
+              current: index + 1,
+            },
+            status: "progress",
+          });
+        }, tags).promise;
+        handler.emitStatus({
+          i18nKey: "tasks.updateDatas",
+          status: "complete",
+        });
+        // Tileの更新対象は、PetaTagIdsのみ。
+        this.parent.emitMainEvent("updatePetaTags", {
+          petaTagIds: tags.map((tag) => tag.id),
+          petaImageIds: [],
+        });
+        this.parent.emitMainEvent("updatePetaTagCounts", await this.getPetaTagCounts());
+        return true;
+      },
+      {},
+      silent,
+    );
   }
-  async updatePetaTags(tags: PetaTag[], mode: UpdateMode) {
-    await promiseSerial((tag) => this.updatePetaTag(tag, mode), tags).promise;
-    // Tileの更新対象は、PetaTagIdsのみ。
-    this.parent.emitMainEvent("updatePetaTags", {
-      petaTagIds: tags.map((tag) => tag.id),
-      petaImageIds: [],
-    });
-    this.parent.emitMainEvent("updatePetaTagCounts", await this.getPetaTagCounts());
-    return true;
-  }
-  async updatePetaImagesPetaTags(petaImageIds: string[], petaTagIds: string[], mode: UpdateMode) {
+  async updatePetaImagesPetaTags(
+    petaImageIds: string[],
+    petaTagIds: string[],
+    mode: UpdateMode,
+    silent = false,
+  ) {
     return Tasks.spawn(
       "UpdatePetaImagesPetaTags",
       async (handler) => {
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           status: "begin",
-          log: [],
         });
         await promiseSerial(async (petaImageId, iIndex) => {
           await promiseSerial(async (petaTagId, tIndex) => {
@@ -55,14 +66,12 @@ export class PetaDataPetaTags {
                 current: iIndex * petaTagIds.length + tIndex + 1,
               },
               status: "progress",
-              log: [petaTagId, petaImageId],
             });
           }, petaTagIds).promise;
         }, petaImageIds).promise;
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           status: "complete",
-          log: [],
         });
         // Tileの更新対象はPetaImageIdsのみ。
         this.parent.emitMainEvent("updatePetaTags", {
@@ -75,28 +84,8 @@ export class PetaDataPetaTags {
         );
       },
       {},
-      false,
+      silent,
     );
-  }
-  private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
-    const log = this.parent.mainLogger.logChunk();
-    log.log("##Update PetaImagePetaTag");
-    log.log("mode:", mode);
-    log.log("tag:", minimId(petaImagePetaTag.id));
-    if (mode === UpdateMode.REMOVE) {
-      await this.parent.datas.dbPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
-      log.log("removed");
-    } else if (mode === UpdateMode.UPDATE) {
-      await this.parent.datas.dbPetaImagesPetaTags.update(
-        { id: petaImagePetaTag.id },
-        petaImagePetaTag,
-      );
-      log.log("updated");
-    } else {
-      await this.parent.datas.dbPetaImagesPetaTags.insert(petaImagePetaTag);
-      log.log("inserted");
-    }
-    return true;
   }
   async getPetaImageIdsByPetaTagIds(petaTagIds: string[] | undefined) {
     const log = this.parent.mainLogger.logChunk();
@@ -215,5 +204,43 @@ export class PetaDataPetaTags {
         }
       }),
     ];
+  }
+  private async updatePetaTag(tag: PetaTag, mode: UpdateMode) {
+    const log = this.parent.mainLogger.logChunk();
+    log.log("##Update PetaTag");
+    log.log("mode:", mode);
+    log.log("tag:", minimId(tag.id));
+    if (mode === UpdateMode.REMOVE) {
+      await this.parent.datas.dbPetaImagesPetaTags.remove({ petaTagId: tag.id });
+      await this.parent.datas.dbPetaTags.remove({ id: tag.id });
+      log.log("removed");
+    } else if (mode === UpdateMode.UPDATE) {
+      await this.parent.datas.dbPetaTags.update({ id: tag.id }, tag);
+      log.log("updated");
+    } else {
+      await this.parent.datas.dbPetaTags.insert(tag);
+      log.log("inserted");
+    }
+    return true;
+  }
+  private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
+    const log = this.parent.mainLogger.logChunk();
+    log.log("##Update PetaImagePetaTag");
+    log.log("mode:", mode);
+    log.log("tag:", minimId(petaImagePetaTag.id));
+    if (mode === UpdateMode.REMOVE) {
+      await this.parent.datas.dbPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
+      log.log("removed");
+    } else if (mode === UpdateMode.UPDATE) {
+      await this.parent.datas.dbPetaImagesPetaTags.update(
+        { id: petaImagePetaTag.id },
+        petaImagePetaTag,
+      );
+      log.log("updated");
+    } else {
+      await this.parent.datas.dbPetaImagesPetaTags.insert(petaImagePetaTag);
+      log.log("inserted");
+    }
+    return true;
   }
 }

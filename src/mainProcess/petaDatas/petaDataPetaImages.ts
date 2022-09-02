@@ -19,34 +19,6 @@ import {
 } from "@/commons/defines";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
-  private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    const log = this.parent.mainLogger.logChunk();
-    log.log("##Update PetaImage");
-    log.log("mode:", mode);
-    log.log("image:", minimId(petaImage.id));
-    if (mode === UpdateMode.REMOVE) {
-      await this.parent.datas.dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
-      log.log("removed tags");
-      await this.parent.datas.dbPetaImages.remove({ id: petaImage.id });
-      log.log("removed db");
-      await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch(() => {
-        //
-      });
-      log.log("removed file");
-      await file.rm(this.getImagePath(petaImage, ImageType.THUMBNAIL)).catch(() => {
-        //
-      });
-      log.log("removed thumbnail");
-      log.log("removed");
-    } else if (mode === UpdateMode.UPDATE) {
-      await this.parent.datas.dbPetaImages.update({ id: petaImage.id }, petaImage);
-      log.log("updated");
-    } else {
-      await this.parent.datas.dbPetaImages.insert(petaImage);
-      log.log("inserted");
-    }
-    return true;
-  }
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
     return Tasks.spawn(
       "UpdatePetaImages",
@@ -199,5 +171,33 @@ export class PetaDataPetaImages {
     };
     await promiseSerial(generate, images).promise;
     this.parent.emitMainEvent("regenerateMetadatasComplete");
+  }
+  private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
+    const log = this.parent.mainLogger.logChunk();
+    log.log("##Update PetaImage");
+    log.log("mode:", mode);
+    log.log("image:", minimId(petaImage.id));
+    if (mode === UpdateMode.REMOVE) {
+      await this.parent.datas.dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
+      log.log("removed tags");
+      await this.parent.datas.dbPetaImages.remove({ id: petaImage.id });
+      log.log("removed db");
+      await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch(() => {
+        //
+      });
+      log.log("removed file");
+      await file.rm(this.getImagePath(petaImage, ImageType.THUMBNAIL)).catch(() => {
+        //
+      });
+      log.log("removed thumbnail");
+      log.log("removed");
+    } else if (mode === UpdateMode.UPDATE) {
+      await this.parent.datas.dbPetaImages.update({ id: petaImage.id }, petaImage);
+      log.log("updated");
+    } else {
+      await this.parent.datas.dbPetaImages.insert(petaImage);
+      log.log("inserted");
+    }
+    return true;
   }
 }

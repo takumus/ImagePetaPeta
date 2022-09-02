@@ -6,7 +6,7 @@ import * as Path from "path";
 import * as file from "@/mainProcess/storages/file";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
-import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
 import { MainEvents } from "@/commons/api/mainEvents";
 import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
@@ -126,7 +126,7 @@ export class PetaDatas {
     }
     return petaImages.map((petaImage) => petaImage.id);
   }
-  async importImagesFromFilePaths(filePaths: string[]) {
+  async importImagesFromFilePaths(filePaths: string[], silent = false) {
     if (filePaths.length == 0) {
       return [];
     }
@@ -223,7 +223,7 @@ export class PetaDatas {
         return petaImages;
       },
       {},
-      false,
+      silent,
     );
   }
   async waifu2x(petaImages: PetaImage[]) {
@@ -284,7 +284,7 @@ export class PetaDatas {
           const result = await childProcess.promise;
           handler.onCancel = undefined;
           if (result) {
-            const newPetaImages = await this.importImagesFromFilePaths([outputFile]);
+            const newPetaImages = await this.importImagesFromFilePaths([outputFile], true);
             if (newPetaImages.length < 1) {
               log.log("return: false");
               return false;
@@ -298,16 +298,18 @@ export class PetaDatas {
             newPetaImage.fileDate = petaImage.fileDate;
             newPetaImage.name = petaImage.name + "-converted";
             log.log("update new petaImage");
-            await this.petaImages.updatePetaImages([newPetaImage], UpdateMode.UPDATE);
+            await this.petaImages.updatePetaImages([newPetaImage], UpdateMode.UPDATE, true);
             this.emitMainEvent("updatePetaImages", [newPetaImage], UpdateMode.UPDATE);
             log.log("get tags");
             const pipts = await this.datas.dbPetaImagesPetaTags.find({ petaImageId: petaImage.id });
             log.log("tags:", pipts.length);
-            await promiseSerial(async (pipt, index) => {
-              log.log("copy tag: (", index, "/", pipts.length, ")");
-              const newPIPT = createPetaImagePetaTag(newPetaImage.id, pipt.petaTagId);
-              await this.datas.dbPetaImagesPetaTags.insert(newPIPT);
-            }, pipts).promise;
+            log.log("copy tags");
+            await this.petaTags.updatePetaImagesPetaTags(
+              [newPetaImage.id],
+              pipts.map((pipt) => pipt.petaTagId),
+              UpdateMode.INSERT,
+              true,
+            );
             log.log(`add "before waifu2x" tag to old petaImage`);
             const name = "before waifu2x";
             let petaTag = (await this.datas.dbPetaTags.find({ name: name }))[0];
@@ -319,6 +321,7 @@ export class PetaDatas {
               [petaImage.id],
               [petaTag.id],
               UpdateMode.INSERT,
+              true,
             );
           } else {
             success = false;

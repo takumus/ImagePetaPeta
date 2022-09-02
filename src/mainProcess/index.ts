@@ -364,7 +364,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             if (Object.keys(petaBoards).length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
-              await petaDatas.petaBoards.updatePetaBoard(board, UpdateMode.INSERT);
+              await petaDatas.petaBoards.updatePetaBoards([board], UpdateMode.INSERT);
               petaBoards[board.id] = board;
             }
             log.log("return:", petaBoards.length);
