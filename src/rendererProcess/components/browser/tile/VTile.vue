@@ -66,6 +66,7 @@ import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
 import { API } from "@/rendererProcess/api";
 import { PetaTag } from "@/commons/datas/petaTag";
+import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import {
   BROWSER_FETCH_TAGS_DELAY,
   BROWSER_FETCH_TAGS_DELAY_RANDOM,
@@ -224,9 +225,8 @@ watch(originalURL, (url) => {
   }
   if (img.src !== url) {
     loadingOriginal.value = true;
-    img.src = url;
-    img.decode().then(() => {
-      loadingOriginal.value = false;
+    ImageDecoder.decode(img, url, (failed) => {
+      loadingOriginal.value = failed;
     });
   }
 });

@@ -71,13 +71,11 @@
 <script setup lang="ts">
 // Vue
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-// Components
 import VTile from "@/rendererProcess/components/browser/tile/VTile.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 import VPreview from "@/rendererProcess/components/browser/property/VPreview.vue";
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
-// Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { API } from "@/rendererProcess/api";
 import {
@@ -105,6 +103,7 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
+import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -408,6 +407,7 @@ function sort(a: PetaImage, b: PetaImage) {
   }
 }
 async function fetchFilteredPetaImages() {
+  ImageDecoder.clear();
   if (selectedPetaTagIds.value.length === 0) {
     filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
     return;
