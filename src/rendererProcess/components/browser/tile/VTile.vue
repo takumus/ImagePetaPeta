@@ -98,7 +98,6 @@ const petaImagesStore = usePetaImagesStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const thumbnailURL = ref("");
-const originalURL = ref("");
 const image = ref<HTMLImageElement>();
 const loadingThumbnail = ref(true);
 const loadingOriginal = ref(true);
@@ -110,7 +109,7 @@ let fetchTagsTimeoutHandler = -1;
 let pressing = false;
 const fetchingPetaTags = ref(false);
 onMounted(() => {
-  delayedUpdateImage();
+  delayedLoadImage();
   delayedFetchPetaTags();
 });
 onUnmounted(() => {
@@ -203,45 +202,31 @@ function delayedFetchPetaTags() {
     fetchingPetaTags.value = false;
   }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
 }
-function delayedUpdateImage() {
+function delayedLoadImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
-  // imageURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
   thumbnailURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
   if (props.original) {
     loadOriginalTimeoutHandler = window.setTimeout(() => {
       if (props.tile.visible) {
-        originalURL.value = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
+        const img = image.value;
+        const url = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
+        if (img === undefined) {
+          return;
+        }
+        if (img.src !== url) {
+          loadingOriginal.value = true;
+          ImageDecoder.decode(img, url, (failed) => {
+            loadingOriginal.value = failed;
+          });
+        }
       }
     }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
   }
 }
-const visible = computed(() => {
-  return props.tile.visible;
+watch([() => props.tile.visible, () => props.original], () => {
+  delayedLoadImage();
 });
-watch(originalURL, (url) => {
-  const img = image.value;
-  if (img === undefined) {
-    return;
-  }
-  if (img.src !== url) {
-    loadingOriginal.value = true;
-    ImageDecoder.decode(img, url, (failed) => {
-      loadingOriginal.value = failed;
-    });
-  }
-});
-watch(
-  [
-    () => props.parentAreaMinY,
-    () => props.parentAreaMaxY,
-    () => props.original,
-    () => props.tile.width,
-  ],
-  () => {
-    delayedUpdateImage();
-  },
-);
-watch([visible, () => settingsStore.state.value.showTagsOnTile], () => {
+watch([() => props.tile.visible, () => settingsStore.state.value.showTagsOnTile], () => {
   delayedFetchPetaTags();
 });
 petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
