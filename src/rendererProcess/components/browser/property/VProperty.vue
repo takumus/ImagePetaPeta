@@ -33,6 +33,13 @@
           </t-value>
         </t-data>
         <t-data>
+          <t-name>{{ t("browser.property.infos.size") }}</t-name>
+          <t-value
+            >{{ singlePetaImageInfo.petaImage.width }}px,
+            {{ singlePetaImageInfo.petaImage.height }}px</t-value
+          >
+        </t-data>
+        <t-data>
           <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
           <t-value>{{ singlePetaImageInfo.fileDate }}</t-value>
         </t-data>
@@ -322,7 +329,7 @@ t-property-root {
         margin: 4px 0px;
         > t-name {
           display: block;
-          width: 40%;
+          width: 35%;
           position: relative;
           text-align: right;
           padding: 0px 8px;
@@ -335,7 +342,7 @@ t-property-root {
         > t-value {
           padding: 0px 8px;
           display: block;
-          width: 60%;
+          width: 65%;
           word-break: break-word;
           > textarea {
             width: 100%;

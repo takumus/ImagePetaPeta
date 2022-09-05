@@ -110,6 +110,7 @@ const ja = {
         fileDate: "変更日",
         note: "ノート",
         name: "名前",
+        size: "サイズ",
       },
       colors: {
         label: "色",
