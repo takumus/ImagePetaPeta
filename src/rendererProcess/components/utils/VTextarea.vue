@@ -4,7 +4,7 @@
       lock-keyboard
       ref="textArea"
       v-text="value"
-      @input="input(($event.target as HTMLDivElement).innerHTML)"
+      @input="input(($event.target as HTMLDivElement).innerText)"
       @blur="blur"
       @keypress.enter="enter"
       @keydown.escape="escape"
@@ -159,7 +159,7 @@ function blur() {
 }
 function restore() {
   if (textArea.value) {
-    textArea.value.innerHTML = value.value;
+    textArea.value.innerText = value.value;
   }
 }
 const value = computed({
