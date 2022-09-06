@@ -238,8 +238,12 @@ export class PetaDataPetaTags {
       );
       log.log("updated");
     } else {
-      await this.parent.datas.dbPetaImagesPetaTags.insert(petaImagePetaTag);
-      log.log("inserted");
+      if (await this.parent.datas.dbPetaImagesPetaTags.find(petaImagePetaTag)) {
+        log.log("already exists");
+      } else {
+        await this.parent.datas.dbPetaImagesPetaTags.insert(petaImagePetaTag);
+        log.log("inserted");
+      }
     }
     return true;
   }
