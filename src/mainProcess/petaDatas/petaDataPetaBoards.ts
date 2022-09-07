@@ -25,13 +25,10 @@ export class PetaDataPetaBoards {
     log.log("board:", minimId(board.id));
     if (mode === UpdateMode.REMOVE) {
       await this.parent.datas.dbPetaBoard.remove({ id: board.id });
-      log.log("removed");
     } else if (mode === UpdateMode.UPDATE) {
       await this.parent.datas.dbPetaBoard.update({ id: board.id }, board);
-      log.log("updated");
     } else {
       await this.parent.datas.dbPetaBoard.insert(board);
-      log.log("inserted");
     }
     return true;
   }

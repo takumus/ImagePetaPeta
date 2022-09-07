@@ -179,24 +179,17 @@ export class PetaDataPetaImages {
     log.log("image:", minimId(petaImage.id));
     if (mode === UpdateMode.REMOVE) {
       await this.parent.datas.dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
-      log.log("removed tags");
       await this.parent.datas.dbPetaImages.remove({ id: petaImage.id });
-      log.log("removed db");
       await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch(() => {
         //
       });
-      log.log("removed file");
       await file.rm(this.getImagePath(petaImage, ImageType.THUMBNAIL)).catch(() => {
         //
       });
-      log.log("removed thumbnail");
-      log.log("removed");
     } else if (mode === UpdateMode.UPDATE) {
       await this.parent.datas.dbPetaImages.update({ id: petaImage.id }, petaImage);
-      log.log("updated");
     } else {
       await this.parent.datas.dbPetaImages.insert(petaImage);
-      log.log("inserted");
     }
     return true;
   }

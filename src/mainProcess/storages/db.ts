@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import TypedEmitter from "typed-emitter";
 import Nedb from "@seald-io/nedb";
 type MessageEvents = {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   compactionError: (error: any) => void;
   beginCompaction: () => void;
   doneCompaction: () => void;
@@ -50,12 +51,14 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
         });
     }
   };
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   find(query: Partial<T> | any = {}): Promise<T[]> {
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
     }
     return this.nedb.findAsync(query).execAsync();
   }
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   count(query: Partial<T> | any = {}): Promise<number> {
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
@@ -82,9 +85,18 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
     }
-    const result = await this.nedb.insertAsync(data);
-    this.orderCompaction();
-    return result;
+    try {
+      const result = await this.nedb.insertAsync(data);
+      this.orderCompaction();
+      return result;
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } catch (err: any) {
+      if (err.errorType === "uniqueViolated") {
+        return undefined;
+      } else {
+        throw err;
+      }
+    }
   }
   ensureIndex(ensureIndexOptions: Nedb.EnsureIndexOptions) {
     return new Promise((res) => {

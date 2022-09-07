@@ -213,13 +213,10 @@ export class PetaDataPetaTags {
     if (mode === UpdateMode.REMOVE) {
       await this.parent.datas.dbPetaImagesPetaTags.remove({ petaTagId: tag.id });
       await this.parent.datas.dbPetaTags.remove({ id: tag.id });
-      log.log("removed");
     } else if (mode === UpdateMode.UPDATE) {
       await this.parent.datas.dbPetaTags.update({ id: tag.id }, tag);
-      log.log("updated");
     } else {
       await this.parent.datas.dbPetaTags.insert(tag);
-      log.log("inserted");
     }
     return true;
   }
@@ -230,20 +227,13 @@ export class PetaDataPetaTags {
     log.log("tag:", minimId(petaImagePetaTag.id));
     if (mode === UpdateMode.REMOVE) {
       await this.parent.datas.dbPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
-      log.log("removed");
     } else if (mode === UpdateMode.UPDATE) {
       await this.parent.datas.dbPetaImagesPetaTags.update(
         { id: petaImagePetaTag.id },
         petaImagePetaTag,
       );
-      log.log("updated");
     } else {
-      if (await this.parent.datas.dbPetaImagesPetaTags.find(petaImagePetaTag)) {
-        log.log("already exists");
-      } else {
-        await this.parent.datas.dbPetaImagesPetaTags.insert(petaImagePetaTag);
-        log.log("inserted");
-      }
+      await this.parent.datas.dbPetaImagesPetaTags.insert(petaImagePetaTag);
     }
     return true;
   }
