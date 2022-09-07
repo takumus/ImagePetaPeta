@@ -5,7 +5,10 @@ import { settings } from "@pixi/settings";
 import { SCALE_MODES } from "@pixi/constants";
 import { Ticker, UPDATE_PRIORITY } from "@pixi/ticker";
 import DecompressWorker from "@/rendererProcess/utils/pixi-gif/decompress.worker";
-import { DecompressWorkerData } from "@/rendererProcess/utils/pixi-gif/decompressWorkerData";
+import {
+  DecompressWorkerInputData,
+  DecompressWorkerOutputData,
+} from "@/rendererProcess/utils/pixi-gif/decompressWorkerData";
 /**
  * Frame object.
  */
@@ -125,7 +128,7 @@ class AnimatedGIF extends Sprite {
   private _frames: FrameObject[];
 
   /** Drawing context reference. */
-  private _context?: CanvasRenderingContext2D;
+  private _context?: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
   /** Dirty means the image needs to be redrawn. Set to `true` to force redraw. */
   public dirty = false;
@@ -163,74 +166,40 @@ class AnimatedGIF extends Sprite {
     if (!buffer || buffer.byteLength === 0) {
       throw new Error("Invalid buffer");
     }
-
     const frames: FrameObject[] = [];
-
-    // Temporary canvases required for compositing frames
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d")!;
-    const patchCanvas = document.createElement("canvas");
-    const patchContext = patchCanvas.getContext("2d")!;
-
     let time = 0;
-
     // Some GIFs have a non-zero frame delay, so we need to calculate the fallback
     const { fps } = Object.assign({}, AnimatedGIF.defaultOptions, options);
-    const defaultDelay = 1000 / fps;
     // Precompute each frame and store as ImageData
     console.log("GIF(worker): begin converting");
-    let first = true;
+    const defaultDelay = 1000 / fps;
     let cancel = () => {
       //
     };
     const worker = new (DecompressWorker as any)() as Worker;
     const promise = new Promise<AnimatedGIF>((res, rej) => {
       cancel = rej;
-      worker.postMessage(buffer);
+      worker.postMessage({
+        buffer,
+        defaultDelay,
+      } as DecompressWorkerInputData);
       worker.addEventListener("error", (e) => {
+        worker.terminate();
         rej(e.message);
       });
       worker.addEventListener("message", (e) => {
-        const data = e.data as DecompressWorkerData;
-        if (first) {
-          canvas.width = data.parsedFrame.dims.width;
-          canvas.height = data.parsedFrame.dims.height;
-          first = false;
-        }
-        // Some GIF's omit the disposalType, so let's assume clear if missing
-        const {
-          disposalType = 2,
-          delay = defaultDelay,
-          patch,
-          dims: { width, height, left, top },
-        } = data.parsedFrame;
-
-        patchCanvas.width = width;
-        patchCanvas.height = height;
-        patchContext.clearRect(0, 0, width, height);
-        const patchData = patchContext.createImageData(width, height);
-
-        patchData.data.set(patch);
-        patchContext.putImageData(patchData, 0, 0);
-
-        context.drawImage(patchCanvas, left, top);
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-        if (disposalType === 2) {
-          context.clearRect(0, 0, width, height);
-        }
+        const data = e.data as DecompressWorkerOutputData;
         console.log(`GIF(worker): converting (${data.index + 1}/${data.length})`);
+        const endTime = time + data.delay;
         frames.push({
           start: time,
-          end: time + delay,
-          imageData,
+          end: endTime,
+          imageData: data.imageData,
         });
-        time += delay;
+        time = endTime;
         if (data.isLast) {
           worker.terminate();
           console.log("GIF(worker): complete converting");
-          canvas.width = canvas.height = 0;
-          patchCanvas.width = patchCanvas.height = 0;
           res(new AnimatedGIF(frames, options));
         }
       });
@@ -263,13 +232,13 @@ class AnimatedGIF extends Sprite {
     const { scaleMode, ...rest } = Object.assign({}, AnimatedGIF.defaultOptions, options);
 
     // Create the texture
-    const canvas = document.createElement("canvas");
+    const canvas = new OffscreenCanvas(0, 0);
     const context = canvas.getContext("2d");
 
     canvas.width = frames[0]!.imageData.width;
     canvas.height = frames[0]!.imageData.height;
 
-    this.texture = Texture.from(canvas, { scaleMode });
+    this.texture = Texture.from(canvas as any, { scaleMode });
 
     this.duration = frames[frames.length - 1]!.end;
     this._frames = frames;
@@ -345,7 +314,9 @@ class AnimatedGIF extends Sprite {
     const currentTime = this._currentTime + elapsed;
     const localTime = currentTime % this.duration;
 
-    const localFrame = this._frames.findIndex((frame) => frame.start <= localTime && frame.end > localTime);
+    const localFrame = this._frames.findIndex(
+      (frame) => frame.start <= localTime && frame.end > localTime,
+    );
 
     if (currentTime >= this.duration) {
       if (this.loop) {
