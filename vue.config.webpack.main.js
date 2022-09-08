@@ -1,0 +1,22 @@
+module.exports = (config) => {
+  config.resolveLoader.modules.add("node_modules");
+  config.resolveLoader.modules.add("loaders");
+  config.module
+    .rule("images")
+    .test(/\.(png)(\?.*)?$/)
+    .use("url-loader")
+    .loader("url-loader")
+    .end();
+  config.module
+    .rule("worker-threads")
+    .test(/\.worker-threads\.ts$/)
+    .use("worker-threads-loader")
+    .loader("worker-threads-loader")
+    .end()
+    .use("worker-loader")
+    .loader("worker-loader")
+    .end()
+    .use("ts-loader")
+    .loader("ts-loader")
+    .end();
+};
