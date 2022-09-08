@@ -18,6 +18,7 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 import { Worker } from "worker_threads";
+import GenerateMetadataWorker from "@/mainProcess/workers/generateMetadata.worker-threads";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -150,7 +151,7 @@ export class PetaDataPetaImages {
     let completed = 0;
     for (let i = 0; i < 12; i++) {
       const worker = {
-        worker: new Worker(Path.join(__dirname, "./workers/generateMetadata.worker-threads.js")),
+        worker: new (GenerateMetadataWorker as any)() as Worker, //new Worker(Path.join(__dirname, "./workers/generateMetadata.worker-threads.js")),
         idle: true,
         id: i,
       };
@@ -187,7 +188,7 @@ export class PetaDataPetaImages {
       });
       return result;
     }
-    const generate = async (image: PetaImage, i: number) => {
+    const generate = async (image: PetaImage) => {
       upgradePetaImage(image);
       // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
       //   return;
@@ -195,7 +196,7 @@ export class PetaDataPetaImages {
       const data = await file.readFile(
         Path.resolve(this.parent.paths.DIR_IMAGES, image.file.original),
       );
-      const resulta = await execWorker(
+      await execWorker(
         {
           data,
           outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, image.file.original),
@@ -222,7 +223,7 @@ export class PetaDataPetaImages {
       log.log(`thumbnail (${++completed} / ${images.length})`);
       this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
     };
-    await Promise.all(images.map((image, i) => generate(image, i)));
+    await Promise.all(images.map((image) => generate(image)));
     await Promise.all(
       workers.map(async (worker) => {
         console.log(`killed(${worker.id}):`, await worker.worker.terminate());

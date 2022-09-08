@@ -77,17 +77,31 @@ module.exports = defineConfig({
     electronBuilder: {
       preload: {
         preload: files.input.main.preload,
-        "workers/generateMetadata.worker-threads":
-          "./src/mainProcess/workers/generateMetadata.worker-threads.ts",
+        // "workers/generateMetadata.worker-threads":
+        //   "./src/mainProcess/workers/generateMetadata.worker-threads.ts",
       },
       mainProcessFile: files.input.main.index,
       outputDir: files.output.electron.appDir,
       chainWebpackMainProcess: (config) => {
+        config.resolveLoader.modules.add("node_modules");
+        config.resolveLoader.modules.add("loaders");
         config.module
           .rule("images")
           .test(/\.(png)(\?.*)?$/)
           .use("url-loader")
           .loader("url-loader")
+          .end();
+        config.module
+          .rule("web-worker")
+          .test(/\.worker-threads\.ts$/)
+          .use("worker-threads-loader")
+          .loader("worker-threads-loader")
+          .end()
+          .use("worker-loader")
+          .loader("worker-loader")
+          .end()
+          .use("ts-loader")
+          .loader("ts-loader")
           .end();
       },
       builderOptions: {
