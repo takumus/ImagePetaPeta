@@ -38,41 +38,6 @@ module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
   pages,
-  chainWebpack: (config) => {
-    config.optimization.delete("splitChunks");
-    config.performance
-      .maxEntrypointSize(16 * 1024 * 1024) // 16mb
-      .maxAssetSize(16 * 1024 * 1024); // 16mb
-    config.module
-      .rule("vue")
-      .use("vue-loader")
-      .tap((options) => {
-        options.hotReload = false;
-        options.compilerOptions = {
-          isCustomElement: (tag) => tag.startsWith("t-"),
-        };
-        return options;
-      })
-      .end();
-    config.module
-      .rule("images")
-      .set("parser", {
-        dataUrlCondition: {
-          maxSize: 16 * 1024 * 1024, // 16mb
-        },
-      })
-      .end();
-    config.module.rule("ts").exclude.add(/\.worker\.ts$/);
-    config.module
-      .rule("web-worker")
-      .test(/\.worker\.ts$/)
-      .use("worker-loader")
-      .loader("worker-loader")
-      .end()
-      .use("ts-loader")
-      .loader("ts-loader")
-      .end();
-  },
   pluginOptions: {
     electronBuilder: {
       preload: {
@@ -82,6 +47,41 @@ module.exports = defineConfig({
       },
       mainProcessFile: files.input.main.index,
       outputDir: files.output.electron.appDir,
+      chainWebpackRendererProcess: (config) => {
+        config.optimization.delete("splitChunks");
+        config.performance
+          .maxEntrypointSize(16 * 1024 * 1024) // 16mb
+          .maxAssetSize(16 * 1024 * 1024); // 16mb
+        config.module
+          .rule("vue")
+          .use("vue-loader")
+          .tap((options) => {
+            options.hotReload = false;
+            options.compilerOptions = {
+              isCustomElement: (tag) => tag.startsWith("t-"),
+            };
+            return options;
+          })
+          .end();
+        config.module
+          .rule("images")
+          .set("parser", {
+            dataUrlCondition: {
+              maxSize: 16 * 1024 * 1024, // 16mb
+            },
+          })
+          .end();
+        config.module.rule("ts").exclude.add(/\.worker\.ts$/);
+        config.module
+          .rule("web-worker")
+          .test(/\.worker\.ts$/)
+          .use("worker-loader")
+          .loader("worker-loader")
+          .end()
+          .use("ts-loader")
+          .loader("ts-loader")
+          .end();
+      },
       chainWebpackMainProcess: (config) => {
         config.resolveLoader.modules.add("node_modules");
         config.resolveLoader.modules.add("loaders");
@@ -92,7 +92,7 @@ module.exports = defineConfig({
           .loader("url-loader")
           .end();
         config.module
-          .rule("web-worker")
+          .rule("worker-threads")
           .test(/\.worker-threads\.ts$/)
           .use("worker-threads-loader")
           .loader("worker-threads-loader")
