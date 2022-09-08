@@ -23,7 +23,9 @@ const windowTypes = fs
   .match(/"(.*?)"/g)
   .map((name) => name.replace(/"/g, ""));
 if (windowTypes.sort().join() !== Object.keys(pages).sort().join()) {
-  console.error(`Error: ${files.input.renderer.windowTypes} or ${files.input.renderer.windowsRoot} is wrong.`);
+  console.error(
+    `Error: ${files.input.renderer.windowTypes} or ${files.input.renderer.windowsRoot} is wrong.`,
+  );
   process.kill(0);
 }
 let appxConfig = null;
@@ -70,7 +72,9 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
-      preload: files.input.main.preload,
+      preload: {
+        preload: files.input.main.preload,
+      },
       mainProcessFile: files.input.main.index,
       outputDir: files.output.electron.appDir,
       chainWebpackMainProcess: (config) => {

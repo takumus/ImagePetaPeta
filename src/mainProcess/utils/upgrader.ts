@@ -278,21 +278,3 @@ export async function upgradePetaImagesPetaTags(
   }
   return changed;
 }
-
-function migrate<T>(data: T, defaultData: T): T {
-  Object.keys(defaultData).forEach((key) => {
-    const dataType = typeof (data as any)[key];
-    const defaultDataType = typeof (defaultData as any)[key];
-    if (
-      dataType === defaultDataType &&
-      !Array.isArray((defaultData as any)[key]) &&
-      defaultDataType === "object"
-    ) {
-      (data as any)[key] = migrate((data as any)[key], (defaultData as any)[key]);
-    }
-    if (dataType !== defaultDataType) {
-      (data as any)[key] = (defaultData as any)[key];
-    }
-  });
-  return data;
-}
