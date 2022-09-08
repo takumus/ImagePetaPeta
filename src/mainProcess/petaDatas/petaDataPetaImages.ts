@@ -17,6 +17,7 @@ import {
   BROWSER_THUMBNAIL_SIZE,
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
+import { Worker } from "worker_threads";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -145,31 +146,89 @@ export class PetaDataPetaImages {
     const log = this.parent.mainLogger.logChunk();
     this.parent.emitMainEvent("regenerateMetadatasBegin");
     const images = await this.parent.datas.dbPetaImages.find({});
+    const workers: { idle: boolean; worker: Worker; id: number }[] = [];
+    let completed = 0;
+    for (let i = 0; i < 12; i++) {
+      const worker = {
+        worker: new Worker(Path.join(__dirname, "./workers/generateMetadata.worker-threads.js")),
+        idle: true,
+        id: i,
+      };
+      workers.push(worker);
+    }
+    async function execWorker(params: any, afterTask: (result: any) => Promise<void>) {
+      let worker: { idle: boolean; worker: Worker } | undefined = undefined;
+      /* eslint-disable-next-line */
+      while (true) {
+        await new Promise((res) => {
+          setTimeout(res);
+        });
+        worker = workers.find((worker) => worker.idle === true);
+        if (worker) {
+          worker.idle = false;
+          break;
+        }
+      }
+      const result = await new Promise<ReturnType<typeof generateMetadata>>((res, rej) => {
+        if (worker === undefined) {
+          rej();
+          return;
+        }
+        // console.log(workers.map((w) => (w.id + ": " + w.idle ? "0" : "1")));
+        worker.worker.postMessage(params);
+        worker.worker.once("message", async (data) => {
+          await afterTask(data);
+          res(data);
+          if (worker === undefined) {
+            return;
+          }
+          worker.idle = true;
+        });
+      });
+      return result;
+    }
     const generate = async (image: PetaImage, i: number) => {
       upgradePetaImage(image);
-      if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
-        return;
-      }
+      // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
+      //   return;
+      // }
       const data = await file.readFile(
         Path.resolve(this.parent.paths.DIR_IMAGES, image.file.original),
       );
-      const result = await generateMetadata({
-        data,
-        outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, image.file.original),
-        size: BROWSER_THUMBNAIL_SIZE,
-        quality: BROWSER_THUMBNAIL_QUALITY,
-      });
-      image.placeholder = result.placeholder;
-      image.palette = result.palette;
-      image.width = result.original.width;
-      image.height = result.original.height;
-      image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
-      image.metadataVersion = PETAIMAGE_METADATA_VERSION;
-      await this.updatePetaImages([image], UpdateMode.UPDATE, true);
-      log.log(`thumbnail (${i + 1} / ${images.length})`);
-      this.parent.emitMainEvent("regenerateMetadatasProgress", i + 1, images.length);
+      const resulta = await execWorker(
+        {
+          data,
+          outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, image.file.original),
+          size: BROWSER_THUMBNAIL_SIZE,
+          quality: BROWSER_THUMBNAIL_QUALITY,
+        },
+        async (result) => {
+          image.placeholder = result.placeholder;
+          image.palette = result.palette;
+          image.width = result.original.width;
+          image.height = result.original.height;
+          image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
+          image.metadataVersion = PETAIMAGE_METADATA_VERSION;
+          await this.updatePetaImages([image], UpdateMode.UPDATE, true);
+        },
+      );
+      // image.placeholder = result.placeholder;
+      // image.palette = result.palette;
+      // image.width = result.original.width;
+      // image.height = result.original.height;
+      // image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
+      // image.metadataVersion = PETAIMAGE_METADATA_VERSION;
+      // await this.updatePetaImages([image], UpdateMode.UPDATE, true);
+      log.log(`thumbnail (${++completed} / ${images.length})`);
+      this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
     };
-    await promiseSerial(generate, images).promise;
+    await Promise.all(images.map((image, i) => generate(image, i)));
+    await Promise.all(
+      workers.map(async (worker) => {
+        console.log(`killed(${worker.id}):`, await worker.worker.terminate());
+      }),
+    );
+    // await promiseSerial(generate, images).promise;
     this.parent.emitMainEvent("regenerateMetadatasComplete");
   }
   private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {

@@ -52,28 +52,33 @@ module.exports = defineConfig({
           isCustomElement: (tag) => tag.startsWith("t-"),
         };
         return options;
-      });
-    config.module.rule("images").set("parser", {
-      dataUrlCondition: {
-        maxSize: 16 * 1024 * 1024, // 16mb
-      },
-    });
+      })
+      .end();
+    config.module
+      .rule("images")
+      .set("parser", {
+        dataUrlCondition: {
+          maxSize: 16 * 1024 * 1024, // 16mb
+        },
+      })
+      .end();
     config.module.rule("ts").exclude.add(/\.worker\.ts$/);
     config.module
-      .rule("worker")
+      .rule("web-worker")
       .test(/\.worker\.ts$/)
       .use("worker-loader")
-      .loader("worker-loader");
-    config.module
-      .rule("worker")
-      .test(/\.worker\.ts$/)
+      .loader("worker-loader")
+      .end()
       .use("ts-loader")
-      .loader("ts-loader");
+      .loader("ts-loader")
+      .end();
   },
   pluginOptions: {
     electronBuilder: {
       preload: {
         preload: files.input.main.preload,
+        "workers/generateMetadata.worker-threads":
+          "./src/mainProcess/workers/generateMetadata.worker-threads.ts",
       },
       mainProcessFile: files.input.main.index,
       outputDir: files.output.electron.appDir,
@@ -82,7 +87,8 @@ module.exports = defineConfig({
           .rule("images")
           .test(/\.(png)(\?.*)?$/)
           .use("url-loader")
-          .loader("url-loader");
+          .loader("url-loader")
+          .end();
       },
       builderOptions: {
         appId: "io.takumus." + packageJSON.name,
