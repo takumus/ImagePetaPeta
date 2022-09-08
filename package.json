@@ -1,36 +1,30 @@
 {
   "name": "imagepetapeta-beta",
-  "productName": "ImagePetaPeta-beta",
   "version": "2.7.0-beta",
   "private": true,
-  "author": "takumus",
   "description": "image viewer",
-  "lint-staged": {
-    "*.{ts,js,vue}": [
-      "yarn prettier --write",
-      "git add"
-    ]
-  },
+  "author": "takumus",
   "scripts": {
-    "prepare": "husky install && yarn generate-assets",
     "serve": "vue-cli-service electron:serve",
     "build": "vue-cli-service electron:build",
-    "release": "yarn build && node ./scripts/commitAndAddTag.js",
-    "preserve": "yarn generate-assets",
-    "prebuild": "yarn tsc && yarn audit --groups dependencies && yarn generate-assets",
-    "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
     "generate-assets": "run-s generate-assets:*",
-    "generate-assets:dirs": "node ./scripts/generateDirs.js",
-    "generate-assets:licenses": "node ./scripts/generateLicenses.js",
-    "generate-assets:icons": "node ./scripts/generateIcons.js",
     "generate-assets:cursors": "node ./scripts/generateCursors.js",
+    "generate-assets:dirs": "node ./scripts/generateDirs.js",
+    "generate-assets:icons": "node ./scripts/generateIcons.js",
+    "generate-assets:licenses": "node ./scripts/generateLicenses.js",
+    "linecount": "node ./scripts/linecount",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "lint": "vue-cli-service lint",
-    "linecount": "node ./scripts/linecount",
+    "prebuild": "yarn tsc && yarn audit --groups dependencies && yarn generate-assets",
+    "prepare": "husky install && yarn generate-assets",
+    "preserve": "yarn generate-assets",
+    "release": "yarn build && node ./scripts/commitAndAddTag.js",
+    "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
     "tsc": "tsc -p ./tsconfig.json --noEmit "
   },
-  "main": "background.js",
   "dependencies": {
     "@araki-packages/promise-serial": "^2.0.2",
     "@seald-io/nedb": "^3.0.0",
@@ -88,9 +82,16 @@
     "typed-emitter": "^2.1.0",
     "typescript": "^4.7.4",
     "url-loader": "^4.1.1",
-    "vue-cli-plugin-electron-builder": "~2.1.1",
+    "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
     "worker-loader": "^3.0.8"
   },
+  "lint-staged": {
+    "*.{ts,js,vue}": [
+      "yarn prettier --write",
+      "git add"
+    ]
+  },
+  "productName": "ImagePetaPeta-beta",
   "volta": {
     "node": "16.16.0",
     "yarn": "1.22.19"
