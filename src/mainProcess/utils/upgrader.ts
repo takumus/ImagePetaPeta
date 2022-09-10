@@ -100,8 +100,8 @@ export function upgradeSettings(settings: Settings) {
   //   settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
   //   changed = true;
   // }
-  if (settings.waifu2x === undefined) {
-    settings.waifu2x = deepcopy(defaultSettings.waifu2x);
+  if (settings.realESRGAN === undefined) {
+    settings.realESRGAN = deepcopy(defaultSettings.realESRGAN);
     changed = true;
   }
   // v2.8.0

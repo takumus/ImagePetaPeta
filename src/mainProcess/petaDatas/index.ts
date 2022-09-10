@@ -226,12 +226,12 @@ export class PetaDatas {
       silent,
     );
   }
-  async waifu2x(petaImages: PetaImage[]) {
+  async realESRGAN(petaImages: PetaImage[]) {
     return Tasks.spawn(
-      "waifu2x",
+      "realESRGAN",
       async (handler) => {
         const log = this.mainLogger.logChunk();
-        const execFilePath = Path.resolve(this.datas.configSettings.data.waifu2x.execFilePath);
+        const execFilePath = Path.resolve(this.datas.configSettings.data.realESRGAN.execFilePath);
         let success = true;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",
@@ -243,33 +243,31 @@ export class PetaDatas {
         await promiseSerial(async (petaImage, index) => {
           const inputFile = this.petaImages.getImagePath(petaImage, ImageType.ORIGINAL);
           const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
-          const parameters = this.datas.configSettings.data.waifu2x.parameters.map((param) => {
+          const parameters = this.datas.configSettings.data.realESRGAN.parameters.map((param) => {
             if (param === "$$INPUT$$") {
               return inputFile;
             }
             if (param === "$$OUTPUT$$") {
               return outputFile;
             }
+            if (param === "$$MODEL$$") {
+              return "realESRGAN-x4plus";
+            }
             return param;
           });
-          const childProcess = runExternalApplication(
-            execFilePath,
-            parameters,
-            process.platform === "win32" ? "utf16le" : "utf8",
-            (l) => {
-              log.log(l);
-              handler.emitStatus({
-                i18nKey: "tasks.upconverting",
-                progress: {
-                  all: petaImages.length,
-                  current: index + 1,
-                },
-                log: [l],
-                status: "progress",
-                cancelable: true,
-              });
-            },
-          );
+          const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
+            log.log(l);
+            handler.emitStatus({
+              i18nKey: "tasks.upconverting",
+              progress: {
+                all: petaImages.length,
+                current: index + 1,
+              },
+              log: [l],
+              status: "progress",
+              cancelable: true,
+            });
+          });
           handler.onCancel = childProcess.kill;
           handler.emitStatus({
             i18nKey: "tasks.upconverting",
@@ -310,8 +308,8 @@ export class PetaDatas {
               UpdateMode.INSERT,
               true,
             );
-            log.log(`add "before waifu2x" tag to old petaImage`);
-            const name = "before waifu2x";
+            log.log(`add "before realESRGAN" tag to old petaImage`);
+            const name = "before realESRGAN";
             let petaTag = (await this.datas.dbPetaTags.find({ name: name }))[0];
             if (petaTag === undefined) {
               petaTag = createPetaTag(name);

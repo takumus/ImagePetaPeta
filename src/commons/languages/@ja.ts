@@ -76,7 +76,7 @@ const ja = {
         return `${ctx.list(0)}枚の画像を削除`;
       },
       openImageFile: "画像ファイルの場所を開く",
-      waifu2x: "waifu2xで変換する",
+      realESRGAN: "Real-ESRGANで変換する",
       searchImageByGoogle: "Googleで類似画像を検索",
     },
     removeImageDialog: (ctx: any) => {
@@ -248,13 +248,13 @@ const ja = {
       },
     },
     upconverting: {
-      name: "waifu2xで変換しています。",
+      name: "Real-ESRGANで変換しています。",
       logs: {
         begin: (ctx: any) => {
           return `${ctx.list(0)}枚の画像を変換します。`;
         },
         progress: (ctx: any) => {
-          return `waifu2xログ: ${ctx.list(0)}`;
+          return `Real-ESRGAN: ${ctx.list(0)}`;
         },
         complete: "完了",
         failed: "失敗",

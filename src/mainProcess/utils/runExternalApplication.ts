@@ -6,6 +6,7 @@ export function runExternalApplication(
   log: (value: string) => void,
 ) {
   const childProcess = spawn(cliToolPath, args);
+  console.log(args);
   return {
     promise: new Promise((res: (value: boolean) => void, rej: (error: Error) => void) => {
       childProcess.stdout.setEncoding(encoding);

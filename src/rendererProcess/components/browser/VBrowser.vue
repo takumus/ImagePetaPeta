@@ -362,9 +362,9 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
       //   }
       // },
       {
-        label: t("browser.petaImageMenu.waifu2x"),
+        label: t("browser.petaImageMenu.realESRGAN"),
         click: async () => {
-          await API.send("waifu2xConvert", selectedPetaImages.value);
+          await API.send("realESRGANConvert", selectedPetaImages.value);
         },
       },
       {

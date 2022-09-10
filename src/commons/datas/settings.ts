@@ -14,9 +14,9 @@ const defaultSettings = {
     default: true,
     path: "",
   },
-  waifu2x: {
+  realESRGAN: {
     execFilePath: "",
-    parameters: ["-i", "$$INPUT$$", "-o", "$$OUTPUT$$", "-n", "1", "--scale_ratio", "2"],
+    parameters: ["-i", "$$INPUT$$", "-o", "$$OUTPUT$$", "-n", "$$MODEL$$"],
   },
   show: "board" as "board" | "browser" | "both",
 };

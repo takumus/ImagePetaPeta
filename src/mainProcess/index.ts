@@ -702,11 +702,11 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           log.log("#Get States");
           return configStates.data;
         },
-        async waifu2xConvert(event, petaImages) {
+        async realESRGANConvert(event, petaImages) {
           const log = mainLogger.logChunk();
           try {
-            log.log("#Waifu2x Convert");
-            const result = await petaDatas.waifu2x(petaImages);
+            log.log("#Real-ESRGAN Convert");
+            const result = await petaDatas.realESRGAN(petaImages);
             log.log("return:", result);
             return result;
           } catch (error) {
