@@ -133,12 +133,10 @@ async function restoreBoard() {
     selectPetaBoard(sortedPetaBoards.value[0]);
   }
 }
-function addPanelByDragAndDrop(ids: string[], mouse: Vec2, fromBrowser: boolean) {
+function addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
   orderedAddPanelIds.value = ids;
   orderedAddPanelDragEvent.value = mouse;
-  if (fromBrowser) {
-    addOrderedPetaPanels();
-  }
+  addOrderedPetaPanels();
 }
 function addOrderedPetaPanels() {
   let offsetIndex = 0;
