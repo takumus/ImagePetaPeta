@@ -219,7 +219,6 @@ export class PetaDatas {
           log: [addedFileCount.toString(), _filePaths.length.toString()],
           status: addedFileCount === _filePaths.length ? "complete" : "failed",
         });
-        this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.INSERT);
         return petaImages;
       },
       {},
@@ -393,7 +392,6 @@ export class PetaDatas {
           log: [addedFileCount.toString(), datas.length.toString()],
           status: addedFileCount === datas.length ? "complete" : "failed",
         });
-        this.emitMainEvent("updatePetaImages", petaImages, UpdateMode.INSERT);
         return petaImages;
       },
       {},
