@@ -1,18 +1,19 @@
-import { spawn } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 export function runExternalApplication(
   cliToolPath: string,
   args: string[],
   encoding: BufferEncoding,
   log: (value: string) => void,
 ) {
-  const childProcess = spawn(cliToolPath, args);
-  console.log(args);
+  let childProcess: ChildProcessWithoutNullStreams | undefined;
   return {
-    promise: new Promise((res: (value: boolean) => void, rej: (error: Error) => void) => {
+    promise: new Promise((res: (value: boolean) => void) => {
+      log(`${cliToolPath}, ${args.join(", ")}`);
+      childProcess = spawn(cliToolPath, args);
       childProcess.stdout.setEncoding(encoding);
       childProcess.stderr.setEncoding(encoding);
       childProcess.on("exit", (code) => {
-        if (childProcess.killed) {
+        if (childProcess?.killed) {
           log("killed");
           res(false);
           return;
@@ -32,7 +33,7 @@ export function runExternalApplication(
       });
     }),
     kill: () => {
-      childProcess.kill();
+      childProcess?.kill();
     },
   };
 }
