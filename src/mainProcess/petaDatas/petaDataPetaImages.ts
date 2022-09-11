@@ -226,7 +226,7 @@ export class PetaDataPetaImages {
     await Promise.all(images.map((image) => generate(image)));
     await Promise.all(
       workers.map(async (worker) => {
-        console.log(`killed(${worker.id}):`, await worker.worker.terminate());
+        // console.log(`killed(${worker.id}):`, await worker.worker.terminate());
       }),
     );
     // await promiseSerial(generate, images).promise;

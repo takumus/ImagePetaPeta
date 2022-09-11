@@ -4,6 +4,5 @@ module.exports = function (source, map) {
     "__webpack_public_path__",
     '__dirname + "/"',
   )}`;
-  console.log(result);
   this.callback(null, result, map);
 };

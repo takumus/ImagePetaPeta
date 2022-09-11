@@ -79,7 +79,6 @@ function changeTaskStatus() {
   }
 }
 function addLog(value: string) {
-  console.log(value);
   log.value = value + "\n" + log.value;
 }
 function cancel() {
