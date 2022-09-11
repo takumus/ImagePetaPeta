@@ -239,7 +239,7 @@ export class PetaDatas {
           cancelable: true,
         });
         log.log("execFilePath:", execFilePath);
-        await promiseSerial(async (petaImage, index) => {
+        const tasks = promiseSerial(async (petaImage, index) => {
           const inputFile = this.petaImages.getImagePath(petaImage, ImageType.ORIGINAL);
           const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
           const parameters = this.datas.configSettings.data.realESRGAN.parameters.map((param) => {
@@ -254,32 +254,37 @@ export class PetaDatas {
             }
             return param;
           });
+          let percent = 0;
           const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
+            l = l.trim();
+            percent = /^\d+\.\d+%$/.test(l) ? Number(l.replace(/%/, "")) : percent;
             log.log(l);
             handler.emitStatus({
               i18nKey: "tasks.upconverting",
               progress: {
                 all: petaImages.length,
-                current: index + 1,
+                current: index + percent / 100,
               },
               log: [l],
               status: "progress",
               cancelable: true,
             });
           });
-          handler.onCancel = childProcess.kill;
+          handler.onCancel = () => {
+            childProcess.kill();
+            tasks.cancel();
+          };
           handler.emitStatus({
             i18nKey: "tasks.upconverting",
             progress: {
               all: petaImages.length,
-              current: index + 1,
+              current: index,
             },
             log: [[execFilePath, ...parameters].join(" ")],
             status: "progress",
             cancelable: true,
           });
           const result = await childProcess.promise;
-          handler.onCancel = undefined;
           if (result) {
             const newPetaImages = await this.importImagesFromFilePaths([outputFile], true);
             if (newPetaImages.length < 1) {
@@ -323,7 +328,8 @@ export class PetaDatas {
           } else {
             success = false;
           }
-        }, petaImages).promise;
+        }, petaImages);
+        await tasks.promise;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",
           log: [],

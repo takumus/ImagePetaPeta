@@ -70,13 +70,16 @@ function changeTaskStatus() {
     }:${localized}`,
   );
   Cursor.setCursor("wait");
-  if (task.status === "complete" || task.status === "failed") {
+  if (task.status === "complete") {
     progress.value = 100;
+  }
+  if (task.status === "complete" || task.status === "failed") {
     Cursor.setDefaultCursor();
     cancelable.value = false;
   }
 }
 function addLog(value: string) {
+  console.log(value);
   log.value = value + "\n" + log.value;
 }
 function cancel() {
