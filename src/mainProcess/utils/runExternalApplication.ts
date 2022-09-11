@@ -33,7 +33,11 @@ export function runExternalApplication(
       });
     }),
     kill: () => {
-      childProcess?.kill();
+      try {
+        childProcess?.kill();
+      } catch {
+        //
+      }
     },
   };
 }
