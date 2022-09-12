@@ -94,7 +94,7 @@ const currentPetaBoardId = ref("");
 const errorPetaBoardId = ref("");
 onMounted(async () => {
   AnimatedGIFLoader.add?.();
-  petaImagesStore.events.on("update", async (newPetaImages, mode) => {
+  petaImagesStore.onUpdate(async (newPetaImages, mode) => {
     const needReload =
       currentPetaBoard.value === undefined
         ? false

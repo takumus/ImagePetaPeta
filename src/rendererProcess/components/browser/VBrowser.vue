@@ -90,7 +90,6 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
@@ -345,7 +344,7 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
               [t("shared.yes"), t("shared.no")],
             )) === 0
           ) {
-            await updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);
+            petaImagesStore.updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);
           }
         },
       },

@@ -1,25 +1,25 @@
-import { InjectionKey, ref } from "vue";
+import { InjectionKey, onUnmounted, ref } from "vue";
 import { API } from "@/rendererProcess/api";
 import { inject } from "@/rendererProcess/utils/vue";
-import {
-  dbPetaImagesToPetaImages,
-  dbPetaImageToPetaImage,
-  PetaImage,
-} from "@/commons/datas/petaImage";
+import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
 export async function createPetaImagesStore() {
-  const states = ref(dbPetaImagesToPetaImages(await API.send("getPetaImages"), false));
+  const states = ref(await API.send("getPetaImages"));
   const selection = ref<{ [key: string]: boolean }>({});
   const eventEmitter = new EventEmitter() as TypedEmitter<{
     update: (changes: PetaImage[], mode: UpdateMode) => void;
   }>;
   API.on("updatePetaImages", async (e, newPetaImages, mode) => {
     if (mode === UpdateMode.INSERT || mode === UpdateMode.UPDATE) {
-      newPetaImages.forEach((petaImage) => {
-        // restore selected
-        states.value[petaImage.id] = dbPetaImageToPetaImage(petaImage);
+      newPetaImages.forEach((newPetaImage) => {
+        const oldPetaImage = states.value[newPetaImage.id];
+        if (oldPetaImage === undefined) {
+          states.value[newPetaImage.id] = newPetaImage;
+        } else {
+          Object.assign(oldPetaImage, newPetaImage);
+        }
       });
     } else if (mode === UpdateMode.REMOVE) {
       newPetaImages.forEach((petaImage) => {
@@ -42,7 +42,15 @@ export async function createPetaImagesStore() {
     getSelected(petaImage: PetaImage) {
       return selection.value[petaImage.id] === true;
     },
-    events: eventEmitter,
+    updatePetaImages(petaImages: PetaImage[], mode: UpdateMode) {
+      return API.send("updatePetaImages", petaImages, mode);
+    },
+    onUpdate: (callback: (petaImages: PetaImage[], mode: UpdateMode) => void) => {
+      eventEmitter.on("update", callback);
+      onUnmounted(() => {
+        eventEmitter.off("update", callback);
+      });
+    },
   };
 }
 export function usePetaImagesStore() {

@@ -89,7 +89,7 @@ async function addTag(name: string) {
   if (petaTagsStore.state.petaTags.value.find((pi) => pi.name === name)) {
     return;
   }
-  API.send("updatePetaTags", [createPetaTag(name)], UpdateMode.INSERT);
+  await petaTagsStore.updatePetaTags([createPetaTag(name)], UpdateMode.INSERT);
 }
 async function removeTag(petaTag: PetaTag) {
   if (
@@ -98,7 +98,7 @@ async function removeTag(petaTag: PetaTag) {
       t("shared.no"),
     ])) === 0
   ) {
-    await API.send("updatePetaTags", [petaTag], UpdateMode.REMOVE);
+    await petaTagsStore.updatePetaTags([petaTag], UpdateMode.REMOVE);
     const index = props.selectedPetaTagIds.findIndex((pt) => pt === petaTag.id);
     if (index >= 0) {
       // props.selectedPetaTags.splice(index, 1);
@@ -117,7 +117,7 @@ async function changeTag(petaTag: PetaTag, newName: string) {
     return;
   }
   petaTag.name = newName;
-  await API.send("updatePetaTags", [petaTag], UpdateMode.UPDATE);
+  await petaTagsStore.updatePetaTags([petaTag], UpdateMode.UPDATE);
   selectPetaTag(petaTag);
 }
 function selectPetaTag(petaTag?: PetaTag) {

@@ -128,7 +128,6 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { updatePetaImages } from "@/rendererProcess/utils/updatePetaImages";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
@@ -137,6 +136,7 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
+import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -146,6 +146,7 @@ const props = defineProps<{
 }>();
 const textsStore = useTextsStore();
 const petaTagsStore = usePetaTagsStore();
+const petaImagesStore = usePetaImagesStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const fetchingTags = ref(false);
@@ -157,7 +158,7 @@ async function addTag(name: string) {
   // リクエスト2回飛ばさない
   if (!petaTag) {
     petaTag = createPetaTag(name);
-    await API.send("updatePetaTags", [petaTag], UpdateMode.INSERT);
+    await petaTagsStore.updatePetaTags([petaTag], UpdateMode.INSERT);
   }
   await API.send(
     "updatePetaImagesPetaTags",
@@ -179,20 +180,20 @@ function changeName(name: string) {
     return;
   }
   singlePetaImageInfo.value.petaImage.name = name;
-  API.send("updatePetaImages", [singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
+  petaImagesStore.updatePetaImages([singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
 }
 function changeNote(note: string) {
   if (singlePetaImageInfo.value === undefined) {
     return;
   }
   singlePetaImageInfo.value.petaImage.note = note;
-  API.send("updatePetaImages", [singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
+  petaImagesStore.updatePetaImages([singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
 }
 function changeNSFW(value: boolean) {
   props.petaImages.forEach((pi) => {
     pi.nsfw = value;
   });
-  updatePetaImages(props.petaImages, UpdateMode.UPDATE);
+  petaImagesStore.updatePetaImages(props.petaImages, UpdateMode.UPDATE);
 }
 function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
   components.contextMenu.open(
@@ -290,6 +291,7 @@ watch(
       note.value = "";
     }
   },
+  { deep: true },
 );
 petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
   if (

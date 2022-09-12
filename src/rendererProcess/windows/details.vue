@@ -72,7 +72,7 @@ const petaImageId = ref<string>();
 const keyboards = new Keyboards();
 onMounted(async () => {
   AnimatedGIFLoader.add?.();
-  petaImagesStore.events.on("update", async (newPetaImages, mode) => {
+  petaImagesStore.onUpdate(async (newPetaImages, mode) => {
     if (mode === UpdateMode.UPDATE) {
       vPetaBoard.value?.orderPIXIRender();
     } else if (mode === UpdateMode.REMOVE) {
