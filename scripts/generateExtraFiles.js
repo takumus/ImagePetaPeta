@@ -51,8 +51,7 @@ async function add(name, destPath, targetFiles, url) {
     script.utils.log(`exists: ${developmentPath}`);
   } catch (err) {
     script.utils.log(`download: ${url}`);
-    const data = await fetch(url);
-    const zip = new AdmZip(Buffer.from(await data.arrayBuffer()));
+    const zip = new AdmZip(Buffer.from(await (await fetch(url)).arrayBuffer()));
     script.utils.mkdir(developmentPath);
     targetFiles.map((file) => {
       script.utils.log(`+${file}`);
