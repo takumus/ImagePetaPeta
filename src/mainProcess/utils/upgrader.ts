@@ -100,10 +100,10 @@ export function upgradeSettings(settings: Settings) {
   //   settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
   //   changed = true;
   // }
-  if (settings.realESRGAN === undefined) {
-    settings.realESRGAN = deepcopy(defaultSettings.realESRGAN);
-    changed = true;
-  }
+  // if (settings.realESRGAN === undefined) {
+  //   settings.realESRGAN = deepcopy(defaultSettings.realESRGAN);
+  //   changed = true;
+  // }
   // v2.8.0
   if (settings.show === undefined) {
     settings.show = defaultSettings.show;

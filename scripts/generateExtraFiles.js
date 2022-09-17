@@ -4,7 +4,7 @@ script.run("generate extra files", async () => {
   const extras = [];
   extras.push(
     await add(
-      "Real-ESRGAN",
+      "win32",
       "realesrgan",
       [
         "models/realesrgan-x4plus-anime.bin",
@@ -18,6 +18,14 @@ script.run("generate extra files", async () => {
       "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-windows.zip",
     ),
   );
+  extras.push(
+    await add(
+      "darwin",
+      "realesrgan",
+      ["models/", "realesrgan-ncnn-vulkan"],
+      "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-macos.zip",
+    ),
+  );
   script.utils.log(
     script.utils.write(
       "./src/@assets/extraFiles.ts",
@@ -26,7 +34,7 @@ script.run("generate extra files", async () => {
           extras
             .map(
               (extra) =>
-                `  "${extra.name}": {\n` +
+                `  "${extra.name}.${extra.platform}": {\n` +
                 extra.files
                   .map(
                     (file) =>
@@ -42,27 +50,32 @@ script.run("generate extra files", async () => {
     ),
   );
 });
-async function add(name, destPath, targetFiles, url) {
-  script.utils.log(name);
-  const developmentPath = script.files.output.electron.resources.tempExtraFiles + "/" + destPath;
-  const productionPath = script.files.output.electron.resources.extraFiles + "/" + destPath;
-  try {
-    script.utils.readdir(developmentPath);
-    script.utils.log(`exists: ${developmentPath}`);
-  } catch (err) {
-    script.utils.log(`download: ${url}`);
-    const zip = new AdmZip(Buffer.from(await (await fetch(url)).arrayBuffer()));
-    script.utils.mkdir(developmentPath);
-    targetFiles.map((file) => {
-      script.utils.log(`+${file}`);
-      zip.extractEntryTo(file, developmentPath, undefined, true);
-    });
-    script.utils.log("complete");
+async function add(platform, name, files, url) {
+  const developmentPath =
+    script.files.output.electron.resources.tempExtraFiles + "/" + platform + "/" + name;
+  const productionPath =
+    script.files.output.electron.resources.extraFiles + "/" + platform + "/" + name;
+  if (platform === process.platform) {
+    script.utils.log(name, platform);
+    try {
+      script.utils.readdir(developmentPath);
+      script.utils.log(`exists: ${developmentPath}`);
+    } catch (err) {
+      script.utils.log(`download: ${url}`);
+      const zip = new AdmZip(Buffer.from(await (await fetch(url)).arrayBuffer()));
+      script.utils.mkdir(developmentPath);
+      files.map((file) => {
+        script.utils.log(`+${file}`);
+        zip.extractEntryTo(file, developmentPath, undefined, true);
+      });
+      script.utils.log("complete");
+    }
   }
   return {
     name,
+    platform,
     productionPath,
     developmentPath,
-    files: targetFiles,
+    files,
   };
 }

@@ -25,6 +25,8 @@ import { I18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { DateTimeFormat, NumberFormat } from "@intlify/core-base";
 import { extraFiles } from "@/@assets/extraFiles";
+import { app } from "electron";
+import * as fs from "fs";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -231,7 +233,28 @@ export class PetaDatas {
       "realESRGAN",
       async (handler) => {
         const log = this.mainLogger.logChunk();
-        const execFilePath = Path.resolve(extraFiles["Real-ESRGAN"]["realesrgan-ncnn-vulkan.exe"]);
+        const isMac = process.platform === "darwin";
+        const additionalPath =
+          isMac && process.env.NODE_ENV === "production" ? [__dirname, "../../"] : [];
+        const execFilePath = Path.resolve(
+          ...additionalPath,
+          isMac
+            ? extraFiles["realesrgan.darwin"]["realesrgan-ncnn-vulkan"]
+            : extraFiles["realesrgan.win32"]["realesrgan-ncnn-vulkan.exe"],
+        );
+        const modelFilePath = Path.resolve(
+          ...additionalPath,
+          isMac
+            ? extraFiles["realesrgan.darwin"]["models/"]
+            : extraFiles["realesrgan.win32"]["realesrgan-ncnn-vulkan.exe"],
+        );
+        if (isMac) {
+          try {
+            fs.accessSync(execFilePath, fs.constants.X_OK);
+          } catch {
+            fs.chmodSync(execFilePath, "755");
+          }
+        }
         let success = true;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",
@@ -243,18 +266,16 @@ export class PetaDatas {
         const tasks = promiseSerial(async (petaImage, index) => {
           const inputFile = this.petaImages.getImagePath(petaImage, ImageType.ORIGINAL);
           const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
-          const parameters = this.datas.configSettings.data.realESRGAN.parameters.map((param) => {
-            if (param === "$$INPUT$$") {
-              return inputFile;
-            }
-            if (param === "$$OUTPUT$$") {
-              return outputFile;
-            }
-            if (param === "$$MODEL$$") {
-              return "realESRGAN-x4plus";
-            }
-            return param;
-          });
+          const parameters = [
+            "-i",
+            inputFile,
+            "-o",
+            outputFile,
+            "-m",
+            modelFilePath,
+            "-n",
+            "realesrgan-x4plus",
+          ];
           let percent = 0;
           const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
             l = l.trim();

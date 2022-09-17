@@ -14,9 +14,6 @@ const defaultSettings = {
     default: true,
     path: "",
   },
-  realESRGAN: {
-    parameters: ["-i", "$$INPUT$$", "-o", "$$OUTPUT$$", "-n", "$$MODEL$$"],
-  },
   show: "board" as "board" | "browser" | "both",
 };
 export function getDefaultSettings() {
