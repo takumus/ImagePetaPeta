@@ -90,10 +90,12 @@ function cancel() {
 t-task-root {
   text-align: center;
   display: block;
-  .log {
+  >pre {
+    width: 100%;
     text-align: left;
     overflow: hidden;
     word-break: break-word;
+    white-space: pre-wrap;
     height: 64px;
     overflow-y: auto;
     overflow-x: hidden;
