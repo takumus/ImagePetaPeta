@@ -10,8 +10,6 @@ try {
 module.exports = {
   preload: {
     preload: files.input.main.preload,
-    // "workers/generateMetadata.worker-threads":
-    //   "./src/mainProcess/workers/generateMetadata.worker-threads.ts",
   },
   mainProcessFile: files.input.main.index,
   outputDir: files.output.electron.appDir,
@@ -41,8 +39,8 @@ module.exports = {
     },
     extraFiles: [
       {
-        from: "resources/realesrgan",
-        to: "resources/realesrgan",
+        from: "externalExecutables",
+        to: "externalExecutables",
         filter: ["**/*"],
       },
     ],

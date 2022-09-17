@@ -24,6 +24,7 @@ import { PetaDataPetaTags } from "@/mainProcess/petaDatas/petaDataPetaTags";
 import { I18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { DateTimeFormat, NumberFormat } from "@intlify/core-base";
+import { externalExecutables } from "@/@assets/externalExecutables";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -230,7 +231,9 @@ export class PetaDatas {
       "realESRGAN",
       async (handler) => {
         const log = this.mainLogger.logChunk();
-        const execFilePath = Path.resolve("./resources/realesrgan/realesrgan-ncnn-vulkan.exe");
+        const execFilePath = Path.resolve(
+          externalExecutables["Real-ESRGAN"]["realesrgan-ncnn-vulkan.exe"],
+        );
         let success = true;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",

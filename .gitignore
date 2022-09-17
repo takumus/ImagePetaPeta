@@ -2,9 +2,10 @@
 /node_modules
 /dist
 /build
-/resources/realesrgan
+/externalExecutables
 electron.config.appx.js
 src/@assets/licenses.ts
+src/@assets/externalExecutables.ts
 
 # local env files
 .env.local
