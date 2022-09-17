@@ -30,13 +30,13 @@ script.run("generate extra files", async () => {
                 `  "${external.name}": {\n` +
                 external.files
                   .map((file) => {
-                    return `    "${file}": process.env.NODE_ENV === "development" ? "${external.developmentPath}/${file}" : "${external.productionPath}/${file}"`;
+                    return `    "${file}":\n      process.env.NODE_ENV === "development"\n        ? "${external.developmentPath}/${file}"\n        : "${external.productionPath}/${file}",`;
                   })
-                  .join(",\n") +
-                `\n  }`
+                  .join("\n") +
+                `\n  },`
               );
             })
-            .join(",\n") +
+            .join("\n") +
           `\n};`,
         "utf-8",
       ),
