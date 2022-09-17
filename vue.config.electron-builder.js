@@ -36,8 +36,8 @@ module.exports = {
     },
     extraFiles: [
       {
-        from: files.output.electron.resources.extraFiles,
-        to: ".",
+        from: files.output.electron.resources.tempExtraFiles,
+        to: files.output.electron.resources.extraFiles,
         filter: ["**/*"],
       },
     ],

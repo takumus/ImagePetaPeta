@@ -6,7 +6,7 @@ script.run("generate extra files", async () => {
   externals.push(
     await add(
       "Real-ESRGAN",
-      script.files.output.electron.resources.extraFiles + "/realesrgan",
+      "realesrgan",
       [
         "models/realesrgan-x4plus-anime.bin",
         "models/realesrgan-x4plus-anime.param",
@@ -30,7 +30,7 @@ script.run("generate extra files", async () => {
                 `  "${external.name}": {\n` +
                 external.files
                   .map((file) => {
-                    return `    "${file}": "${external.path}/${file}"`;
+                    return `    "${file}": process.env.NODE_ENV === "development" ? "${external.developmentPath}/${file}" : "${external.productionPath}/${file}"`;
                   })
                   .join(",\n") +
                 `\n  }`
@@ -43,26 +43,27 @@ script.run("generate extra files", async () => {
     ),
   );
 });
-
 async function add(name, destPath, targetFiles, url) {
   script.utils.log(name);
+  const developmentPath = script.files.output.electron.resources.tempExtraFiles + "/" + destPath;
   try {
-    script.utils.readdir(destPath);
-    script.utils.log(`exists: ${destPath}`);
+    script.utils.readdir(developmentPath);
+    script.utils.log(`exists: ${developmentPath}`);
   } catch (err) {
     script.utils.log(`download: ${url}`);
     const data = await axios.get(url, { responseType: "arraybuffer" });
     var zip = new AdmZip(data.data);
-    script.utils.mkdir(destPath);
+    script.utils.mkdir(developmentPath);
     targetFiles.map((file) => {
       script.utils.log(`+${file}`);
-      zip.extractEntryTo(file, destPath, undefined, true);
+      zip.extractEntryTo(file, developmentPath, undefined, true);
     });
     script.utils.log("complete");
   }
   return {
     name,
-    path: destPath,
+    productionPath: script.files.output.electron.resources.extraFiles + "/" + destPath,
+    developmentPath,
     files: targetFiles,
   };
 }

@@ -2,8 +2,7 @@
 /node_modules
 /dist
 /build
-/extraFiles
-/appIcons
+/.temp
 electron.config.appx.js
 src/@assets/licenses.ts
 src/@assets/extraFiles.ts
