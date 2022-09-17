@@ -1,12 +1,12 @@
 const script = require("./@script");
 var AdmZip = require("adm-zip");
 const axios = require("axios").default;
-script.run("generate external executables", async () => {
+script.run("generate extra files", async () => {
   const externals = [];
   externals.push(
     await add(
       "Real-ESRGAN",
-      script.files.output.electron.resources.externalExecutables + "/realesrgan",
+      script.files.output.electron.resources.extraFiles + "/realesrgan",
       [
         "models/realesrgan-x4plus-anime.bin",
         "models/realesrgan-x4plus-anime.param",
@@ -21,9 +21,9 @@ script.run("generate external executables", async () => {
   );
   script.utils.log(
     script.utils.write(
-      "./src/@assets/externalExecutables.ts",
+      "./src/@assets/extraFiles.ts",
       Buffer.from(
-        `export const externalExecutables = {\n` +
+        `export const extraFiles = {\n` +
           externals
             .map((external) => {
               return (

@@ -15,13 +15,13 @@ module.exports = {
     electron: {
       appDir: "./dist/electron",
       resources: {
-        externalExecutables: "./externalExecutables",
-        dir: "./dist/electron_resources",
+        extraFiles: "./extraFiles",
+        iconsDir: "./appIcons",
         win: {
-          appIcon: "./dist/electron_resources/app_icon_win.ico",
+          appIcon: "./appIcons/app_icon_win.ico",
         },
         mac: {
-          appIcon: "./dist/electron_resources/app_icon_mac.png",
+          appIcon: "./appIcons/app_icon_mac.png",
         },
       },
     },

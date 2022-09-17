@@ -2,10 +2,11 @@
 /node_modules
 /dist
 /build
-/externalExecutables
+/extraFiles
+/appIcons
 electron.config.appx.js
 src/@assets/licenses.ts
-src/@assets/externalExecutables.ts
+src/@assets/extraFiles.ts
 
 # local env files
 .env.local

@@ -17,9 +17,6 @@ module.exports = {
     appId: "io.takumus." + packageJSON.name,
     productName: packageJSON.productName,
     asar: true,
-    directories: {
-      buildResources: files.output.electron.resources.dir,
-    },
     win: {
       icon: path.join(files.output.electron.resources.win.appIcon),
       target: ["nsis", ...(appxConfig ? ["appx"] : [])],
@@ -39,8 +36,8 @@ module.exports = {
     },
     extraFiles: [
       {
-        from: "externalExecutables",
-        to: "externalExecutables",
+        from: files.output.electron.resources.extraFiles,
+        to: ".",
         filter: ["**/*"],
       },
     ],
