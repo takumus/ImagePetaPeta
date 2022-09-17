@@ -6,15 +6,7 @@ script.run("generate extra files", async () => {
     await add(
       "win32",
       "realesrgan",
-      [
-        "models/realesrgan-x4plus-anime.bin",
-        "models/realesrgan-x4plus-anime.param",
-        "models/realesrgan-x4plus.bin",
-        "models/realesrgan-x4plus.param",
-        "realesrgan-ncnn-vulkan.exe",
-        "vcomp140.dll",
-        "vcomp140d.dll",
-      ],
+      ["models/", "realesrgan-ncnn-vulkan.exe", "vcomp140.dll", "vcomp140d.dll"],
       "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-windows.zip",
     ),
   );

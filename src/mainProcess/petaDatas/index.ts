@@ -25,8 +25,8 @@ import { I18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { DateTimeFormat, NumberFormat } from "@intlify/core-base";
 import { extraFiles } from "@/@assets/extraFiles";
-import { app } from "electron";
 import * as fs from "fs";
+import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -234,19 +234,15 @@ export class PetaDatas {
       async (handler) => {
         const log = this.mainLogger.logChunk();
         const isMac = process.platform === "darwin";
-        const additionalPath =
-          isMac && process.env.NODE_ENV === "production" ? [__dirname, "../../"] : [];
-        const execFilePath = Path.resolve(
-          ...additionalPath,
+        const execFilePath = resolveExtraFilesPath(
           isMac
             ? extraFiles["realesrgan.darwin"]["realesrgan-ncnn-vulkan"]
             : extraFiles["realesrgan.win32"]["realesrgan-ncnn-vulkan.exe"],
         );
-        const modelFilePath = Path.resolve(
-          ...additionalPath,
+        const modelFilePath = resolveExtraFilesPath(
           isMac
             ? extraFiles["realesrgan.darwin"]["models/"]
-            : extraFiles["realesrgan.win32"]["realesrgan-ncnn-vulkan.exe"],
+            : extraFiles["realesrgan.win32"]["models/"],
         );
         if (isMac) {
           try {
