@@ -22,7 +22,7 @@ script.run("generate extra files", async () => {
     script.utils.write(
       "./src/@assets/extraFiles.ts",
       Buffer.from(
-        `export const extraFiles = {\n` +
+        `const development = process.env.NODE_ENV === "development";\nexport const extraFiles = {\n` +
           extras
             .map(
               (extra) =>
@@ -30,7 +30,7 @@ script.run("generate extra files", async () => {
                 extra.files
                   .map(
                     (file) =>
-                      `    "${file}":\n      process.env.NODE_ENV === "development"\n        ? "${extra.developmentPath}/${file}"\n        : "${extra.productionPath}/${file}",`,
+                      `    "${file}":\n      development\n        ? "${extra.developmentPath}/${file}"\n        : "${extra.productionPath}/${file}",`,
                   )
                   .join("\n") +
                 `\n  },`,
