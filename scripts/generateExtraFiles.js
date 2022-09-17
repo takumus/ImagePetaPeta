@@ -1,9 +1,8 @@
 const script = require("./@script");
-var AdmZip = require("adm-zip");
-const axios = require("axios").default;
+const AdmZip = require("adm-zip");
 script.run("generate extra files", async () => {
-  const externals = [];
-  externals.push(
+  const extras = [];
+  extras.push(
     await add(
       "Real-ESRGAN",
       "realesrgan",
@@ -24,13 +23,13 @@ script.run("generate extra files", async () => {
       "./src/@assets/extraFiles.ts",
       Buffer.from(
         `export const extraFiles = {\n` +
-          externals
-            .map((external) => {
+          extras
+            .map((extra) => {
               return (
-                `  "${external.name}": {\n` +
-                external.files
+                `  "${extra.name}": {\n` +
+                extra.files
                   .map((file) => {
-                    return `    "${file}":\n      process.env.NODE_ENV === "development"\n        ? "${external.developmentPath}/${file}"\n        : "${external.productionPath}/${file}",`;
+                    return `    "${file}":\n      process.env.NODE_ENV === "development"\n        ? "${extra.developmentPath}/${file}"\n        : "${extra.productionPath}/${file}",`;
                   })
                   .join("\n") +
                 `\n  },`
@@ -46,13 +45,13 @@ script.run("generate extra files", async () => {
 async function add(name, destPath, targetFiles, url) {
   script.utils.log(name);
   const developmentPath = script.files.output.electron.resources.tempExtraFiles + "/" + destPath;
+  const productionPath = script.files.output.electron.resources.extraFiles + "/" + destPath;
   try {
     script.utils.readdir(developmentPath);
     script.utils.log(`exists: ${developmentPath}`);
   } catch (err) {
     script.utils.log(`download: ${url}`);
-    const data = await axios.get(url, { responseType: "arraybuffer" });
-    var zip = new AdmZip(data.data);
+    const zip = new AdmZip(await (await fetch(url)).arrayBuffer());
     script.utils.mkdir(developmentPath);
     targetFiles.map((file) => {
       script.utils.log(`+${file}`);
@@ -62,7 +61,7 @@ async function add(name, destPath, targetFiles, url) {
   }
   return {
     name,
-    productionPath: script.files.output.electron.resources.extraFiles + "/" + destPath,
+    productionPath,
     developmentPath,
     files: targetFiles,
   };
