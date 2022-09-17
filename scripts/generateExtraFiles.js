@@ -30,7 +30,7 @@ script.run("generate extra files", async () => {
                 extra.files
                   .map(
                     (file) =>
-                      `    "${file}":\n      development\n        ? "${extra.developmentPath}/${file}"\n        : "${extra.productionPath}/${file}",`,
+                      `    "${file}": development\n      ? "${extra.developmentPath}/${file}"\n      : "${extra.productionPath}/${file}",`,
                   )
                   .join("\n") +
                 `\n  },`,
@@ -51,7 +51,8 @@ async function add(name, destPath, targetFiles, url) {
     script.utils.log(`exists: ${developmentPath}`);
   } catch (err) {
     script.utils.log(`download: ${url}`);
-    const zip = new AdmZip(await (await fetch(url)).arrayBuffer());
+    const data = await fetch(url);
+    const zip = new AdmZip(Buffer.from(await data.arrayBuffer()));
     script.utils.mkdir(developmentPath);
     targetFiles.map((file) => {
       script.utils.log(`+${file}`);
