@@ -80,9 +80,7 @@ module.exports = {
   },
   "Real-ESRGAN": {
     customLicensesName: "BSD 3-Clause License",
-    customLicensesText: `BSD 3-Clause License
-
-    Copyright (c) 2021, Xintao Wang
+    customLicensesText: `Copyright (c) 2021, Xintao Wang
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
