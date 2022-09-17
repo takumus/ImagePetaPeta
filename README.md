@@ -13,7 +13,7 @@
 1. `package.json`の`volta`のバージョンを参考に`node`, `yarn`の環境を整えてください。  
 1. [Volta](https://docs.volta.sh/guide/getting-started)をインストールでもOKです。  
 2. `yarn build`  
-3. `dist_electron`内に生成されたappファイルがアプリ本体です。
+3. `dist/electron`内に生成されたappファイルがアプリ本体です。
 ## ご協力
 まだ開発段階のアプリなので、多くのユーザーに最新版を使っていただき、新鮮なフィードバックを貰いたいと思っております。  
 そのため、アップデートの通知はオフにできないようになっています。  
