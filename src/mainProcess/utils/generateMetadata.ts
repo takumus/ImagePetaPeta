@@ -8,7 +8,7 @@ export async function generateMetadata(params: {
   quality: number;
 }) {
   console.time(" mtd");
-  const metadata = await sharp(params.data).metadata();
+  const metadata = await sharp(params.data, { limitInputPixels: false }).metadata();
   console.timeEnd(" mtd");
   const originalWidth = metadata.width;
   const originalHeight = metadata.height;
@@ -17,7 +17,7 @@ export async function generateMetadata(params: {
     throw "invalid image data";
   }
   console.time(" rsz");
-  const resizedData = await sharp(params.data)
+  const resizedData = await sharp(params.data, { limitInputPixels: false })
     .resize(params.size)
     .webp({ quality: params.quality })
     .toBuffer({ resolveWithObject: true });
@@ -35,7 +35,7 @@ export async function generateMetadata(params: {
     })(),
     (async () => {
       console.time(" srp");
-      const raw = await sharp(resizedData.data)
+      const raw = await sharp(resizedData.data, { limitInputPixels: false })
         .ensureAlpha()
         .raw()
         .toBuffer({ resolveWithObject: true });

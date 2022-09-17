@@ -97,11 +97,11 @@ export class PetaDataPetaImages {
         petaImage: upgradePetaImage(exists),
         exists: true,
       };
-    const metadata = await sharp(param.data).metadata();
+    const metadata = await sharp(param.data, { limitInputPixels: false }).metadata();
     let extName: string | undefined | null = undefined;
     if (metadata.orientation !== undefined) {
       // jpegの角度情報があったら回転する。pngにする。
-      param.data = await sharp(param.data).rotate().png().toBuffer();
+      param.data = await sharp(param.data, { limitInputPixels: false }).rotate().png().toBuffer();
       extName = "png";
     } else {
       // formatを拡張子にする。
