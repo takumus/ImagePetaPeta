@@ -24,17 +24,17 @@ script.run("generate extra files", async () => {
       Buffer.from(
         `export const extraFiles = {\n` +
           extras
-            .map((extra) => {
-              return (
+            .map(
+              (extra) =>
                 `  "${extra.name}": {\n` +
                 extra.files
-                  .map((file) => {
-                    return `    "${file}":\n      process.env.NODE_ENV === "development"\n        ? "${extra.developmentPath}/${file}"\n        : "${extra.productionPath}/${file}",`;
-                  })
+                  .map(
+                    (file) =>
+                      `    "${file}":\n      process.env.NODE_ENV === "development"\n        ? "${extra.developmentPath}/${file}"\n        : "${extra.productionPath}/${file}",`,
+                  )
                   .join("\n") +
-                `\n  },`
-              );
-            })
+                `\n  },`,
+            )
             .join("\n") +
           `\n};`,
         "utf-8",
