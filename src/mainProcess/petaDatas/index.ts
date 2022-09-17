@@ -261,7 +261,7 @@ export class PetaDatas {
         log.log("execFilePath:", execFilePath);
         const tasks = promiseSerial(async (petaImage, index) => {
           const inputFile = this.petaImages.getImagePath(petaImage, ImageType.ORIGINAL);
-          const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.png`;
+          const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.webp`;
           const parameters = [
             "-i",
             inputFile,
