@@ -29,14 +29,14 @@ script.run("generate icons", async () => {
   }
   script.utils.log(
     await exportIcon(
-      "./rawAssets/icon/icon.png",
+      "./resources/icon/icon.png",
       Path.resolve(script.files.output.electron.resources.win.appIcon),
       [16, 32, 48, 64, 128, 256],
     ),
   );
   script.utils.log(
     await exportImageWithMargin(
-      "./rawAssets/icon/icon.png",
+      "./resources/icon/icon.png",
       Path.resolve(script.files.output.electron.resources.mac.appIcon),
       512,
       50,

@@ -39,6 +39,13 @@ module.exports = {
       name: "image-petapeta-protocol",
       schemes: ["image-petapeta"],
     },
+    extraFiles: [
+      {
+        from: "resources/realesrgan",
+        to: "resources/realesrgan",
+        filter: ["**/*"],
+      },
+    ],
     ...appxConfig,
   },
 };

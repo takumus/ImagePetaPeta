@@ -7,7 +7,7 @@ script.run("generate cursors", async () => {
     script.utils.log(
       script.utils.write(
         `./src/@assets/rotateCursor${i + 1}x.png`,
-        await sharp("./rawAssets/cursor/rotate.png").resize(size).toBuffer(),
+        await sharp("./resources/cursor/rotate.png").resize(size).toBuffer(),
       ),
     );
   }

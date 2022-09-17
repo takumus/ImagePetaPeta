@@ -230,7 +230,7 @@ export class PetaDatas {
       "realESRGAN",
       async (handler) => {
         const log = this.mainLogger.logChunk();
-        const execFilePath = Path.resolve(this.datas.configSettings.data.realESRGAN.execFilePath);
+        const execFilePath = Path.resolve("./resources/realesrgan/realesrgan-ncnn-vulkan.exe");
         let success = true;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",

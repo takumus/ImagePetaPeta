@@ -15,7 +15,6 @@ const defaultSettings = {
     path: "",
   },
   realESRGAN: {
-    execFilePath: "",
     parameters: ["-i", "$$INPUT$$", "-o", "$$OUTPUT$$", "-n", "$$MODEL$$"],
   },
   show: "board" as "board" | "browser" | "both",
