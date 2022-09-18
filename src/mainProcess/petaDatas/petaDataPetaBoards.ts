@@ -2,7 +2,7 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { minimId } from "@/commons/utils/utils";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { upgradePetaBoard } from "@/mainProcess/utils/upgrader";
+import { migratePetaBoard } from "@/mainProcess/utils/migrater";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 export class PetaDataPetaBoards {
   constructor(private parent: PetaDatas) {}
@@ -13,7 +13,7 @@ export class PetaDataPetaBoards {
     const boards: { [id: string]: PetaBoard } = {};
     (await this.parent.datas.dbPetaBoard.find({})).forEach((board) => {
       // バージョンアップ時のプロパティ更新
-      upgradePetaBoard(board);
+      migratePetaBoard(board);
       boards[board.id] = board;
     });
     return boards;

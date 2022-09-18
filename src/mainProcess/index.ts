@@ -19,10 +19,10 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { MainFunctions } from "@/commons/api/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import {
-  upgradePetaImage,
-  upgradePetaTag,
-  upgradePetaImagesPetaTags,
-} from "@/mainProcess/utils/upgrader";
+  migratePetaImage,
+  migratePetaTag,
+  migratePetaImagesPetaTags,
+} from "@/mainProcess/utils/migrater";
 import { arrLast } from "@/commons/utils/utils";
 import { showErrorWindow, ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import * as Tasks from "@/mainProcess/tasks/task";
@@ -220,13 +220,13 @@ import { LogFrom } from "@/mainProcess/storages/logger";
       const petaImagesArray = await dbPetaImages.find({});
       const petaImages: PetaImages = {};
       petaImagesArray.forEach((pi) => {
-        petaImages[pi.id] = upgradePetaImage(pi);
+        petaImages[pi.id] = migratePetaImage(pi);
       });
-      if (await upgradePetaTag(dbPetaTags, petaImages)) {
+      if (await migratePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade Tags");
         await petaDatas.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
       }
-      if (await upgradePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
+      if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
       }
       if (configDBInfo.data.version !== app.getVersion()) {

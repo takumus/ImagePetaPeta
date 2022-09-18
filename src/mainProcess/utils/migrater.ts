@@ -15,7 +15,7 @@ import DB from "@/mainProcess/storages/db";
 import deepcopy from "deepcopy";
 import { v4 as uuid } from "uuid";
 const defaultSettings = getDefaultSettings();
-export function upgradePetaImage(petaImage: PetaImage) {
+export function migratePetaImage(petaImage: PetaImage) {
   // v0.2.0 (move to PetaImagePetaTag)
   // if (petaImage.tags === undefined) {
   //   petaImage.tags = [];
@@ -53,7 +53,7 @@ export function upgradePetaImage(petaImage: PetaImage) {
   }
   return petaImage;
 }
-export function upgradeSettings(settings: Settings) {
+export function migrateSettings(settings: Settings) {
   let changed = false;
   // v0.8.4
   if (settings.zoomSensitivity === undefined) {
@@ -122,7 +122,7 @@ export function upgradeSettings(settings: Settings) {
     changed,
   };
 }
-export function upgradeStates(states: States) {
+export function migrateStates(states: States) {
   let changed = false;
   if (states.selectedPetaBoardId === undefined) {
     states.selectedPetaBoardId = "";
@@ -153,7 +153,7 @@ export function upgradeStates(states: States) {
     changed,
   };
 }
-export function upgradeWindowStates(states: WindowStates) {
+export function migrateWindowStates(states: WindowStates) {
   const changed = false;
   //
   return {
@@ -161,7 +161,7 @@ export function upgradeWindowStates(states: WindowStates) {
     changed,
   };
 }
-export function upgradePetaBoard(board: PetaBoard) {
+export function migratePetaBoard(board: PetaBoard) {
   // v0.5.0
   if (board.background === undefined) {
     board.background = {
@@ -170,7 +170,7 @@ export function upgradePetaBoard(board: PetaBoard) {
     };
   }
   // board.petaPanels.forEach((petaPanel) => {
-  //   upgradePetaPanel(petaPanel);
+  //   migratePetaPanel(petaPanel);
   // });
 
   // v3.0.0
@@ -184,15 +184,15 @@ export function upgradePetaBoard(board: PetaBoard) {
   }
 
   Object.values(board.petaPanels).forEach((petaPanel) => {
-    upgradePetaPanel(petaPanel);
+    migratePetaPanel(petaPanel);
   });
 
   return board;
 }
 // 1.8.0
-export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImages) {
+export async function migratePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImages) {
   const petaImagesArr = Object.values(petaImages);
-  let upgraded = false;
+  let migrated = false;
   const addTags = async (petaImage: PetaImage, index: number) => {
     const anyPetaImage = petaImage as any;
     await promiseSerial(async (tag) => {
@@ -208,15 +208,15 @@ export async function upgradePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
       anyPetaTag.petaImages.push(petaImage.id);
       anyPetaTag.petaImages = Array.from(new Set(anyPetaTag.petaImages));
       await petaTags.insert(anyPetaTag);
-      upgraded = true;
+      migrated = true;
     }, (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).promise;
     anyPetaImage["tags"] = undefined;
   };
   await promiseSerial(addTags, petaImagesArr).promise;
-  return upgraded;
+  return migrated;
 }
 
-export function upgradePetaPanel(petaPanel: PetaPanel) {
+export function migratePetaPanel(petaPanel: PetaPanel) {
   // 1.8.0
   if (petaPanel.gif === undefined) {
     petaPanel.gif = {
@@ -235,7 +235,7 @@ export function upgradePetaPanel(petaPanel: PetaPanel) {
 }
 
 // 2.0.1
-export async function upgradePetaImagesPetaTags(
+export async function migratePetaImagesPetaTags(
   petaTags: DB<PetaTag>,
   petaImagesPetaTags: DB<PetaImagePetaTag>,
   petaImages: PetaImages,

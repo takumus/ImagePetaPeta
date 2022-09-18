@@ -8,7 +8,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
 import crypto from "crypto";
 import { ImageType } from "@/commons/datas/imageType";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
-import { upgradePetaImage } from "@/mainProcess/utils/upgrader";
+import { migratePetaImage } from "@/mainProcess/utils/migrater";
 import sharp from "sharp";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
 import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
@@ -78,7 +78,7 @@ export class PetaDataPetaImages {
     const data = await this.parent.datas.dbPetaImages.find({});
     const petaImages: PetaImages = {};
     data.forEach((pi) => {
-      petaImages[pi.id] = upgradePetaImage(pi);
+      petaImages[pi.id] = migratePetaImage(pi);
     });
     return petaImages;
   }
@@ -93,7 +93,7 @@ export class PetaDataPetaImages {
     const exists = await this.getPetaImage(id);
     if (exists)
       return {
-        petaImage: upgradePetaImage(exists),
+        petaImage: migratePetaImage(exists),
         exists: true,
       };
     const metadata = await sharp(param.data, { limitInputPixels: false }).metadata();
@@ -147,7 +147,7 @@ export class PetaDataPetaImages {
     const images = await this.parent.datas.dbPetaImages.find({});
     let completed = 0;
     const generate = async (image: PetaImage) => {
-      upgradePetaImage(image);
+      migratePetaImage(image);
       // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
       //   return;
       // }

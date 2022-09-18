@@ -15,7 +15,7 @@ import * as file from "@/mainProcess/storages/file";
 import { app, nativeTheme } from "electron";
 import isValidFilePath from "@/mainProcess/utils/isValidFilePath";
 import { isLatest } from "@/commons/utils/versions";
-import { upgradeSettings, upgradeStates, upgradeWindowStates } from "@/mainProcess/utils/upgrader";
+import { migrateSettings, migrateStates, migrateWindowStates } from "@/mainProcess/utils/migrater";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { v4 as uuid } from "uuid";
@@ -69,7 +69,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     configSettings = new Config<Settings>(
       files.FILE_SETTINGS,
       getDefaultSettings(),
-      upgradeSettings,
+      migrateSettings,
     );
     if (configSettings.data.petaImageDirectory.default) {
       dirs.DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
@@ -109,11 +109,11 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
     dbPetaTags = new DB<PetaTag>("petaTags", files.FILE_TAGS_DB);
     dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", files.FILE_IMAGES_TAGS_DB);
-    configStates = new Config<States>(files.FILE_STATES, defaultStates, upgradeStates);
+    configStates = new Config<States>(files.FILE_STATES, defaultStates, migrateStates);
     configWindowStates = new Config<WindowStates>(
       files.FILE_WINDOW_STATES,
       defaultWindowStates,
-      upgradeWindowStates,
+      migrateWindowStates,
     );
     ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach(
       (db) => {
