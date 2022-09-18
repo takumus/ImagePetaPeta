@@ -136,7 +136,6 @@ export class PetaDataPetaImages {
       metadataVersion: PETAIMAGE_METADATA_VERSION,
     };
     await file.writeFile(Path.resolve(this.parent.paths.DIR_IMAGES, originalFileName), param.data);
-    await this.updatePetaImages([petaImage], UpdateMode.INSERT, true);
     return {
       petaImage: petaImage,
       exists: false,

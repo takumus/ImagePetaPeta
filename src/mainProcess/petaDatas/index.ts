@@ -190,6 +190,11 @@ export class PetaDatas {
               result = ImportImageResult.EXISTS;
               petaImages.push(addResult.petaImage);
             } else {
+              await this.petaImages.updatePetaImages(
+                [addResult.petaImage],
+                UpdateMode.INSERT,
+                true,
+              );
               addedFileCount++;
               petaImages.push(addResult.petaImage);
             }
@@ -389,6 +394,11 @@ export class PetaDatas {
               result = ImportImageResult.EXISTS;
               petaImages.push(importResult.petaImage);
             } else {
+              await this.petaImages.updatePetaImages(
+                [importResult.petaImage],
+                UpdateMode.INSERT,
+                true,
+              );
               addedFileCount++;
               petaImages.push(importResult.petaImage);
             }
