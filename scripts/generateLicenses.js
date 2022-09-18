@@ -52,9 +52,13 @@ script.run("generate licenses", async () => {
     };
   });
   script.utils.log(
-    script.utils.write("./src/@assets/licenses.ts", `export const LICENSES = ${JSON.stringify(licenses, null, 2)}`, {
-      encoding: "utf-8",
-    }),
+    script.utils.write(
+      "./src/@assets/licenses.ts",
+      `export const LICENSES = ${JSON.stringify(licenses, null, 2)}`,
+      {
+        encoding: "utf-8",
+      },
+    ),
   );
   script.utils.log(
     Object.keys(licensesCounts)
