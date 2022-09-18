@@ -7,21 +7,17 @@ export async function generateMetadata(params: {
   size: number;
   quality: number;
 }) {
-  console.time(" mtd");
   const metadata = await sharp(params.data, { limitInputPixels: false }).metadata();
-  console.timeEnd(" mtd");
   const originalWidth = metadata.width;
   const originalHeight = metadata.height;
   const format = metadata.format;
   if (originalWidth === undefined || originalHeight === undefined || format === undefined) {
     throw "invalid image data";
   }
-  console.time(" rsz");
   const resizedData = await sharp(params.data, { limitInputPixels: false })
     .resize(params.size)
     .webp({ quality: params.quality })
     .toBuffer({ resolveWithObject: true });
-  console.timeEnd(" rsz");
   const thumbWidth = resizedData.info.width;
   const thumbHeight = resizedData.info.height;
   const [, palette] = await Promise.all([
@@ -34,20 +30,16 @@ export async function generateMetadata(params: {
       return format;
     })(),
     (async () => {
-      console.time(" srp");
       const raw = await sharp(resizedData.data, { limitInputPixels: false })
         .ensureAlpha()
         .raw()
         .toBuffer({ resolveWithObject: true });
-      console.timeEnd(" srp");
-      console.time(" plt");
       const palette =
         getSimplePalette({
           buffer: raw.data,
           width: raw.info.width,
           height: raw.info.height,
         }) || [];
-      console.timeEnd(" plt");
       return palette;
     })(),
   ]);
