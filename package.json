@@ -36,6 +36,7 @@
     "deepcopy": "^2.1.0",
     "fuzzy-search": "^3.2.1",
     "gifuct-js": "^2.1.2",
+    "p-limit": "^4.0.0",
     "pixi.js": "^6.4.2",
     "quantize": "^1.0.2",
     "sharp": "^0.30.6",

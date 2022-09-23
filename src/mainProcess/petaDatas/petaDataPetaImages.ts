@@ -10,6 +10,7 @@ import { ImageType } from "@/commons/datas/imageType";
 import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { migratePetaImage } from "@/mainProcess/utils/migrater";
 import sharp from "sharp";
+import pLimit from "p-limit";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
 import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
 import {
@@ -72,7 +73,11 @@ export class PetaDataPetaImages {
     }
   }
   async getPetaImage(id: string) {
-    return (await this.parent.datas.dbPetaImages.find({ id }))[0];
+    const petaImage = (await this.parent.datas.dbPetaImages.find({ id }))[0];
+    if (petaImage === undefined) {
+      return undefined;
+    }
+    return migratePetaImage(petaImage);
   }
   async getPetaImages() {
     const data = await this.parent.datas.dbPetaImages.find({});
@@ -93,7 +98,7 @@ export class PetaDataPetaImages {
     const exists = await this.getPetaImage(id);
     if (exists)
       return {
-        petaImage: migratePetaImage(exists),
+        petaImage: exists,
         exists: true,
       };
     const metadata = await sharp(param.data, { limitInputPixels: false }).metadata();
@@ -144,7 +149,7 @@ export class PetaDataPetaImages {
   async regenerateMetadatas() {
     const log = this.parent.mainLogger.logChunk();
     this.parent.emitMainEvent("regenerateMetadatasBegin");
-    const images = await this.parent.datas.dbPetaImages.find({});
+    const images = Object.values(await this.getPetaImages());
     let completed = 0;
     const generate = async (image: PetaImage) => {
       migratePetaImage(image);
@@ -154,27 +159,24 @@ export class PetaDataPetaImages {
       const data = await file.readFile(
         Path.resolve(this.parent.paths.DIR_IMAGES, image.file.original),
       );
-      await generateMetadataByWorker(
-        {
-          data,
-          outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, image.file.original),
-          size: BROWSER_THUMBNAIL_SIZE,
-          quality: BROWSER_THUMBNAIL_QUALITY,
-        },
-        async (result) => {
-          image.placeholder = result.placeholder;
-          image.palette = result.palette;
-          image.width = result.original.width;
-          image.height = result.original.height;
-          image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
-          image.metadataVersion = PETAIMAGE_METADATA_VERSION;
-          await this.updatePetaImages([image], UpdateMode.UPDATE, true);
-        },
-      );
+      const result = await generateMetadataByWorker({
+        data,
+        outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, image.file.original),
+        size: BROWSER_THUMBNAIL_SIZE,
+        quality: BROWSER_THUMBNAIL_QUALITY,
+      });
+      image.placeholder = result.placeholder;
+      image.palette = result.palette;
+      image.width = result.original.width;
+      image.height = result.original.height;
+      image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
+      image.metadataVersion = PETAIMAGE_METADATA_VERSION;
+      await this.updatePetaImages([image], UpdateMode.UPDATE, true);
       log.log(`thumbnail (${++completed} / ${images.length})`);
       this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
     };
-    await Promise.all(images.map((image) => generate(image)));
+    const limit = pLimit(16);
+    await Promise.all(images.map((image) => limit(() => generate(image))));
     this.parent.emitMainEvent("regenerateMetadatasComplete");
   }
   private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {

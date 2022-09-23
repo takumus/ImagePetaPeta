@@ -3,7 +3,7 @@ import GenerateMetadataWorkerThreads from "@/mainProcess/workers/generateMetadat
 import { Worker } from "worker_threads";
 
 const workers: { idle: boolean; worker: Worker; id: number }[] = [];
-for (let i = 0; i < 8; i++) {
+for (let i = 0; i < 16; i++) {
   const worker = {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     worker: new (GenerateMetadataWorkerThreads as any)() as Worker,
@@ -12,10 +12,7 @@ for (let i = 0; i < 8; i++) {
   };
   workers.push(worker);
 }
-export async function generateMetadataByWorker(
-  params: Parameters<typeof generateMetadata>[0],
-  afterTask: (result: Awaited<ReturnType<typeof generateMetadata>>) => Promise<void>,
-) {
+export async function generateMetadataByWorker(params: Parameters<typeof generateMetadata>[0]) {
   let worker: { idle: boolean; worker: Worker } | undefined = undefined;
   /* eslint-disable-next-line */
   while (true) {
@@ -36,7 +33,7 @@ export async function generateMetadataByWorker(
     worker.worker.postMessage(params);
     worker.worker.once("message", async (data) => {
       try {
-        await afterTask(data);
+        // await afterTask(data);
         res(data);
       } catch (err) {
         rej(err);
