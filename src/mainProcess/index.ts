@@ -84,7 +84,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
     electronのready前にやらないといけない事
   */
   //-------------------------------------------------------------------------------------------------//
-  configSettings.data.eula = 0;
   protocol.registerSchemesAsPrivileged([
     {
       scheme: "app",
