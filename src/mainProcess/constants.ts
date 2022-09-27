@@ -5,7 +5,7 @@ import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
-import { defaultWindowStates, WindowStates } from "@/commons/datas/windowStates";
+import { WindowStates } from "@/commons/datas/windowStates";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import Config from "@/mainProcess/storages/config";
 import DB from "@/mainProcess/storages/db";
@@ -112,7 +112,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     configStates = new Config<States>(files.FILE_STATES, defaultStates, migrateStates);
     configWindowStates = new Config<WindowStates>(
       files.FILE_WINDOW_STATES,
-      defaultWindowStates,
+      {},
       migrateWindowStates,
     );
     ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach(

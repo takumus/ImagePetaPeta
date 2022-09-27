@@ -67,4 +67,5 @@ export interface MainFunctions {
   getIsDarkMode: () => Promise<boolean>;
   getIsDataInitialized: () => Promise<boolean>;
   getLatestVersion: () => Promise<RemoteBinaryInfo>;
+  eula: (agree: boolean) => Promise<void>;
 }

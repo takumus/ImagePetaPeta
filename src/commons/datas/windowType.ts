@@ -3,4 +3,5 @@ export enum WindowType {
   BROWSER = "browser",
   SETTINGS = "settings",
   DETAILS = "details",
+  EULA = "eula",
 }

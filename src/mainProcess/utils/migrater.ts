@@ -117,6 +117,10 @@ export function migrateSettings(settings: Settings) {
     settings.showTagsOnTile = defaultSettings.showTagsOnTile;
     changed = true;
   }
+  if (settings.eula === undefined) {
+    settings.eula = 0;
+    changed = true;
+  }
   return {
     data: settings,
     changed,

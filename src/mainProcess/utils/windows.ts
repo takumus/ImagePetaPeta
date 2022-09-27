@@ -5,6 +5,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
   BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+  EULA,
   WINDOW_DEFAULT_HEIGHT,
   WINDOW_DEFAULT_WIDTH,
   WINDOW_MIN_HEIGHT,
@@ -46,6 +47,10 @@ export class Windows {
     }
   }
   showWindows() {
+    if (this.configSettings.data.eula < EULA) {
+      this.windows.eula = this.initEULAWindow();
+      return;
+    }
     if (this.configSettings.data.show === "both") {
       this.windows.board = this.initBoardWindow();
       this.windows.browser = this.initBrowserWindow();
@@ -67,14 +72,16 @@ export class Windows {
         contextIsolation: true,
         preload: Path.join(__dirname, "preload.js"),
       },
-      backgroundColor: this.isDarkMode() ? BOARD_DARK_BACKGROUND_FILL_COLOR : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+      backgroundColor: this.isDarkMode()
+        ? BOARD_DARK_BACKGROUND_FILL_COLOR
+        : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
       ...options,
     });
     this.activeWindows[type] = true;
     const state = this.configWindowStates.data[type];
     this.mainLogger.logChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);
-    if (state.maximized) {
+    if (state?.maximized) {
       window.maximize();
     }
     window.on("close", () => {
@@ -117,8 +124,8 @@ export class Windows {
   }
   initBrowserWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.BROWSER, {
-      width: this.configWindowStates.data.browser.width,
-      height: this.configWindowStates.data.browser.height,
+      width: this.configWindowStates.data.browser?.width,
+      height: this.configWindowStates.data.browser?.height,
       trafficLightPosition: {
         x: 8,
         y: 8,
@@ -148,8 +155,8 @@ export class Windows {
   }
   initBoardWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.BOARD, {
-      width: this.configWindowStates.data.board.width,
-      height: this.configWindowStates.data.board.height,
+      width: this.configWindowStates.data.board?.width,
+      height: this.configWindowStates.data.board?.height,
       trafficLightPosition: {
         x: 13,
         y: 13,
@@ -161,8 +168,21 @@ export class Windows {
   }
   initDetailsWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.DETAILS, {
-      width: this.configWindowStates.data.details.width,
-      height: this.configWindowStates.data.details.height,
+      width: this.configWindowStates.data.details?.width,
+      height: this.configWindowStates.data.details?.height,
+      trafficLightPosition: {
+        x: 8,
+        y: 8,
+      },
+      x,
+      y,
+      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+    });
+  }
+  initEULAWindow(x?: number, y?: number) {
+    return this.createWindow(WindowType.EULA, {
+      width: WINDOW_SETTINGS_WIDTH,
+      height: WINDOW_SETTINGS_HEIGHT,
       trafficLightPosition: {
         x: 8,
         y: 8,
@@ -174,7 +194,14 @@ export class Windows {
   }
   saveWindowSize(windowType: WindowType) {
     this.mainLogger.logChunk().log("$Save Window States:", windowType);
-    const state = this.configWindowStates.data[windowType];
+    let state = this.configWindowStates.data[windowType];
+    if (state === undefined) {
+      state = this.configWindowStates.data[windowType] = {
+        width: WINDOW_DEFAULT_WIDTH,
+        height: WINDOW_DEFAULT_HEIGHT,
+        maximized: false,
+      };
+    }
     const window = this.windows[windowType];
     if (window === undefined || window.isDestroyed()) {
       return;

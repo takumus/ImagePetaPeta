@@ -15,6 +15,7 @@ const defaultSettings = {
     path: "",
   },
   show: "board" as "board" | "browser" | "both",
+  eula: 0,
 };
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);

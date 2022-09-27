@@ -11,7 +11,7 @@ import {
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { DEFAULT_BOARD_NAME, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, EULA, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
@@ -361,13 +361,14 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           try {
             log.log("#Get PetaBoards");
             const petaBoards = await petaDatas.petaBoards.getPetaBoards();
-            if (Object.keys(petaBoards).length === 0) {
+            const length = Object.keys(petaBoards).length;
+            if (length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
               await petaDatas.petaBoards.updatePetaBoards([board], UpdateMode.INSERT);
               petaBoards[board.id] = board;
             }
-            log.log("return:", petaBoards.length);
+            log.log("return:", length);
             return petaBoards;
           } catch (e) {
             log.error(e);
@@ -826,6 +827,22 @@ import { LogFrom } from "@/mainProcess/storages/logger";
         },
         async getLatestVersion() {
           return getLatestVersion();
+        },
+        async eula(event, agree) {
+          const log = mainLogger.logChunk();
+          log.log("#EULA");
+          log.log(agree ? "agree" : "disagree", EULA);
+          if (configSettings.data.eula === EULA) {
+            return;
+          }
+          if (agree) {
+            configSettings.data.eula = EULA;
+            configSettings.save();
+            windows.showWindows();
+            windows.windows.eula?.close();
+          } else {
+            app.quit();
+          }
         },
       };
     }
