@@ -183,6 +183,8 @@ export class Windows {
     return this.createWindow(WindowType.EULA, {
       width: WINDOW_SETTINGS_WIDTH,
       height: WINDOW_SETTINGS_HEIGHT,
+      minWidth: WINDOW_SETTINGS_WIDTH,
+      minHeight: WINDOW_SETTINGS_HEIGHT,
       trafficLightPosition: {
         x: 8,
         y: 8,
