@@ -593,12 +593,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           log.log("return:", isFocued);
           return isFocued;
         },
-        async setZoomLevel(event, level) {
-          const log = mainLogger.logChunk();
-          log.log("#Set Zoom Level");
-          log.log("level:", level);
-          windows.windows.board?.webContents.setZoomLevel(level);
-        },
         async windowMinimize(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Minimize");
@@ -787,7 +781,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           return [];
         },
         async openWindow(event, windowType) {
-          windows.openWindow(event, windowType);
+          windows.openWindow(windowType, event);
         },
         async getMainWindowType() {
           return windows.mainWindowType;
@@ -867,19 +861,17 @@ import { LogFrom } from "@/mainProcess/storages/logger";
     if (checkUpdateTimeoutHandler) {
       clearTimeout(checkUpdateTimeoutHandler);
     }
-    if (process.platform != "win32") {
-      return;
-    }
     const log = mainLogger.logChunk();
     log.log("$Check Update");
+    if (process.platform != "win32") {
+      log.log("mac os is not available");
+      return;
+    }
     const remote: RemoteBinaryInfo = await getLatestVersion();
     log.log(remote);
     if (!remote.isLatest) {
       log.log("this version is old");
-      if (windows.windows.settings === undefined || windows.windows.settings.isDestroyed()) {
-        windows.windows.settings = windows.initSettingsWindow(0, 0);
-      }
-      windows.moveSettingsWindowToTop();
+      windows.openWindow(WindowType.SETTINGS);
       windows.emitMainEvent("foundLatestVersion", remote);
     } else {
       log.log("this version is latest");

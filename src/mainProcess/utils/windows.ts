@@ -8,6 +8,8 @@ import {
   EULA,
   WINDOW_DEFAULT_HEIGHT,
   WINDOW_DEFAULT_WIDTH,
+  WINDOW_EULA_HEIGHT,
+  WINDOW_EULA_WIDTH,
   WINDOW_MIN_HEIGHT,
   WINDOW_MIN_WIDTH,
   WINDOW_SETTINGS_HEIGHT,
@@ -30,7 +32,7 @@ export class Windows {
   ) {
     //
   }
-  closeWindow(type: WindowType) {
+  onCloseWindow(type: WindowType) {
     this.mainLogger.logChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
@@ -89,7 +91,7 @@ export class Windows {
       window.maximize();
     }
     window.on("close", () => {
-      this.closeWindow(type);
+      this.onCloseWindow(type);
     });
     window.addListener("blur", () => {
       this.emitMainEvent("windowFocused", false, type);
@@ -111,20 +113,6 @@ export class Windows {
   changeMainWindow(type: WindowType) {
     this.mainWindowType = type;
     this.emitMainEvent("mainWindowType", type);
-    this.moveSettingsWindowToTop();
-  }
-  moveSettingsWindowToTop() {
-    if (this.mainWindowType) {
-      const mainWindow = this.windows[this.mainWindowType];
-      if (
-        mainWindow !== undefined &&
-        !mainWindow.isDestroyed() &&
-        this.windows.settings !== undefined &&
-        !this.windows.settings.isDestroyed()
-      ) {
-        this.windows.settings.setParentWindow(mainWindow);
-      }
-    }
   }
   initBrowserWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.BROWSER, {
@@ -185,10 +173,10 @@ export class Windows {
   }
   initEULAWindow(x?: number, y?: number) {
     return this.createWindow(WindowType.EULA, {
-      width: WINDOW_SETTINGS_WIDTH,
-      height: WINDOW_SETTINGS_HEIGHT,
-      minWidth: WINDOW_SETTINGS_WIDTH,
-      minHeight: WINDOW_SETTINGS_HEIGHT,
+      width: WINDOW_EULA_WIDTH,
+      height: WINDOW_EULA_HEIGHT,
+      minWidth: WINDOW_EULA_WIDTH,
+      minHeight: WINDOW_EULA_HEIGHT,
       trafficLightPosition: {
         x: 8,
         y: 8,
@@ -242,10 +230,12 @@ export class Windows {
     }
     return undefined;
   }
-  openWindow(event: IpcMainInvokeEvent, windowType: WindowType) {
+  openWindow(windowType: WindowType, event?: IpcMainInvokeEvent) {
     const position = new Vec2();
     try {
-      const parentWindowBounds = this.getWindowByEvent(event)?.window.getBounds();
+      const parentWindowBounds = event
+        ? this.getWindowByEvent(event)?.window.getBounds()
+        : undefined;
       if (parentWindowBounds) {
         const display = screen.getDisplayNearestPoint({
           x: parentWindowBounds.x + parentWindowBounds.width / 2,
@@ -276,7 +266,6 @@ export class Windows {
       this.windows[windowType]?.moveTop();
       this.windows[windowType]?.focus();
     }
-    this.moveSettingsWindowToTop();
   }
   emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
     Object.values(this.windows).forEach((window) => {
