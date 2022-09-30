@@ -14,6 +14,10 @@
     <button tabindex="-1" @click="showConfigFolder">
       {{ t("info.configFolderButton") }}
     </button>
+    <p></p>
+    <button tabindex="-1" @click="showEULA">
+      {{ t("info.showEULAButton") }}
+    </button>
     <p>{{ t("info.assets") }}</p>
     <button tabindex="-1" @click="gotoIcons8">Icons8.com</button>
     <p>{{ t("info.debuggers") }}</p>
@@ -32,6 +36,7 @@ import { SUPPORT_URL } from "@/commons/defines";
 import { LICENSES } from "@/@assets/licenses";
 import { DEBUGGERS } from "@/@assets/debuggers";
 import { computed } from "@vue/reactivity";
+import { WindowType } from "@/commons/datas/windowType";
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const licenses = computed(() => {
@@ -59,6 +64,9 @@ function showDBFolder() {
 }
 function showConfigFolder() {
   API.send("showConfigFolder");
+}
+function showEULA() {
+  API.send("openWindow", WindowType.EULA);
 }
 </script>
 

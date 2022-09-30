@@ -10,9 +10,12 @@
       </t-top>
       <t-browser>
         <t-body>{{ t("eula.body") }}</t-body>
-        <t-buttons>
+        <t-buttons v-if="needToAgree">
           <button @click="agree">{{ t("eula.agree") }}</button>
           <button @click="disagree">{{ t("eula.disagree") }}</button>
+        </t-buttons>
+        <t-buttons v-else>
+          <button @click="close">{{ t("shared.closeButton") }}</button>
         </t-buttons>
       </t-browser>
     </t-content>
@@ -23,7 +26,7 @@
 
 <script setup lang="ts">
 // Vue
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
@@ -33,9 +36,12 @@ import { API } from "@/rendererProcess/api";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
+import { useSettingsStore } from "../stores/settingsStore";
+import { EULA } from "@/commons/defines";
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();
+const settings = useSettingsStore();
 const title = ref("");
 onMounted(() => {
   title.value = `${t("titles.eula")} - ${appInfoStore.state.value.name} ${
@@ -49,6 +55,12 @@ function agree() {
 function disagree() {
   API.send("eula", false);
 }
+function close() {
+  API.send("windowClose");
+}
+const needToAgree = computed(() => {
+  return settings.state.value.eula !== EULA;
+});
 </script>
 
 <style lang="scss" scoped>

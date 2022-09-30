@@ -260,6 +260,9 @@ export class Windows {
         case WindowType.DETAILS:
           this.windows[windowType] = this.initDetailsWindow(position.x, position.y);
           break;
+        case WindowType.EULA:
+          this.windows[windowType] = this.initEULAWindow(position.x, position.y);
+          break;
       }
       this.windows[windowType]?.center();
     } else {

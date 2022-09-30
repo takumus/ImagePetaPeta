@@ -136,6 +136,7 @@ const ja = {
     issuesButton: "バグ/要望",
     dbFolderButton: "データベースフォルダ",
     configFolderButton: "コンフィグフォルダ",
+    showEULAButton: "はじめにお読みください",
     licenses: "使用しているライブラリ情報",
     assets: "使用しているアセット情報",
     debuggers: "デバッグ協力",
