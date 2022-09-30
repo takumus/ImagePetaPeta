@@ -48,7 +48,11 @@ export class Windows {
   }
   showWindows() {
     if (this.configSettings.data.eula < EULA) {
-      this.windows.eula = this.initEULAWindow();
+      if (this.windows.eula === undefined || this.windows.eula.isDestroyed()) {
+        this.windows.eula = this.initEULAWindow();
+      } else {
+        this.windows.eula.moveTop();
+      }
       return;
     }
     if (this.configSettings.data.show === "both") {

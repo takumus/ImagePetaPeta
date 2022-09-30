@@ -838,8 +838,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           if (agree) {
             configSettings.data.eula = EULA;
             configSettings.save();
-            windows.showWindows();
-            windows.windows.eula?.close();
+            relaunch();
           } else {
             app.quit();
           }
