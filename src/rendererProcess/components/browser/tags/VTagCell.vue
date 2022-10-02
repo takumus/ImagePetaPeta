@@ -1,0 +1,49 @@
+<template>
+  <t-tag-cell-root @click="select()" :class="{ selected: selected }">
+    <VTextarea
+      :type="'single'"
+      :readonly="readonly"
+      :trim="true"
+      :value="value"
+      :look="look"
+      :clickToEdit="clickToEdit"
+      @update:value="(name) => updateName(name)"
+    />
+  </t-tag-cell-root>
+</template>
+
+<script setup lang="ts">
+// Vue
+import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
+const emit = defineEmits<{
+  (e: "update:value", value: string): void;
+}>();
+defineProps<{
+  selected: boolean;
+  readonly: boolean;
+  value?: string;
+  look?: string;
+  clickToEdit?: boolean;
+}>();
+function updateName(name: string) {
+  emit("update:value", name);
+}
+function select() {
+  //
+}
+</script>
+
+<style lang="scss" scoped>
+t-tag-cell-root {
+  display: block;
+  width: fit-content;
+  margin: 0px 0px 4px 4px;
+  border-radius: var(--rounded);
+  padding: 4px;
+  background-color: var(--color-sub);
+  &.selected {
+    font-weight: bold;
+    font-size: var(--size-2);
+  }
+}
+</style>
