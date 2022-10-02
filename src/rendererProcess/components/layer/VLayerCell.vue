@@ -23,11 +23,6 @@
       }"
     >
     </t-icon>
-    <!-- <div
-      class="name"
-    >
-     {{name}}
-    </div> -->
     <t-thumb
       v-if="url"
       :style="{
@@ -65,17 +60,6 @@ const petaImagesStore = usePetaImagesStore();
 const visibleIcon = ref<HTMLElement>();
 const lockedIcon = ref<HTMLElement>();
 const nsfwStore = useNSFWStore();
-// @Prop()
-// cellData: {
-//   id: number;
-//   data: PetaPanel;
-// } | null = null;
-// @Prop()
-// drag = false;
-// @Ref()
-// visibleIcon!: HTMLElement;
-// @Ref()
-// lockedIcon!: HTMLElement;
 const click = new ClickChecker();
 let mouseIsDown = false;
 onMounted(() => {
@@ -170,9 +154,6 @@ function pointermove(event: PointerEvent) {
   &.drag {
     position: absolute;
     top: 0px;
-  }
-  &.hide {
-    visibility: hidden;
   }
   > t-icon {
     padding: 0px 8px;
