@@ -103,6 +103,7 @@ import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
+import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -119,8 +120,8 @@ const areaPreVisibleMaxY = ref(0);
 const areaPreVisibleMinY = ref(0);
 const scrollAreaHeight = ref(0);
 const sortMode = ref<SortMode>(SortMode.ADD_DATE);
-let thumbnailsResizer: ResizeObserver | undefined;
-let scrollAreaResizer: ResizeObserver | undefined;
+const thumbnailsResizerStore = useResizerStore();
+const scrollAreaResizerStore = useResizerStore();
 const firstSelectedTile = ref<Tile>();
 const thumbnailsSize = ref(0);
 const currentScrollTileId = ref("");
@@ -130,18 +131,6 @@ const defines = useDefinesStore().defines;
 const filteredPetaImages = ref<PetaImage[]>([]);
 const ignoreScrollEvent = ref(false);
 onMounted(() => {
-  thumbnailsResizer = new ResizeObserver((entries) => {
-    const rect = entries[0]?.contentRect;
-    if (rect) {
-      resizeImages(rect);
-    }
-  });
-  scrollAreaResizer = new ResizeObserver((entries) => {
-    const rect = entries[0]?.contentRect;
-    if (rect) {
-      resizeScrollArea(rect);
-    }
-  });
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", (e) => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
@@ -154,11 +143,10 @@ onMounted(() => {
       }
     }
   });
-  if (thumbsWrapper.value && thumbnails.value) {
-    thumbnailsResizer.observe(thumbsWrapper.value);
-    scrollAreaResizer.observe(thumbnails.value);
-  }
-
+  thumbnailsResizerStore.observe(thumbsWrapper.value);
+  scrollAreaResizerStore.observe(thumbnails.value);
+  thumbnailsResizerStore.on("resize", resizeImages);
+  scrollAreaResizerStore.on("resize", resizeScrollArea);
   thumbnailsSize.value = statesStore.state.value.browserTileSize;
   keyboards.enabled = true;
   keyboards.keys("KeyA").down(keyA);
@@ -166,12 +154,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
-  if (thumbsWrapper.value && thumbnails.value) {
-    thumbnailsResizer?.unobserve(thumbsWrapper.value);
-    scrollAreaResizer?.unobserve(thumbnails.value);
-  }
-  thumbnailsResizer?.disconnect();
-  scrollAreaResizer?.disconnect();
   keyboards.destroy();
 });
 function saveScrollPosition() {

@@ -33,6 +33,7 @@ import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useI18n } from "vue-i18n";
 import { resizeImage } from "@/commons/utils/resizeImage";
+import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
 }>();
@@ -43,22 +44,10 @@ const { t } = useI18n();
 const previews = ref<HTMLElement>();
 const previewWidth = ref(0);
 const previewHeight = ref(0);
-const previewsResizer: ResizeObserver = new ResizeObserver((entries) => {
-  const rect = entries[0]?.contentRect;
-  if (rect) {
-    resizePreviews(rect);
-  }
-});
+const resizerStore = useResizerStore();
 onMounted(() => {
-  if (previews.value) {
-    previewsResizer.observe(previews.value);
-  }
-});
-onUnmounted(() => {
-  if (previews.value) {
-    previewsResizer.unobserve(previews.value);
-    previewsResizer.disconnect();
-  }
+  resizerStore.on("resize", resizePreviews);
+  resizerStore.observe(previews.value);
 });
 function resizePreviews(rect: DOMRectReadOnly) {
   previewWidth.value = rect.width;

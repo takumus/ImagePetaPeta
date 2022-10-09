@@ -69,6 +69,7 @@ import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -83,6 +84,7 @@ const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
 const petaImagesStore = usePetaImagesStore();
+const resizerStore = useResizerStore();
 const { t } = useI18n();
 /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
 const panelsBackground = ref<HTMLElement>();
@@ -112,7 +114,6 @@ const pTransformer = new PTransformer(pPanels);
 const resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
 const mouseOffset = new Vec2();
 // let draggingPanels = false;
-let resizer: ResizeObserver | undefined;
 let pixi: PIXI.Application | undefined;
 let mouseLeftPressing = false;
 let mouseRightPressing = false;
@@ -177,15 +178,8 @@ function construct() {
   panelsBackground.value?.appendChild(pixi.view);
   pixi.stage.interactive = true;
   pixi.ticker.stop();
-  resizer = new ResizeObserver((entries) => {
-    const rect = entries[0]?.contentRect;
-    if (rect) {
-      resize(rect);
-    }
-  });
-  if (panelsBackground.value) {
-    resizer.observe(panelsBackground.value);
-  }
+  resizerStore.on("resize", resize);
+  resizerStore.observe(panelsBackground.value);
   renderPIXI();
   PIXI.Ticker.shared.add(updateAnimatedGIF);
 }
@@ -194,10 +188,6 @@ function destruct() {
     logChunk().log("destruct PIXI");
     pixi.destroy(true);
   }
-  if (panelsBackground.value) {
-    resizer?.unobserve(panelsBackground.value);
-  }
-  resizer?.disconnect();
   PIXI.Ticker.shared.remove(updateAnimatedGIF);
   cancelAnimationFrame(requestAnimationFrameHandle);
 }

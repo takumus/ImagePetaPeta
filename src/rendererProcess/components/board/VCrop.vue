@@ -25,6 +25,7 @@ import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { resizeImage } from "@/commons/utils/resizeImage";
+import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 const props = defineProps<{
   petaPanel?: PetaPanel;
 }>();
@@ -34,8 +35,8 @@ const emit = defineEmits<{
 const nsfwStore = useNSFWStore();
 const petaImagesStore = usePetaImagesStore();
 const { t } = useI18n();
+const resizerStore = useResizerStore();
 const cropRoot = ref<HTMLElement>();
-let resizer: ResizeObserver;
 let pixi: PIXI.Application;
 const rootContainer = new PIXI.Container();
 const selectionContainer = new PIXI.Container();
@@ -102,15 +103,8 @@ onMounted(() => {
   }
   selectionContainer.addChild(...corners);
   PIXI.Ticker.shared.add(updateAnimatedGIF);
-  resizer = new ResizeObserver((entries) => {
-    const rect = entries[0]?.contentRect;
-    if (rect) {
-      resize(rect);
-    }
-  });
-  if (cropRoot.value) {
-    resizer.observe(cropRoot.value);
-  }
+  resizerStore.on("resize", resize);
+  resizerStore.observe(cropRoot.value);
   renderPIXI();
   keyboards.enabled = true;
   changePetaPanel();
@@ -123,10 +117,6 @@ function beginMoveSelection(e: PIXI.InteractionEvent) {
   dragging.value = true;
 }
 onUnmounted(() => {
-  if (cropRoot.value) {
-    resizer?.unobserve(cropRoot.value);
-  }
-  resizer?.disconnect();
   cropRoot.value?.removeChild(pixi.view);
   pixi.destroy();
   keyboards.destroy();
