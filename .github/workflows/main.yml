@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: yarn
       - name: yarn install
         run: yarn install --network-timeout 600000
       - name: build
@@ -36,6 +37,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: yarn
       - name: yarn install
         run: yarn install --network-timeout 600000
       - name: build
@@ -46,6 +48,6 @@ jobs:
         with:
           draft: true
           files: |
-            dist/electron/*.exe
+            dist/electron/*.exe.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
