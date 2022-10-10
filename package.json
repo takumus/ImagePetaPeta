@@ -19,6 +19,7 @@
     "linecount": "node ./scripts/linecount",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
+    "postbuild": "node ./scripts/compressForWindows.js",
     "prebuild": "yarn audit --groups dependencies && yarn generate-assets && yarn tsc",
     "prepare": "husky install && yarn generate-assets",
     "preserve": "yarn generate-assets",
