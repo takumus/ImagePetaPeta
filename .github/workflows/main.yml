@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    tags:
+    # "v" で始まる Tag 名
+    - 'v*'
+
+jobs:
+  build_on_win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: yarn install
+      run: yarn install
+    - name: build
+      run: yarn build
+    - name: create release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        draft: true
+        files: |
+          dist/electron/*.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
