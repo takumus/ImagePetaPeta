@@ -13,5 +13,7 @@ script.run("compress for windows", async () => {
     throw new Error(exeFile + " is not found");
   }
   zip.addLocalFile(script.files.output.electron.appDir + "/" + exeFile);
-  zip.writeZip(script.files.output.electron.appDir + "/" + exeFile + ".zip");
+  const out = script.files.output.electron.appDir + "/" + exeFile + ".zip";
+  zip.writeZip(out);
+  script.utils.log(out);
 });
