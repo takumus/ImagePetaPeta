@@ -17,7 +17,7 @@ module.exports = {
     appId: "io.takumus." + packageJSON.name,
     productName: packageJSON.productName,
     asar: true,
-    artifactName: "${productName}-${version}-${arch}.${ext}",
+    artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
     win: {
       icon: path.join(files.output.electron.resources.win.appIcon),
       target: ["nsis", ...(appxConfig ? ["appx"] : [])],
