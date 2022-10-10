@@ -39,6 +39,7 @@ import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
 import VLayer from "@/rendererProcess/components/layer/VLayer.vue";
 // Others
+import { PBoardGrid } from "@/rendererProcess/components/board/pGrid";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaPanel } from "@/commons/datas/petaPanel";
@@ -70,6 +71,7 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
+import { PetaImage } from "@/commons/datas/petaImage";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -106,7 +108,7 @@ const centerWrapper = new PIXI.Container();
 const panelsCenterWrapper = new PIXI.Container();
 const backgroundSprite = new PIXI.Graphics();
 const pSelection = new PSelection();
-const crossLine = new PIXI.Graphics();
+const grid = new PBoardGrid();
 const stageRect = new Vec2();
 const mousePosition = new Vec2();
 let pPanels: { [key: string]: PPanel } = {};
@@ -168,7 +170,8 @@ function construct() {
   pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
   if (!props.detailsMode) {
     pixi.stage.addChild(backgroundSprite);
-    pixi.stage.addChild(crossLine);
+    // pixi.stage.addChild(crossLine);
+    pixi.stage.addChild(grid);
   }
   pixi.stage.addChild(centerWrapper);
   centerWrapper.addChild(rootContainer);
@@ -259,24 +262,16 @@ function pointerup(e: PIXI.InteractionEvent) {
       const pPanel = getPPanelFromObject(e.target);
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
-        // selectedPPanels().forEach((pPanel) => (pPanel.dragging = false));
         petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
       } else if (!props.detailsMode) {
         components.contextMenu.open(
           [
             {
               label: t("boards.menu.openBrowser"),
-              click: () => {
-                API.send("openWindow", WindowType.BROWSER);
-              },
+              click: () => API.send("openWindow", WindowType.BROWSER),
             },
             { separate: true },
-            {
-              label: t("boards.menu.resetPosition"),
-              click: () => {
-                resetTransform();
-              },
-            },
+            { label: t("boards.menu.resetPosition"), click: resetTransform },
           ],
           new Vec2(mouse),
         );
@@ -288,9 +283,6 @@ function pointerup(e: PIXI.InteractionEvent) {
     }
   } else if (e.data.button === MouseButton.LEFT) {
     mouseLeftPressing = false;
-    // pPanelsArray().forEach((pPanel) => {
-    //   pPanel.dragging = false;
-    // });
     selecting = false;
   }
   orderPIXIRender();
@@ -298,7 +290,6 @@ function pointerup(e: PIXI.InteractionEvent) {
 function pointermove(e: PIXI.InteractionEvent) {
   const mouse = getMouseFromEvent(e);
   mousePosition.set(mouse);
-  // pTransformer.mousePosition.set(mouse);
   click.move(mousePosition);
   if (mouseLeftPressing || mouseRightPressing) {
     orderPIXIRender();
@@ -341,18 +332,7 @@ function updateRect() {
   if (!currentBoard.value) {
     return;
   }
-  crossLine.clear();
-  crossLine.lineStyle(
-    1,
-    Number(currentBoard.value.background.lineColor.replace("#", "0x")),
-    1,
-    undefined,
-    true,
-  );
-  crossLine.moveTo(-stageRect.x, 0);
-  crossLine.lineTo(stageRect.x, 0);
-  crossLine.moveTo(0, -stageRect.y);
-  crossLine.lineTo(0, stageRect.y);
+  grid.update(stageRect.x, stageRect.y, currentBoard.value.background.lineColor);
   backgroundSprite.clear();
   backgroundSprite.hitArea = new Rectangle(0, 0, stageRect.x, stageRect.y);
   backgroundSprite.beginFill(Number(currentBoard.value.background.fillColor.replace("#", "0x")));
@@ -364,9 +344,7 @@ function animate() {
   }
   const boardScale = currentBoard.value.transform.scale;
   rootContainer.scale.set(boardScale);
-  pPanelsArray().forEach((pp) => {
-    pp.setZoomScale(boardScale);
-  });
+  pPanelsArray().forEach((pp) => pp.setZoomScale(boardScale));
   pTransformer.setScale(1 / boardScale);
   pTransformer.update();
 
@@ -378,10 +356,10 @@ function animate() {
     }
   }
   currentBoard.value.transform.position.setTo(rootContainer);
-  new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(crossLine);
+  new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(grid);
   const offset = 0;
-  crossLine.x = clamp(crossLine.x, offset, stageRect.x - offset);
-  crossLine.y = clamp(crossLine.y, offset, stageRect.y - offset);
+  grid.x = clamp(grid.x, offset, stageRect.x - offset);
+  grid.y = clamp(grid.y, offset, stageRect.y - offset);
   pSelection.clear();
   if (selecting) {
     pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
@@ -397,17 +375,11 @@ function animate() {
         !pPanel.petaPanel.locked;
     });
   }
-  pPanelsArray().forEach((pp) => {
-    pp.unselected = false;
-  });
+  pPanelsArray().forEach((pp) => (pp.unselected = false));
   if (selectedPPanels().length > 0) {
-    unselectedPPanels().forEach((pp) => {
-      pp.unselected = true;
-    });
+    unselectedPPanels().forEach((pp) => (pp.unselected = true));
   }
-  pPanelsArray().forEach((pPanel) => {
-    pPanel.orderRender();
-  });
+  pPanelsArray().forEach((pPanel) => pPanel.orderRender());
 }
 function resetTransform() {
   if (!currentBoard.value) {
@@ -439,123 +411,80 @@ function removePPanel(pPanel: PPanel) {
   pPanel.destroy();
   delete pPanels[pPanel.petaPanel.id];
 }
-function petaPanelMenu(pPanel: PetaPanel, position: Vec2) {
-  const _pPanel = pPanels[pPanel.id];
+function petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
   if (props.detailsMode) {
     return;
   }
+  const pPanel = pPanels[petaPanel.id]!;
+  const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
   const isMultiple = selectedPPanels().length > 1;
   components.contextMenu.open(
     [
+      { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
+      { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },
+      { separate: true },
+      { label: t("boards.panelMenu.details"), click: () => openDetails(petaImage) },
+      { separate: true },
       {
-        label: t("boards.panelMenu.toFront"),
+        skip: isMultiple || !pPanel.isGIF,
+        label: pPanel.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
         click: () => {
-          selectedPPanels().forEach((pPanel) => {
-            pPanel.petaPanel.index += pPanelsArray().length;
-          });
-          sortIndex();
-        },
-      },
-      {
-        label: t("boards.panelMenu.toBack"),
-        click: () => {
-          selectedPPanels().forEach((pPanel) => {
-            pPanel.petaPanel.index -= pPanelsArray().length;
-          });
-          sortIndex();
-        },
-      },
-      {
-        separate: true,
-      },
-      {
-        label: t("boards.panelMenu.details"),
-        click: () => {
-          const petaImage = petaImagesStore.getPetaImage(pPanel.petaImageId);
-          if (petaImage === undefined) {
-            return;
-          }
-          API.send("setDetailsPetaImage", petaImage);
-          API.send("openWindow", WindowType.DETAILS);
-        },
-      },
-      {
-        separate: true,
-      },
-      {
-        skip: isMultiple || !_pPanel?.isGIF,
-        label: _pPanel?.isPlayingGIF
-          ? t("boards.panelMenu.stopGIF")
-          : t("boards.panelMenu.playGIF"),
-        click: () => {
-          if (_pPanel?.isPlayingGIF) {
-            _pPanel.stopGIF();
-          } else {
-            _pPanel?.playGIF();
-          }
+          pPanel.toggleGIF();
           updatePetaBoard();
         },
       },
-      {
-        skip: isMultiple || !_pPanel?.isGIF,
-        separate: true,
-      },
+      { skip: isMultiple || !pPanel?.isGIF, separate: true },
       {
         skip: isMultiple,
         label: t("boards.panelMenu.crop"),
         click: () => {
-          beginCrop(pPanel);
+          beginCrop(petaPanel);
         },
       },
-      {
-        skip: isMultiple,
-        separate: true,
-      },
-      {
-        label: t("boards.panelMenu.flipHorizontal"),
-        click: () => {
-          selectedPPanels().forEach((pPanel) => {
-            pPanel.petaPanel.width = -pPanel.petaPanel.width;
-          });
-          updatePetaBoard();
-        },
-      },
-      {
-        label: t("boards.panelMenu.flipVertical"),
-        click: () => {
-          selectedPPanels().forEach((pPanel) => {
-            pPanel.petaPanel.height = -pPanel.petaPanel.height;
-          });
-          updatePetaBoard();
-        },
-      },
-      {
-        separate: true,
-      },
-      {
-        label: t("boards.panelMenu.reset"),
-        click: () => {
-          selectedPPanels().forEach((pPanel) => {
-            pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
-            pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
-            pPanel.petaPanel.crop.position.set(0, 0);
-            pPanel.petaPanel.crop.width = 1;
-            pPanel.petaPanel.crop.height = 1;
-            pPanel.petaPanel.rotation = 0;
-            updateCrop(pPanel.petaPanel);
-          });
-        },
-      },
+      { skip: isMultiple, separate: true },
+      { label: t("boards.panelMenu.flipHorizontal"), click: () => flipPetaPanel("horizontal") },
+      { label: t("boards.panelMenu.flipVertical"), click: () => flipPetaPanel("vertical") },
       { separate: true },
-      {
-        label: t("boards.panelMenu.remove"),
-        click: () => {
-          removeSelectedPanels();
-        },
-      },
+      { label: t("boards.panelMenu.reset"), click: resetPetaPanel },
+      { separate: true },
+      { label: t("boards.panelMenu.remove"), click: removeSelectedPanels },
     ],
     position,
   );
+}
+function changeOrder(to: "front" | "back") {
+  selectedPPanels().forEach(
+    (pPanel) => (pPanel.petaPanel.index += pPanelsArray().length * (to === "front" ? 1 : -1)),
+  );
+  sortIndex();
+}
+function openDetails(petaImage?: PetaImage) {
+  if (petaImage === undefined) {
+    return;
+  }
+  API.send("setDetailsPetaImage", petaImage);
+  API.send("openWindow", WindowType.DETAILS);
+}
+function resetPetaPanel() {
+  selectedPPanels().forEach((pPanel) => {
+    pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
+    pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
+    pPanel.petaPanel.crop.position.set(0, 0);
+    pPanel.petaPanel.crop.width = 1;
+    pPanel.petaPanel.crop.height = 1;
+    pPanel.petaPanel.rotation = 0;
+    updateCrop(pPanel.petaPanel);
+  });
+}
+function flipPetaPanel(direction: "vertical" | "horizontal") {
+  selectedPPanels().forEach((pPanel) => {
+    if (direction === "vertical") {
+      pPanel.petaPanel.height = -pPanel.petaPanel.height;
+    } else {
+      pPanel.petaPanel.width = -pPanel.petaPanel.width;
+    }
+  });
+  updatePetaBoard();
 }
 async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   if (!currentBoard.value) {
@@ -572,9 +501,7 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   petaPanel.position = new Vec2(
     panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)),
   );
-  petaPanel.index =
-    Math.max(...Object.values(currentBoard.value.petaPanels).map((petaPanel) => petaPanel.index)) +
-    1;
+  petaPanel.index = Math.max(...petaPanelsArray.value.map((petaPanel) => petaPanel.index)) + 1;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   updatePetaBoard();
 }
@@ -616,9 +543,7 @@ function updateCrop(petaPanel?: PetaPanel) {
 }
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
-    pPanelsArray().forEach((p) => {
-      p.petaPanel._selected = false;
-    });
+    pPanelsArray().forEach((pPanel) => (pPanel.petaPanel._selected = false));
   }
 }
 function sortIndex() {
@@ -627,12 +552,10 @@ function sortIndex() {
   }
   Object.values(currentBoard.value.petaPanels)
     .sort((a, b) => a.index - b.index)
-    .forEach((petaPanel, i) => {
-      petaPanel.index = i;
-    });
-  panelsCenterWrapper.children.sort((a, b) => {
-    return (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index;
-  });
+    .forEach((petaPanel, i) => (petaPanel.index = i));
+  panelsCenterWrapper.children.sort(
+    (a, b) => (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index,
+  );
   updatePetaBoard();
   orderPIXIRender();
 }
@@ -647,9 +570,7 @@ async function load(params: {
   endCrop();
   // リロードじゃないならクリア。
   if (params.reload === undefined) {
-    pPanelsArray().forEach((pPanel) => {
-      removePPanel(pPanel);
-    });
+    pPanelsArray().forEach(removePPanel);
     pTransformer.pPanels = pPanels = {};
   }
   if (currentBoard.value === undefined) {
@@ -676,9 +597,7 @@ async function load(params: {
   extractProgress.value = 0;
   if (cancelExtract !== undefined) {
     log("vBoard", `canceling loading`);
-    pPanelsArray().forEach((pPanel) => {
-      pPanel.cancelLoading();
-    });
+    pPanelsArray().forEach((pPanel) => pPanel.cancelLoading());
     await cancelExtract();
     log("vBoard", `canceled loading`);
     return load(params);
@@ -836,11 +755,9 @@ function renderPIXI() {
   requestAnimationFrameHandle = requestAnimationFrame(renderPIXI);
 }
 function updateAnimatedGIF(deltaTime: number) {
-  Object.values(pPanels).forEach((pPanel) => {
-    if (pPanel.isGIF) {
-      pPanel.updateGIF(deltaTime);
-    }
-  });
+  Object.values(pPanels)
+    .filter((pPanel) => pPanel.isGIF)
+    .forEach((pPanel) => pPanel.updateGIF(deltaTime));
 }
 function keyShift(pressed: boolean) {
   pTransformer.fit = pressed;
@@ -910,9 +827,7 @@ const petaPanelsArray = computed(() => {
 watch(
   () => nsfwStore.state.value,
   () => {
-    pPanelsArray().forEach((pp) => {
-      pp.showNSFW = nsfwStore.state.value;
-    });
+    pPanelsArray().forEach((pp) => (pp.showNSFW = nsfwStore.state.value));
     orderPIXIRender();
   },
 );

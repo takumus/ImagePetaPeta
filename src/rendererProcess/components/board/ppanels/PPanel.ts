@@ -300,6 +300,15 @@ export class PPanel extends PIXI.Sprite {
       this.petaPanel.gif.stopped = true;
     }
   }
+  public toggleGIF() {
+    if (this.gif) {
+      if (this.isPlayingGIF) {
+        this.stopGIF();
+      } else {
+        this.playGIF();
+      }
+    }
+  }
   public updateGIF(deltaTime: number) {
     this.gif?.update(deltaTime);
   }
