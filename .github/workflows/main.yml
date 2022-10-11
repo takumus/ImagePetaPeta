@@ -15,7 +15,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: npm
+          cache: yarn
+          cache-dependency-path: yarn.lock
       - name: yarn install
         run: yarn install --network-timeout 600000
       - name: build intel
@@ -39,7 +40,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: npm
+          cache: yarn
+          cache-dependency-path: yarn.lock
       - name: yarn install
         run: yarn install --network-timeout 600000
       - name: build
