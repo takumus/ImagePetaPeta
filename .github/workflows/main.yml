@@ -18,8 +18,9 @@ jobs:
           cache: npm
       - name: yarn install
         run: yarn install --network-timeout 600000
-      - name: build
+      - name: build intel
         run: yarn build:mac
+      - name: build arm64
         run: yarn build:mac-arm64
       - name: create release
         uses: softprops/action-gh-release@v1
