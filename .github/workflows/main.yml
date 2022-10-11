@@ -7,6 +7,31 @@ on:
       - "v*"
 
 jobs:
+  build_on_mac_m1:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: env to arm64
+        run: echo "arch=arm64\nplatform=darwin" > .npmrc
+      - name: yarn install
+        run: yarn install --network-timeout 600000
+      - name: build arm64
+        run: yarn build:mac-arm64
+      - name: create release mac-arm64
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: |
+            dist/electron/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build_on_mac:
     runs-on: macos-latest
     steps:
@@ -22,17 +47,6 @@ jobs:
       - name: build intel
         run: yarn build:mac-intel
       - name: create release mac-intel
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          draft: true
-          files: |
-            dist/electron/*.dmg
-      - name: install sharp module for arm64
-        run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm_config_arch=arm64 npm_config_platform=darwin yarn add sharp
-      - name: build arm64
-        run: yarn build:mac-arm64
-      - name: create release mac-arm64
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
