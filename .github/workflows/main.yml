@@ -28,6 +28,8 @@ jobs:
           draft: true
           files: |
             dist/electron/*.dmg
+      - name: install sharp module for arm64
+        run: SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm_config_arch=arm64 npm_config_platform=darwin yarn add sharp
       - name: build arm64
         run: yarn build:mac-arm64
       - name: create release mac-arm64
