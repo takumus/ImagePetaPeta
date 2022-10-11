@@ -20,7 +20,7 @@ jobs:
       - name: yarn install
         run: yarn install --network-timeout 600000
       - name: rebuild arm64
-        run: npm rebuild --platform=darwin --arch=x64
+        run: npm rebuild --platform=darwin --arch=arm64
       - name: build arm64
         run: yarn build:mac-arm64
       - name: create release mac-arm64
