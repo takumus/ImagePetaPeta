@@ -32,7 +32,7 @@
   "dependencies": {
     "@araki-packages/promise-serial": "^2.0.2",
     "@seald-io/nedb": "^3.0.0",
-    "@xmldom/xmldom": "^0.8.2",
+    "@xmldom/xmldom": "^0.8.3",
     "axios": "^0.27.2",
     "data-uri-to-buffer": "^3.0.1",
     "dateformat": "^5.0.3",
