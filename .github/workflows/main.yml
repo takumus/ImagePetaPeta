@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     tags:
-      # "v" で始まる Tag 名
-      - "v*"
+      # "vXX.XX.XX" で始まる Tag 名
+      - "v*.*.*"
 
 jobs:
   build_on_mac_arm64:
