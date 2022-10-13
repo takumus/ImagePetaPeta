@@ -37,8 +37,7 @@
 <script lang="ts" setup>
 import { PetaTag } from "@/commons/datas/petaTag";
 import { UNTAGGED_ID } from "@/commons/defines";
-import { ref } from "@vue/reactivity";
-import { computed } from "@vue/runtime-core";
+import { ref, computed } from "vue";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 
