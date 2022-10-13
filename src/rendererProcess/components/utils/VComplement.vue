@@ -59,7 +59,7 @@ const currentIndex = ref(0);
 const height = ref("unset");
 const keyboards = useKeyboardsStore();
 const textsStore = useTextsStore();
-let searcher: FuzzySearch<string> = new FuzzySearch([], undefined, {
+const searcher: FuzzySearch<string> = new FuzzySearch([], undefined, {
   sort: true,
 });
 onMounted(() => {

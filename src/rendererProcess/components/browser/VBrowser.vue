@@ -449,7 +449,7 @@ const selectedPetaImages = computed(() => {
   return petaImagesArray.value.filter((pi) => petaImagesStore.getSelected(pi));
 });
 const thumbnailsRowCount = computed(() => {
-  let c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);
+  const c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);
   if (c < 1) {
     return 1;
   }

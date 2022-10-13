@@ -26,8 +26,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, nextTick } from "vue";
-import { computed } from "@vue/reactivity";
+import { ref, onMounted, nextTick, computed } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";

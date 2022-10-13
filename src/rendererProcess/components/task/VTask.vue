@@ -32,7 +32,7 @@ const currentTaskId = ref("");
 const log = ref("");
 const cancelable = ref(false);
 const name = ref("");
-let closeWindowHandler = -1;
+// let closeWindowHandler = -1;
 onMounted(() => {
   changeTaskStatus();
 });
@@ -46,7 +46,7 @@ watch(
 function changeTaskStatus() {
   const task = props.taskStatus;
   currentTaskId.value = props.taskId;
-  window.clearTimeout(closeWindowHandler);
+  // window.clearTimeout(closeWindowHandler);
   name.value = task.i18nKey + ".name";
   progress.value = task.progress
     ? Math.floor((task.progress.current / task.progress.all) * 100)
@@ -90,7 +90,7 @@ function cancel() {
 t-task-root {
   text-align: center;
   display: block;
-  >pre {
+  > pre {
     width: 100%;
     text-align: left;
     overflow: hidden;

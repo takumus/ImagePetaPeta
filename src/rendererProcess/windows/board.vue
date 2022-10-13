@@ -151,7 +151,7 @@ function addOrderedPetaPanels() {
       DEFAULT_IMAGE_SIZE,
       (petaImage.height / petaImage.width) * DEFAULT_IMAGE_SIZE,
     );
-    vPetaBoard.value?.addPanel(panel, offsetIndex);
+    vPetaBoard.value?.addPanel(panel, offsetIndex++);
   });
   if (currentPetaBoard.value && orderedAddPanelIds.value.length > 0) {
     vPetaBoard.value?.load({

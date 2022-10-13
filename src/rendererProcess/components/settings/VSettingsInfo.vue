@@ -35,7 +35,7 @@ import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { SUPPORT_URL } from "@/commons/defines";
 import { LICENSES } from "@/@assets/licenses";
 import { DEBUGGERS } from "@/@assets/debuggers";
-import { computed } from "@vue/reactivity";
+import { computed } from "vue";
 import { WindowType } from "@/commons/datas/windowType";
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();

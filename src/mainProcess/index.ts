@@ -29,7 +29,7 @@ import * as Tasks from "@/mainProcess/tasks/task";
 import { getLatestVersion } from "@/commons/utils/versions";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import Transparent from "@/@assets/transparent.png";
-import { DraggingPreviewWindow } from "@/mainProcess/draggingPreviewWindow/draggingPreviewWindow";
+// import { DraggingPreviewWindow } from "@/mainProcess/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
 import { searchImageByGoogle } from "@/mainProcess/utils/searchImageByGoogle";
 import { getConstants } from "@/mainProcess/constants";
@@ -47,7 +47,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
     window, ファイルパス, DBの定義
   */
   //-------------------------------------------------------------------------------------------------//
-  const draggingPreviewWindow = new DraggingPreviewWindow();
+  // const draggingPreviewWindow = new DraggingPreviewWindow();
   let temporaryShowNSFW = false;
   let isDataInitialized = false;
   let detailsPetaImage: PetaImage | undefined;
@@ -102,9 +102,9 @@ import { LogFrom } from "@/mainProcess/storages/logger";
       windows.showWindows();
     }
   });
-  app.on("before-quit", () => {
-    draggingPreviewWindow.destroy();
-  });
+  // app.on("before-quit", () => {
+  //   draggingPreviewWindow.destroy();
+  // });
   app.on("window-all-closed", () => {
     //
   });
@@ -709,16 +709,16 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
           return false;
         },
-        async startDrag(event, petaImages, iconSize) {
+        async startDrag(event, petaImages) {
           const first = petaImages[0];
           if (!first) {
             return;
           }
           const firstPath = Path.resolve(DIR_IMAGES, first.file.original);
-          draggingPreviewWindow.createWindow();
-          draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
-          draggingPreviewWindow.setSize(iconSize, (first.height / first.width) * iconSize);
-          draggingPreviewWindow.setVisible(true);
+          // draggingPreviewWindow.createWindow();
+          // draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
+          // draggingPreviewWindow.setSize(iconSize, (first.height / first.width) * iconSize);
+          // draggingPreviewWindow.setVisible(true);
           dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) =>
             Path.resolve(DIR_IMAGES, petaImage.file.original),
@@ -726,14 +726,17 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
             windows.windows.board.moveTop();
           }
-          draggingPreviewWindow.window?.moveTop();
+          // draggingPreviewWindow.window?.moveTop();
+          // await new Promise((res) => {
+          //   setTimeout(res, 100);
+          // });
           event.sender.startDrag({
             file: firstPath,
             files: files,
             icon: nativeImage.createFromDataURL(Transparent),
           });
-          draggingPreviewWindow.setVisible(false);
-          draggingPreviewWindow.destroy();
+          // draggingPreviewWindow.setVisible(false);
+          // draggingPreviewWindow.destroy();
           setTimeout(() => {
             dropFromBrowserPetaImageIds = undefined;
           }, 100);
@@ -744,9 +747,9 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
           const ids = [...dropFromBrowserPetaImageIds];
           dropFromBrowserPetaImageIds = undefined;
-          draggingPreviewWindow.clearImages();
-          draggingPreviewWindow.setVisible(false);
-          draggingPreviewWindow.destroy();
+          // draggingPreviewWindow.clearImages();
+          // draggingPreviewWindow.setVisible(false);
+          // draggingPreviewWindow.destroy();
           return ids;
         },
         async updateStates(event, states) {

@@ -48,7 +48,7 @@ const prevMousePosition = new Vec2();
 const keyboards = useKeyboardsStore();
 const selection = new PTransformerDashedLine();
 let pPanel: PPanel | undefined;
-let corners: PTransformerControlPoint[] = [];
+const corners: PTransformerControlPoint[] = [];
 const blackMask = new PIXI.Graphics();
 let draggingControlPoint: PTransformerControlPoint | undefined;
 const minX = ref(0);

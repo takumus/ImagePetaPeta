@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, toRaw } from "vue";
+import { ref, onMounted, onUnmounted, watch, toRaw, computed } from "vue";
 // Components
 import VCrop from "@/rendererProcess/components/board/VCrop.vue";
 import VBoardLoading from "@/rendererProcess/components/board/VBoardLoading.vue";
@@ -63,7 +63,6 @@ import { PSelection } from "@/rendererProcess/components/board/PSelection";
 import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
-import { computed } from "@vue/reactivity";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
@@ -122,10 +121,10 @@ let mouseRightPressing = false;
 let renderOrdered = false;
 let selecting = false;
 let requestAnimationFrameHandle = 0;
-let keyboards: Keyboards = useKeyboardsStore(true);
+const keyboards = useKeyboardsStore(true);
 let cancelExtract: (() => Promise<void[]>) | undefined;
 let resolution = -1;
-let currentBoard = ref<PetaBoard>();
+const currentBoard = ref<PetaBoard>();
 onMounted(() => {
   setTimeout(() => {
     constructIfResolutionChanged();
