@@ -11,8 +11,7 @@
 下記より zip ファイル **(ImagePetaPeta-beta-X.X.X-beta-win32-x64.exe.zip)** をダウンロードしてインストールしてください。  
 <https://github.com/takumus/ImagePetaPeta/releases/>  
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
-<img src="./.readme_assets/install-win-01.png" width="40%">
-<img src="./.readme_assets/install-win-02.png" width="40%">
+<img src="./.readme_assets/install-win-01.png" width="49%"><img src="./.readme_assets/install-win-02.png" width="49%">
 
 ### Mac
 
@@ -20,13 +19,12 @@
 **`YYY` は、M1 や M2 等をお使いの場合は arm64 を、それ以外の方は Intel を選んでください。**  
 <https://github.com/takumus/ImagePetaPeta/releases/>
 
-1. `Temrminal.app` を起動します。  
-   <img src="./.readme_assets/install-mac-01.png" width="30%">
-   <img src="./.readme_assets/install-mac-02.png" width="30%">
-   <img src="./.readme_assets/install-mac-03.png" width="30%">
+#### 1. `Temrminal.app` を起動します。
+  
+<img src="./.readme_assets/install-mac-01.png" width="33%"><img src="./.readme_assets/install-mac-02.png" width="33%"><img src="./.readme_assets/install-mac-03.png" width="33%">
 
-2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。  
-   <img src="./.readme_assets/install-mac-04.png" width="100%">
+#### 2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。  
+<img src="./.readme_assets/install-mac-04.png" width="100%">
 
 その後は通常通りに起動できます。
 
