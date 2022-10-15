@@ -60,6 +60,13 @@ export class PetaDatas {
     arrayBuffers: ArrayBuffer[],
     filePaths: string[],
   ) {
+    filePaths.filter((filePath) => {
+      if (Path.resolve(Path.dirname(filePath)) !== Path.resolve(this.paths.DIR_IMAGES)) {
+        return;
+      }
+      const name = Path.basename(filePath).split(".")[0];
+      console.log(name);
+    });
     let petaImages: PetaImage[] = [];
     const urls: string[] = [];
     const log2 = this.mainLogger.logChunk();
