@@ -42,16 +42,16 @@ onMounted(() => {
           : await promiseSerial(async (file) => {
               return file.arrayBuffer();
             }, fileList).promise;
-      const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
-      if (dropFromBrowserPetaImageIds) {
-        emit(
-          "addPanelByDragAndDrop",
-          dropFromBrowserPetaImageIds,
-          vec2FromPointerEvent(event),
-          true,
-        );
-        return;
-      }
+      // const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
+      // if (dropFromBrowserPetaImageIds) {
+      //   emit(
+      //     "addPanelByDragAndDrop",
+      //     dropFromBrowserPetaImageIds,
+      //     vec2FromPointerEvent(event),
+      //     true,
+      //   );
+      //   return;
+      // }
       const ids = await API.send("importImagesByDragAndDrop", htmls, arrayBuffers, filePaths);
       emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
     }

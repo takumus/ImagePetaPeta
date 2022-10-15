@@ -55,7 +55,6 @@ export interface MainFunctions {
   changePetaImageDirectory: (path: string) => Promise<boolean>;
   realESRGANConvert: (petaImages: PetaImage[]) => Promise<boolean>;
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
-  getDropFromBrowserPetaImageIds: () => Promise<string[] | undefined>;
   openWindow: (windowType: WindowType) => Promise<void>;
   setDetailsPetaImage: (petaImage: PetaImage) => Promise<void>;
   getDetailsPetaImage: () => Promise<PetaImage | undefined>;

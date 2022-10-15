@@ -60,17 +60,22 @@ export class PetaDatas {
     arrayBuffers: ArrayBuffer[],
     filePaths: string[],
   ) {
-    filePaths.filter((filePath) => {
-      if (Path.resolve(Path.dirname(filePath)) !== Path.resolve(this.paths.DIR_IMAGES)) {
-        return;
-      }
-      const name = Path.basename(filePath).split(".")[0];
-      console.log(name);
-    });
+    const log1 = this.mainLogger.logChunk();
+    const ids = filePaths
+      .filter(
+        (filePath) => Path.resolve(Path.dirname(filePath)) === Path.resolve(this.paths.DIR_IMAGES),
+      )
+      .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
+    if (ids.length === filePaths.length) {
+      log1.log("0.from browser");
+      log1.log("result:", ids);
+      return ids;
+    }
+    const log2 = this.mainLogger.logChunk();
     let petaImages: PetaImage[] = [];
     const urls: string[] = [];
-    const log2 = this.mainLogger.logChunk();
     try {
+      log2.log("1.trying to download");
       htmls.map((html) => {
         try {
           urls.push(getURLFromImgTag(html));
@@ -79,7 +84,6 @@ export class PetaDatas {
           log2.error("invalid html", error);
         }
       });
-      log2.log("1.trying to download:", urls);
       const datas = await promiseSerial(async (url) => {
         let data: Buffer;
         let remoteURL = "";

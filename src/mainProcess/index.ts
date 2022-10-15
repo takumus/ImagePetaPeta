@@ -52,7 +52,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
   let isDataInitialized = false;
   let detailsPetaImage: PetaImage | undefined;
   let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
-  let dropFromBrowserPetaImageIds: string[] | undefined;
   //-------------------------------------------------------------------------------------------------//
   /*
     ファイルパスとDBの、検証・読み込み・作成
@@ -719,7 +718,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           // draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
           // draggingPreviewWindow.setSize(iconSize, (first.height / first.width) * iconSize);
           // draggingPreviewWindow.setVisible(true);
-          dropFromBrowserPetaImageIds = petaImages.map((petaImage) => petaImage.id);
           const files = petaImages.map((petaImage) =>
             Path.resolve(DIR_IMAGES, petaImage.file.original),
           );
@@ -737,20 +735,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           });
           // draggingPreviewWindow.setVisible(false);
           // draggingPreviewWindow.destroy();
-          setTimeout(() => {
-            dropFromBrowserPetaImageIds = undefined;
-          }, 100);
-        },
-        async getDropFromBrowserPetaImageIds() {
-          if (!dropFromBrowserPetaImageIds) {
-            return undefined;
-          }
-          const ids = [...dropFromBrowserPetaImageIds];
-          dropFromBrowserPetaImageIds = undefined;
-          // draggingPreviewWindow.clearImages();
-          // draggingPreviewWindow.setVisible(false);
-          // draggingPreviewWindow.destroy();
-          return ids;
         },
         async updateStates(event, states) {
           const log = mainLogger.logChunk();
