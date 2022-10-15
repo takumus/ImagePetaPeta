@@ -20,7 +20,7 @@
 **`YYY` は、M1 や M2 等をお使いの場合は arm64 を、それ以外の方は Intel を選んでください。**  
 <https://github.com/takumus/ImagePetaPeta/releases/>
 
-1. `Temrminal.app` を起動します。
+1. `Temrminal.app` を起動します。  
    <img src="./.readme_assets/install-mac-01.png" width="30%">
    <img src="./.readme_assets/install-mac-02.png" width="30%">
    <img src="./.readme_assets/install-mac-03.png" width="30%">
