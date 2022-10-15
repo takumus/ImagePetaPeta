@@ -4,16 +4,17 @@
 写真やイラスト資料を閲覧、管理するソフトです。
 ## インストール
 ### Windows
-下記よりzipファイル **(ImagePetaPeta-beta.Setup.X.X.X-beta.zip)** をダウンロードしてインストールしてください。  
+下記よりzipファイル **(ImagePetaPeta-beta-X.X.X-beta-win32-x64.exe.zip)** をダウンロードしてインストールしてください。  
 <https://github.com/takumus/ImagePetaPeta/releases/>  
 下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
 <img src="./.readme_assets/install01.png" width="40%">
 <img src="./.readme_assets/install02.png" width="40%">
 ### Mac
-1. `package.json`の`volta`のバージョンを参考に`node`, `yarn`の環境を整えてください。  
-1. [Volta](https://docs.volta.sh/guide/getting-started)をインストールでもOKです。  
-2. `yarn build`  
-3. `dist/electron`内に生成されたappファイルがアプリ本体です。
+下記よりdmgファイル **(ImagePetaPeta-beta-X.X.X-beta-darwin-YYY.dmg)** をダウンロードしてApplicationsにドラッグしてください。  
+**`YYY` は、M1やM2等をお使いの場合はarm64を、それ以外の方はIntelを選んでください。**   
+ドラッグした後、`Temrminal.app` を起動し、`xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、Returnキーを押してください。  
+その後は通常通りに起動できます。
+<https://github.com/takumus/ImagePetaPeta/releases/>  
 ## ご協力
 まだ開発段階のアプリなので、多くのユーザーに最新版を使っていただき、新鮮なフィードバックを貰いたいと思っております。  
 そのため、アップデートの通知はオフにできないようになっています。  
