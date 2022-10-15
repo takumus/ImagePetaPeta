@@ -68,7 +68,7 @@ export class PetaDatas {
       .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
     if (ids.length === filePaths.length) {
       log1.log("0.from browser");
-      log1.log("result:", ids);
+      log1.log("result:", ids.length);
       return ids;
     }
     const log2 = this.mainLogger.logChunk();
