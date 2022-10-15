@@ -54,6 +54,7 @@
     "@types/fuzzy-search": "^2.1.2",
     "@types/mime-types": "^2.1.1",
     "@types/nedb": "^1.8.12",
+    "@types/node": "18.8.0",
     "@types/offscreencanvas": "^2019.7.0",
     "@types/resize-observer-browser": "^0.1.6",
     "@types/sharp": "^0.31.0",
