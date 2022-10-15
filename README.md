@@ -26,7 +26,7 @@
    <img src="./.readme_assets/install-mac-03.png" width="30%">
 
 2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。  
-   <img src="./.readme_assets/install-mac-04.png" width="40%">
+   <img src="./.readme_assets/install-mac-04.png" width="100%">
 
 その後は通常通りに起動できます。
 
