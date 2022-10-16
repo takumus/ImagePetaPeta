@@ -66,7 +66,7 @@ export class PetaDatas {
         (filePath) => Path.resolve(Path.dirname(filePath)) === Path.resolve(this.paths.DIR_IMAGES),
       )
       .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
-    if (ids.length === filePaths.length) {
+    if (ids.length > 0 && ids.length === filePaths.length) {
       log1.log("0.from browser");
       log1.log("result:", ids.length);
       return ids;
