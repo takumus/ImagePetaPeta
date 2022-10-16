@@ -12,11 +12,11 @@ export interface MainFunctions {
   importImageFiles: () => Promise<number>;
   importImageDirectories: () => Promise<number>;
   importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
-  importImagesByDragAndDrop: (
-    htmls: string[],
-    buffers: ArrayBuffer[],
-    filePaths: string[],
-  ) => Promise<string[]>;
+  importImagesByDragAndDrop: (datas: {
+    htmls: string[];
+    buffers: ArrayBuffer[];
+    filePaths: string[];
+  }) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
   getPetaImages: () => Promise<PetaImages>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;

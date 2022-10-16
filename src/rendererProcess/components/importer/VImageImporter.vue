@@ -36,7 +36,7 @@ onMounted(() => {
           return path.length > 0;
         });
       // 空文字のpathsだったらarraybufferを読む。
-      const arrayBuffers =
+      const buffers =
         filePaths.length > 0
           ? []
           : await promiseSerial(async (file) => {
@@ -52,7 +52,7 @@ onMounted(() => {
       //   );
       //   return;
       // }
-      const ids = await API.send("importImagesByDragAndDrop", htmls, arrayBuffers, filePaths);
+      const ids = await API.send("importImagesByDragAndDrop", { htmls, buffers, filePaths });
       emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
     }
   });

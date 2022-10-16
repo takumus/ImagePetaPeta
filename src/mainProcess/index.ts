@@ -264,7 +264,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"],
             });
-            petaDatas.importImagesFromFilePaths(result.filePaths);
+            petaDatas.petaImages.importImagesFromFilePaths(result.filePaths);
             return result.filePaths.length;
           }
           return 0;
@@ -279,7 +279,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
                 properties: ["openDirectory"],
               })
             ).filePaths;
-            petaDatas.importImagesFromFilePaths(filePaths);
+            petaDatas.petaImages.importImagesFromFilePaths(filePaths);
             return filePaths.length;
           }
           return 0;
@@ -289,7 +289,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           try {
             log.log("#Import Images From Clipboard");
             return (
-              await petaDatas.importImagesFromBuffers(
+              await petaDatas.petaImages.importImagesFromBuffers(
                 buffers.map((buffer) => {
                   return {
                     buffer: buffer,
@@ -750,16 +750,20 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
           return false;
         },
-        async importImagesByDragAndDrop(event, htmls, arrayBuffers, filePaths) {
+        async importImagesByDragAndDrop(event, datas) {
           const log = mainLogger.logChunk();
           try {
             log.log("#ImportImagesByDragAndDrop");
-            log.log(htmls.length, arrayBuffers.length, filePaths.length);
-            const petaImages = await petaDatas.importImagesByDragAndDrop(
-              htmls,
-              arrayBuffers,
-              filePaths,
+            log.log(datas);
+            log.log(
+              "htmls:",
+              datas.htmls.length,
+              "\nbuffers:",
+              datas.buffers.length,
+              "\nfilePaths:",
+              datas.filePaths.length,
             );
+            const petaImages = await petaDatas.petaImages.importImages(datas);
             log.log("return:", petaImages.length);
             return petaImages;
           } catch (e) {
