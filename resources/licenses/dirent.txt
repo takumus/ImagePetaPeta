@@ -1,5 +1,5 @@
 dirent
-The MIT License (MIT)
+MIT
 Copyright (c) 1998-2019 Toni Ronkko
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
