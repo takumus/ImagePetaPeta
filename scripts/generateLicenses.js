@@ -1,7 +1,22 @@
 const script = require("./@script");
 script.run("generate licenses", async () => {
   const licenseChecker = require("license-checker");
-  const customLicenses = require("./customLicenses");
+  const customLicenses = script.utils
+    .readdir("resources/licenses")
+    .filter((fileName) => fileName.endsWith(".txt"))
+    .reduce((licenses, fileName) => {
+      const text = script.utils
+        .read("resources/licenses/" + fileName)
+        .toString()
+        .split(/\r?\n/g);
+      return {
+        ...licenses,
+        [text.shift()]: {
+          customLicensesName: text.shift(),
+          customLicensesText: text.join("\n"),
+        },
+      };
+    }, {});
   const packages = {
     ...(await new Promise((res, rej) => {
       licenseChecker.init(
