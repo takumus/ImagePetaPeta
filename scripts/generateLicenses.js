@@ -8,7 +8,7 @@ script.run("generate licenses", async () => {
       const text = script.utils
         .read("resources/licenses/" + fileName)
         .toString()
-        .split(/\r?\n/g);
+        .split(/\r\n|\n|\r/g);
       return {
         ...licenses,
         [text.shift()]: {
