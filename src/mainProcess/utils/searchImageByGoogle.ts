@@ -43,10 +43,17 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
         });
         window.webContents.debugger.attach("1.1");
         const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
+        await new Promise((res) => setTimeout(res, 500));
+        await window.webContents.executeJavaScript(
+          `document.querySelector("div[data-is-images-mode='true']").click();`,
+          false,
+        );
+        await new Promise((res) => setTimeout(res, 500));
         const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
           nodeId: document.root.nodeId,
           selector: "input[name=encoded_image]",
         });
+        await new Promise((res) => setTimeout(res, 500));
         await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
           nodeId: input.nodeId,
           files: [imageFilePath],
@@ -66,6 +73,9 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             rej("timeout");
           }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
           window.webContents.addListener("did-finish-load", () => {
+            if (!window.webContents.getURL().includes("/search?")) {
+              return;
+            }
             shell.openExternal(window.webContents.getURL());
             clearTimeout(timeoutHandler);
             handler.emitStatus({
