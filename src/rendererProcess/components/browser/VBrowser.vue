@@ -104,6 +104,7 @@ import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
+import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -342,12 +343,14 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
       //     this.targetPetaImage = thumb.petaImage;
       //   }
       // },
-      {
-        label: t("browser.petaImageMenu.realESRGAN"),
-        click: async () => {
-          await API.send("realESRGANConvert", selectedPetaImages.value);
-        },
-      },
+      ...realESRGANModelNames.map((modelName) => {
+        return {
+          label: `${t("browser.petaImageMenu.realESRGAN")}(${modelName})`,
+          click: async () => {
+            await API.send("realESRGANConvert", selectedPetaImages.value, modelName);
+          },
+        };
+      }),
       {
         label: t("browser.petaImageMenu.searchImageByGoogle"),
         click: async () => {

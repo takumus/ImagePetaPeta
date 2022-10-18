@@ -696,11 +696,11 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           log.log("#Get States");
           return configStates.data;
         },
-        async realESRGANConvert(event, petaImages) {
+        async realESRGANConvert(event, petaImages, modelName) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Real-ESRGAN Convert");
-            const result = await petaDatas.realESRGAN(petaImages);
+            const result = await petaDatas.realESRGAN(petaImages, modelName);
             log.log("return:", result);
             return result;
           } catch (error) {
@@ -754,13 +754,12 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           const log = mainLogger.logChunk();
           try {
             log.log("#ImportImagesByDragAndDrop");
-            log.log(datas);
             log.log(
               "htmls:",
               datas.htmls.length,
-              "\nbuffers:",
+              ", buffers:",
               datas.buffers.length,
-              "\nfilePaths:",
+              ", filePaths:",
               datas.filePaths.length,
             );
             const petaImages = await petaDatas.petaImages.importImages(datas);

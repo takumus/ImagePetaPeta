@@ -7,6 +7,7 @@ import { States } from "@/commons/datas/states";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { WindowType } from "@/commons/datas/windowType";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
+import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
   importImageFiles: () => Promise<number>;
@@ -53,7 +54,7 @@ export interface MainFunctions {
   regenerateMetadatas: () => Promise<void>;
   browsePetaImageDirectory: () => Promise<string | null>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
-  realESRGANConvert: (petaImages: PetaImage[]) => Promise<boolean>;
+  realESRGANConvert: (petaImages: PetaImage[], modelName: RealESRGANModelName) => Promise<boolean>;
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
   openWindow: (windowType: WindowType) => Promise<void>;
   setDetailsPetaImage: (petaImage: PetaImage) => Promise<void>;

@@ -22,6 +22,7 @@ import { DateTimeFormat, NumberFormat } from "@intlify/core-base";
 import { extraFiles } from "@/@assets/extraFiles";
 import * as fs from "fs";
 import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath";
+import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -50,7 +51,7 @@ export class PetaDatas {
     this.petaBoards = new PetaDataPetaBoards(this);
     this.petaTags = new PetaDataPetaTags(this);
   }
-  async realESRGAN(petaImages: PetaImage[]) {
+  async realESRGAN(petaImages: PetaImage[], modelName: RealESRGANModelName) {
     return Tasks.spawn(
       "realESRGAN",
       async (handler) => {
@@ -92,7 +93,7 @@ export class PetaDatas {
             "-m",
             modelFilePath,
             "-n",
-            "realesrgan-x4plus",
+            modelName,
           ];
           let percent = 0;
           const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
