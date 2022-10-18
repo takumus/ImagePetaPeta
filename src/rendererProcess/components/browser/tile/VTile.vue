@@ -179,7 +179,6 @@ const placeholderColor = computed(() => {
   return "#ffffff";
 });
 async function fetchPetaTags() {
-  myPetaTags.value = [];
   if (!settingsStore.state.value.showTagsOnTile) {
     return;
   }
