@@ -4,7 +4,7 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import * as Path from "path";
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
+import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
 import { MainEvents } from "@/commons/api/mainEvents";
@@ -140,12 +140,13 @@ export class PetaDatas {
               log.log("return: false");
               return false;
             }
-            newPetaImage.addDate = petaImage.addDate;
+            newPetaImage.addDate = petaImage.addDate + 1;
             newPetaImage.fileDate = petaImage.fileDate;
-            newPetaImage.name = petaImage.name + "-converted";
+            newPetaImage.name = `${petaImage.name}(RealESRGAN-${modelName})`;
+            newPetaImage.note = petaImage.note;
+            newPetaImage.nsfw = petaImage.nsfw;
             log.log("update new petaImage");
             await this.petaImages.updatePetaImages([newPetaImage], UpdateMode.UPDATE, true);
-            this.emitMainEvent("updatePetaImages", [newPetaImage], UpdateMode.UPDATE);
             log.log("get tags");
             const pipts = await this.datas.dbPetaImagesPetaTags.find({ petaImageId: petaImage.id });
             log.log("tags:", pipts.length);
@@ -153,19 +154,6 @@ export class PetaDatas {
             await this.petaTags.updatePetaImagesPetaTags(
               [newPetaImage.id],
               pipts.map((pipt) => pipt.petaTagId),
-              UpdateMode.INSERT,
-              true,
-            );
-            log.log(`add "before realESRGAN" tag to old petaImage`);
-            const name = "before realESRGAN";
-            let petaTag = (await this.datas.dbPetaTags.find({ name: name }))[0];
-            if (petaTag === undefined) {
-              petaTag = createPetaTag(name);
-              await this.petaTags.updatePetaTags([petaTag], UpdateMode.INSERT);
-            }
-            await this.petaTags.updatePetaImagesPetaTags(
-              [petaImage.id],
-              [petaTag.id],
               UpdateMode.INSERT,
               true,
             );
