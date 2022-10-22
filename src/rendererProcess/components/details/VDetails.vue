@@ -14,7 +14,7 @@
       }"
     >
       <img v-show="loaded" :src="url" draggable="false" @load="loaded = true" />
-      <t-nsfw v-if="props.petaImage.nsfw"></t-nsfw>
+      <t-nsfw v-if="nsfwMask"></t-nsfw>
     </t-img>
   </t-details-root>
 </template>
@@ -26,6 +26,7 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
+import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
@@ -44,6 +45,7 @@ const scale = ref(1);
 const position = ref(new Vec2());
 const settingsStore = useSettingsStore();
 const resizerStore = useResizerStore();
+const nsfwStore = useNSFWStore();
 const pointerPosition = new Vec2();
 const dragging = ref(false);
 const loaded = ref(false);
@@ -140,6 +142,9 @@ const defaultScale = computed(() => {
   }
   height;
   return width / props.petaImage.width;
+});
+const nsfwMask = computed(() => {
+  return props.petaImage.nsfw && !nsfwStore.state.value;
 });
 watch(
   () => props.petaImage,

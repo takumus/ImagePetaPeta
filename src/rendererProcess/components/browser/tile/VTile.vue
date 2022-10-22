@@ -16,7 +16,7 @@
           'selected-image': petaImagesStore.getSelected(tile.petaImage),
         }"
       >
-        <t-nsfw v-if="showNSFW"> </t-nsfw>
+        <t-nsfw v-if="nsfwMask"> </t-nsfw>
         <t-placeholder
           class="placeholder"
           :class="{
@@ -162,7 +162,7 @@ function dblclick() {
     emit("dblclick", props.tile.petaImage);
   }
 }
-const showNSFW = computed(() => {
+const nsfwMask = computed(() => {
   if (props.tile.petaImage === undefined) {
     return false;
   }

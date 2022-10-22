@@ -29,7 +29,7 @@
         backgroundImage: `url(${url})`,
       }"
     >
-      <t-nsfw v-if="showNSFW"></t-nsfw>
+      <t-nsfw v-if="nsfwMask"></t-nsfw>
     </t-thumb>
   </li>
 </template>
@@ -87,7 +87,7 @@ const locked = computed(() => {
 const visible = computed(() => {
   return props.cellData?.data.visible;
 });
-const showNSFW = computed(() => {
+const nsfwMask = computed(() => {
   return (
     petaImagesStore.getPetaImage(props.cellData?.data.petaImageId)?.nsfw && !nsfwStore.state.value
   );

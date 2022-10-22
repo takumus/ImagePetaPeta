@@ -8,7 +8,7 @@
     }"
   >
     <t-image-wrapper>
-      <t-nsfw v-if="showNSFW"> </t-nsfw>
+      <t-nsfw v-if="nsfwMask"> </t-nsfw>
       <img draggable="false" :src="imageURL" v-if="loaded" />
     </t-image-wrapper>
   </t-property-thumbnail-root>
@@ -33,7 +33,7 @@ onMounted(() => {
 const loaded = computed(() => {
   return imageURL.value != "";
 });
-const showNSFW = computed(() => {
+const nsfwMask = computed(() => {
   return props.propertyThumbnail.petaImage.nsfw && !nsfwStore.state.value;
 });
 </script>
