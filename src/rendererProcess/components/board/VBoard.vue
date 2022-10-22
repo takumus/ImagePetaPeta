@@ -398,7 +398,10 @@ function removePPanel(pPanel: PPanel) {
   delete pPanels[pPanel.petaPanel.id];
 }
 function petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
-  const pPanel = pPanels[petaPanel.id]!;
+  const pPanel = pPanels[petaPanel.id];
+  if (!pPanel) {
+    return;
+  }
   const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
   const isMultiple = selectedPPanels().length > 1;
   components.contextMenu.open(
