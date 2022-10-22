@@ -10,8 +10,8 @@
         <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
-        <t-board>
-          <VBoard :zIndex="1" :board="board" :detailsMode="true" ref="vPetaBoard" />
+        <t-board v-if="petaImage">
+          <VDetails :petaImage="petaImage" :zIndex="1" />
         </t-board>
         <t-property>
           <VProperty
@@ -59,6 +59,7 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
+import VDetails from "@/rendererProcess/components/details/VDetails.vue";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
@@ -184,6 +185,7 @@ t-root {
         display: block;
         flex: 1;
         z-index: 1;
+        overflow: hidden;
         background-repeat: repeat;
         background-image: url("~@/@assets/transparentBackground.png");
         cursor: grab;
