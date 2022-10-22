@@ -28,7 +28,6 @@
         <VBoard
           :zIndex="1"
           :board="currentPetaBoard"
-          :detailsMode="false"
           ref="vPetaBoard"
           @update:board="updatePetaBoard"
         />

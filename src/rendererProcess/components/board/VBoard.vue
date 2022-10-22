@@ -19,7 +19,6 @@
     ></VBoardLoading>
     <VLayer
       ref="layer"
-      v-show="!detailsMode"
       :zIndex="1"
       :visible="true"
       :pPanelsArray="petaPanelsArray"
@@ -75,7 +74,6 @@ const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
 const props = defineProps<{
-  detailsMode: boolean;
   board?: PetaBoard;
   zIndex: number;
 }>();
@@ -131,7 +129,7 @@ onMounted(() => {
   }, 200);
   resolutionMatchMedia.addEventListener("change", constructIfResolutionChanged);
   pTransformer.updatePetaPanels = updatePetaPanels;
-  keyboards.enabled = !props.detailsMode;
+  keyboards.enabled = true;
   keyboards.keys("Delete").down(removeSelectedPanels);
   keyboards.keys("Backspace").down(removeSelectedPanels);
   keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
@@ -167,11 +165,9 @@ function construct() {
   pixi.stage.on("pointerupoutside", pTransformer.pointerup.bind(pTransformer));
   pixi.stage.on("pointermove", pTransformer.pointermove.bind(pTransformer));
   pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
-  if (!props.detailsMode) {
-    pixi.stage.addChild(backgroundSprite);
-    // pixi.stage.addChild(crossLine);
-    pixi.stage.addChild(grid);
-  }
+  pixi.stage.addChild(backgroundSprite);
+  // pixi.stage.addChild(crossLine);
+  pixi.stage.addChild(grid);
   pixi.stage.addChild(centerWrapper);
   centerWrapper.addChild(rootContainer);
   rootContainer.addChild(panelsCenterWrapper);
@@ -197,7 +193,6 @@ function resize(rect: DOMRectReadOnly) {
   stageRect.x = rect.width;
   stageRect.y = rect.height;
   mouseOffset.set(panelsBackground.value?.getBoundingClientRect());
-  updateDetailsPetaPanel();
   if (pixi) {
     pixi.renderer.resize(rect.width, rect.height);
     pixi.view.style.width = rect.width + "px";
@@ -220,11 +215,7 @@ function pointerdown(e: PIXI.InteractionEvent) {
   }
   const mouse = getMouseFromEvent(e);
   click.down(mouse);
-  if (
-    e.data.button === MouseButton.RIGHT ||
-    e.data.button === MouseButton.MIDDLE ||
-    (props.detailsMode && e.data.button === MouseButton.LEFT)
-  ) {
+  if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE) {
     mouseRightPressing = true;
     dragging.value = true;
     dragged.value = false;
@@ -251,18 +242,14 @@ function getPPanelFromObject(object: PIXI.DisplayObject) {
 }
 function pointerup(e: PIXI.InteractionEvent) {
   const mouse = getMouseFromEvent(e).add(mouseOffset);
-  if (
-    e.data.button === MouseButton.RIGHT ||
-    e.data.button === MouseButton.MIDDLE ||
-    (props.detailsMode && e.data.button === MouseButton.LEFT)
-  ) {
+  if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE) {
     mouseRightPressing = false;
     if (click.isClick && e.data.button === MouseButton.RIGHT) {
       const pPanel = getPPanelFromObject(e.target);
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
         petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
-      } else if (!props.detailsMode) {
+      } else {
         components.contextMenu.open(
           [
             {
@@ -411,9 +398,6 @@ function removePPanel(pPanel: PPanel) {
   delete pPanels[pPanel.petaPanel.id];
 }
 function petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
-  if (props.detailsMode) {
-    return;
-  }
   const pPanel = pPanels[petaPanel.id]!;
   const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
   const isMultiple = selectedPPanels().length > 1;
@@ -564,7 +548,6 @@ async function load(params: {
     deletions: string[];
   };
 }): Promise<void> {
-  updateDetailsPetaPanel();
   const log = logChunk().log;
   endCrop();
   // リロードじゃないならクリア。
@@ -712,9 +695,7 @@ async function load(params: {
     }
   });
   Cursor.setDefaultCursor();
-  if (!props.detailsMode) {
-    statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
-  }
+  statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
 }
 function onUpdateGif() {
   if (extracting.value) {
@@ -723,7 +704,7 @@ function onUpdateGif() {
   orderPIXIRender();
 }
 function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
-  if (!currentBoard.value || props.detailsMode) {
+  if (!currentBoard.value) {
     return;
   }
   if (
@@ -760,28 +741,6 @@ function updateAnimatedGIF(deltaTime: number) {
 }
 function keyShift(pressed: boolean) {
   pTransformer.fit = pressed;
-}
-function updateDetailsPetaPanel() {
-  if (!props.detailsMode) {
-    return;
-  }
-  const petaPanel = currentBoard.value?.petaPanels[0];
-  const petaImage = petaImagesStore.getPetaImage(petaPanel?.petaImageId);
-  if (petaPanel && petaImage) {
-    let width = 0;
-    let height = 0;
-    const maxWidth = stageRect.x * 0.9;
-    const maxHeight = stageRect.y * 0.9;
-    if (petaImage.height / petaImage.width < maxHeight / maxWidth) {
-      width = maxWidth;
-      height = maxWidth * petaImage.height;
-    } else {
-      height = maxHeight;
-      width = maxHeight / petaImage.height;
-    }
-    petaPanel.width = width;
-    petaPanel.height = height;
-  }
 }
 function pPanelsArray() {
   return Object.values(pPanels);
