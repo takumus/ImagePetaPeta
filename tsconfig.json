@@ -16,9 +16,9 @@
     "types": [
       "webpack-env",
       "resize-observer-browser",
+      "offscreencanvas",
+      "node",
       "./src/@types",
-      "./node_modules/@types/offscreencanvas",
-      "node"
     ],
     "paths": {
       "@/*": [
