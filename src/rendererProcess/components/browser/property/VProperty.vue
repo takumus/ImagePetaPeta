@@ -93,6 +93,7 @@
             :complements="complements"
             :textAreaStyle="{ width: '100%' }"
             :outerStyle="{ width: '100%' }"
+            :noOutline="true"
             @update:value="addTag"
           />
         </t-tag>

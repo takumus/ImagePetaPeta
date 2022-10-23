@@ -25,6 +25,7 @@
           :outerStyle="{ width: '100%' }"
           :blurToReset="true"
           :look="textsStore.state.value.plus"
+          :noOutline="true"
           @update:value="addSelectedTag"
           @deleteOfEmpty="removeLastPetaTag()"
           ref="searchInput"
