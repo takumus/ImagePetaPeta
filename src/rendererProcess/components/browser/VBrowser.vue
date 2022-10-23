@@ -247,10 +247,8 @@ function selectTile(thumb: Tile, force = false) {
     );
   } else {
     // コントロールキーが押されていなければ選択をリセット
+    petaImagesStore.clearSelection();
     petaImagesStore.setSelected(thumb.petaImage, true);
-    petaImagesArray.value.forEach((pi) => {
-      petaImagesStore.setSelected(pi, thumb.petaImage === pi);
-    });
   }
   if (firstSelectedTile.value && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
     // 最初の選択と、シフトキーが押されていれば、範囲選択。
