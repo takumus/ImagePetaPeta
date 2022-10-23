@@ -78,7 +78,6 @@ onMounted(() => {
 onUnmounted(() => {
   background.value?.removeEventListener("pointerdown", pointerdown);
   background.value?.removeEventListener("pointerup", pointerup);
-  keyboards.destroy();
 });
 function close() {
   emit("close");

@@ -119,7 +119,6 @@ function beginMoveSelection(e: PIXI.InteractionEvent) {
 onUnmounted(() => {
   cropRoot.value?.removeChild(pixi.view);
   pixi.destroy();
-  keyboards.destroy();
   cancelAnimationFrame(requestAnimationFrameHandle);
   PIXI.Ticker.shared.remove(updateAnimatedGIF);
 });

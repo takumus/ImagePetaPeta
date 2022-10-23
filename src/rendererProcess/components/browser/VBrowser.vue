@@ -148,7 +148,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
-  keyboards.destroy();
 });
 function saveScrollPosition() {
   let minDistance = Infinity;
