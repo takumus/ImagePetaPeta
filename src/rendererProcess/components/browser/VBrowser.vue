@@ -383,31 +383,37 @@ function sort(a: PetaImage, b: PetaImage) {
     }
   }
 }
-async function fetchFilteredPetaImages() {
-  ImageDecoder.clear();
-  if (selectedPetaTagIds.value.length === 0) {
-    filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
-    return;
-  }
-  const untagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
-  const results = await API.send(
-    "getPetaImageIdsByPetaTagIds",
-    untagged ? [] : selectedPetaTagIds.value,
-  );
-  filteredPetaImages.value = (
-    Array.from(
-      new Set(
-        results
-          .map((id) => {
-            return petaImages.value[id];
-          })
-          .filter((petaImage) => {
-            return petaImage;
-          }),
-      ),
-    ) as PetaImage[]
-  ).sort(sort);
-}
+const fetchFilteredPetaImages = (() => {
+  let fetchId = 0;
+  return async () => {
+    const currentFetchId = ++fetchId;
+    if (selectedPetaTagIds.value.length === 0) {
+      filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
+      return;
+    }
+    const untagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
+    const results = await API.send(
+      "getPetaImageIdsByPetaTagIds",
+      untagged ? [] : selectedPetaTagIds.value,
+    );
+    if (currentFetchId !== fetchId) {
+      return;
+    }
+    filteredPetaImages.value = (
+      Array.from(
+        new Set(
+          results
+            .map((id) => {
+              return petaImages.value[id];
+            })
+            .filter((petaImage) => {
+              return petaImage;
+            }),
+        ),
+      ) as PetaImage[]
+    ).sort(sort);
+  };
+})();
 function selectTag(tag: PetaTag) {
   selectedPetaTagIds.value = [tag.id];
 }
