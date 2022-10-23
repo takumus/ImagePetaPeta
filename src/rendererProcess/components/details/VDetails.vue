@@ -7,15 +7,20 @@
   >
     <t-img
       :style="{
-        top: position.y + stageRect.y / 2 + 'px',
-        left: position.x + stageRect.x / 2 + 'px',
-        width: props.petaImage.width * scale + 'px',
-        height: props.petaImage.height * scale + 'px',
+        transform: `translate(${position.x + stageRect.x / 2}px, ${
+          position.y + stageRect.y / 2
+        }px) scale(${scale})`,
+        width: `${props.petaImage.width}px`,
+        height: `${props.petaImage.height}px`,
       }"
     >
       <img v-show="loaded" :src="url" draggable="false" @load="loaded = true" />
       <t-nsfw v-if="nsfwMask"></t-nsfw>
     </t-img>
+    <!-- 1pxだけ右下から出すとスムーズなズームが出来る。ブラウザの仕様。 -->
+    <t-smooth>
+      <img :src="url" draggable="false" />
+    </t-smooth>
   </t-details-root>
 </template>
 
@@ -166,6 +171,7 @@ t-details-root {
   > t-img {
     display: block;
     position: absolute;
+    transform-origin: top left;
     > img,
     t-nsfw {
       width: 100%;
@@ -180,6 +186,14 @@ t-details-root {
       background-repeat: repeat;
       background-image: url("~@/@assets/nsfwBackground.png");
     }
+  }
+  // 1pxだけ右下から出す。
+  > t-smooth {
+    display: block;
+    position: absolute;
+    top: calc(100% - 1px);
+    left: calc(100% - 1px);
+    opacity: 0.1%;
   }
 }
 </style>
