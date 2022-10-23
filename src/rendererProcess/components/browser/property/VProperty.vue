@@ -212,22 +212,29 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
 function selectTag(tag: PetaTag) {
   emit("selectTag", tag);
 }
-async function fetchPetaTags() {
-  fetchingTags.value = true;
-  if (noImage.value) {
-    sharedPetaTags.value = [];
+const fetchPetaTags = (() => {
+  let fetchId = 0;
+  return async () => {
+    const currentFetchId = ++fetchId;
+    fetchingTags.value = true;
+    if (noImage.value) {
+      sharedPetaTags.value = [];
+      fetchingTags.value = false;
+      return;
+    }
+    const result = await API.send(
+      "getPetaTagIdsByPetaImageIds",
+      props.petaImages.map((petaImage) => petaImage.id),
+    );
+    if (currentFetchId !== fetchId) {
+      return;
+    }
+    sharedPetaTags.value = petaTagsStore.state.petaTags.value
+      .filter((pti) => result.find((id) => id === pti.id))
+      .map((pi) => pi);
     fetchingTags.value = false;
-    return;
-  }
-  const result = await API.send(
-    "getPetaTagIdsByPetaImageIds",
-    props.petaImages.map((petaImage) => petaImage.id),
-  );
-  sharedPetaTags.value = petaTagsStore.state.petaTags.value
-    .filter((pti) => result.find((id) => id === pti.id))
-    .map((pi) => pi);
-  fetchingTags.value = false;
-}
+  };
+})();
 const singlePetaImageInfo = computed(() => {
   if (props.petaImages.length === 1) {
     const petaImage = props.petaImages[0];

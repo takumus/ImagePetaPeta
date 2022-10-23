@@ -178,19 +178,26 @@ const placeholderColor = computed(() => {
   }
   return "#ffffff";
 });
-async function fetchPetaTags() {
-  if (!settingsStore.state.value.showTagsOnTile) {
-    return;
-  }
-  if (props.tile.petaImage === undefined) {
-    return;
-  }
-  const result = await API.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
-  myPetaTags.value = petaTagsStore.state.petaTags.value.filter((petaTag) =>
-    result.find((id) => id === petaTag.id),
-  );
-  loadingTags.value = false;
-}
+const fetchPetaTags = (() => {
+  let fetchId = 0;
+  return async () => {
+    const currentFetchId = ++fetchId;
+    if (!settingsStore.state.value.showTagsOnTile) {
+      return;
+    }
+    if (props.tile.petaImage === undefined) {
+      return;
+    }
+    const result = await API.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
+    if (currentFetchId !== fetchId) {
+      return;
+    }
+    myPetaTags.value = petaTagsStore.state.petaTags.value.filter((petaTag) =>
+      result.find((id) => id === petaTag.id),
+    );
+    loadingTags.value = false;
+  };
+})();
 function delayedFetchPetaTags() {
   window.clearTimeout(fetchTagsTimeoutHandler);
   fetchingPetaTags.value = true;
