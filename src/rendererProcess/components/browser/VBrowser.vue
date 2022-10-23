@@ -560,6 +560,9 @@ const original = computed(() => {
     settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE
   );
 });
+watch(filteredPetaImages, () => {
+  ImageDecoder.clear();
+});
 watch(selectedPetaTagIds, () => {
   currentScrollTileId.value = "";
   nextTick(() => {
