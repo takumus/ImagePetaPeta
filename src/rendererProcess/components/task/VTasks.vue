@@ -22,6 +22,7 @@ import { API } from "@/rendererProcess/api";
 import { TaskStatus } from "@/commons/api/interfaces/task";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 import { useI18n } from "vue-i18n";
+import { TASK_CLOSE_DELAY } from "@/commons/defines";
 
 const windowStatus = useWindowStatusStore();
 const { t } = useI18n();
@@ -32,7 +33,7 @@ onMounted(() => {
     if (task.status === "complete") {
       window.setTimeout(() => {
         delete taskStatuses.value[id];
-      }, 200);
+      }, TASK_CLOSE_DELAY);
     }
   });
 });
