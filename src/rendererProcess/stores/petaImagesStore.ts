@@ -39,6 +39,9 @@ export async function createPetaImagesStore() {
     setSelected(petaImage: PetaImage, selected: boolean) {
       selection.value[petaImage.id] = selected;
     },
+    clearSelection() {
+      selection.value = {};
+    },
     getSelected(petaImage: PetaImage) {
       return selection.value[petaImage.id] === true;
     },
