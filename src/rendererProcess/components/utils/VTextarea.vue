@@ -15,6 +15,7 @@
       :contenteditable="editing"
       :class="{
         editing: editing,
+        outline: props.noOutline === false,
       }"
       spellcheck="false"
       :style="textAreaStyle"
@@ -48,6 +49,7 @@ const props = defineProps<{
   readonly?: boolean;
   complements?: string[];
   blurToReset?: boolean;
+  noOutline?: boolean;
 }>();
 const emit = defineEmits<{
   (e: "update:value", value: string): void;
@@ -213,8 +215,10 @@ t-textarea-root {
     border-radius: 2px;
     &.editing {
       cursor: unset;
-      outline: solid 2px var(--color-font);
-      outline-offset: 1px;
+      &.outline {
+        outline: solid 2px var(--color-font);
+        outline-offset: 1px;
+      }
     }
   }
   // &::before {
