@@ -567,7 +567,7 @@ watch(selectedPetaTagIds, () => {
   currentScrollTileId.value = "";
   nextTick(() => {
     if (thumbnails.value) {
-      thumbnails.value.scrollTop = 0;
+      thumbnails.value.scrollTo(0, 0);
     }
   });
   fetchFilteredPetaImages();
