@@ -308,6 +308,7 @@ petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
 <style lang="scss" scoped>
 t-property-root {
   width: 100%;
+  height: 100%;
   // color: #333333;
   position: relative;
   display: flex;
