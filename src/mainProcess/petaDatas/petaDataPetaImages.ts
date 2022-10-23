@@ -22,7 +22,7 @@ import { generateMetadataByWorker } from "@/mainProcess/utils/generateMetadataBy
 import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
 import axios from "axios";
-import { getURLFromImgTag } from "@/rendererProcess/utils/getURLFromImgTag";
+import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -132,7 +132,7 @@ export class PetaDataPetaImages {
       log2.log("1.trying to download");
       datas.htmls.map((html) => {
         try {
-          urls.push(getURLFromImgTag(html));
+          urls.push(getURLFromHTML(html));
         } catch (error) {
           //
           log2.error("invalid html", error);
