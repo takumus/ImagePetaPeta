@@ -1,20 +1,13 @@
 <template>
   <t-browser-root>
     <t-left>
-      <VTags
-        :petaImagesArray="petaImagesArray"
-        :petaTags="petaTagsStore.state.petaTags.value"
-        v-model:selectedPetaTagIds="selectedPetaTagIds"
-      />
+      <VTags :petaImagesArray="petaImagesArray" v-model:selectedPetaTagIds="selectedPetaTagIds" />
     </t-left>
     <t-center>
       <t-content>
         <t-top>
           <t-search>
-            <VSearch
-              :petaTags="petaTagsStore.state.petaTags.value"
-              v-model:selectedPetaTagIds="selectedPetaTagIds"
-            />
+            <VSearch v-model:selectedPetaTagIds="selectedPetaTagIds" />
           </t-search>
           <t-buttons>
             <label>
