@@ -32,7 +32,7 @@ onMounted(() => {
     if (task.status === "complete") {
       window.setTimeout(() => {
         delete taskStatuses.value[id];
-      }, 500);
+      }, 200);
     }
   });
 });
