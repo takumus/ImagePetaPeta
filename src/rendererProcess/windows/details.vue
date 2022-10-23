@@ -14,11 +14,7 @@
           <VDetails :petaImage="petaImage" :zIndex="1" />
         </t-board>
         <t-property>
-          <VProperty
-            :petaImages="singlePetaImages"
-            :petaTags="petaTagsStore.state.petaTags.value"
-            @selectTag="() => {}"
-          />
+          <VProperty :petaImages="singlePetaImages" @selectTag="() => {}" />
         </t-property>
       </t-browser>
     </t-content>
