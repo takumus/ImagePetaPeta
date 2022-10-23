@@ -28,6 +28,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
+          allowUpdates: true
           artifacts: |
             dist/electron/*.dmg
         env:
@@ -51,6 +52,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
+          allowUpdates: true
           artifacts: |
             dist/electron/*.dmg
         env:
@@ -74,6 +76,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
+          allowUpdates: true
           artifacts: |
             dist/electron/*.exe.zip
         env:
