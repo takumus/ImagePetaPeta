@@ -7,7 +7,6 @@ import * as file from "@/mainProcess/storages/file";
 import * as Tasks from "@/mainProcess/tasks/task";
 import crypto from "crypto";
 import { ImageType } from "@/commons/datas/imageType";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { migratePetaImage } from "@/mainProcess/utils/migrater";
 import sharp from "sharp";
 import pLimit from "p-limit";
@@ -24,6 +23,7 @@ import dataUriToBuffer from "data-uri-to-buffer";
 import axios from "axios";
 import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 import { CPU_LENGTH } from "@/commons/cpu";
+import { ppa } from "@/commons/utils/pp";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -47,7 +47,7 @@ export class PetaDataPetaImages {
             status: "progress",
           });
         };
-        await promiseSerial(update, datas).promise;
+        await ppa(update, datas).promise;
         if (mode === UpdateMode.REMOVE) {
           // Tileの更新対象なし
           this.parent.emitMainEvent("updatePetaTags", {
@@ -139,7 +139,7 @@ export class PetaDataPetaImages {
           log2.error("invalid html", error);
         }
       });
-      const buffers = await promiseSerial(async (url) => {
+      const buffers = await ppa(async (url) => {
         let data: Buffer;
         let remoteURL = "";
         if (url.trim().indexOf("data:") === 0) {
@@ -276,7 +276,7 @@ export class PetaDataPetaImages {
             cancelable: true,
           });
         };
-        const result = promiseSerial(importImage, _filePaths);
+        const result = ppa(importImage, _filePaths);
         handler.onCancel = result.cancel;
         try {
           await result.promise;
@@ -344,7 +344,7 @@ export class PetaDataPetaImages {
             status: "progress",
           });
         };
-        const result = promiseSerial(importImage, datas);
+        const result = ppa(importImage, datas);
         handler.onCancel = result.cancel;
         await result.promise;
         log.log("return:", addedFileCount, "/", datas.length);

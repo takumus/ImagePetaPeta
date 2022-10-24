@@ -3,11 +3,11 @@ import { minimId } from "@/commons/utils/utils";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { migratePetaBoard } from "@/mainProcess/utils/migrater";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { ppa } from "@/commons/utils/pp";
 export class PetaDataPetaBoards {
   constructor(private parent: PetaDatas) {}
   async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {
-    return await promiseSerial((board) => this.updatePetaBoard(board, mode), boards).promise;
+    return await ppa((board) => this.updatePetaBoard(board, mode), boards).promise;
   }
   async getPetaBoards() {
     const boards: { [id: string]: PetaBoard } = {};

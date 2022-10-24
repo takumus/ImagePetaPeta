@@ -10,7 +10,7 @@ import {
   BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
   BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
 } from "@/commons/defines";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { ppa } from "@/commons/utils/pp";
 import DB from "@/mainProcess/storages/db";
 import deepcopy from "deepcopy";
 import { v4 as uuid } from "uuid";
@@ -199,7 +199,7 @@ export async function migratePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
   let migrated = false;
   const addTags = async (petaImage: PetaImage, index: number) => {
     const anyPetaImage = petaImage as any;
-    await promiseSerial(async (tag) => {
+    await ppa(async (tag) => {
       const anyPetaTag = ((await petaTags.find({ name: tag }))[0] || {
         name: tag,
         id: uuid(),
@@ -216,7 +216,7 @@ export async function migratePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
     }, (anyPetaImage["tags"] || anyPetaImage["categories"] || []) as string[]).promise;
     anyPetaImage["tags"] = undefined;
   };
-  await promiseSerial(addTags, petaImagesArr).promise;
+  await ppa(addTags, petaImagesArr).promise;
   return migrated;
 }
 
@@ -246,12 +246,12 @@ export async function migratePetaImagesPetaTags(
 ) {
   let changed = false;
   try {
-    await promiseSerial(async (petaTag) => {
+    await ppa(async (petaTag) => {
       const petaImageIds = (petaTag as any).petaImages as string[] | undefined;
       if (!petaImageIds) {
         return;
       }
-      await promiseSerial(async (petaImageId) => {
+      await ppa(async (petaImageId) => {
         if (!petaImages[petaImageId]) {
           return;
         }
@@ -269,7 +269,7 @@ export async function migratePetaImagesPetaTags(
   }
   // 2.6.0
   try {
-    await promiseSerial(async (pipt) => {
+    await ppa(async (pipt) => {
       if (pipt.id.length > 64) {
         await petaImagesPetaTags.update(
           pipt,

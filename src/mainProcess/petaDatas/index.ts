@@ -8,7 +8,6 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
 import { MainEvents } from "@/commons/api/mainEvents";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Settings } from "@/commons/datas/settings";
 import Config from "@/mainProcess/storages/config";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
@@ -23,6 +22,7 @@ import { extraFiles } from "@/@assets/extraFiles";
 import * as fs from "fs";
 import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
+import { ppa } from "@/commons/utils/pp";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -82,85 +82,91 @@ export class PetaDatas {
           cancelable: true,
         });
         log.log("execFilePath:", execFilePath);
-        const tasks = promiseSerial(async (petaImage, index) => {
-          const inputFile = this.petaImages.getImagePath(petaImage, ImageType.ORIGINAL);
-          const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.webp`;
-          const parameters = [
-            "-i",
-            inputFile,
-            "-o",
-            outputFile,
-            "-m",
-            modelFilePath,
-            "-n",
-            modelName,
-          ];
-          let percent = 0;
-          const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
-            l = l.trim();
-            percent = /^\d+\.\d+%$/.test(l) ? Number(l.replace(/%/, "")) : percent;
-            log.log(l);
+        const tasks = ppa(
+          async (petaImage, index) => {
+            const inputFile = this.petaImages.getImagePath(petaImage, ImageType.ORIGINAL);
+            const outputFile = `${Path.resolve(this.paths.DIR_TEMP, petaImage.id)}.webp`;
+            const parameters = [
+              "-i",
+              inputFile,
+              "-o",
+              outputFile,
+              "-m",
+              modelFilePath,
+              "-n",
+              modelName,
+            ];
+            let percent = 0;
+            const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
+              l = l.trim();
+              percent = /^\d+\.\d+%$/.test(l) ? Number(l.replace(/%/, "")) : percent;
+              log.log(l);
+              handler.emitStatus({
+                i18nKey: "tasks.upconverting",
+                progress: {
+                  all: petaImages.length,
+                  current: index + percent / 100,
+                },
+                log: [l],
+                status: "progress",
+                cancelable: true,
+              });
+            });
+            handler.onCancel = () => {
+              childProcess.kill();
+              tasks.cancel();
+            };
             handler.emitStatus({
               i18nKey: "tasks.upconverting",
               progress: {
                 all: petaImages.length,
-                current: index + percent / 100,
+                current: index,
               },
-              log: [l],
+              log: [[execFilePath, ...parameters].join(" ")],
               status: "progress",
               cancelable: true,
             });
-          });
-          handler.onCancel = () => {
-            childProcess.kill();
-            tasks.cancel();
-          };
-          handler.emitStatus({
-            i18nKey: "tasks.upconverting",
-            progress: {
-              all: petaImages.length,
-              current: index,
-            },
-            log: [[execFilePath, ...parameters].join(" ")],
-            status: "progress",
-            cancelable: true,
-          });
-          const result = await childProcess.promise;
-          if (result) {
-            const newPetaImages = await this.petaImages.importImagesFromFilePaths(
-              [outputFile],
-              true,
-            );
-            if (newPetaImages.length < 1) {
-              log.log("return: false");
-              return false;
+            const result = await childProcess.promise;
+            if (result) {
+              const newPetaImages = await this.petaImages.importImagesFromFilePaths(
+                [outputFile],
+                true,
+              );
+              if (newPetaImages.length < 1) {
+                log.log("return: false");
+                return false;
+              }
+              const newPetaImage = newPetaImages[0];
+              if (!newPetaImage) {
+                log.log("return: false");
+                return false;
+              }
+              newPetaImage.addDate = petaImage.addDate + 1;
+              newPetaImage.fileDate = petaImage.fileDate;
+              newPetaImage.name = `${petaImage.name}(RealESRGAN-${modelName})`;
+              newPetaImage.note = petaImage.note;
+              newPetaImage.nsfw = petaImage.nsfw;
+              log.log("update new petaImage");
+              await this.petaImages.updatePetaImages([newPetaImage], UpdateMode.UPDATE, true);
+              log.log("get tags");
+              const pipts = await this.datas.dbPetaImagesPetaTags.find({
+                petaImageId: petaImage.id,
+              });
+              log.log("tags:", pipts.length);
+              log.log("copy tags");
+              await this.petaTags.updatePetaImagesPetaTags(
+                [newPetaImage.id],
+                pipts.map((pipt) => pipt.petaTagId),
+                UpdateMode.INSERT,
+                true,
+              );
+            } else {
+              success = false;
             }
-            const newPetaImage = newPetaImages[0];
-            if (!newPetaImage) {
-              log.log("return: false");
-              return false;
-            }
-            newPetaImage.addDate = petaImage.addDate + 1;
-            newPetaImage.fileDate = petaImage.fileDate;
-            newPetaImage.name = `${petaImage.name}(RealESRGAN-${modelName})`;
-            newPetaImage.note = petaImage.note;
-            newPetaImage.nsfw = petaImage.nsfw;
-            log.log("update new petaImage");
-            await this.petaImages.updatePetaImages([newPetaImage], UpdateMode.UPDATE, true);
-            log.log("get tags");
-            const pipts = await this.datas.dbPetaImagesPetaTags.find({ petaImageId: petaImage.id });
-            log.log("tags:", pipts.length);
-            log.log("copy tags");
-            await this.petaTags.updatePetaImagesPetaTags(
-              [newPetaImage.id],
-              pipts.map((pipt) => pipt.petaTagId),
-              UpdateMode.INSERT,
-              true,
-            );
-          } else {
-            success = false;
-          }
-        }, petaImages);
+          },
+          petaImages,
+          1,
+        );
         await tasks.promise;
         handler.emitStatus({
           i18nKey: "tasks.upconverting",

@@ -7,7 +7,7 @@ export class PPCancelError extends Error {
 export function ppa<T, K>(
   cb: (data: T, index: number) => Promise<K>,
   arr: T[],
-  concurrency: number,
+  concurrency = 1,
   resolveCancelationOnNextTick = true,
 ) {
   const result = pp(
@@ -24,7 +24,7 @@ export function ppa<T, K>(
 }
 export function pp<T extends readonly (() => unknown)[] | []>(
   promises: T,
-  concurrency: number,
+  concurrency = 1,
   resolveCancelationOnNextTick = true,
 ) {
   if (concurrency < 1) {
@@ -75,7 +75,7 @@ export function pp<T extends readonly (() => unknown)[] | []>(
     ),
   );
   return {
-    promise: promise as Promise<{ readonly [P in keyof T]: Awaited<ReturnType<T[P]>> }>,
+    promise: promise as Promise<{ [P in keyof T]: Awaited<ReturnType<T[P]>> }>,
     cancel: async () => {
       if (completed) {
         return;

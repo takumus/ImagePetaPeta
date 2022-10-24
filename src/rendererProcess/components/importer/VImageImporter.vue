@@ -8,8 +8,8 @@ import { onMounted } from "vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Buffer } from "buffer";
+import { ppa } from "@/commons/utils/pp";
 const emit = defineEmits<{
   (e: "addPanelByDragAndDrop", ids: string[], position: Vec2, fromBrowser: boolean): void;
 }>();
@@ -39,7 +39,7 @@ onMounted(() => {
       const buffers =
         filePaths.length > 0
           ? []
-          : await promiseSerial(async (file) => {
+          : await ppa(async (file) => {
               return file.arrayBuffer();
             }, fileList).promise;
       // const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
@@ -77,7 +77,7 @@ onMounted(() => {
       }
       buffers.push(Buffer.from(data));
     };
-    await promiseSerial(readBuffer, [...items]).promise;
+    await ppa(readBuffer, [...items]).promise;
     const ids = await API.send("importImagesFromClipboard", buffers);
     emit("addPanelByDragAndDrop", ids, mousePosition, false);
   });

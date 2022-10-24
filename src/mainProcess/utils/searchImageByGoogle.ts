@@ -3,7 +3,7 @@ import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
 import { BrowserWindow, shell, WebContents } from "electron";
 import * as Path from "path";
 import * as Tasks from "@/mainProcess/tasks/task";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
+import { ppa } from "@/commons/utils/pp";
 type SearchImageByGoogleTaskStep = { js: string } | { wait: number };
 export interface SearchImageByGoogleTask {
   url: string;
@@ -44,7 +44,7 @@ async function steps(
   steps: SearchImageByGoogleTaskStep[],
   progress: (step: SearchImageByGoogleTaskStep) => void,
 ) {
-  await promiseSerial(async (step) => {
+  await ppa(async (step) => {
     if ("js" in step) {
       await webContents.executeJavaScript(step.js, false);
     } else if ("wait" in step) {

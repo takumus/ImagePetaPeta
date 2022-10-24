@@ -50,7 +50,6 @@ import { PTransformer } from "@/rendererProcess/components/board/ppanels/pTransf
 import { hitTest } from "@/rendererProcess/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { minimId } from "@/commons/utils/utils";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
@@ -70,6 +69,7 @@ import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 import { PetaImage } from "@/commons/datas/petaImage";
+import { ppa } from "@/commons/utils/pp";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -120,7 +120,7 @@ let renderOrdered = false;
 let selecting = false;
 let requestAnimationFrameHandle = 0;
 const keyboards = useKeyboardsStore(true);
-let cancelExtract: (() => Promise<void[]>) | undefined;
+let cancelExtract: (() => Promise<void>) | undefined;
 let resolution = -1;
 const currentBoard = ref<PetaBoard>();
 onMounted(() => {
@@ -680,7 +680,7 @@ async function load(params: {
     }
     extractProgress.value = ((index + 1) / petaPanels.length) * 100;
   };
-  const extraction = promiseSerial(extract, [...petaPanels]);
+  const extraction = ppa(extract, petaPanels);
   cancelExtract = extraction.cancel;
   try {
     await extraction.promise;

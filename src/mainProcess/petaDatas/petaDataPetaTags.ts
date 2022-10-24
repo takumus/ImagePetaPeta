@@ -2,10 +2,10 @@ import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { minimId } from "@/commons/utils/utils";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
+import { ppa } from "@/commons/utils/pp";
 export class PetaDataPetaTags {
   constructor(private parent: PetaDatas) {}
   async updatePetaTags(tags: PetaTag[], mode: UpdateMode, silent = false) {
@@ -16,7 +16,7 @@ export class PetaDataPetaTags {
           i18nKey: "tasks.updateDatas",
           status: "begin",
         });
-        await promiseSerial(async (tag, index) => {
+        await ppa(async (tag, index) => {
           await this.updatePetaTag(tag, mode);
           handler.emitStatus({
             i18nKey: "tasks.updateDatas",
@@ -56,8 +56,8 @@ export class PetaDataPetaTags {
           i18nKey: "tasks.updateDatas",
           status: "begin",
         });
-        await promiseSerial(async (petaImageId, iIndex) => {
-          await promiseSerial(async (petaTagId, tIndex) => {
+        await ppa(async (petaImageId, iIndex) => {
+          await ppa(async (petaTagId, tIndex) => {
             await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImageId, petaTagId), mode);
             handler.emitStatus({
               i18nKey: "tasks.updateDatas",
@@ -179,7 +179,7 @@ export class PetaDataPetaTags {
       },
     });
     const petaTagCounts: { [id: string]: number } = {};
-    await promiseSerial(async (petaTag) => {
+    await ppa(async (petaTag) => {
       petaTagCounts[petaTag.id] = await this.parent.datas.dbPetaImagesPetaTags.count({
         petaTagId: petaTag.id,
       });
