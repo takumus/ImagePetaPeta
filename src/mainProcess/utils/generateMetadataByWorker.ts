@@ -1,9 +1,9 @@
+import { CPU_LENGTH } from "@/commons/cpu";
 import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
 import GenerateMetadataWorkerThreads from "@/mainProcess/workers/generateMetadata.worker-threads";
 import { Worker } from "worker_threads";
-import { cpus } from "os";
 const workers: { idle: boolean; worker: Worker; id: number }[] = [];
-for (let i = 0; i < cpus().length; i++) {
+for (let i = 0; i < CPU_LENGTH; i++) {
   const worker = {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     worker: new (GenerateMetadataWorkerThreads as any)() as Worker,

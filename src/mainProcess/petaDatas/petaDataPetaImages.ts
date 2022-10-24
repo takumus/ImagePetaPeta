@@ -23,6 +23,7 @@ import { ImportImageResult } from "@/commons/api/interfaces/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
 import axios from "axios";
 import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
+import { CPU_LENGTH } from "@/commons/cpu";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -387,7 +388,7 @@ export class PetaDataPetaImages {
       log.log(`thumbnail (${++completed} / ${images.length})`);
       this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
     };
-    const limit = pLimit(16);
+    const limit = pLimit(CPU_LENGTH);
     await Promise.all(images.map((image) => limit(() => generate(image))));
     this.parent.emitMainEvent("regenerateMetadatasComplete");
   }
