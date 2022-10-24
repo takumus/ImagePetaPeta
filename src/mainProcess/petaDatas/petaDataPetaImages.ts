@@ -9,7 +9,6 @@ import crypto from "crypto";
 import { ImageType } from "@/commons/datas/imageType";
 import { migratePetaImage } from "@/mainProcess/utils/migrater";
 import sharp from "sharp";
-import pLimit from "p-limit";
 import { imageFormatToExtention } from "@/mainProcess/utils/imageFormatToExtention";
 import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
 import {
@@ -388,8 +387,7 @@ export class PetaDataPetaImages {
       log.log(`thumbnail (${++completed} / ${images.length})`);
       this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
     };
-    const limit = pLimit(CPU_LENGTH);
-    await Promise.all(images.map((image) => limit(() => generate(image))));
+    await ppa((image) => generate(image), images, CPU_LENGTH).promise;
     this.parent.emitMainEvent("regenerateMetadatasComplete");
   }
   private async addImage(param: {
