@@ -22,7 +22,7 @@ export function ppa<T, K>(
     cancel: result.cancel,
   };
 }
-export function pp<T extends readonly (() => unknown)[] | []>(
+export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
   promises: T,
   concurrency = 1,
   resolveCancelationOnNextTick = true,
