@@ -5,14 +5,14 @@ export class PPCancelError extends Error {
   }
 }
 export function ppa<T, K>(
-  cb: (data: T, index: number) => Promise<K>,
-  arr: T[],
+  fn: (data: T, index: number) => Promise<K>,
+  array: T[],
   concurrency = 1,
   resolveCancelationOnNextTick = true,
 ) {
   const result = pp(
-    arr.map((value: T, index: number) => () => {
-      return cb(value, index);
+    array.map((value: T, index: number) => () => {
+      return fn(value, index);
     }),
     concurrency,
     resolveCancelationOnNextTick,
@@ -23,7 +23,7 @@ export function ppa<T, K>(
   };
 }
 export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
-  promises: T,
+  functions: T,
   concurrency = 1,
   resolveCancelationOnNextTick = true,
 ) {
@@ -33,25 +33,25 @@ export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
   const limit = pLimit(concurrency);
   const cancels: ((error: PPCancelError) => void)[] = [];
   const resolveCancels: (() => void)[] = [];
+  const functionsCopy = [...functions];
   let allCanceled = false;
-  let completed = false;
+  let allCompleted = false;
   let remaining = 0;
-  const _promises = [...promises];
   const promise = Promise.all(
-    _promises.map(
+    functionsCopy.map(
       (promise) =>
         new Promise((res, rej: (error: PPCancelError) => void) => {
           let canceled = false;
           limit(promise).then((v) => {
             if (canceled) {
-              return "";
+              return;
             }
             res(v);
             if (limit.activeCount + limit.pendingCount === 0) {
               // 実行済み、ペンディングがゼロなら完了。
               if (allCanceled) {
                 // キャンセルされてたらエラー。
-                const error = new PPCancelError(_promises.length, remaining);
+                const error = new PPCancelError(functionsCopy.length, remaining);
                 cancels.map((cancel) => {
                   cancel(error);
                 });
@@ -64,7 +64,7 @@ export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
                   resolveCancels.map((rc) => rc());
                 }
               }
-              completed = true;
+              allCompleted = true;
             }
           });
           cancels.push((error) => {
@@ -77,7 +77,7 @@ export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
   return {
     promise: promise as Promise<{ [P in keyof T]: Awaited<ReturnType<T[P]>> }>,
     cancel: async () => {
-      if (completed) {
+      if (allCompleted) {
         return;
       }
       remaining = limit.pendingCount;
