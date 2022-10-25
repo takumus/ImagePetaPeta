@@ -9,6 +9,7 @@ module.exports = (config) => {
     .tap((options) => {
       options.hotReload = false;
       options.compilerOptions = {
+        ...options.compilerOptions,
         isCustomElement: (tag) => tag.startsWith("t-"),
       };
       return options;
