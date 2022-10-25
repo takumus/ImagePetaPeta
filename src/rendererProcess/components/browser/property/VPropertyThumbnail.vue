@@ -9,7 +9,7 @@
   >
     <t-image-wrapper>
       <t-nsfw v-if="nsfwMask"> </t-nsfw>
-      <img draggable="false" :src="imageURL" v-if="loaded" />
+      <img draggable="false" :src="imageURL" v-if="!nsfwMask && imageURL !== undefined" />
     </t-image-wrapper>
   </t-property-thumbnail-root>
 </template>
@@ -26,12 +26,9 @@ const nsfwStore = useNSFWStore();
 const props = defineProps<{
   propertyThumbnail: PropertyThumbnail;
 }>();
-const imageURL = ref("");
+const imageURL = ref<string | undefined>(undefined);
 onMounted(() => {
   imageURL.value = getImageURL(props.propertyThumbnail.petaImage, ImageType.THUMBNAIL);
-});
-const loaded = computed(() => {
-  return imageURL.value != "";
 });
 const nsfwMask = computed(() => {
   return props.propertyThumbnail.petaImage.nsfw && !nsfwStore.state.value;
@@ -56,12 +53,10 @@ t-property-thumbnail-root {
       width: 100%;
       height: 100%;
       position: relative;
-      z-index: 1;
       top: 0px;
       left: 0px;
     }
     > t-nsfw {
-      z-index: 2;
       position: relative;
       top: 0px;
       left: 0px;
