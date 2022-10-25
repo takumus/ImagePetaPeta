@@ -8,7 +8,7 @@ const ja = {
     settings: "設定",
     eula: "はじめにお読みください",
   },
-  shared: {
+  commons: {
     yes: "はい",
     no: "いいえ",
     closeButton: "閉じる",
@@ -105,6 +105,7 @@ const ja = {
       openDetailsButton: "詳細",
       clearSelectionDialog: "選択解除しますか?",
       tags: "タグ",
+      mutualTags: "共通のタグ",
       infos: {
         label: "基本情報",
         addDate: "追加日",
