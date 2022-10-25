@@ -66,7 +66,13 @@
       </t-palette>
     </t-colors>
     <t-tags v-show="!noImage" class="content">
-      <p>{{ t("browser.property.tags") }}</p>
+      <p>
+        {{
+          singlePetaImageInfo !== undefined
+            ? t("browser.property.tags")
+            : t("browser.property.mutualTags")
+        }}
+      </p>
       <t-search-box v-if="!fetchingTags">
         <t-tag v-for="tag in mutualPetaTags" :key="tag.id">
           <VTextarea
