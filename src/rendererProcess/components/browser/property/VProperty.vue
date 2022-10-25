@@ -25,7 +25,7 @@
               :type="'multi'"
               :clickToEdit="true"
               :allowEmpty="true"
-              :textAreaStyle="{ width: '100%' }"
+              :textAreaStyle="{ width: '100%', overflowY: 'auto', maxHeight: '64px' }"
               :outerStyle="{ width: '100%' }"
               :value="note"
               @update:value="changeNote"

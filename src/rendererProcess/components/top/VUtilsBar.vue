@@ -3,7 +3,7 @@
     <t-property>
       <slot></slot>
     </t-property>
-    <t-shared class="left" v-if="visible">
+    <t-commons class="left" v-if="visible">
       <button
         v-if="windowType === 'browser' || windowType === 'details'"
         tabindex="-1"
@@ -24,15 +24,15 @@
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
         <t-icon class="import-folder"></t-icon>
       </button>
-    </t-shared>
-    <t-shared class="right" v-if="visible">
+    </t-commons>
+    <t-commons class="right" v-if="visible">
       <button tabindex="-1" @click="toggleNSFW">
         <t-icon :class="nsfwClass"></t-icon>
       </button>
       <button tabindex="-1" @click="openSettings">
         <t-icon class="settings"></t-icon>
       </button>
-    </t-shared>
+    </t-commons>
   </t-utils-bar-root>
 </template>
 
@@ -71,8 +71,8 @@ async function toggleNSFW() {
   if (!nsfwStore.state.value) {
     if (
       (await components.dialog.show(t("utilsBar.nsfwConfirm"), [
-        t("shared.yes"),
-        t("shared.no"),
+        t("commons.yes"),
+        t("commons.no"),
       ])) === 0
     ) {
       nsfwStore.update(true);
@@ -100,7 +100,7 @@ t-utils-bar-root {
   border-bottom: solid 1px var(--color-main);
   display: block;
   z-index: 2;
-  > t-shared {
+  > t-commons {
     position: absolute;
     top: 0px;
     height: 30px;

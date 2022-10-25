@@ -5,7 +5,7 @@
         <VTask v-for="t in taskStatusArray" :key="t.id" :taskId="t.id" :taskStatus="t.status" />
       </t-tasks>
       <button tabindex="-1" @click="close" v-if="closable">
-        {{ t("shared.closeButton") }}
+        {{ t("commons.closeButton") }}
       </button>
     </t-tasks-root>
   </VModal>

@@ -39,13 +39,13 @@ onMounted(() => {
 async function changePetaImageDirectory() {
   const result = await components.dialog.show(
     t("settings.changePetaImageDirectoryDialog", [tempPetaImageDirectory.value]),
-    [t("shared.yes"), t("shared.no")],
+    [t("commons.yes"), t("commons.no")],
   );
   if (result === 0) {
     if (!(await API.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
       await components.dialog.show(
         t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
-        [t("shared.yes")],
+        [t("commons.yes")],
       );
       restorePetaImageDirectory();
     }

@@ -314,7 +314,7 @@ function petaImageMenu(thumb: Tile, position: Vec2) {
           if (
             (await components.dialog.show(
               t("browser.removeImageDialog", [selectedPetaImages.value.length]),
-              [t("shared.yes"), t("shared.no")],
+              [t("commons.yes"), t("commons.no")],
             )) === 0
           ) {
             petaImagesStore.updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);

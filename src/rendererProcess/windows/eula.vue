@@ -15,7 +15,7 @@
           <button @click="disagree">{{ t("eula.disagree") }}</button>
         </t-buttons>
         <t-buttons v-else>
-          <button @click="close">{{ t("shared.closeButton") }}</button>
+          <button @click="close">{{ t("commons.closeButton") }}</button>
         </t-buttons>
       </t-browser>
     </t-content>

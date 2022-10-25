@@ -175,8 +175,8 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
   if (errorPetaBoardId.value === board.id) {
     if (
       (await components.dialog.show(t("boards.selectErrorBoardDialog", [board.name]), [
-        t("shared.yes"),
-        t("shared.no"),
+        t("commons.yes"),
+        t("commons.no"),
       ])) != 0
     ) {
       return;
@@ -189,8 +189,8 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
 async function removePetaBoard(board: PetaBoard) {
   if (
     (await components.dialog.show(t("boards.removeDialog", [board.name]), [
-      t("shared.yes"),
-      t("shared.no"),
+      t("commons.yes"),
+      t("commons.no"),
     ])) != 0
   ) {
     return;

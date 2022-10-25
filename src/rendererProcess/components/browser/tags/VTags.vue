@@ -87,8 +87,8 @@ async function addTag(name: string) {
 async function removeTag(petaTag: PetaTag) {
   if (
     (await components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [
-      t("shared.yes"),
-      t("shared.no"),
+      t("commons.yes"),
+      t("commons.no"),
     ])) === 0
   ) {
     await petaTagsStore.updatePetaTags([petaTag], UpdateMode.REMOVE);
@@ -106,7 +106,7 @@ async function changeTag(petaTag: PetaTag, newName: string) {
     return;
   }
   if (browserTags.value.find((c) => c.petaTag.name === newName)) {
-    components.dialog.show(t("browser.tagAlreadyExistsDialog", [newName]), [t("shared.yes")]);
+    components.dialog.show(t("browser.tagAlreadyExistsDialog", [newName]), [t("commons.yes")]);
     return;
   }
   petaTag.name = newName;
