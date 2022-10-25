@@ -68,7 +68,7 @@
     <t-tags v-show="!noImage" class="content">
       <p>{{ t("browser.property.tags") }}</p>
       <t-search-box v-if="!fetchingTags">
-        <t-tag v-for="tag in sharedPetaTags" :key="tag.id">
+        <t-tag v-for="tag in mutualPetaTags" :key="tag.id">
           <VTextarea
             :type="'single'"
             :trim="true"
@@ -152,7 +152,7 @@ const components = useComponentsStore();
 const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
-const sharedPetaTags = ref<PetaTag[]>([]);
+const mutualPetaTags = ref<PetaTag[]>([]);
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
   let petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === name);
@@ -218,7 +218,7 @@ const fetchPetaTags = (() => {
     const currentFetchId = ++fetchId;
     fetchingTags.value = true;
     if (noImage.value) {
-      sharedPetaTags.value = [];
+      mutualPetaTags.value = [];
       fetchingTags.value = false;
       return;
     }
@@ -229,7 +229,7 @@ const fetchPetaTags = (() => {
     if (currentFetchId !== fetchId) {
       return;
     }
-    sharedPetaTags.value = petaTagsStore.state.petaTags.value
+    mutualPetaTags.value = petaTagsStore.state.petaTags.value
       .filter((pti) => result.find((id) => id === pti.id))
       .map((pi) => pi);
     fetchingTags.value = false;
@@ -304,7 +304,7 @@ watch(
 petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
   if (
     petaImageIds.find((id) => props.petaImages.find((petaImage) => petaImage.id === id)) ||
-    petaTagIds.find((id) => sharedPetaTags.value.find((petaTag) => petaTag.id === id)) ||
+    petaTagIds.find((id) => mutualPetaTags.value.find((petaTag) => petaTag.id === id)) ||
     fetchingTags.value
   ) {
     fetchPetaTags();

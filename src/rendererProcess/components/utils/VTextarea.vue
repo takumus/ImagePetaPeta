@@ -155,6 +155,7 @@ function format(value: string) {
 }
 function forceResetValue() {
   rawValue.value = props.value !== undefined ? props.value : "";
+  textArea.value?.scrollTo(0, 0);
 }
 function blur() {
   end(true);
