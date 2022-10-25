@@ -7,7 +7,7 @@
       @pointerdown="pointerdown($event, b, index)"
       @contextmenu="menu($event, b)"
       :key="b.id"
-      :ref="(element) => setTabRef(element as HTMLElement, b.id)"
+      :ref="(element: HTMLElement) => setTabRef(element, b.id)"
     >
       <t-label-wrapper>
         <t-label>
