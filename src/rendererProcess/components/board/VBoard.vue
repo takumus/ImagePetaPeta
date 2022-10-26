@@ -110,7 +110,6 @@ const stageRect = new Vec2();
 const mousePosition = new Vec2();
 let pPanels: { [key: string]: PPanel } = {};
 const pTransformer = new PTransformer(pPanels);
-const resolutionMatchMedia = matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
 const mouseOffset = new Vec2();
 // let draggingPanels = false;
 let pixi: PIXI.Application | undefined;
@@ -122,35 +121,33 @@ let requestAnimationFrameHandle = 0;
 const keyboards = useKeyboardsStore(true);
 let cancelExtract: (() => Promise<void>) | undefined;
 let resolution = -1;
+let changeResolutionIntervalHandler = -1;
 const currentBoard = ref<PetaBoard>();
 onMounted(() => {
   constructIfResolutionChanged();
-  setTimeout(() => {
-    constructIfResolutionChanged();
-  }, 200);
-  resolutionMatchMedia.addEventListener("change", constructIfResolutionChanged);
   pTransformer.updatePetaPanels = updatePetaPanels;
   keyboards.enabled = true;
   keyboards.keys("Delete").down(removeSelectedPanels);
   keyboards.keys("Backspace").down(removeSelectedPanels);
   keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
+  changeResolutionIntervalHandler = window.setInterval(constructIfResolutionChanged, 1000);
 });
 onUnmounted(() => {
   destruct();
-  resolutionMatchMedia.removeEventListener("change", constructIfResolutionChanged);
+  window.clearInterval(changeResolutionIntervalHandler);
 });
 function constructIfResolutionChanged() {
   if (resolution != window.devicePixelRatio) {
-    destruct();
-    construct();
     resolution = window.devicePixelRatio;
+    destruct();
+    construct(resolution);
   }
 }
-function construct() {
+function construct(resolution?: number) {
   logChunk().log("construct PIXI");
   PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.OFF;
   pixi = new PIXI.Application({
-    resolution: window.devicePixelRatio,
+    resolution,
     antialias: true,
     backgroundAlpha: 0,
   });
