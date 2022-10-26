@@ -116,7 +116,6 @@ onMounted(async () => {
   document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${
     appInfoStore.state.value.version
   }`;
-  await petaBoardsStore.getPetaBoards();
   await restoreBoard();
   nextTick(() => {
     API.send("showMainWindow");
