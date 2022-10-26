@@ -124,6 +124,7 @@ let cancelExtract: (() => Promise<void>) | undefined;
 let resolution = -1;
 const currentBoard = ref<PetaBoard>();
 onMounted(() => {
+  constructIfResolutionChanged();
   setTimeout(() => {
     constructIfResolutionChanged();
   }, 200);
