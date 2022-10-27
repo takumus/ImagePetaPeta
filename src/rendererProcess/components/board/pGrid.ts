@@ -31,7 +31,6 @@ export class PBoardGrid extends PIXI.Container {
       (position.x % maxGridSize) + width / 2,
       (position.y % maxGridSize) + height / 2,
     );
-    // this.center.position.set(position.x + width / 2, position.y + height / 2);
     //------------------------------------------------------
     // 主線(maxGridSizeごと)
     //------------------------------------------------------
