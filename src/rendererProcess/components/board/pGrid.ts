@@ -52,10 +52,10 @@ export class PBoardGrid extends PIXI.Container {
     this.center.lineStyle(2, numColor);
     this.center.drawPolygon(position.x + width / 2, -height, position.x + width / 2, height);
     this.center.drawPolygon(-width, position.y + height / 2, width, position.y + height / 2);
-    // デバッグ中心線
-    this.grid.lineStyle(4, 0xff0000);
-    this.grid.drawPolygon(0, -16, 0, 16);
-    this.grid.drawPolygon(-16, 0, 16, 0);
+    // // デバッグ中心線
+    // this.grid.lineStyle(4, 0xff0000);
+    // this.grid.drawPolygon(0, -16, 0, 16);
+    // this.grid.drawPolygon(-16, 0, 16, 0);
   }
   setScale(scale: number) {
     this._scale = scale;
