@@ -4,8 +4,7 @@
     class="context-menu-root"
     ref="contextMenu"
     :style="{
-      top: position.y + 'px',
-      left: position.x + 'px',
+      transform: `translate(${position.x}px, ${position.y}px)`,
       zIndex: zIndex,
     }"
   >
@@ -54,20 +53,20 @@ function open(_items: ContextMenuItem[], _position: Vec2): void {
     select();
   }
   _items.forEach((i) => (i.id = uuid()));
-  position.value.x = _position.x + 8;
-  position.value.y = _position.y + 8;
+  position.value.x = _position.x;
+  position.value.y = _position.y;
   items.value = _items;
   show.value = true;
   nextTick(() => {
-    if (contextMenu.value === undefined) {
+    const rect = contextMenu.value?.getBoundingClientRect();
+    if (rect === undefined) {
       return;
     }
-    const rect = contextMenu.value.getBoundingClientRect();
     if (rect.right > document.body.clientWidth) {
-      position.value.x = document.body.clientWidth - rect.width - 8;
+      position.value.x = _position.x - rect.width;
     }
     if (rect.bottom > document.body.clientHeight) {
-      position.value.y = document.body.clientHeight - rect.height - 8;
+      position.value.y = _position.y - rect.height;
     }
   });
 }
