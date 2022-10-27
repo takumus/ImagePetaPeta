@@ -4,8 +4,7 @@
     class="complement-root"
     ref="complement"
     :style="{
-      top: position.y + 'px',
-      left: position.x + 'px',
+      transform: `translate(${position.x}px, ${position.y}px)`,
       height: height,
       zIndex: zIndex,
     }"
@@ -181,6 +180,8 @@ watch(
   border-radius: var(--rounded);
   overflow-y: auto;
   overflow-x: hidden;
+  top: 0px;
+  left: 0px;
   > .item {
     word-break: break-word;
     list-style-type: none;
