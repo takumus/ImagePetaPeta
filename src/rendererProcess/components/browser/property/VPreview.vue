@@ -1,6 +1,6 @@
 <template>
   <t-previews-root>
-    <t-previews ref="previews" v-show="!noImage">
+    <t-previews ref="previews" v-show="!noImage" @contextmenu="menu">
       <VPropertyThumbnail
         v-for="data in propertyThumbnails"
         :key="data.petaImage.id"
@@ -25,7 +25,7 @@ import { computed, ref, onMounted } from "vue";
 // Components
 import VPropertyThumbnail from "@/rendererProcess/components/browser/property/VPropertyThumbnail.vue";
 // Others
-import { Vec2 } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
@@ -36,6 +36,7 @@ import { resizeImage } from "@/commons/utils/resizeImage";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
+  (e: "menu", petaImage: PetaImage, position: Vec2): void;
 }>();
 const props = defineProps<{
   petaImages: PetaImage[];
@@ -49,6 +50,11 @@ onMounted(() => {
   resizerStore.on("resize", resizePreviews);
   resizerStore.observe(previews.value);
 });
+function menu(e: MouseEvent) {
+  const petaImage = props.petaImages[0];
+  if (petaImage === undefined) return;
+  emit("menu", petaImage, vec2FromPointerEvent(e));
+}
 function resizePreviews(rect: DOMRectReadOnly) {
   previewWidth.value = rect.width;
   previewHeight.value = rect.height;

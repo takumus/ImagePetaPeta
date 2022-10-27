@@ -46,7 +46,9 @@
               :parentAreaMinY="areaMinY"
               :parentAreaMaxY="areaMaxY"
               @select="selectTile"
-              @menu="petaImageMenu"
+              @menu="
+                (tile, position) => (tile.petaImage ? petaImageMenu(tile.petaImage, position) : 0)
+              "
               @drag="drag"
               @dblclick="openDetail"
             />
@@ -55,7 +57,11 @@
       </t-content>
     </t-center>
     <t-right>
-      <VPreview :petaImages="selectedPetaImages" @clearSelectionAll="clearSelectionAll" />
+      <VPreview
+        :petaImages="selectedPetaImages"
+        @clearSelectionAll="clearSelectionAll"
+        @menu="petaImageMenu"
+      />
       <VProperty :petaImages="selectedPetaImages" @selectTag="selectTag" />
     </t-right>
   </t-browser-root>
@@ -298,13 +304,12 @@ function clearSelectionAll() {
     petaImagesStore.setSelected(pi, false);
   });
 }
-function petaImageMenu(thumb: Tile, position: Vec2) {
-  if (thumb.petaImage === undefined) {
-    return;
-  }
-  const petaImage = thumb.petaImage;
-  if (!petaImagesStore.getSelected(thumb.petaImage)) {
-    selectTile(thumb, true);
+function petaImageMenu(petaImage: PetaImage, position: Vec2) {
+  if (!petaImagesStore.getSelected(petaImage)) {
+    const tile = tiles.value.find((tile) => tile.petaImage?.id === petaImage.id);
+    if (tile) {
+      selectTile(tile, true);
+    }
   }
   components.contextMenu.open(
     [
