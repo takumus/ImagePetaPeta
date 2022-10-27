@@ -27,9 +27,6 @@
       @update="orderPIXIRender"
       @update:petaPanels="updatePetaPanelsFromLayer"
     />
-    <t-debug>
-      grid:<input type="checkbox" @change="(e) => grid.DEBUG = (e as any).target.checked" />
-    </t-debug>
   </t-board-root>
 </template>
 
@@ -331,13 +328,6 @@ function animate() {
   rootContainer.scale.set(boardScale);
   pPanelsArray().forEach((pp) => pp.setZoomScale(boardScale));
   pTransformer.setScale(1 / boardScale);
-  grid.setScale(boardScale);
-  grid.update(
-    stageRect.x,
-    stageRect.y,
-    currentBoard.value.transform.position,
-    currentBoard.value.background.lineColor,
-  );
   pTransformer.update();
 
   if (dragging.value) {
@@ -348,9 +338,13 @@ function animate() {
     }
   }
   currentBoard.value.transform.position.setTo(rootContainer);
-  // new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(grid);
-  // grid.x = clamp(grid.x, offset, stageRect.x - offset);
-  // grid.y = clamp(grid.y, offset, stageRect.y - offset);
+  grid.setScale(boardScale);
+  grid.update(
+    stageRect.x,
+    stageRect.y,
+    currentBoard.value.transform.position,
+    currentBoard.value.background.lineColor,
+  );
   pSelection.clear();
   if (selecting) {
     pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
@@ -855,11 +849,6 @@ t-board-root {
     width: 100%;
     height: 100%;
     display: block;
-  }
-  > t-debug {
-    position: absolute;
-    z-index: 999;
-    bottom: 0px;
   }
 }
 </style>
