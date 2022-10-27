@@ -58,7 +58,6 @@ import { API } from "@/rendererProcess/api";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
-import { clamp } from "@/commons/utils/matthew";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
@@ -316,7 +315,6 @@ function updateRect() {
   if (!currentBoard.value) {
     return;
   }
-  grid.update(stageRect.x, stageRect.y, currentBoard.value.background.lineColor);
   backgroundSprite.clear();
   backgroundSprite.hitArea = new Rectangle(0, 0, stageRect.x, stageRect.y);
   backgroundSprite.beginFill(Number(currentBoard.value.background.fillColor.replace("#", "0x")));
@@ -340,10 +338,13 @@ function animate() {
     }
   }
   currentBoard.value.transform.position.setTo(rootContainer);
-  new Vec2(panelsCenterWrapper.toGlobal(new Vec2(0, 0))).setTo(grid);
-  const offset = 0;
-  grid.x = clamp(grid.x, offset, stageRect.x - offset);
-  grid.y = clamp(grid.y, offset, stageRect.y - offset);
+  grid.setScale(boardScale);
+  grid.update(
+    stageRect.x,
+    stageRect.y,
+    currentBoard.value.transform.position,
+    currentBoard.value.background.lineColor,
+  );
   pSelection.clear();
   if (selecting) {
     pSelection.bottomRight.set(rootContainer.toLocal(mousePosition));
