@@ -1,14 +1,19 @@
+import { BOARD_ZOOM_MAX } from "@/commons/defines";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
+import { valueChecker } from "@/commons/utils/valueChecker";
 const GRID_SIZE = 100;
 const DIVISION = 5;
 const SUB_GRID_SIZE = GRID_SIZE / DIVISION;
 const MAX_ALPHA = 0.2;
 const MIN_ALPHA = 0.04;
+const MAXIMUM_ZOOM_BEGIN_SCALE = 50;
 export class PBoardGrid extends PIXI.Container {
   grid: PIXI.Graphics;
   center: PIXI.Graphics;
   _scale = 1;
+  private ignoreRenderGrids = valueChecker().isSameAll;
+  private ignoreRenderCenter = valueChecker().isSameAll;
   constructor() {
     super();
     this.grid = new PIXI.Graphics();
@@ -17,8 +22,6 @@ export class PBoardGrid extends PIXI.Container {
   }
   update(width: number, height: number, position: Vec2, color: string) {
     const numColor = Number(color.replace("#", "0x")); // 後でutilsを作ろう
-    this.grid.clear();
-    this.center.clear();
     const getMaxVisibleGridSize = (size: number, division: number, min: number): number =>
       size < min * division
         ? size * division
@@ -29,34 +32,85 @@ export class PBoardGrid extends PIXI.Container {
       DIVISION,
       SUB_GRID_SIZE,
     );
+    if (
+      !this.ignoreRenderGrids(
+        "width",
+        width,
+        "height",
+        height,
+        "color",
+        numColor,
+        "scale",
+        this._scale,
+      )
+    ) {
+      this.grid.clear();
+      const maximumZoomAlpha = Math.max(
+        (this._scale - (BOARD_ZOOM_MAX - MAXIMUM_ZOOM_BEGIN_SCALE)) / MAXIMUM_ZOOM_BEGIN_SCALE,
+        0,
+      );
+      //------------------------------------------------------
+      // 主線(maxGridSizeごと)
+      //------------------------------------------------------
+      this.grid.lineStyle(1, numColor, MAX_ALPHA * (1 - maximumZoomAlpha), undefined, true);
+      this.renderGrid(maxGridSize, width, height);
+      //------------------------------------------------------
+      // 複線(maxGridSizeのDIVISONごと)
+      //------------------------------------------------------
+      this.grid.lineStyle(
+        1,
+        numColor,
+        // 透明度はグリッドサイズとの距離 0.05が最小、最大が1
+        Math.max(
+          Math.min((maxGridSize - GRID_SIZE) / (GRID_SIZE * DIVISION - GRID_SIZE), MAX_ALPHA),
+          MIN_ALPHA,
+        ) *
+          (1 - maximumZoomAlpha),
+        undefined,
+        true,
+      );
+      this.renderGrid(maxGridSize / DIVISION, width, height, DIVISION);
+      //------------------------------------------------------
+      // 最大ズーム時の線 (複線のDIVISION倍の細かさ)
+      //------------------------------------------------------
+      if (maximumZoomAlpha > 0) {
+        this.grid.lineStyle(1, numColor, maximumZoomAlpha * MAX_ALPHA, undefined, true);
+        this.renderGrid(maxGridSize / (DIVISION * DIVISION), width, height);
+      }
+      console.log("render grid");
+    }
+    if (
+      !this.ignoreRenderCenter(
+        "width",
+        width,
+        "height",
+        height,
+        "scale",
+        this._scale,
+        "color",
+        numColor,
+        "position.x",
+        position.x,
+        "position.y",
+        position.y,
+      )
+    ) {
+      this.center.clear();
+      //------------------------------------------------------
+      // 中心線
+      //------------------------------------------------------
+      this.center.lineStyle(1, numColor, 1, undefined, true);
+      this.center.drawPolygon(position.x + width / 2, -height, position.x + width / 2, height);
+      this.center.drawPolygon(-width, position.y + height / 2, width, position.y + height / 2);
+      console.log("render center");
+    }
+    //------------------------------------------------------
+    // 基準座標
+    //------------------------------------------------------
     this.grid.position.set(
       (position.x % maxGridSize) + width / 2,
       (position.y % maxGridSize) + height / 2,
     );
-    //------------------------------------------------------
-    // 主線(maxGridSizeごと)
-    //------------------------------------------------------
-    this.grid.lineStyle(1, numColor, MAX_ALPHA, undefined, true);
-    this.renderGrid(maxGridSize, width, height);
-    //------------------------------------------------------
-    // 複線(maxGridSizeのDIVISONごと)
-    //------------------------------------------------------
-    this.grid.lineStyle(
-      1,
-      numColor,
-      // 透明度はグリッドサイズとの距離 0.05が最小、最大が1
-      Math.max(
-        Math.min((maxGridSize - GRID_SIZE) / (GRID_SIZE * DIVISION - GRID_SIZE), MAX_ALPHA),
-        MIN_ALPHA,
-      ),
-      undefined,
-      true,
-    );
-    this.renderGrid(maxGridSize / DIVISION, width, height, DIVISION);
-    // 中心線
-    this.center.lineStyle(1, numColor, 1, undefined, true);
-    this.center.drawPolygon(position.x + width / 2, -height, position.x + width / 2, height);
-    this.center.drawPolygon(-width, position.y + height / 2, width, position.y + height / 2);
     // デバッグ中心線
     // this.grid.lineStyle(4, 0xff0000);
     // this.grid.drawPolygon(0, -16, 0, 16);
@@ -66,6 +120,8 @@ export class PBoardGrid extends PIXI.Container {
     this._scale = scale;
   }
   private renderGrid(size: number, width: number, height: number, skipIndex?: number) {
+    width += GRID_SIZE * DIVISION;
+    height += GRID_SIZE * DIVISION;
     const cx = width / size;
     const cy = height / size;
     const useSkipIndex = skipIndex !== undefined;
