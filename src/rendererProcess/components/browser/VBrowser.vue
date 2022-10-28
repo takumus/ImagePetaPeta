@@ -61,6 +61,7 @@
         :petaImages="selectedPetaImages"
         @clearSelectionAll="clearSelectionAll"
         @menu="petaImageMenu"
+        @drag="drag"
       />
       <VProperty :petaImages="selectedPetaImages" @selectTag="selectTag" />
     </t-right>

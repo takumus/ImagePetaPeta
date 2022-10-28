@@ -1,6 +1,12 @@
 <template>
   <t-previews-root>
-    <t-previews ref="previews" v-show="!noImage" @contextmenu="menu">
+    <t-previews
+      ref="previews"
+      v-show="!noImage"
+      @contextmenu="menu"
+      @dragstart="dragstart($event)"
+      draggable="true"
+    >
       <VPropertyThumbnail
         v-for="data in propertyThumbnails"
         :key="data.petaImage.id"
@@ -37,6 +43,7 @@ import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
   (e: "menu", petaImage: PetaImage, position: Vec2): void;
+  (e: "drag", petaImage: PetaImage): void;
 }>();
 const props = defineProps<{
   petaImages: PetaImage[];
@@ -54,6 +61,12 @@ function menu(e: MouseEvent) {
   const petaImage = props.petaImages[0];
   if (petaImage === undefined) return;
   emit("menu", petaImage, vec2FromPointerEvent(e));
+}
+function dragstart(event: PointerEvent) {
+  event.preventDefault();
+  const petaImage = props.petaImages[0];
+  if (petaImage === undefined) return;
+  emit("drag", petaImage);
 }
 function resizePreviews(rect: DOMRectReadOnly) {
   previewWidth.value = rect.width;
@@ -127,6 +140,7 @@ t-previews-root {
     height: 150px;
     overflow: hidden;
     display: block;
+    cursor: pointer;
   }
   > t-buttons {
     text-align: center;
