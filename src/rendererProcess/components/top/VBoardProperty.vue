@@ -1,6 +1,6 @@
 <template>
   <t-board-property-root>
-    <button tabindex="-1" @click="scale = 1">{{ Math.floor(scale * 100) }}%</button>
+    <button tabindex="-1" @click="scale = 1">{{ scale.toFixed(2) }}x</button>
     <button
       class="color"
       tabindex="-1"
