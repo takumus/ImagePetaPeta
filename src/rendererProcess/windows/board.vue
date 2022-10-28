@@ -39,6 +39,7 @@
     </t-modals>
     <VDialog :zIndex="6"></VDialog>
     <VContextMenu :zIndex="4" />
+    <VFramerate />
   </t-root>
 </template>
 
@@ -78,6 +79,7 @@ import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { hasPetaImages } from "@/commons/utils/board";
 import { usePetaBoardsStore } from "@/rendererProcess/stores/petaBoardsStore";
+import VFramerate from "@/rendererProcess/components/utils/VFramerate.vue";
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();
