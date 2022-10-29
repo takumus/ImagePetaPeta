@@ -93,7 +93,7 @@ function addSelectedTag(tagName: string) {
 
   setTimeout(() => {
     searchInput.value?.edit();
-  }, 100);
+  });
 }
 
 const complementItems = computed(() => {
