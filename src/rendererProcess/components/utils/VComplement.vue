@@ -1,33 +1,28 @@
 <template>
-  <ul
-    v-show="props.editing"
+  <t-complement-root
     class="complement-root"
     ref="complement"
+    v-show="props.editing"
     :style="{
       transform: `translate(${position.x}px, ${position.y}px)`,
       height: height,
       zIndex: zIndex,
     }"
   >
-    <li
+    <t-tag
       v-for="(item, i) in filteredItems"
       :key="item"
       @pointerdown="select(item)"
       @pointermove="moveSelectionAbsolute(i)"
       @mouseleave="moveSelectionAbsolute(-1)"
-      class="item"
       :class="{
         selected: i === currentIndex,
       }"
     >
       {{ item }}
-    </li>
-    <li
-      class="item close"
-      v-html="textsStore.state.value.close"
-      v-if="filteredItems.length > 0"
-    ></li>
-  </ul>
+    </t-tag>
+    <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
+  </t-complement-root>
 </template>
 
 <script setup lang="ts">
@@ -36,7 +31,7 @@ import { ref, onMounted, watch } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
-import { Keyboards } from "@/rendererProcess/utils/keyboards";
+import { Keyboards, Keys } from "@/rendererProcess/utils/keyboards";
 import FuzzySearch from "fuzzy-search";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
@@ -144,6 +139,14 @@ function updatePosition() {
     }
   }
 }
+function disableUpDownKeys() {
+  props.textArea?.addEventListener("keydown", (e) => {
+    const code = e.code as Keys;
+    if (code === "ArrowDown" || code === "ArrowUp" || code === "Tab") {
+      e.preventDefault();
+    }
+  });
+}
 watch(
   () => props.editing,
   () => {
@@ -155,25 +158,15 @@ watch(
 watch(filteredItems, () => {
   keyboards.enabled = filteredItems.value.length > 0;
 });
-watch(
-  () => props.items,
-  () => {
-    input();
-  },
-);
-watch(
-  () => props.value,
-  () => {
-    input();
-  },
-);
+watch(() => props.textArea, disableUpDownKeys);
+watch(() => props.items, input);
+watch(() => props.value, input);
 </script>
 
 <style lang="scss" scoped>
-.complement-root {
+t-complement-root {
   position: fixed;
   background-color: var(--color-main);
-  padding: 0px;
   margin: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   color: var(--color-font);
@@ -182,28 +175,35 @@ watch(
   overflow-x: hidden;
   top: 0px;
   left: 0px;
-  > .item {
-    word-break: break-word;
-    list-style-type: none;
-    min-width: 128px;
-    width: 256px;
-    padding: 4px 24px;
-    // padding-left: 24px;
-    font-size: var(--size-1);
+
+  outline: none;
+  padding: 8px 8px 8px 4px;
+  word-break: break-word;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow-y: auto;
+  max-width: 256px;
+  > t-tag {
+    line-height: var(--size-2);
+    display: inline-block;
+    margin: 0px 0px 4px 4px;
+    border-radius: var(--rounded);
+    padding: 4px;
+    background-color: var(--color-sub);
     cursor: pointer;
     &.selected,
     &.close:hover {
       background-color: var(--color-hover);
     }
-    &.close {
-      text-align: center;
-    }
   }
-  > .separate {
-    border-bottom: solid 1px #cccccc;
-    margin: 0px 8px;
-    height: 0px;
-    overflow: hidden;
+  > t-close {
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
 }
 </style>
