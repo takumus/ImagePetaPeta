@@ -5,10 +5,11 @@
     v-show="props.editing && matched"
     :style="{
       transform: `translate(${position.x}px, ${position.y}px)`,
-      height: height,
+      maxHeight: height,
       zIndex: zIndex,
     }"
   >
+    <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
     <t-tag
       v-for="(item, i) in filteredItems"
       :key="item.value"
@@ -29,7 +30,6 @@
         {{ co.c }}
       </t-char>
     </t-tag>
-    <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
   </t-complement-root>
 </template>
 
@@ -234,6 +234,7 @@ t-complement-root {
     cursor: pointer;
     display: inline-block;
     width: 100%;
+    margin-bottom: 8px;
     text-align: center;
   }
 }
