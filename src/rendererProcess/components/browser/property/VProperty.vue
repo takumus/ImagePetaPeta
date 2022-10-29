@@ -291,6 +291,9 @@ const complements = computed(() => {
     .filter((pti) => {
       return pti.id !== UNTAGGED_ID;
     })
+    .filter((pti) => {
+      return mutualPetaTags.value.find((tag) => pti.id === tag.id) === undefined;
+    })
     .map((pti) => {
       return pti.name;
     });
