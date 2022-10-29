@@ -2,7 +2,7 @@
   <t-complement-root
     class="complement-root"
     ref="complement"
-    v-show="props.editing"
+    v-show="props.editing && matched"
     :style="{
       transform: `translate(${position.x}px, ${position.y}px)`,
       height: height,
@@ -11,15 +11,23 @@
   >
     <t-tag
       v-for="(item, i) in filteredItems"
-      :key="item"
-      @pointerdown="select(item)"
+      :key="item.value"
+      @pointerdown="select(item.value)"
       @pointermove="moveSelectionAbsolute(i)"
       @mouseleave="moveSelectionAbsolute(-1)"
       :class="{
         selected: i === currentIndex,
       }"
     >
-      {{ item }}
+      <t-char
+        v-for="co in item.value.split('').map((c, i) => ({ c, i }))"
+        :key="co.i"
+        :class="{
+          match: item.matches.find((range) => range[0] <= co.i && co.i <= range[1]) !== undefined,
+        }"
+      >
+        {{ co.c }}
+      </t-char>
     </t-tag>
     <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
   </t-complement-root>
@@ -27,12 +35,12 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards, Keys } from "@/rendererProcess/utils/keyboards";
-import FuzzySearch from "fuzzy-search";
+import Fuse from "fuse.js";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
 const props = defineProps<{
@@ -47,15 +55,12 @@ const emit = defineEmits<{
   (e: "cancel"): void;
 }>();
 const complement = ref<HTMLElement>();
-const filteredItems = ref<string[]>([]);
+const filteredItems = ref<{ value: string; matches: [number, number][] }[]>([]);
 const position = ref(new Vec2(0, 0));
 const currentIndex = ref(0);
 const height = ref("unset");
 const keyboards = useKeyboardsStore();
 const textsStore = useTextsStore();
-const searcher: FuzzySearch<string> = new FuzzySearch([], undefined, {
-  sort: true,
-});
 onMounted(() => {
   keyboards.keys("ArrowUp").down(() => {
     if (!props.editing) return;
@@ -73,7 +78,7 @@ onMounted(() => {
     if (!props.editing) return;
     const item = filteredItems.value[currentIndex.value];
     if (item) {
-      select(item);
+      select(item.value);
     }
   });
   setInterval(() => {
@@ -114,8 +119,24 @@ function input() {
   currentIndex.value = -1;
   const value = props.value.trim();
   // -Fuzzy
-  searcher.haystack = props.items;
-  filteredItems.value = searcher.search(value);
+  const fuse = new Fuse(props.items, {
+    includeMatches: true,
+    includeScore: true,
+  });
+
+  const result = fuse.search(value);
+  if (value === "") {
+    filteredItems.value = props.items.map((item) => ({ value: item, matches: [] }));
+  } else {
+    filteredItems.value = result.map((r) => {
+      const matches: [number, number][] =
+        r.matches?.[0]?.indices.map((match) => [match[0], match[1]]) ?? [];
+      return {
+        value: r.item,
+        matches,
+      };
+    });
+  }
   updatePosition();
 }
 function select(item: string) {
@@ -147,6 +168,9 @@ function disableUpDownKeys() {
     }
   });
 }
+const matched = computed(() => {
+  return filteredItems.value.length > 0;
+});
 watch(
   () => props.editing,
   () => {
@@ -155,8 +179,8 @@ watch(
     }
   },
 );
-watch(filteredItems, () => {
-  keyboards.enabled = filteredItems.value.length > 0;
+watch(matched, () => {
+  keyboards.enabled = matched.value;
 });
 watch(() => props.textArea, disableUpDownKeys);
 watch(() => props.items, input);
@@ -197,6 +221,13 @@ t-complement-root {
     &.selected,
     &.close:hover {
       background-color: var(--color-hover);
+    }
+    > t-char {
+      display: inline;
+      &.match {
+        font-weight: bold;
+        text-decoration: underline;
+      }
     }
   }
   > t-close {
