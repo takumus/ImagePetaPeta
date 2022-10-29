@@ -81,14 +81,14 @@ function removeLastPetaTag() {
 
 function addSelectedTag(tagName: string) {
   const petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === tagName);
-  const untaggedId = props.selectedPetaTagIds.findIndex((id) => id === UNTAGGED_ID);
-
-  if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
-    emit("update:selectedPetaTagIds", []);
-  }
-
-  if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
-    emit("update:selectedPetaTagIds", [...props.selectedPetaTagIds, petaTag.id]);
+  if (petaTag?.id === UNTAGGED_ID) {
+    emit("update:selectedPetaTagIds", [UNTAGGED_ID]);
+  } else if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
+    if (props.selectedPetaTagIds.includes(UNTAGGED_ID)) {
+      emit("update:selectedPetaTagIds", [petaTag.id]);
+    } else {
+      emit("update:selectedPetaTagIds", [...props.selectedPetaTagIds, petaTag.id]);
+    }
   }
 
   setTimeout(() => {
