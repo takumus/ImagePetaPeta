@@ -39,10 +39,10 @@
             {{ singlePetaImageInfo.petaImage.height }}px</t-value
           >
         </t-data>
-        <t-data>
+        <!-- <t-data>
           <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
           <t-value>{{ singlePetaImageInfo.fileDate }}</t-value>
-        </t-data>
+        </t-data> -->
         <t-data>
           <t-name>{{ t("browser.property.infos.addDate") }}</t-name>
           <t-value>{{ singlePetaImageInfo.addDate }}</t-value>
