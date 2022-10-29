@@ -77,7 +77,6 @@ export class PBoardGrid extends PIXI.Container {
         this.grid.lineStyle(1, numColor, maximumZoomAlpha * MAX_ALPHA, undefined, true);
         this.renderGrid(maxGridSize / (DIVISION * DIVISION), width, height);
       }
-      console.log("render grid");
     }
     if (
       !this.ignoreRenderCenter(
@@ -102,7 +101,6 @@ export class PBoardGrid extends PIXI.Container {
       this.center.lineStyle(1, numColor, 1, undefined, true);
       this.center.drawPolygon(position.x + width / 2, -height, position.x + width / 2, height);
       this.center.drawPolygon(-width, position.y + height / 2, width, position.y + height / 2);
-      console.log("render center");
     }
     //------------------------------------------------------
     // 基準座標
