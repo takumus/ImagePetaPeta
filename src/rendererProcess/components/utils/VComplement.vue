@@ -149,10 +149,10 @@ function updatePosition() {
         return;
       }
       if (rect.right > document.body.clientWidth) {
-        position.value.x = document.body.clientWidth - rect.width;
+        position.value.x = inputRect.x - rect.width;
       }
       if (rect.bottom > document.body.clientHeight) {
-        position.value.y = position.value.y - rect.height - inputRect.height;
+        position.value.y = inputRect.y - rect.height - inputRect.height;
       }
     });
   }
