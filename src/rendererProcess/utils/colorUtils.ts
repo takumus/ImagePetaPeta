@@ -1,4 +1,5 @@
 // from https://github.com/Vibrant-Colors/node-vibrant/blob/master/src/util.ts
+/* eslint-disable */
 type Vec3 = [number, number, number];
 
 export const DELTAE94_DIFF_STATUS = {
@@ -25,7 +26,6 @@ export interface DeferredPromise<R> {
 export function defer<R>(): DeferredPromise<R> {
   let resolve: (thenableOrResult: R | PromiseLike<R>) => void;
   let reject: (error: any) => void;
-  // eslint-disable-next-line promise/param-names
   let promise = new Promise<R>((_resolve, _reject) => {
     resolve = _resolve;
     reject = _reject;
