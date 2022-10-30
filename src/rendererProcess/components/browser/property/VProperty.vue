@@ -4,7 +4,7 @@
       <p>{{ t("browser.property.infos.label") }}</p>
       <t-datas>
         <t-data>
-          <t-name>{{ t("browser.property.infos.name") }}</t-name>
+          <t-name>{{ t("browser.property.infos.name") }}:</t-name>
           <t-value>
             <VTextarea
               :type="'single'"
@@ -19,7 +19,7 @@
           </t-value>
         </t-data>
         <t-data>
-          <t-name>{{ t("browser.property.infos.note") }}</t-name>
+          <t-name>{{ t("browser.property.infos.note") }}:</t-name>
           <t-value>
             <VTextarea
               :type="'multi'"
@@ -33,7 +33,7 @@
           </t-value>
         </t-data>
         <t-data>
-          <t-name>{{ t("browser.property.infos.size") }}</t-name>
+          <t-name>{{ t("browser.property.infos.size") }}:</t-name>
           <t-value
             >{{ singlePetaImageInfo.petaImage.width }}px,
             {{ singlePetaImageInfo.petaImage.height }}px</t-value
@@ -44,7 +44,7 @@
           <t-value>{{ singlePetaImageInfo.fileDate }}</t-value>
         </t-data> -->
         <t-data>
-          <t-name>{{ t("browser.property.infos.addDate") }}</t-name>
+          <t-name>{{ t("browser.property.infos.addDate") }}:</t-name>
           <t-value>{{ singlePetaImageInfo.addDate }}</t-value>
         </t-data>
       </t-datas>
@@ -57,12 +57,56 @@
             v-for="color in singlePetaImageInfo.palette"
             :key="color.id"
             :style="{
-              backgroundColor: color.color,
+              backgroundColor: `rgb(${color.color.r}, ${color.color.g}, ${color.color.b})`,
               flex: Math.floor(color.population * 80 + 20),
             }"
+            @click="changeCurrentColor(color.color)"
           >
           </t-color>
         </t-color-background>
+        <t-current-color v-if="currentColor">
+          <t-color-label
+            ><t-name>RGB:</t-name>
+            <t-value>
+              <VTextarea
+                :type="'single'"
+                :trim="true"
+                :clickToEdit="true"
+                :allowEmpty="true"
+                :blurToReset="true"
+                :complements="complements"
+                :value="toRGB(currentColor)" /></t-value
+          ></t-color-label>
+          <t-color-label
+            ><t-name>HEX:</t-name>
+            <t-value>
+              <VTextarea
+                :type="'single'"
+                :trim="true"
+                :clickToEdit="true"
+                :allowEmpty="true"
+                :blurToReset="true"
+                :complements="complements"
+                :value="toHEX(currentColor)" /></t-value
+          ></t-color-label>
+          <t-color-label
+            ><t-name>HSL:</t-name>
+            <t-value>
+              <VTextarea
+                :type="'single'"
+                :trim="true"
+                :clickToEdit="true"
+                :allowEmpty="true"
+                :blurToReset="true"
+                :complements="complements"
+                :value="toHSL(currentColor)" /></t-value
+          ></t-color-label>
+          <t-color
+            :style="{
+              backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
+            }"
+          ></t-color>
+        </t-current-color>
       </t-palette>
     </t-colors>
     <t-tags v-show="!noImage" class="content">
@@ -145,6 +189,8 @@ import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { PetaColor } from "@/commons/datas/petaColor";
+import { rgbToHex, rgbToHsl } from "@/rendererProcess/utils/colorUtils";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -161,6 +207,7 @@ const fetchingTags = ref(false);
 const note = ref("");
 const mutualPetaTags = ref<PetaTag[]>([]);
 const tagInput = ref<InstanceType<typeof VTextarea>>();
+const currentColor = ref<PetaColor | undefined>();
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
   let petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === name);
@@ -223,6 +270,22 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
 function selectTag(tag: PetaTag) {
   emit("selectTag", tag);
 }
+function changeCurrentColor(color: PetaColor | undefined) {
+  if (color === undefined) {
+    return;
+  }
+  currentColor.value = color;
+}
+function toHEX(color: PetaColor) {
+  return rgbToHex(color.r, color.g, color.b).toUpperCase();
+}
+function toRGB(color: PetaColor) {
+  return `${color.r}, ${color.g}, ${color.b}`;
+}
+function toHSL(color: PetaColor) {
+  const hsl = rgbToHsl(color.r, color.g, color.b);
+  return `${Math.floor(hsl[0] * 360)}, ${Math.floor(hsl[1] * 100)}%, ${Math.floor(hsl[2] * 100)}%`;
+}
 const fetchPetaTags = (() => {
   let fetchId = 0;
   return async () => {
@@ -262,7 +325,7 @@ const singlePetaImageInfo = computed(() => {
       addDate: dateFormat(petaImage.addDate, "yyyy/mm/dd hh:MM:ss"),
       palette: petaImage.palette.map((color, i) => {
         return {
-          color: `rgb(${color.r}, ${color.g}, ${color.b})`,
+          color,
           population: color.population / all,
           id: i,
         };
@@ -309,6 +372,7 @@ watch(
     fetchPetaTags();
     if (singlePetaImageInfo.value) {
       note.value = singlePetaImageInfo.value.petaImage.note;
+      changeCurrentColor(singlePetaImageInfo.value.palette[0]?.color);
     } else {
       note.value = "";
     }
@@ -353,38 +417,22 @@ t-property-root {
         margin: var(--px0) 0px;
         > t-name {
           display: block;
-          width: 35%;
+          width: 30%;
           position: relative;
           text-align: right;
-          padding: 0px var(--px1);
-          &::after {
-            position: absolute;
-            right: 0px;
-            content: ":";
-          }
+          padding: 0px var(--px0);
         }
         > t-value {
-          padding: 0px var(--px1);
+          padding: 0px var(--px0);
           display: block;
-          width: 65%;
+          width: 70%;
           word-break: break-word;
-          > textarea {
-            width: 100%;
-            height: 80px;
-            resize: none;
-            background-color: transparent;
-            color: inherit;
-            border: none;
-            font-family: inherit;
-            font-size: inherit;
-          }
         }
       }
     }
   }
   > t-colors {
     > t-palette {
-      pointer-events: none;
       padding: var(--px1);
       display: block;
       width: 100%;
@@ -394,10 +442,45 @@ t-property-root {
         height: var(--px1);
         width: 100%;
         overflow: hidden;
-        box-shadow: 0px 0px 0px 1px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
+        margin: var(--px0) 0px;
+        box-shadow: 0px 0px 0px var(--px0) #ffffff, 0px 0px 2px var(--px0) rgba(0, 0, 0, 0.5);
         > t-color {
           height: 100%;
           display: block;
+          &:hover {
+            cursor: pointer;
+            transform: scaleX(1.5);
+          }
+        }
+      }
+      > t-current-color {
+        display: flex;
+        flex-direction: column;
+        > t-color-label {
+          display: flex;
+          margin: var(--px0) 0px;
+          > t-name {
+            display: block;
+            width: 30%;
+            position: relative;
+            text-align: right;
+            padding: 0px var(--px0);
+          }
+          > t-value {
+            padding: 0px var(--px0);
+            display: block;
+            width: 70%;
+            word-break: break-word;
+          }
+        }
+        > t-color {
+          margin: var(--px0) 0px;
+          border-radius: var(--rounded);
+          height: var(--px1);
+          width: 100%;
+          overflow: hidden;
+          display: block;
+          box-shadow: 0px 0px 0px var(--px0) #ffffff, 0px 0px 2px var(--px0) rgba(0, 0, 0, 0.5);
         }
       }
     }
