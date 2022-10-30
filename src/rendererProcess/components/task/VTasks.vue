@@ -19,7 +19,7 @@ import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VTask from "@/rendererProcess/components/task/VTask.vue";
 // Others
 import { API } from "@/rendererProcess/api";
-import { TaskStatus } from "@/commons/api/interfaces/task";
+import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 import { useI18n } from "vue-i18n";
 import { TASK_CLOSE_DELAY } from "@/commons/defines";
@@ -30,7 +30,7 @@ const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {
   API.on("taskStatus", (e, id, task) => {
     taskStatuses.value[id] = task;
-    if (task.status === "complete") {
+    if (task.status === TaskStatusCode.COMPLETE) {
       window.setTimeout(() => {
         delete taskStatuses.value[id];
       }, TASK_CLOSE_DELAY);
@@ -54,13 +54,13 @@ const visible = computed(() => {
 const closable = computed(() => {
   return (
     Object.values(taskStatuses.value).filter((status) => {
-      return status.status === "complete" || status.status === "failed";
+      return status.status === TaskStatusCode.COMPLETE || status.status === TaskStatusCode.FAILED;
     }).length === taskStatusArray.value.length
   );
 });
 function close() {
   Object.keys(taskStatuses.value)
-    .filter((id) => taskStatuses.value[id]?.status === "failed")
+    .filter((id) => taskStatuses.value[id]?.status === TaskStatusCode.FAILED)
     .forEach((key) => {
       delete taskStatuses.value[key];
     });

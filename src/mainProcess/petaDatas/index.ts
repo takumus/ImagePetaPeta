@@ -23,6 +23,7 @@ import * as fs from "fs";
 import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { ppa } from "@/commons/utils/pp";
+import { TaskStatusCode } from "@/commons/api/interfaces/task";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
@@ -78,7 +79,7 @@ export class PetaDatas {
         handler.emitStatus({
           i18nKey: "tasks.upconverting",
           log: [petaImages.length.toString()],
-          status: "begin",
+          status: TaskStatusCode.BEGIN,
           cancelable: true,
         });
         log.log("execFilePath:", execFilePath);
@@ -108,7 +109,7 @@ export class PetaDatas {
                   current: index + percent / 100,
                 },
                 log: [l],
-                status: "progress",
+                status: TaskStatusCode.PROGRESS,
                 cancelable: true,
               });
             });
@@ -123,7 +124,7 @@ export class PetaDatas {
                 current: index,
               },
               log: [[execFilePath, ...parameters].join(" ")],
-              status: "progress",
+              status: TaskStatusCode.PROGRESS,
               cancelable: true,
             });
             const result = await childProcess.promise;
@@ -171,7 +172,7 @@ export class PetaDatas {
         handler.emitStatus({
           i18nKey: "tasks.upconverting",
           log: [],
-          status: success ? "complete" : "failed",
+          status: success ? TaskStatusCode.COMPLETE : TaskStatusCode.FAILED,
         });
         return success;
       },

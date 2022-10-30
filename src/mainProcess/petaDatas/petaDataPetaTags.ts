@@ -6,6 +6,7 @@ import { UNTAGGED_ID } from "@/commons/defines";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { ppa } from "@/commons/utils/pp";
+import { TaskStatusCode } from "@/commons/api/interfaces/task";
 export class PetaDataPetaTags {
   constructor(private parent: PetaDatas) {}
   async updatePetaTags(tags: PetaTag[], mode: UpdateMode, silent = false) {
@@ -14,7 +15,7 @@ export class PetaDataPetaTags {
       async (handler) => {
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
-          status: "begin",
+          status: TaskStatusCode.BEGIN,
         });
         await ppa(async (tag, index) => {
           await this.updatePetaTag(tag, mode);
@@ -24,12 +25,12 @@ export class PetaDataPetaTags {
               all: tags.length,
               current: index + 1,
             },
-            status: "progress",
+            status: TaskStatusCode.PROGRESS,
           });
         }, tags).promise;
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
-          status: "complete",
+          status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象は、PetaTagIdsのみ。
         this.parent.emitMainEvent("updatePetaTags", {
@@ -54,7 +55,7 @@ export class PetaDataPetaTags {
       async (handler) => {
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
-          status: "begin",
+          status: TaskStatusCode.BEGIN,
         });
         await ppa(async (petaImageId, iIndex) => {
           await ppa(async (petaTagId, tIndex) => {
@@ -65,13 +66,13 @@ export class PetaDataPetaTags {
                 all: petaImageIds.length * petaTagIds.length,
                 current: iIndex * petaTagIds.length + tIndex + 1,
               },
-              status: "progress",
+              status: TaskStatusCode.PROGRESS,
             });
           }, petaTagIds).promise;
         }, petaImageIds).promise;
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
-          status: "complete",
+          status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象はPetaImageIdsのみ。
         this.parent.emitMainEvent("updatePetaTags", {

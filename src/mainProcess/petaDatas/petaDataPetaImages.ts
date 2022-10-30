@@ -23,6 +23,7 @@ import axios from "axios";
 import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 import { CPU_LENGTH } from "@/commons/cpu";
 import { ppa } from "@/commons/utils/pp";
+import { TaskStatusCode } from "@/commons/api/interfaces/task";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -32,7 +33,7 @@ export class PetaDataPetaImages {
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           log: [],
-          status: "begin",
+          status: TaskStatusCode.BEGIN,
         });
         const update = async (data: PetaImage, index: number) => {
           await this.updatePetaImage(data, mode);
@@ -43,7 +44,7 @@ export class PetaDataPetaImages {
               current: index + 1,
             },
             log: [data.id],
-            status: "progress",
+            status: TaskStatusCode.PROGRESS,
           });
         };
         await ppa(update, datas).promise;
@@ -62,7 +63,7 @@ export class PetaDataPetaImages {
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           log: [],
-          status: "complete",
+          status: TaskStatusCode.COMPLETE,
         });
       },
       {},
@@ -206,7 +207,7 @@ export class PetaDataPetaImages {
         log.log("###List Files", filePaths.length);
         handler.emitStatus({
           i18nKey: "tasks.listingFiles",
-          status: "begin",
+          status: TaskStatusCode.BEGIN,
           log: [],
           cancelable: true,
         });
@@ -229,7 +230,7 @@ export class PetaDataPetaImages {
         } catch (error) {
           handler.emitStatus({
             i18nKey: "tasks.listingFiles",
-            status: "failed",
+            status: TaskStatusCode.FAILED,
             log: ["tasks.listingFiles.logs.failed"],
             cancelable: true,
           });
@@ -237,6 +238,7 @@ export class PetaDataPetaImages {
         }
         log.log("complete", _filePaths.length);
         let addedFileCount = 0;
+        let error = false;
         const petaImages: PetaImage[] = [];
         const importImage = async (filePath: string, index: number) => {
           log.log("import:", index + 1, "/", _filePaths.length);
@@ -263,6 +265,7 @@ export class PetaDataPetaImages {
           } catch (err) {
             log.error(err);
             result = ImportImageResult.ERROR;
+            error = true;
           }
           handler.emitStatus({
             i18nKey: "tasks.importingFiles",
@@ -271,7 +274,7 @@ export class PetaDataPetaImages {
               current: index + 1,
             },
             log: [result, filePath],
-            status: "progress",
+            status: TaskStatusCode.PROGRESS,
             cancelable: true,
           });
         };
@@ -286,7 +289,7 @@ export class PetaDataPetaImages {
         handler.emitStatus({
           i18nKey: "tasks.importingFiles",
           log: [addedFileCount.toString(), _filePaths.length.toString()],
-          status: addedFileCount === _filePaths.length ? "complete" : "failed",
+          status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
         });
         return petaImages;
       },
@@ -301,12 +304,13 @@ export class PetaDataPetaImages {
         handler.emitStatus({
           i18nKey: "tasks.importingFiles",
           log: [],
-          status: "begin",
+          status: TaskStatusCode.BEGIN,
         });
         const log = this.parent.mainLogger.logChunk();
         log.log("##Import Images From Buffers");
         log.log("buffers:", datas.length);
         let addedFileCount = 0;
+        let error = false;
         const petaImages: PetaImage[] = [];
         const importImage = async (
           data: { buffer: Buffer; name: string; note: string },
@@ -332,6 +336,7 @@ export class PetaDataPetaImages {
           } catch (err) {
             log.error(err);
             result = ImportImageResult.ERROR;
+            error = true;
           }
           handler.emitStatus({
             i18nKey: "tasks.importingFiles",
@@ -340,7 +345,7 @@ export class PetaDataPetaImages {
               current: index + 1,
             },
             log: [result, data.name],
-            status: "progress",
+            status: TaskStatusCode.PROGRESS,
           });
         };
         const result = ppa(importImage, datas);
@@ -350,7 +355,7 @@ export class PetaDataPetaImages {
         handler.emitStatus({
           i18nKey: "tasks.importingFiles",
           log: [addedFileCount.toString(), datas.length.toString()],
-          status: addedFileCount === datas.length ? "complete" : "failed",
+          status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
         });
         return petaImages;
       },

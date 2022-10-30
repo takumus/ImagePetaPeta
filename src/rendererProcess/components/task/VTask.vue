@@ -27,7 +27,7 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const progress = ref(100);
-const status = ref<TaskStatusCode>("complete");
+const status = ref<TaskStatusCode>(TaskStatusCode.COMPLETE);
 const currentTaskId = ref("");
 const log = ref("");
 const cancelable = ref(false);
@@ -59,21 +59,21 @@ function changeTaskStatus() {
   //   console.warn(i18nKey, "にundefinedが含まれています。怪しい。");
   //   console.warn(localized);
   // }
-  if (task.status === "begin") {
+  if (task.status === TaskStatusCode.BEGIN) {
     log.value = "";
   }
   addLog(
     `[${task.status}]${
-      task.status === "progress" && task.progress
+      task.status === TaskStatusCode.PROGRESS && task.progress
         ? `(${task.progress.current}/${task.progress.all})`
         : ""
     }:${localized}`,
   );
   Cursor.setCursor("wait");
-  if (task.status === "complete") {
+  if (task.status === TaskStatusCode.COMPLETE) {
     progress.value = 100;
   }
-  if (task.status === "complete" || task.status === "failed") {
+  if (task.status === TaskStatusCode.COMPLETE || task.status === TaskStatusCode.FAILED) {
     Cursor.setDefaultCursor();
     cancelable.value = false;
   }

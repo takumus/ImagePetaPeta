@@ -4,6 +4,7 @@ import { BrowserWindow, shell, WebContents } from "electron";
 import * as Path from "path";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { ppa } from "@/commons/utils/pp";
+import { TaskStatusCode } from "@/commons/api/interfaces/task";
 type SearchImageByGoogleTaskStep = { js: string } | { wait: number };
 export interface SearchImageByGoogleTask {
   url: string;
@@ -66,7 +67,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
           current: taskCount++,
         },
         log: [],
-        status: "begin",
+        status: TaskStatusCode.BEGIN,
         cancelable: false,
       });
       const imageFilePath = Path.resolve(dirThumbnails, petaImage.file.thumbnail);
@@ -87,7 +88,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             current: taskCount++,
           },
           log: [`loaded: ${task.url}`],
-          status: "progress",
+          status: TaskStatusCode.PROGRESS,
           cancelable: false,
         });
         window.webContents.debugger.attach("1.1");
@@ -102,7 +103,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
               current: taskCount++,
             },
             log: [JSON.stringify(step)],
-            status: "progress",
+            status: TaskStatusCode.PROGRESS,
             cancelable: false,
           });
         });
@@ -125,7 +126,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
               current: taskCount++,
             },
             log: [JSON.stringify(step)],
-            status: "progress",
+            status: TaskStatusCode.PROGRESS,
             cancelable: false,
           });
         });
@@ -136,7 +137,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             current: taskCount++,
           },
           log: [`uploading`],
-          status: "progress",
+          status: TaskStatusCode.PROGRESS,
           cancelable: false,
         });
         await new Promise((res, rej) => {
@@ -160,7 +161,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
                 current: taskCount++,
               },
               log: [`uploaded`],
-              status: "complete",
+              status: TaskStatusCode.COMPLETE,
               cancelable: false,
             });
             res(true);
@@ -175,7 +176,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             current: taskCount++,
           },
           log: [],
-          status: "failed",
+          status: TaskStatusCode.FAILED,
           cancelable: false,
         });
         throw error;

@@ -1,4 +1,4 @@
-import { TaskStatus } from "@/commons/api/interfaces/task";
+import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 import { v4 as uuid } from "uuid";
 const tasks: { [id: string]: TaskHandler } = {};
 let emitStatusCallback: ((taskId: string, status: TaskStatus) => void) | undefined;
@@ -23,7 +23,7 @@ export async function spawn<T, K>(
           emitStatusCallback(id, status);
         }
       }
-      if (status.status === "failed" || status.status === "complete") {
+      if (status.status === TaskStatusCode.FAILED || status.status === TaskStatusCode.COMPLETE) {
         done = true;
       }
     },
@@ -38,7 +38,7 @@ export async function spawn<T, K>(
     handler.emitStatus({
       i18nKey: "tasks.error",
       log: [String(error)],
-      status: "failed",
+      status: TaskStatusCode.FAILED,
     });
     removeTask(handler);
     throw error;
