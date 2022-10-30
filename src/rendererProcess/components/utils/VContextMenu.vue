@@ -117,7 +117,7 @@ defineExpose({
     }
   }
   > .separate {
-    border-bottom: solid 1px #cccccc;
+    border-bottom: solid 1px var(--color-font);
     margin: var(--px0) var(--px1);
     height: 0px;
     overflow: hidden;

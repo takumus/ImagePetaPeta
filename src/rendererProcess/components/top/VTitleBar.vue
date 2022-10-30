@@ -132,7 +132,7 @@ t-titlebar-root {
       &:hover {
         background-color: var(--color-hover);
         &.close {
-          color: #ffffff;
+          color: var(--color-window-button);
           background-color: var(--window-buttons-close-hover);
         }
       }

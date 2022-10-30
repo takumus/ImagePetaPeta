@@ -330,7 +330,6 @@ petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
 t-property-root {
   width: 100%;
   height: 100%;
-  // color: #333333;
   position: relative;
   display: flex;
   flex-direction: column;

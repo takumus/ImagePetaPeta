@@ -172,10 +172,7 @@ const nsfwMask = computed(() => {
   return props.tile.petaImage.nsfw && !nsfwStore.state.value;
 });
 const placeholderColor = computed(() => {
-  if (props.tile.petaImage === undefined) {
-    return "#ffffff";
-  }
-  const petaColor = props.tile.petaImage.palette[0];
+  const petaColor = props.tile.petaImage?.palette[0];
   if (petaColor) {
     return `rgb(${petaColor.r}, ${petaColor.g}, ${petaColor.b})`;
   }
@@ -319,7 +316,7 @@ t-tile-root {
         height: 100%;
         opacity: 1;
         transition: opacity 200ms ease-in-out;
-        background-color: #ffffff;
+        background-color: unset;
         &.loaded {
           opacity: 0;
         }

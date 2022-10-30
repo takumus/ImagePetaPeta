@@ -128,12 +128,10 @@ const noImage = computed<boolean>(() => {
 <style lang="scss" scoped>
 t-previews-root {
   width: 100%;
-  // color: #333333;
   position: relative;
   display: flex;
   flex-direction: column;
   flex-shrink: 2;
-  // overflow-y: auto;
   > t-previews {
     position: relative;
     width: 100%;

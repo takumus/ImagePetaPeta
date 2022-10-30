@@ -222,16 +222,5 @@ t-textarea-root {
       }
     }
   }
-  // &::before {
-  //   content: "";
-  //   position: absolute;
-  //   top: 0px;
-  //   left: 0px;
-  //   width: 100%;
-  //   height: 100%;
-  //   border-radius: var(--rounded);
-  //   pointer-events: none;
-  //   background-color: rgba($color: #ff0000, $alpha: 0.5);
-  // }
 }
 </style>
