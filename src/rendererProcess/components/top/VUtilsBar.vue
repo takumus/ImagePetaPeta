@@ -104,7 +104,7 @@ t-utils-bar-root {
     position: absolute;
     top: 0px;
     height: 30px;
-    padding: 4px;
+    padding: var(--px0);
     display: flex;
     flex-shrink: 1;
     text-align: left;
@@ -112,13 +112,13 @@ t-utils-bar-root {
     &.left {
       left: 0px;
       button {
-        margin-right: 4px;
+        margin-right: var(--px0);
       }
     }
     &.right {
       right: 0px;
       button {
-        margin-left: 4px;
+        margin-left: var(--px0);
       }
     }
     &.left,

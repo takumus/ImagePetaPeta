@@ -124,7 +124,7 @@ t-search-root {
     border-radius: var(--rounded);
     border: solid 1.2px var(--color-border);
     outline: none;
-    padding: 4px 4px 0px 0px;
+    padding: var(--px0) var(--px0) 0px 0px;
     width: 100%;
     height: 100%;
     word-break: break-word;
@@ -137,9 +137,9 @@ t-search-root {
     justify-content: center;
     > t-tag {
       display: inline-block;
-      margin: 0px 0px 4px 4px;
+      margin: 0px 0px var(--px0) var(--px0);
       border-radius: var(--rounded);
-      padding: 4px;
+      padding: var(--px0);
       background-color: var(--color-sub);
       // border: solid 1.2px var(--color-border);
       &.last {

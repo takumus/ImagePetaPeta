@@ -75,7 +75,7 @@ t-root {
     > t-browser {
       display: block;
       overflow: hidden;
-      padding: 8px;
+      padding: var(--px1);
       background-color: var(--color-main);
       flex: 1;
       z-index: 1;

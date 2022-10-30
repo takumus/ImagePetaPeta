@@ -203,7 +203,7 @@ defineExpose({
 <style lang="scss" scoped>
 t-textarea-root {
   display: inline-block;
-  min-width: 16px;
+  min-width: var(--px2);
   position: relative;
   > t-textarea {
     line-height: var(--size-2);

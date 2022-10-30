@@ -19,7 +19,7 @@ defineProps<{
 t-progress-bar-root {
   background-color: var(--color-font);
   width: 100%;
-  height: 16px;
+  height: var(--px2);
   overflow: hidden;
   border-radius: var(--rounded);
   padding: 2px;

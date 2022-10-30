@@ -221,11 +221,11 @@ t-tab-root {
       border-left: solid 1px var(--color-border);
     }
     &.add {
-      min-width: 16px;
+      min-width: var(--px2);
       border-right: none;
       flex-shrink: 0;
       > t-label-wrapper t-label {
-        padding: 0px 8px;
+        padding: 0px var(--px1);
       }
     }
     &:not(.selected):not(:hover) + t-tab:not(.selected):not(:hover) {
@@ -300,7 +300,7 @@ t-tab-root {
       align-items: center;
       height: 100%;
       > t-label {
-        padding: 0px 8px;
+        padding: 0px var(--px1);
         flex-shrink: 1;
       }
     }

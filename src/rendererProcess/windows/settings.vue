@@ -68,7 +68,7 @@ t-root {
     > t-browser {
       display: block;
       overflow: hidden;
-      padding: 16px;
+      padding: var(--px2);
       background-color: var(--color-main);
       flex: 1;
       z-index: 1;

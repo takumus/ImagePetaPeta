@@ -187,7 +187,7 @@ t-root {
         cursor: grab;
       }
       > t-property {
-        padding: 8px;
+        padding: var(--px1);
         display: block;
         background-color: var(--color-main);
         z-index: 2;

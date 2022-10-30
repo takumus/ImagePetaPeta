@@ -104,7 +104,7 @@ defineExpose({
     word-break: break-word;
     list-style-type: none;
     min-width: 128px;
-    padding: 8px 24px;
+    padding: var(--px1) 24px;
     // padding-left: 24px;
     cursor: pointer;
     &:hover {
@@ -118,7 +118,7 @@ defineExpose({
   }
   > .separate {
     border-bottom: solid 1px #cccccc;
-    margin: 4px 8px;
+    margin: var(--px0) var(--px1);
     height: 0px;
     overflow: hidden;
   }

@@ -77,7 +77,7 @@ t-settings-root {
     list-style-type: none;
     padding: 0px;
     > li {
-      margin: 0px 8px;
+      margin: 0px var(--px1);
       display: inline-block;
       cursor: pointer;
       &.selected {

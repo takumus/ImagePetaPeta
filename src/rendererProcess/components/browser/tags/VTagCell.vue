@@ -37,9 +37,9 @@ function select() {
 t-tag-cell-root {
   display: block;
   width: fit-content;
-  margin: 0px 0px 4px 4px;
+  margin: 0px 0px var(--px0) var(--px0);
   border-radius: var(--rounded);
-  padding: 4px;
+  padding: var(--px0);
   background-color: var(--color-sub);
   &.selected {
     font-weight: bold;

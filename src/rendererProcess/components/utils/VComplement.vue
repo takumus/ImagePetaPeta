@@ -201,7 +201,7 @@ t-complement-root {
   left: 0px;
 
   outline: none;
-  padding: 8px 8px 8px 4px;
+  padding: var(--px1) var(--px1) var(--px1) var(--px0);
   word-break: break-word;
   text-align: left;
   display: flex;
@@ -213,9 +213,9 @@ t-complement-root {
   > t-tag {
     line-height: var(--size-2);
     display: inline-block;
-    margin: 0px 0px 4px 4px;
+    margin: 0px 0px var(--px0) var(--px0);
     border-radius: var(--rounded);
-    padding: 4px;
+    padding: var(--px0);
     background-color: var(--color-sub);
     cursor: pointer;
     &.selected,
@@ -234,7 +234,7 @@ t-complement-root {
     cursor: pointer;
     display: inline-block;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: var(--px1);
     text-align: center;
   }
 }

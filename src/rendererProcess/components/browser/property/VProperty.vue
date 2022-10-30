@@ -91,6 +91,7 @@
         </t-tag>
         <t-tag class="last">
           <VTextarea
+            ref="tagInput"
             :type="'single'"
             :trim="true"
             :look="textsStore.state.value.plus + '       '"
@@ -159,6 +160,7 @@ const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
 const mutualPetaTags = ref<PetaTag[]>([]);
+const tagInput = ref<InstanceType<typeof VTextarea>>();
 async function addTag(name: string) {
   // タグを探す。なかったら作る。
   let petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === name);
@@ -173,6 +175,9 @@ async function addTag(name: string) {
     [petaTag.id],
     UpdateMode.INSERT,
   );
+  setTimeout(() => {
+    tagInput.value?.edit();
+  }, 100);
 }
 async function removeTag(petaTag: PetaTag) {
   await API.send(
@@ -346,13 +351,13 @@ t-property-root {
       overflow-y: auto;
       > t-data {
         display: flex;
-        margin: 4px 0px;
+        margin: var(--px0) 0px;
         > t-name {
           display: block;
           width: 35%;
           position: relative;
           text-align: right;
-          padding: 0px 8px;
+          padding: 0px var(--px1);
           &::after {
             position: absolute;
             right: 0px;
@@ -360,7 +365,7 @@ t-property-root {
           }
         }
         > t-value {
-          padding: 0px 8px;
+          padding: 0px var(--px1);
           display: block;
           width: 65%;
           word-break: break-word;
@@ -381,13 +386,13 @@ t-property-root {
   > t-colors {
     > t-palette {
       pointer-events: none;
-      padding: 8px;
+      padding: var(--px1);
       display: block;
       width: 100%;
       > t-color-background {
         display: flex;
         border-radius: var(--rounded);
-        height: 8px;
+        height: var(--px1);
         width: 100%;
         overflow: hidden;
         box-shadow: 0px 0px 0px 1px #ffffff, 0px 0px 2px 1.5px rgba(0, 0, 0, 0.5);
@@ -405,7 +410,7 @@ t-property-root {
     min-height: 128px;
     > t-search-box {
       outline: none;
-      padding: 4px 4px 0px 0px;
+      padding: var(--px0) var(--px0) 0px 0px;
       width: 100%;
       word-break: break-word;
       text-align: left;
@@ -416,9 +421,9 @@ t-property-root {
       overflow-y: auto;
       > t-tag {
         display: inline-block;
-        margin: 0px 0px 4px 4px;
+        margin: 0px 0px var(--px0) var(--px0);
         border-radius: var(--rounded);
-        padding: 4px;
+        padding: var(--px0);
         background-color: var(--color-sub);
         &.last {
           width: 100%;
@@ -433,7 +438,7 @@ t-property-root {
   }
   p {
     text-align: center;
-    margin: 4px 0px;
+    margin: var(--px0) 0px;
   }
 }
 </style>

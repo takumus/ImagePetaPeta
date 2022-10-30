@@ -90,7 +90,7 @@ t-board-property-root {
   left: 0px;
   height: 100%;
   width: 100%;
-  padding: 4px;
+  padding: var(--px0);
   text-align: center;
   > input {
     display: inline-block;
@@ -108,7 +108,7 @@ t-board-property-root {
     height: 100%;
     margin: 0px;
     min-width: 50px;
-    margin-right: 4px;
+    margin-right: var(--px0);
     &.color {
       border-radius: 100px;
       width: auto;

@@ -83,7 +83,7 @@ t-root {
     > t-browser {
       display: block;
       overflow-y: auto;
-      margin: 16px;
+      margin: var(--px2);
       background-color: var(--color-main);
       flex: 1;
       z-index: 1;

@@ -72,7 +72,7 @@ t-dialog-root {
   }
   > t-modal {
     background-color: var(--color-main);
-    padding: 16px;
+    padding: var(--px2);
     border-radius: var(--rounded);
     overflow: hidden;
     display: flex;

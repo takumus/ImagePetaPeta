@@ -76,7 +76,7 @@ t-tasks-root {
     max-height: 512px;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 4px;
+    padding: var(--px0);
     display: block;
   }
 }

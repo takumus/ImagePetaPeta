@@ -173,14 +173,14 @@ t-tags-root {
   width: 100%;
   height: 100%;
   > t-tag-add {
-    padding: 4px 4px 0px 0px;
+    padding: var(--px0) var(--px0) 0px 0px;
     > t-tag {
-      padding: 4px;
+      padding: var(--px0);
     }
   }
   > t-tags {
     outline: none;
-    padding: 4px 4px 0px 0px;
+    padding: var(--px0) var(--px0) 0px 0px;
     width: 100%;
     text-align: left;
     overflow-y: auto;

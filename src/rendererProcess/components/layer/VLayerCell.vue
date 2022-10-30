@@ -138,7 +138,7 @@ function pointermove(event: PointerEvent) {
 .layer-cell-root {
   cursor: pointer;
   margin: 0px;
-  padding: 4px;
+  padding: var(--px0);
   background-color: var(--color-main);
   display: flex;
   align-items: center;
@@ -156,7 +156,7 @@ function pointermove(event: PointerEvent) {
     top: 0px;
   }
   > t-icon {
-    padding: 0px 8px;
+    padding: 0px var(--px1);
     height: 100%;
     width: 24px;
     background: no-repeat;
@@ -179,7 +179,7 @@ function pointermove(event: PointerEvent) {
   > t-thumb {
     min-width: 32px;
     height: 100%;
-    margin: 0px 8px;
+    margin: 0px var(--px1);
     flex: 1;
     background: no-repeat;
     background-position: center center;
