@@ -13,7 +13,7 @@
         @dblclick="dblclick"
         draggable="true"
         :class="{
-          'selected-image': petaImagesStore.getSelected(tile.petaImage),
+          selected,
         }"
       >
         <t-nsfw v-if="nsfwMask"> </t-nsfw>
@@ -36,7 +36,12 @@
         <img ref="image" draggable="false" v-show="!loadingOriginal" />
         <t-background> </t-background>
       </t-images>
-      <t-tags v-if="settingsStore.state.value.showTagsOnTile">
+      <t-tags
+        v-if="settingsStore.state.value.showTagsOnTile"
+        :class="{
+          selected,
+        }"
+      >
         <t-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
           {{ petaTag.name }}
         </t-tag>
@@ -44,9 +49,7 @@
           {{ t("browser.untagged") }}
         </t-tag>
       </t-tags>
-      <t-selected v-show="petaImagesStore.getSelected(tile.petaImage)">
-        <t-icon> ✔ </t-icon>
-      </t-selected>
+      <t-selected v-show="selected"> </t-selected>
     </t-tile-wrapper>
     <t-group v-else>
       {{ tile.group }}
@@ -229,6 +232,12 @@ function delayedLoadImage() {
     }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
   }
 }
+const selected = computed(() => {
+  if (props.tile.petaImage !== undefined) {
+    return petaImagesStore.getSelected(props.tile.petaImage);
+  }
+  return false;
+});
 watch([() => props.tile.visible, () => props.original], () => {
   delayedLoadImage();
 });
@@ -275,7 +284,7 @@ t-tile-root {
       cursor: pointer;
       filter: brightness(0.7);
       position: relative;
-      &.selected-image {
+      &.selected {
         filter: brightness(1);
         border-radius: var(--rounded);
         padding: 2px;
@@ -341,7 +350,7 @@ t-tile-root {
       bottom: 0px;
       pointer-events: none;
       outline: none;
-      padding: 2px 2px;
+      padding: 2px;
       font-size: var(--size-0);
       word-break: break-word;
       text-align: left;
@@ -353,9 +362,15 @@ t-tile-root {
         display: inline-block;
         margin: 1px 1px;
         border-radius: var(--rounded);
-        padding: 3px;
+        padding: var(--px0);
         background-color: var(--color-sub);
         font-size: var(--size-0);
+        line-height: var(--size-0);
+        font-weight: bold;
+        // border: solid 2px var(--color-font);
+      }
+      &.selected {
+        padding: var(--px1);
       }
     }
     > t-selected {
@@ -366,20 +381,24 @@ t-tile-root {
       border-radius: var(--rounded);
       width: 100%;
       height: 100%;
-      // background-color: rgba($color: #ffffff, $alpha: 0.4);
-      border: solid 4px var(--color-font);
+      box-shadow: 0px 0px var(--px0) var(--px1) rgba(0, 0, 0, 0.3) inset;
       display: block;
-      > t-icon {
-        border-radius: var(--rounded) 0px 0px 0px;
-        background-color: var(--color-font);
-        color: var(--color-main);
+      &:before {
+        content: "";
         position: absolute;
-        padding: 0px 6px;
-        margin-right: -2px;
-        margin-bottom: -2px;
-        bottom: 0px;
-        right: 0px;
-        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: var(--rounded);
+        border: solid calc(var(--px0)) var(--color-main);
+        box-shadow: 0px 0px 0px calc(var(--px0) / 2) var(--color-font) inset;
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: var(--rounded);
+        border: solid calc(var(--px0) / 2) var(--color-font);
       }
     }
   }
