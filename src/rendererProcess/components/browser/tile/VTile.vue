@@ -390,7 +390,7 @@ t-tile-root {
         height: 100%;
         border-radius: var(--rounded);
         border: solid calc(var(--px0)) var(--color-main);
-        box-shadow: 0px 0px 0px calc(var(--px0) * 0.5) var(--color-font) inset;
+        box-shadow: 0px 0px 0px calc(var(--px0) * 0.5 - 0.4px) var(--color-font) inset;
       }
       &:after {
         content: "";
