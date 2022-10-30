@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch, computed, nextTick } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
@@ -81,11 +81,6 @@ onMounted(() => {
       select(item.value);
     }
   });
-  setInterval(() => {
-    if (props.editing) {
-      updatePosition();
-    }
-  }, 50);
 });
 function normalizeIndex() {
   if (currentIndex.value < 0) {
@@ -148,16 +143,18 @@ function updatePosition() {
     position.value.x = inputRect.x;
     position.value.y = inputRect.y + inputRect.height;
     height.value = "unset";
-    if (complement.value) {
-      const rect = complement.value.getBoundingClientRect();
-      if (position.value.x + rect.width > document.body.clientWidth - 9) {
-        position.value.x = document.body.clientWidth - rect.width - 8;
+    nextTick(() => {
+      const rect = complement.value?.getBoundingClientRect();
+      if (rect === undefined) {
+        return;
       }
-      if (position.value.y + rect.height > document.body.clientHeight - 9) {
-        // this.position.y = document.body.clientHeight - rect.height;
-        height.value = `${document.body.clientHeight - position.value.y - 8}px`;
+      if (rect.right > document.body.clientWidth) {
+        position.value.x = document.body.clientWidth - rect.width;
       }
-    }
+      if (rect.bottom > document.body.clientHeight) {
+        position.value.y = position.value.y - rect.height - inputRect.height;
+      }
+    });
   }
 }
 function disableUpDownKeys() {
