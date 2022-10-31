@@ -52,7 +52,7 @@
     <t-colors v-if="singlePetaImageInfo" class="content">
       <p>{{ t("browser.property.colors.label") }}</p>
       <t-palette>
-        <t-color-background>
+        <t-color-wrapper>
           <t-color
             v-for="color in singlePetaImageInfo.palette"
             :key="color.id"
@@ -63,7 +63,7 @@
             @click="changeCurrentColor(color.color)"
           >
           </t-color>
-        </t-color-background>
+        </t-color-wrapper>
         <t-current-color v-if="currentColor">
           <t-color-label
             ><t-name>RGB:</t-name>
@@ -101,11 +101,14 @@
                 :complements="complements"
                 :value="toHSL(currentColor)" /></t-value
           ></t-color-label>
-          <t-color
-            :style="{
-              backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
-            }"
-          ></t-color>
+          <t-color-wrapper
+            ><t-color
+              :style="{
+                backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
+                flex: 1,
+              }"
+            ></t-color
+          ></t-color-wrapper>
         </t-current-color>
       </t-palette>
     </t-colors>
@@ -436,20 +439,20 @@ t-property-root {
       padding: var(--px1);
       display: block;
       width: 100%;
-      > t-color-background {
+      t-color-wrapper {
         display: flex;
         border-radius: var(--rounded);
         height: var(--px1);
         width: 100%;
         overflow: hidden;
-        margin: var(--px0) 0px;
-        box-shadow: 0px 0px 0px var(--px0) #ffffff, 0px 0px 2px var(--px0) rgba(0, 0, 0, 0.5);
+        margin: var(--px-1) 0px;
+        box-shadow: 0px 0px 0px var(--px-1) var(--color-border);
         > t-color {
           height: 100%;
           display: block;
           &:hover {
             cursor: pointer;
-            transform: scaleX(1.5);
+            transform: scaleX(1.5) scaleY(2);
           }
         }
       }
@@ -472,15 +475,6 @@ t-property-root {
             width: 70%;
             word-break: break-word;
           }
-        }
-        > t-color {
-          margin: var(--px0) 0px;
-          border-radius: var(--rounded);
-          height: var(--px1);
-          width: 100%;
-          overflow: hidden;
-          display: block;
-          box-shadow: 0px 0px 0px var(--px0) #ffffff, 0px 0px 2px var(--px0) rgba(0, 0, 0, 0.5);
         }
       }
     }
