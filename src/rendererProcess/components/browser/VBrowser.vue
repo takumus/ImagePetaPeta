@@ -142,6 +142,11 @@ onMounted(() => {
   keyboards.enabled = true;
   keyboards.keys("KeyA").down(keyA);
   fetchFilteredPetaImages();
+  petaImagesStore.onUpdate((petaImages, mode) => {
+    if (mode === UpdateMode.INSERT) {
+      selectedPetaTagIds.value = [];
+    }
+  });
 });
 onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
