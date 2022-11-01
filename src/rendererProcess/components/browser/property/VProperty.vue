@@ -66,41 +66,14 @@
         </t-color-wrapper>
         <t-current-color v-if="currentColor">
           <t-color-label
-            ><t-name>RGB:</t-name>
-            <t-value>
-              <VTextarea
-                :type="'single'"
-                :trim="true"
-                :clickToEdit="true"
-                :allowEmpty="true"
-                :blurToReset="true"
-                :complements="complements"
-                :value="toRGB(currentColor)" /></t-value
-          ></t-color-label>
+            ><t-name>RGB:</t-name> <t-value> {{ toRGB(currentColor) }}</t-value></t-color-label
+          >
           <t-color-label
-            ><t-name>HEX:</t-name>
-            <t-value>
-              <VTextarea
-                :type="'single'"
-                :trim="true"
-                :clickToEdit="true"
-                :allowEmpty="true"
-                :blurToReset="true"
-                :complements="complements"
-                :value="toHEX(currentColor)" /></t-value
-          ></t-color-label>
+            ><t-name>HEX:</t-name> <t-value> {{ toHEX(currentColor) }}</t-value></t-color-label
+          >
           <t-color-label
-            ><t-name>HSL:</t-name>
-            <t-value>
-              <VTextarea
-                :type="'single'"
-                :trim="true"
-                :clickToEdit="true"
-                :allowEmpty="true"
-                :blurToReset="true"
-                :complements="complements"
-                :value="toHSL(currentColor)" /></t-value
-          ></t-color-label>
+            ><t-name>HSL:</t-name> <t-value> {{ toHSL(currentColor) }}</t-value></t-color-label
+          >
           <t-color-wrapper
             ><t-color
               :style="{
@@ -474,6 +447,7 @@ t-property-root {
             display: block;
             width: 70%;
             word-break: break-word;
+            user-select: text;
           }
         }
       }
