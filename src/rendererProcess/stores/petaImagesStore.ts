@@ -24,6 +24,7 @@ export async function createPetaImagesStore() {
     } else if (mode === UpdateMode.REMOVE) {
       newPetaImages.forEach((petaImage) => {
         delete states.value[petaImage.id];
+        delete selection.value[petaImage.id];
       });
     }
     eventEmitter.emit("update", newPetaImages, mode);
