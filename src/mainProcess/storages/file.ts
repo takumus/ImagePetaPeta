@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as Path from "path";
-export function writeFile(filePath: string, buffer: Buffer): Promise<boolean> {
+export function writeFile(filePath: string, buffer: NodeJS.ArrayBufferView): Promise<boolean> {
   return new Promise((res, rej) => {
     fs.writeFile(filePath, buffer, (err) => {
       if (err) {
@@ -40,6 +40,7 @@ export function mkdir(path: string, recursive = false): Promise<string> {
 export function mkdirSync(path: string, recursive = false) {
   try {
     fs.mkdirSync(path, { recursive });
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   } catch (err: any) {
     if (err && err.code != "EEXIST") {
       throw err;
@@ -94,7 +95,9 @@ export function writable(path: string, isDirectory: boolean) {
   }
   // 存在する場合はファイルの種類の確認
   if (stat.isDirectory() != isDirectory) {
-    throw new Error(`File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`);
+    throw new Error(
+      `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
+    );
   }
   // 存在する場合はパスのアクセス権確認
   fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
@@ -110,7 +113,10 @@ export function readdir(path: string) {
     });
   });
 }
-export function readDirRecursive(path: string, onFile?: (filePaths: string[], count: number) => void) {
+export function readDirRecursive(
+  path: string,
+  onFile?: (filePaths: string[], count: number) => void,
+) {
   let count = 0;
   const canceled = {
     value: false,
@@ -130,7 +136,11 @@ export function readDirRecursive(path: string, onFile?: (filePaths: string[], co
     },
   };
 }
-async function _readDirRecursive(path: string, onFile: (filePaths: string[]) => void, canceled: { value: boolean }) {
+async function _readDirRecursive(
+  path: string,
+  onFile: (filePaths: string[]) => void,
+  canceled: { value: boolean },
+) {
   if (canceled.value) {
     throw "canceled";
   }
@@ -140,7 +150,11 @@ async function _readDirRecursive(path: string, onFile: (filePaths: string[]) => 
     const files = await readdir(path);
     for (let i = 0; i < files.length; i++) {
       try {
-        const cPath = Path.resolve(path, files[i]!);
+        const fileName = files[i];
+        if (fileName === undefined) {
+          continue;
+        }
+        const cPath = Path.resolve(path, fileName);
         const isDirectory = fs.statSync(cPath).isDirectory();
         if (isDirectory) {
           _files.push(...(await _readDirRecursive(cPath, onFile, canceled)));
