@@ -22,6 +22,9 @@
               />
               <span>{{ t("browser.grouping") }}</span>
             </label>
+            <select v-model="sortMode">
+              <option v-for="sm in sortModes" :key="sm" :value="sm">{{ sm }}</option>
+            </select>
             <input
               type="range"
               v-model="thumbnailsSize"
@@ -87,7 +90,6 @@ import {
   UNTAGGED_ID,
 } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
-import { SortMode } from "@/commons/datas/sortMode";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
@@ -120,7 +122,8 @@ const areaMinY = ref(0);
 const areaPreVisibleMaxY = ref(0);
 const areaPreVisibleMinY = ref(0);
 const scrollAreaHeight = ref(0);
-const sortMode = ref<SortMode>(SortMode.ADD_DATE);
+const sortModes = ["ADD_DATE", "COLOR_NUM"] as const;
+const sortMode = ref<typeof sortModes[number]>("ADD_DATE");
 const thumbnailsResizerStore = useResizerStore();
 const scrollAreaResizerStore = useResizerStore();
 const firstSelectedTile = ref<Tile>();
@@ -377,11 +380,14 @@ function updateTileSize(value: number) {
 }
 function sort(a: PetaImage, b: PetaImage) {
   switch (sortMode.value) {
-    case SortMode.ADD_DATE: {
+    case "ADD_DATE": {
       if (a.addDate === b.addDate) {
         return b.fileDate - a.fileDate;
       }
       return b.addDate - a.addDate;
+    }
+    case "COLOR_NUM": {
+      return b.palette.length - a.palette.length;
     }
   }
 }
@@ -554,6 +560,7 @@ watch(selectedPetaTagIds, () => {
 });
 watch(petaImagesArray, fetchFilteredPetaImages);
 watch(petaTagsStore.state.petaTags, fetchFilteredPetaImages);
+watch(sortMode, fetchFilteredPetaImages);
 watch(thumbnailsSize, restoreScrollPosition);
 </script>
 
