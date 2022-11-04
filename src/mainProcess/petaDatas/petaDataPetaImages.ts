@@ -114,33 +114,17 @@ export class PetaDataPetaImages {
     }
     return true;
   }
-  async importImages(datas: {
-    htmls: string[];
-    buffers: (ArrayBuffer | Buffer)[];
-    filePaths: string[];
-  }): Promise<string[]> {
-    const logFromBrowser = this.parent.mainLogger.logChunk();
-    const ids = datas.filePaths
-      .filter(
-        (filePath) =>
-          Path.resolve(Path.dirname(filePath)) === Path.resolve(this.parent.paths.DIR_IMAGES),
-      )
-      .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
-    if (ids.length > 0 && ids.length === datas.filePaths.length) {
-      logFromBrowser.log("### 0.from browser");
-      logFromBrowser.log("return:", ids.length);
-      return ids;
-    }
-    const logDownload = this.parent.mainLogger.logChunk();
+  async importImagesFromHTMLs(htmls: string[]) {
+    const log = this.parent.mainLogger.logChunk();
     const urls: string[] = [];
     try {
-      logDownload.log("### 1.trying to download");
-      datas.htmls.map((html) => {
+      log.log("## Import Images From HTMLs");
+      htmls.map((html) => {
         try {
           urls.push(getURLFromHTML(html));
         } catch (error) {
           //
-          logDownload.error("invalid html", error);
+          log.error("invalid html", error);
         }
       });
       const fileInfos = await ppa(async (url) => {
@@ -163,21 +147,26 @@ export class PetaDataPetaImages {
         } as ImportFileInfo;
       }, urls).promise;
       if (fileInfos.length > 0) {
-        const petaImages = await this.importImagesFromFilePaths({
+        const petaImages = await this.importImagesFromFileInfos({
           fileInfos,
         });
-        logDownload.log("return:", petaImages.length);
+        log.log("return:", petaImages.length);
         if (petaImages.length > 0) {
           return petaImages.map((petaImage) => petaImage.id);
         }
       }
     } catch (error) {
-      logDownload.error(error);
+      log.error(error);
     }
-    const logBuffer = this.parent.mainLogger.logChunk();
+    log.log("return:", 0);
+    return [];
+  }
+  async importImagesFromBuffers(buffers: (ArrayBuffer | Buffer)[]) {
+    const log = this.parent.mainLogger.logChunk();
+    const urls: string[] = [];
     try {
-      if (datas.buffers.length > 0) {
-        logBuffer.log("### 2.trying to read ArrayBuffer:", datas.buffers.length);
+      log.log("## Import Images From ArrayBuffers");
+      if (buffers.length > 0) {
         const fileInfos = await ppa(async (buffer) => {
           const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
           await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
@@ -186,33 +175,20 @@ export class PetaDataPetaImages {
             note: urls[0] || "",
             name: urls.length > 0 ? "downloaded" : "noname",
           } as ImportFileInfo;
-        }, datas.buffers).promise;
-        const petaImages = await this.importImagesFromFilePaths({ fileInfos });
-        logBuffer.log("return:", petaImages.length);
+        }, buffers).promise;
+        const petaImages = await this.importImagesFromFileInfos({ fileInfos });
+        log.log("return:", petaImages.length);
         if (petaImages.length > 0) {
           return petaImages.map((petaImage) => petaImage.id);
         }
       }
     } catch (error) {
-      logBuffer.error(error);
+      log.error(error);
     }
-    const logFilePaths = this.parent.mainLogger.logChunk();
-    try {
-      logFilePaths.log("### 3.trying to read filePath:", datas.filePaths.length);
-      const petaImages = await this.importImagesFromFilePaths({
-        fileInfos: datas.filePaths.map((path) => ({ path })),
-        extract: true,
-      });
-      logFilePaths.log("return:", petaImages.length);
-      if (petaImages.length > 0) {
-        return petaImages.map((petaImage) => petaImage.id);
-      }
-    } catch (error) {
-      logFilePaths.error(error);
-    }
+    log.log("return:", 0);
     return [];
   }
-  async importImagesFromFilePaths(
+  async importImagesFromFileInfos(
     params: {
       fileInfos: ImportFileInfo[];
       extract?: boolean;
@@ -226,7 +202,7 @@ export class PetaDataPetaImages {
       "ImportImagesFromFilePaths",
       async (handler) => {
         const log = this.parent.mainLogger.logChunk();
-        log.log("##Import Images From File Paths");
+        log.log("## Import Images From File Paths");
         const fileInfos: ImportFileInfo[] = [];
         if (params.extract) {
           log.log("###List Files", params.fileInfos.length);
