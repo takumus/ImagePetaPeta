@@ -40,33 +40,37 @@ export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
   const promise = Promise.all(
     functionsCopy.map(
       (promise) =>
-        new Promise((res, rej: (error: PPCancelError) => void) => {
+        new Promise((res, rej) => {
           let canceled = false;
-          limit(promise).then((v) => {
-            if (canceled) {
-              return;
-            }
-            res(v);
-            if (limit.activeCount + limit.pendingCount === 0) {
-              // 実行済み、ペンディングがゼロなら完了。
-              if (allCanceled) {
-                // キャンセルされてたらエラー。
-                const error = new PPCancelError(functionsCopy.length, remaining);
-                cancels.map((cancel) => {
-                  cancel(error);
-                });
-                // nextTickで呼ぶか分ける。
-                if (resolveCancelationOnNextTick) {
-                  setImmediate(() => {
-                    resolveCancels.map((rc) => rc());
-                  });
-                } else {
-                  resolveCancels.map((rc) => rc());
-                }
+          limit(promise)
+            .then((v) => {
+              if (canceled) {
+                return;
               }
-              allCompleted = true;
-            }
-          });
+              res(v);
+              if (limit.activeCount + limit.pendingCount === 0) {
+                // 実行済み、ペンディングがゼロなら完了。
+                if (allCanceled) {
+                  // キャンセルされてたらエラー。
+                  const error = new PPCancelError(functionsCopy.length, remaining);
+                  cancels.map((cancel) => {
+                    cancel(error);
+                  });
+                  // nextTickで呼ぶか分ける。
+                  if (resolveCancelationOnNextTick) {
+                    setImmediate(() => {
+                      resolveCancels.map((rc) => rc());
+                    });
+                  } else {
+                    resolveCancels.map((rc) => rc());
+                  }
+                }
+                allCompleted = true;
+              }
+            })
+            .catch((reason) => {
+              rej(reason);
+            });
           cancels.push((error) => {
             canceled = true;
             rej(error);
