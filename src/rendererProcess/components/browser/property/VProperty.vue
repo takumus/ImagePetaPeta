@@ -166,7 +166,7 @@ import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgbToHex, rgbToHsl } from "@/rendererProcess/utils/colorUtils";
+import { rgb2hex, rgb2hsl } from "@csstools/convert-colors";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
@@ -253,13 +253,13 @@ function changeCurrentColor(color: PetaColor | undefined) {
   currentColor.value = color;
 }
 function toHEX(color: PetaColor) {
-  return rgbToHex(color.r, color.g, color.b).toUpperCase();
+  return rgb2hex(color.r, color.g, color.b).toUpperCase();
 }
 function toRGB(color: PetaColor) {
   return `${color.r}, ${color.g}, ${color.b}`;
 }
 function toHSL(color: PetaColor) {
-  const hsl = rgbToHsl(color.r, color.g, color.b);
+  const hsl = rgb2hsl(color.r, color.g, color.b);
   return `${Math.floor(hsl[0] * 360)}, ${Math.floor(hsl[1] * 100)}%, ${Math.floor(hsl[2] * 100)}%`;
 }
 const fetchPetaTags = (() => {

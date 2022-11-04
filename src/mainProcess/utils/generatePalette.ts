@@ -1,5 +1,5 @@
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgbDiff } from "@/rendererProcess/utils/colorUtils";
+import { rgb2ciede } from "@csstools/convert-colors";
 import quantize from "quantize";
 function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
@@ -17,40 +17,20 @@ function createPixels(buffer: Buffer, pixelCount: number) {
 }
 export function getSimplePalette(imageData: { buffer: Buffer; width: number; height: number }) {
   const palette = getPalette({
-    sample: 3000,
-    mergeCIEDiff: 5,
-    fixColorCIEDiff: 5,
+    sample: 2000,
+    mergeCIEDiff: 15,
+    fixColorCIEDiff: 3,
     ...imageData,
   });
-  // allPalette.push(...palette);
-  // cie94色差で色削除
-  for (let i = 0; i < palette.length; i++) {
-    for (let ii = i + 1; ii < palette.length; ii++) {
-      const cieDiff = getDiff(palette[i]!, palette[ii]!);
-      if (cieDiff < 15) {
-        palette.splice(ii, 1);
-        ii--;
-      }
-    }
-  }
-  // if (palette.length >= 6) {
-  //   const newMergedPalette: PetaColor[] = [];
-  //   // 人口の多い色3つ。
-  //   newMergedPalette.push(...palette.splice(0, 5));
-  //   // 鮮やか順に
-  //   palette.sort((a, b) => {
-  //     return (Math.max(b.r, b.g, b.b) - Math.min(b.r, b.g, b.b)) - (Math.max(a.r, a.g, a.b) - Math.min(a.r, a.g, a.b));
-  //   });
-  //   newMergedPalette.push(...palette.splice(0, 3));
-  //   newMergedPalette.sort((a, b) => {
-  //     return b.population - a.population;
-  //   });
-  //   palette.length = 0;
-  //   palette.push(...newMergedPalette);
-  // }
-  // palette.sort((a, b) => {
-  //   return b.population - a.population;
-  // });
+  return palette;
+}
+export function getFullPalette(imageData: { buffer: Buffer; width: number; height: number }) {
+  const palette = getPalette({
+    sample: 10000,
+    mergeCIEDiff: 5,
+    fixColorCIEDiff: 4,
+    ...imageData,
+  });
   return palette;
 }
 export function getPalette(imageData: {
@@ -63,7 +43,7 @@ export function getPalette(imageData: {
 }): PetaColor[] {
   const pixelCount = imageData.width * imageData.height;
   const pixels = createPixels(imageData.buffer, imageData.width * imageData.height);
-  const qPalette = quantize(pixels, 64).palette();
+  const qPalette = quantize(pixels, 256).palette();
   const colors = qPalette.map((color): PetaColor => {
     return {
       r: color[0],
@@ -93,7 +73,7 @@ export function getPalette(imageData: {
       const rc = pixels[i]!;
       const y = Math.floor(i / imageData.width);
       const x = i % imageData.width;
-      const cieDiff = rgbDiff(rc, [color.r, color.g, color.b]);
+      const cieDiff = rgb2ciede(rc, [color.r, color.g, color.b]);
       if (cieDiff < imageData.fixColorCIEDiff) {
         color.population++;
         positions.push({ x, y });
@@ -149,5 +129,5 @@ export function getPalette(imageData: {
     });
 }
 function getDiff(color1: PetaColor, color2: PetaColor) {
-  return rgbDiff([color1.r, color1.g, color1.b], [color2.r, color2.g, color2.b]);
+  return rgb2ciede([color1.r, color1.g, color1.b], [color2.r, color2.g, color2.b]);
 }

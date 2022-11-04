@@ -19,3 +19,9 @@ declare module "quantize" {
     palette: () => [number, number, number][];
   };
 }
+declare module "@csstools/convert-colors" {
+  export function rgb2ciede([number, number, number], [number, number, number]): number;
+  export function rgb2hsl(r: number, g: number, b: number): [number, number, number];
+  export function rgb2hsv(r: number, g: number, b: number): [number, number, number];
+  export function rgb2hex(r: number, g: number, b: number): string;
+}

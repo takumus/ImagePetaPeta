@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@araki-packages/promise-serial": "^2.0.2",
+    "@csstools/convert-colors": "^2.0.0",
     "@seald-io/nedb": "^3.0.0",
     "@xmldom/xmldom": "^0.8.5",
     "axios": "^1.1.2",
