@@ -130,7 +130,9 @@ export class PetaDatas {
             const result = await childProcess.promise;
             if (result) {
               const newPetaImages = await this.petaImages.importImagesFromFilePaths(
-                [outputFile],
+                {
+                  fileInfos: [{ path: outputFile }],
+                },
                 true,
               );
               if (newPetaImages.length < 1) {

@@ -24,6 +24,7 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 import { CPU_LENGTH } from "@/commons/cpu";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/api/interfaces/task";
+import { v4 as uuid } from "uuid";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -113,8 +114,12 @@ export class PetaDataPetaImages {
     }
     return true;
   }
-  async importImages(datas: { htmls: string[]; buffers: ArrayBuffer[]; filePaths: string[] }) {
-    const log1 = this.parent.mainLogger.logChunk();
+  async importImages(datas: {
+    htmls: string[];
+    buffers: (ArrayBuffer | Buffer)[];
+    filePaths: string[];
+  }): Promise<string[]> {
+    const logFromBrowser = this.parent.mainLogger.logChunk();
     const ids = datas.filePaths
       .filter(
         (filePath) =>
@@ -122,27 +127,26 @@ export class PetaDataPetaImages {
       )
       .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
     if (ids.length > 0 && ids.length === datas.filePaths.length) {
-      log1.log("0.from browser");
-      log1.log("result:", ids.length);
+      logFromBrowser.log("### 0.from browser");
+      logFromBrowser.log("return:", ids.length);
       return ids;
     }
-    const log2 = this.parent.mainLogger.logChunk();
-    let petaImages: PetaImage[] = [];
+    const logDownload = this.parent.mainLogger.logChunk();
     const urls: string[] = [];
     try {
-      log2.log("1.trying to download");
+      logDownload.log("### 1.trying to download");
       datas.htmls.map((html) => {
         try {
           urls.push(getURLFromHTML(html));
         } catch (error) {
           //
-          log2.error("invalid html", error);
+          logDownload.error("invalid html", error);
         }
       });
-      const buffers = await ppa(async (url) => {
+      const fileInfos = await ppa(async (url) => {
         let data: Buffer;
         let remoteURL = "";
-        if (url.trim().indexOf("data:") === 0) {
+        if (url.trim().startsWith("data:")) {
           // dataURIだったら
           data = dataUriToBuffer(url);
         } else {
@@ -150,53 +154,72 @@ export class PetaDataPetaImages {
           data = (await axios.get(url, { responseType: "arraybuffer" })).data;
           remoteURL = url;
         }
+        const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
+        await file.writeFile(dist, data);
         return {
-          buffer: data,
+          path: dist,
           note: remoteURL,
           name: "downloaded",
-        };
+        } as ImportFileInfo;
       }, urls).promise;
-      if (buffers.length > 0) {
-        petaImages = await this.importImagesFromBuffers(buffers);
-        log2.log("result:", petaImages.length);
-      }
-    } catch (error) {
-      log2.error(error);
-    }
-    const log3 = this.parent.mainLogger.logChunk();
-    try {
-      if (petaImages.length === 0) {
-        if (datas.buffers.length > 0) {
-          log3.log("2.trying to read ArrayBuffer:", datas.buffers.length);
-          petaImages = await this.importImagesFromBuffers(
-            datas.buffers.map((ab) => {
-              return {
-                buffer: Buffer.from(ab),
-                name: urls.length > 0 ? "downloaded" : "noname",
-                note: urls[0] || "",
-              };
-            }),
-          );
-          log3.log("result:", petaImages.length);
+      if (fileInfos.length > 0) {
+        const petaImages = await this.importImagesFromFilePaths({
+          fileInfos,
+        });
+        logDownload.log("return:", petaImages.length);
+        if (petaImages.length > 0) {
+          return petaImages.map((petaImage) => petaImage.id);
         }
       }
     } catch (error) {
-      log3.error(error);
+      logDownload.error(error);
     }
-    const log4 = this.parent.mainLogger.logChunk();
+    const logBuffer = this.parent.mainLogger.logChunk();
     try {
-      if (petaImages.length === 0) {
-        log4.log("3.trying to read filePath:", datas.filePaths.length);
-        petaImages = await this.importImagesFromFilePaths(datas.filePaths);
-        log4.log("result:", petaImages.length);
+      if (datas.buffers.length > 0) {
+        logBuffer.log("### 2.trying to read ArrayBuffer:", datas.buffers.length);
+        const fileInfos = await ppa(async (buffer) => {
+          const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
+          await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
+          return {
+            path: dist,
+            note: urls[0] || "",
+            name: urls.length > 0 ? "downloaded" : "noname",
+          } as ImportFileInfo;
+        }, datas.buffers).promise;
+        const petaImages = await this.importImagesFromFilePaths({ fileInfos });
+        logBuffer.log("return:", petaImages.length);
+        if (petaImages.length > 0) {
+          return petaImages.map((petaImage) => petaImage.id);
+        }
       }
     } catch (error) {
-      log4.error(error);
+      logBuffer.error(error);
     }
-    return petaImages.map((petaImage) => petaImage.id);
+    const logFilePaths = this.parent.mainLogger.logChunk();
+    try {
+      logFilePaths.log("### 3.trying to read filePath:", datas.filePaths.length);
+      const petaImages = await this.importImagesFromFilePaths({
+        fileInfos: datas.filePaths.map((path) => ({ path })),
+        extract: true,
+      });
+      logFilePaths.log("return:", petaImages.length);
+      if (petaImages.length > 0) {
+        return petaImages.map((petaImage) => petaImage.id);
+      }
+    } catch (error) {
+      logFilePaths.error(error);
+    }
+    return [];
   }
-  async importImagesFromFilePaths(filePaths: string[], silent = false) {
-    if (filePaths.length == 0) {
+  async importImagesFromFilePaths(
+    params: {
+      fileInfos: ImportFileInfo[];
+      extract?: boolean;
+    },
+    silent = false,
+  ) {
+    if (params.fileInfos.length == 0) {
       return [];
     }
     return Tasks.spawn(
@@ -204,54 +227,57 @@ export class PetaDataPetaImages {
       async (handler) => {
         const log = this.parent.mainLogger.logChunk();
         log.log("##Import Images From File Paths");
-        log.log("###List Files", filePaths.length);
-        handler.emitStatus({
-          i18nKey: "tasks.listingFiles",
-          status: TaskStatusCode.BEGIN,
-          log: [],
-          cancelable: true,
-        });
-        // emitMainEvent("taskProgress", {
-        //   progress: 0,
-        //   file: filePaths.join("\n"),
-        //   result: ImportImageResult.LIST
-        // });
-        const _filePaths: string[] = [];
-        try {
-          for (let i = 0; i < filePaths.length; i++) {
-            const filePath = filePaths[i];
-            if (!filePath) continue;
-            const readDirResult = file.readDirRecursive(filePath, () => {
-              //
-            });
-            handler.onCancel = readDirResult.cancel;
-            _filePaths.push(...(await readDirResult.files));
-          }
-        } catch (error) {
+        const fileInfos: ImportFileInfo[] = [];
+        if (params.extract) {
+          log.log("###List Files", params.fileInfos.length);
           handler.emitStatus({
             i18nKey: "tasks.listingFiles",
-            status: TaskStatusCode.FAILED,
-            log: ["tasks.listingFiles.logs.failed"],
+            status: TaskStatusCode.BEGIN,
+            log: [],
             cancelable: true,
           });
-          return [];
+          try {
+            for (let i = 0; i < params.fileInfos.length; i++) {
+              const fileInfo = params.fileInfos[i];
+              if (!fileInfo) continue;
+              const readDirResult = file.readDirRecursive(fileInfo.path);
+              handler.onCancel = readDirResult.cancel;
+              fileInfos.push(
+                ...(await readDirResult.files).map((path) => ({
+                  path,
+                  note: fileInfo.note,
+                  name: fileInfo.name,
+                })),
+              );
+            }
+          } catch (error) {
+            handler.emitStatus({
+              i18nKey: "tasks.listingFiles",
+              status: TaskStatusCode.FAILED,
+              log: ["tasks.listingFiles.logs.failed"],
+              cancelable: true,
+            });
+            return [];
+          }
+          log.log("complete", fileInfos.length);
+        } else {
+          fileInfos.push(...params.fileInfos);
         }
-        log.log("complete", _filePaths.length);
         let addedFileCount = 0;
         let error = false;
         const petaImages: PetaImage[] = [];
-        const importImage = async (filePath: string, index: number) => {
-          log.log("import:", index + 1, "/", _filePaths.length);
+        const importImage = async (fileInfo: ImportFileInfo, index: number) => {
+          log.log("import:", index + 1, "/", fileInfos.length);
           let result = ImportImageResult.SUCCESS;
           try {
-            const data = await file.readFile(filePath);
-            const name = Path.basename(filePath);
-            const fileDate = (await file.stat(filePath)).mtime;
+            const data = await file.readFile(fileInfo.path);
+            const name = Path.basename(fileInfo.path);
+            const fileDate = (await file.stat(fileInfo.path)).mtime;
             const addResult = await this.addImage({
               data,
-              name,
+              name: fileInfo.name ?? name,
               fileDate,
-              note: "",
+              note: fileInfo.note ?? "",
             });
             if (addResult.exists) {
               result = ImportImageResult.EXISTS;
@@ -270,97 +296,31 @@ export class PetaDataPetaImages {
           handler.emitStatus({
             i18nKey: "tasks.importingFiles",
             progress: {
-              all: _filePaths.length,
+              all: fileInfos.length,
               current: index + 1,
             },
-            log: [result, filePath],
+            log: [result, fileInfo.path],
             status: TaskStatusCode.PROGRESS,
             cancelable: true,
           });
         };
-        const result = ppa(importImage, _filePaths);
+        const result = ppa(importImage, fileInfos);
         handler.onCancel = result.cancel;
         try {
           await result.promise;
         } catch (err) {
           //
         }
-        log.log("return:", addedFileCount, "/", _filePaths.length);
+        log.log("return:", addedFileCount, "/", fileInfos.length);
         handler.emitStatus({
           i18nKey: "tasks.importingFiles",
-          log: [addedFileCount.toString(), _filePaths.length.toString()],
+          log: [addedFileCount.toString(), fileInfos.length.toString()],
           status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
         });
         return petaImages;
       },
       {},
       silent,
-    );
-  }
-  async importImagesFromBuffers(datas: { buffer: Buffer; name: string; note: string }[]) {
-    return Tasks.spawn(
-      "ImportImagesFromBuffers",
-      async (handler) => {
-        handler.emitStatus({
-          i18nKey: "tasks.importingFiles",
-          log: [],
-          status: TaskStatusCode.BEGIN,
-        });
-        const log = this.parent.mainLogger.logChunk();
-        log.log("##Import Images From Buffers");
-        log.log("buffers:", datas.length);
-        let addedFileCount = 0;
-        let error = false;
-        const petaImages: PetaImage[] = [];
-        const importImage = async (
-          data: { buffer: Buffer; name: string; note: string },
-          index: number,
-        ) => {
-          log.log("import:", index + 1, "/", datas.length);
-          let result = ImportImageResult.SUCCESS;
-          try {
-            const importResult = await this.addImage({
-              data: data.buffer,
-              name: data.name,
-              note: data.note,
-            });
-            if (importResult.exists) {
-              result = ImportImageResult.EXISTS;
-              petaImages.push(importResult.petaImage);
-            } else {
-              await this.updatePetaImages([importResult.petaImage], UpdateMode.INSERT, true);
-              addedFileCount++;
-              petaImages.push(importResult.petaImage);
-            }
-            log.log("imported", data.name, result);
-          } catch (err) {
-            log.error(err);
-            result = ImportImageResult.ERROR;
-            error = true;
-          }
-          handler.emitStatus({
-            i18nKey: "tasks.importingFiles",
-            progress: {
-              all: datas.length,
-              current: index + 1,
-            },
-            log: [result, data.name],
-            status: TaskStatusCode.PROGRESS,
-          });
-        };
-        const result = ppa(importImage, datas);
-        handler.onCancel = result.cancel;
-        await result.promise;
-        log.log("return:", addedFileCount, "/", datas.length);
-        handler.emitStatus({
-          i18nKey: "tasks.importingFiles",
-          log: [addedFileCount.toString(), datas.length.toString()],
-          status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
-        });
-        return petaImages;
-      },
-      {},
-      false,
     );
   }
   async regenerateMetadatas() {
@@ -454,4 +414,10 @@ export class PetaDataPetaImages {
       exists: false,
     };
   }
+}
+
+interface ImportFileInfo {
+  path: string;
+  name?: string;
+  note?: string;
 }

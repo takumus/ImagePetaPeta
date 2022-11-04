@@ -264,7 +264,10 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             const result = await dialog.showOpenDialog(window.window, {
               properties: ["openFile", "multiSelections"],
             });
-            petaDatas.petaImages.importImagesFromFilePaths(result.filePaths);
+            petaDatas.petaImages.importImagesFromFilePaths({
+              fileInfos: result.filePaths.map((path) => ({ path })),
+              extract: true,
+            });
             return result.filePaths.length;
           }
           return 0;
@@ -279,7 +282,10 @@ import { LogFrom } from "@/mainProcess/storages/logger";
                 properties: ["openDirectory"],
               })
             ).filePaths;
-            petaDatas.petaImages.importImagesFromFilePaths(filePaths);
+            petaDatas.petaImages.importImagesFromFilePaths({
+              fileInfos: filePaths.map((path) => ({ path })),
+              extract: true,
+            });
             return filePaths.length;
           }
           return 0;
@@ -288,17 +294,11 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           const log = mainLogger.logChunk();
           try {
             log.log("#Import Images From Clipboard");
-            return (
-              await petaDatas.petaImages.importImagesFromBuffers(
-                buffers.map((buffer) => {
-                  return {
-                    buffer: buffer,
-                    name: "clipboard",
-                    note: "",
-                  };
-                }),
-              )
-            ).map((petaImage) => petaImage.id);
+            return await petaDatas.petaImages.importImages({
+              htmls: [],
+              filePaths: [],
+              buffers,
+            });
           } catch (error) {
             log.error(error);
           }
