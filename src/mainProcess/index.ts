@@ -758,6 +758,18 @@ import { LogFrom } from "@/mainProcess/storages/logger";
               ", filePaths:",
               datas.filePaths.length,
             );
+            const logFromBrowser = mainLogger.logChunk();
+            const ids = datas.filePaths
+              .filter(
+                (filePath) => Path.resolve(Path.dirname(filePath)) === Path.resolve(DIR_IMAGES),
+              )
+              .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
+            logFromBrowser.log("## From Browser");
+            if (ids.length > 0 && ids.length === datas.filePaths.length) {
+              logFromBrowser.log("## From Browser");
+              logFromBrowser.log("return:", ids.length);
+              return ids;
+            }
             let petaImageIds = await petaDatas.petaImages.importImagesFromHTMLs(datas.htmls);
             if (petaImageIds.length === 0) {
               petaImageIds = await petaDatas.petaImages.importImagesFromBuffers(datas.buffers);
