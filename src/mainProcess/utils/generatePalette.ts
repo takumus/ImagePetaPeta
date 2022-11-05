@@ -1,5 +1,5 @@
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgb2ciede } from "@csstools/convert-colors";
+import { ciede } from "@/commons/utils/colors";
 import quantize from "quantize";
 function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
@@ -17,9 +17,9 @@ function createPixels(buffer: Buffer, pixelCount: number) {
 }
 export function getSimplePalette(imageData: { buffer: Buffer; width: number; height: number }) {
   const palette = getPalette({
-    sample: 2000,
+    sample: 1000,
     mergeCIEDiff: 15,
-    fixColorCIEDiff: 3,
+    fixColorCIEDiff: 8,
     ...imageData,
   });
   return palette;
@@ -55,7 +55,7 @@ export function getPalette(imageData: {
   });
   for (let i = 0; i < colors.length; i++) {
     for (let ii = i + 1; ii < colors.length; ii++) {
-      const cieDiff = getDiff(colors[i]!, colors[ii]!);
+      const cieDiff = ciede(colors[i]!, colors[ii]!);
       if (cieDiff < imageData.mergeCIEDiff) {
         colors.splice(ii, 1);
         ii--;
@@ -73,7 +73,7 @@ export function getPalette(imageData: {
       const rc = pixels[i]!;
       const y = Math.floor(i / imageData.width);
       const x = i % imageData.width;
-      const cieDiff = rgb2ciede(rc, [color.r, color.g, color.b]);
+      const cieDiff = ciede(rc, [color.r, color.g, color.b]);
       if (cieDiff < imageData.fixColorCIEDiff) {
         color.population++;
         positions.push({ x, y });
@@ -127,7 +127,4 @@ export function getPalette(imageData: {
     .sort((a, b) => {
       return b.population - a.population;
     });
-}
-function getDiff(color1: PetaColor, color2: PetaColor) {
-  return rgb2ciede([color1.r, color1.g, color1.b], [color2.r, color2.g, color2.b]);
 }
