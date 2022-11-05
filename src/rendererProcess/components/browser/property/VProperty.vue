@@ -393,7 +393,7 @@ t-property-root {
         margin: var(--px0) 0px;
         > t-name {
           display: block;
-          width: 30%;
+          width: 35%;
           position: relative;
           text-align: right;
           padding: 0px var(--px0);
@@ -401,7 +401,7 @@ t-property-root {
         > t-value {
           padding: 0px var(--px0);
           display: block;
-          width: 70%;
+          width: 65%;
           word-break: break-word;
         }
       }
