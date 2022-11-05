@@ -58,7 +58,7 @@
             :key="color.id"
             :style="{
               backgroundColor: `rgb(${color.color.r}, ${color.color.g}, ${color.color.b})`,
-              flex: Math.floor(color.population * 80 + 20),
+              flex: Math.floor(color.population * 90 + 10),
             }"
             @click="changeCurrentColor(color.color)"
           >

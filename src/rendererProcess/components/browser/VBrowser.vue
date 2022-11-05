@@ -108,8 +108,7 @@ import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
-import { ciede } from "@/commons/utils/colors";
-import { hex2rgb } from "@pixi/utils";
+import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { debounce } from "throttle-debounce";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
@@ -138,7 +137,7 @@ const keyboards = useKeyboardsStore();
 const defines = useDefinesStore().defines;
 const filteredPetaImages = ref<PetaImage[]>([]);
 const ignoreScrollEvent = ref(false);
-const currentColor = ref("");
+const currentColor = ref("#ffffff");
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -383,6 +382,7 @@ async function openDetail(petaImage: PetaImage) {
 function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;
 }
+let ciedeCache: { [key: string]: number } = {};
 function sort(a: PetaImage, b: PetaImage) {
   switch (sortMode.value) {
     case "ADD_DATE": {
@@ -395,19 +395,28 @@ function sort(a: PetaImage, b: PetaImage) {
       return b.palette.length - a.palette.length;
     }
     case "SIMILAR": {
-      const rgb = hex2rgb(parseInt(currentColor.value.replace("#", "0x"))).map(
-        (v) => v * 255,
-      ) as any;
+      const rgb = hex2rgb(currentColor.value);
       // console.log(rgb);
-      return ciede(a.palette[0]!, rgb) - ciede(b.palette[0]!, rgb);
+      const ciedeA = ciedeCache[a.id] ?? (ciedeCache[a.id] = calcCiedeFromPalette(a, rgb));
+      const ciedeB = ciedeCache[b.id] ?? (ciedeCache[b.id] = calcCiedeFromPalette(b, rgb));
+      return ciedeA - ciedeB;
     }
   }
+}
+function calcCiedeFromPalette(petaImage: PetaImage, rgb: { r: number; g: number; b: number }) {
+  const populations = petaImage.palette.reduce((num, color) => num + color.population, 0);
+  return Math.min(
+    ...petaImage.palette
+      .filter((pc) => pc.population / populations > 0.2)
+      .map((pc) => ciede(pc, rgb)),
+  );
 }
 const fetchFilteredPetaImages = (() => {
   let fetchId = 0;
   return async () => {
     const currentFetchId = ++fetchId;
     if (selectedPetaTagIds.value.length === 0) {
+      ciedeCache = {};
       filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
       return;
     }
@@ -419,6 +428,7 @@ const fetchFilteredPetaImages = (() => {
     if (currentFetchId !== fetchId) {
       return;
     }
+    ciedeCache = {};
     filteredPetaImages.value = (
       Array.from(
         new Set(
