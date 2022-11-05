@@ -1,20 +1,26 @@
 import colorDiff from "color-diff";
 import * as convert from "color-convert";
 function _ciede(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number {
-  return colorDiff.diff(
-    colorDiff.rgb_to_lab({
-      R: r1,
-      G: g1,
-      B: b1,
-    }),
-    colorDiff.rgb_to_lab({
-      R: r2,
-      G: g2,
-      B: b2,
-    }),
-  );
+  return colorDiff.diff(getLab(r1, g1, b1), getLab(r2, g2, b2));
 }
-export function ciede(color1: Color, color2: Color) {
+const getLab = (() => {
+  const labCache: { [key: string | number]: colorDiff.LabColor } = {};
+  return (r: number, g: number, b: number) => {
+    const key = (r << 16) | (g << 8) | b;
+    return (
+      labCache[key] ??
+      (labCache[key] = colorDiff.rgb_to_lab({
+        R: r,
+        G: g,
+        B: b,
+      }))
+    );
+  };
+})();
+export function ciede(color1?: Color, color2?: Color) {
+  if (color1 === undefined || color2 === undefined) {
+    return 200;
+  }
   return _ciede(...toArrayColor(color1), ...toArrayColor(color2));
 }
 export function rgb2hsl(color: Color) {
