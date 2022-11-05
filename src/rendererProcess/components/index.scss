@@ -67,6 +67,49 @@ t-root {
       background-color: var(--color-hover);
     }
   }
+  input[type="checkbox"] {
+    margin: 0px;
+    --checkbox-width: 3em;
+    --checkbox-height: 1.5em;
+    --checkbox-background-color: var(--color-main);
+    --checkbox-checked-background-color: var(--color-hover);
+    --checkbox-button-color: var(--color-border);
+    --checkbox-checked-button-color: var(--color-border);
+    --checkbox-border-color: var(--color-border);
+    --checkbox-checked-border-color: var(--color-border);
+    --checkbox-border-size: 1.5px;
+
+    cursor: pointer;
+    appearance: none;
+    display: inline-block;
+    transition-duration: 200ms;
+    box-sizing: border-box;
+
+    /*  */
+    width: var(--checkbox-width);
+    height: var(--checkbox-height);
+    line-height: var(--checkbox-height);
+
+    background-color: var(--checkbox-button-color);
+    border-radius: 9999px;
+    border: var(--checkbox-border-size) solid var(--checkbox-border-color);
+    box-shadow: inset 0px 0px 0px var(--checkbox-background-color),
+      inset calc(var(--checkbox-height) * -1) 0px 0px var(--checkbox-background-color);
+  }
+  input[type="checkbox"]:checked {
+    background-color: var(--checkbox-checked-button-color);
+    border: var(--checkbox-border-size) solid var(--checkbox-checked-border-color);
+    box-shadow: inset var(--checkbox-height) 0px 0px var(--checkbox-checked-background-color),
+      inset 0px 0px 0px var(--checkbox-background-color);
+  }
+  input[type="checkbox"]:disabled {
+    opacity: 0.5;
+  }
+  label {
+    display: flex;
+    gap: 0px var(--px0);
+    align-items: center;
+  }
 }
 // 全適用
 *,
@@ -83,5 +126,7 @@ html {
   margin: 0px;
   padding: 0px;
   font-size: 12px;
-  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  line-height: 12px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
+    sans-serif;
 }
