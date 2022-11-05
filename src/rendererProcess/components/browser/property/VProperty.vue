@@ -69,7 +69,7 @@
             ><t-name>RGB:</t-name> <t-value> {{ toRGB(currentColor) }}</t-value></t-color-label
           >
           <t-color-label
-            ><t-name>HEX:</t-name> <t-value> {{ toHEX(currentColor) }}</t-value></t-color-label
+            ><t-name>HEX:</t-name> <t-value> #{{ toHEX(currentColor) }}</t-value></t-color-label
           >
           <t-color-label
             ><t-name>HSL:</t-name> <t-value> {{ toHSL(currentColor) }}</t-value></t-color-label
