@@ -3,14 +3,14 @@ import * as file from "@/mainProcess/storages/file";
 import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 import { PetaColor } from "@/commons/datas/petaColor";
 import Path from "path";
-import { ppa } from "@/commons/utils/pp";
+import { promiseSerial } from "@/commons/utils/promiseSerial";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fileConfig = require("../../files.config");
 (async () => {
   const files = await file.readdir("./src/test/sample_images");
   console.time("time");
   const palettes: { palette: PetaColor[]; allPalette: PetaColor[]; path: string }[] = [];
-  await ppa(async (f) => {
+  await promiseSerial(async (f) => {
     try {
       const label = f.substring(0, 10);
       console.time(label);
@@ -28,7 +28,7 @@ const fileConfig = require("../../files.config");
       });
       console.timeEnd(label);
     } catch (error) {
-      //
+      console.log(error);
     }
   }, files).promise;
   console.timeEnd("time");

@@ -25,6 +25,7 @@
             <select v-model="sortMode">
               <option v-for="sm in sortModes" :key="sm" :value="sm">{{ sm }}</option>
             </select>
+            <input type="color" v-model="currentColor" />
             <input
               type="range"
               v-model="thumbnailsSize"
@@ -107,6 +108,9 @@ import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
+import { ciede } from "@/commons/utils/colors";
+import { hex2rgb } from "@pixi/utils";
+import { debounce } from "throttle-debounce";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -122,7 +126,7 @@ const areaMinY = ref(0);
 const areaPreVisibleMaxY = ref(0);
 const areaPreVisibleMinY = ref(0);
 const scrollAreaHeight = ref(0);
-const sortModes = ["ADD_DATE", "COLOR_NUM"] as const;
+const sortModes = ["ADD_DATE", "COLOR_NUM", "SIMILAR"] as const;
 const sortMode = ref<typeof sortModes[number]>("ADD_DATE");
 const thumbnailsResizerStore = useResizerStore();
 const scrollAreaResizerStore = useResizerStore();
@@ -134,6 +138,7 @@ const keyboards = useKeyboardsStore();
 const defines = useDefinesStore().defines;
 const filteredPetaImages = ref<PetaImage[]>([]);
 const ignoreScrollEvent = ref(false);
+const currentColor = ref("");
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -389,6 +394,13 @@ function sort(a: PetaImage, b: PetaImage) {
     case "COLOR_NUM": {
       return b.palette.length - a.palette.length;
     }
+    case "SIMILAR": {
+      const rgb = hex2rgb(parseInt(currentColor.value.replace("#", "0x"))).map(
+        (v) => v * 255,
+      ) as any;
+      // console.log(rgb);
+      return ciede(a.palette[0]!, rgb) - ciede(b.palette[0]!, rgb);
+    }
   }
 }
 const fetchFilteredPetaImages = (() => {
@@ -561,6 +573,12 @@ watch(selectedPetaTagIds, () => {
 watch(petaImagesArray, fetchFilteredPetaImages);
 watch(petaTagsStore.state.petaTags, fetchFilteredPetaImages);
 watch(sortMode, fetchFilteredPetaImages);
+const f = debounce(200, fetchFilteredPetaImages);
+watch(currentColor, () => {
+  if (sortMode.value === "SIMILAR") {
+    f();
+  }
+});
 watch(thumbnailsSize, restoreScrollPosition);
 </script>
 
