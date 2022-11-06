@@ -6,6 +6,7 @@ const ja = {
     browser: "ブラウザ",
     boards: "ボード",
     settings: "設定",
+    capture: "キャプチャ",
     eula: "はじめにお読みください",
   },
   commons: {

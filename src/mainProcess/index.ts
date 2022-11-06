@@ -8,6 +8,7 @@ import {
   protocol,
   nativeImage,
   nativeTheme,
+  desktopCapturer,
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
@@ -845,6 +846,17 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           } else {
             app.quit();
           }
+        },
+        async getMediaSources() {
+          return (await desktopCapturer.getSources({ types: ["window", "screen"] })).map(
+            (source) => {
+              return {
+                name: source.name,
+                id: source.id,
+                thumbnailDataURL: source.thumbnail.toDataURL(),
+              };
+            },
+          );
         },
       };
     }

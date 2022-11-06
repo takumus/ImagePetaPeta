@@ -42,6 +42,8 @@ export class Windows {
       this.changeMainWindow(WindowType.BROWSER);
     } else if (this.activeWindows.details) {
       this.changeMainWindow(WindowType.DETAILS);
+    } else if (this.activeWindows.capture) {
+      this.changeMainWindow(WindowType.CAPTURE);
     } else {
       if (process.platform !== "darwin") {
         app.quit();
@@ -98,7 +100,12 @@ export class Windows {
     });
     window.addListener("focus", () => {
       this.emitMainEvent("windowFocused", true, type);
-      if (type === WindowType.BOARD || type === WindowType.BROWSER || type === WindowType.DETAILS) {
+      if (
+        type === WindowType.BOARD ||
+        type === WindowType.BROWSER ||
+        type === WindowType.DETAILS ||
+        type === WindowType.CAPTURE
+      ) {
         this.changeMainWindow(type);
       }
       window.moveTop();
@@ -162,6 +169,19 @@ export class Windows {
     return this.createWindow(WindowType.DETAILS, {
       width: this.configWindowStates.data.details?.width,
       height: this.configWindowStates.data.details?.height,
+      trafficLightPosition: {
+        x: 8,
+        y: 8,
+      },
+      x,
+      y,
+      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+    });
+  }
+  initCaptureWindow(x?: number, y?: number) {
+    return this.createWindow(WindowType.CAPTURE, {
+      width: this.configWindowStates.data.capture?.width,
+      height: this.configWindowStates.data.capture?.height,
       trafficLightPosition: {
         x: 8,
         y: 8,
@@ -259,6 +279,9 @@ export class Windows {
           break;
         case WindowType.DETAILS:
           this.windows[windowType] = this.initDetailsWindow(position.x, position.y);
+          break;
+        case WindowType.CAPTURE:
+          this.windows[windowType] = this.initCaptureWindow(position.x, position.y);
           break;
         case WindowType.EULA:
           this.windows[windowType] = this.initEULAWindow(position.x, position.y);

@@ -4,4 +4,5 @@ export enum WindowType {
   SETTINGS = "settings",
   DETAILS = "details",
   EULA = "eula",
+  CAPTURE = "capture",
 }

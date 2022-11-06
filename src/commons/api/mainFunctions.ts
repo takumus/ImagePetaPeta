@@ -67,5 +67,6 @@ export interface MainFunctions {
   getIsDarkMode: () => Promise<boolean>;
   getIsDataInitialized: () => Promise<boolean>;
   getLatestVersion: () => Promise<RemoteBinaryInfo>;
+  getMediaSources: () => Promise<{ name: string; id: string; thumbnailDataURL: string }[]>;
   eula: (agree: boolean) => Promise<void>;
 }

@@ -5,14 +5,14 @@
     </t-property>
     <t-commons class="left" v-if="visible">
       <button
-        v-if="windowType === 'browser' || windowType === 'details'"
+        v-if="windowType === 'browser' || windowType === 'details' || windowType === 'capture'"
         tabindex="-1"
         @click="openBoard()"
       >
         <t-icon class="board"></t-icon>
       </button>
       <button
-        v-if="windowType === 'board' || windowType === 'details'"
+        v-if="windowType === 'board' || windowType === 'details' || windowType === 'capture'"
         tabindex="-1"
         @click="openBrowser()"
       >
@@ -22,6 +22,9 @@
         <t-icon class="import-file"></t-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
+        <t-icon class="import-folder"></t-icon>
+      </button>
+      <button v-if="windowType !== 'capture'" tabindex="-1" @click="openCapture()">
         <t-icon class="import-folder"></t-icon>
       </button>
     </t-commons>
@@ -60,6 +63,9 @@ function openBrowser() {
 }
 function openSettings() {
   API.send("openWindow", WindowType.SETTINGS);
+}
+function openCapture() {
+  API.send("openWindow", WindowType.CAPTURE);
 }
 function importImageFiles() {
   API.send("importImageFiles");
