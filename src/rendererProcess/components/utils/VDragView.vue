@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 // Vue
-import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
+import { BOARD_ZOOM_MAX } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
