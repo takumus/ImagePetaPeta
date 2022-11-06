@@ -848,15 +848,13 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
         },
         async getMediaSources() {
-          return (await desktopCapturer.getSources({ types: ["window", "screen"] })).map(
-            (source) => {
-              return {
-                name: source.name,
-                id: source.id,
-                thumbnailDataURL: source.thumbnail.toDataURL(),
-              };
-            },
-          );
+          return (await desktopCapturer.getSources({ types: ["screen"] })).map((source) => {
+            return {
+              name: source.name,
+              id: source.id,
+              thumbnailDataURL: source.thumbnail.toDataURL(),
+            };
+          });
         },
       };
     }

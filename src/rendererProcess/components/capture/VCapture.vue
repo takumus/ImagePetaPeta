@@ -5,52 +5,77 @@
       zIndex: zIndex,
     }"
   >
-    <video
-      ref="video"
-      :style="{
-        width: '100%',
-        // height: '256px',
-      }"
-    ></video>
+    <!-- <select v-model="currentSource">
+      <option v-for="source in sources" :key="source.id" :value="source">{{ source.name }}</option>
+    </select> -->
+    <video ref="video"></video>
+    <t-thumbnails
+      ><img
+        v-for="source in sources"
+        :key="source.id"
+        :src="source.thumbnailDataURL"
+        @click="currentSource = source"
+        :class="{
+          selected: source === currentSource,
+        }"
+        draggable="false"
+      />
+    </t-thumbnails>
   </t-details-root>
 </template>
 
 <script setup lang="ts">
 // Vue
 import { API } from "@/rendererProcess/api";
-import { ref, onMounted } from "vue";
-const props = defineProps<{
+import { ref, onMounted, watch } from "vue";
+import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+// const props =
+defineProps<{
   zIndex: number;
 }>();
 const detailsRoot = ref<HTMLElement>();
 const video = ref<HTMLVideoElement>();
-onMounted(() => {
-  props;
-  (async () => {
-    const sources = await API.send("getMediaSources");
-    const source = sources[0];
-    if (source === undefined) {
-      return;
-    }
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        mandatory: {
-          chromeMediaSource: "desktop",
-          chromeMediaSourceId: source.id,
-          maxFrameRate: 60,
-        },
-      },
-    } as any);
-    if (video.value) {
-      video.value.srcObject = stream;
-      video.value.onloadedmetadata = (e) => video.value?.play();
-      setInterval(() => {
-        console.log(stream.getVideoTracks()[0]?.getSettings());
-      }, 1000);
-    }
-  })();
+const sources = ref<MediaSourceInfo[]>([]);
+const currentSource = ref<MediaSourceInfo>();
+const mediaStream = ref<MediaStream>();
+onMounted(async () => {
+  sources.value = await API.send("getMediaSources");
+  currentSource.value = sources.value[0];
 });
+function stopSource() {
+  if (mediaStream.value === undefined) {
+    return;
+  }
+  try {
+    mediaStream.value.getVideoTracks().forEach((track) => {
+      track.stop();
+    });
+  } catch {
+    //
+  }
+}
+async function changeSource() {
+  stopSource();
+  if (currentSource.value === undefined || video.value === undefined) {
+    return;
+  }
+  mediaStream.value = await navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: {
+      mandatory: {
+        chromeMediaSource: "desktop",
+        chromeMediaSourceId: currentSource.value.id,
+        maxFrameRate: 60,
+        // minWidth: 1280,
+        // minHeight: 720,
+      },
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any,
+  });
+  video.value.srcObject = mediaStream.value;
+  video.value.play();
+}
+watch(currentSource, changeSource);
 </script>
 
 <style lang="scss" scoped>
@@ -58,8 +83,37 @@ t-details-root {
   position: relative;
   width: 100%;
   height: 100%;
-  display: block;
+  display: flex;
+  flex-direction: column;
   background-image: url("~@/@assets/transparentBackground.png");
   overflow: hidden;
+  > input {
+    display: block;
+  }
+  > video {
+    display: block;
+    flex: 1;
+    overflow: hidden;
+  }
+  > t-thumbnails {
+    background-color: var(--color-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--px1);
+    height: 128px;
+    > img {
+      height: 100%;
+      display: block;
+      margin-right: var(--px1);
+      cursor: pointer;
+      border-radius: var(--rounded);
+      overflow: hidden;
+      filter: brightness(0.5);
+      &.selected {
+        filter: brightness(1);
+      }
+    }
+  }
 }
 </style>

@@ -9,6 +9,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
+import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
   importImageFiles: () => Promise<number>;
@@ -67,6 +68,6 @@ export interface MainFunctions {
   getIsDarkMode: () => Promise<boolean>;
   getIsDataInitialized: () => Promise<boolean>;
   getLatestVersion: () => Promise<RemoteBinaryInfo>;
-  getMediaSources: () => Promise<{ name: string; id: string; thumbnailDataURL: string }[]>;
+  getMediaSources: () => Promise<MediaSourceInfo[]>;
   eula: (agree: boolean) => Promise<void>;
 }
