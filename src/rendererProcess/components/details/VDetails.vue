@@ -10,7 +10,14 @@
     </VDragView>
     <!-- 1pxだけ右下から出すとスムーズなズームが出来る。ブラウザの仕様。 -->
     <t-smooth>
-      <img :src="url" draggable="false" />
+      <img
+        :src="url"
+        draggable="false"
+        :style="{
+          width: petaImage.width + 'px',
+          height: petaImage.height + 'px',
+        }"
+      />
     </t-smooth>
   </t-details-root>
 </template>
@@ -73,6 +80,8 @@ t-details-root {
     position: absolute;
     top: calc(100% - 1px);
     left: calc(100% - 1px);
+    width: 1px;
+    height: 1px;
     opacity: 0.1%;
   }
 }
