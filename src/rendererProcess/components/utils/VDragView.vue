@@ -38,7 +38,7 @@ const settingsStore = useSettingsStore();
 const resizerStore = useResizerStore();
 const pointerPosition = new Vec2();
 const dragging = ref(false);
-let fitToOutside = false;
+let fitToOutside = true;
 onMounted(() => {
   detailsRoot.value?.addEventListener("mousewheel", wheel as (e: Event) => void);
   detailsRoot.value?.addEventListener("pointerdown", pointerdown);
@@ -60,13 +60,13 @@ onUnmounted(() => {
 function resize(rect: DOMRect | DOMRectReadOnly) {
   mouseOffset.set(detailsRoot.value?.getBoundingClientRect());
   stageRect.value.set(rect.width, rect.height);
-  if (!fitToOutside) {
+  if (fitToOutside) {
     reset();
   }
   constraint();
 }
 function reset() {
-  fitToOutside = false;
+  fitToOutside = true;
   scale.value = defaultScale.value;
   position.value.x = (-props.contentWidth * defaultScale.value) / 2;
   position.value.y = (-props.contentHeight * defaultScale.value) / 2;
@@ -82,7 +82,7 @@ function pointermove(event: PointerEvent) {
   if (!dragging.value) {
     return;
   }
-  fitToOutside = true;
+  fitToOutside = false;
   const p = vec2FromPointerEvent(event);
   const vec = p.clone().sub(pointerPosition);
   position.value.add(vec);
@@ -93,7 +93,7 @@ function constraint() {
   // スケールが小さすぎたらデフォルトに
   if (scale.value < defaultScale.value) {
     scale.value = defaultScale.value;
-    fitToOutside = false;
+    fitToOutside = true;
   }
   // 左側がはみ出たら修正
   if (position.value.x + stageRect.value.x / 2 > 0) {
@@ -155,8 +155,8 @@ function wheel(event: WheelEvent) {
         .mult(-0.01),
     );
   }
+  fitToOutside = false;
   constraint();
-  fitToOutside = true;
 }
 const defaultScale = computed(() => {
   let width = 0;
