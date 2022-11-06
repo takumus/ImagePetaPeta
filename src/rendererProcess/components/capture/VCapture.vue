@@ -8,7 +8,15 @@
     <!-- <select v-model="currentSource">
       <option v-for="source in sources" :key="source.id" :value="source">{{ source.name }}</option>
     </select> -->
-    <video ref="video"></video>
+    <t-video>
+      <VDragView
+        v-if="currentSource?.size"
+        :contentWidth="currentSource.size.width"
+        :contentHeight="currentSource.size.height"
+      >
+        <video ref="video"></video>
+      </VDragView>
+    </t-video>
     <t-thumbnails
       ><img
         v-for="source in sources"
@@ -29,6 +37,7 @@
 import { API } from "@/rendererProcess/api";
 import { ref, onMounted, watch } from "vue";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+import VDragView from "@/rendererProcess/components/utils/VDragView.vue";
 // const props =
 defineProps<{
   zIndex: number;
@@ -56,9 +65,10 @@ function stopSource() {
 }
 async function changeSource() {
   stopSource();
-  if (currentSource.value === undefined || video.value === undefined) {
+  if (currentSource.value === undefined) {
     return;
   }
+  console.log("change source:", currentSource.value);
   mediaStream.value = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
@@ -66,14 +76,16 @@ async function changeSource() {
         chromeMediaSource: "desktop",
         chromeMediaSourceId: currentSource.value.id,
         maxFrameRate: 60,
-        // minWidth: 1280,
-        // minHeight: 720,
+        minWidth: currentSource.value.size?.width,
+        minHeight: currentSource.value.size?.height,
       },
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    } as any,
-  });
-  video.value.srcObject = mediaStream.value;
-  video.value.play();
+    },
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  } as any);
+  if (video.value !== undefined) {
+    video.value.srcObject = mediaStream.value;
+    video.value.play();
+  }
 }
 watch(currentSource, changeSource);
 </script>
@@ -90,10 +102,14 @@ t-details-root {
   > input {
     display: block;
   }
-  > video {
+  > t-video {
     display: block;
     flex: 1;
     overflow: hidden;
+  }
+  video {
+    width: 100%;
+    height: 100%;
   }
   > t-thumbnails {
     background-color: var(--color-main);
