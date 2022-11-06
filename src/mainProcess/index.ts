@@ -9,6 +9,7 @@ import {
   nativeImage,
   nativeTheme,
   desktopCapturer,
+  screen,
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
@@ -848,13 +849,23 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
         },
         async getMediaSources() {
-          return (await desktopCapturer.getSources({ types: ["screen"] })).map((source) => {
-            return {
-              name: source.name,
-              id: source.id,
-              thumbnailDataURL: source.thumbnail.toDataURL(),
-            };
-          });
+          const displaySizes = screen.getAllDisplays().reduce(
+            (displaySizes, display) => ({
+              ...displaySizes,
+              [display.id.toString()]: {
+                width: display.size.width * display.scaleFactor,
+                height: display.size.height * display.scaleFactor,
+                scale: display.scaleFactor,
+              },
+            }),
+            {} as { [key: string]: { width: number; height: number; scale: number } },
+          );
+          return (await desktopCapturer.getSources({ types: ["screen"] })).map((source) => ({
+            name: source.name,
+            id: source.id,
+            thumbnailDataURL: source.thumbnail.toDataURL(),
+            size: displaySizes[source.display_id],
+          }));
         },
       };
     }
