@@ -8,6 +8,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { WindowType } from "@/commons/datas/windowType";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
+import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 export interface MainFunctions {
   showMainWindow: () => Promise<void>;
   importImageFiles: () => Promise<number>;
@@ -24,7 +25,7 @@ export interface MainFunctions {
   getPetaBoards: () => Promise<{ [petaBoardId: string]: PetaBoard }>;
   updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
-  getPetaImageIdsByPetaTagIds: (petaTagIds?: string[]) => Promise<string[]>;
+  getPetaImageIds: (params: GetPetaImageIdsParams) => Promise<string[]>;
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
   getPetaTagCounts: () => Promise<{ [petaTagId: string]: number }>;
   getPetaTags: () => Promise<PetaTag[]>;

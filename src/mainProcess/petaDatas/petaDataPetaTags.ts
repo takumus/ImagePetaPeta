@@ -7,6 +7,7 @@ import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaIm
 import { PetaTag } from "@/commons/datas/petaTag";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/api/interfaces/task";
+import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 export class PetaDataPetaTags {
   constructor(private parent: PetaDatas) {}
   async updatePetaTags(tags: PetaTag[], mode: UpdateMode, silent = false) {
@@ -88,18 +89,14 @@ export class PetaDataPetaTags {
       silent,
     );
   }
-  async getPetaImageIdsByPetaTagIds(petaTagIds: string[] | undefined) {
-    const log = this.parent.mainLogger.logChunk();
+  async getPetaImageIds(params: GetPetaImageIdsParams) {
     // all
-    if (!petaTagIds) {
-      log.log("type: all");
+    if (params.type === "all") {
       const ids = (await this.parent.datas.dbPetaImages.find({})).map((pi) => pi.id);
-      log.log("return:", ids.length);
       return ids;
     }
     // untagged
-    if (petaTagIds.length === 0) {
-      log.log("type: untagged");
+    if (params.type === "untagged") {
       const taggedIds = Array.from(
         new Set(
           (await this.parent.datas.dbPetaImagesPetaTags.find({})).map((pipt) => {
@@ -117,28 +114,30 @@ export class PetaDataPetaTags {
       return ids;
     }
     // filter by ids
-    log.log("type: filter");
-    const pipts = await this.parent.datas.dbPetaImagesPetaTags.find({
-      $or: petaTagIds.map((id) => {
-        return {
-          petaTagId: id,
-        };
-      }),
-    });
-    const ids = Array.from(
-      new Set(
-        pipts.map((pipt) => {
-          return pipt.petaImageId;
+    if (params.type === "petaTag") {
+      const pipts = await this.parent.datas.dbPetaImagesPetaTags.find({
+        $or: params.petaTagIds.map((id) => {
+          return {
+            petaTagId: id,
+          };
         }),
-      ),
-    ).filter((id) => {
-      return (
-        pipts.filter((pipt) => {
-          return pipt.petaImageId === id;
-        }).length === petaTagIds.length
-      );
-    });
-    return ids;
+      });
+      const ids = Array.from(
+        new Set(
+          pipts.map((pipt) => {
+            return pipt.petaImageId;
+          }),
+        ),
+      ).filter((id) => {
+        return (
+          pipts.filter((pipt) => {
+            return pipt.petaImageId === id;
+          }).length === params.petaTagIds.length
+        );
+      });
+      return ids;
+    }
+    return [];
   }
   async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
     // const log = this.parent.mainLogger.logChunk();

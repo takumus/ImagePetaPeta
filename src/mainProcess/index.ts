@@ -430,11 +430,12 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
           return false;
         },
-        async getPetaImageIdsByPetaTagIds(event, petaTagIds) {
+        async getPetaImageIds(event, params) {
           const log = mainLogger.logChunk();
           try {
-            log.log("#Get PetaImageIds By PetaTagIds");
-            const ids = await petaDatas.petaTags.getPetaImageIdsByPetaTagIds(petaTagIds);
+            log.log("#Get PetaImageIds");
+            log.log("type:", params.type);
+            const ids = await petaDatas.petaTags.getPetaImageIds(params);
             log.log("return:", ids.length);
             return ids;
           } catch (error) {
@@ -442,7 +443,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             showError({
               category: "M",
               code: 100,
-              title: "Get PetaImageIds By PetaTagIds Error",
+              title: "Get PetaImageIds Error",
               message: String(error),
             });
           }
@@ -766,7 +767,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
               .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
             logFromBrowser.log("## From Browser");
             if (ids.length > 0 && ids.length === datas.filePaths.length) {
-              logFromBrowser.log("## From Browser");
               logFromBrowser.log("return:", ids.length);
               return ids;
             }

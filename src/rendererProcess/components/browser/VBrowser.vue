@@ -415,16 +415,22 @@ const fetchFilteredPetaImages = (() => {
   let fetchId = 0;
   return async () => {
     const currentFetchId = ++fetchId;
-    if (selectedPetaTagIds.value.length === 0) {
-      ciedeCache = {};
-      filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
-      return;
-    }
-    const untagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
+    // if (selectedPetaTagIds.value.length === 0) {
+    //   ciedeCache = {};
+    //   filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
+    //   return;
+    // }
+    const selectedUntagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
+    console.time("fetch" + currentFetchId);
     const results = await API.send(
-      "getPetaImageIdsByPetaTagIds",
-      untagged ? [] : selectedPetaTagIds.value,
+      "getPetaImageIds",
+      selectedUntagged !== undefined
+        ? { type: "untagged" }
+        : selectedPetaTagIds.value.length > 0
+        ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
+        : { type: "all" },
     );
+    console.timeEnd("fetch" + currentFetchId);
     if (currentFetchId !== fetchId) {
       return;
     }
@@ -583,7 +589,7 @@ watch(selectedPetaTagIds, () => {
 watch(petaImagesArray, fetchFilteredPetaImages);
 watch(petaTagsStore.state.petaTags, fetchFilteredPetaImages);
 watch(sortMode, fetchFilteredPetaImages);
-const f = debounce(200, fetchFilteredPetaImages);
+const f = debounce(100, fetchFilteredPetaImages);
 watch(currentColor, () => {
   if (sortMode.value === "SIMILAR") {
     f();
