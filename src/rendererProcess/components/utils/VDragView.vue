@@ -38,7 +38,7 @@ const settingsStore = useSettingsStore();
 const resizerStore = useResizerStore();
 const pointerPosition = new Vec2();
 const dragging = ref(false);
-let moved = false;
+let fitToOutside = false;
 onMounted(() => {
   detailsRoot.value?.addEventListener("mousewheel", wheel as (e: Event) => void);
   detailsRoot.value?.addEventListener("pointerdown", pointerdown);
@@ -60,12 +60,13 @@ onUnmounted(() => {
 function resize(rect: DOMRect | DOMRectReadOnly) {
   mouseOffset.set(detailsRoot.value?.getBoundingClientRect());
   stageRect.value.set(rect.width, rect.height);
-  if (!moved) {
+  if (!fitToOutside) {
     reset();
   }
+  constraint();
 }
 function reset() {
-  moved = false;
+  fitToOutside = false;
   scale.value = defaultScale.value;
   position.value.x = (-props.contentWidth * defaultScale.value) / 2;
   position.value.y = (-props.contentHeight * defaultScale.value) / 2;
@@ -81,11 +82,57 @@ function pointermove(event: PointerEvent) {
   if (!dragging.value) {
     return;
   }
-  moved = true;
+  fitToOutside = true;
   const p = vec2FromPointerEvent(event);
   const vec = p.clone().sub(pointerPosition);
   position.value.add(vec);
   pointerPosition.set(p);
+  constraint();
+}
+function constraint() {
+  // スケールが小さすぎたらデフォルトに
+  if (scale.value < defaultScale.value) {
+    scale.value = defaultScale.value;
+    fitToOutside = false;
+  }
+  // 左側がはみ出たら修正
+  if (position.value.x + stageRect.value.x / 2 > 0) {
+    position.value.x = -stageRect.value.x / 2;
+  }
+  // 右がはみ出たら修正
+  if (
+    props.contentWidth * scale.value +
+      position.value.x +
+      stageRect.value.x / 2 -
+      stageRect.value.x <
+    0
+  ) {
+    position.value.x =
+      -props.contentWidth * scale.value - (stageRect.value.x / 2 - stageRect.value.x);
+  }
+  // 上がはみ出たら修正
+  if (position.value.y + stageRect.value.y / 2 > 0) {
+    position.value.y = -stageRect.value.y / 2;
+  }
+  // 下がはみ出たら修正
+  if (
+    props.contentHeight * scale.value +
+      position.value.y +
+      stageRect.value.y / 2 -
+      stageRect.value.y <
+    0
+  ) {
+    position.value.y =
+      -props.contentHeight * scale.value - (stageRect.value.y / 2 - stageRect.value.y);
+  }
+  // 左右がはみ出たら中心へ
+  if (props.contentWidth * scale.value < stageRect.value.x) {
+    position.value.x = (-props.contentWidth * scale.value) / 2;
+  }
+  // 上下がはみ出たら中心へ
+  if (props.contentHeight * scale.value < stageRect.value.y) {
+    position.value.y = (-props.contentHeight * scale.value) / 2;
+  }
 }
 function wheel(event: WheelEvent) {
   const mouse = vec2FromPointerEvent(event).sub(mouseOffset).sub(stageRect.value.clone().div(2));
@@ -94,8 +141,6 @@ function wheel(event: WheelEvent) {
     scale.value *= 1 + -event.deltaY * settingsStore.state.value.zoomSensitivity * 0.00001;
     if (scale.value > BOARD_ZOOM_MAX) {
       scale.value = BOARD_ZOOM_MAX;
-    } else if (scale.value < BOARD_ZOOM_MIN) {
-      scale.value = BOARD_ZOOM_MIN;
     }
     position.value
       .mult(-1)
@@ -110,7 +155,8 @@ function wheel(event: WheelEvent) {
         .mult(-0.01),
     );
   }
-  moved = true;
+  constraint();
+  fitToOutside = true;
 }
 const defaultScale = computed(() => {
   let width = 0;
