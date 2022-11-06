@@ -96,14 +96,14 @@ t-utils-bar-root {
   position: relative;
   background-color: var(--color-main);
   min-height: 30px;
-  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 1.5px 1px 0px rgba(0, 0, 0, 0.3);
   border-bottom: solid 1px var(--color-main);
   display: block;
   z-index: 2;
   > t-commons {
     position: absolute;
     top: 0px;
-    height: 30px;
+    height: 100%;
     padding: var(--px0);
     display: flex;
     flex-shrink: 1;

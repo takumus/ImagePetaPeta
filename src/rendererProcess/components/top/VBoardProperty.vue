@@ -1,27 +1,7 @@
 <template>
   <t-board-property-root>
     <button tabindex="-1" @click="scale = 1">{{ scale.toFixed(2) }}x</button>
-    <button
-      class="color"
-      tabindex="-1"
-      :style="{
-        backgroundColor: fillColor,
-      }"
-      @click="inputFillColor?.click()"
-    >
-      &nbsp;
-    </button>
     <input type="color" v-model="fillColor" tabindex="-1" ref="inputFillColor" />
-    <button
-      class="color"
-      tabindex="-1"
-      :style="{
-        backgroundColor: lineColor,
-      }"
-      @click="inputLineColor?.click()"
-    >
-      &nbsp;
-    </button>
     <input type="color" v-model="lineColor" tabindex="-1" ref="inputLineColor" />
   </t-board-property-root>
 </template>
@@ -91,30 +71,24 @@ t-board-property-root {
   height: 100%;
   width: 100%;
   padding: var(--px0);
-  text-align: center;
-  > input {
-    display: inline-block;
-    width: 0px;
-    height: 0px;
-    overflow: hidden;
-    position: relative;
-    margin: 0px;
-    padding: 0px;
-    border: none;
-  }
+  align-items: center;
+  justify-content: center;
+  display: flex;
   > button {
     min-width: 24px;
     padding: 0px;
     height: 100%;
-    margin: 0px;
     min-width: 50px;
-    margin-right: var(--px0);
     &.color {
       border-radius: 100px;
       width: auto;
       min-width: 0px;
       aspect-ratio: 1;
     }
+  }
+  > * {
+    margin: 0px;
+    margin-right: var(--px0);
   }
 }
 </style>
