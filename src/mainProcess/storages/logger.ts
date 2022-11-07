@@ -10,11 +10,14 @@ export class Logger {
       this.open();
       const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})`;
       if (this.logFile) {
-        this.logFile.write(date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n", (error) => {
-          if (error) {
-            console.log("Could not write logfile", error);
-          }
-        });
+        this.logFile.write(
+          date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n",
+          (error) => {
+            if (error) {
+              console.log("Could not write logfile", error);
+            }
+          },
+        );
       }
       console.log(date, ...args);
     } catch (error) {
@@ -52,5 +55,5 @@ export class Logger {
 }
 export enum LogFrom {
   MAIN = "MAIN",
-  RENDERER = "REND",
+  RENDERER = "RENDERER",
 }
