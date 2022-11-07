@@ -169,6 +169,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
       windows.emitMainEvent("darkMode", isDarkMode());
     });
     windows.showWindows();
+    checkUpdate();
     //-------------------------------------------------------------------------------------------------//
     /*
       データベースのロード
