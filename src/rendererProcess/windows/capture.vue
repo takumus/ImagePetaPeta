@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 // Vue
-import { onMounted, ref } from "vue";
+import { watch } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
@@ -30,17 +30,21 @@ import VCapture from "@/rendererProcess/components/capture/VCapture.vue";
 // Others
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
-const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();
-const title = ref("");
-onMounted(() => {
-  title.value = `${t("titles.capture")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
-  document.title = title.value;
-});
+const windowTypeStore = useWindowTypeStore();
+const windowTitleStore = useWindowTitleStore();
+const appInfoStore = useAppInfoStore();
+watch(
+  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>

@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 // Vue
-import { nextTick, onMounted, ref } from "vue";
+import { watch } from "vue";
 // Components
 import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
@@ -34,25 +34,25 @@ import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { API } from "@/rendererProcess/api";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
+const windowTypeStore = useWindowTypeStore();
+const windowTitleStore = useWindowTitleStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
-const title = ref("");
-onMounted(async () => {
-  title.value = `${t("titles.browser")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
-  document.title = title.value;
-  nextTick(() => {
-    API.send("showMainWindow");
-  });
-});
+watch(
+  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>

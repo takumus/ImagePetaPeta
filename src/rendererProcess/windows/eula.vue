@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, onMounted, ref } from "vue";
+import { computed, watch } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
@@ -38,17 +38,14 @@ import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
 import { useSettingsStore } from "../stores/settingsStore";
 import { EULA } from "@/commons/defines";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();
 const settings = useSettingsStore();
-const title = ref("");
-onMounted(() => {
-  title.value = `${t("titles.eula")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
-  document.title = title.value;
-});
+const windowTypeStore = useWindowTypeStore();
+const windowTitleStore = useWindowTitleStore();
 function agree() {
   API.send("eula", true);
 }
@@ -61,6 +58,13 @@ function close() {
 const needToAgree = computed(() => {
   return settings.state.value.eula !== EULA;
 });
+watch(
+  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>

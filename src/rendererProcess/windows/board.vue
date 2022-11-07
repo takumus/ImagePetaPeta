@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 // Components
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
@@ -80,12 +80,16 @@ import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { hasPetaImages } from "@/commons/utils/board";
 import { usePetaBoardsStore } from "@/rendererProcess/stores/petaBoardsStore";
 import VFramerate from "@/rendererProcess/components/utils/VFramerate.vue";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
+const windowTypeStore = useWindowTypeStore();
+const windowTitleStore = useWindowTitleStore();
 const petaImagesStore = usePetaImagesStore();
 const petaBoardsStore = usePetaBoardsStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
@@ -115,13 +119,7 @@ onMounted(async () => {
       vPetaBoard.value?.orderPIXIRender();
     }
   });
-  document.title = `${t("titles.boards")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
   await restoreBoard();
-  nextTick(() => {
-    API.send("showMainWindow");
-  });
 });
 async function restoreBoard() {
   const states = await API.send("getStates");
@@ -231,6 +229,13 @@ watch(
       vPetaBoard.value?.orderPIXIRender();
     }
   },
+);
+watch(
+  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
 );
 </script>
 

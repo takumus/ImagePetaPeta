@@ -4,7 +4,7 @@ const ja = {
   titles: {
     details: "詳細",
     browser: "ブラウザ",
-    boards: "ボード",
+    board: "ボード",
     settings: "設定",
     capture: "キャプチャ",
     eula: "はじめにお読みください",

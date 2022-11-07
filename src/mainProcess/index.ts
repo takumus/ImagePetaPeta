@@ -255,9 +255,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
       ) => ReturnType<MainFunctions[P]>;
     } {
       return {
-        async showMainWindow() {
-          checkUpdate();
-        },
         async importImageFiles(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");

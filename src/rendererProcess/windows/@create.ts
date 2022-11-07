@@ -29,6 +29,10 @@ import {
   componentsStoreKey,
   createComponentsStore,
 } from "@/rendererProcess/stores/componentsStore";
+import {
+  createWindowTitleStore,
+  windowTitleStoreKey,
+} from "@/rendererProcess/stores/windowTitleStore";
 export async function create(
   component: Component,
   windowType: WindowType,
@@ -65,6 +69,7 @@ export async function create(
       (async () => app.provide(appInfoStoreKey, await createAppInfoStore()))(),
       (async () => app.provide(textsStoreKey, await createTextsStore()))(),
       (async () => app.provide(componentsStoreKey, await createComponentsStore()))(),
+      (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
       ...(stores?.map(async (store) => app.provide(store.key, await store.value())) || []),
     ]);
     app.mount("#app");

@@ -11,7 +11,6 @@ import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 export interface MainFunctions {
-  showMainWindow: () => Promise<void>;
   importImageFiles: () => Promise<number>;
   importImageDirectories: () => Promise<number>;
   importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;

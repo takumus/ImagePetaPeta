@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 // Components
 import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
@@ -54,17 +54,18 @@ import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
-import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import VDetails from "@/rendererProcess/components/details/VDetails.vue";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const petaImagesStore = usePetaImagesStore();
-const petaTagsStore = usePetaTagsStore();
+const windowTypeStore = useWindowTypeStore();
+const windowTitleStore = useWindowTitleStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
 const board = ref<PetaBoard>();
-const title = ref("");
 const petaImageId = ref<string>();
 const keyboards = new Keyboards();
 onMounted(async () => {
@@ -89,13 +90,6 @@ onMounted(async () => {
     petaImageId.value = petaImage.id;
   });
   petaImageId.value = (await API.send("getDetailsPetaImage"))?.id;
-  title.value = `${t("titles.details")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
-  document.title = title.value;
-  nextTick(() => {
-    API.send("showMainWindow");
-  });
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
     API.send("windowClose");
@@ -152,6 +146,13 @@ watch(petaImage, () => {
   };
   vPetaBoard.value?.load({});
 });
+watch(
+  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>

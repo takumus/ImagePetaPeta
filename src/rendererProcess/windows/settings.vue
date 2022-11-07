@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 // Vue
-import { onMounted, ref } from "vue";
+import { onMounted, watch } from "vue";
 // Components
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
@@ -28,24 +28,30 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 import { API } from "@/rendererProcess/api";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
-import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
+import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
+import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 const { t } = useI18n();
-const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();
-const title = ref("");
 const keyboards = useKeyboardsStore();
+const windowTypeStore = useWindowTypeStore();
+const windowTitleStore = useWindowTitleStore();
+const appInfoStore = useAppInfoStore();
 onMounted(() => {
-  title.value = `${t("titles.settings")} - ${appInfoStore.state.value.name} ${
-    appInfoStore.state.value.version
-  }`;
-  document.title = title.value;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
     API.send("windowClose");
   });
 });
+watch(
+  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>
