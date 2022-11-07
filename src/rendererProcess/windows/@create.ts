@@ -8,15 +8,27 @@ import { WindowType } from "@/commons/datas/windowType";
 
 import { createDarkModeStore, darkModeStoreKey } from "@/rendererProcess/stores/darkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/rendererProcess/stores/nsfwStore";
-import { createWindowTypeStore, windowTypeStoreKey } from "@/rendererProcess/stores/windowTypeStore";
+import {
+  createWindowTypeStore,
+  windowTypeStoreKey,
+} from "@/rendererProcess/stores/windowTypeStore";
 import { createDefinesStore, definesStoreKey } from "@/rendererProcess/stores/definesStore";
-import { createSystemInfoStore, systemInfoStoreKey } from "@/rendererProcess/stores/systemInfoStore";
-import { createWindowStatusStore, windowStatusStoreKey } from "@/rendererProcess/stores/windowStatusStore";
+import {
+  createSystemInfoStore,
+  systemInfoStoreKey,
+} from "@/rendererProcess/stores/systemInfoStore";
+import {
+  createWindowStatusStore,
+  windowStatusStoreKey,
+} from "@/rendererProcess/stores/windowStatusStore";
 import { createStatesStore, statesStoreKey } from "@/rendererProcess/stores/statesStore";
 import { settingsStoreKey, createSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { appInfoStoreKey, createAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { textsStoreKey, createTextsStore } from "@/rendererProcess/stores/textsStore";
-import { componentsStoreKey, createComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import {
+  componentsStoreKey,
+  createComponentsStore,
+} from "@/rendererProcess/stores/componentsStore";
 export async function create(
   component: Component,
   windowType: WindowType,
@@ -28,7 +40,7 @@ export async function create(
       return;
     }
     initialized = true;
-    logChunk().log(`window "${windowType}" init`);
+    logChunk().log(`$Window "${windowType}" init`);
     const app = createApp(component);
     async function appUse(plugin: Plugin) {
       return await plugin.install?.(app);
