@@ -124,12 +124,14 @@ let changeResolutionIntervalHandler = -1;
 const currentBoard = ref<PetaBoard>();
 onMounted(() => {
   constructIfResolutionChanged();
+  resizerStore.on("resize", resize);
+  resizerStore.observe(panelsBackground.value);
   pTransformer.updatePetaPanels = updatePetaPanels;
   keyboards.enabled = true;
   keyboards.keys("Delete").down(removeSelectedPanels);
   keyboards.keys("Backspace").down(removeSelectedPanels);
   keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
-  changeResolutionIntervalHandler = window.setInterval(constructIfResolutionChanged, 1000);
+  changeResolutionIntervalHandler = window.setInterval(constructIfResolutionChanged, 500);
 });
 onUnmounted(() => {
   destruct();
@@ -173,8 +175,11 @@ function construct(resolution?: number) {
   panelsBackground.value?.appendChild(pixi.view);
   pixi.stage.interactive = true;
   pixi.ticker.stop();
-  resizerStore.on("resize", resize);
-  resizerStore.observe(panelsBackground.value);
+  pixi.view.addEventListener("webglcontextlost", (e) => {
+    logChunk().error("WEBGL_lose_context", e);
+    API.send("reloadWindow");
+  });
+  resizerStore.forceEmit();
   renderPIXI();
   PIXI.Ticker.shared.add(updateAnimatedGIF);
 }

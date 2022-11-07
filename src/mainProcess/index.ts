@@ -792,7 +792,16 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           return [];
         },
         async openWindow(event, windowType) {
+          const log = mainLogger.logChunk();
+          log.log("#Open Window");
+          log.log("type:", windowType);
           windows.openWindow(windowType, event);
+        },
+        async reloadWindow(event) {
+          const log = mainLogger.logChunk();
+          log.log("#Reload Window");
+          const type = windows.reloadWindowByEvent(event);
+          log.log("type:", type);
         },
         async getMainWindowType() {
           return windows.mainWindowType;
