@@ -250,6 +250,21 @@ export class Windows {
     }
     return undefined;
   }
+  reloadWindow(type: WindowType) {
+    try {
+      this.windows[type]?.reload();
+    } catch {
+      //
+    }
+  }
+  reloadWindowByEvent(event: IpcMainInvokeEvent) {
+    const type = this.getWindowByEvent(event)?.type;
+    if (type === undefined) {
+      return undefined;
+    }
+    this.reloadWindow(type);
+    return type;
+  }
   openWindow(windowType: WindowType, event?: IpcMainInvokeEvent) {
     const position = new Vec2();
     try {
