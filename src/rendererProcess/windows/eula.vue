@@ -65,7 +65,7 @@ const needToAgree = computed(() => {
 
 <style lang="scss" scoped>
 t-root {
-  background-color: var(--color-main);
+  background-color: var(--color-0);
   color: var(--color-font);
   > t-content {
     position: fixed;
@@ -83,8 +83,8 @@ t-root {
     > t-browser {
       display: block;
       overflow-y: auto;
-      margin: var(--px2);
-      background-color: var(--color-main);
+      margin: var(--px-3);
+      background-color: var(--color-0);
       flex: 1;
       z-index: 1;
       > t-body {

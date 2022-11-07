@@ -69,7 +69,7 @@ const isMac = computed(() => {
 t-titlebar-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
-  background-color: var(--color-sub);
+  background-color: var(--color-1);
   min-height: var(--tab-height);
   display: flex;
   position: relative;
@@ -130,7 +130,7 @@ t-titlebar-root {
         font-family: Segoe MDL2 Assets;
       }
       &:hover {
-        background-color: var(--color-hover);
+        background-color: var(--color-2);
         &.close {
           color: var(--color-window-button);
           background-color: var(--window-buttons-close-hover);

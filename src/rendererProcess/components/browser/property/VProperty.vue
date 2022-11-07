@@ -390,16 +390,16 @@ t-property-root {
       overflow-y: auto;
       > t-data {
         display: flex;
-        margin: var(--px0) 0px;
+        margin: var(--px-1) 0px;
         > t-name {
           display: block;
           width: 35%;
           position: relative;
           text-align: right;
-          padding: 0px var(--px0);
+          padding: 0px var(--px-1);
         }
         > t-value {
-          padding: 0px var(--px0);
+          padding: 0px var(--px-1);
           display: block;
           width: 65%;
           word-break: break-word;
@@ -409,17 +409,17 @@ t-property-root {
   }
   > t-colors {
     > t-palette {
-      padding: var(--px1);
+      padding: var(--px-2);
       display: block;
       width: 100%;
       t-color-wrapper {
         display: flex;
         border-radius: var(--rounded);
-        height: var(--px1);
+        height: var(--px-2);
         width: 100%;
         overflow: hidden;
-        margin: var(--px-1) 0px;
-        box-shadow: 0px 0px 0px var(--px-1) var(--color-border);
+        margin: var(--px-0) 0px;
+        box-shadow: 0px 0px 0px var(--px-0) var(--color-border);
         > t-color {
           height: 100%;
           display: block;
@@ -434,16 +434,16 @@ t-property-root {
         flex-direction: column;
         > t-color-label {
           display: flex;
-          margin: var(--px0) 0px;
+          margin: var(--px-1) 0px;
           > t-name {
             display: block;
             width: 30%;
             position: relative;
             text-align: right;
-            padding: 0px var(--px0);
+            padding: 0px var(--px-1);
           }
           > t-value {
-            padding: 0px var(--px0);
+            padding: 0px var(--px-1);
             display: block;
             width: 70%;
             word-break: break-word;
@@ -460,7 +460,7 @@ t-property-root {
     min-height: 128px;
     > t-search-box {
       outline: none;
-      padding: var(--px0) var(--px0) 0px 0px;
+      padding: var(--px-1) var(--px-1) 0px 0px;
       width: 100%;
       word-break: break-word;
       text-align: left;
@@ -471,10 +471,10 @@ t-property-root {
       overflow-y: auto;
       > t-tag {
         display: inline-block;
-        margin: 0px 0px var(--px0) var(--px0);
+        margin: 0px 0px var(--px-1) var(--px-1);
         border-radius: var(--rounded);
-        padding: var(--px0);
-        background-color: var(--color-sub);
+        padding: var(--px-1);
+        background-color: var(--color-1);
         &.last {
           width: 100%;
           background-color: unset;
@@ -488,7 +488,7 @@ t-property-root {
   }
   p {
     text-align: center;
-    margin: var(--px0) 0px;
+    margin: var(--px-1) 0px;
   }
 }
 </style>

@@ -146,7 +146,7 @@ t-previews-root {
   }
   p {
     text-align: center;
-    margin: var(--px0) 0px;
+    margin: var(--px-1) 0px;
   }
 }
 </style>

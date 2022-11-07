@@ -370,7 +370,7 @@ t-crop-root {
     display: block;
     position: absolute;
     transform: translateX(-50%);
-    bottom: var(--px1);
+    bottom: var(--px-2);
     left: 50%;
   }
 }

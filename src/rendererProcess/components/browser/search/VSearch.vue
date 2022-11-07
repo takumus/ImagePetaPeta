@@ -124,7 +124,7 @@ t-search-root {
     border-radius: var(--rounded);
     border: solid 1.2px var(--color-border);
     outline: none;
-    padding: var(--px0) var(--px0) 0px 0px;
+    padding: var(--px-1) var(--px-1) 0px 0px;
     width: 100%;
     height: 100%;
     word-break: break-word;
@@ -137,10 +137,10 @@ t-search-root {
     justify-content: center;
     > t-tag {
       display: inline-block;
-      margin: 0px 0px var(--px0) var(--px0);
+      margin: 0px 0px var(--px-1) var(--px-1);
       border-radius: var(--rounded);
-      padding: var(--px0);
-      background-color: var(--color-sub);
+      padding: var(--px-1);
+      background-color: var(--color-1);
       // border: solid 1.2px var(--color-border);
       &.last {
         width: 100%;

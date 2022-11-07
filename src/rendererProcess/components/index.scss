@@ -6,33 +6,37 @@ t-root {
   --size-0: 0.8em;
   --size-1: 1em;
   --size-2: 1.2em;
-  --px-1: 2px;
-  --px0: 4px;
-  --px1: 8px;
-  --px2: 16px;
-  --px3: 32px;
+  --px-0: 2px;
+  --px-1: 4px;
+  --px-2: 8px;
+  --px-3: 16px;
+  --px-4: 32px;
   --color-window-button: #ffffff;
   // 明るいモード
   & {
-    --color-main: #ffffff;
-    --color-sub: #f1f1f1;
-    --color-hover: #d9d9d9;
+    --color-0: #ffffff;
+    --color-0-float: #ffffff;
+    --color-1: #eeeeee;
+    --color-2: #dedede;
+    --color-accent: rgb(206, 240, 255);
     --color-border: #999999;
-    --color-modal: #00000070;
+    --color-overlay: #00000070;
     --color-font: #1a1a1a;
     --filter-icon: brightness(0.7) invert(100%);
-    --shadow: 0px 0px var(--px0) var(--px1) rgba(0, 0, 0, 0.3);
+    --shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3);
   }
   // ダークモード
   &.dark {
-    --color-main: #141414;
-    --color-sub: #272727;
-    --color-hover: #333333;
+    --color-0: #141414;
+    --color-0-float: #1d1d1d;
+    --color-1: #272727;
+    --color-2: #343434;
+    --color-accent: rgb(41, 85, 112);
     --color-border: #5c5c5c;
-    --color-modal: #ffffff30;
+    --color-overlay: #ffffff30;
     --color-font: #d3d3d3;
     --filter-icon: unset;
-    --shadow: 0px 0px var(--px0) var(--px1) rgba(0, 0, 0, 0.5);
+    --shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.5);
   }
 }
 // 共通スタイル
@@ -43,36 +47,36 @@ t-root {
   ::-webkit-scrollbar-thumb {
     background-color: var(--color-border);
     border-radius: var(--rounded);
-    min-height: var(--px2);
+    min-height: var(--px-3);
   }
   button {
     display: inline-block;
     border-radius: var(--rounded);
     border: none;
-    background-color: var(--color-main);
+    background-color: var(--color-0);
     color: var(--color-font);
-    padding: var(--px0) var(--px2);
+    padding: var(--px-1) var(--px-3);
     line-height: var(--size-1);
     font-size: var(--size-1);
     cursor: pointer;
     border: solid 1.2px var(--color-border);
-    margin: var(--px0);
+    margin: var(--px-1);
     outline: none;
     overflow: hidden;
     text-overflow: ellipsis;
     &:hover {
-      background-color: var(--color-hover);
+      background-color: var(--color-2);
     }
     &:active {
-      background-color: var(--color-hover);
+      background-color: var(--color-2);
     }
   }
   input[type="checkbox"] {
-    margin: var(--px0);
+    margin: var(--px-1);
     --checkbox-width: 3em;
     --checkbox-height: 1.5em;
-    --checkbox-background-color: var(--color-main);
-    --checkbox-checked-background-color: var(--color-hover);
+    --checkbox-background-color: var(--color-0);
+    --checkbox-checked-background-color: var(--color-2);
     --checkbox-button-color: var(--color-border);
     --checkbox-checked-button-color: var(--color-border);
     --checkbox-border-color: var(--color-border);
@@ -106,7 +110,7 @@ t-root {
     opacity: 0.5;
   }
   input[type="color"] {
-    margin: var(--px0);
+    margin: var(--px-1);
     height: 1.5em;
     width: 1.5em;
     appearance: none;

@@ -100,17 +100,17 @@ t-utils-bar-root {
   --top-draggable-height: 10px;
   width: 100%;
   position: relative;
-  background-color: var(--color-main);
+  background-color: var(--color-0);
   min-height: 30px;
   box-shadow: 0px 1.5px 1px 0px rgba(0, 0, 0, 0.3);
-  border-bottom: solid 1px var(--color-main);
+  border-bottom: solid 1px var(--color-0);
   display: block;
   z-index: 2;
   > t-commons {
     position: absolute;
     top: 0px;
     height: 100%;
-    padding: var(--px0);
+    padding: var(--px-1);
     display: flex;
     flex-shrink: 1;
     text-align: left;
@@ -118,13 +118,13 @@ t-utils-bar-root {
     &.left {
       left: 0px;
       button {
-        margin-right: var(--px0);
+        margin-right: var(--px-1);
       }
     }
     &.right {
       right: 0px;
       button {
-        margin-left: var(--px0);
+        margin-left: var(--px-1);
       }
     }
     &.left,

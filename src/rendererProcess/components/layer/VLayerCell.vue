@@ -138,25 +138,25 @@ function pointermove(event: PointerEvent) {
 .layer-cell-root {
   cursor: pointer;
   margin: 0px;
-  padding: var(--px0);
-  background-color: var(--color-main);
+  padding: var(--px-1);
+  background-color: var(--color-0);
   display: flex;
   align-items: center;
   height: 64px;
   width: 100%;
   &.selected {
-    background-color: var(--color-hover) !important;
+    background-color: var(--color-accent) !important;
   }
   &.drag,
   &:hover {
-    background-color: var(--color-hover);
+    background-color: var(--color-accent);
   }
   &.drag {
     position: absolute;
     top: 0px;
   }
   > t-icon {
-    padding: 0px var(--px1);
+    padding: 0px var(--px-2);
     height: 100%;
     width: 24px;
     background: no-repeat;
@@ -179,7 +179,7 @@ function pointermove(event: PointerEvent) {
   > t-thumb {
     min-width: 32px;
     height: 100%;
-    margin: 0px var(--px1);
+    margin: 0px var(--px-2);
     flex: 1;
     background: no-repeat;
     background-position: center center;

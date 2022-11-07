@@ -57,7 +57,7 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 t-root {
-  background-color: var(--color-main);
+  background-color: var(--color-0);
   color: var(--color-font);
   > t-content {
     position: fixed;
@@ -75,8 +75,8 @@ t-root {
     > t-browser {
       display: block;
       overflow: hidden;
-      padding: var(--px1);
-      background-color: var(--color-main);
+      padding: var(--px-2);
+      background-color: var(--color-0);
       flex: 1;
       z-index: 1;
     }

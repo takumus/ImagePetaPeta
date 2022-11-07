@@ -112,16 +112,16 @@ t-details-root {
     height: 100%;
   }
   > t-thumbnails {
-    background-color: var(--color-main);
+    background-color: var(--color-0);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: var(--px1);
+    padding: var(--px-2);
     height: 128px;
     > img {
       height: 100%;
       display: block;
-      margin-right: var(--px1);
+      margin-right: var(--px-2);
       cursor: pointer;
       border-radius: var(--rounded);
       overflow: hidden;

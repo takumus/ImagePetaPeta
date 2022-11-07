@@ -63,7 +63,7 @@ t-dialog-root {
   height: 100%;
   top: 0px;
   left: 0px;
-  background-color: var(--color-modal);
+  background-color: var(--color-overlay);
   color: var(--color-font);
   overflow: hidden;
   display: block;
@@ -71,8 +71,8 @@ t-dialog-root {
     background-color: transparent;
   }
   > t-modal {
-    background-color: var(--color-main);
-    padding: var(--px2);
+    background-color: var(--color-0);
+    padding: var(--px-3);
     border-radius: var(--rounded);
     overflow: hidden;
     display: flex;

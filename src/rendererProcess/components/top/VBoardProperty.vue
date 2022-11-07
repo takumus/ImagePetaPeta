@@ -70,7 +70,7 @@ t-board-property-root {
   left: 0px;
   height: 100%;
   width: 100%;
-  padding: var(--px0);
+  padding: var(--px-1);
   align-items: center;
   justify-content: center;
   display: flex;
@@ -88,7 +88,7 @@ t-board-property-root {
   }
   > * {
     margin: 0px;
-    margin-right: var(--px0);
+    margin-right: var(--px-1);
   }
 }
 </style>

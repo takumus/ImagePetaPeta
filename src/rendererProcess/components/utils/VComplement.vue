@@ -187,7 +187,7 @@ watch(() => props.value, input);
 <style lang="scss" scoped>
 t-complement-root {
   position: fixed;
-  background-color: var(--color-main);
+  background-color: var(--color-0-float);
   margin: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   color: var(--color-font);
@@ -198,7 +198,7 @@ t-complement-root {
   left: 0px;
 
   outline: none;
-  padding: var(--px1) var(--px1) var(--px1) var(--px0);
+  padding: var(--px-2) var(--px-2) var(--px-2) var(--px-1);
   word-break: break-word;
   text-align: left;
   display: flex;
@@ -210,14 +210,14 @@ t-complement-root {
   > t-tag {
     line-height: var(--size-2);
     display: inline-block;
-    margin: 0px 0px var(--px0) var(--px0);
+    margin: 0px 0px var(--px-1) var(--px-1);
     border-radius: var(--rounded);
-    padding: var(--px0);
-    background-color: var(--color-sub);
+    padding: var(--px-1);
+    background-color: var(--color-1);
     cursor: pointer;
     &.selected,
     &.close:hover {
-      background-color: var(--color-hover);
+      background-color: var(--color-accent);
     }
     > t-char {
       display: inline;
@@ -231,7 +231,7 @@ t-complement-root {
     cursor: pointer;
     display: inline-block;
     width: 100%;
-    margin-bottom: var(--px1);
+    margin-bottom: var(--px-2);
     text-align: center;
   }
 }

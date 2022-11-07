@@ -28,6 +28,6 @@ t-framerate-root {
   position: fixed;
   left: 0px;
   bottom: 0px;
-  margin: var(--px1);
+  margin: var(--px-2);
 }
 </style>

@@ -93,7 +93,7 @@ defineExpose({
 <style lang="scss" scoped>
 .context-menu-root {
   position: fixed;
-  background-color: var(--color-main);
+  background-color: var(--color-0-float);
   padding: 0px;
   margin: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
@@ -104,21 +104,21 @@ defineExpose({
     word-break: break-word;
     list-style-type: none;
     min-width: 128px;
-    padding: var(--px1) 24px;
+    padding: var(--px-2) 24px;
     // padding-left: 24px;
     cursor: pointer;
     &:hover {
-      background-color: var(--color-hover);
+      background-color: var(--color-accent);
     }
     > .disabled {
       &:hover {
-        background-color: var(--color-main);
+        background-color: var(--color-1);
       }
     }
   }
   > .separate {
     border-bottom: solid 1px var(--color-font);
-    margin: var(--px0) var(--px1);
+    margin: var(--px-1) var(--px-2);
     height: 0px;
     overflow: hidden;
   }

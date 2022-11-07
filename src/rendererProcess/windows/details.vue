@@ -156,7 +156,7 @@ watch(petaImage, () => {
 
 <style lang="scss" scoped>
 t-root {
-  background-color: var(--color-main);
+  background-color: var(--color-0);
   color: var(--color-font);
   > t-content {
     position: fixed;
@@ -174,7 +174,7 @@ t-root {
     > t-browser {
       display: flex;
       overflow: hidden;
-      background-color: var(--color-main);
+      background-color: var(--color-0);
       flex: 1;
       z-index: 1;
       > t-board {
@@ -187,9 +187,9 @@ t-root {
         cursor: grab;
       }
       > t-property {
-        padding: var(--px1);
+        padding: var(--px-2);
         display: block;
-        background-color: var(--color-main);
+        background-color: var(--color-0);
         z-index: 2;
         width: 300px;
       }

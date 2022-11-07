@@ -136,7 +136,7 @@ t-modal-root {
   height: 100%;
   top: 0px;
   left: 0px;
-  background-color: var(--color-modal);
+  background-color: var(--color-overlay);
   color: var(--color-font);
   overflow: hidden;
   display: block;
@@ -145,8 +145,8 @@ t-modal-root {
   }
   > t-modal {
     width: 600px;
-    background-color: var(--color-main);
-    padding: var(--px2);
+    background-color: var(--color-0);
+    padding: var(--px-3);
     border-radius: var(--rounded);
     overflow: hidden;
     display: flex;

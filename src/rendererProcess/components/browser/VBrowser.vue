@@ -605,7 +605,7 @@ t-browser-root {
   display: flex;
   overflow: hidden;
   > t-left {
-    padding: var(--px1);
+    padding: var(--px-2);
     width: 200px;
     min-width: 180px;
     display: block;
@@ -615,7 +615,7 @@ t-browser-root {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    padding: var(--px1);
+    padding: var(--px-2);
     > t-content {
       width: 100%;
       height: 100%;
@@ -627,11 +627,11 @@ t-browser-root {
       > t-top {
         width: 100%;
         display: flex;
-        padding: 0px 0px var(--px1) 0px;
+        padding: 0px 0px var(--px-2) 0px;
         > t-search {
           display: block;
           flex: 1;
-          padding: 0px var(--px1);
+          padding: 0px var(--px-2);
         }
         > t-buttons {
           display: flex;
@@ -648,7 +648,7 @@ t-browser-root {
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
-        border-radius: var(--px1);
+        border-radius: var(--px-2);
         > t-tiles-content {
           display: block;
         }
@@ -658,7 +658,7 @@ t-browser-root {
   > t-right {
     width: 200px;
     min-width: 180px;
-    padding: var(--px1);
+    padding: var(--px-2);
     display: flex;
     flex-direction: column;
   }

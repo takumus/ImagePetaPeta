@@ -173,7 +173,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 t-layer-root {
-  background-color: var(--color-main);
+  background-color: var(--color-0);
   border-radius: var(--rounded);
   overflow: hidden;
   display: flex;
@@ -182,8 +182,8 @@ t-layer-root {
   right: 0px;
   bottom: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-  margin: var(--px1);
-  padding: var(--px1);
+  margin: var(--px-2);
+  padding: var(--px-2);
   top: 50%;
   width: 128px;
   &.hide {
@@ -204,7 +204,7 @@ t-layer-root {
     height: 14px;
     min-width: 14px;
     flex-shrink: 0;
-    margin-bottom: var(--px1);
+    margin-bottom: var(--px-2);
     filter: var(--filter-icon);
   }
   > t-layers-parent {

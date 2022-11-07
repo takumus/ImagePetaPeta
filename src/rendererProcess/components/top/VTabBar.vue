@@ -199,7 +199,7 @@ t-tab-root {
   --top-draggable-height: 10px;
   top: 0px;
   left: 0px;
-  background-color: var(--color-sub);
+  background-color: var(--color-1);
   color: var(--color-font);
   height: var(--tab-height);
   display: flex;
@@ -221,11 +221,11 @@ t-tab-root {
       border-left: solid 1px var(--color-border);
     }
     &.add {
-      min-width: var(--px2);
+      min-width: var(--px-3);
       border-right: none;
       flex-shrink: 0;
       > t-label-wrapper t-label {
-        padding: 0px var(--px1);
+        padding: 0px var(--px-2);
       }
     }
     &:not(.selected):not(:hover) + t-tab:not(.selected):not(:hover) {
@@ -247,11 +247,11 @@ t-tab-root {
       z-index: 2;
       border-radius: var(--rounded) var(--rounded) 0px 0px;
       overflow: visible;
-      background-color: var(--color-main);
+      background-color: var(--color-0);
       flex-shrink: 0;
       border: none;
       &:hover {
-        background-color: var(--color-main);
+        background-color: var(--color-0);
       }
       &::before,
       &::after {
@@ -264,7 +264,7 @@ t-tab-root {
         height: var(--rounded);
         border-radius: 0 0 100% 0;
         box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2)
-          var(--color-main);
+          var(--color-0);
       }
       &::after {
         left: unset;
@@ -273,7 +273,7 @@ t-tab-root {
       }
     }
     &:hover:not(.selected) {
-      background-color: var(--color-hover);
+      background-color: var(--color-2);
       overflow: visible;
       flex-shrink: 0;
       &::before,
@@ -287,7 +287,7 @@ t-tab-root {
         height: var(--rounded);
         border-radius: 0 0 100% 0;
         box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2)
-          var(--color-hover);
+          var(--color-2);
       }
       &::after {
         left: unset;
@@ -300,7 +300,7 @@ t-tab-root {
       align-items: center;
       height: 100%;
       > t-label {
-        padding: 0px var(--px1);
+        padding: 0px var(--px-2);
         flex-shrink: 1;
       }
     }

@@ -37,10 +37,10 @@ function select() {
 t-tag-cell-root {
   display: block;
   width: fit-content;
-  margin: 0px 0px var(--px0) var(--px0);
+  margin: 0px 0px var(--px-1) var(--px-1);
   border-radius: var(--rounded);
-  padding: var(--px0);
-  background-color: var(--color-sub);
+  padding: var(--px-1);
+  background-color: var(--color-1);
   &.selected {
     font-weight: bold;
     font-size: var(--size-2);
