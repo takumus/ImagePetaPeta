@@ -15,7 +15,7 @@ t-root {
   // 明るいモード
   & {
     --color-0: #ffffff;
-    --color-0-float: #ffffff;
+    --color-0-floating: #ffffff;
     --color-1: #eeeeee;
     --color-2: #dedede;
     --color-accent: rgb(206, 240, 255);
@@ -28,7 +28,7 @@ t-root {
   // ダークモード
   &.dark {
     --color-0: #141414;
-    --color-0-float: #1d1d1d;
+    --color-0-floating: #1d1d1d;
     --color-1: #272727;
     --color-2: #343434;
     --color-accent: rgb(41, 85, 112);

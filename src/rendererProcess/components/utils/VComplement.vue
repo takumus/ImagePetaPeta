@@ -1,48 +1,47 @@
 <template>
-  <t-complement-root
-    class="complement-root"
-    ref="complement"
-    v-show="props.editing && matched"
-    :style="{
-      transform: `translate(${position.x}px, ${position.y}px)`,
-      maxHeight: height,
-      zIndex: zIndex,
-    }"
+  <VFloating
+    :zIndex="zIndex"
+    :visible="props.editing && matched"
+    :maxWidth="'512px'"
+    :maxHeight="'unset'"
+    ref="floating"
   >
-    <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
-    <t-tag
-      v-for="(item, i) in filteredItems"
-      :key="item.value"
-      @pointerdown="select(item.value)"
-      @pointermove="moveSelectionAbsolute(i)"
-      @mouseleave="moveSelectionAbsolute(-1)"
-      :class="{
-        selected: i === currentIndex,
-      }"
-    >
-      <t-char
-        v-for="co in item.value.split('').map((c, i) => ({ c, i }))"
-        :key="co.i"
+    <t-complement-root class="complement-root" ref="complement">
+      <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
+      <t-tag
+        v-for="(item, i) in filteredItems"
+        :key="item.value"
+        @pointerdown="select(item.value)"
+        @pointermove="moveSelectionAbsolute(i)"
+        @mouseleave="moveSelectionAbsolute(-1)"
         :class="{
-          match: item.matches.find((range) => range[0] <= co.i && co.i <= range[1]) !== undefined,
+          selected: i === currentIndex,
         }"
       >
-        {{ co.c }}
-      </t-char>
-    </t-tag>
-  </t-complement-root>
+        <t-char
+          v-for="co in item.value.split('').map((c, i) => ({ c, i }))"
+          :key="co.i"
+          :class="{
+            match: item.matches.find((range) => range[0] <= co.i && co.i <= range[1]) !== undefined,
+          }"
+        >
+          {{ co.c }}
+        </t-char>
+      </t-tag>
+    </t-complement-root>
+  </VFloating>
 </template>
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, watch, computed, nextTick } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 
 // Others
-import { Vec2 } from "@/commons/utils/vec2";
 import { Keyboards, Keys } from "@/rendererProcess/utils/keyboards";
 import Fuse from "fuse.js";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
+import VFloating from "@/rendererProcess/components/utils/VFloating.vue";
 const props = defineProps<{
   zIndex: number;
   value: string;
@@ -56,11 +55,10 @@ const emit = defineEmits<{
 }>();
 const complement = ref<HTMLElement>();
 const filteredItems = ref<{ value: string; matches: [number, number][] }[]>([]);
-const position = ref(new Vec2(0, 0));
 const currentIndex = ref(0);
-const height = ref("unset");
 const keyboards = useKeyboardsStore();
 const textsStore = useTextsStore();
+const floating = ref<InstanceType<typeof VFloating>>();
 onMounted(() => {
   keyboards.keys("ArrowUp").down(() => {
     if (!props.editing) return;
@@ -139,22 +137,7 @@ function select(item: string) {
 }
 function updatePosition() {
   if (props.textArea) {
-    const inputRect = props.textArea.getBoundingClientRect();
-    position.value.x = inputRect.x;
-    position.value.y = inputRect.y + inputRect.height;
-    height.value = "unset";
-    nextTick(() => {
-      const rect = complement.value?.getBoundingClientRect();
-      if (rect === undefined) {
-        return;
-      }
-      if (rect.right > document.body.clientWidth) {
-        position.value.x = inputRect.x - rect.width;
-      }
-      if (rect.bottom > document.body.clientHeight) {
-        position.value.y = inputRect.y - rect.height - inputRect.height;
-      }
-    });
+    floating.value?.updateFloating(props.textArea.getBoundingClientRect());
   }
 }
 function disableUpDownKeys() {
@@ -165,9 +148,7 @@ function disableUpDownKeys() {
     }
   });
 }
-const matched = computed(() => {
-  return filteredItems.value.length > 0;
-});
+const matched = computed(() => filteredItems.value.length > 0);
 watch(
   () => props.editing,
   () => {
@@ -186,18 +167,6 @@ watch(() => props.value, input);
 
 <style lang="scss" scoped>
 t-complement-root {
-  position: fixed;
-  background-color: var(--color-0-float);
-  margin: 0px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-  color: var(--color-font);
-  border-radius: var(--rounded);
-  overflow-y: auto;
-  overflow-x: hidden;
-  top: 0px;
-  left: 0px;
-
-  outline: none;
   padding: var(--px-2) var(--px-2) var(--px-2) var(--px-1);
   word-break: break-word;
   text-align: left;
@@ -206,7 +175,6 @@ t-complement-root {
   flex-wrap: wrap;
   justify-content: center;
   overflow-y: auto;
-  max-width: 256px;
   > t-tag {
     line-height: var(--size-2);
     display: inline-block;

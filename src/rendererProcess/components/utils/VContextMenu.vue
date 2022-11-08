@@ -1,45 +1,46 @@
 <template>
-  <ul
-    v-show="show"
-    class="context-menu-root"
-    ref="contextMenu"
-    :style="{
-      transform: `translate(${position.x}px, ${position.y}px)`,
-      zIndex: zIndex,
-    }"
+  <VFloating
+    :visible="true"
+    :zIndex="zIndex"
+    :maxWidth="'512px'"
+    :maxHeight="'unset'"
+    ref="floating"
   >
-    <li
-      v-for="item in filteredItems"
-      :key="item.id"
-      @click="select(item)"
-      :class="{
-        item: !item.separate,
-        separate: item.separate,
-        disabled: item.disabled,
-      }"
-    >
-      {{ item.label }}
-    </li>
-  </ul>
+    <ul v-show="show" class="context-menu-root" ref="contextMenu">
+      <li
+        v-for="item in filteredItems"
+        :key="item.id"
+        @click="select(item)"
+        :class="{
+          item: !item.separate,
+          separate: item.separate,
+          disabled: item.disabled,
+        }"
+      >
+        {{ item.label }}
+      </li>
+    </ul>
+  </VFloating>
 </template>
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, nextTick, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import { v4 as uuid } from "uuid";
 import { ContextMenuItem } from "@/rendererProcess/components/utils/contextMenuItem";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
+import VFloating from "@/rendererProcess/components/utils/VFloating.vue";
 defineProps<{
   zIndex: number;
 }>();
 
 const contextMenu = ref<HTMLElement>();
 const items = ref<ContextMenuItem[]>([]);
-const position = ref(new Vec2(0, 0));
 const show = ref(false);
+const floating = ref<InstanceType<typeof VFloating>>();
 onMounted(() => {
   window.addEventListener("pointerdown", (event) => {
     if ((event.target as HTMLElement).parentElement != contextMenu.value) {
@@ -53,22 +54,9 @@ function open(_items: ContextMenuItem[], _position: Vec2): void {
     select();
   }
   _items.forEach((i) => (i.id = uuid()));
-  position.value.x = _position.x;
-  position.value.y = _position.y;
   items.value = _items;
   show.value = true;
-  nextTick(() => {
-    const rect = contextMenu.value?.getBoundingClientRect();
-    if (rect === undefined) {
-      return;
-    }
-    if (rect.right > document.body.clientWidth) {
-      position.value.x = _position.x - rect.width;
-    }
-    if (rect.bottom > document.body.clientHeight) {
-      position.value.y = _position.y - rect.height;
-    }
-  });
+  floating.value?.updateFloating({ ..._position, width: 0, height: 0 });
 }
 function select(item?: ContextMenuItem) {
   if (!show.value) return;
@@ -92,8 +80,6 @@ defineExpose({
 
 <style lang="scss" scoped>
 .context-menu-root {
-  position: fixed;
-  background-color: var(--color-0-float);
   padding: 0px;
   margin: 0px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
