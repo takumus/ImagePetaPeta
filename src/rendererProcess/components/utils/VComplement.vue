@@ -2,7 +2,7 @@
   <VFloating
     :zIndex="zIndex"
     :visible="props.editing && matched"
-    :maxWidth="'512px'"
+    :maxWidth="'256px'"
     :maxHeight="'unset'"
     ref="floating"
   >
