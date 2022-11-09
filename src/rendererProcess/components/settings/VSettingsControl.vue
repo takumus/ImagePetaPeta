@@ -1,10 +1,14 @@
 <template>
   <t-settings-content-root>
-    <label> {{ t("settings.zoomSensitivity") }}: </label>
-    <input type="number" v-model="settingsStore.state.value.zoomSensitivity" />
+    <label>
+      {{ t("settings.zoomSensitivity") }}:
+      <input type="number" v-model="settingsStore.state.value.zoomSensitivity"
+    /></label>
     <p>{{ t("settings.zoomSensitivityDescriptions") }}</p>
-    <label> {{ t("settings.moveSensitivity") }}: </label>
-    <input type="number" v-model="settingsStore.state.value.moveSensitivity" />
+    <label>
+      {{ t("settings.moveSensitivity") }}:
+      <input type="number" v-model="settingsStore.state.value.moveSensitivity"
+    /></label>
     <p>{{ t("settings.moveSensitivityDescriptions") }}</p>
   </t-settings-content-root>
 </template>
