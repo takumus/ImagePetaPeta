@@ -156,7 +156,7 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
+import { PetaTag } from "@/commons/datas/petaTag";
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
 import { useTextsStore } from "@/rendererProcess/stores/textsStore";
