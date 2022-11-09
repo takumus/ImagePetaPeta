@@ -21,7 +21,7 @@ export function initWebhook(
   http.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }));
   http.use(bodyParser.json({ limit: "100mb" }));
   http.use(cors());
-  http.use(IpFilter(["127.0.0.1"], { mode: "allow" }));
+  // http.use(IpFilter(["127.0.0.1"], { mode: "allow" }));
   const server = http.listen(port, () => {
     initLog(`$Webhook: opened (${port})`);
   });
@@ -29,14 +29,15 @@ export function initWebhook(
     const executeLog = mainLogger.logChunk().log;
     executeLog(`$Webhook: receive(${req.body})`);
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    const event = (mainFunctions as any)[req.body.event];
+    const eventName = req.body.event as string;
+    const event = (mainFunctions as any)[eventName];
     if (event) {
-      executeLog(`$Webhook: execute (${event})`);
+      executeLog(`$Webhook: execute (${eventName})`);
       res.json(await event(undefined, ...(req.body.args ?? [])));
-      executeLog(`$Webhook: done (${event})`);
+      executeLog(`$Webhook: done (${eventName})`);
       return;
     }
-    executeLog(`$Webhook: invalid event (${event})`);
+    executeLog(`$Webhook: invalid event (${eventName})`);
   });
   return {
     close: () => {
