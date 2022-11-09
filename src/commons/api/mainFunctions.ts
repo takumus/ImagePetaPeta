@@ -13,8 +13,7 @@ import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 export interface MainFunctions {
   importImageFiles: () => Promise<number>;
   importImageDirectories: () => Promise<number>;
-  importImagesFromClipboard: (buffer: Buffer[]) => Promise<string[]>;
-  importImagesByDragAndDrop: (datas: {
+  importImages: (datas: {
     htmls: string[];
     buffers: ArrayBuffer[];
     filePaths: string[];

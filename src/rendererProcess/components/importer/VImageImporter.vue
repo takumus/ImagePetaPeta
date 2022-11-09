@@ -26,33 +26,8 @@ onMounted(() => {
       if (html !== "") {
         htmls.push(html);
       }
-      const fileList: File[] = [];
-      for (const file of event.dataTransfer.files) {
-        fileList.push(file);
-      }
-      const filePaths = fileList
-        .map((file) => file.path)
-        .filter((path) => {
-          return path.length > 0;
-        });
-      // 空文字のpathsだったらarraybufferを読む。
-      const buffers =
-        filePaths.length > 0
-          ? []
-          : await ppa(async (file) => {
-              return file.arrayBuffer();
-            }, fileList).promise;
-      // const dropFromBrowserPetaImageIds = await API.send("getDropFromBrowserPetaImageIds");
-      // if (dropFromBrowserPetaImageIds) {
-      //   emit(
-      //     "addPanelByDragAndDrop",
-      //     dropFromBrowserPetaImageIds,
-      //     vec2FromPointerEvent(event),
-      //     true,
-      //   );
-      //   return;
-      // }
-      const ids = await API.send("importImagesByDragAndDrop", { htmls, buffers, filePaths });
+      const data = await getDataFromFileList(event.dataTransfer.files);
+      const ids = await API.send("importImages", { htmls, ...data });
       emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
     }
   });
@@ -65,23 +40,48 @@ onMounted(() => {
   });
   document.addEventListener("paste", async (event) => {
     const mousePosition = currentMousePosition.clone();
-    const items = event.clipboardData?.files;
-    if (!items || items.length < 1) {
-      return;
-    }
-    const buffers: Buffer[] = [];
-    const readBuffer = async (item: File) => {
-      const data = await item.arrayBuffer();
-      if (!data) {
-        return;
-      }
-      buffers.push(Buffer.from(data));
-    };
-    await ppa(readBuffer, [...items]).promise;
-    const ids = await API.send("importImagesFromClipboard", buffers);
+    const data = await getDataFromFileList(event.clipboardData?.files);
+    const ids = await API.send("importImages", {
+      htmls: [],
+      ...data,
+    });
     emit("addPanelByDragAndDrop", ids, mousePosition, false);
   });
 });
+async function getDataFromFileList(fileList?: FileList): Promise<{
+  buffers: Buffer[];
+  filePaths: string[];
+}> {
+  const items = [...(fileList ?? [])];
+  if (items.length === 0) {
+    return {
+      buffers: [],
+      filePaths: [],
+    };
+  }
+  if (items[0]?.path !== "") {
+    // パスがあったらファイルパスから読む。
+    return {
+      buffers: [],
+      filePaths: items.map((file) => file.path),
+    };
+  } else {
+    // 無かったらバッファーから読む
+    const buffers = (
+      await ppa(
+        async (item: File) => {
+          const data = await item.arrayBuffer();
+          if (!data) {
+            return undefined;
+          }
+          return Buffer.from(data);
+        },
+        [...items],
+      ).promise
+    ).filter((buffer) => buffer != undefined) as Buffer[];
+    return { buffers, filePaths: [] };
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

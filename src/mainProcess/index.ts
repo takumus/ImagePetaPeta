@@ -13,7 +13,7 @@ import {
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { DEFAULT_BOARD_NAME, EULA, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, EULA, UPDATE_CHECK_INTERVAL, WEBHOOK_PORT } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
@@ -36,6 +36,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { searchImageByGoogle } from "@/mainProcess/utils/searchImageByGoogle";
 import { getConstants } from "@/mainProcess/constants";
 import { LogFrom } from "@/mainProcess/storages/logger";
+import { initWebhook } from "@/mainProcess/webhook/webhook";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -246,6 +247,12 @@ import { LogFrom } from "@/mainProcess/storages/logger";
     }
     //-------------------------------------------------------------------------------------------------//
     /*
+      Webhooks
+    */
+    //-------------------------------------------------------------------------------------------------//
+    initWebhook(WEBHOOK_PORT, mainFunctions, mainLogger);
+    //-------------------------------------------------------------------------------------------------//
+    /*
       IPCのメインプロセス側のAPI
     */
     //-------------------------------------------------------------------------------------------------//
@@ -289,16 +296,6 @@ import { LogFrom } from "@/mainProcess/storages/logger";
             return filePaths.length;
           }
           return 0;
-        },
-        async importImagesFromClipboard(event, buffers) {
-          const log = mainLogger.logChunk();
-          try {
-            log.log("#Import Images From Clipboard");
-            return await petaDatas.petaImages.importImagesFromBuffers(buffers);
-          } catch (error) {
-            log.error(error);
-          }
-          return [];
         },
         async cancelTasks(event, ids) {
           const log = mainLogger.logChunk();
@@ -747,10 +744,10 @@ import { LogFrom } from "@/mainProcess/storages/logger";
           }
           return false;
         },
-        async importImagesByDragAndDrop(event, datas) {
+        async importImages(event, datas) {
           const log = mainLogger.logChunk();
           try {
-            log.log("#ImportImagesByDragAndDrop");
+            log.log("#importImages");
             log.log(
               "htmls:",
               datas.htmls.length,
