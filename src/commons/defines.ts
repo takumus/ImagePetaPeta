@@ -49,3 +49,4 @@ export const SEARCH_IMAGE_BY_GOOGLE_TIMEOUT = 10 * 1000;
 export const EULA = 2;
 export const TASK_CLOSE_DELAY = 200;
 export const WEBHOOK_PORT = 51915;
+export const WEBHOOK_WHITELIST_IP_LIST = ["127.0.0.1", "::ffff:127.0.0.1", "::1"];

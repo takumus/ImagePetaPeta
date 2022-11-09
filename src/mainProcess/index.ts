@@ -13,7 +13,7 @@ import {
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { DEFAULT_BOARD_NAME, EULA, UPDATE_CHECK_INTERVAL, WEBHOOK_PORT } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, EULA, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
@@ -251,7 +251,7 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
     */
     //-------------------------------------------------------------------------------------------------//
     if (configSettings.data.developerMode) {
-      initWebhook(WEBHOOK_PORT, mainFunctions, mainLogger);
+      initWebhook(mainFunctions, mainLogger);
     }
     //-------------------------------------------------------------------------------------------------//
     /*
