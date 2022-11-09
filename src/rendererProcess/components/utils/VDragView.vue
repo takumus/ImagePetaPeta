@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 // Vue
-import { BOARD_ZOOM_MAX } from "@/commons/defines";
+import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
@@ -90,11 +90,6 @@ function pointermove(event: PointerEvent) {
   constraint();
 }
 function constraint() {
-  // スケールが小さすぎたらデフォルトに
-  if (scale.value < defaultScale.value) {
-    scale.value = defaultScale.value;
-    fitToOutside = true;
-  }
   // 左側がはみ出たら修正
   if (position.value.x + stageRect.value.x / 2 > 0) {
     position.value.x = -stageRect.value.x / 2;
@@ -141,6 +136,9 @@ function wheel(event: WheelEvent) {
     scale.value *= 1 + -event.deltaY * settingsStore.state.value.zoomSensitivity * 0.00001;
     if (scale.value > BOARD_ZOOM_MAX) {
       scale.value = BOARD_ZOOM_MAX;
+    }
+    if (scale.value < BOARD_ZOOM_MIN) {
+      scale.value = BOARD_ZOOM_MIN;
     }
     position.value
       .mult(-1)
