@@ -48,3 +48,4 @@ export const PETAIMAGE_METADATA_VERSION = 1.7;
 export const SEARCH_IMAGE_BY_GOOGLE_TIMEOUT = 10 * 1000;
 export const EULA = 2;
 export const TASK_CLOSE_DELAY = 200;
+export const WEBHOOK_PORT = 51915;
