@@ -192,6 +192,9 @@ const ja = {
     updateButton: "アップデートする",
     checkUpdateButton: "アップデート確認",
     releaseNoteButton: "リリースノートを確認",
+    developerMode: "開発者モード",
+    developerModeDescriptions:
+      "開発者モードを有効にすると51915ポートを使用し、ローカルにAPIを公開します。変更後は再起動が必要です。",
     changePetaImageDirectoryDialog: (ctx: any) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;
     },

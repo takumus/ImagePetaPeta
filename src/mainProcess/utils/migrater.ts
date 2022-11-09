@@ -12,7 +12,6 @@ import {
 } from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
 import DB from "@/mainProcess/storages/db";
-import deepcopy from "deepcopy";
 import { v4 as uuid } from "uuid";
 const defaultSettings = getDefaultSettings();
 export function migratePetaImage(petaImage: PetaImage) {
@@ -119,6 +118,10 @@ export function migrateSettings(settings: Settings) {
   }
   if (settings.eula === undefined) {
     settings.eula = 0;
+    changed = true;
+  }
+  if (settings.developerMode === undefined) {
+    settings.developerMode = false;
     changed = true;
   }
   return {

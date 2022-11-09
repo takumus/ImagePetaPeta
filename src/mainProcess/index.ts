@@ -250,7 +250,9 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
       Webhooks
     */
     //-------------------------------------------------------------------------------------------------//
-    initWebhook(WEBHOOK_PORT, mainFunctions, mainLogger);
+    if (configSettings.data.developerMode) {
+      initWebhook(WEBHOOK_PORT, mainFunctions, mainLogger);
+    }
     //-------------------------------------------------------------------------------------------------//
     /*
       IPCのメインプロセス側のAPI
