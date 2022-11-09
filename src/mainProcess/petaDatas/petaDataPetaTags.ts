@@ -188,9 +188,10 @@ export class PetaDataPetaTags {
   }
   async getPetaTagCounts() {
     const petaTags = await this.parent.datas.dbPetaTags.find({});
+    const petaImagesPetaTags = await this.parent.datas.dbPetaImagesPetaTags.find({});
     const taggedIds = Array.from(
       new Set(
-        (await this.parent.datas.dbPetaImagesPetaTags.find({})).map((pipt) => {
+        petaImagesPetaTags.map((pipt) => {
           return pipt.petaImageId;
         }),
       ),
@@ -201,11 +202,11 @@ export class PetaDataPetaTags {
       },
     });
     const petaTagCounts: { [id: string]: number } = {};
-    await ppa(async (petaTag) => {
-      petaTagCounts[petaTag.id] = await this.parent.datas.dbPetaImagesPetaTags.count({
-        petaTagId: petaTag.id,
-      });
-    }, petaTags).promise;
+    petaTags.forEach((petaTag) => {
+      petaTagCounts[petaTag.id] = petaImagesPetaTags.filter(
+        (pipt) => pipt.petaTagId === petaTag.id,
+      ).length;
+    });
     petaTagCounts[UNTAGGED_ID] = count;
     return petaTagCounts;
   }
