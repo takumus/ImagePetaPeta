@@ -18,7 +18,7 @@
       >
         <t-icon class="browser"></t-icon>
       </button>
-      <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageFiles()">
+      <button v-if="windowType !== 'details'" tabindex="-1" @click="browseAndImportImageFiles()">
         <t-icon class="import-file"></t-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
@@ -67,11 +67,11 @@ function openSettings() {
 function openCapture() {
   API.send("openWindow", WindowType.CAPTURE);
 }
-function importImageFiles() {
-  API.send("importImageFiles");
+function browseAndImportImageFiles() {
+  API.send("browseAndImportImageFiles", "files");
 }
 function importImageDirectories() {
-  API.send("importImageDirectories");
+  API.send("browseAndImportImageFiles", "directories");
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {

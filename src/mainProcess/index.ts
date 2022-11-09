@@ -263,37 +263,19 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
       ) => ReturnType<MainFunctions[P]>;
     } {
       return {
-        async importImageFiles(event) {
+        async browseAndImportImageFiles(event, type) {
           const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
-          const window = windows.getWindowByEvent(event);
-          if (window) {
-            const result = await dialog.showOpenDialog(window.window, {
-              properties: ["openFile", "multiSelections"],
+          const windowInfo = windows.getWindowByEvent(event);
+          if (windowInfo) {
+            const result = await dialog.showOpenDialog(windowInfo.window, {
+              properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
             });
             petaDatas.petaImages.importImagesFromFileInfos({
               fileInfos: result.filePaths.map((path) => ({ path })),
               extract: true,
             });
             return result.filePaths.length;
-          }
-          return 0;
-        },
-        async importImageDirectories(event) {
-          const log = mainLogger.logChunk();
-          log.log("#Browse Image Directories");
-          const window = windows.getWindowByEvent(event);
-          if (window) {
-            const filePaths = (
-              await dialog.showOpenDialog(window.window, {
-                properties: ["openDirectory"],
-              })
-            ).filePaths;
-            petaDatas.petaImages.importImagesFromFileInfos({
-              fileInfos: filePaths.map((path) => ({ path })),
-              extract: true,
-            });
-            return filePaths.length;
           }
           return 0;
         },
