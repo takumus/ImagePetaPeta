@@ -39,7 +39,7 @@
 // Vue
 import { computed } from "vue";
 import { PetaImage } from "@/commons/datas/petaImage";
-import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
+import { PetaTag } from "@/commons/datas/petaTag";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";

@@ -4,7 +4,7 @@ import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
+import { createPetaTag } from "@/commons/datas/petaTag";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/api/interfaces/task";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
