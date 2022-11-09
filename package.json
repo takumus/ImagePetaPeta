@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@araki-packages/promise-serial": "^2.0.2",
-    "@seald-io/nedb": "^3.0.0",
+    "@seald-io/nedb": "^3.1.0",
     "@xmldom/xmldom": "^0.8.5",
     "axios": "^1.1.2",
     "body-parser": "^1.20.1",
@@ -61,7 +61,6 @@
     "@types/express": "^4.17.14",
     "@types/fuzzy-search": "^2.1.2",
     "@types/mime-types": "^2.1.1",
-    "@types/nedb": "^1.8.12",
     "@types/node": "18.8.0",
     "@types/offscreencanvas": "^2019.7.0",
     "@types/resize-observer-browser": "^0.1.6",
