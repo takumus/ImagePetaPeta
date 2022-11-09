@@ -10,7 +10,7 @@
       <li
         v-for="item in filteredItems"
         :key="item.id"
-        @click="select(item)"
+        @mouseup.left="select(item)"
         :class="{
           item: !item.separate,
           separate: item.separate,
