@@ -576,18 +576,17 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
         async windowMaximize(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Maximize");
-          const window = windows.getWindowByEvent(event);
-          if (window?.window.isMaximized()) {
-            window?.window.unmaximize();
+          const windowInfo = windows.getWindowByEvent(event);
+          if (windowInfo?.window.isMaximized()) {
+            windowInfo?.window.unmaximize();
             return;
           }
-          window?.window.maximize();
+          windowInfo?.window.maximize();
         },
         async windowClose(event) {
           const log = mainLogger.logChunk();
           log.log("#Window Close");
-          const window = windows.getWindowByEvent(event);
-          window?.window.close();
+          windows.getWindowByEvent(event)?.window.close();
         },
         async windowActivate(event) {
           windows.getWindowByEvent(event)?.window.moveTop();
@@ -624,10 +623,10 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
         async browsePetaImageDirectory(event) {
           const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
-          const window = windows.getWindowByEvent(event);
-          if (window) {
+          const windowInfo = windows.getWindowByEvent(event);
+          if (windowInfo) {
             const filePath = (
-              await dialog.showOpenDialog(window.window, {
+              await dialog.showOpenDialog(windowInfo.window, {
                 properties: ["openDirectory"],
               })
             ).filePaths[0];
