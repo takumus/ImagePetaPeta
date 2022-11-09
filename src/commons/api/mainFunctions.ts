@@ -10,6 +10,7 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export interface MainFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
   importImages: (datas: {
@@ -22,14 +23,14 @@ export interface MainFunctions {
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<{ [petaBoardId: string]: PetaBoard }>;
   updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
-  updatePetaTags: (tags: PetaTag[], mode: UpdateMode) => Promise<boolean>;
+  updatePetaTags: (tags: PetaTagLike[], mode: UpdateMode) => Promise<boolean>;
   getPetaImageIds: (params: GetPetaImageIdsParams) => Promise<string[]>;
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
   getPetaTagCounts: () => Promise<{ [petaTagId: string]: number }>;
   getPetaTags: () => Promise<PetaTag[]>;
   updatePetaImagesPetaTags: (
     petaImageIds: string[],
-    petaTagIds: string[],
+    petaTagLikes: PetaTagLike[],
     mode: UpdateMode,
   ) => Promise<boolean>;
   log: (id: string, ...args: unknown[]) => Promise<boolean>;

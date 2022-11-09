@@ -185,17 +185,10 @@ const mutualPetaTags = ref<PetaTag[]>([]);
 const tagInput = ref<InstanceType<typeof VTextarea>>();
 const currentColor = ref<PetaColor | undefined>();
 async function addTag(name: string) {
-  // タグを探す。なかったら作る。
-  let petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === name);
-  // リクエスト2回飛ばさない
-  if (!petaTag) {
-    petaTag = createPetaTag(name);
-    await petaTagsStore.updatePetaTags([petaTag], UpdateMode.INSERT);
-  }
   await API.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
-    [petaTag.id],
+    [{ type: "name", name }],
     UpdateMode.INSERT,
   );
   setTimeout(() => {
@@ -206,7 +199,7 @@ async function removeTag(petaTag: PetaTag) {
   await API.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
-    [petaTag.id],
+    [{ type: "id", id: petaTag.id }],
     UpdateMode.REMOVE,
   );
 }

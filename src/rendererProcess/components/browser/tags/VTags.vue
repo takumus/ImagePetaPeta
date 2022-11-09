@@ -79,10 +79,7 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   );
 }
 async function addTag(name: string) {
-  if (petaTagsStore.state.petaTags.value.find((pi) => pi.name === name)) {
-    return;
-  }
-  await petaTagsStore.updatePetaTags([createPetaTag(name)], UpdateMode.INSERT);
+  await petaTagsStore.updatePetaTags([{ type: "name", name }], UpdateMode.INSERT);
 }
 async function removeTag(petaTag: PetaTag) {
   if (
@@ -91,7 +88,7 @@ async function removeTag(petaTag: PetaTag) {
       t("commons.no"),
     ])) === 0
   ) {
-    await petaTagsStore.updatePetaTags([petaTag], UpdateMode.REMOVE);
+    await petaTagsStore.updatePetaTags([{ type: "id", id: petaTag.id }], UpdateMode.REMOVE);
     const index = props.selectedPetaTagIds.findIndex((pt) => pt === petaTag.id);
     if (index >= 0) {
       // props.selectedPetaTags.splice(index, 1);
@@ -110,7 +107,7 @@ async function changeTag(petaTag: PetaTag, newName: string) {
     return;
   }
   petaTag.name = newName;
-  await petaTagsStore.updatePetaTags([petaTag], UpdateMode.UPDATE);
+  await petaTagsStore.updatePetaTags([{ type: "petaTag", petaTag }], UpdateMode.UPDATE);
   selectPetaTag(petaTag);
 }
 function selectPetaTag(petaTag?: PetaTag) {

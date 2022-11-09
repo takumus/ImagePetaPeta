@@ -159,7 +159,10 @@ export class PetaDatas {
               log.log("copy tags");
               await this.petaTags.updatePetaImagesPetaTags(
                 [newPetaImage.id],
-                pipts.map((pipt) => pipt.petaTagId),
+                pipts.map((pipt) => ({
+                  type: "id",
+                  id: pipt.petaTagId,
+                })),
                 UpdateMode.INSERT,
                 true,
               );

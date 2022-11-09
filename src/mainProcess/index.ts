@@ -393,11 +393,11 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
           }
           return false;
         },
-        async updatePetaImagesPetaTags(event, petaImageIds, petaTagIds, mode) {
+        async updatePetaImagesPetaTags(event, petaImageIds, petaTagLikes, mode) {
           const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
-            await petaDatas.petaTags.updatePetaImagesPetaTags(petaImageIds, petaTagIds, mode);
+            await petaDatas.petaTags.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
             log.log("return:", true);
             return true;
           } catch (error) {

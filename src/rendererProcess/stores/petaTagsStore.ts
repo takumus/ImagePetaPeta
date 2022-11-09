@@ -5,6 +5,7 @@ import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
+import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export async function createPetaTagsStore() {
   const petaTags = ref(await API.send("getPetaTags"));
   const petaTagCounts = ref(await API.send("getPetaTagCounts"));
@@ -24,8 +25,8 @@ export async function createPetaTagsStore() {
       petaTags,
       petaTagCounts,
     },
-    updatePetaTags(petaTags: PetaTag[], mode: UpdateMode) {
-      return API.send("updatePetaTags", petaTags, mode);
+    updatePetaTags(petaTagLikes: PetaTagLike[], mode: UpdateMode) {
+      return API.send("updatePetaTags", petaTagLikes, mode);
     },
     onUpdate: (callback: (petaTagIds: string[], petaImageIds: string[]) => void) => {
       eventEmitter.on("update", callback);
