@@ -235,11 +235,11 @@ export class Windows {
           window: this.windows[key as WindowType],
         };
       })
-      .find((window) => {
+      .find((windowInfo) => {
         return (
-          window.window &&
-          !window.window.isDestroyed() &&
-          window.window.webContents.mainFrame === event.sender.mainFrame
+          windowInfo.window &&
+          !windowInfo.window.isDestroyed() &&
+          windowInfo.window.webContents.mainFrame === event.sender.mainFrame
         );
       });
     if (windowSet && windowSet.window !== undefined) {
