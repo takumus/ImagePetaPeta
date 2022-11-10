@@ -613,11 +613,16 @@ async function load(params: {
     const progress = `${index + 1}/${petaPanels.length}`;
     let loadResult = "";
     try {
-      const onLoaded = (petaPanel: PetaPanel) => {
+      const onLoaded = (petaPanel: PetaPanel, error?: unknown) => {
         loaded++;
         if (currentBoard.value) {
           loadProgress.value = Math.floor((loaded / petaPanels.length) * 100);
           const progress = `${loaded}/${petaPanels.length}`;
+          log(
+            "vBoard",
+            `loaded[${error ?? "success"}](${minimId(petaPanel.petaImageId)}):`,
+            progress,
+          );
           extractingLog.value =
             `load complete   (${minimId(petaPanel.petaImageId)}):${progress}\n` +
             extractingLog.value;
@@ -638,14 +643,15 @@ async function load(params: {
         pPanel.orderRender();
         orderPIXIRender();
         (async () => {
+          let error: unknown;
           try {
             await pPanel.load();
-          } catch (error) {
-            //
+          } catch (err) {
+            error = err;
           }
           pPanel.orderRender();
           orderPIXIRender();
-          onLoaded(petaPanel);
+          onLoaded(petaPanel, error);
         })();
         await new Promise((res) => {
           setTimeout(res);
@@ -663,14 +669,15 @@ async function load(params: {
       ) {
         // pPanelはあるが、noImageだったら再ロードトライ。
         (async () => {
+          let error: unknown;
           try {
             await pPanel.load();
-          } catch (error) {
-            //
+          } catch (err) {
+            error = err;
           }
           pPanel.orderRender();
           orderPIXIRender();
-          onLoaded(petaPanel);
+          onLoaded(petaPanel, error);
         })();
         await new Promise((res) => {
           setTimeout(res);
@@ -680,11 +687,11 @@ async function load(params: {
         onLoaded(petaPanel);
         loadResult = "skip";
       }
-      log("vBoard", `loaded[${loadResult}](${minimId(petaPanel.petaImageId)}):`, progress);
+      log("vBoard", `extracted[${loadResult}](${minimId(petaPanel.petaImageId)}):`, progress);
       extractingLog.value =
         `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
     } catch (error) {
-      log("vBoard", `loderr(${minimId(petaPanel.petaImageId)}):`, progress, error);
+      log("vBoard", `extract error(${minimId(petaPanel.petaImageId)}):`, progress, error);
       extractingLog.value =
         `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
     }

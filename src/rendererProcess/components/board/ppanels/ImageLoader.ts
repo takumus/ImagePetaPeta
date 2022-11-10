@@ -24,31 +24,30 @@ export function getImage(petaImage: PetaImage | undefined) {
     }
     const imageURL = getImageURL(petaImage, ImageType.ORIGINAL);
     PIXI.Assets.load(imageURL)
-      .then((resource) => {
+      .then(async (resource) => {
         if (canceled) {
           rej("canceled");
           return;
         }
         if (resource instanceof AnimatedGIFResource) {
-          resource
-            .load()
-            .then(() => {
-              res({ animatedGIF: resource.getNewAnimatedGIF() });
-            })
-            .catch((reason) => {
-              rej("could not load texture" + reason);
-            });
           cancelAnimatedGIFLoader = resource.cancel;
+          try {
+            const animatedGIFResource = await resource.load();
+            res({ animatedGIF: animatedGIFResource.getNewAnimatedGIF() });
+            return;
+          } catch (reason) {
+            rej("AnimatedGIFResource error:" + reason);
+          }
           return;
         }
         if (resource instanceof PIXI.Texture) {
           res({ texture: resource });
           return;
         }
-        rej("could not load texture");
+        rej(`unknown resource: ${imageURL}`);
       })
       .catch((reason) => {
-        rej("could not load texture" + reason);
+        rej(`could not load resource: ${reason}`);
       });
   });
   return {
