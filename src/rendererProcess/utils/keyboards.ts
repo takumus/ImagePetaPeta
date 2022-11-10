@@ -66,7 +66,9 @@ export class Keyboards {
     }
   }
   public get enabled() {
-    return this._enabled && (Keyboards.locked < 0 || Keyboards.locked === this.id || !this.lockable);
+    return (
+      this._enabled && (Keyboards.locked < 0 || Keyboards.locked === this.id || !this.lockable)
+    );
   }
 
   // statics

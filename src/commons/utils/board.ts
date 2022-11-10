@@ -6,7 +6,9 @@ export function hasPetaImages(board: PetaBoard, petaImages: PetaImage[]) {
     return need
       ? true
       : board
-      ? Object.values(board.petaPanels).find((petaPanel) => petaPanel.petaImageId === petaImage.id) !== undefined
+      ? Object.values(board.petaPanels).find(
+          (petaPanel) => petaPanel.petaImageId === petaImage.id,
+        ) !== undefined
       : false;
   }, false);
 }

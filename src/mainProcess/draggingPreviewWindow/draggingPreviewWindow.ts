@@ -131,7 +131,9 @@ export class DraggingPreviewWindow {
   }
   clearImages() {
     try {
-      this.draggingPreviewWindow?.loadURL("data:text/html;charset=utf-8,<html><body></body></html>");
+      this.draggingPreviewWindow?.loadURL(
+        "data:text/html;charset=utf-8,<html><body></body></html>",
+      );
     } catch (error) {
       //
     }
