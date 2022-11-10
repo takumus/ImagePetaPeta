@@ -33,6 +33,7 @@ import {
   createWindowTitleStore,
   windowTitleStoreKey,
 } from "@/rendererProcess/stores/windowTitleStore";
+import { injectAnimatedGIFAsset } from "@/rendererProcess/utils/pixi-gif/AnimatedGIFAsset";
 export async function create(
   component: Component,
   windowType: WindowType,
@@ -44,7 +45,6 @@ export async function create(
       return;
     }
     initialized = true;
-    injectAnimatedGifLoader();
     logChunk().log(`$Window "${windowType}" init`);
     const app = createApp(component);
     async function appUse(plugin: Plugin) {
@@ -73,6 +73,7 @@ export async function create(
       (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
       ...(stores?.map(async (store) => app.provide(store.key, await store.value())) || []),
     ]);
+    injectAnimatedGIFAsset();
     app.mount("#app");
   };
   API.on("dataInitialized", () => {
@@ -101,38 +102,4 @@ export async function create(
   window.onerror = (e) => {
     logChunk().log(`window "${windowType}" error:`, e);
   };
-}
-
-import { extensions, ExtensionType, settings, utils } from "@pixi/core";
-import type { AssetExtension } from "@pixi/assets";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
-function injectAnimatedGifLoader() {
-  /**
-   * Handle the loading of GIF images. Registering this loader plugin will
-   * load all `.gif` images as an ArrayBuffer and transform into an
-   * AnimatedGIF object.
-   * @ignore
-   */
-  const AnimatedGIFAsset = {
-    extension: ExtensionType.Asset,
-    detection: {
-      test: async () => true,
-      add: async (formats) => [...formats, "gif"],
-      remove: async (formats) => formats.filter((format) => format !== "gif"),
-    },
-    loader: {
-      test: (url) => utils.path.extname(url) === ".gif",
-      load: async (url, asset) => {
-        const response = await settings.ADAPTER.fetch(url);
-        const buffer = await response.arrayBuffer();
-        const animatedGIF = await AnimatedGIF.fromBuffer(buffer, asset?.data).promise;
-        return animatedGIF;
-      },
-      unload: async (asset) => {
-        asset.destroy();
-      },
-    },
-  } as AssetExtension<AnimatedGIF>;
-
-  extensions.add(AnimatedGIFAsset);
 }

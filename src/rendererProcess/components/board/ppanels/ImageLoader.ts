@@ -1,7 +1,7 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
+import { AnimatedGIF, AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 import * as PIXI from "pixi.js";
 let animatedGIFCache: { [key: string]: AnimatedGIF } = {};
 export function clearAnimatedGIF() {
@@ -19,34 +19,12 @@ export function getAnimatedGIF(key: string) {
 }
 export function getImage(petaImage: PetaImage | undefined) {
   let canceled = false;
-  const cancelAnimatedGIFLoader = () => {
+  let cancelAnimatedGIFLoader = () => {
     //
   };
   let cancelResourcesLoader = (reason: string) => {
     reason;
-    //
   };
-  // const loader = new PIXI.Loader(undefined);
-  // loader.use(async (resource, next) => {
-  //   if (canceled) {
-  //     next();
-  //     return;
-  //   }
-  //   if (resource.extension === "gif") {
-  //     const result = AnimatedGIF.fromBuffer(resource.data, undefined);
-  //     cancelAnimatedGIFLoader = result.cancel;
-  //     result.promise
-  //       .then((data) => {
-  //         resource.animation = data;
-  //         next();
-  //       })
-  //       .catch(() => {
-  //         next();
-  //       });
-  //     return;
-  //   }
-  //   next();
-  // });
   const promise = new Promise<ImageLoaderResult>((res, rej) => {
     if (canceled) {
       rej("canceled");
@@ -63,29 +41,31 @@ export function getImage(petaImage: PetaImage | undefined) {
       res({ animatedGIF: animatedGIF.clone() });
       return;
     }
-    // const texture = PIXI.utils.TextureCache[imageURL];
-    // if (texture?.baseTexture) {
-    //   res({ texture });
-    //   return;
-    // }
     PIXI.Assets.load(imageURL)
       .then((resource) => {
-        // const texture = resource?.texture;
-        // const animatedGIF = resource?.animation as AnimatedGIF | undefined;
-        console.log("ok:", resource);
         if (canceled) {
-          // animatedGIF?.destroy();
-          // resource?.destroy();
           rej("canceled");
           return;
         }
-        if (resource instanceof AnimatedGIF) {
-          // resource.autoUpdate = false;
-          addAnimatedGIF(imageURL, resource);
-          res({ animatedGIF: resource.clone() });
+        if (resource instanceof AnimatedGIFResource) {
+          resource.retry();
+          resource.promise
+            .then((animatedGIF) => {
+              if (canceled) {
+                animatedGIF.destroy();
+                rej("canceled");
+                return;
+              }
+              addAnimatedGIF(imageURL, animatedGIF);
+              res({ animatedGIF: animatedGIF.clone() });
+            })
+            .catch((reason) => {
+              rej("could not load texture" + reason);
+            });
+          cancelAnimatedGIFLoader = resource.cancel;
           return;
         }
-        if (resource?.baseTexture) {
+        if (resource instanceof PIXI.Texture) {
           res({ texture: resource });
           return;
         }
@@ -94,33 +74,6 @@ export function getImage(petaImage: PetaImage | undefined) {
       .catch((reason) => {
         rej("could not load texture" + reason);
       });
-    // loader.add(imageURL);
-    // loader.onError.add((error) => {
-    //   loader.resources[imageURL]?.texture?.destroy();
-    //   rej("could not load texture" + error);
-    // });
-    // loader.load((_, resources) => {
-    //   const resource = resources[imageURL];
-    //   const texture = resource?.texture;
-    //   // const animatedGIF = resource?.animation as AnimatedGIF | undefined;
-    //   if (canceled) {
-    //     // animatedGIF?.destroy();
-    //     texture?.destroy();
-    //     rej("canceled");
-    //     return;
-    //   }
-    //   // if (animatedGIF) {
-    //   //   animatedGIF.autoUpdate = false;
-    //   //   addAnimatedGIF(imageURL, animatedGIF);
-    //   //   res({ animatedGIF: animatedGIF.clone() });
-    //   //   return;
-    //   // }
-    //   if (texture?.baseTexture) {
-    //     res({ texture });
-    //     return;
-    //   }
-    //   rej("could not load texture");
-    // });
   });
   return {
     promise,
@@ -128,8 +81,6 @@ export function getImage(petaImage: PetaImage | undefined) {
       canceled = true;
       cancelAnimatedGIFLoader();
       cancelResourcesLoader("canceled");
-      // loader.reset();
-      // loader.destroy();
     },
   };
 }

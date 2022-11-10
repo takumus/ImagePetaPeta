@@ -43,7 +43,6 @@ interface AnimatedGIFOptions {
   /** Fallback FPS if GIF contains no time information */
   fps: number;
 }
-
 /**
  * Runtime object to play animated GIFs. This object is similar to an AnimatedSprite.
  * It support playback (seek, play, stop) as well as animation speed and looping.
@@ -204,14 +203,11 @@ class AnimatedGIF extends Sprite {
         }
       });
     });
-    return {
-      promise,
-      cancel: () => {
-        console.log("GIF(worker): cancel converting");
-        worker.terminate();
-        cancel();
-      },
-    };
+    return new AnimatedGIFResource(buffer, promise, () => {
+      console.log("GIF(worker): cancel converting");
+      worker.terminate();
+      cancel();
+    });
   }
 
   /**
@@ -468,6 +464,27 @@ class AnimatedGIF extends Sprite {
     });
   }
 }
-
-export { AnimatedGIF };
+class AnimatedGIFResource {
+  public canceled = false;
+  constructor(
+    public readonly buffer: ArrayBuffer,
+    public promise: Promise<AnimatedGIF>,
+    public cancelPromise: () => void,
+  ) {
+    //
+  }
+  public readonly cancel = () => {
+    this.canceled = true;
+    this.cancelPromise();
+  };
+  public readonly retry = () => {
+    if (this.canceled) {
+      this.canceled = false;
+      const loading = AnimatedGIF.fromBuffer(this.buffer);
+      this.promise = loading.promise;
+      this.cancelPromise = loading.cancelPromise;
+    }
+  };
+}
+export { AnimatedGIF, AnimatedGIFResource };
 export type { AnimatedGIFOptions };
