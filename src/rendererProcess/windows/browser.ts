@@ -1,4 +1,4 @@
-import BrowserIndex from "@/rendererProcess/windows/browser.vue";
+import BrowserIndex from "@/rendererProcess/components/VWBrowser.vue";
 import { create } from "@/rendererProcess/windows/@create";
 import { WindowType } from "@/commons/datas/windowType";
 import {

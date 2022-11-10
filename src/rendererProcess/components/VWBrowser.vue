@@ -6,12 +6,17 @@
   >
     <t-content>
       <t-top>
-        <VTitleBar :title="t('titles.settings')"> </VTitleBar>
+        <VTitleBar :title="t('titles.browser')"> </VTitleBar>
+        <VUtilsBar> </VUtilsBar>
       </t-top>
       <t-browser>
-        <VSettings />
+        <VBrowser />
       </t-browser>
     </t-content>
+    <t-modals v-show="components.modal.modalIds.length > 0">
+      <VImageImporter />
+      <VTasks />
+    </t-modals>
     <VDialog :zIndex="6"></VDialog>
     <VContextMenu :zIndex="4" />
   </t-root>
@@ -19,32 +24,28 @@
 
 <script setup lang="ts">
 // Vue
-import { onMounted, watch } from "vue";
+import { watch } from "vue";
 // Components
+import VBrowser from "@/rendererProcess/components/browser/VBrowser.vue";
+import VImageImporter from "@/rendererProcess/components/importer/VImageImporter.vue";
+import VTasks from "@/rendererProcess/components/task/VTasks.vue";
 import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
+import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
-import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { API } from "@/rendererProcess/api";
-import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
+import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
+import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
 import { useWindowTitleStore } from "@/rendererProcess/stores/windowTitleStore";
-import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
-const { t } = useI18n();
-const darkModeStore = useDarkModeStore();
-const keyboards = useKeyboardsStore();
+const appInfoStore = useAppInfoStore();
+const components = useComponentsStore();
 const windowTypeStore = useWindowTypeStore();
 const windowTitleStore = useWindowTitleStore();
-const appInfoStore = useAppInfoStore();
-onMounted(() => {
-  keyboards.enabled = true;
-  keyboards.keys("Escape").up(() => {
-    API.send("windowClose");
-  });
-});
+const { t } = useI18n();
+const darkModeStore = useDarkModeStore();
 watch(
   () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {
@@ -74,7 +75,7 @@ t-root {
     > t-browser {
       display: block;
       overflow: hidden;
-      padding: var(--px-3);
+      padding: var(--px-2);
       background-color: var(--color-0);
       flex: 1;
       z-index: 1;
@@ -91,5 +92,5 @@ t-root {
 }
 </style>
 <style lang="scss">
-@import "@/rendererProcess/components/index.scss";
+@import "@/rendererProcess/styles/index.scss";
 </style>

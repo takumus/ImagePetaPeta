@@ -772,6 +772,7 @@ function unselectedPPanels() {
   return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
 }
 function updatePetaBoard() {
+  console.log("update!");
   if (currentBoard.value) {
     emit("update:board", currentBoard.value);
   }

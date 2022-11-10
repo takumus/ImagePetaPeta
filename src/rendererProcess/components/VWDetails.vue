@@ -207,5 +207,5 @@ t-root {
 }
 </style>
 <style lang="scss">
-@import "@/rendererProcess/components/index.scss";
+@import "@/rendererProcess/styles/index.scss";
 </style>
