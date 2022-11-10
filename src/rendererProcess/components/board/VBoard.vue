@@ -616,6 +616,9 @@ async function load(params: {
       const onLoaded = (petaPanel: PetaPanel, error?: unknown) => {
         loaded++;
         if (currentBoard.value) {
+          if (!petaPanel.gif.stopped) {
+            pPanels[petaPanel.id]?.playGIF();
+          }
           loadProgress.value = Math.floor((loaded / petaPanels.length) * 100);
           const progress = `${loaded}/${petaPanels.length}`;
           log(
@@ -709,11 +712,6 @@ async function load(params: {
   cancelExtract = undefined;
   log("vBoard", "load complete");
   sortIndex();
-  Object.values(pPanels).forEach((pPanel) => {
-    if (!pPanel.petaPanel.gif.stopped) {
-      pPanel.playGIF();
-    }
-  });
   Cursor.setDefaultCursor();
   statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
 }
