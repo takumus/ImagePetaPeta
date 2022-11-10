@@ -1,3 +1,13 @@
+export const PROTOCOLS = {
+  FILE: {
+    IMAGE_ORIGINAL: "file-image-original",
+    IMAGE_THUMBNAIL: "file-image-thumbnail",
+  },
+  BUFFER: {
+    IMAGE_ORIGINAL: "buffer-image-original",
+    IMAGE_THUMBNAIL: "buffer-image-thumbnail",
+  },
+} as const;
 export const IMG_TAG_WIDTH = 10000;
 export const DEFAULT_BOARD_NAME = "noname";
 export const SAVE_DELAY = 500;

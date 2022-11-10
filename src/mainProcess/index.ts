@@ -13,7 +13,7 @@ import {
 } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { DEFAULT_BOARD_NAME, EULA, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, EULA, PROTOCOLS, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
@@ -140,16 +140,44 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
       画像用URL作成
     */
     //-------------------------------------------------------------------------------------------------//
-    session.defaultSession.protocol.registerFileProtocol("image-original", async (req, res) => {
-      res({
-        path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
-      });
-    });
-    session.defaultSession.protocol.registerFileProtocol("image-thumbnail", async (req, res) => {
-      res({
-        path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
-      });
-    });
+    session.defaultSession.protocol.registerFileProtocol(
+      PROTOCOLS.FILE.IMAGE_ORIGINAL,
+      async (req, res) => {
+        console.log(`file: ${req.url}`);
+        res({
+          path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
+        });
+      },
+    );
+    session.defaultSession.protocol.registerFileProtocol(
+      PROTOCOLS.FILE.IMAGE_THUMBNAIL,
+      async (req, res) => {
+        console.log(`file: ${req.url}`);
+        res({
+          path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
+        });
+      },
+    );
+    session.defaultSession.protocol.registerBufferProtocol(
+      PROTOCOLS.BUFFER.IMAGE_ORIGINAL,
+      async (req, res) => {
+        const buffer = await file.readFile(
+          Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
+        );
+        console.log(`buffer: ${req.url}`);
+        res(buffer);
+      },
+    );
+    session.defaultSession.protocol.registerBufferProtocol(
+      PROTOCOLS.BUFFER.IMAGE_THUMBNAIL,
+      async (req, res) => {
+        const buffer = await file.readFile(
+          Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
+        );
+        console.log(`buffer: ${req.url}`);
+        res(buffer);
+      },
+    );
     //-------------------------------------------------------------------------------------------------//
     /*
       ipcへ関数を登録
