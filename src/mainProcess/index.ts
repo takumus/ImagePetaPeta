@@ -95,6 +95,20 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
       },
     },
   ]);
+  protocol.registerSchemesAsPrivileged([
+    {
+      scheme: PROTOCOLS.FILE.IMAGE_THUMBNAIL,
+      privileges: {
+        supportFetchAPI: true,
+      },
+    },
+    {
+      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
+      privileges: {
+        supportFetchAPI: true,
+      },
+    },
+  ]);
   app.on("activate", async () => {
     mainLogger.logChunk().log("$Electron event: activate");
     if (
@@ -156,26 +170,6 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
         res({
           path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
         });
-      },
-    );
-    session.defaultSession.protocol.registerBufferProtocol(
-      PROTOCOLS.BUFFER.IMAGE_ORIGINAL,
-      async (req, res) => {
-        const buffer = await file.readFile(
-          Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
-        );
-        console.log(`buffer: ${req.url}`);
-        res(buffer);
-      },
-    );
-    session.defaultSession.protocol.registerBufferProtocol(
-      PROTOCOLS.BUFFER.IMAGE_THUMBNAIL,
-      async (req, res) => {
-        const buffer = await file.readFile(
-          Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
-        );
-        console.log(`buffer: ${req.url}`);
-        res(buffer);
       },
     );
     //-------------------------------------------------------------------------------------------------//
