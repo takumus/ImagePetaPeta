@@ -122,6 +122,7 @@ let cancelExtract: (() => Promise<void>) | undefined;
 let resolution = -1;
 let changeResolutionIntervalHandler = -1;
 const currentBoard = ref<PetaBoard>();
+let pixiView: HTMLCanvasElement | undefined;
 onMounted(() => {
   constructIfResolutionChanged();
   resizerStore.on("resize", resize);
@@ -152,18 +153,19 @@ function construct(resolution?: number) {
     antialias: true,
     backgroundAlpha: 0,
   });
-  pixi.view.addEventListener("dblclick", resetTransform);
-  pixi.view.addEventListener("mousewheel", wheel as (e: Event) => void);
-  pixi.view.addEventListener("pointerdown", preventWheelClick);
+  pixiView = pixi.view as HTMLCanvasElement;
+  pixiView.addEventListener("dblclick", resetTransform);
+  pixiView.addEventListener("pointerdown", preventWheelClick);
   pixi.stage.on("pointerdown", pointerdown);
   pixi.stage.on("pointerup", pointerup);
   pixi.stage.on("pointerupoutside", pointerup);
   pixi.stage.on("pointermove", pointermove);
-  pixi.stage.on("pointermoveoutside", pointermove);
+  // pixi.stage.on("pointermoveoutside", pointermove);
   pixi.stage.on("pointerup", pTransformer.pointerup.bind(pTransformer));
   pixi.stage.on("pointerupoutside", pTransformer.pointerup.bind(pTransformer));
   pixi.stage.on("pointermove", pTransformer.pointermove.bind(pTransformer));
-  pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
+  // pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
+  panelsBackground.value?.addEventListener("mousewheel", wheel as (e: Event) => void);
   pixi.stage.addChild(backgroundSprite);
   // pixi.stage.addChild(crossLine);
   pixi.stage.addChild(grid);
@@ -172,23 +174,22 @@ function construct(resolution?: number) {
   rootContainer.addChild(panelsCenterWrapper);
   rootContainer.addChild(pTransformer);
   rootContainer.addChild(pSelection);
-  panelsBackground.value?.appendChild(pixi.view);
+  panelsBackground.value?.appendChild(pixiView as HTMLCanvasElement);
   pixi.stage.interactive = true;
   pixi.ticker.stop();
-  pixi.view.addEventListener("webglcontextlost", (e) => {
+  pixiView.addEventListener("webglcontextlost", (e) => {
     logChunk().error("WEBGL_lose_context", e);
     API.send("reloadWindow");
   });
   resizerStore.forceEmit();
   renderPIXI();
-  PIXI.Ticker.shared.add(updateAnimatedGIF);
 }
 function destruct() {
   if (pixi) {
     logChunk().log("destruct PIXI");
     pixi.destroy(true);
   }
-  PIXI.Ticker.shared.remove(updateAnimatedGIF);
+  panelsBackground.value?.removeEventListener("mousewheel", wheel as (e: Event) => void);
   cancelAnimationFrame(requestAnimationFrameHandle);
 }
 function resize(rect: DOMRectReadOnly) {
@@ -197,8 +198,10 @@ function resize(rect: DOMRectReadOnly) {
   mouseOffset.set(panelsBackground.value?.getBoundingClientRect());
   if (pixi) {
     pixi.renderer.resize(rect.width, rect.height);
-    pixi.view.style.width = rect.width + "px";
-    pixi.view.style.height = rect.height + "px";
+    if (pixiView !== undefined) {
+      pixiView.style.width = rect.width + "px";
+      pixiView.style.height = rect.height + "px";
+    }
   }
   centerWrapper.x = rect.width / 2;
   centerWrapper.y = rect.height / 2;
@@ -211,23 +214,23 @@ function preventWheelClick(event: PointerEvent) {
     event.preventDefault();
   }
 }
-function pointerdown(e: PIXI.InteractionEvent) {
+function pointerdown(e: PIXI.FederatedPointerEvent) {
   if (!currentBoard.value) {
     return;
   }
   const mouse = getMouseFromEvent(e);
   click.down(mouse);
-  if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE) {
+  if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
     mouseRightPressing = true;
     dragging.value = true;
     dragged.value = false;
     dragOffset.set(currentBoard.value.transform.position).sub(mouse);
-  } else if (e.data.button === MouseButton.LEFT) {
+  } else if (e.button === MouseButton.LEFT) {
     mouseLeftPressing = true;
     const pPanel = getPPanelFromObject(e.target);
     if (pPanel) {
       pointerdownPPanel(pPanel, e);
-    } else if (e.target.name != "transformer") {
+    } else if (e.target instanceof PIXI.Container && e.target.name != "transformer") {
       clearSelectionAll();
       selecting = true;
       pSelection.topLeft.set(rootContainer.toLocal(mouse));
@@ -236,17 +239,20 @@ function pointerdown(e: PIXI.InteractionEvent) {
   }
   orderPIXIRender();
 }
-function getPPanelFromObject(object: PIXI.DisplayObject) {
-  if (currentBoard.value?.petaPanels[(object as PPanel).petaPanel?.id]) {
+function getPPanelFromObject(object: PIXI.DisplayObject | PIXI.FederatedEventTarget) {
+  if (!(object instanceof PPanel)) {
+    return undefined;
+  }
+  if (currentBoard.value?.petaPanels[object.petaPanel?.id]) {
     return object as PPanel;
   }
   return undefined;
 }
-function pointerup(e: PIXI.InteractionEvent) {
+function pointerup(e: PIXI.FederatedPointerEvent) {
   const mouse = getMouseFromEvent(e).add(mouseOffset);
-  if (e.data.button === MouseButton.RIGHT || e.data.button === MouseButton.MIDDLE) {
+  if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
     mouseRightPressing = false;
-    if (click.isClick && e.data.button === MouseButton.RIGHT) {
+    if (click.isClick && e.button === MouseButton.RIGHT) {
       const pPanel = getPPanelFromObject(e.target);
       if (pPanel) {
         pointerdownPPanel(pPanel, e);
@@ -269,13 +275,13 @@ function pointerup(e: PIXI.InteractionEvent) {
     if (!click.isClick) {
       updatePetaBoard();
     }
-  } else if (e.data.button === MouseButton.LEFT) {
+  } else if (e.button === MouseButton.LEFT) {
     mouseLeftPressing = false;
     selecting = false;
   }
   orderPIXIRender();
 }
-function pointermove(e: PIXI.InteractionEvent) {
+function pointermove(e: PIXI.FederatedPointerEvent) {
   const mouse = getMouseFromEvent(e);
   mousePosition.set(mouse);
   click.move(mousePosition);
@@ -283,7 +289,7 @@ function pointermove(e: PIXI.InteractionEvent) {
     orderPIXIRender();
   }
 }
-function getMouseFromEvent(e: PIXI.InteractionEvent) {
+function getMouseFromEvent(e: PIXI.FederatedPointerEvent) {
   return new Vec2(e.data.global);
 }
 function wheel(event: WheelEvent) {
@@ -710,7 +716,7 @@ function onUpdateGif() {
   }
   orderPIXIRender();
 }
-function pointerdownPPanel(pPanel: PPanel, e: PIXI.InteractionEvent) {
+function pointerdownPPanel(pPanel: PPanel, e: PIXI.FederatedPointerEvent) {
   if (!currentBoard.value) {
     return;
   }
@@ -741,11 +747,11 @@ function renderPIXI() {
   }
   requestAnimationFrameHandle = requestAnimationFrame(renderPIXI);
 }
-function updateAnimatedGIF(deltaTime: number) {
-  Object.values(pPanels)
-    .filter((pPanel) => pPanel.isGIF)
-    .forEach((pPanel) => pPanel.updateGIF(deltaTime));
-}
+// function updateAnimatedGIF(deltaTime: number) {
+//   Object.values(pPanels)
+//     .filter((pPanel) => pPanel.isGIF)
+//     .forEach((pPanel) => pPanel.updateGIF(deltaTime));
+// }
 function keyShift(pressed: boolean) {
   pTransformer.fit = pressed;
 }

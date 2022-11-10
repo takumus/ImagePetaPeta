@@ -57,7 +57,7 @@ import VUtilsBar from "@/rendererProcess/components/top/VUtilsBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
+// import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
 import {
   BOARD_ADD_MULTIPLE_OFFSET_X,
@@ -98,7 +98,7 @@ const orderedAddPanelDragEvent = ref(new Vec2());
 const currentPetaBoardId = ref("");
 const errorPetaBoardId = ref("");
 onMounted(async () => {
-  AnimatedGIFLoader.add?.();
+  // AnimatedGIFLoader.add?.();
   petaImagesStore.onUpdate(async (newPetaImages, mode) => {
     const needReload =
       currentPetaBoard.value === undefined

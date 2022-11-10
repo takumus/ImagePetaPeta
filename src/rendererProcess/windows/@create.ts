@@ -33,6 +33,7 @@ import {
   createWindowTitleStore,
   windowTitleStoreKey,
 } from "@/rendererProcess/stores/windowTitleStore";
+import { injectAnimatedGIFAsset } from "@/rendererProcess/utils/pixi-gif/AnimatedGIFAsset";
 export async function create(
   component: Component,
   windowType: WindowType,
@@ -72,6 +73,7 @@ export async function create(
       (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
       ...(stores?.map(async (store) => app.provide(store.key, await store.value())) || []),
     ]);
+    injectAnimatedGIFAsset();
     app.mount("#app");
   };
   API.on("dataInitialized", () => {

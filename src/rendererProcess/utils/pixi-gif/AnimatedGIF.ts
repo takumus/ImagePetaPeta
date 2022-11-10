@@ -43,7 +43,6 @@ interface AnimatedGIFOptions {
   /** Fallback FPS if GIF contains no time information */
   fps: number;
 }
-
 /**
  * Runtime object to play animated GIFs. This object is similar to an AnimatedSprite.
  * It support playback (seek, play, stop) as well as animation speed and looping.
@@ -162,7 +161,7 @@ class AnimatedGIF extends Sprite {
    * @param options - Options to use.
    * @returns
    */
-  static fromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {
+  static decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {
     if (!buffer || buffer.byteLength === 0) {
       throw new Error("Invalid buffer");
     }
@@ -468,6 +467,54 @@ class AnimatedGIF extends Sprite {
     });
   }
 }
-
-export { AnimatedGIF };
+class AnimatedGIFResource {
+  private loaded = false;
+  private _animatedGIF: AnimatedGIF | undefined;
+  private cancelPromise: () => void = () => {
+    //
+  };
+  private loadingPromise: Promise<AnimatedGIFResource> | undefined;
+  constructor(public readonly buffer: ArrayBuffer) {
+    //
+  }
+  public async load(): Promise<AnimatedGIFResource> {
+    if (this.loaded) {
+      return this;
+    }
+    if (this.loadingPromise !== undefined) {
+      return this.loadingPromise;
+    }
+    const result = AnimatedGIF.decodeFromBuffer(this.buffer);
+    this.cancelPromise = result.cancel;
+    this.loadingPromise = new Promise<AnimatedGIFResource>((res, rej) => {
+      result.promise
+        .then((animatedGIF) => {
+          this._animatedGIF = animatedGIF;
+          this.loaded = true;
+          this.loadingPromise = undefined;
+          res(this);
+        })
+        .catch((reason) => {
+          this.loadingPromise = undefined;
+          rej(reason);
+        });
+    });
+    return this.loadingPromise;
+  }
+  public getNewAnimatedGIF() {
+    return this._animatedGIF?.clone();
+  }
+  public getAnimatedGIF() {
+    return this._animatedGIF;
+  }
+  public readonly cancel = () => {
+    if (this.loaded) {
+      return;
+    }
+    this.loaded = false;
+    this.loadingPromise = undefined;
+    this.cancelPromise();
+  };
+}
+export { AnimatedGIF, AnimatedGIFResource };
 export type { AnimatedGIFOptions };

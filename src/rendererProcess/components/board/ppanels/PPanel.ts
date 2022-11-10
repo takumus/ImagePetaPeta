@@ -1,13 +1,14 @@
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif";
+// import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif";
 import { getImage } from "@/rendererProcess/components/board/ppanels/ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 usePetaImagesStore;
 export class PPanel extends PIXI.Sprite {
   // public selected = false;
@@ -308,9 +309,6 @@ export class PPanel extends PIXI.Sprite {
         this.playGIF();
       }
     }
-  }
-  public updateGIF(deltaTime: number) {
-    this.gif?.update(deltaTime);
   }
   private absPanelWidth() {
     return Math.abs(this.petaPanel.width);

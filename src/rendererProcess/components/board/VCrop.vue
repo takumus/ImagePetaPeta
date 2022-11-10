@@ -57,20 +57,22 @@ const minY = ref(0);
 const maxY = ref(0);
 const dragging = ref(false);
 const loaded = ref(false);
+let pixiView: HTMLCanvasElement | undefined;
 onMounted(() => {
   pixi = new PIXI.Application({
     resolution: window.devicePixelRatio,
     antialias: true,
     backgroundAlpha: 0,
   });
+  pixiView = pixi.view as HTMLCanvasElement;
   pixi.stage.on("pointerup", pointerup);
   pixi.stage.on("pointerupoutside", pointerup);
   pixi.stage.on("pointermove", pointermove);
-  pixi.stage.on("pointermoveoutside", pointermove);
+  // pixi.stage.on("pointermoveoutside", pointermove);
   pixi.stage.interactive = true;
   pixi.ticker.stop();
   pixi.stage.addChild(rootContainer);
-  cropRoot.value?.appendChild(pixi.view);
+  cropRoot.value?.appendChild(pixiView);
   rootContainer.addChild(blackMask, selectionContainer);
   selectionContainer.addChild(selection);
   selection.interactive = true;
@@ -102,32 +104,35 @@ onMounted(() => {
     corners.push(cp);
   }
   selectionContainer.addChild(...corners);
-  PIXI.Ticker.shared.add(updateAnimatedGIF);
+  // PIXI.Ticker.shared.add(updateAnimatedGIF);
   resizerStore.on("resize", resize);
   resizerStore.observe(cropRoot.value);
   renderPIXI();
   keyboards.enabled = true;
   changePetaPanel();
 });
-function startDrag(e: PIXI.InteractionEvent, controlPoint: PTransformerControlPoint) {
+function startDrag(e: PIXI.FederatedPointerEvent, controlPoint: PTransformerControlPoint) {
   draggingControlPoint = controlPoint;
 }
-function beginMoveSelection(e: PIXI.InteractionEvent) {
+function beginMoveSelection(e: PIXI.FederatedPointerEvent) {
   prevMousePosition.set(e.data.global);
   dragging.value = true;
 }
 onUnmounted(() => {
-  cropRoot.value?.removeChild(pixi.view);
+  if (pixiView !== undefined) {
+    cropRoot.value?.removeChild(pixiView);
+  }
   pixi.destroy();
   cancelAnimationFrame(requestAnimationFrameHandle);
-  PIXI.Ticker.shared.remove(updateAnimatedGIF);
 });
 function resize(rect: DOMRectReadOnly) {
   stageRect.x = rect.width;
   stageRect.y = rect.height;
   pixi.renderer.resize(rect.width, rect.height);
-  pixi.view.style.width = rect.width + "px";
-  pixi.view.style.height = rect.height + "px";
+  if (pixiView !== undefined) {
+    pixiView.style.width = rect.width + "px";
+    pixiView.style.height = rect.height + "px";
+  }
   rootContainer.x = rect.width / 2;
   rootContainer.y = rect.height / 2;
   orderPIXIRender();
@@ -136,7 +141,7 @@ function pointerup() {
   draggingControlPoint = undefined;
   dragging.value = false;
 }
-function pointermove(e: PIXI.InteractionEvent) {
+function pointermove(e: PIXI.FederatedPointerEvent) {
   mousePosition.set(e.data.global);
   if (draggingControlPoint) {
     const pos = selectionContainer.toLocal(mousePosition);
@@ -187,11 +192,11 @@ function pointermove(e: PIXI.InteractionEvent) {
     orderPIXIRender();
   }
 }
-function updateAnimatedGIF(deltaTime: number) {
-  if (pPanel?.isGIF) {
-    pPanel.updateGIF(deltaTime);
-  }
-}
+// function updateAnimatedGIF(deltaTime: number) {
+//   if (pPanel?.isGIF) {
+//     pPanel.updateGIF(deltaTime);
+//   }
+// }
 function animate() {
   if (!pPanel || !props.petaPanel) {
     return;
