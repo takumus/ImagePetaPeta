@@ -43,7 +43,7 @@
 // Vue
 import { computed } from "vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
@@ -56,22 +56,22 @@ const { t } = useI18n();
 const { windowType } = useWindowTypeStore();
 const windowStatusStore = useWindowStatusStore();
 function openBoard() {
-  API.send("openWindow", WindowType.BOARD);
+  IPC.send("openWindow", WindowType.BOARD);
 }
 function openBrowser() {
-  API.send("openWindow", WindowType.BROWSER);
+  IPC.send("openWindow", WindowType.BROWSER);
 }
 function openSettings() {
-  API.send("openWindow", WindowType.SETTINGS);
+  IPC.send("openWindow", WindowType.SETTINGS);
 }
 function openCapture() {
-  API.send("openWindow", WindowType.CAPTURE);
+  IPC.send("openWindow", WindowType.CAPTURE);
 }
 function browseAndImportImageFiles() {
-  API.send("browseAndImportImageFiles", "files");
+  IPC.send("browseAndImportImageFiles", "files");
 }
 function importImageDirectories() {
-  API.send("browseAndImportImageFiles", "directories");
+  IPC.send("browseAndImportImageFiles", "directories");
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {

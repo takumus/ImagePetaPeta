@@ -18,7 +18,7 @@ import { computed, onMounted, ref } from "vue";
 import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VTask from "@/rendererProcess/components/task/VTask.vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 import { useI18n } from "vue-i18n";
@@ -28,7 +28,7 @@ const windowStatus = useWindowStatusStore();
 const { t } = useI18n();
 const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {
-  API.on("taskStatus", (e, id, task) => {
+  IPC.on("taskStatus", (e, id, task) => {
     taskStatuses.value[id] = task;
     if (task.status === TaskStatusCode.COMPLETE) {
       window.setTimeout(() => {

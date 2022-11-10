@@ -1,23 +1,22 @@
 import { InjectionKey, onUnmounted, ref } from "vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
-import { PetaTag } from "@/commons/datas/petaTag";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export async function createPetaTagsStore() {
-  const petaTags = ref(await API.send("getPetaTags"));
-  const petaTagCounts = ref(await API.send("getPetaTagCounts"));
+  const petaTags = ref(await IPC.send("getPetaTags"));
+  const petaTagCounts = ref(await IPC.send("getPetaTagCounts"));
   const eventEmitter = new EventEmitter() as TypedEmitter<{
     update: (petaImageIds: string[], petaTagIds: string[]) => void;
   }>;
   eventEmitter.setMaxListeners(100000);
-  API.on("updatePetaTags", async (event, { petaTagIds, petaImageIds }) => {
-    petaTags.value = await API.send("getPetaTags");
+  IPC.on("updatePetaTags", async (event, { petaTagIds, petaImageIds }) => {
+    petaTags.value = await IPC.send("getPetaTags");
     eventEmitter.emit("update", petaTagIds, petaImageIds);
   });
-  API.on("updatePetaTagCounts", async (event, _petaTagCounts) => {
+  IPC.on("updatePetaTagCounts", async (event, _petaTagCounts) => {
     petaTagCounts.value = _petaTagCounts;
   });
   return {
@@ -26,7 +25,7 @@ export async function createPetaTagsStore() {
       petaTagCounts,
     },
     updatePetaTags(petaTagLikes: PetaTagLike[], mode: UpdateMode) {
-      return API.send("updatePetaTags", petaTagLikes, mode);
+      return IPC.send("updatePetaTags", petaTagLikes, mode);
     },
     onUpdate: (callback: (petaTagIds: string[], petaImageIds: string[]) => void) => {
       eventEmitter.on("update", callback);

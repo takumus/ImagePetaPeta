@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -33,20 +33,20 @@ const regenerateMetadatasCompleted = ref(true);
 const regenerateMetadatasDone = ref(0);
 const regenerateMetadatasCount = ref(0);
 onMounted(() => {
-  API.on("regenerateMetadatasProgress", (_, done, count) => {
+  IPC.on("regenerateMetadatasProgress", (_, done, count) => {
     regenerateMetadatasDone.value = done;
     regenerateMetadatasCount.value = count;
     regenerateMetadatasCompleted.value = false;
   });
-  API.on("regenerateMetadatasBegin", () => {
+  IPC.on("regenerateMetadatasBegin", () => {
     regenerateMetadatasCompleted.value = false;
   });
-  API.on("regenerateMetadatasComplete", () => {
+  IPC.on("regenerateMetadatasComplete", () => {
     regenerateMetadatasCompleted.value = true;
   });
 });
 function regenerateMetadatas() {
-  API.send("regenerateMetadatas");
+  IPC.send("regenerateMetadatas");
 }
 </script>
 

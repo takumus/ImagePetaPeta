@@ -1,10 +1,10 @@
 import { InjectionKey, readonly, ref } from "vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 
 export async function createDarkModeStore() {
-  const state = ref(await API.send("getIsDarkMode"));
-  API.on("darkMode", (_, value) => {
+  const state = ref(await IPC.send("getIsDarkMode"));
+  IPC.on("darkMode", (_, value) => {
     state.value = value;
   });
   return {

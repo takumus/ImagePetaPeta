@@ -1,9 +1,9 @@
 import { contextBridge, ipcRenderer, webFrame } from "electron";
-import { GLOBAL_API_NAME } from "@/commons/defines";
+import { IPC_GLOBAL_NAME } from "@/commons/defines";
 const listeners: { [key: string]: { key: string; cb: (...argv: unknown[]) => void } } = {};
 webFrame.setZoomLevel(1);
 let listenerId = 0;
-contextBridge.exposeInMainWorld(GLOBAL_API_NAME, {
+contextBridge.exposeInMainWorld(IPC_GLOBAL_NAME, {
   send: (key: string, ...args: unknown[]) => {
     return ipcRenderer.invoke(key, ...args);
   },

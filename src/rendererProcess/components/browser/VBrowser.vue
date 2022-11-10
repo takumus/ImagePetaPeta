@@ -81,7 +81,7 @@ import VPreview from "@/rendererProcess/components/browser/property/VPreview.vue
 import VTags from "@/rendererProcess/components/browser/tags/VTags.vue";
 import VSearch from "@/rendererProcess/components/browser/search/VSearch.vue";
 import { Vec2 } from "@/commons/utils/vec2";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import {
   BROWSER_THUMBNAIL_MARGIN,
   BROWSER_THUMBNAIL_SIZE,
@@ -239,7 +239,7 @@ function drag(petaImage: PetaImage) {
   }
   const petaImages = petaImagesStore.getSelected(petaImage) ? [] : [petaImage];
   petaImages.push(...selectedPetaImages.value);
-  API.send("startDrag", petaImages, actualTileSize.value, "");
+  IPC.send("startDrag", petaImages, actualTileSize.value, "");
 }
 function selectTile(thumb: Tile, force = false) {
   if (thumb.petaImage === undefined) {
@@ -342,21 +342,21 @@ function petaImageMenu(petaImage: PetaImage, position: Vec2) {
       {
         label: t("browser.petaImageMenu.openImageFile"),
         click: async () => {
-          await API.send("openImageFile", petaImage);
+          await IPC.send("openImageFile", petaImage);
         },
       },
       ...realESRGANModelNames.map((modelName) => {
         return {
           label: `${t("browser.petaImageMenu.realESRGAN")}(${modelName})`,
           click: async () => {
-            await API.send("realESRGANConvert", selectedPetaImages.value, modelName);
+            await IPC.send("realESRGANConvert", selectedPetaImages.value, modelName);
           },
         };
       }),
       {
         label: t("browser.petaImageMenu.searchImageByGoogle"),
         click: async () => {
-          await API.send("searchImageByGoogle", petaImage);
+          await IPC.send("searchImageByGoogle", petaImage);
         },
       },
     ],
@@ -376,8 +376,8 @@ async function openDetail(petaImage: PetaImage) {
   ) {
     return;
   }
-  await API.send("setDetailsPetaImage", petaImage);
-  await API.send("openWindow", WindowType.DETAILS);
+  await IPC.send("setDetailsPetaImage", petaImage);
+  await IPC.send("openWindow", WindowType.DETAILS);
 }
 function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;
@@ -422,7 +422,7 @@ const fetchFilteredPetaImages = (() => {
     // }
     const selectedUntagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
     console.time("fetch" + currentFetchId);
-    const results = await API.send(
+    const results = await IPC.send(
       "getPetaImageIds",
       selectedUntagged !== undefined
         ? { type: "untagged" }

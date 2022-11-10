@@ -1,10 +1,10 @@
 import { InjectionKey, readonly, ref } from "vue";
 import { inject } from "@/rendererProcess/utils/vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 
 export async function createAppInfoStore() {
   return {
-    state: readonly(ref(await API.send("getAppInfo"))),
+    state: readonly(ref(await IPC.send("getAppInfo"))),
   };
 }
 export function useAppInfoStore() {

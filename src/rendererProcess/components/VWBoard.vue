@@ -58,7 +58,7 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
 // import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import {
   BOARD_ADD_MULTIPLE_OFFSET_X,
   BOARD_ADD_MULTIPLE_OFFSET_Y,
@@ -122,7 +122,7 @@ onMounted(async () => {
   await restoreBoard();
 });
 async function restoreBoard() {
-  const states = await API.send("getStates");
+  const states = await IPC.send("getStates");
   errorPetaBoardId.value =
     states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
   const lastBoard = petaBoardsStore.state.value[states.selectedPetaBoardId];

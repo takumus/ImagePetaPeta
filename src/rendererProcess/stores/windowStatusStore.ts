@@ -1,19 +1,19 @@
 import { InjectionKey, readonly, ref } from "vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 import { WindowType } from "@/commons/datas/windowType";
 
 export async function createWindowStatusStore(myWindowType: WindowType) {
   const state = ref({
-    focused: await API.send("getWindowIsFocused"),
-    isMainWindow: (await API.send("getMainWindowType")) === myWindowType,
+    focused: await IPC.send("getWindowIsFocused"),
+    isMainWindow: (await IPC.send("getMainWindowType")) === myWindowType,
   });
-  API.on("windowFocused", (event, focused, windowType) => {
+  IPC.on("windowFocused", (event, focused, windowType) => {
     if (myWindowType === windowType) {
       state.value.focused = focused;
     }
   });
-  API.on("mainWindowType", (event, type) => {
+  IPC.on("mainWindowType", (event, type) => {
     state.value.isMainWindow = type === myWindowType;
   });
   return {

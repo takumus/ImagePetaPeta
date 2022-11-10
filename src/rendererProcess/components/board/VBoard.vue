@@ -54,7 +54,7 @@ import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { Rectangle } from "pixi.js";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { PSelection } from "@/rendererProcess/components/board/PSelection";
@@ -179,7 +179,7 @@ function construct(resolution?: number) {
   pixi.ticker.stop();
   pixiView.addEventListener("webglcontextlost", (e) => {
     logChunk().error("WEBGL_lose_context", e);
-    API.send("reloadWindow");
+    IPC.send("reloadWindow");
   });
   resizerStore.forceEmit();
   renderPIXI();
@@ -262,7 +262,7 @@ function pointerup(e: PIXI.FederatedPointerEvent) {
           [
             {
               label: t("boards.menu.openBrowser"),
-              click: () => API.send("openWindow", WindowType.BROWSER),
+              click: () => IPC.send("openWindow", WindowType.BROWSER),
             },
             { separate: true },
             { label: t("boards.menu.resetPosition"), click: resetTransform },
@@ -458,8 +458,8 @@ function openDetails(petaImage?: PetaImage) {
   if (petaImage === undefined) {
     return;
   }
-  API.send("setDetailsPetaImage", petaImage);
-  API.send("openWindow", WindowType.DETAILS);
+  IPC.send("setDetailsPetaImage", petaImage);
+  IPC.send("openWindow", WindowType.DETAILS);
 }
 function resetPetaPanel() {
   selectedPPanels().forEach((pPanel) => {

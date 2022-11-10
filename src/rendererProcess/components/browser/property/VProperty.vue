@@ -151,7 +151,7 @@
 // import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
@@ -185,7 +185,7 @@ const mutualPetaTags = ref<PetaTag[]>([]);
 const tagInput = ref<InstanceType<typeof VTextarea>>();
 const currentColor = ref<PetaColor | undefined>();
 async function addTag(name: string) {
-  await API.send(
+  await IPC.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
     [{ type: "name", name }],
@@ -196,7 +196,7 @@ async function addTag(name: string) {
   }, 100);
 }
 async function removeTag(petaTag: PetaTag) {
-  await API.send(
+  await IPC.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
     [{ type: "id", id: petaTag.id }],
@@ -265,7 +265,7 @@ const fetchPetaTags = (() => {
       fetchingTags.value = false;
       return;
     }
-    const result = await API.send(
+    const result = await IPC.send(
       "getPetaTagIdsByPetaImageIds",
       props.petaImages.map((petaImage) => petaImage.id),
     );

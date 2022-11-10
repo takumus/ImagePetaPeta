@@ -1,14 +1,14 @@
 import { InjectionKey, readonly, ref } from "vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 
 export async function createNSFWStore() {
-  const state = ref(await API.send("getShowNSFW"));
-  API.on("showNSFW", (_, value) => {
+  const state = ref(await IPC.send("getShowNSFW"));
+  IPC.on("showNSFW", (_, value) => {
     state.value = value;
   });
   function update(value: boolean) {
-    API.send("setShowNSFW", value);
+    IPC.send("setShowNSFW", value);
   }
   return {
     state: readonly(state),

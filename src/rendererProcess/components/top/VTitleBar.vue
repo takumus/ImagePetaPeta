@@ -38,7 +38,7 @@
 import { computed } from "vue";
 // Components
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useWindowTypeStore } from "@/rendererProcess/stores/windowTypeStore";
 import { useSystemInfoStore } from "@/rendererProcess/stores/systemInfoStore";
@@ -49,13 +49,13 @@ defineProps<{
 }>();
 
 function minimizeWindow() {
-  API.send("windowMinimize");
+  IPC.send("windowMinimize");
 }
 function maximizeWindow() {
-  API.send("windowMaximize");
+  IPC.send("windowMaximize");
 }
 function closeWindow() {
-  API.send("windowClose");
+  IPC.send("windowClose");
 }
 const resizable = computed(() => {
   return windowType.value !== WindowType.SETTINGS;

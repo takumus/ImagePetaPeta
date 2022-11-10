@@ -35,7 +35,7 @@ import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/rendererProcess/components/browser/property/propertyThumbnail";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useI18n } from "vue-i18n";
 import { resizeImage } from "@/commons/utils/resizeImage";
@@ -78,8 +78,8 @@ function clearSelection() {
 function openDetails() {
   const petaImage = props.petaImages[0];
   if (petaImage) {
-    API.send("setDetailsPetaImage", petaImage);
-    API.send("openWindow", WindowType.DETAILS);
+    IPC.send("setDetailsPetaImage", petaImage);
+    IPC.send("openWindow", WindowType.DETAILS);
   }
 }
 const propertyThumbnails = computed<PropertyThumbnail[]>(() => {

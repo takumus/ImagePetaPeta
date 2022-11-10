@@ -17,7 +17,7 @@ import { onMounted, ref, watch } from "vue";
 // Components
 import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import * as Cursor from "@/rendererProcess/utils/cursor";
 import { TaskStatus, TaskStatusCode } from "@/commons/api/interfaces/task";
 import { useI18n } from "vue-i18n";
@@ -82,7 +82,7 @@ function addLog(value: string) {
   log.value = value + "\n" + log.value;
 }
 function cancel() {
-  API.send("cancelTasks", [currentTaskId.value]);
+  IPC.send("cancelTasks", [currentTaskId.value]);
 }
 </script>
 

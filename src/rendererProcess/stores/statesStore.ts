@@ -1,14 +1,14 @@
 import { InjectionKey, ref, watch as _watch } from "vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 
 export async function createStatesStore() {
-  const states = ref(await API.send("getStates"));
+  const states = ref(await IPC.send("getStates"));
   const watch = () => {
     return _watch(
       states,
       (value) => {
-        API.send("updateStates", value);
+        IPC.send("updateStates", value);
       },
       {
         deep: true,
@@ -17,7 +17,7 @@ export async function createStatesStore() {
   };
   // watch開始。
   let unwatch = watch();
-  API.on("updateStates", (_event, _states) => {
+  IPC.on("updateStates", (_event, _states) => {
     // メインプロセス側からの変更はunwatch
     unwatch();
     // レンダラに適用

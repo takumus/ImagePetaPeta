@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { useSettingsStore } from "@/rendererProcess/stores/settingsStore";
 import { onMounted, ref, watch } from "vue";
@@ -42,7 +42,7 @@ async function changePetaImageDirectory() {
     [t("commons.yes"), t("commons.no")],
   );
   if (result === 0) {
-    if (!(await API.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
+    if (!(await IPC.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
       await components.dialog.show(
         t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
         [t("commons.yes")],
@@ -57,7 +57,7 @@ function restorePetaImageDirectory() {
   tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
 }
 async function browsePetaImageDirectory() {
-  const path = await API.send("browsePetaImageDirectory");
+  const path = await IPC.send("browsePetaImageDirectory");
   if (path) {
     tempPetaImageDirectory.value = path;
   }

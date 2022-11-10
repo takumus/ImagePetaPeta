@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 // Vue
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { ref, onMounted, watch } from "vue";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import VDragView from "@/rendererProcess/components/utils/VDragView.vue";
@@ -48,7 +48,7 @@ const sources = ref<MediaSourceInfo[]>([]);
 const currentSource = ref<MediaSourceInfo>();
 const mediaStream = ref<MediaStream>();
 onMounted(async () => {
-  sources.value = await API.send("getMediaSources");
+  sources.value = await IPC.send("getMediaSources");
   currentSource.value = sources.value[0];
 });
 function stopSource() {

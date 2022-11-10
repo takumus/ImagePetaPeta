@@ -6,7 +6,7 @@
 // Vue
 import { onMounted } from "vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { Buffer } from "buffer";
 import { ppa } from "@/commons/utils/pp";
@@ -20,14 +20,14 @@ onMounted(() => {
     event.preventDefault();
     event.stopPropagation();
     if (event.dataTransfer) {
-      API.send("windowActivate");
+      IPC.send("windowActivate");
       const htmls: string[] = [];
       const html = event.dataTransfer.getData("text/html");
       if (html !== "") {
         htmls.push(html);
       }
       const data = await getDataFromFileList(event.dataTransfer.files);
-      const ids = await API.send("importImages", { htmls, ...data });
+      const ids = await IPC.send("importImages", { htmls, ...data });
       emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
     }
   });
@@ -41,7 +41,7 @@ onMounted(() => {
   document.addEventListener("paste", async (event) => {
     const mousePosition = currentMousePosition.clone();
     const data = await getDataFromFileList(event.clipboardData?.files);
-    const ids = await API.send("importImages", {
+    const ids = await IPC.send("importImages", {
       htmls: [],
       ...data,
     });

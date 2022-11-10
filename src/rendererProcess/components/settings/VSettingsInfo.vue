@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { useI18n } from "vue-i18n";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { SUPPORT_URL } from "@/commons/defines";
@@ -46,10 +46,10 @@ const debuggers = computed(() => {
   return DEBUGGERS.join(", ");
 });
 function gotoGithub() {
-  API.send("openURL", "https://github.com/takumus/ImagePetaPeta");
+  IPC.send("openURL", "https://github.com/takumus/ImagePetaPeta");
 }
 function gotoIssues() {
-  API.send(
+  IPC.send(
     "openURL",
     `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(
       appInfoStore.state.value.version,
@@ -57,16 +57,16 @@ function gotoIssues() {
   );
 }
 function gotoIcons8() {
-  API.send("openURL", "https://icons8.com/");
+  IPC.send("openURL", "https://icons8.com/");
 }
 function showDBFolder() {
-  API.send("showDBFolder");
+  IPC.send("showDBFolder");
 }
 function showConfigFolder() {
-  API.send("showConfigFolder");
+  IPC.send("showConfigFolder");
 }
 function showEULA() {
-  API.send("openWindow", WindowType.EULA);
+  IPC.send("openWindow", WindowType.EULA);
 }
 </script>
 

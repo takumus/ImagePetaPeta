@@ -32,7 +32,7 @@ import VTitleBar from "@/rendererProcess/components/top/VTitleBar.vue";
 import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
@@ -47,13 +47,13 @@ const settings = useSettingsStore();
 const windowTypeStore = useWindowTypeStore();
 const windowTitleStore = useWindowTitleStore();
 function agree() {
-  API.send("eula", true);
+  IPC.send("eula", true);
 }
 function disagree() {
-  API.send("eula", false);
+  IPC.send("eula", false);
 }
 function close() {
-  API.send("windowClose");
+  IPC.send("windowClose");
 }
 const needToAgree = computed(() => {
   return settings.state.value.eula !== EULA;

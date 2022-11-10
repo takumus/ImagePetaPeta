@@ -26,7 +26,7 @@ import VContextMenu from "@/rendererProcess/components/utils/VContextMenu.vue";
 import VSettings from "@/rendererProcess/components/settings/VSettings.vue";
 import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { useKeyboardsStore } from "@/rendererProcess/stores/keyboardsStore";
 import { useDarkModeStore } from "@/rendererProcess/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
@@ -42,7 +42,7 @@ const appInfoStore = useAppInfoStore();
 onMounted(() => {
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
-    API.send("windowClose");
+    IPC.send("windowClose");
   });
 });
 watch(

@@ -67,7 +67,7 @@ import { Tile } from "@/rendererProcess/components/browser/tile/tile";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { PetaTag } from "@/commons/datas/petaTag";
 import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import {
@@ -188,7 +188,7 @@ const fetchPetaTags = (() => {
     if (props.tile.petaImage === undefined) {
       return;
     }
-    const result = await API.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
+    const result = await IPC.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
     if (currentFetchId !== fetchId) {
       return;
     }

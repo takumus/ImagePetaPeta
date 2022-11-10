@@ -2,7 +2,7 @@ import { Component, createApp, InjectionKey, Plugin } from "vue";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { WindowType } from "@/commons/datas/windowType";
 
@@ -50,7 +50,7 @@ export async function create(
     async function appUse(plugin: Plugin) {
       return await plugin.install?.(app);
     }
-    const platform = await API.send("getPlatform");
+    const platform = await IPC.send("getPlatform");
     await appUse(
       createI18n({
         legacy: false,
@@ -76,10 +76,10 @@ export async function create(
     injectAnimatedGIFAsset();
     app.mount("#app");
   };
-  API.on("dataInitialized", () => {
+  IPC.on("dataInitialized", () => {
     initVue();
   });
-  if (await API.send("getIsDataInitialized")) {
+  if (await IPC.send("getIsDataInitialized")) {
     initVue();
   }
   document.body.addEventListener(
@@ -95,7 +95,7 @@ export async function create(
   const keyboards = new Keyboards();
   keyboards.keys("KeyD").down(() => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      API.send("windowToggleDevTools");
+      IPC.send("windowToggleDevTools");
     }
   });
   keyboards.enabled = true;

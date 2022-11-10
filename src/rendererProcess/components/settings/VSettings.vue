@@ -42,7 +42,7 @@
 // Vue
 import { onMounted, ref } from "vue";
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { useI18n } from "vue-i18n";
 import VSettingsGeneral from "@/rendererProcess/components/settings/VSettingsGeneral.vue";
 import VSettingsDatas from "@/rendererProcess/components/settings/VSettingsDatas.vue";
@@ -56,10 +56,10 @@ const tabNames = ["general", "control", "browser", "datas", "others", "update", 
 const tabs = ref<typeof tabNames[number][]>([...tabNames]);
 const currentTab = ref<typeof tabNames[number]>("general");
 onMounted(async () => {
-  API.on("foundLatestVersion", async () => {
+  IPC.on("foundLatestVersion", async () => {
     currentTab.value = "update";
   });
-  const remoteBinaryInfo = await API.send("getLatestVersion");
+  const remoteBinaryInfo = await IPC.send("getLatestVersion");
   if (!remoteBinaryInfo.isLatest) {
     currentTab.value = "update";
   }

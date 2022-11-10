@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 // Others
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAppInfoStore } from "@/rendererProcess/stores/appInfoStore";
@@ -30,15 +30,15 @@ onMounted(() => {
   checkUpdate();
 });
 async function checkUpdate() {
-  const remoteBinaryInfo = await API.send("getLatestVersion");
+  const remoteBinaryInfo = await IPC.send("getLatestVersion");
   latestVersion.value = remoteBinaryInfo.version;
   updateAvailable.value = !remoteBinaryInfo.isLatest;
 }
 function downloadUpdate() {
-  API.send("openURL", `${DOWNLOAD_URL}${latestVersion.value}`);
+  IPC.send("openURL", `${DOWNLOAD_URL}${latestVersion.value}`);
 }
 function releaseNote() {
-  API.send("openURL", `${DOWNLOAD_URL}${appInfoStore.state.value.version}`);
+  IPC.send("openURL", `${DOWNLOAD_URL}${appInfoStore.state.value.version}`);
 }
 </script>
 

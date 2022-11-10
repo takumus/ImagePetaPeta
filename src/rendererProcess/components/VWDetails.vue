@@ -39,7 +39,7 @@ import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 // Others
 // import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -80,19 +80,19 @@ onMounted(async () => {
         }
         Object.values(board.value.petaPanels).forEach((petaPanel) => {
           if (petaPanel.petaImageId === petaImage.id) {
-            API.send("windowClose");
+            IPC.send("windowClose");
           }
         });
       });
     }
   });
-  API.on("detailsPetaImage", (event, petaImage) => {
+  IPC.on("detailsPetaImage", (event, petaImage) => {
     petaImageId.value = petaImage.id;
   });
-  petaImageId.value = (await API.send("getDetailsPetaImage"))?.id;
+  petaImageId.value = (await IPC.send("getDetailsPetaImage"))?.id;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
-    API.send("windowClose");
+    IPC.send("windowClose");
   });
 });
 const petaImage = computed(() => {

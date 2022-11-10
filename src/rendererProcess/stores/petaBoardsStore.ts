@@ -1,5 +1,5 @@
 import { InjectionKey, ref } from "vue";
-import { API } from "@/rendererProcess/api";
+import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import {
@@ -15,7 +15,7 @@ export async function createPetaBoardsStore() {
   const states = ref<{ [petaBoardId: string]: PetaBoard }>({});
   const boardUpdaters = ref<{ [key: string]: DelayUpdater<PetaBoard> }>({});
   async function getPetaBoards() {
-    states.value = await API.send("getPetaBoards");
+    states.value = await IPC.send("getPetaBoards");
     dbPetaBoardsToPetaBoards(states.value, false);
     Object.values(states.value).forEach((board) => {
       let updater = boardUpdaters.value[board.id];
@@ -25,7 +25,7 @@ export async function createPetaBoardsStore() {
       updater = boardUpdaters.value[board.id] = new DelayUpdater<PetaBoard>(SAVE_DELAY);
       updater.initData(board);
       updater.onUpdate((board) => {
-        API.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
+        IPC.send("updatePetaBoards", [petaBoardsToDBPetaBoards(board)], UpdateMode.UPDATE);
       });
     });
   }
@@ -42,7 +42,7 @@ export async function createPetaBoardsStore() {
   async function removePetaBoard(petaBoard: PetaBoard) {
     boardUpdaters.value[petaBoard.id]?.destroy();
     delete boardUpdaters.value[petaBoard.id];
-    await API.send("updatePetaBoards", [petaBoard], UpdateMode.REMOVE);
+    await IPC.send("updatePetaBoards", [petaBoard], UpdateMode.REMOVE);
     await getPetaBoards();
   }
   async function addPetaBoard(dark = false) {
@@ -55,7 +55,7 @@ export async function createPetaBoardsStore() {
       Math.max(...Object.values(states.value).map((b) => b.index), 0) + 1,
       dark,
     );
-    await API.send("updatePetaBoards", [board], UpdateMode.INSERT);
+    await IPC.send("updatePetaBoards", [board], UpdateMode.INSERT);
     await getPetaBoards();
     const addedBoard = states.value[board.id];
     if (addedBoard === undefined) {
