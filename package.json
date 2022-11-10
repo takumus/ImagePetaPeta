@@ -43,7 +43,7 @@
     "fuse.js": "^6.6.2",
     "gifuct-js": "^2.1.2",
     "p-limit": "^4.0.0",
-    "pixi.js": "^6.4.2",
+    "pixi.js": "^7.0.3",
     "quantize": "^1.0.2",
     "sharp": "^0.31.1",
     "throttle-debounce": "^5.0.0",

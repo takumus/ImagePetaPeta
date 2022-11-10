@@ -109,10 +109,10 @@ onMounted(() => {
   keyboards.enabled = true;
   changePetaPanel();
 });
-function startDrag(e: PIXI.InteractionEvent, controlPoint: PTransformerControlPoint) {
+function startDrag(e: PIXI.FederatedPointerEvent, controlPoint: PTransformerControlPoint) {
   draggingControlPoint = controlPoint;
 }
-function beginMoveSelection(e: PIXI.InteractionEvent) {
+function beginMoveSelection(e: PIXI.FederatedPointerEvent) {
   prevMousePosition.set(e.data.global);
   dragging.value = true;
 }
@@ -136,7 +136,7 @@ function pointerup() {
   draggingControlPoint = undefined;
   dragging.value = false;
 }
-function pointermove(e: PIXI.InteractionEvent) {
+function pointermove(e: PIXI.FederatedPointerEvent) {
   mousePosition.set(e.data.global);
   if (draggingControlPoint) {
     const pos = selectionContainer.toLocal(mousePosition);

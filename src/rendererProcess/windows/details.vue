@@ -38,7 +38,7 @@ import VDialog from "@/rendererProcess/components/utils/VDialog.vue";
 import VBoard from "@/rendererProcess/components/board/VBoard.vue";
 import VProperty from "@/rendererProcess/components/browser/property/VProperty.vue";
 // Others
-import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
+// import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { API } from "@/rendererProcess/api";
 import { UpdateMode } from "@/commons/api/interfaces/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
@@ -69,7 +69,7 @@ const board = ref<PetaBoard>();
 const petaImageId = ref<string>();
 const keyboards = new Keyboards();
 onMounted(async () => {
-  AnimatedGIFLoader.add?.();
+  // AnimatedGIFLoader.add?.();
   petaImagesStore.onUpdate(async (newPetaImages, mode) => {
     if (mode === UpdateMode.UPDATE) {
       vPetaBoard.value?.orderPIXIRender();
