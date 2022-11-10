@@ -18,6 +18,8 @@
       "resize-observer-browser",
       "offscreencanvas",
       "node",
+    ],
+    "typeRoots": [
       "./src/@types",
     ],
     "paths": {
