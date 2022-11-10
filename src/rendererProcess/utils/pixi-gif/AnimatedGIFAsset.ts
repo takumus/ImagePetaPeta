@@ -2,12 +2,6 @@ import { extensions, ExtensionType, settings, utils } from "@pixi/core";
 import type { AssetExtension } from "@pixi/assets";
 import { AnimatedGIF, AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 export function injectAnimatedGIFAsset() {
-  /**
-   * Handle the loading of GIF images. Registering this loader plugin will
-   * load all `.gif` images as an ArrayBuffer and transform into an
-   * AnimatedGIF object.
-   * @ignore
-   */
   const AnimatedGIFAsset = {
     extension: ExtensionType.Asset,
     detection: {
@@ -28,6 +22,5 @@ export function injectAnimatedGIFAsset() {
       },
     },
   } as AssetExtension<AnimatedGIF>;
-
   extensions.add(AnimatedGIFAsset);
 }
