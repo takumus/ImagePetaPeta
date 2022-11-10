@@ -3,20 +3,7 @@ import { PetaImage } from "@/commons/datas/petaImage";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { AnimatedGIF, AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 import * as PIXI from "pixi.js";
-let animatedGIFCache: { [key: string]: AnimatedGIF } = {};
-export function clearAnimatedGIF() {
-  Object.values(animatedGIFCache).forEach((cache) => {
-    cache.destroy();
-  });
-  animatedGIFCache = {};
-}
-export function addAnimatedGIF(key: string, object: AnimatedGIF) {
-  animatedGIFCache[key] = object;
-  return animatedGIFCache[key];
-}
-export function getAnimatedGIF(key: string) {
-  return animatedGIFCache[key];
-}
+
 export function getImage(petaImage: PetaImage | undefined) {
   let canceled = false;
   let cancelAnimatedGIFLoader = () => {
@@ -36,11 +23,6 @@ export function getImage(petaImage: PetaImage | undefined) {
       return;
     }
     const imageURL = getImageURL(petaImage, ImageType.ORIGINAL);
-    const animatedGIF = getAnimatedGIF(imageURL);
-    if (animatedGIF) {
-      res({ animatedGIF: animatedGIF.clone() });
-      return;
-    }
     PIXI.Assets.load(imageURL)
       .then((resource) => {
         if (canceled) {
@@ -48,16 +30,10 @@ export function getImage(petaImage: PetaImage | undefined) {
           return;
         }
         if (resource instanceof AnimatedGIFResource) {
-          resource.retry();
-          resource.promise
-            .then((animatedGIF) => {
-              if (canceled) {
-                animatedGIF.destroy();
-                rej("canceled");
-                return;
-              }
-              addAnimatedGIF(imageURL, animatedGIF);
-              res({ animatedGIF: animatedGIF.clone() });
+          resource
+            .load()
+            .then(() => {
+              res({ animatedGIF: resource.getNewAnimatedGIF() });
             })
             .catch((reason) => {
               rej("could not load texture" + reason);

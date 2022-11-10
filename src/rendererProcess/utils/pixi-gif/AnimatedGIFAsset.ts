@@ -1,6 +1,6 @@
 import { extensions, ExtensionType, settings, utils } from "@pixi/core";
 import type { AssetExtension } from "@pixi/assets";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
+import { AnimatedGIF, AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 export function injectAnimatedGIFAsset() {
   /**
    * Handle the loading of GIF images. Registering this loader plugin will
@@ -18,9 +18,10 @@ export function injectAnimatedGIFAsset() {
     loader: {
       test: (url) => utils.path.extname(url) === ".gif",
       load: async (url, asset) => {
+        asset;
         const response = await settings.ADAPTER.fetch(url);
         const buffer = await response.arrayBuffer();
-        return AnimatedGIF.fromBuffer(buffer, asset?.data);
+        return new AnimatedGIFResource(buffer);
       },
       unload: async (asset) => {
         asset.destroy();
