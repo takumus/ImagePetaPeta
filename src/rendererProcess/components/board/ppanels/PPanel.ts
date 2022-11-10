@@ -8,6 +8,7 @@ import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
 usePetaImagesStore;
 export class PPanel extends PIXI.Sprite {
   // public selected = false;
@@ -15,7 +16,7 @@ export class PPanel extends PIXI.Sprite {
   public dragging = false;
   public draggingOffset = new Vec2();
   public image = new PIXI.Sprite();
-  // public gif: AnimatedGIF | undefined;
+  public gif: AnimatedGIF | undefined;
   public imageWrapper = new PIXI.Sprite();
   public noImage = true;
   public loading = true;
@@ -80,23 +81,22 @@ export class PPanel extends PIXI.Sprite {
       this._cancelLoading = result.cancel;
       const image = await result.promise;
       this.loading = false;
-      // if (this.gif) {
-      //   this.imageWrapper.removeChild(this.gif);
-      //   this.gif.onFrameChange = undefined;
-      //   this.gif.destroy();
-      //   this.gif = undefined;
-      // }
-      // if (image.animatedGIF) {
-      //   // this.gif = image.animatedGIF;
-      //   // this.gif.onFrameChange = this.onUpdateGIF;
-      //   // this.imageWrapper.addChild(this.gif);
-      //   // if (this.petaPanel.gif.stopped) {
-      //   //   this.gif.stop();
-      //   //   this.gif.currentFrame = this.petaPanel.gif.frame;
-      //   // }
-      //   // this.noImage = false;
-      // } else
-      if (image.texture) {
+      if (this.gif) {
+        this.imageWrapper.removeChild(this.gif);
+        this.gif.onFrameChange = undefined;
+        this.gif.destroy();
+        this.gif = undefined;
+      }
+      if (image.animatedGIF) {
+        this.gif = image.animatedGIF;
+        this.gif.onFrameChange = this.onUpdateGIF;
+        this.imageWrapper.addChild(this.gif);
+        if (this.petaPanel.gif.stopped) {
+          this.gif.stop();
+          this.gif.currentFrame = this.petaPanel.gif.frame;
+        }
+        this.noImage = false;
+      } else if (image.texture) {
         try {
           this.image.texture = image.texture;
         } catch (error) {
@@ -202,12 +202,12 @@ export class PPanel extends PIXI.Sprite {
       this.image.height = imageHeight;
       this.image.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
       this.image.y = -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
-      // if (this.gif) {
-      //   this.gif.width = this.image.width;
-      //   this.gif.height = this.image.height;
-      //   this.gif.x = this.image.x;
-      //   this.gif.y = this.image.y;
-      // }
+      if (this.gif) {
+        this.gif.width = this.image.width;
+        this.gif.height = this.image.height;
+        this.gif.x = this.image.x;
+        this.gif.y = this.image.y;
+      }
       if (this.imageWrapper.mask) {
         this.masker.clear();
         this.masker.beginFill(0xff0000);
@@ -278,40 +278,37 @@ export class PPanel extends PIXI.Sprite {
   }
   public destroy() {
     this.image.destroy();
-    // this.gif?.destroy();
+    this.gif?.destroy();
     this.cancelLoading();
     super.destroy();
   }
   public get isGIF() {
-    return false;
+    return this.gif ? true : false;
   }
   public get isPlayingGIF() {
-    return false;
+    return this.gif?.playing ? true : false;
   }
   public playGIF() {
-    // if (this.gif) {
-    //   this.gif.play();
-    //   this.petaPanel.gif.stopped = false;
-    // }
+    if (this.gif) {
+      this.gif.play();
+      this.petaPanel.gif.stopped = false;
+    }
   }
   public stopGIF() {
-    // if (this.gif) {
-    //   this.gif.stop();
-    //   this.petaPanel.gif.frame = this.gif.currentFrame;
-    //   this.petaPanel.gif.stopped = true;
-    // }
+    if (this.gif) {
+      this.gif.stop();
+      this.petaPanel.gif.frame = this.gif.currentFrame;
+      this.petaPanel.gif.stopped = true;
+    }
   }
   public toggleGIF() {
-    // if (this.gif) {
-    //   if (this.isPlayingGIF) {
-    //     this.stopGIF();
-    //   } else {
-    //     this.playGIF();
-    //   }
-    // }
-  }
-  public updateGIF(deltaTime: number) {
-    // this.gif?.update(deltaTime);
+    if (this.gif) {
+      if (this.isPlayingGIF) {
+        this.stopGIF();
+      } else {
+        this.playGIF();
+      }
+    }
   }
   private absPanelWidth() {
     return Math.abs(this.petaPanel.width);

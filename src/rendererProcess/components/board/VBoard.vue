@@ -183,14 +183,12 @@ function construct(resolution?: number) {
   });
   resizerStore.forceEmit();
   renderPIXI();
-  PIXI.Ticker.shared.add(updateAnimatedGIF);
 }
 function destruct() {
   if (pixi) {
     logChunk().log("destruct PIXI");
     pixi.destroy(true);
   }
-  PIXI.Ticker.shared.remove(updateAnimatedGIF);
   panelsBackground.value?.removeEventListener("mousewheel", wheel as (e: Event) => void);
   cancelAnimationFrame(requestAnimationFrameHandle);
 }
@@ -749,11 +747,11 @@ function renderPIXI() {
   }
   requestAnimationFrameHandle = requestAnimationFrame(renderPIXI);
 }
-function updateAnimatedGIF(deltaTime: number) {
-  Object.values(pPanels)
-    .filter((pPanel) => pPanel.isGIF)
-    .forEach((pPanel) => pPanel.updateGIF(deltaTime));
-}
+// function updateAnimatedGIF(deltaTime: number) {
+//   Object.values(pPanels)
+//     .filter((pPanel) => pPanel.isGIF)
+//     .forEach((pPanel) => pPanel.updateGIF(deltaTime));
+// }
 function keyShift(pressed: boolean) {
   pTransformer.fit = pressed;
 }

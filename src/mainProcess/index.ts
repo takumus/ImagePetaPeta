@@ -157,7 +157,6 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
     session.defaultSession.protocol.registerFileProtocol(
       PROTOCOLS.FILE.IMAGE_ORIGINAL,
       async (req, res) => {
-        console.log(`file: ${req.url}`);
         res({
           path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
         });
@@ -166,7 +165,6 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
     session.defaultSession.protocol.registerFileProtocol(
       PROTOCOLS.FILE.IMAGE_THUMBNAIL,
       async (req, res) => {
-        console.log(`file: ${req.url}`);
         res({
           path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
         });
