@@ -75,6 +75,8 @@ import {
   BROWSER_FETCH_TAGS_DELAY_RANDOM,
   BROWSER_LOAD_ORIGINAL_DELAY,
   BROWSER_LOAD_ORIGINAL_DELAY_RANDOM,
+  BROWSER_LOAD_THUMBNAIL_DELAY,
+  BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM,
 } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
@@ -108,6 +110,7 @@ const loadingTags = ref(true);
 const myPetaTags = ref<PetaTag[]>([]);
 const click: ClickChecker = new ClickChecker();
 let loadOriginalTimeoutHandler = -1;
+let loadThumbnailTimeoutHandler = -1;
 let fetchTagsTimeoutHandler = -1;
 let pressing = false;
 const fetchingPetaTags = ref(false);
@@ -119,6 +122,7 @@ onUnmounted(() => {
   window.removeEventListener("pointermove", pointermove);
   window.removeEventListener("pointerup", pointerup);
   window.clearTimeout(loadOriginalTimeoutHandler);
+  window.clearTimeout(loadThumbnailTimeoutHandler);
   window.clearTimeout(fetchTagsTimeoutHandler);
 });
 function dragstart(event: PointerEvent) {
@@ -210,24 +214,27 @@ function delayedFetchPetaTags() {
 }
 function delayedLoadImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
-  thumbnailURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
-  if (props.original) {
-    loadOriginalTimeoutHandler = window.setTimeout(() => {
-      if (props.tile.visible) {
-        const img = image.value;
-        const url = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
-        if (img === undefined) {
-          return;
+  window.clearTimeout(loadThumbnailTimeoutHandler);
+  loadThumbnailTimeoutHandler = window.setTimeout(() => {
+    thumbnailURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
+    if (props.original) {
+      loadOriginalTimeoutHandler = window.setTimeout(() => {
+        if (props.tile.visible) {
+          const img = image.value;
+          const url = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
+          if (img === undefined) {
+            return;
+          }
+          if (img.src !== url) {
+            loadingOriginal.value = true;
+            ImageDecoder.decode(img, url, (failed) => {
+              loadingOriginal.value = failed;
+            });
+          }
         }
-        if (img.src !== url) {
-          loadingOriginal.value = true;
-          ImageDecoder.decode(img, url, (failed) => {
-            loadingOriginal.value = failed;
-          });
-        }
-      }
-    }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
-  }
+      }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
+    }
+  }, Math.random() * BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM + BROWSER_LOAD_THUMBNAIL_DELAY);
 }
 const selected = computed(() => {
   if (props.tile.petaImage !== undefined) {
@@ -315,7 +322,7 @@ t-tile-root {
         width: 100%;
         height: 100%;
         opacity: 1;
-        transition: opacity 200ms ease-in-out;
+        // transition: opacity 200ms ease-in-out;
         background-color: unset;
         &.loaded {
           opacity: 0;
