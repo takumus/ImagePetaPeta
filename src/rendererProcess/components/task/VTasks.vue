@@ -19,7 +19,7 @@ import VModal from "@/rendererProcess/components/modal/VModal.vue";
 import VTask from "@/rendererProcess/components/task/VTask.vue";
 // Others
 import { IPC } from "@/rendererProcess/ipc";
-import { TaskStatus, TaskStatusCode } from "@/commons/ipc/interfaces/task";
+import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { useWindowStatusStore } from "@/rendererProcess/stores/windowStatusStore";
 import { useI18n } from "vue-i18n";
 import { TASK_CLOSE_DELAY } from "@/commons/defines";

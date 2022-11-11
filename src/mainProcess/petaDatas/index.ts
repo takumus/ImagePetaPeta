@@ -1,4 +1,4 @@
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
@@ -23,7 +23,7 @@ import * as fs from "fs";
 import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/ipc/interfaces/task";
+import { TaskStatusCode } from "@/commons/datas/task";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;

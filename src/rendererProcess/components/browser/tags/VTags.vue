@@ -41,7 +41,7 @@ import { computed } from "vue";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";

@@ -1,4 +1,4 @@
-import { TaskStatus, TaskStatusCode } from "@/commons/ipc/interfaces/task";
+import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";
 const tasks: { [id: string]: TaskHandler } = {};
 let emitStatusCallback: ((taskId: string, status: TaskStatus) => void) | undefined;

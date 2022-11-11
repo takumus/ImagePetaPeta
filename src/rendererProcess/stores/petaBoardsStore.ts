@@ -1,7 +1,7 @@
 import { InjectionKey, ref } from "vue";
 import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   createPetaBoard,
   dbPetaBoardsToPetaBoards,

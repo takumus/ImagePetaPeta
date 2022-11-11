@@ -3,8 +3,8 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { WindowType } from "@/commons/datas/windowType";
-import { TaskStatus } from "@/commons/ipc/interfaces/task";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { TaskStatus } from "@/commons/datas/task";
+import { UpdateMode } from "@/commons/datas/updateMode";
 
 export interface MainEvents {
   updatePetaImages: (petaImages: PetaImage[], mode: UpdateMode) => void;

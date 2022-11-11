@@ -1,4 +1,4 @@
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { minimId } from "@/commons/utils/utils";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import { PetaBoard } from "@/commons/datas/petaBoard";

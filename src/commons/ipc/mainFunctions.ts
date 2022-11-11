@@ -1,6 +1,6 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { AppInfo } from "@/commons/datas/appInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";

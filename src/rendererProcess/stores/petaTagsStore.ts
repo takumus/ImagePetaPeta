@@ -3,7 +3,7 @@ import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export async function createPetaTagsStore() {
   const petaTags = ref(await IPC.send("getPetaTags"));

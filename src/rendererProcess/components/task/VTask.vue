@@ -19,7 +19,7 @@ import VProgressBar from "@/rendererProcess/components/utils/VProgressBar.vue";
 // Others
 import { IPC } from "@/rendererProcess/ipc";
 import * as Cursor from "@/rendererProcess/utils/cursor";
-import { TaskStatus, TaskStatusCode } from "@/commons/ipc/interfaces/task";
+import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { useI18n } from "vue-i18n";
 const props = defineProps<{
   taskId: string;

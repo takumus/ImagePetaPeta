@@ -1,4 +1,4 @@
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { minimId } from "@/commons/utils/utils";
 import { PetaDatas } from "@/mainProcess/petaDatas";
 import * as Tasks from "@/mainProcess/tasks/task";
@@ -6,7 +6,7 @@ import { UNTAGGED_ID } from "@/commons/defines";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { createPetaTag } from "@/commons/datas/petaTag";
 import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/ipc/interfaces/task";
+import { TaskStatusCode } from "@/commons/datas/task";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export class PetaDataPetaTags {

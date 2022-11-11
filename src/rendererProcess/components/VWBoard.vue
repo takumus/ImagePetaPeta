@@ -66,7 +66,7 @@ import {
 } from "@/commons/defines";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { createPetaPanel } from "@/commons/datas/petaPanel";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { Vec2 } from "@/commons/utils/vec2";
 import { logChunk } from "@/rendererProcess/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";

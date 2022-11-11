@@ -40,7 +40,7 @@ import VProperty from "@/rendererProcess/components/browser/property/VProperty.v
 // Others
 // import { AnimatedGIFLoader } from "@/rendererProcess/utils/pixi-gif";
 import { IPC } from "@/rendererProcess/ipc";
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { Vec2 } from "@/commons/utils/vec2";
 import {

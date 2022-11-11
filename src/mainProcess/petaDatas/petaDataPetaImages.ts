@@ -1,4 +1,4 @@
-import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { minimId } from "@/commons/utils/utils";
 import { PetaDatas } from "@/mainProcess/petaDatas";
@@ -17,13 +17,13 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 import { generateMetadataByWorker } from "@/mainProcess/utils/generateMetadataByWorker";
-import { ImportImageResult } from "@/commons/ipc/interfaces/importImageResult";
+import { ImportImageResult } from "@/commons/datas/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
 import axios from "axios";
 import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 import { CPU_LENGTH } from "@/commons/cpu";
 import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/ipc/interfaces/task";
+import { TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
