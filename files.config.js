@@ -26,6 +26,9 @@ module.exports = {
         },
       },
     },
+    chromeExtension: {
+      iconsDir: "./chromeExtension/",
+    },
     tempDir: "./.temp",
     testDir: "./dist/test",
   },

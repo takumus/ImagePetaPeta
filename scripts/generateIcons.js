@@ -35,6 +35,20 @@ script.run("generate icons", async () => {
     ),
   );
   script.utils.log(
+    (
+      await Promise.all(
+        [16, 32, 48, 128].map(async (size) =>
+          exportImageWithMargin(
+            "./resources/icon/icon.png",
+            Path.resolve(script.files.output.chromeExtension.iconsDir, `icon${size}.png`),
+            size,
+            0,
+          ),
+        ),
+      )
+    ).join("\n"),
+  );
+  script.utils.log(
     await exportImageWithMargin(
       "./resources/icon/icon.png",
       Path.resolve(script.files.output.electron.resources.mac.appIcon),
