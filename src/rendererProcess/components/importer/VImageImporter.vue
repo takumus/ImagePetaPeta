@@ -22,44 +22,40 @@ onMounted(() => {
     if (event.dataTransfer) {
       IPC.send("windowActivate");
       const html = event.dataTransfer.getData("text/html");
-      const data = await getDataFromFileList(event.dataTransfer.files);
+      const { buffers, filePaths } = await getDataFromFileList(event.dataTransfer.files);
       let ids: string[] = [];
       if (html !== "") {
-        try {
-          ids = await IPC.send("importImages", [
-            [
-              {
-                type: "html",
-                html,
-              },
-              ...(data.buffers?.[0]
-                ? [
-                    {
-                      type: "buffer",
-                      buffer: data.buffers?.[0],
-                    } as const,
-                  ]
-                : []),
-            ],
-          ]);
-        } catch {
-          //
-        }
+        ids = await IPC.send("importImages", [
+          [
+            {
+              type: "html",
+              html,
+            },
+            ...(buffers?.[0]
+              ? [
+                  {
+                    type: "buffer",
+                    buffer: buffers[0],
+                  } as const,
+                ]
+              : []),
+          ],
+        ]);
       } else {
         ids = await IPC.send(
           "importImages",
-          data.buffers !== undefined
-            ? data.buffers.map((buffer) => [
-                {
-                  type: "buffer",
-                  buffer,
-                } as const,
-              ])
-            : data.filePaths !== undefined
-            ? data.filePaths.map((filePath) => [
+          filePaths !== undefined
+            ? filePaths.map((filePath) => [
                 {
                   type: "filePath",
                   filePath,
+                } as const,
+              ])
+            : buffers !== undefined
+            ? buffers.map((buffer) => [
+                {
+                  type: "buffer",
+                  buffer,
                 } as const,
               ])
             : [],
@@ -70,21 +66,21 @@ onMounted(() => {
   });
   document.addEventListener("paste", async (event) => {
     const mousePosition = currentMousePosition.clone();
-    const data = await getDataFromFileList(event.clipboardData?.files);
+    const { buffers, filePaths } = await getDataFromFileList(event.clipboardData?.files);
     const ids = await IPC.send(
       "importImages",
-      data.buffers !== undefined
-        ? data.buffers.map((buffer) => [
-            {
-              type: "buffer",
-              buffer,
-            } as const,
-          ])
-        : data.filePaths !== undefined
-        ? data.filePaths.map((filePath) => [
+      filePaths !== undefined
+        ? filePaths.map((filePath) => [
             {
               type: "filePath",
               filePath,
+            } as const,
+          ])
+        : buffers !== undefined
+        ? buffers.map((buffer) => [
+            {
+              type: "buffer",
+              buffer,
             } as const,
           ])
         : [],
