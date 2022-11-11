@@ -1,4 +1,4 @@
-import { MainEvents } from "@/commons/ipc/mainEvents";
+import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
 import { Settings } from "@/commons/datas/settings";
 import { WindowStates } from "@/commons/datas/windowStates";
 import { WindowType } from "@/commons/datas/windowType";
@@ -308,7 +308,10 @@ export class Windows {
       this.windows[windowType]?.focus();
     }
   }
-  emitMainEvent<U extends keyof MainEvents>(key: U, ...args: Parameters<MainEvents[U]>): void {
+  emitMainEvent<U extends keyof ToFrontFunctions>(
+    key: U,
+    ...args: Parameters<ToFrontFunctions[U]>
+  ): void {
     Object.values(this.windows).forEach((window) => {
       if (window !== undefined && !window.isDestroyed()) {
         window.webContents.send(key, ...args);

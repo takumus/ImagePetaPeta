@@ -6,7 +6,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { TaskStatus } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 
-export interface MainEvents {
+export interface ToFrontFunctions {
   updatePetaImages: (petaImages: PetaImage[], mode: UpdateMode) => void;
   updatePetaTags: (updates: { petaTagIds: string[]; petaImageIds: string[] }) => void;
   updatePetaTagCounts: (petaTagCounts: { [petaTagId: string]: number }) => void;

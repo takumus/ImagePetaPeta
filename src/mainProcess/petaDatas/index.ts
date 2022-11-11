@@ -7,7 +7,7 @@ import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
-import { MainEvents } from "@/commons/ipc/mainEvents";
+import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
 import { Settings } from "@/commons/datas/settings";
 import Config from "@/mainProcess/storages/config";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
@@ -42,9 +42,9 @@ export class PetaDatas {
       DIR_THUMBNAILS: string;
       DIR_TEMP: string;
     },
-    public emitMainEvent: <U extends keyof MainEvents>(
+    public emitMainEvent: <U extends keyof ToFrontFunctions>(
       key: U,
-      ...args: Parameters<MainEvents[U]>
+      ...args: Parameters<ToFrontFunctions[U]>
     ) => void,
     public mainLogger: MainLogger,
   ) {

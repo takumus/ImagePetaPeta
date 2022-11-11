@@ -2,16 +2,16 @@ import express from "express";
 import bodyParser from "body-parser";
 import { IpFilter } from "express-ipfilter";
 import cors from "cors";
-import { MainFunctions } from "@/commons/ipc/mainFunctions";
+import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
 import { IpcMainInvokeEvent } from "electron";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { WEBHOOK_PORT, WEBHOOK_WHITELIST_IP_LIST } from "@/commons/defines";
 export function initWebhook(
-  mainFunctions: {
-    [P in keyof MainFunctions]: (
+  toMainFunctions: {
+    [P in keyof ToMainFunctions]: (
       event: IpcMainInvokeEvent,
-      ...args: Parameters<MainFunctions[P]>
-    ) => ReturnType<MainFunctions[P]>;
+      ...args: Parameters<ToMainFunctions[P]>
+    ) => ReturnType<ToMainFunctions[P]>;
   },
   mainLogger: MainLogger,
 ) {
@@ -32,7 +32,7 @@ export function initWebhook(
         executeLog.log(`$Webhook: receive`, req.body);
         const eventName = req.body.event as string;
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        const event = (mainFunctions as any)[eventName];
+        const event = (toMainFunctions as any)[eventName];
         if (event) {
           executeLog.log(`$Webhook: execute`, eventName);
           res.json(await event(undefined, ...(req.body.args ?? [])));

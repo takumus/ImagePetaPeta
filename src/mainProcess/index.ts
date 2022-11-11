@@ -18,7 +18,7 @@ import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { MainFunctions } from "@/commons/ipc/mainFunctions";
+import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import {
   migratePetaImage,
@@ -175,10 +175,10 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
       ipcへ関数を登録
     */
     //-------------------------------------------------------------------------------------------------//
-    const mainFunctions = getMainFunctions();
-    Object.keys(mainFunctions).forEach((key) => {
+    const toMainFunctions = getMainFunctions();
+    Object.keys(toMainFunctions).forEach((key) => {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      ipcMain.handle(key, (mainFunctions as any)[key] as any);
+      ipcMain.handle(key, (toMainFunctions as any)[key] as any);
     });
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -271,7 +271,7 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
     */
     //-------------------------------------------------------------------------------------------------//
     if (configSettings.data.developerMode) {
-      initWebhook(mainFunctions, mainLogger);
+      initWebhook(toMainFunctions, mainLogger);
     }
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -279,10 +279,10 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
     */
     //-------------------------------------------------------------------------------------------------//
     function getMainFunctions(): {
-      [P in keyof MainFunctions]: (
+      [P in keyof ToMainFunctions]: (
         event: IpcMainInvokeEvent,
-        ...args: Parameters<MainFunctions[P]>
-      ) => ReturnType<MainFunctions[P]>;
+        ...args: Parameters<ToMainFunctions[P]>
+      ) => ReturnType<ToMainFunctions[P]>;
     } {
       return {
         async browseAndImportImageFiles(event, type) {
