@@ -92,7 +92,7 @@ import {
 } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { Tile } from "@/rendererProcess/components/browser/tile/tile";
-import { UpdateMode } from "@/commons/api/interfaces/updateMode";
+import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/rendererProcess/utils/isKeyboardLocked";

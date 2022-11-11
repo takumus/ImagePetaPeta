@@ -4,7 +4,7 @@ import { BrowserWindow, shell, WebContents } from "electron";
 import * as Path from "path";
 import * as Tasks from "@/mainProcess/tasks/task";
 import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/api/interfaces/task";
+import { TaskStatusCode } from "@/commons/ipc/interfaces/task";
 type SearchImageByGoogleTaskStep = { js: string } | { wait: number };
 export interface SearchImageByGoogleTask {
   url: string;

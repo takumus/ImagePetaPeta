@@ -1,4 +1,4 @@
-import { MainEvents } from "@/commons/api/mainEvents";
+import { MainEvents } from "@/commons/ipc/mainEvents";
 import { Settings } from "@/commons/datas/settings";
 import { WindowStates } from "@/commons/datas/windowStates";
 import { WindowType } from "@/commons/datas/windowType";

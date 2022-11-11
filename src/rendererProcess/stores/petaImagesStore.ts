@@ -2,7 +2,7 @@ import { InjectionKey, onUnmounted, ref } from "vue";
 import { IPC } from "@/rendererProcess/ipc";
 import { inject } from "@/rendererProcess/utils/vue";
 import { PetaImage } from "@/commons/datas/petaImage";
-import { UpdateMode } from "@/commons/api/interfaces/updateMode";
+import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
 import EventEmitter from "events";
 import TypedEmitter from "typed-emitter";
 export async function createPetaImagesStore() {

@@ -17,8 +17,8 @@ import { DEFAULT_BOARD_NAME, EULA, PROTOCOLS, UPDATE_CHECK_INTERVAL } from "@/co
 import * as file from "@/mainProcess/storages/file";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
-import { UpdateMode } from "@/commons/api/interfaces/updateMode";
-import { MainFunctions } from "@/commons/api/mainFunctions";
+import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
+import { MainFunctions } from "@/commons/ipc/mainFunctions";
 import { ImageType } from "@/commons/datas/imageType";
 import {
   migratePetaImage,

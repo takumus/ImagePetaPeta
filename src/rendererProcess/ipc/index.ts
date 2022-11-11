@@ -1,5 +1,5 @@
-import { MainFunctions } from "@/commons/api/mainFunctions";
-import { MainEvents } from "@/commons/api/mainEvents";
+import { MainFunctions } from "@/commons/ipc/mainFunctions";
+import { MainEvents } from "@/commons/ipc/mainEvents";
 import { IpcRendererEvent } from "electron/main";
 import deepcopy from "deepcopy";
 import { IPC_GLOBAL_NAME } from "@/commons/defines";

@@ -1,4 +1,4 @@
-import { UpdateMode } from "@/commons/api/interfaces/updateMode";
+import { UpdateMode } from "@/commons/ipc/interfaces/updateMode";
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
@@ -7,7 +7,7 @@ import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import DB from "@/mainProcess/storages/db";
-import { MainEvents } from "@/commons/api/mainEvents";
+import { MainEvents } from "@/commons/ipc/mainEvents";
 import { Settings } from "@/commons/datas/settings";
 import Config from "@/mainProcess/storages/config";
 import { runExternalApplication } from "@/mainProcess/utils/runExternalApplication";
@@ -23,7 +23,7 @@ import * as fs from "fs";
 import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/api/interfaces/task";
+import { TaskStatusCode } from "@/commons/ipc/interfaces/task";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;

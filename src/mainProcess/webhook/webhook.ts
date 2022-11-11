@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { IpFilter } from "express-ipfilter";
 import cors from "cors";
-import { MainFunctions } from "@/commons/api/mainFunctions";
+import { MainFunctions } from "@/commons/ipc/mainFunctions";
 import { IpcMainInvokeEvent } from "electron";
 import { MainLogger } from "@/mainProcess/utils/mainLogger";
 import { WEBHOOK_PORT, WEBHOOK_WHITELIST_IP_LIST } from "@/commons/defines";
