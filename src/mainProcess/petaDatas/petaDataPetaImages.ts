@@ -21,7 +21,7 @@ import { ImportImageResult } from "@/commons/datas/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
 import axios from "axios";
 import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
-import { CPU_LENGTH } from "@/commons/cpu";
+import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";

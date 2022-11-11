@@ -1,4 +1,4 @@
-import { CPU_LENGTH } from "@/commons/cpu";
+import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
 import GenerateMetadataWorkerThreads from "@/mainProcess/workers/generateMetadata.worker-threads";
 import { Worker } from "worker_threads";
