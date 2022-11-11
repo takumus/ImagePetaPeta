@@ -1,4 +1,4 @@
-import { DOMParser } from "@xmldom/xmldom";
+// import { DOMParser } from "@xmldom/xmldom";
 export function getURLFromHTML(html: string) {
   const dom = new DOMParser().parseFromString(html, "text/html");
   const imgDom = dom.getElementsByTagName("img")[0];

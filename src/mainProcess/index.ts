@@ -754,17 +754,21 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
           try {
             log.log("#importImages");
             log.log(datas.length);
-            // const logFromBrowser = mainLogger.logChunk();
-            // const ids = datas.filePaths
-            //   .filter(
-            //     (filePath) => Path.resolve(Path.dirname(filePath)) === Path.resolve(DIR_IMAGES),
-            //   )
-            //   .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
-            // logFromBrowser.log("## From Browser");
-            // if (ids.length > 0 && ids.length === datas.filePaths.length) {
-            //   logFromBrowser.log("return:", ids.length);
-            //   return ids;
-            // }
+            const logFromBrowser = mainLogger.logChunk();
+            const ids = datas
+              .filter(
+                (data) =>
+                  data.filePath !== undefined &&
+                  Path.resolve(Path.dirname(data.filePath)) === Path.resolve(DIR_IMAGES),
+              )
+              .map((data) => Path.basename(data.filePath ?? "?").split(".")[0] ?? "?");
+            logFromBrowser.log("## From Browser");
+            if (ids.length > 0 && ids.length === datas.length) {
+              logFromBrowser.log("return:", ids.length);
+              return ids;
+            } else {
+              logFromBrowser.log("return:", false);
+            }
             const fileInfos = (
               await ppa(async (data): Promise<ImportFileInfo | undefined> => {
                 if (data.filePath !== undefined) {
@@ -774,12 +778,6 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
                 }
                 if (data.url !== undefined) {
                   const result = await petaDatas.petaImages.createFileInfoFromURL(data.url);
-                  if (result !== undefined) {
-                    return result;
-                  }
-                }
-                if (data.html !== undefined) {
-                  const result = await petaDatas.petaImages.createFileInfoFromHTML(data.html);
                   if (result !== undefined) {
                     return result;
                   }

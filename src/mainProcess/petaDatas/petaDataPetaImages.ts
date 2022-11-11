@@ -19,7 +19,7 @@ import {
 import { generateMetadataByWorker } from "@/mainProcess/utils/generateMetadataByWorker";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
@@ -118,7 +118,7 @@ export class PetaDataPetaImages {
   async createFileInfoFromURL(url: string) {
     const log = this.parent.mainLogger.logChunk();
     try {
-      log.log("## Import Images From URL");
+      log.log("## Create File Info URL");
       let data: Buffer;
       let remoteURL = "";
       if (url.trim().startsWith("data:")) {
@@ -138,23 +138,11 @@ export class PetaDataPetaImages {
         name: "downloaded",
       } as ImportFileInfo;
     } catch (error) {
-      log.error(error);
-    }
-    log.log("return:", false);
-    return undefined;
-  }
-  async createFileInfoFromHTML(html: string) {
-    const log = this.parent.mainLogger.logChunk();
-    try {
-      log.log("## Import Images From HTML");
-      const url = getURLFromHTML(html);
-      const info = await this.createFileInfoFromURL(url);
-      if (info) {
-        log.log("return:", true);
-        return info;
+      if (error instanceof AxiosError) {
+        log.error(error.message, error.code);
+      } else {
+        log.error(error);
       }
-    } catch (error) {
-      log.error(error);
     }
     log.log("return:", false);
     return undefined;
@@ -162,7 +150,7 @@ export class PetaDataPetaImages {
   async createFileInfoFromBuffer(buffer: ArrayBuffer | Buffer) {
     const log = this.parent.mainLogger.logChunk();
     try {
-      log.log("## Import Images From ArrayBuffer");
+      log.log("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
       await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
       log.log("return:", true);

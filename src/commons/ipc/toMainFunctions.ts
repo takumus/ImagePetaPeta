@@ -15,7 +15,6 @@ export interface ToMainFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
   importImages: (
     datas: {
-      html?: string;
       url?: string;
       buffer?: ArrayBuffer;
       filePath?: string;
