@@ -37,6 +37,8 @@ import { searchImageByGoogle } from "@/mainProcess/utils/searchImageByGoogle";
 import { getConstants } from "@/mainProcess/constants";
 import { LogFrom } from "@/mainProcess/storages/logger";
 import { initWebhook } from "@/mainProcess/webhook/webhook";
+import { ppa } from "@/commons/utils/pp";
+import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -751,37 +753,52 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
           const log = mainLogger.logChunk();
           try {
             log.log("#importImages");
-            log.log(
-              "htmls:",
-              datas.htmls.length,
-              ", buffers:",
-              datas.buffers.length,
-              ", filePaths:",
-              datas.filePaths.length,
-            );
-            const logFromBrowser = mainLogger.logChunk();
-            const ids = datas.filePaths
-              .filter(
-                (filePath) => Path.resolve(Path.dirname(filePath)) === Path.resolve(DIR_IMAGES),
-              )
-              .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
-            logFromBrowser.log("## From Browser");
-            if (ids.length > 0 && ids.length === datas.filePaths.length) {
-              logFromBrowser.log("return:", ids.length);
-              return ids;
-            }
-            let petaImageIds = await petaDatas.petaImages.importImagesFromHTMLs(datas.htmls);
-            if (petaImageIds.length === 0) {
-              petaImageIds = await petaDatas.petaImages.importImagesFromBuffers(datas.buffers);
-            }
-            if (petaImageIds.length === 0) {
-              petaImageIds = (
-                await petaDatas.petaImages.importImagesFromFileInfos({
-                  fileInfos: datas.filePaths.map((path) => ({ path })),
-                  extract: true,
-                })
-              ).map((petaImage) => petaImage.id);
-            }
+            log.log(datas.length);
+            // const logFromBrowser = mainLogger.logChunk();
+            // const ids = datas.filePaths
+            //   .filter(
+            //     (filePath) => Path.resolve(Path.dirname(filePath)) === Path.resolve(DIR_IMAGES),
+            //   )
+            //   .map((filePath) => Path.basename(filePath).split(".")[0] ?? "?");
+            // logFromBrowser.log("## From Browser");
+            // if (ids.length > 0 && ids.length === datas.filePaths.length) {
+            //   logFromBrowser.log("return:", ids.length);
+            //   return ids;
+            // }
+            const fileInfos = (
+              await ppa(async (data): Promise<ImportFileInfo | undefined> => {
+                if (data.filePath !== undefined) {
+                  return {
+                    path: data.filePath,
+                  };
+                }
+                if (data.url !== undefined) {
+                  const result = await petaDatas.petaImages.createFileInfoFromURL(data.url);
+                  if (result !== undefined) {
+                    return result;
+                  }
+                }
+                if (data.html !== undefined) {
+                  const result = await petaDatas.petaImages.createFileInfoFromHTML(data.html);
+                  if (result !== undefined) {
+                    return result;
+                  }
+                }
+                if (data.buffer !== undefined) {
+                  const result = await petaDatas.petaImages.createFileInfoFromBuffer(data.buffer);
+                  if (result !== undefined) {
+                    return result;
+                  }
+                }
+                return undefined;
+              }, datas).promise
+            ).filter((info) => info !== undefined) as ImportFileInfo[];
+            const petaImageIds = (
+              await petaDatas.petaImages.importImagesFromFileInfos({
+                fileInfos,
+                extract: true,
+              })
+            ).map((petaImage) => petaImage.id);
             log.log("return:", petaImageIds.length);
             return petaImageIds;
           } catch (e) {

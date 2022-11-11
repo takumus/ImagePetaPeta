@@ -21,15 +21,49 @@ onMounted(() => {
     event.stopPropagation();
     if (event.dataTransfer) {
       IPC.send("windowActivate");
-      const htmls: string[] = [];
       const html = event.dataTransfer.getData("text/html");
-      if (html !== "") {
-        htmls.push(html);
-      }
       const data = await getDataFromFileList(event.dataTransfer.files);
-      const ids = await IPC.send("importImages", { htmls, ...data });
+      let ids: string[] = [];
+      if (html !== "") {
+        ids = await IPC.send("importImages", [
+          {
+            html,
+            buffer: data.buffers?.[0],
+          },
+        ]);
+      } else {
+        ids = await IPC.send(
+          "importImages",
+          data.buffers !== undefined
+            ? data.buffers.map((buffer) => ({
+                buffer,
+              }))
+            : data.filePaths !== undefined
+            ? data.filePaths.map((filePath) => ({
+                filePath,
+              }))
+            : [],
+        );
+      }
       emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
     }
+  });
+  document.addEventListener("paste", async (event) => {
+    const mousePosition = currentMousePosition.clone();
+    const data = await getDataFromFileList(event.clipboardData?.files);
+    const ids = await IPC.send(
+      "importImages",
+      data.buffers !== undefined
+        ? data.buffers.map((buffer) => ({
+            buffer,
+          }))
+        : data.filePaths !== undefined
+        ? data.filePaths.map((filePath) => ({
+            filePath,
+          }))
+        : [],
+    );
+    emit("addPanelByDragAndDrop", ids, mousePosition, false);
   });
   document.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -38,31 +72,18 @@ onMounted(() => {
   window.addEventListener("pointermove", (event) => {
     currentMousePosition = vec2FromPointerEvent(event);
   });
-  document.addEventListener("paste", async (event) => {
-    const mousePosition = currentMousePosition.clone();
-    const data = await getDataFromFileList(event.clipboardData?.files);
-    const ids = await IPC.send("importImages", {
-      htmls: [],
-      ...data,
-    });
-    emit("addPanelByDragAndDrop", ids, mousePosition, false);
-  });
 });
 async function getDataFromFileList(fileList?: FileList): Promise<{
-  buffers: Buffer[];
-  filePaths: string[];
+  buffers?: Buffer[];
+  filePaths?: string[];
 }> {
   const items = [...(fileList ?? [])];
   if (items.length === 0) {
-    return {
-      buffers: [],
-      filePaths: [],
-    };
+    return {};
   }
   if (items[0]?.path !== "") {
     // パスがあったらファイルパスから読む。
     return {
-      buffers: [],
       filePaths: items.map((file) => file.path),
     };
   } else {
@@ -79,7 +100,7 @@ async function getDataFromFileList(fileList?: FileList): Promise<{
         [...items],
       ).promise
     ).filter((buffer) => buffer != undefined) as Buffer[];
-    return { buffers, filePaths: [] };
+    return { buffers };
   }
 }
 </script>

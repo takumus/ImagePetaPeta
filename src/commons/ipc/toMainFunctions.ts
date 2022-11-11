@@ -13,11 +13,14 @@ import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export interface ToMainFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
-  importImages: (datas: {
-    htmls: string[];
-    buffers: ArrayBuffer[];
-    filePaths: string[];
-  }) => Promise<string[]>;
+  importImages: (
+    datas: {
+      html?: string;
+      url?: string;
+      buffer?: ArrayBuffer;
+      filePath?: string;
+    }[],
+  ) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
   getPetaImages: () => Promise<PetaImages>;
   updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;

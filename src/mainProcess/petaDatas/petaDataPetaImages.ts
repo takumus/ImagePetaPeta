@@ -25,6 +25,7 @@ import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";
+import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 export class PetaDataPetaImages {
   constructor(private parent: PetaDatas) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -114,79 +115,67 @@ export class PetaDataPetaImages {
     }
     return true;
   }
-  async importImagesFromHTMLs(htmls: string[]) {
+  async createFileInfoFromURL(url: string) {
     const log = this.parent.mainLogger.logChunk();
-    const urls: string[] = [];
     try {
-      log.log("## Import Images From HTMLs");
-      htmls.map((html) => {
-        try {
-          urls.push(getURLFromHTML(html));
-        } catch (error) {
-          //
-          log.error("invalid html", error);
-        }
-      });
-      const fileInfos = await ppa(async (url) => {
-        let data: Buffer;
-        let remoteURL = "";
-        if (url.trim().startsWith("data:")) {
-          // dataURIだったら
-          data = dataUriToBuffer(url);
-        } else {
-          // 普通のurlだったら
-          data = (await axios.get(url, { responseType: "arraybuffer" })).data;
-          remoteURL = url;
-        }
-        const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
-        await file.writeFile(dist, data);
-        return {
-          path: dist,
-          note: remoteURL,
-          name: "downloaded",
-        } as ImportFileInfo;
-      }, urls).promise;
-      if (fileInfos.length > 0) {
-        const petaImages = await this.importImagesFromFileInfos({
-          fileInfos,
-        });
-        log.log("return:", petaImages.length);
-        if (petaImages.length > 0) {
-          return petaImages.map((petaImage) => petaImage.id);
-        }
+      log.log("## Import Images From URL");
+      let data: Buffer;
+      let remoteURL = "";
+      if (url.trim().startsWith("data:")) {
+        // dataURIだったら
+        data = dataUriToBuffer(url);
+      } else {
+        // 普通のurlだったら
+        data = (await axios.get(url, { responseType: "arraybuffer" })).data;
+        remoteURL = url;
       }
+      const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
+      await file.writeFile(dist, data);
+      log.log("return:", true);
+      return {
+        path: dist,
+        note: remoteURL,
+        name: "downloaded",
+      } as ImportFileInfo;
     } catch (error) {
       log.error(error);
     }
-    log.log("return:", 0);
-    return [];
+    log.log("return:", false);
+    return undefined;
   }
-  async importImagesFromBuffers(buffers: (ArrayBuffer | Buffer)[]) {
+  async createFileInfoFromHTML(html: string) {
     const log = this.parent.mainLogger.logChunk();
-    const urls: string[] = [];
     try {
-      log.log("## Import Images From ArrayBuffers");
-      if (buffers.length > 0) {
-        const fileInfos = await ppa(async (buffer) => {
-          const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
-          await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
-          return {
-            path: dist,
-            note: urls[0] || "",
-            name: urls.length > 0 ? "downloaded" : "noname",
-          } as ImportFileInfo;
-        }, buffers).promise;
-        const petaImages = await this.importImagesFromFileInfos({ fileInfos });
-        log.log("return:", petaImages.length);
-        if (petaImages.length > 0) {
-          return petaImages.map((petaImage) => petaImage.id);
-        }
+      log.log("## Import Images From HTML");
+      const url = getURLFromHTML(html);
+      const info = await this.createFileInfoFromURL(url);
+      if (info) {
+        log.log("return:", true);
+        return info;
       }
     } catch (error) {
       log.error(error);
     }
-    log.log("return:", 0);
-    return [];
+    log.log("return:", false);
+    return undefined;
+  }
+  async createFileInfoFromBuffer(buffer: ArrayBuffer | Buffer) {
+    const log = this.parent.mainLogger.logChunk();
+    try {
+      log.log("## Import Images From ArrayBuffer");
+      const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
+      await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
+      log.log("return:", true);
+      return {
+        path: dist,
+        note: "",
+        name: "noname",
+      } as ImportFileInfo;
+    } catch (error) {
+      log.error(error);
+    }
+    log.log("return:", false);
+    return undefined;
   }
   async importImagesFromFileInfos(
     params: {
@@ -390,10 +379,4 @@ export class PetaDataPetaImages {
       exists: false,
     };
   }
-}
-
-interface ImportFileInfo {
-  path: string;
-  name?: string;
-  note?: string;
 }
