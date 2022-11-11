@@ -266,7 +266,7 @@ export async function migratePetaImagesPetaTags(
       (petaTag as any).petaImages = undefined;
       // update
       await petaTags.update({ id: petaTag.id }, petaTag);
-    }, await petaTags.find({})).promise;
+    }, petaTags.getAll()).promise;
   } catch (error) {
     //
   }
@@ -279,7 +279,7 @@ export async function migratePetaImagesPetaTags(
           createPetaImagePetaTag(pipt.petaImageId, pipt.petaTagId),
         );
       }
-    }, await petaImagesPetaTags.find({})).promise;
+    }, petaImagesPetaTags.getAll()).promise;
   } catch (error) {
     //
   }

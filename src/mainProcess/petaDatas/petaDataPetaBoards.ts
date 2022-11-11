@@ -11,7 +11,7 @@ export class PetaDataPetaBoards {
   }
   async getPetaBoards() {
     const boards: { [id: string]: PetaBoard } = {};
-    (await this.parent.datas.dbPetaBoard.find({})).forEach((board) => {
+    this.parent.datas.dbPetaBoard.getAll().forEach((board) => {
       // バージョンアップ時のプロパティ更新
       migratePetaBoard(board);
       boards[board.id] = board;

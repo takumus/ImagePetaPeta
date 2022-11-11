@@ -240,7 +240,7 @@ import { initWebhook } from "@/mainProcess/webhook/webhook";
     */
     //-------------------------------------------------------------------------------------------------//
     try {
-      const petaImagesArray = await dbPetaImages.find({});
+      const petaImagesArray = dbPetaImages.getAll();
       const petaImages: PetaImages = {};
       petaImagesArray.forEach((pi) => {
         petaImages[pi.id] = migratePetaImage(pi);

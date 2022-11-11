@@ -86,7 +86,7 @@ export class PetaDataPetaImages {
     return migratePetaImage(petaImage);
   }
   async getPetaImages() {
-    const data = await this.parent.datas.dbPetaImages.find({});
+    const data = this.parent.datas.dbPetaImages.getAll();
     const petaImages: PetaImages = {};
     data.forEach((pi) => {
       petaImages[pi.id] = migratePetaImage(pi);

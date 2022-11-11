@@ -58,6 +58,12 @@ export default class DB<T> extends (EventEmitter as new () => TypedEmitter<Messa
     }
     return this.nedb.findAsync(query).execAsync();
   }
+  getAll() {
+    if (!this.nedb || !this.loaded) {
+      throw new Error("DB is not initialized");
+    }
+    return this.nedb.getAllData();
+  }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   count(query: Partial<T> | any = {}): Promise<number> {
     if (!this.nedb || !this.loaded) {

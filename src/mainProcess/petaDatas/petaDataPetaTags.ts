@@ -114,14 +114,14 @@ export class PetaDataPetaTags {
   async getPetaImageIds(params: GetPetaImageIdsParams) {
     // all
     if (params.type === "all") {
-      const ids = (await this.parent.datas.dbPetaImages.find({})).map((pi) => pi.id);
+      const ids = this.parent.datas.dbPetaImages.getAll().map((pi) => pi.id);
       return ids;
     }
     // untagged
     if (params.type === "untagged") {
       const taggedIds = Array.from(
         new Set(
-          (await this.parent.datas.dbPetaImagesPetaTags.find({})).map((pipt) => {
+          this.parent.datas.dbPetaImagesPetaTags.getAll().map((pipt) => {
             return pipt.petaImageId;
           }),
         ),
@@ -162,14 +162,9 @@ export class PetaDataPetaTags {
     return [];
   }
   async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
-    // const log = this.parent.mainLogger.logChunk();
-    let pipts: PetaImagePetaTag[] = [];
-    pipts =
-      petaImageIds.length === 1
-        ? await this.parent.datas.dbPetaImagesPetaTags.find({ petaImageId: petaImageIds[0] })
-        : (await this.parent.datas.dbPetaImagesPetaTags.find()).filter((pipt) => {
-            return petaImageIds.includes(pipt.petaImageId);
-          });
+    const pipts = this.parent.datas.dbPetaImagesPetaTags
+      .getAll()
+      .filter((pipt) => petaImageIds.includes(pipt.petaImageId));
     const ids = Array.from(
       new Set(
         pipts.map((pipt) => {
@@ -187,8 +182,8 @@ export class PetaDataPetaTags {
     return petaTagIds;
   }
   async getPetaTagCounts() {
-    const petaTags = await this.parent.datas.dbPetaTags.find({});
-    const petaImagesPetaTags = await this.parent.datas.dbPetaImagesPetaTags.find({});
+    const petaTags = this.parent.datas.dbPetaTags.getAll();
+    const petaImagesPetaTags = this.parent.datas.dbPetaImagesPetaTags.getAll();
     const taggedIds = Array.from(
       new Set(
         petaImagesPetaTags.map((pipt) => {
@@ -201,18 +196,17 @@ export class PetaDataPetaTags {
         $nin: taggedIds,
       },
     });
-    const petaTagCounts: { [id: string]: number } = {};
-    petaTags.forEach((petaTag) => {
-      petaTagCounts[petaTag.id] = petaImagesPetaTags.filter(
+    const petaTagCounts = petaTags.reduce((counts, petaTag) => {
+      counts[petaTag.id] = petaImagesPetaTags.filter(
         (pipt) => pipt.petaTagId === petaTag.id,
       ).length;
-    });
+      return counts;
+    }, {} as { [id: string]: number });
     petaTagCounts[UNTAGGED_ID] = count;
     return petaTagCounts;
   }
   async getPetaTags() {
-    // const log = this.parent.mainLogger.logChunk();
-    const petaTags = await this.parent.datas.dbPetaTags.find({});
+    const petaTags = this.parent.datas.dbPetaTags.getAll();
     return [
       {
         index: 0,
