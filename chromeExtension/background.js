@@ -2,7 +2,7 @@ import { clientScript } from "./clientScript.js";
 import { post } from "./post.js";
 chrome.runtime.onMessage.addListener((request, _, response) => {
   console.log(request);
-  post("importImages", [{ html: request.html }]).then((ids) => {
+  post("importImages", [[{ type: "html", html: request.html }]]).then((ids) => {
     console.log(ids);
     response(ids);
   });

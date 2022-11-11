@@ -14,11 +14,12 @@ import { PetaTagLike } from "@/commons/datas/petaTagLike";
 export interface ToMainFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
   importImages: (
-    datas: {
-      url?: string;
-      buffer?: ArrayBuffer;
-      filePath?: string;
-    }[],
+    datas: (
+      | { type: "html"; html: string }
+      | { type: "url"; url: string }
+      | { type: "buffer"; buffer: ArrayBuffer }
+      | { type: "filePath"; filePath: string }
+    )[][],
   ) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
   getPetaImages: () => Promise<PetaImages>;

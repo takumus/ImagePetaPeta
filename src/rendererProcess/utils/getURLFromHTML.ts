@@ -1,20 +1,24 @@
-// import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 export function getURLFromHTML(html: string) {
-  const dom = new DOMParser().parseFromString(html, "text/html");
-  const imgDom = dom.getElementsByTagName("img")[0];
-  const aDom = dom.getElementsByTagName("a")[0];
-  if (imgDom !== undefined) {
-    const url = fromImg(imgDom);
-    if (url !== undefined) {
-      return url;
+  try {
+    const dom = new DOMParser().parseFromString(html, "text/html");
+    const imgDom = dom.getElementsByTagName("img")[0];
+    const aDom = dom.getElementsByTagName("a")[0];
+    if (imgDom !== undefined) {
+      const url = fromImg(imgDom);
+      if (url !== undefined) {
+        return url;
+      }
+    } else if (aDom !== undefined) {
+      const url = fromA(aDom);
+      if (url !== undefined) {
+        return url;
+      }
     }
-  } else if (aDom !== undefined) {
-    const url = fromA(aDom);
-    if (url !== undefined) {
-      return url;
-    }
+  } catch {
+    //
   }
-  throw new Error("invalid html");
+  return undefined;
 }
 function fromA(dom: HTMLAnchorElement) {
   const attrs = Array.from(dom.attributes);

@@ -39,6 +39,7 @@ import { LogFrom } from "@/mainProcess/storages/logger";
 import { initWebhook } from "@/mainProcess/webhook/webhook";
 import { ppa } from "@/commons/utils/pp";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
+import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -758,10 +759,15 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
             const ids = datas
               .filter(
                 (data) =>
-                  data.filePath !== undefined &&
-                  Path.resolve(Path.dirname(data.filePath)) === Path.resolve(DIR_IMAGES),
+                  data[0]?.type === "filePath" &&
+                  Path.resolve(Path.dirname(data[0].filePath)) === Path.resolve(DIR_IMAGES),
               )
-              .map((data) => Path.basename(data.filePath ?? "?").split(".")[0] ?? "?");
+              .map(
+                (data) =>
+                  Path.basename(data[0]?.type === "filePath" ? data[0].filePath : "?").split(
+                    ".",
+                  )[0] ?? "?",
+              );
             logFromBrowser.log("## From Browser");
             if (ids.length > 0 && ids.length === datas.length) {
               logFromBrowser.log("return:", ids.length);
@@ -771,21 +777,33 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
             }
             const fileInfos = (
               await ppa(async (data): Promise<ImportFileInfo | undefined> => {
-                if (data.filePath !== undefined) {
-                  return {
-                    path: data.filePath,
-                  };
-                }
-                if (data.url !== undefined) {
-                  const result = await petaDatas.petaImages.createFileInfoFromURL(data.url);
-                  if (result !== undefined) {
-                    return result;
+                for (let i = 0; i < data.length; i++) {
+                  const d = data[i];
+                  if (d?.type === "filePath") {
+                    return {
+                      path: d.filePath,
+                    };
                   }
-                }
-                if (data.buffer !== undefined) {
-                  const result = await petaDatas.petaImages.createFileInfoFromBuffer(data.buffer);
-                  if (result !== undefined) {
-                    return result;
+                  if (d?.type === "url") {
+                    const result = await petaDatas.petaImages.createFileInfoFromURL(d.url);
+                    if (result !== undefined) {
+                      return result;
+                    }
+                  }
+                  if (d?.type === "html") {
+                    const url = getURLFromHTML(d.html);
+                    if (url !== undefined) {
+                      const result = await petaDatas.petaImages.createFileInfoFromURL(url);
+                      if (result !== undefined) {
+                        return result;
+                      }
+                    }
+                  }
+                  if (d?.type === "buffer") {
+                    const result = await petaDatas.petaImages.createFileInfoFromBuffer(d.buffer);
+                    if (result !== undefined) {
+                      return result;
+                    }
                   }
                 }
                 return undefined;

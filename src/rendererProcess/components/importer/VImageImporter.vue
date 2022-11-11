@@ -28,10 +28,20 @@ onMounted(() => {
       if (html !== "") {
         try {
           ids = await IPC.send("importImages", [
-            {
-              url: getURLFromHTML(html),
-              buffer: data.buffers?.[0],
-            },
+            [
+              {
+                type: "html",
+                html,
+              },
+              ...(data.buffers?.[0]
+                ? [
+                    {
+                      type: "buffer",
+                      buffer: data.buffers?.[0],
+                    } as const,
+                  ]
+                : []),
+            ],
           ]);
         } catch {
           //
@@ -40,13 +50,19 @@ onMounted(() => {
         ids = await IPC.send(
           "importImages",
           data.buffers !== undefined
-            ? data.buffers.map((buffer) => ({
-                buffer,
-              }))
+            ? data.buffers.map((buffer) => [
+                {
+                  type: "buffer",
+                  buffer,
+                } as const,
+              ])
             : data.filePaths !== undefined
-            ? data.filePaths.map((filePath) => ({
-                filePath,
-              }))
+            ? data.filePaths.map((filePath) => [
+                {
+                  type: "filePath",
+                  filePath,
+                } as const,
+              ])
             : [],
         );
       }
@@ -59,13 +75,19 @@ onMounted(() => {
     const ids = await IPC.send(
       "importImages",
       data.buffers !== undefined
-        ? data.buffers.map((buffer) => ({
-            buffer,
-          }))
+        ? data.buffers.map((buffer) => [
+            {
+              type: "buffer",
+              buffer,
+            } as const,
+          ])
         : data.filePaths !== undefined
-        ? data.filePaths.map((filePath) => ({
-            filePath,
-          }))
+        ? data.filePaths.map((filePath) => [
+            {
+              type: "filePath",
+              filePath,
+            } as const,
+          ])
         : [],
     );
     emit("addPanelByDragAndDrop", ids, mousePosition, false);
