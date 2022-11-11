@@ -6,6 +6,7 @@ export class AnimatedGIFResource {
   private loaded = false;
   private _animatedGIF: AnimatedGIF | undefined;
   private static decodeLimit = pLimit(ANIMATED_GIF_DECODE_THREAD);
+  private canceled = false;
   private cancelPromise: () => void = () => {
     //
   };
@@ -14,20 +15,23 @@ export class AnimatedGIFResource {
     //
   }
   public async load(): Promise<AnimatedGIFResource> {
+    this.canceled = false;
     if (this.loaded) {
       return this;
     }
     if (this.loadingPromise !== undefined) {
       return this.loadingPromise;
     }
-    return AnimatedGIFResource.decodeLimit(() => {
+    this.loadingPromise = AnimatedGIFResource.decodeLimit(() => {
+      if (this.canceled) {
+        return this;
+      }
       const result = AnimatedGIF.decodeFromBuffer(this.buffer);
       this.cancelPromise = result.cancel;
-      this.loadingPromise = new Promise<AnimatedGIFResource>((res, rej) => {
+      return new Promise<AnimatedGIFResource>((res, rej) => {
         result.promise
           .then((animatedGIF) => {
             this._animatedGIF = animatedGIF;
-            animatedGIF.stop();
             this.loaded = true;
             this.loadingPromise = undefined;
             res(this);
@@ -37,8 +41,8 @@ export class AnimatedGIFResource {
             rej(reason);
           });
       });
-      return this.loadingPromise;
     });
+    return this.loadingPromise;
   }
   public getNewAnimatedGIF() {
     return this._animatedGIF?.clone();
@@ -52,6 +56,7 @@ export class AnimatedGIFResource {
     }
     this.loaded = false;
     this.loadingPromise = undefined;
+    this.canceled = true;
     this.cancelPromise();
   };
 }
