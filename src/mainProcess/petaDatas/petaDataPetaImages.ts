@@ -20,7 +20,6 @@ import { generateMetadataByWorker } from "@/mainProcess/utils/generateMetadataBy
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
 import axios, { AxiosError } from "axios";
-import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";

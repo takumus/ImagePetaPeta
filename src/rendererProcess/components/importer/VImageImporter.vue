@@ -10,7 +10,6 @@ import { IPC } from "@/rendererProcess/ipc";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { Buffer } from "buffer";
 import { ppa } from "@/commons/utils/pp";
-import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
 const emit = defineEmits<{
   (e: "addPanelByDragAndDrop", ids: string[], position: Vec2, fromBrowser: boolean): void;
 }>();
