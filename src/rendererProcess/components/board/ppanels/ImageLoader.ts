@@ -1,7 +1,8 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
-import { AnimatedGIF, AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
+import { AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIFResource";
 import * as PIXI from "pixi.js";
 
 export function getImage(petaImage: PetaImage | undefined) {

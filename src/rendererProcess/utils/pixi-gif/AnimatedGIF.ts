@@ -14,7 +14,7 @@ interface FrameObject {
   start: number;
   end: number;
 }
-interface AnimatedGIFOptions {
+export interface AnimatedGIFOptions {
   scaleMode: SCALE_MODES;
   loop: boolean;
   animationSpeed: number;
@@ -24,7 +24,7 @@ interface AnimatedGIFOptions {
   onFrameChange?: (currentFrame: number) => void;
   fps: number;
 }
-class AnimatedGIF extends Sprite {
+export class AnimatedGIF extends Sprite {
   public static defaultOptions: AnimatedGIFOptions = {
     scaleMode: SCALE_MODES.LINEAR,
     fps: Ticker.shared.FPS,
@@ -250,55 +250,3 @@ class AnimatedGIF extends Sprite {
     });
   }
 }
-class AnimatedGIFResource {
-  private loaded = false;
-  private _animatedGIF: AnimatedGIF | undefined;
-  private cancelPromise: () => void = () => {
-    //
-  };
-  private loadingPromise: Promise<AnimatedGIFResource> | undefined;
-  constructor(public readonly buffer: ArrayBuffer) {
-    //
-  }
-  public async load(): Promise<AnimatedGIFResource> {
-    if (this.loaded) {
-      return this;
-    }
-    if (this.loadingPromise !== undefined) {
-      return this.loadingPromise;
-    }
-    const result = AnimatedGIF.decodeFromBuffer(this.buffer);
-    this.cancelPromise = result.cancel;
-    this.loadingPromise = new Promise<AnimatedGIFResource>((res, rej) => {
-      result.promise
-        .then((animatedGIF) => {
-          this._animatedGIF = animatedGIF;
-          animatedGIF.stop();
-          this.loaded = true;
-          this.loadingPromise = undefined;
-          res(this);
-        })
-        .catch((reason) => {
-          this.loadingPromise = undefined;
-          rej(reason);
-        });
-    });
-    return this.loadingPromise;
-  }
-  public getNewAnimatedGIF() {
-    return this._animatedGIF?.clone();
-  }
-  public getAnimatedGIF() {
-    return this._animatedGIF;
-  }
-  public readonly cancel = () => {
-    if (this.loaded) {
-      return;
-    }
-    this.loaded = false;
-    this.loadingPromise = undefined;
-    this.cancelPromise();
-  };
-}
-export { AnimatedGIF, AnimatedGIFResource };
-export type { AnimatedGIFOptions };
