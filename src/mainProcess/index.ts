@@ -97,17 +97,17 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
         standard: true,
       },
     },
-  ]);
-  protocol.registerSchemesAsPrivileged([
     {
       scheme: PROTOCOLS.FILE.IMAGE_THUMBNAIL,
       privileges: {
+        secure: true,
         supportFetchAPI: true,
       },
     },
     {
       scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
       privileges: {
+        secure: true,
         supportFetchAPI: true,
       },
     },
