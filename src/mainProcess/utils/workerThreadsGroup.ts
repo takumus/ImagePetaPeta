@@ -1,8 +1,8 @@
-import { Worker as WorkerThread } from "worker_threads";
-export class WT<T extends WorkerThread> {
+import { Worker as WorkerThreads } from "worker_threads";
+export class WT<T extends WorkerThreads> {
   private _idle = true;
   constructor(public readonly worker: T) {
-    // console.log("NEW WTMOTHER!!!:", worker.threadId);
+    // console.log("new worker_threads", worker);
   }
   use() {
     this._idle = false;
@@ -14,7 +14,7 @@ export class WT<T extends WorkerThread> {
     return this._idle;
   }
 }
-export function createWorkerThreadsGroup<T extends WorkerThread>(WorkerClass: { new (): T }) {
+export function createWorkerThreadsGroup<T extends WorkerThreads>(WorkerClass: { new (): T }) {
   const wts: { [key: number]: WT<T> } = {};
   function getWT() {
     const wt = Object.values(wts).find((worker) => worker.idle);
