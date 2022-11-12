@@ -118,7 +118,6 @@ function startDrag(event: PointerEvent, data: PetaTag) {
       setFloatingPosition(mouseMovePosition.clone().add(startDragOffset));
       const flexGap = 2;
       let minDistance = Infinity;
-      let lockedY: number | undefined = undefined;
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
@@ -126,11 +125,8 @@ function startDrag(event: PointerEvent, data: PetaTag) {
         }))
         .sort((a, b) => a.order - b.order)
         .map((o) => {
-          if (lockedY !== undefined && lockedY !== o.rect.y) {
+          if (o.rect.y > mouseMovePosition.y || o.rect.y + o.rect.height < mouseMovePosition.y) {
             return;
-          }
-          if (o.rect.y < mouseMovePosition.y && o.rect.y + o.rect.height > mouseMovePosition.y) {
-            lockedY = o.rect.y;
           }
           const leftDistance = mouseMovePosition.getDistance({
             x: o.rect.x,
