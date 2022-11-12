@@ -66,7 +66,7 @@ t-floating-root {
   position: fixed;
   background-color: var(--color-0-floating);
   margin: 0px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--floating-shadow);
   border-radius: var(--rounded);
   top: 0px;
   left: 0px;

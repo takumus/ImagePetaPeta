@@ -27,7 +27,7 @@
       />
     </t-tags>
     <t-drag-target-line ref="dragInsertTarget" v-if="draggingData"></t-drag-target-line>
-    <t-tag-dragging v-if="draggingData">
+    <t-drag-floating-tag-cell v-if="draggingData">
       <VTagCell
         :key="draggingData.id"
         :selected="true"
@@ -36,7 +36,7 @@
         :look="`${draggingData.name}`"
         ref="vFloatingCell"
       />
-    </t-tag-dragging>
+    </t-drag-floating-tag-cell>
     <t-tag-add>
       <t-tag>
         <VTextarea
@@ -121,6 +121,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
       let minDistance = Infinity;
       setFloatingPosition(mouseMovePosition.clone().add(startDragOffset));
       startDragCellElement.style.opacity = "0.2";
+      floatingCellStyle.visibility = "visible";
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
@@ -190,6 +191,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
       window.removeEventListener("pointerup", pointerup);
       draggingData.value = undefined;
       startDragCellElement.style.opacity = "unset";
+      floatingCellStyle.visibility = "hidden";
       if (prevOrders !== JSON.stringify(orders.value)) {
         petaTagsStore.updatePetaTags(
           Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
@@ -368,14 +370,15 @@ t-tags-root {
       height: 100%;
       border-radius: 99px;
       transform: translateX(calc(-1 * var(--px-0) / 2));
-      background-color: var(--color-font);
+      background-color: var(--color-border);
     }
   }
-  > t-tag-dragging {
+  > t-drag-floating-tag-cell {
     pointer-events: none;
     top: 0px;
     left: 0px;
     position: fixed;
+    visibility: hidden;
     opacity: 0.9;
   }
 }

@@ -17,12 +17,13 @@ t-root {
     --color-0-floating: #ffffff;
     --color-1: #eeeeee;
     --color-2: #dedede;
-    --color-accent: rgb(206, 240, 255);
+    --color-accent: rgb(189, 229, 246);
     --color-border: #999999;
     --color-overlay: #00000070;
     --color-font: #1a1a1a;
     --filter-icon: brightness(0.7) invert(100%);
     --shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3);
+    --floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
   }
   // ダークモード
   &.dark {
@@ -36,5 +37,6 @@ t-root {
     --color-font: #d3d3d3;
     --filter-icon: unset;
     --shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.5);
+    --floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   }
 }
