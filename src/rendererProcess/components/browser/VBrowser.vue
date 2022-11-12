@@ -109,7 +109,7 @@ import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
-import { debounce } from "throttle-debounce";
+import { debounce, throttle } from "throttle-debounce";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -589,7 +589,7 @@ watch(selectedPetaTagIds, () => {
 watch(petaImagesArray, fetchFilteredPetaImages);
 watch(petaTagsStore.state.petaTags, fetchFilteredPetaImages);
 watch(sortMode, fetchFilteredPetaImages);
-const f = debounce(100, fetchFilteredPetaImages);
+const f = throttle(100, fetchFilteredPetaImages);
 watch(currentColor, () => {
   if (sortMode.value === "SIMILAR") {
     f();
