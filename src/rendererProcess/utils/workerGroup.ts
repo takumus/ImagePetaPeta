@@ -2,7 +2,7 @@ export class WT<T extends Worker> {
   private _idle = true;
   public onTerminate?: () => void;
   constructor(public readonly worker: T) {
-    console.log("NEW WEBWROEKER!!!:", worker);
+    // console.log("new webworker", worker);
   }
   use() {
     this._idle = false;
