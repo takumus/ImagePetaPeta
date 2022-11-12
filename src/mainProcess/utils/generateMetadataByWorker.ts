@@ -3,7 +3,7 @@ import GenerateMetadataWorkerThreads from "@/mainProcess/workers/generateMetadat
 import { createWorkerThreadsGroup } from "@/mainProcess/utils/workerThreadsGroup";
 const wtGroup = createWorkerThreadsGroup(GenerateMetadataWorkerThreads);
 export async function generateMetadataByWorker(params: Parameters<typeof generateMetadata>[0]) {
-  return new Promise<ReturnType<typeof generateMetadata>>((res, rej) => {
+  return new Promise<Awaited<ReturnType<typeof generateMetadata>>>((res, rej) => {
     const wt = wtGroup.getWT();
     wt.use();
     wt.worker.postMessage(params);

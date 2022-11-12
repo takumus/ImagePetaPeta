@@ -1,9 +1,5 @@
 import DecompressWorker from "@/rendererProcess/utils/pixi-gif/decoder/decompress.worker";
 import {
-  DecompressWorkerInputData,
-  DecompressWorkerOutputData,
-} from "@/rendererProcess/utils/pixi-gif/decoder/decompressWorkerData";
-import {
   AnimatedGIF,
   AnimatedGIFFrame,
   AnimatedGIFOptions,
@@ -17,7 +13,7 @@ export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<Animated
   const frames: AnimatedGIFFrame[] = [];
   let time = 0;
   const { fps } = Object.assign({}, AnimatedGIF.defaultOptions, options);
-  // console.log("GIF(worker): begin converting");
+  console.log("GIF(worker): begin converting");
   const defaultDelay = 1000 / fps;
   let cancel = () => {
     //
@@ -30,14 +26,14 @@ export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<Animated
     wt.worker.postMessage({
       buffer,
       defaultDelay,
-    } as DecompressWorkerInputData);
+    });
     wt.worker.onerror = (e) => {
       wt.terminate();
       rej(e.message);
     };
     wt.worker.onmessage = (e) => {
-      const data = e.data as DecompressWorkerOutputData;
-      // console.log(`GIF(worker): converting (${data.index + 1}/${data.length})`);
+      const data = e.data;
+      console.log(`GIF(worker): converting (${data.index + 1}/${data.length})`);
       const endTime = time + data.delay;
       frames.push({
         start: time,
@@ -47,7 +43,7 @@ export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<Animated
       time = endTime;
       if (data.isLast) {
         wt.unuse();
-        // console.log("GIF(worker): complete converting");
+        console.log("GIF(worker): complete converting");
         res(new AnimatedGIF(frames, options));
       }
     };
@@ -55,7 +51,7 @@ export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<Animated
   return {
     promise,
     cancel: () => {
-      // console.log("GIF(worker): cancel converting");
+      console.log("GIF(worker): cancel converting");
       wt.terminate();
       cancel();
     },

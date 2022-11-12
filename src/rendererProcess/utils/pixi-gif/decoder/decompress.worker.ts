@@ -3,8 +3,9 @@ import {
   DecompressWorkerInputData,
   DecompressWorkerOutputData,
 } from "@/rendererProcess/utils/pixi-gif/decoder/decompressWorkerData";
+type WorkerType = WorkerTypeFrom<DecompressWorkerInputData, DecompressWorkerOutputData>;
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const worker: Worker = self as any;
+const worker = self as any as WorkerType["InWorker"];
 worker.addEventListener("message", async (e) => {
   const canvas = new OffscreenCanvas(0, 0);
   const context = canvas.getContext("2d");
@@ -13,7 +14,7 @@ worker.addEventListener("message", async (e) => {
   if (patchContext === null || context === null) {
     throw new Error("context is undefined");
   }
-  const data = e.data as DecompressWorkerInputData;
+  const data = e.data;
   const gif = parseGIF(data.buffer);
   const frames = (gif.frames as Frame[]).filter((f) => f.image);
   frames.forEach((f, i) => {
@@ -48,4 +49,4 @@ worker.addEventListener("message", async (e) => {
     } as DecompressWorkerOutputData);
   });
 });
-export default {} as WebWorkerClass;
+export default {} as WorkerType["InMain"];
