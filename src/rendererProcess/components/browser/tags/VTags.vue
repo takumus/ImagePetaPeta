@@ -7,6 +7,8 @@
         :readonly="true"
         :look="`${t('browser.all')}(${petaImagesArray.length})`"
       />
+    </t-tags>
+    <t-tags>
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
@@ -14,7 +16,7 @@
         @click="selectPetaTag(c.petaTag)"
         :readonly="c.readonly"
         :value="c.petaTag.name"
-        :look="`${c.petaTag.name}(${c.count})`"
+        :look="`${c.petaTag.name}`"
         @update:value="(name) => changeTag(c.petaTag, name)"
         @contextmenu="tagMenu($event, c)"
       />
@@ -181,6 +183,11 @@ t-tags-root {
     width: 100%;
     text-align: left;
     overflow-y: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--px-1);
   }
 }
 </style>
