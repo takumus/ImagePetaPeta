@@ -1,7 +1,7 @@
 import deepcopy from "deepcopy";
 const defaultSettings = {
-  darkMode: false,
-  autoDarkMode: true,
+  darkMode: true,
+  autoDarkMode: false,
   alwaysOnTop: false,
   showFPS: false,
   zoomSensitivity: 100,
