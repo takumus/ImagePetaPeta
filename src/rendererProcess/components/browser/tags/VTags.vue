@@ -105,7 +105,6 @@ function startDrag(event: PointerEvent, data: PetaTag) {
   const startDragOffset = vec2FromPointerEvent(event).getDiff(startDragCellRect);
   const prevOrders = JSON.stringify(orders.value);
   let newOrder = orders.value[data.id] ?? 0;
-  startDragCellElement.style.opacity = "0.2";
   draggingData.value = data;
   nextTick(() => {
     const floatingCellStyle = vFloatingCell.value?.$el.style as CSSStyleDeclaration;
@@ -118,9 +117,10 @@ function startDrag(event: PointerEvent, data: PetaTag) {
     setFloatingPosition(mouseDownPosition.clone().add(startDragOffset));
     function pointermove(event: PointerEvent) {
       const mouseMovePosition = vec2FromPointerEvent(event);
-      setFloatingPosition(mouseMovePosition.clone().add(startDragOffset));
       const flexGap = 2;
       let minDistance = Infinity;
+      setFloatingPosition(mouseMovePosition.clone().add(startDragOffset));
+      startDragCellElement.style.opacity = "0.2";
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
