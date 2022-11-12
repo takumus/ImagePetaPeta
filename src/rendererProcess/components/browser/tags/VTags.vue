@@ -22,9 +22,10 @@
         @update:value="(name) => changeTag(c.petaTag, name)"
         @contextmenu="tagMenu($event, c)"
         :style="{
-          order: orders[c.petaTag.id] ?? browserTags.length,
+          order: (orders[c.petaTag.id] ?? browserTags.length) * 2,
         }"
       />
+      <t-drag-target></t-drag-target>
     </t-tags>
     <t-tag-dragging v-if="draggingPetaTag">
       <VTagCell
@@ -114,72 +115,54 @@ function startDrag(event: PointerEvent, petaTag: PetaTag) {
       const rect = element.getBoundingClientRect();
       const mouse = vec2FromPointerEvent(event);
       style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
-      [
-        ...Object.keys(vTagCells.value)
-          .map((id) => ({
+      let newOrder = 0;
+      Object.keys(orders.value)
+        .map((id) => {
+          const element = vTagCells.value[id]?.$el as HTMLElement;
+          const rect = element.getBoundingClientRect();
+          return {
+            order: orders.value[id] ?? 0,
             id,
-            element: vTagCells.value[id]?.$el as HTMLElement,
-          }))
-          .filter((cell) => cell.id !== petaTag.id)
-          .map((cell) => {
-            const rect = cell.element.getBoundingClientRect();
-            return {
-              me: false,
+            element,
+            rect: {
               x: rect.x,
               y: rect.y,
               width: rect.width,
               height: rect.height,
-              id: cell.id,
-            };
-          }),
-        {
-          me: true,
-          x: mouse.x,
-          y: mouse.y,
-          width: rect.width,
-          height: rect.height,
-          id: petaTag.id,
-        },
-      ]
-        .sort((a, b) => {
-          if (a.me) {
-            if (a.y > b.y && a.y < b.y + b.height) {
-              if (a.x > b.x && a.x < b.x + b.width && rect.y != b.y) {
-                return -1;
-              }
-              if (a.x < b.x + b.width / 2) {
-                return -1;
-              } else {
-                return 1;
-              }
-            }
-          } else if (b.me) {
-            if (b.y > a.y && b.y < a.y + a.height) {
-              if (b.x > a.x && b.x < a.x + a.width && rect.y != b.y) {
-                return -1;
-              }
-              if (a.x < b.x + b.width / 2) {
-                return -1;
-              } else {
-                return 1;
-              }
-            }
-          }
-          if (a.y < b.y) {
-            return -1;
-          } else if (a.y > b.y) {
-            return 1;
-          } else {
-            if (a.x < b.x) {
-              return -1;
-            } else {
-              return 1;
-            }
-          }
+            },
+          };
         })
-        .forEach((result, i) => {
-          orders.value[result.id] = i;
+        .filter((o) => o.id !== petaTag.id)
+        .sort((a, b) => a.order - b.order)
+        .map((o) => {
+          if (mouse.y > o.rect.y && mouse.y < o.rect.y + o.rect.height) {
+            if (rect.y == o.rect.y) {
+              //同じ高さにある
+              if (mouse.x > o.rect.x + o.rect.width / 2) {
+                newOrder = o.order + 1;
+              }
+            } else {
+              //違う高さにある
+              if (mouse.x > o.rect.x && mouse.x < o.rect.x + o.rect.width) {
+                //ホバーした
+                newOrder = o.order + (rect.y < o.rect.y ? 1 : 0);
+              }
+            }
+          } else {
+            if (mouse.y > o.rect.y + o.rect.height) {
+              newOrder = o.order + 1;
+            }
+          }
+          return o;
+        })
+        .forEach((o) => {
+          if (o.order >= newOrder) {
+            if (orders.value[o.id]) {
+              orders.value[o.id]++;
+            }
+          }
         });
+      orders.value[petaTag.id] = newOrder;
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
@@ -356,6 +339,18 @@ t-tags-root {
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--px-1);
+    > t-drag-target {
+      position: relative;
+      width: 0px;
+      &::after {
+        width: 1px;
+        height: 100%;
+        background-color: #ff0000;
+        content: "";
+        position: absolute;
+        display: block;
+      }
+    }
   }
   > t-tag-dragging {
     top: 0px;
