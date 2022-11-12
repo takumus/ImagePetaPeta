@@ -1,6 +1,7 @@
 <template>
   <t-tag-cell-root @click="select()" :class="{ selected: selected }">
     <VTextarea
+      ref="vTextarea"
       :type="'single'"
       :readonly="readonly"
       :trim="true"
@@ -15,6 +16,7 @@
 <script setup lang="ts">
 // Vue
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
+import { ref } from "vue";
 const emit = defineEmits<{
   (e: "update:value", value: string): void;
 }>();
@@ -25,12 +27,16 @@ defineProps<{
   look?: string;
   clickToEdit?: boolean;
 }>();
+const vTextarea = ref<InstanceType<typeof VTextarea>>();
 function updateName(name: string) {
   emit("update:value", name);
 }
 function select() {
   //
 }
+defineExpose({
+  isEditing: () => vTextarea.value?.isEditing() ?? false,
+});
 </script>
 
 <style lang="scss" scoped>

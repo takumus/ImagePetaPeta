@@ -165,6 +165,9 @@ function restore() {
     textArea.value.innerText = value.value;
   }
 }
+function isEditing() {
+  return editing.value;
+}
 const value = computed({
   get() {
     if (editing.value) {
@@ -197,6 +200,7 @@ watch(
 );
 defineExpose({
   edit,
+  isEditing,
 });
 </script>
 
