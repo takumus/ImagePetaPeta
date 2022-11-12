@@ -33,7 +33,7 @@ import {
   createWindowTitleStore,
   windowTitleStoreKey,
 } from "@/rendererProcess/stores/windowTitleStore";
-import { injectAnimatedGIFAsset } from "@/rendererProcess/utils/pixi-gif/AnimatedGIFAsset";
+import { injectAnimatedGIFAsset } from "@/rendererProcess/utils/pixi-gif/animatedGIFAsset";
 export async function create(
   component: Component,
   windowType: WindowType,

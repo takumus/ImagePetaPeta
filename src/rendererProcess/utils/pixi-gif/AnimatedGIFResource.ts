@@ -1,48 +1,49 @@
 import { ANIMATED_GIF_DECODE_THREAD } from "@/commons/defines";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/animatedGIF";
+import { decodeFromBuffer } from "@/rendererProcess/utils/pixi-gif/decoder/animatedGIFDecoder";
 import pLimit from "p-limit";
 
 export class AnimatedGIFResource {
-  private loaded = false;
+  private deocded = false;
   private _animatedGIF: AnimatedGIF | undefined;
   private static decodeLimit = pLimit(ANIMATED_GIF_DECODE_THREAD);
   private canceled = false;
   private cancelPromise: () => void = () => {
     //
   };
-  private loadingPromise: Promise<AnimatedGIFResource> | undefined;
+  private decodePromise: Promise<AnimatedGIFResource> | undefined;
   constructor(public readonly buffer: ArrayBuffer) {
     //
   }
   public async load(): Promise<AnimatedGIFResource> {
     this.canceled = false;
-    if (this.loaded) {
+    if (this.deocded) {
       return this;
     }
-    if (this.loadingPromise !== undefined) {
-      return this.loadingPromise;
+    if (this.decodePromise !== undefined) {
+      return this.decodePromise;
     }
-    this.loadingPromise = AnimatedGIFResource.decodeLimit(() => {
+    this.decodePromise = AnimatedGIFResource.decodeLimit(() => {
       if (this.canceled) {
         return this;
       }
-      const result = AnimatedGIF.decodeFromBuffer(this.buffer);
+      const result = decodeFromBuffer(this.buffer);
       this.cancelPromise = result.cancel;
       return new Promise<AnimatedGIFResource>((res, rej) => {
         result.promise
           .then((animatedGIF) => {
             this._animatedGIF = animatedGIF;
-            this.loaded = true;
-            this.loadingPromise = undefined;
+            this.deocded = true;
+            this.decodePromise = undefined;
             res(this);
           })
           .catch((reason) => {
-            this.loadingPromise = undefined;
+            this.decodePromise = undefined;
             rej(reason);
           });
       });
     });
-    return this.loadingPromise;
+    return this.decodePromise;
   }
   public getNewAnimatedGIF() {
     return this._animatedGIF?.clone();
@@ -51,11 +52,11 @@ export class AnimatedGIFResource {
     return this._animatedGIF;
   }
   public readonly cancel = () => {
-    if (this.loaded) {
+    if (this.deocded) {
       return;
     }
-    this.loaded = false;
-    this.loadingPromise = undefined;
+    this.deocded = false;
+    this.decodePromise = undefined;
     this.canceled = true;
     this.cancelPromise();
   };

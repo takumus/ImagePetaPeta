@@ -8,4 +8,4 @@ parentPort?.on(
     parentPort?.postMessage(metadata);
   },
 );
-export default {};
+export default {} as WorkerThreadsClass;

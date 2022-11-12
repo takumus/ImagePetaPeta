@@ -8,7 +8,7 @@ import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/animatedGIF";
 usePetaImagesStore;
 export class PPanel extends PIXI.Sprite {
   // public selected = false;

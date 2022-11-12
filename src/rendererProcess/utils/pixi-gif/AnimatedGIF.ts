@@ -4,12 +4,7 @@ import { Texture, Renderer } from "@pixi/core";
 import { settings } from "@pixi/settings";
 import { SCALE_MODES } from "@pixi/constants";
 import { Ticker, UPDATE_PRIORITY } from "@pixi/ticker";
-import DecompressWorker from "@/rendererProcess/utils/pixi-gif/decompress.worker";
-import {
-  DecompressWorkerInputData,
-  DecompressWorkerOutputData,
-} from "@/rendererProcess/utils/pixi-gif/decompressWorkerData";
-interface FrameObject {
+export interface AnimatedGIFFrame {
   imageData: ImageData;
   start: number;
   end: number;
@@ -41,7 +36,7 @@ export class AnimatedGIF extends Sprite {
   public onFrameChange?: (currentFrame: number) => void;
   public onLoop?: () => void;
   public readonly duration: number;
-  private _frames: FrameObject[];
+  private _frames: AnimatedGIFFrame[];
   private _context?: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   public dirty = false;
   private _currentFrame = 0;
@@ -49,56 +44,7 @@ export class AnimatedGIF extends Sprite {
   private _isConnectedToTicker: boolean;
   private _playing: boolean;
   private _currentTime: number;
-  static decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {
-    if (!buffer || buffer.byteLength === 0) {
-      throw new Error("Invalid buffer");
-    }
-    const frames: FrameObject[] = [];
-    let time = 0;
-    const { fps } = Object.assign({}, AnimatedGIF.defaultOptions, options);
-    console.log("GIF(worker): begin converting");
-    const defaultDelay = 1000 / fps;
-    let cancel = () => {
-      //
-    };
-    const worker = new (DecompressWorker as any)() as Worker;
-    const promise = new Promise<AnimatedGIF>((res, rej) => {
-      cancel = rej;
-      worker.postMessage({
-        buffer,
-        defaultDelay,
-      } as DecompressWorkerInputData);
-      worker.addEventListener("error", (e) => {
-        worker.terminate();
-        rej(e.message);
-      });
-      worker.addEventListener("message", (e) => {
-        const data = e.data as DecompressWorkerOutputData;
-        console.log(`GIF(worker): converting (${data.index + 1}/${data.length})`);
-        const endTime = time + data.delay;
-        frames.push({
-          start: time,
-          end: endTime,
-          imageData: data.imageData,
-        });
-        time = endTime;
-        if (data.isLast) {
-          worker.terminate();
-          console.log("GIF(worker): complete converting");
-          res(new AnimatedGIF(frames, options));
-        }
-      });
-    });
-    return {
-      promise,
-      cancel: () => {
-        console.log("GIF(worker): cancel converting");
-        worker.terminate();
-        cancel();
-      },
-    };
-  }
-  constructor(frames: FrameObject[], options?: Partial<AnimatedGIFOptions>) {
+  constructor(frames: AnimatedGIFFrame[], options?: Partial<AnimatedGIFOptions>) {
     super();
     const { scaleMode, ...rest } = Object.assign({}, AnimatedGIF.defaultOptions, options);
     const canvas = new OffscreenCanvas(0, 0);

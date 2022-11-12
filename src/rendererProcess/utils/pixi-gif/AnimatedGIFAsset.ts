@@ -1,7 +1,7 @@
 import { extensions, ExtensionType, settings, utils } from "@pixi/core";
 import type { AssetExtension } from "@pixi/assets";
-import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/AnimatedGIF";
-import { AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/AnimatedGIFResource";
+import { AnimatedGIF } from "@/rendererProcess/utils/pixi-gif/animatedGIF";
+import { AnimatedGIFResource } from "@/rendererProcess/utils/pixi-gif/animatedGIFResource";
 export function injectAnimatedGIFAsset() {
   const AnimatedGIFAsset = {
     extension: ExtensionType.Asset,
