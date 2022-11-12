@@ -159,7 +159,7 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
     //-------------------------------------------------------------------------------------------------//
     session.defaultSession.protocol.registerFileProtocol(
       PROTOCOLS.FILE.IMAGE_ORIGINAL,
-      async (req, res) => {
+      (req, res) => {
         res({
           path: Path.resolve(DIR_IMAGES, arrLast(req.url.split("/"), "")),
         });
@@ -167,7 +167,7 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
     );
     session.defaultSession.protocol.registerFileProtocol(
       PROTOCOLS.FILE.IMAGE_THUMBNAIL,
-      async (req, res) => {
+      (req, res) => {
         res({
           path: Path.resolve(DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
         });
