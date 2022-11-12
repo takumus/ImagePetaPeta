@@ -1,28 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Worker as _WorkerThreads } from "worker_threads";
-type _WorkerThreadsMessagePort = import("worker_threads").MessagePort;
-interface _WT<I, O> extends _WorkerThreads {
+import { Worker as WorkerThreads, MessagePort } from "worker_threads";
+type TypedWorkerThreads<I, O> = {
   postMessage(data: O): void;
-  addListener(event: "message", callback: (e: I) => any): this;
-  addListener(...args: any): this;
-  once(event: "message", callback: (e: I) => any): this;
-  once(...args: any): this;
-  on(event: "message", callback: (e: I) => any): this;
-  on(...args: any): this;
-}
-interface _WTMP<I, O> extends _WorkerThreadsMessagePort {
+  addListener(event: "message", callback: (e: I) => any): void;
+  once(event: "message", callback: (e: I) => any): TypedWorkerThreads<I, O>;
+  on(event: "message", listener: (e: I) => any): TypedWorkerThreads<I, O>;
+} & WorkerThreads;
+type TypedMessagePort<I, O> = {
   postMessage(data: O): void;
   addEventListener(event: "message", callback: (e: MessageEvent<I>) => void): void;
-  addEventListener(...args: unknown[]): void;
-  once(event: "message", callback: (e: MessageEvent<I>) => void): _WorkerThreadsMessagePort;
-  once(...args: any): this;
-  on(event: "message", callback: (e: I) => void): _WorkerThreadsMessagePort;
-  on(...args: any): this;
-}
+  once(event: "message", callback: (e: MessageEvent<I>) => void): TypedMessagePort<I, O>;
+  on(event: "message", callback: (e: I) => void): TypedMessagePort<I, O>;
+} & MessagePort;
 export function initWorkerThreads<ToWorker, ToMain>(
   parentPort: any,
-  init: (parentPort: _WTMP<ToWorker, ToMain>) => void,
+  init: (parentPort: TypedMessagePort<ToWorker, ToMain>) => void,
 ) {
   init(parentPort);
-  return {} as { new (): _WT<ToMain, ToWorker> };
+  return {} as { new (): TypedWorkerThreads<ToMain, ToWorker> };
 }
