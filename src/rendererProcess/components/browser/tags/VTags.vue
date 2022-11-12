@@ -12,7 +12,7 @@
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
-        :selected="(c.selected && draggingPetaTag === undefined) || draggingPetaTag === c.petaTag"
+        :selected="(c.selected && draggingData === undefined) || draggingData === c.petaTag"
         @click="selectPetaTag(c.petaTag)"
         @mousedown="startDrag($event, c.petaTag)"
         :readonly="c.readonly"
@@ -22,19 +22,19 @@
         @update:value="(name) => changeTag(c.petaTag, name)"
         @contextmenu="tagMenu($event, c)"
         :style="{
-          order: (orders[c.petaTag.id] ?? browserTags.length) * 2,
+          order: orders[c.petaTag.id] ?? browserTags.length,
         }"
       />
-      <t-drag-target></t-drag-target>
     </t-tags>
-    <t-tag-dragging v-if="draggingPetaTag">
+    <t-drag-target-line ref="dragInsertTarget" v-if="draggingData"></t-drag-target-line>
+    <t-tag-dragging v-if="draggingData">
       <VTagCell
-        :key="draggingPetaTag.id"
+        :key="draggingData.id"
         :selected="true"
         :readonly="true"
-        :value="draggingPetaTag.name"
-        :look="`${draggingPetaTag.name}`"
-        ref="draggingTagCell"
+        :value="draggingData.name"
+        :look="`${draggingData.name}`"
+        ref="floatingCell"
       />
     </t-tag-dragging>
     <t-tag-add>
@@ -82,79 +82,95 @@ const components = useComponentsStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const vTagCells = ref<{ [key: string]: VTagCellInstance }>({});
-const draggingPetaTag = ref<PetaTag>();
-const draggingTagCell = ref<VTagCellInstance>();
-const startDragOffset = ref(new Vec2());
-const orders = ref<{ [key: string]: number }>({});
 onBeforeUpdate(() => {
   vTagCells.value = {};
 });
 function setVTagCellRef(element: VTagCellInstance, id: string) {
   vTagCells.value[id] = element;
 }
-function startDrag(event: PointerEvent, petaTag: PetaTag) {
-  const element = event.currentTarget as HTMLElement;
-  if (element === undefined) {
-    return;
-  }
-  const rect = element.getBoundingClientRect();
-  startDragOffset.value = vec2FromPointerEvent(event);
-  draggingPetaTag.value = petaTag;
+//--------------------------------------------------------------------//
+// ドラッグここから（いつか共通化したいから変数名も汎用的な感じ）
+//--------------------------------------------------------------------//
+const draggingData = ref<PetaTag>();
+const floatingCell = ref<VTagCellInstance>();
+const dragInsertTarget = ref<HTMLElement>();
+const orders = ref<{ [key: string]: number }>({});
+function startDrag(event: PointerEvent, data: PetaTag) {
+  const startDragCellElement = event.currentTarget as HTMLElement;
+  const startDragCellRect = startDragCellElement.getBoundingClientRect();
+  const mouseDownPosition = vec2FromPointerEvent(event);
+  const startDragOffset = vec2FromPointerEvent(event).getDiff(startDragCellRect);
+  const prevOrder = orders.value[data.id] ?? 0;
+  let newOrder = prevOrder;
+  startDragCellElement.style.opacity = "0.2";
+  draggingData.value = data;
   nextTick(() => {
-    const draggingCellStyle = draggingTagCell.value?.$el.style as CSSStyleDeclaration;
-    if (draggingCellStyle === undefined) {
-      return;
-    }
-    draggingCellStyle.width = rect.width + "px";
-    draggingCellStyle.height = rect.height + "px";
-    const mouse = vec2FromPointerEvent(event);
-    const style = draggingTagCell.value?.$el.style as CSSStyleDeclaration;
-    style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
-    const prevOrders = JSON.stringify(orders.value);
+    const floatingCellStyle = floatingCell.value?.$el.style as CSSStyleDeclaration;
+    const dragTargetLineStyle = dragInsertTarget.value?.style as CSSStyleDeclaration;
+    const setFloatingPosition = (position: Vec2) => {
+      floatingCellStyle.transform = `translate(${position.x}px, ${position.y}px)`;
+    };
+    floatingCellStyle.width = startDragCellRect.width + "px";
+    floatingCellStyle.height = startDragCellRect.height + "px";
+    setFloatingPosition(mouseDownPosition.clone().add(startDragOffset));
     function pointermove(event: PointerEvent) {
-      const rect = element.getBoundingClientRect();
-      const mouse = vec2FromPointerEvent(event);
-      style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
-      let newOrder = 0;
+      const mouseMovePosition = vec2FromPointerEvent(event);
+      setFloatingPosition(mouseMovePosition.clone().add(startDragOffset));
+      const flexGap = 2;
+      let minDistance = Infinity;
+      let lockedY: number | undefined = undefined;
+      Object.keys(orders.value)
+        .map((id) => ({
+          order: orders.value[id] ?? 0,
+          rect: (vTagCells.value[id]?.$el as HTMLElement).getBoundingClientRect(),
+        }))
+        .sort((a, b) => a.order - b.order)
+        .map((o) => {
+          if (lockedY !== undefined && lockedY !== o.rect.y) {
+            return;
+          }
+          if (o.rect.y < mouseMovePosition.y && o.rect.y + o.rect.height > mouseMovePosition.y) {
+            lockedY = o.rect.y;
+          }
+          const leftDistance = mouseMovePosition.getDistance({
+            x: o.rect.x,
+            y: o.rect.y + o.rect.height / 2,
+          });
+          const rightDistance = mouseMovePosition.getDistance({
+            x: o.rect.x + o.rect.width,
+            y: o.rect.y + o.rect.height / 2,
+          });
+          const myMinDistance = Math.min(leftDistance, rightDistance);
+          if (myMinDistance > minDistance) {
+            return;
+          }
+          minDistance = myMinDistance;
+          dragTargetLineStyle.height = o.rect.height + "px";
+          if (leftDistance < rightDistance) {
+            //left
+            dragTargetLineStyle.transform = `translate(${o.rect.x - flexGap}px, ${o.rect.y}px)`;
+            newOrder = o.order;
+          } else {
+            //right
+            dragTargetLineStyle.transform = `translate(${o.rect.x + o.rect.width + flexGap}px, ${
+              o.rect.y
+            }px)`;
+            newOrder = o.order + 1;
+          }
+          return o;
+        });
+    }
+    function pointerup() {
+      orders.value[data.id] = newOrder;
       Object.keys(orders.value)
         .map((id) => {
-          const element = vTagCells.value[id]?.$el as HTMLElement;
-          const rect = element.getBoundingClientRect();
           return {
             order: orders.value[id] ?? 0,
             id,
-            element,
-            rect: {
-              x: rect.x,
-              y: rect.y,
-              width: rect.width,
-              height: rect.height,
-            },
           };
         })
-        .filter((o) => o.id !== petaTag.id)
+        .filter((o) => o.id !== data.id)
         .sort((a, b) => a.order - b.order)
-        .map((o) => {
-          if (mouse.y > o.rect.y && mouse.y < o.rect.y + o.rect.height) {
-            if (rect.y == o.rect.y) {
-              //同じ高さにある
-              if (mouse.x > o.rect.x + o.rect.width / 2) {
-                newOrder = o.order + 1;
-              }
-            } else {
-              //違う高さにある
-              if (mouse.x > o.rect.x && mouse.x < o.rect.x + o.rect.width) {
-                //ホバーした
-                newOrder = o.order + (rect.y < o.rect.y ? 1 : 0);
-              }
-            }
-          } else {
-            if (mouse.y > o.rect.y + o.rect.height) {
-              newOrder = o.order + 1;
-            }
-          }
-          return o;
-        })
         .forEach((o) => {
           if (o.order >= newOrder) {
             if (orders.value[o.id]) {
@@ -162,7 +178,6 @@ function startDrag(event: PointerEvent, petaTag: PetaTag) {
             }
           }
         });
-      orders.value[petaTag.id] = newOrder;
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
@@ -172,13 +187,11 @@ function startDrag(event: PointerEvent, petaTag: PetaTag) {
         .forEach((o, index) => {
           orders.value[o.id] = index;
         });
-    }
-    function pointerup() {
       window.removeEventListener("pointermove", pointermove);
       window.removeEventListener("pointerup", pointerup);
-      const afterOrders = JSON.stringify(orders.value);
-      draggingPetaTag.value = undefined;
-      if (prevOrders !== afterOrders) {
+      draggingData.value = undefined;
+      startDragCellElement.style.opacity = "unset";
+      if (prevOrder !== newOrder) {
         petaTagsStore.updatePetaTags(
           Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
             type: "petaTag",
@@ -195,6 +208,9 @@ function startDrag(event: PointerEvent, petaTag: PetaTag) {
     window.addEventListener("pointerup", pointerup);
   });
 }
+//--------------------------------------------------------------------//
+// ドラッグここまで
+//--------------------------------------------------------------------//
 function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
   if (tag.readonly) {
     return;
@@ -294,6 +310,7 @@ const browserTags = computed((): BrowserTag[] => {
 watch(
   petaTagsStore.state.petaTags,
   () => {
+    orders.value = {};
     petaTagsStore.state.petaTags.value.forEach((petaTag) => {
       orders.value[petaTag.id] = petaTag.index;
     });
@@ -339,24 +356,28 @@ t-tags-root {
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--px-1);
-    > t-drag-target {
-      position: relative;
-      width: 0px;
-      &::after {
-        width: 1px;
-        height: 100%;
-        background-color: #ff0000;
-        content: "";
-        position: absolute;
-        display: block;
-      }
+  }
+  > t-drag-target-line {
+    position: fixed;
+    width: 0px;
+    top: 0px;
+    left: 0px;
+    &::after {
+      content: "";
+      display: block;
+      width: var(--px-0);
+      height: 100%;
+      border-radius: 99px;
+      transform: translateX(calc(-1 * var(--px-0) / 2));
+      background-color: var(--color-font);
     }
   }
   > t-tag-dragging {
+    pointer-events: none;
     top: 0px;
     left: 0px;
     position: fixed;
-    visibility: hidden;
+    opacity: 0.9;
   }
 }
 </style>
