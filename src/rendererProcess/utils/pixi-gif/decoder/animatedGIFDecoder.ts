@@ -4,8 +4,8 @@ import {
   AnimatedGIFFrame,
   AnimatedGIFOptions,
 } from "@/rendererProcess/utils/pixi-gif/animatedGIF";
-import { createWorkerGroup } from "@/rendererProcess/utils/workerGroup";
-const wtGroup = createWorkerGroup(DecompressWorker);
+import { createWebWorkerGroup } from "@/rendererProcess/utils/workerGroup";
+const wtGroup = createWebWorkerGroup(DecompressWorker);
 export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {
   if (!buffer || buffer.byteLength === 0) {
     throw new Error("Invalid buffer");

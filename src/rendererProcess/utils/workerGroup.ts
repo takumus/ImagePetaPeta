@@ -1,4 +1,4 @@
-export class WT<T extends Worker> {
+export class WebWorker<T extends Worker> {
   private _idle = true;
   public onTerminate?: () => void;
   constructor(public readonly worker: T) {
@@ -18,13 +18,13 @@ export class WT<T extends Worker> {
     return this._idle;
   }
 }
-export function createWorkerGroup<T extends Worker>(WorkerClass: { new (): T }) {
-  const wts: { [key: number]: WT<T> } = {};
+export function createWebWorkerGroup<T extends Worker>(WorkerClass: { new (): T }) {
+  const wts: { [key: number]: WebWorker<T> } = {};
   let webWorkerId = 0;
   function getWT() {
     const wt = Object.values(wts).find((worker) => worker.idle);
     if (wt === undefined) {
-      const newWT = new WT<T>(new WorkerClass());
+      const newWT = new WebWorker<T>(new WorkerClass());
       const id = webWorkerId++;
       newWT.onTerminate = () => {
         delete wts[id];
