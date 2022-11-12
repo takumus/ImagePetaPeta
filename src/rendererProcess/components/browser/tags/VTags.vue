@@ -100,8 +100,8 @@ function startDrag(event: PointerEvent, data: PetaTag) {
   const startDragCellRect = startDragCellElement.getBoundingClientRect();
   const mouseDownPosition = vec2FromPointerEvent(event);
   const startDragOffset = vec2FromPointerEvent(event).getDiff(startDragCellRect);
-  const prevOrder = orders.value[data.id] ?? 0;
-  let newOrder = prevOrder;
+  const prevOrders = JSON.stringify(orders.value);
+  let newOrder = orders.value[data.id] ?? 0;
   startDragCellElement.style.opacity = "0.2";
   draggingData.value = data;
   nextTick(() => {
@@ -191,7 +191,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
       window.removeEventListener("pointerup", pointerup);
       draggingData.value = undefined;
       startDragCellElement.style.opacity = "unset";
-      if (prevOrder !== newOrder) {
+      if (prevOrders !== JSON.stringify(orders.value)) {
         petaTagsStore.updatePetaTags(
           Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
             type: "petaTag",
