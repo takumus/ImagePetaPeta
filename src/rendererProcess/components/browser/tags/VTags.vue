@@ -34,7 +34,7 @@
         :readonly="true"
         :value="draggingData.name"
         :look="`${draggingData.name}`"
-        ref="floatingCell"
+        ref="vFloatingCell"
       />
     </t-tag-dragging>
     <t-tag-add>
@@ -81,21 +81,24 @@ const textsStore = useTextsStore();
 const components = useComponentsStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
-const vTagCells = ref<{ [key: string]: VTagCellInstance }>({});
+const vCells = ref<{ [key: string]: VTagCellInstance }>({});
 onBeforeUpdate(() => {
-  vTagCells.value = {};
+  vCells.value = {};
 });
 function setVTagCellRef(element: VTagCellInstance, id: string) {
-  vTagCells.value[id] = element;
+  vCells.value[id] = element;
 }
 //--------------------------------------------------------------------//
 // ドラッグここから（いつか共通化したいから変数名も汎用的な感じ）
 //--------------------------------------------------------------------//
 const draggingData = ref<PetaTag>();
-const floatingCell = ref<VTagCellInstance>();
+const vFloatingCell = ref<VTagCellInstance>();
 const dragInsertTarget = ref<HTMLElement>();
 const orders = ref<{ [key: string]: number }>({});
 function startDrag(event: PointerEvent, data: PetaTag) {
+  if (vCells.value[data.id]?.isEditing() === true) {
+    return;
+  }
   const startDragCellElement = event.currentTarget as HTMLElement;
   const startDragCellRect = startDragCellElement.getBoundingClientRect();
   const mouseDownPosition = vec2FromPointerEvent(event);
@@ -105,7 +108,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
   startDragCellElement.style.opacity = "0.2";
   draggingData.value = data;
   nextTick(() => {
-    const floatingCellStyle = floatingCell.value?.$el.style as CSSStyleDeclaration;
+    const floatingCellStyle = vFloatingCell.value?.$el.style as CSSStyleDeclaration;
     const dragTargetLineStyle = dragInsertTarget.value?.style as CSSStyleDeclaration;
     const setFloatingPosition = (position: Vec2) => {
       floatingCellStyle.transform = `translate(${position.x}px, ${position.y}px)`;
@@ -121,7 +124,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
-          rect: (vTagCells.value[id]?.$el as HTMLElement).getBoundingClientRect(),
+          rect: (vCells.value[id]?.$el as HTMLElement).getBoundingClientRect(),
         }))
         .sort((a, b) => a.order - b.order)
         .map((o) => {
