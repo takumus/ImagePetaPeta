@@ -37,6 +37,7 @@ export function initSortHelper<T extends SortHelperData>(connections: {
     let newOrder = connections.orders.value[id] ?? 0;
     // draggingData.value = data;
     connections.onChangeDraggingData(data);
+    console.log(startDragCellRect);
     nextTick(() => {
       const floatingCellStyle = connections.floatingCellElement.value?.style as CSSStyleDeclaration;
       const dragTargetLineStyle = connections.dragTargetLineElement.value
