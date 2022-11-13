@@ -11,6 +11,7 @@ import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
+import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 export interface ToMainFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
   importImages: (
@@ -34,6 +35,11 @@ export interface ToMainFunctions {
   updatePetaImagesPetaTags: (
     petaImageIds: string[],
     petaTagLikes: PetaTagLike[],
+    mode: UpdateMode,
+  ) => Promise<boolean>;
+  getPetaTagPartitions: () => Promise<PetaTagPartition[]>;
+  updatePetaTagPartitions: (
+    petaTagPartitions: PetaTagPartition[],
     mode: UpdateMode,
   ) => Promise<boolean>;
   log: (id: string, ...args: unknown[]) => Promise<boolean>;

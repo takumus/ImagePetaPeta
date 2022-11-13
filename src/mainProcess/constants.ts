@@ -22,6 +22,7 @@ import { v4 as uuid } from "uuid";
 import { ErrorWindowParameters } from "@/mainProcess/errors/errorWindow";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
+import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 export function getConstants(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
   const dirs = {
     DIR_ROOT: "",
@@ -35,6 +36,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     FILE_IMAGES_DB: "",
     FILE_BOARDS_DB: "",
     FILE_TAGS_DB: "",
+    FILE_TAG_PARTITIONS_DB: "",
     FILE_IMAGES_TAGS_DB: "",
     FILE_SETTINGS: "",
     FILE_STATES: "",
@@ -45,6 +47,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
   let dbPetaImages: DB<PetaImage>;
   let dbPetaBoard: DB<PetaBoard>;
   let dbPetaTags: DB<PetaTag>;
+  let dbPetaTagPartitions: DB<PetaTagPartition>;
   let dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
   let configDBInfo: Config<DBInfo>;
   let configSettings: Config<Settings>;
@@ -93,6 +96,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     files.FILE_IMAGES_DB = file.initFile(dirs.DIR_ROOT, "images.db");
     files.FILE_BOARDS_DB = file.initFile(dirs.DIR_ROOT, "boards.db");
     files.FILE_TAGS_DB = file.initFile(dirs.DIR_ROOT, "tags.db");
+    files.FILE_TAG_PARTITIONS_DB = file.initFile(dirs.DIR_ROOT, "tag_partitions.db");
     files.FILE_IMAGES_TAGS_DB = file.initFile(dirs.DIR_ROOT, "images_tags.db");
     files.FILE_STATES = file.initFile(dirs.DIR_APP, "states.json");
     files.FILE_DBINFO = file.initFile(dirs.DIR_ROOT, "dbInfo.json");
@@ -108,6 +112,10 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     dbPetaImages = new DB<PetaImage>("petaImages", files.FILE_IMAGES_DB);
     dbPetaBoard = new DB<PetaBoard>("petaBoards", files.FILE_BOARDS_DB);
     dbPetaTags = new DB<PetaTag>("petaTags", files.FILE_TAGS_DB);
+    dbPetaTagPartitions = new DB<PetaTagPartition>(
+      "petaTagPartitions",
+      files.FILE_TAG_PARTITIONS_DB,
+    );
     dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", files.FILE_IMAGES_TAGS_DB);
     configStates = new Config<States>(files.FILE_STATES, defaultStates, migrateStates);
     configWindowStates = new Config<WindowStates>(
@@ -115,19 +123,25 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
       {},
       migrateWindowStates,
     );
-    ([dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaImagesPetaTags] as DB<unknown>[]).forEach(
-      (db) => {
-        db.on("beginCompaction", () => {
-          mainLogger.logChunk().log(`begin compaction(${db.name})`);
-        });
-        db.on("doneCompaction", () => {
-          mainLogger.logChunk().log(`done compaction(${db.name})`);
-        });
-        db.on("compactionError", (error) => {
-          mainLogger.logChunk().error(`compaction error(${db.name})`, error);
-        });
-      },
-    );
+    (
+      [
+        dbPetaImages,
+        dbPetaBoard,
+        dbPetaTags,
+        dbPetaTagPartitions,
+        dbPetaImagesPetaTags,
+      ] as DB<unknown>[]
+    ).forEach((db) => {
+      db.on("beginCompaction", () => {
+        mainLogger.logChunk().log(`begin compaction(${db.name})`);
+      });
+      db.on("doneCompaction", () => {
+        mainLogger.logChunk().log(`done compaction(${db.name})`);
+      });
+      db.on("compactionError", (error) => {
+        mainLogger.logChunk().error(`compaction error(${db.name})`, error);
+      });
+    });
     const isDarkMode = () => {
       if (configSettings.data.autoDarkMode) {
         return nativeTheme.shouldUseDarkColors;
@@ -144,6 +158,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
         dbPetaImages,
         dbPetaImagesPetaTags,
         dbPetaTags,
+        dbPetaTagPartitions,
         configSettings,
         i18n,
       },
@@ -174,6 +189,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     dbPetaImages,
     dbPetaBoard,
     dbPetaTags,
+    dbPetaTagPartitions,
     dbPetaImagesPetaTags,
     configDBInfo,
     configSettings,

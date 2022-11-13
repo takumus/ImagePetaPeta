@@ -76,6 +76,7 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
     dbPetaImages,
     dbPetaBoard,
     dbPetaTags,
+    dbPetaTagPartitions,
     dbPetaImagesPetaTags,
     configSettings,
     configStates,
@@ -206,6 +207,7 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
         dbPetaBoard.init(),
         dbPetaImages.init(),
         dbPetaTags.init(),
+        dbPetaTagPartitions.init(),
         dbPetaImagesPetaTags.init(),
       ]);
       await Promise.all([
@@ -217,7 +219,7 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
           fieldName: "id",
           unique: true,
         }),
-        dbPetaTags.ensureIndex({
+        dbPetaTagPartitions.ensureIndex({
           fieldName: "id",
           unique: true,
         }),
@@ -249,11 +251,11 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
         petaImages[pi.id] = migratePetaImage(pi);
       });
       if (await migratePetaTag(dbPetaTags, petaImages)) {
-        mainLogger.logChunk().log("Upgrade Tags");
+        mainLogger.logChunk().log("Migrate PetaTags");
         await petaDatas.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
       }
       if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
-        mainLogger.logChunk().log("Upgrade PetaImagesPetaTags");
+        mainLogger.logChunk().log("Migrate PetaImagesPetaTags");
       }
       if (configDBInfo.data.version !== app.getVersion()) {
         configDBInfo.data.version = app.getVersion();
@@ -433,6 +435,42 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
             });
           }
           return false;
+        },
+        async updatePetaTagPartitions(event, partitions, mode) {
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Update PetaImagesPetaTags");
+            await petaDatas.petaTagPartitions.updatePetaTagPartitions(partitions, mode);
+            log.log("return:", true);
+            return true;
+          } catch (error) {
+            log.error(error);
+            showError({
+              category: "M",
+              code: 200,
+              title: "Update PetaImagesPetaTags Error",
+              message: String(error),
+            });
+          }
+          return false;
+        },
+        async getPetaTagPartitions() {
+          const log = mainLogger.logChunk();
+          try {
+            log.log("#Get PetaTagPartitions");
+            const petaTagPartitions = await petaDatas.petaTagPartitions.getPetaTagPartitions();
+            log.log("return:", petaTagPartitions.length);
+            return petaTagPartitions;
+          } catch (error) {
+            log.error(error);
+            showError({
+              category: "M",
+              code: 100,
+              title: "Get PetaTagPartitions Error",
+              message: String(error),
+            });
+          }
+          return [];
         },
         async getPetaImageIds(event, params) {
           const log = mainLogger.logChunk();

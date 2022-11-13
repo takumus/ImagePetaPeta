@@ -24,15 +24,19 @@ import { resolveExtraFilesPath } from "@/mainProcess/utils/resolveExtraFilesPath
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
+import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
+import { PetaDataPetaTagPartitions } from "@/mainProcess/petaDatas/petaDataPetaTagPartitions";
 export class PetaDatas {
   petaImages: PetaDataPetaImages;
   petaBoards: PetaDataPetaBoards;
   petaTags: PetaDataPetaTags;
+  petaTagPartitions: PetaDataPetaTagPartitions;
   constructor(
     public datas: {
       dbPetaImages: DB<PetaImage>;
       dbPetaBoard: DB<PetaBoard>;
       dbPetaTags: DB<PetaTag>;
+      dbPetaTagPartitions: DB<PetaTagPartition>;
       dbPetaImagesPetaTags: DB<PetaImagePetaTag>;
       configSettings: Config<Settings>;
       i18n: I18n<typeof languages, DateTimeFormat, NumberFormat, string, true>;
@@ -51,6 +55,7 @@ export class PetaDatas {
     this.petaImages = new PetaDataPetaImages(this);
     this.petaBoards = new PetaDataPetaBoards(this);
     this.petaTags = new PetaDataPetaTags(this);
+    this.petaTagPartitions = new PetaDataPetaTagPartitions(this);
   }
   async realESRGAN(petaImages: PetaImage[], modelName: RealESRGANModelName) {
     return Tasks.spawn(

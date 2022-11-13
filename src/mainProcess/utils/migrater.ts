@@ -3,6 +3,7 @@ import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { PetaTag } from "@/commons/datas/petaTag";
+import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
@@ -222,7 +223,10 @@ export async function migratePetaTag(petaTags: DB<PetaTag>, petaImages: PetaImag
   await ppa(addTags, petaImagesArr).promise;
   return migrated;
 }
-
+export async function migratePetaTagPartition(petaTagPartition: PetaTagPartition) {
+  petaTagPartition;
+  return petaTagPartition;
+}
 export function migratePetaPanel(petaPanel: PetaPanel) {
   // 1.8.0
   if (petaPanel.gif === undefined) {
