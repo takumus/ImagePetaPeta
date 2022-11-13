@@ -12,9 +12,14 @@
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
-        :selected="(c.selected && draggingData === undefined) || draggingData === c.petaTag"
+        :selected="
+          (c.selected && draggingData === undefined) ||
+          (draggingData !== undefined &&
+            'petaTag' in draggingData &&
+            draggingData.petaTag === c.petaTag)
+        "
         @click="selectPetaTag(c.petaTag)"
-        @mousedown="startDrag($event, c.petaTag)"
+        @mousedown="startDrag($event, { petaTag: c.petaTag })"
         :readonly="c.readonly"
         :value="c.petaTag.name"
         :look="`${c.petaTag.name}`"
@@ -25,25 +30,37 @@
           order: orders[c.petaTag.id] ?? browserTags.length,
         }"
       />
-      <t-partition
+      <VTagPartition
         v-for="p in partitions"
-        :ref="(element: HTMLElement) => setVPartitionRef(element, p.id)"
+        :value="p.name"
+        :selected="false"
+        :readonly="false"
+        @mousedown="startDrag($event, { petaTagPartition: p })"
+        @update:value="(name) => changePartition(p, name)"
+        :ref="(element) => setVPartitionRef(element as any as VTagPartitionInstance, p.id)"
         :key="p.id"
         :style="{
           order: orders[p.id] ?? browserTags.length,
         }"
-        >---------</t-partition
-      >
+      />
     </t-tags>
     <t-drag-target-line ref="dragInsertTarget" v-if="draggingData"></t-drag-target-line>
-    <t-drag-floating-tag-cell v-if="draggingData">
+    <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="vFloatingCell">
       <VTagCell
-        :key="draggingData.id"
+        v-if="'petaTag' in draggingData"
+        :key="draggingData.petaTag.id"
         :selected="true"
         :readonly="true"
-        :value="draggingData.name"
-        :look="`${draggingData.name}`"
-        ref="vFloatingCell"
+        :value="draggingData.petaTag.name"
+        :look="`${draggingData.petaTag.name}`"
+      />
+      <VTagPartition
+        v-if="'petaTagPartition' in draggingData"
+        :key="draggingData.petaTagPartition.id"
+        :selected="true"
+        :readonly="true"
+        :value="draggingData.petaTagPartition.name"
+        :look="`${draggingData.petaTagPartition.name}`"
       />
     </t-drag-floating-tag-cell>
     <t-tag-add>
@@ -80,7 +97,9 @@ import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
 import { usePetaTagPartitionsStore } from "@/rendererProcess/stores/petaTagPartitionsStore";
 import VTagCell from "@/rendererProcess/components/browser/tags/VTagCell.vue";
+import VTagPartition from "@/rendererProcess/components/browser/tags/VTagPartition.vue";
 type VTagCellInstance = InstanceType<typeof VTagCell>;
+type VTagPartitionInstance = InstanceType<typeof VTagPartition>;
 const emit = defineEmits<{
   (e: "update:selectedPetaTagIds", selectedPetaTagIds: string[]): void;
 }>();
@@ -94,25 +113,34 @@ const petaTagsStore = usePetaTagsStore();
 const petaTagPartitionsStore = usePetaTagPartitionsStore();
 const { t } = useI18n();
 const vCells = ref<{ [key: string]: VTagCellInstance }>({});
-const vPartitions = ref<{ [key: string]: HTMLElement }>({});
+const vPartitions = ref<{ [key: string]: VTagPartitionInstance }>({});
 onBeforeUpdate(() => {
   vCells.value = {};
 });
 function setVTagCellRef(element: VTagCellInstance, id: string) {
   vCells.value[id] = element;
 }
-function setVPartitionRef(element: HTMLElement, id: string) {
+function setVPartitionRef(element: VTagPartitionInstance, id: string) {
   vPartitions.value[id] = element;
 }
 //--------------------------------------------------------------------//
 // ドラッグここから（いつか共通化したいから変数名も汎用的な感じ）
 //--------------------------------------------------------------------//
-const draggingData = ref<PetaTag>();
-const vFloatingCell = ref<VTagCellInstance>();
+const draggingData = ref<
+  | {
+      petaTag: PetaTag;
+    }
+  | { petaTagPartition: PetaTagPartition }
+>();
+const vFloatingCell = ref<HTMLElement>();
 const dragInsertTarget = ref<HTMLElement>();
 const orders = ref<{ [key: string]: number }>({});
-function startDrag(event: PointerEvent, data: PetaTag) {
-  if (vCells.value[data.id]?.isEditing() === true) {
+function startDrag(
+  event: PointerEvent,
+  data: { petaTag: PetaTag } | { petaTagPartition: PetaTagPartition },
+) {
+  const id = "petaTag" in data ? data.petaTag.id : data.petaTagPartition.id;
+  if (vCells.value[id]?.isEditing() === true) {
     return;
   }
   const startDragCellElement = event.currentTarget as HTMLElement;
@@ -120,10 +148,10 @@ function startDrag(event: PointerEvent, data: PetaTag) {
   const mouseDownPosition = vec2FromPointerEvent(event);
   const startDragOffset = vec2FromPointerEvent(event).getDiff(startDragCellRect);
   const prevOrders = JSON.stringify(orders.value);
-  let newOrder = orders.value[data.id] ?? 0;
+  let newOrder = orders.value[id] ?? 0;
   draggingData.value = data;
   nextTick(() => {
-    const floatingCellStyle = vFloatingCell.value?.$el.style as CSSStyleDeclaration;
+    const floatingCellStyle = vFloatingCell.value?.style as CSSStyleDeclaration;
     const dragTargetLineStyle = dragInsertTarget.value?.style as CSSStyleDeclaration;
     const setFloatingPosition = (position: Vec2) => {
       floatingCellStyle.transform = `translate(${position.x}px, ${position.y}px)`;
@@ -142,7 +170,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
         .map((id) => ({
           order: orders.value[id] ?? 0,
           rect: (
-            (vCells.value[id]?.$el ?? vPartitions.value[id]) as HTMLElement
+            (vCells.value[id]?.$el ?? vPartitions.value[id]?.$el) as HTMLElement
           ).getBoundingClientRect(),
         }))
         .sort((a, b) => a.order - b.order)
@@ -179,7 +207,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
         });
     }
     function pointerup() {
-      orders.value[data.id] = newOrder;
+      orders.value[id] = newOrder;
       Object.keys(orders.value)
         .map((id) => {
           return {
@@ -187,7 +215,7 @@ function startDrag(event: PointerEvent, data: PetaTag) {
             id,
           };
         })
-        .filter((o) => o.id !== data.id)
+        .filter((o) => o.id !== id)
         .sort((a, b) => a.order - b.order)
         .forEach((o) => {
           if (o.order >= newOrder) {
@@ -296,6 +324,14 @@ async function changeTag(petaTag: PetaTag, newName: string) {
   }
   petaTag.name = newName;
   await petaTagsStore.updatePetaTags([{ type: "petaTag", petaTag }], UpdateMode.UPDATE);
+  selectPetaTag(petaTag);
+}
+async function changePartition(petaTag: PetaTagPartition, newName: string) {
+  if (petaTag.name === newName) {
+    return;
+  }
+  petaTag.name = newName;
+  await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], UpdateMode.UPDATE);
   selectPetaTag(petaTag);
 }
 function selectPetaTag(petaTag?: PetaTag) {
