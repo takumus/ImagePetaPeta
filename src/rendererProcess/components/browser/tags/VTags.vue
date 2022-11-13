@@ -25,6 +25,15 @@
           order: orders[c.petaTag.id] ?? browserTags.length,
         }"
       />
+      <t-partition
+        v-for="p in partitions"
+        :ref="(element: HTMLElement) => setVPartitionRef(element, p.id)"
+        :key="p.id"
+        :style="{
+          order: orders[p.id] ?? browserTags.length,
+        }"
+        >---------</t-partition
+      >
     </t-tags>
     <t-drag-target-line ref="dragInsertTarget" v-if="draggingData"></t-drag-target-line>
     <t-drag-floating-tag-cell v-if="draggingData">
@@ -58,6 +67,7 @@
 import { computed, nextTick, onBeforeUpdate, ref, watch } from "vue";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
+import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { BrowserTag } from "@/rendererProcess/components/browser/browserTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
@@ -68,6 +78,7 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import VTextarea from "@/rendererProcess/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/rendererProcess/stores/petaTagsStore";
+import { usePetaTagPartitionsStore } from "@/rendererProcess/stores/petaTagPartitionsStore";
 import VTagCell from "@/rendererProcess/components/browser/tags/VTagCell.vue";
 type VTagCellInstance = InstanceType<typeof VTagCell>;
 const emit = defineEmits<{
@@ -80,13 +91,18 @@ const props = defineProps<{
 const textsStore = useTextsStore();
 const components = useComponentsStore();
 const petaTagsStore = usePetaTagsStore();
+const petaTagPartitionsStore = usePetaTagPartitionsStore();
 const { t } = useI18n();
 const vCells = ref<{ [key: string]: VTagCellInstance }>({});
+const vPartitions = ref<{ [key: string]: HTMLElement }>({});
 onBeforeUpdate(() => {
   vCells.value = {};
 });
 function setVTagCellRef(element: VTagCellInstance, id: string) {
   vCells.value[id] = element;
+}
+function setVPartitionRef(element: HTMLElement, id: string) {
+  vPartitions.value[id] = element;
 }
 //--------------------------------------------------------------------//
 // ドラッグここから（いつか共通化したいから変数名も汎用的な感じ）
@@ -125,7 +141,9 @@ function startDrag(event: PointerEvent, data: PetaTag) {
       Object.keys(orders.value)
         .map((id) => ({
           order: orders.value[id] ?? 0,
-          rect: (vCells.value[id]?.$el as HTMLElement).getBoundingClientRect(),
+          rect: (
+            (vCells.value[id]?.$el ?? vPartitions.value[id]) as HTMLElement
+          ).getBoundingClientRect(),
         }))
         .sort((a, b) => a.order - b.order)
         .map((o) => {
@@ -203,6 +221,15 @@ function startDrag(event: PointerEvent, data: PetaTag) {
           })),
           UpdateMode.UPDATE,
         );
+        petaTagPartitionsStore.updatePetaTagPartitions(
+          Object.values(petaTagPartitionsStore.state.petaTagPartitions.value).map(
+            (petaTagPartition) => ({
+              ...petaTagPartition,
+              index: orders.value[petaTagPartition.id] ?? 0,
+            }),
+          ),
+          UpdateMode.UPDATE,
+        );
       }
     }
     window.addEventListener("pointermove", pointermove);
@@ -224,12 +251,23 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
           removeTag(tag.petaTag);
         },
       },
+      {
+        label: "add partition",
+        click: () => {
+          addPartition("test", tag.petaTag.index + 1);
+        },
+      },
     ],
     vec2FromPointerEvent(event),
   );
 }
 async function addTag(name: string) {
   await petaTagsStore.updatePetaTags([{ type: "name", name }], UpdateMode.INSERT);
+}
+async function addPartition(name: string, index: number) {
+  const partition = createPetaTagPartition(name);
+  partition.index = index;
+  await petaTagPartitionsStore.updatePetaTagPartitions([partition], UpdateMode.INSERT);
 }
 async function removeTag(petaTag: PetaTag) {
   if (
@@ -308,12 +346,18 @@ const browserTags = computed((): BrowserTag[] => {
   });
   return browserTags;
 });
+const partitions = computed(() => {
+  return petaTagPartitionsStore.state.petaTagPartitions.value;
+});
 watch(
-  petaTagsStore.state.petaTags,
+  [petaTagsStore.state.petaTags, petaTagPartitionsStore.state.petaTagPartitions],
   () => {
     orders.value = {};
     petaTagsStore.state.petaTags.value.forEach((petaTag) => {
       orders.value[petaTag.id] = petaTag.index;
+    });
+    petaTagPartitionsStore.state.petaTagPartitions.value.forEach((petaTagPartition) => {
+      orders.value[petaTagPartition.id] = petaTagPartition.index;
     });
   },
   { immediate: true },
