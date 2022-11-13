@@ -5,8 +5,9 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 export async function createPetaTagPartitionsStore() {
   const petaTagPartitions = ref(await IPC.send("getPetaTagPartitions"));
-  IPC.on("updatePetaTagPartitions", async (event, _petaTagPartitions) => {
-    petaTagPartitions.value = _petaTagPartitions;
+  IPC.on("updatePetaTagPartitions", async () => {
+    petaTagPartitions.value = await IPC.send("getPetaTagPartitions");
+    // console.log(_petaTagPartitions);
   });
   return {
     state: {
