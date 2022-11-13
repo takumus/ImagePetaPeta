@@ -34,9 +34,9 @@ const vTextarea = ref<InstanceType<typeof VTextarea>>();
 function updateName(name: string) {
   emit("update:value", name);
 }
-function select() {
-  //
-}
+// function select() {
+//   //
+// }
 defineExpose({
   isEditing: () => vTextarea.value?.isEditing() ?? false,
 });
@@ -48,6 +48,8 @@ t-tag-partition-root {
   width: 100%;
   align-items: center;
   cursor: pointer;
+  background-color: var(--color-0);
+  border-radius: var(--rounded);
   > t-content {
     display: flex;
     // background-color: var(--color-border);

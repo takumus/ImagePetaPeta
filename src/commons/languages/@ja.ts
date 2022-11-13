@@ -73,6 +73,12 @@ const ja = {
         return `タグ "${ctx.list(0)}" を削除`;
       },
     },
+    tagPartitionMenu: {
+      remove: (ctx: any) => {
+        return `区切り "${ctx.list(0)}" を削除`;
+      },
+    },
+    addTagPartition: `区切りを追加`,
     petaImageMenu: {
       remove: (ctx: any) => {
         return `${ctx.list(0)}枚の画像を削除`;
@@ -86,6 +92,9 @@ const ja = {
     },
     removeTagDialog: (ctx: any) => {
       return `タグ "${ctx.list(0)}" を削除しますか?\n画像は削除されません。`;
+    },
+    removeTagPartitionDialog: (ctx: any) => {
+      return `区切り "${ctx.list(0)}" を削除しますか?`;
     },
     tagAlreadyExistsDialog: (ctx: any) => {
       return `タグ" ${ctx.list(0)}" はすでに存在します`;
