@@ -210,6 +210,7 @@ t-layer-root {
     overflow-y: auto;
     height: 100%;
     flex: 1;
+    clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0);
     > t-layers {
       display: flex;
       flex-direction: column;
