@@ -18,7 +18,7 @@
             'petaTag' in draggingData &&
             draggingData.petaTag === c.petaTag)
         "
-        @mousedown.left="pointerdown($event, { petaTag: c.petaTag, id: c.petaTag.id })"
+        @mousedown.left="sortHelper.pointerdown($event, { petaTag: c.petaTag, id: c.petaTag.id })"
         :readonly="c.readonly"
         :value="c.petaTag.name"
         :look="`${c.petaTag.name}`"
@@ -34,7 +34,7 @@
         :value="p.name"
         :selected="false"
         :readonly="false"
-        @mousedown.left="pointerdown($event, { petaTagPartition: p, id: p.id })"
+        @mousedown.left="sortHelper.pointerdown($event, { petaTagPartition: p, id: p.id })"
         @update:value="(name) => changePartition(p, name)"
         @contextmenu="partitionMenu($event, p)"
         :ref="(element) => setVPartitionRef(element as any as VTagPartitionInstance, p.id)"
@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, onBeforeUpdate, ref, watch } from "vue";
+import { computed, onBeforeUpdate, onUnmounted, ref, watch } from "vue";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
@@ -123,6 +123,9 @@ const { t } = useI18n();
 const vCells = ref<{ [key: string]: VTagCellInstance }>({});
 const vPartitions = ref<{ [key: string]: VTagPartitionInstance }>({});
 const tagsRoot = ref<HTMLElement>();
+onUnmounted(() => {
+  sortHelper.destroy();
+});
 onBeforeUpdate(() => {
   vCells.value = {};
   vPartitions.value = {};
@@ -145,7 +148,7 @@ const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
 }>({});
-const { pointerdown } = initSortHelper<MergedSortHelperData>(
+const sortHelper = initSortHelper<MergedSortHelperData>(
   {
     getElementFromId: (id) => (vCells.value[id]?.$el ?? vPartitions.value[id]?.$el) as HTMLElement,
     onChangeDraggingData: (data) => (draggingData.value = data),

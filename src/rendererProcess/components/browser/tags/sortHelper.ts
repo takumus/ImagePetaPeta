@@ -37,6 +37,9 @@ export function initSortHelper<T extends SortHelperData>(
   const click = new ClickChecker();
   const flexGap = config?.flexGap ?? 0;
   let dragTargetLineElementAdded = false;
+  function destroy() {
+    dragTargetLineElement.remove();
+  }
   function pointerdown(event: PointerEvent, data: T) {
     const startDragCellElement = event.currentTarget as HTMLElement;
     if (!dragTargetLineElementAdded) {
@@ -224,5 +227,6 @@ export function initSortHelper<T extends SortHelperData>(
   }
   return {
     pointerdown,
+    destroy,
   };
 }

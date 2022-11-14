@@ -17,7 +17,7 @@
           :petaPanel="pPanel"
           :selected="pPanel._selected"
           :sorting="draggingData !== undefined"
-          @startDrag="pointerdown"
+          @startDrag="sortHelper.pointerdown"
           @onClick="clickLayer"
           @update:petaPanel="updatePetaPanel"
           :style="{
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 // Vue
-import { onBeforeUpdate, ref, watch } from "vue";
+import { onBeforeUpdate, onUnmounted, ref, watch } from "vue";
 // Components
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
@@ -65,6 +65,9 @@ const vLayerCells = ref<{ [key: string]: VLayerCellInstance }>({});
 onBeforeUpdate(() => {
   vLayerCells.value = {};
 });
+onUnmounted(() => {
+  sortHelper.destroy();
+});
 function setVLayerCellRef(element: VLayerCellInstance, id: string) {
   vLayerCells.value[id] = element;
 }
@@ -77,7 +80,7 @@ const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
 }>({});
-const { pointerdown } = initSortHelper<PetaPanel>(
+const sortHelper = initSortHelper<PetaPanel>(
   {
     getElementFromId: (id) => vLayerCells.value[id]?.$el as HTMLElement,
     onChangeDraggingData: (data) => (draggingData.value = data),
