@@ -414,11 +414,6 @@ const fetchFilteredPetaImages = (() => {
   let fetchId = 0;
   return async () => {
     const currentFetchId = ++fetchId;
-    // if (selectedPetaTagIds.value.length === 0) {
-    //   ciedeCache = {};
-    //   filteredPetaImages.value = [...petaImagesArray.value].sort(sort);
-    //   return;
-    // }
     const selectedUntagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
     console.time("fetch" + currentFetchId);
     const results = await IPC.send(
