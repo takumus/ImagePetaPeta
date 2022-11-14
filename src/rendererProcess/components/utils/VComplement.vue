@@ -185,7 +185,7 @@ t-complement-root {
     cursor: pointer;
     &.selected,
     &.close:hover {
-      background-color: var(--color-accent);
+      background-color: var(--color-accent-1);
     }
     > t-char {
       display: inline;

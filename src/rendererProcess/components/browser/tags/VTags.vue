@@ -8,7 +8,7 @@
         :look="`${t('browser.all')}(${petaImagesArray.length})`"
       />
     </t-tags-top>
-    <t-tags>
+    <t-tags ref="tagsRoot">
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
@@ -43,8 +43,12 @@
           order: orders[p.id] ?? browserTags.length,
         }"
       />
+      <t-drag-target-linea
+        class="t-drag-target-line"
+        ref="dragTargetLineElement"
+        v-if="draggingData"
+      ></t-drag-target-linea>
     </t-tags>
-    <t-drag-target-line ref="dragTargetLineElement" v-if="draggingData"></t-drag-target-line>
     <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
       <VTagCell
         v-if="'petaTag' in draggingData"
@@ -118,6 +122,7 @@ const petaTagPartitionsStore = usePetaTagPartitionsStore();
 const { t } = useI18n();
 const vCells = ref<{ [key: string]: VTagCellInstance }>({});
 const vPartitions = ref<{ [key: string]: VTagPartitionInstance }>({});
+const tagsRoot = ref<HTMLElement>();
 onBeforeUpdate(() => {
   vCells.value = {};
   vPartitions.value = {};
@@ -136,7 +141,6 @@ type MergedSortHelperData =
   | { petaTagPartition: PetaTagPartition; id: string };
 const draggingData = ref<MergedSortHelperData>();
 const floatingCellElement = ref<HTMLElement>();
-const dragTargetLineElement = ref<HTMLElement>();
 const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
@@ -180,7 +184,6 @@ const { pointerdown } = initSortHelper<MergedSortHelperData>(
     orders,
     constraints,
     floatingCellElement,
-    dragTargetLineElement,
   },
   {
     flexGap: 2,
@@ -416,7 +419,7 @@ t-tags-root {
       width: 100%;
       height: 100%;
       border-radius: 99px;
-      background-color: var(--color-accent);
+      background-color: var(--color-accent-2);
       transform: translate(-50%, -50%);
     }
   }

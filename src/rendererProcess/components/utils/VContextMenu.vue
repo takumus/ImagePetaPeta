@@ -94,7 +94,7 @@ defineExpose({
     // padding-left: 24px;
     cursor: pointer;
     &:hover {
-      background-color: var(--color-accent);
+      background-color: var(--color-accent-1);
     }
     > .disabled {
       &:hover {

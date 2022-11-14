@@ -123,11 +123,11 @@ function pointerdown(event: PointerEvent) {
   height: 64px;
   width: 100%;
   &.selected {
-    background-color: var(--color-accent) !important;
+    background-color: var(--color-accent-1) !important;
   }
   &.drag,
   &:hover {
-    background-color: var(--color-accent);
+    background-color: var(--color-accent-1);
     &.sorting {
       background-color: var(--color-0);
     }

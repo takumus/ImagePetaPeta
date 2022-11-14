@@ -50,7 +50,7 @@ t-tag-cell-root {
   &.selected {
     // font-weight: bold;
     // font-size: var(--size-2);
-    background-color: var(--color-accent);
+    background-color: var(--color-accent-1);
   }
 }
 </style>

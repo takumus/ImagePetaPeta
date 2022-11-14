@@ -26,16 +26,23 @@ export function initSortHelper<T extends SortHelperData>(
       [key: string]: SortHelperConstraint;
     }>;
     floatingCellElement: Ref<HTMLElement | undefined>;
-    dragTargetLineElement: Ref<HTMLElement | undefined>;
   },
   config?: {
     flexGap?: number;
   },
 ) {
+  const dragTargetLineElement = document.createElement("t-drag-target-line");
+  dragTargetLineElement.classList.add("t-drag-target-line");
+  dragTargetLineElement.style.display = "none";
   const click = new ClickChecker();
   const flexGap = config?.flexGap ?? 0;
+  let dragTargetLineElementAdded = false;
   function pointerdown(event: PointerEvent, data: T) {
     const startDragCellElement = event.currentTarget as HTMLElement;
+    if (!dragTargetLineElementAdded) {
+      startDragCellElement.parentElement?.appendChild(dragTargetLineElement);
+    }
+    dragTargetLineElementAdded = true;
     click.on("startDrag", (event) => {
       startDrag(event);
     });
@@ -44,6 +51,7 @@ export function initSortHelper<T extends SortHelperData>(
     });
     click.down();
     function startDrag(event: PointerEvent) {
+      dragTargetLineElement.style.display = "block";
       const startDrag = vec2FromPointerEvent(event);
       functions.onStartDrag?.(data);
       const id = data.id;
@@ -58,7 +66,7 @@ export function initSortHelper<T extends SortHelperData>(
       functions.onChangeDraggingData(data);
       nextTick(() => {
         const floatingCellStyle = refs.floatingCellElement.value?.style as CSSStyleDeclaration;
-        const dragTargetLineStyle = refs.dragTargetLineElement.value?.style as CSSStyleDeclaration;
+        const dragTargetLineStyle = dragTargetLineElement.style as CSSStyleDeclaration;
         const constraint = refs.constraints.value[id];
         const setFloatingPosition = (position: Vec2) => {
           if (constraint?.moveX === false) {
@@ -145,9 +153,9 @@ export function initSortHelper<T extends SortHelperData>(
               minDistance = myMinDistance.distance;
               dragTargetLineStyle.height = "2px";
               if (myMinDistance.type === "left" || myMinDistance.type === "right") {
-                dragTargetLineStyle.width = o.rect.height + "px";
+                dragTargetLineStyle.width = o.rect.height - 4 + "px";
               } else {
-                dragTargetLineStyle.width = o.rect.width + "px";
+                dragTargetLineStyle.width = o.rect.width - 4 + "px";
               }
               if (myMinDistance.type === "left") {
                 dragTargetLineStyle.transform = `translate(${o.rect.x - flexGap}px, ${
@@ -204,6 +212,7 @@ export function initSortHelper<T extends SortHelperData>(
           functions.onChangeDraggingData(undefined);
           startDragCellElement.style.opacity = "unset";
           floatingCellStyle.visibility = "hidden";
+          dragTargetLineElement.style.display = "none";
           if (prevOrders !== JSON.stringify(refs.orders.value)) {
             functions.onSort?.();
           }

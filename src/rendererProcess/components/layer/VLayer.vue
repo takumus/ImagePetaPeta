@@ -25,7 +25,6 @@
           }"
         />
       </t-layers>
-      <t-drag-target-line ref="dragTargetLineElement" v-if="draggingData"></t-drag-target-line>
       <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
         <VLayerCell ref="cellDrag" :petaPanel="draggingData" :drag="true" />
       </t-drag-floating-tag-cell>
@@ -74,7 +73,6 @@ function setVLayerCellRef(element: VLayerCellInstance, id: string) {
 //--------------------------------------------------------------------//
 const draggingData = ref<PetaPanel>();
 const floatingCellElement = ref<HTMLElement>();
-const dragTargetLineElement = ref<HTMLElement>();
 const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
@@ -105,7 +103,6 @@ const { pointerdown } = initSortHelper<PetaPanel>(
     orders,
     constraints,
     floatingCellElement,
-    dragTargetLineElement,
   },
   {
     flexGap: 0,
@@ -233,7 +230,7 @@ t-layer-root {
         width: 100%;
         height: 100%;
         border-radius: 99px;
-        background-color: var(--color-accent);
+        background-color: var(--color-accent-2);
         transform: translate(-50%, -50%);
       }
     }
