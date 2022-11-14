@@ -11,48 +11,42 @@
     <t-layers-parent v-show="statesStore.state.value.visibleLayerPanel" ref="layersParent">
       <t-layers ref="layers">
         <VLayerCell
-          v-for="layerCellData in layerCellDatas"
-          :key="layerCellData.id"
-          :ref="(element) => setVLayerCellRef(element as any as VLayerCellInstance, layerCellData.data.id)"
-          :pPanel="layerCellData.data"
-          :cellData="layerCellData"
+          v-for="pPanel in props.pPanelsArray"
+          :key="pPanel.id"
+          :ref="(element) => setVLayerCellRef(element as any as VLayerCellInstance, pPanel.id)"
+          :petaPanel="pPanel"
+          :selected="pPanel._selected"
+          :sorting="draggingData !== undefined"
+          @startDrag="sortHelper.pointerdown"
+          @onClick="clickLayer"
+          @update:petaPanel="updatePetaPanel"
           :style="{
-            visibility: draggingPPanel?.data === layerCellData.data ? 'hidden' : 'visible',
-          }"
-          @startDrag="sortHelper.startDrag"
-          @update:cellData="updateCellData"
-          @click.right="rightClick(layerCellData.data, $event)"
-          @click.left="leftClick(layerCellData.data)"
-        />
-        <VLayerCell
-          ref="cellDrag"
-          :pPanel="draggingPPanel?.data"
-          :cellData="draggingPPanel"
-          :drag="true"
-          :style="{
-            visibility: !draggingPPanel ? 'hidden' : 'visible',
+            order: orders[pPanel.id] ?? props.pPanelsArray.length,
           }"
         />
       </t-layers>
+      <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
+        <VLayerCell ref="cellDrag" :petaPanel="draggingData" :drag="true" />
+      </t-drag-floating-tag-cell>
     </t-layers-parent>
   </t-layer-root>
 </template>
 
 <script setup lang="ts">
 // Vue
-import { computed, onBeforeUpdate, onMounted, onUnmounted, ref, watch } from "vue";
+import { onBeforeUpdate, onUnmounted, ref, watch } from "vue";
 // Components
 import VLayerCell from "@/rendererProcess/components/layer/VLayerCell.vue";
 // Others
 import { Keyboards } from "@/rendererProcess/utils/keyboards";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { SortHelper } from "@/rendererProcess/components/utils/sortHelper";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { useStateStore } from "@/rendererProcess/stores/statesStore";
-type CellData = {
-  data: PetaPanel;
-  id: number;
-};
+import {
+  initSortHelper,
+  SortHelperConstraint,
+} from "@/rendererProcess/components/browser/tags/sortHelper";
+import { MouseButton } from "@/commons/datas/mouseButton";
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
 const statesStore = useStateStore();
 const emit = defineEmits<{
@@ -67,67 +61,87 @@ const props = defineProps<{
 const layers = ref<HTMLElement>();
 const layersParent = ref<HTMLElement>();
 const cellDrag = ref<VLayerCellInstance>();
-const draggingPPanelId = ref<string>();
 const vLayerCells = ref<{ [key: string]: VLayerCellInstance }>({});
-const sortHelper: SortHelper<CellData, VLayerCellInstance> = new SortHelper(
-  (data) => {
-    return vLayerCells.value[data.data.id];
-  },
-  (data) => {
-    return data.data.index;
-  },
-  (changes) => {
-    emit(
-      "update:petaPanels",
-      changes.map((change) => {
-        return {
-          ...change.data.data,
-          index: change.index,
-        };
-      }),
-    );
-    emit("sortIndex");
-  },
-  (draggingData) => {
-    draggingPPanelId.value = draggingData as string;
-  },
-  (data) => {
-    return data.data.id;
-  },
-);
-onMounted(() => {
-  if (layers.value && layersParent.value && cellDrag.value) {
-    sortHelper.init(layers.value, layersParent.value, cellDrag.value);
-  }
+onBeforeUpdate(() => {
+  vLayerCells.value = {};
 });
 onUnmounted(() => {
   sortHelper.destroy();
 });
-function changeLayerCellDatas() {
-  sortHelper.layerCellDatas = layerCellDatas.value;
-}
-onBeforeUpdate(() => {
-  vLayerCells.value = {};
-});
 function setVLayerCellRef(element: VLayerCellInstance, id: string) {
   vLayerCells.value[id] = element;
 }
-function scrollTo(pPanel: PetaPanel) {
-  sortHelper.scrollTo({
-    id: 0,
-    data: pPanel,
-  });
-}
-function rightClick(pPanel: PetaPanel, event: PointerEvent | MouseEvent) {
-  if (!pPanel._selected) {
+//--------------------------------------------------------------------//
+// ドラッグここから
+//--------------------------------------------------------------------//
+const draggingData = ref<PetaPanel>();
+const floatingCellElement = ref<HTMLElement>();
+const orders = ref<{ [key: string]: number }>({});
+const constraints = ref<{
+  [key: string]: SortHelperConstraint;
+}>({});
+const sortHelper = initSortHelper<PetaPanel>(
+  {
+    getElementFromId: (id) => vLayerCells.value[id]?.$el as HTMLElement,
+    onChangeDraggingData: (data) => (draggingData.value = data),
+    getIsDraggableFromId: () => true,
+    onSort: () => {
+      const updatedPetaPanels: PetaPanel[] = [];
+      props.pPanelsArray.forEach((petaPanel) => {
+        const order = props.pPanelsArray.length - (orders.value[petaPanel.id] ?? 0);
+        if (petaPanel.index !== order) {
+          updatedPetaPanels.push({
+            ...petaPanel,
+            index: order,
+          });
+        }
+      });
+      emit("update:petaPanels", updatedPetaPanels);
+      if (updatedPetaPanels.length > 0) {
+        emit("sortIndex");
+      }
+    },
+  },
+  {
+    orders,
+    constraints,
+    floatingCellElement,
+  },
+  {
+    flexGap: 0,
+  },
+);
+watch(
+  () => props.pPanelsArray,
+  () => {
+    orders.value = {};
+    constraints.value = {};
+    props.pPanelsArray.forEach((petaTag) => {
+      orders.value[petaTag.id] = props.pPanelsArray.length - petaTag.index;
+      constraints.value[petaTag.id] = {
+        insertToX: false,
+        insertToY: true,
+        moveX: true,
+        moveY: true,
+      };
+    });
+  },
+  { immediate: true },
+);
+//--------------------------------------------------------------------//
+// ドラッグここまで
+//--------------------------------------------------------------------//
+function clickLayer(event: PointerEvent, petaPanel: PetaPanel) {
+  if (event.button === MouseButton.LEFT) {
     clearSelectionAll();
+    petaPanel._selected = true;
+  } else if (event.button === MouseButton.RIGHT) {
+    if (!petaPanel._selected) {
+      clearSelectionAll();
+    }
+    petaPanel._selected = true;
+    emit("petaPanelMenu", petaPanel, vec2FromPointerEvent(event));
   }
-  pPanel._selected = true;
-  emit("petaPanelMenu", pPanel, vec2FromPointerEvent(event));
-}
-function leftClick(pPanel: PetaPanel) {
-  clearSelectionAll();
-  pPanel._selected = true;
 }
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
@@ -139,33 +153,16 @@ function clearSelectionAll(force = false) {
 function toggleVisible() {
   statesStore.state.value.visibleLayerPanel = !statesStore.state.value.visibleLayerPanel;
 }
-function updateCellData(cellData: CellData) {
+function updatePetaPanel(petaPanel: PetaPanel) {
   emit("update:petaPanels", [
     {
-      ...cellData.data,
+      ...petaPanel,
     },
   ]);
 }
-const draggingPPanel = computed(() => {
-  return layerCellDatas.value.find((cd) => cd.data.id === draggingPPanelId.value);
-});
-const layerCellDatas = computed((): CellData[] => {
-  if (!props.pPanelsArray) {
-    return [];
-  }
-  return [...props.pPanelsArray]
-    .sort((a, b) => {
-      return b.index - a.index;
-    })
-    .map((pPanel, i) => {
-      // これを挟まないと、更新時スクロール位置が変わる。バグ？なんで？
-      return {
-        data: pPanel,
-        id: i,
-      };
-    });
-});
-watch(() => layerCellDatas.value, changeLayerCellDatas);
+function scrollTo() {
+  //
+}
 defineExpose({
   scrollTo,
 });
@@ -213,11 +210,42 @@ t-layer-root {
     overflow-y: auto;
     height: 100%;
     flex: 1;
+    clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0);
     > t-layers {
-      display: block;
+      display: flex;
+      flex-direction: column;
       margin: 0px;
       padding: 0px;
       position: relative;
+      overflow-anchor: none;
+    }
+    > t-drag-target-line {
+      position: fixed;
+      z-index: 999;
+      width: 0px;
+      height: 0px;
+      top: 0px;
+      left: 0px;
+      transform-origin: top left;
+      &::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 99px;
+        background-color: var(--color-accent-2);
+        transform: translate(-50%, -50%);
+      }
+    }
+    > t-drag-floating-tag-cell {
+      z-index: 999;
+      pointer-events: none;
+      top: 0px;
+      left: 0px;
+      position: fixed;
+      visibility: hidden;
+      opacity: 0.9;
+      transform-origin: top right;
     }
   }
 }

@@ -8,7 +8,7 @@
         :look="`${t('browser.all')}(${petaImagesArray.length})`"
       />
     </t-tags-top>
-    <t-tags>
+    <t-tags ref="tagsRoot">
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
@@ -18,7 +18,7 @@
             'petaTag' in draggingData &&
             draggingData.petaTag === c.petaTag)
         "
-        @mousedown.left="startDrag($event, { petaTag: c.petaTag, id: c.petaTag.id })"
+        @mousedown.left="sortHelper.pointerdown($event, { petaTag: c.petaTag, id: c.petaTag.id })"
         :readonly="c.readonly"
         :value="c.petaTag.name"
         :look="`${c.petaTag.name}`"
@@ -34,7 +34,7 @@
         :value="p.name"
         :selected="false"
         :readonly="false"
-        @mousedown.left="startDrag($event, { petaTagPartition: p, id: p.id })"
+        @mousedown.left="sortHelper.pointerdown($event, { petaTagPartition: p, id: p.id })"
         @update:value="(name) => changePartition(p, name)"
         @contextmenu="partitionMenu($event, p)"
         :ref="(element) => setVPartitionRef(element as any as VTagPartitionInstance, p.id)"
@@ -43,8 +43,12 @@
           order: orders[p.id] ?? browserTags.length,
         }"
       />
+      <t-drag-target-linea
+        class="t-drag-target-line"
+        ref="dragTargetLineElement"
+        v-if="draggingData"
+      ></t-drag-target-linea>
     </t-tags>
-    <t-drag-target-line ref="dragTargetLineElement" v-if="draggingData"></t-drag-target-line>
     <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
       <VTagCell
         v-if="'petaTag' in draggingData"
@@ -81,7 +85,7 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, onBeforeUpdate, ref, watch } from "vue";
+import { computed, onBeforeUpdate, onUnmounted, ref, watch } from "vue";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
@@ -118,6 +122,10 @@ const petaTagPartitionsStore = usePetaTagPartitionsStore();
 const { t } = useI18n();
 const vCells = ref<{ [key: string]: VTagCellInstance }>({});
 const vPartitions = ref<{ [key: string]: VTagPartitionInstance }>({});
+const tagsRoot = ref<HTMLElement>();
+onUnmounted(() => {
+  sortHelper.destroy();
+});
 onBeforeUpdate(() => {
   vCells.value = {};
   vPartitions.value = {};
@@ -136,49 +144,54 @@ type MergedSortHelperData =
   | { petaTagPartition: PetaTagPartition; id: string };
 const draggingData = ref<MergedSortHelperData>();
 const floatingCellElement = ref<HTMLElement>();
-const dragTargetLineElement = ref<HTMLElement>();
 const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
 }>({});
-const { startDrag } = initSortHelper<MergedSortHelperData>({
-  getElementFromId: (id) => (vCells.value[id]?.$el ?? vPartitions.value[id]?.$el) as HTMLElement,
-  onChangeDraggingData: (data) => (draggingData.value = data),
-  getIsDraggableFromId: (id) =>
-    vCells.value[id]?.isEditing() === true || vPartitions.value[id]?.isEditing() === true
-      ? false
-      : true,
-  onSort: () => {
-    petaTagsStore.updatePetaTags(
-      Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
-        type: "petaTag",
-        petaTag: {
-          ...petaTag,
-          index: orders.value[petaTag.id] ?? 0,
-        },
-      })),
-      UpdateMode.UPDATE,
-    );
-    petaTagPartitionsStore.updatePetaTagPartitions(
-      Object.values(petaTagPartitionsStore.state.petaTagPartitions.value).map(
-        (petaTagPartition) => ({
-          ...petaTagPartition,
-          index: orders.value[petaTagPartition.id] ?? 0,
-        }),
-      ),
-      UpdateMode.UPDATE,
-    );
+const sortHelper = initSortHelper<MergedSortHelperData>(
+  {
+    getElementFromId: (id) => (vCells.value[id]?.$el ?? vPartitions.value[id]?.$el) as HTMLElement,
+    onChangeDraggingData: (data) => (draggingData.value = data),
+    getIsDraggableFromId: (id) =>
+      vCells.value[id]?.isEditing() === true || vPartitions.value[id]?.isEditing() === true
+        ? false
+        : true,
+    onSort: () => {
+      petaTagsStore.updatePetaTags(
+        Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
+          type: "petaTag",
+          petaTag: {
+            ...petaTag,
+            index: orders.value[petaTag.id] ?? 0,
+          },
+        })),
+        UpdateMode.UPDATE,
+      );
+      petaTagPartitionsStore.updatePetaTagPartitions(
+        Object.values(petaTagPartitionsStore.state.petaTagPartitions.value).map(
+          (petaTagPartition) => ({
+            ...petaTagPartition,
+            index: orders.value[petaTagPartition.id] ?? 0,
+          }),
+        ),
+        UpdateMode.UPDATE,
+      );
+    },
+    onClick: (_event, data) => {
+      if ("petaTag" in data) {
+        selectPetaTag(data.petaTag);
+      }
+    },
   },
-  onStartDrag: (data) => {
-    if ("petaTag" in data) {
-      selectPetaTag(data.petaTag);
-    }
+  {
+    orders,
+    constraints,
+    floatingCellElement,
   },
-  orders,
-  constraints,
-  floatingCellElement,
-  dragTargetLineElement,
-});
+  {
+    flexGap: 2,
+  },
+);
 //--------------------------------------------------------------------//
 // ドラッグここまで
 //--------------------------------------------------------------------//
@@ -409,7 +422,7 @@ t-tags-root {
       width: 100%;
       height: 100%;
       border-radius: 99px;
-      background-color: var(--color-accent);
+      background-color: var(--color-accent-2);
       transform: translate(-50%, -50%);
     }
   }

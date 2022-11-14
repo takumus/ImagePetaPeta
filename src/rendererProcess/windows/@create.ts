@@ -34,6 +34,7 @@ import {
   windowTitleStoreKey,
 } from "@/rendererProcess/stores/windowTitleStore";
 import { injectAnimatedGIFAsset } from "@/rendererProcess/utils/pixi-gif/animatedGIFAsset";
+import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
 export async function create(
   component: Component,
   windowType: WindowType,
@@ -74,6 +75,7 @@ export async function create(
       ...(stores?.map(async (store) => app.provide(store.key, await store.value())) || []),
     ]);
     injectAnimatedGIFAsset();
+    ClickChecker.init();
     app.mount("#app");
   };
   IPC.on("dataInitialized", () => {

@@ -76,7 +76,7 @@ export class PTransformer extends PIXI.Container {
   }
   beginSizing(index: number, e: PIXI.FederatedPointerEvent) {
     this.mousePosition.set(e.data.global);
-    this.click.down(e.data.global);
+    this.click.down();
     this.controlStatus = ControlStatus.PANEL_SIZE;
     this.sizingCornerIndex = index;
     this.beginSizingPosition = new Vec2(e.data.global);
@@ -94,7 +94,7 @@ export class PTransformer extends PIXI.Container {
   }
   beginRotating(index: number, e: PIXI.FederatedPointerEvent) {
     this.mousePosition.set(e.data.global);
-    this.click.down(e.data.global);
+    this.click.down();
     this.beginSizingPetaPanels = this.selectedPPanels.map((pPanel) => {
       const p = deepcopy(pPanel.petaPanel);
       return p;
@@ -131,7 +131,7 @@ export class PTransformer extends PIXI.Container {
   }
   pointerdownPPanel(pPanel: PPanel, e: PIXI.FederatedPointerEvent) {
     this.mousePosition.set(e.data.global);
-    this.click.down(e.data.global);
+    this.click.down();
     this.controlStatus = ControlStatus.PANEL_DRAG;
     const mouse = new Vec2(e.data.global);
     this.selectedPPanels.forEach((pPanel) => {
@@ -141,7 +141,6 @@ export class PTransformer extends PIXI.Container {
     });
   }
   pointerup(e: PIXI.FederatedPointerEvent) {
-    this.click.move(e.data.global);
     if (this.controlStatus === ControlStatus.PANEL_DRAG) {
       this.selectedPPanels.forEach((pPanel) => {
         pPanel.dragging = false;
@@ -156,7 +155,6 @@ export class PTransformer extends PIXI.Container {
   }
   pointermove(e: PIXI.FederatedPointerEvent) {
     if (this.controlStatus !== ControlStatus.NONE) {
-      this.click.move(e.data.global);
       if (this.click.isClick) {
         return;
       }
