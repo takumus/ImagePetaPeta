@@ -8,7 +8,7 @@
   >
     <t-tile-wrapper v-if="tile.group === undefined && tile.petaImage !== undefined">
       <t-images
-        @pointerdown="pointerdown($event)"
+        @pointerdown="pointerdown"
         @dragstart="dragstart($event)"
         @dblclick="dblclick"
         draggable="true"
@@ -112,15 +112,12 @@ const click: ClickChecker = new ClickChecker();
 let loadOriginalTimeoutHandler = -1;
 let loadThumbnailTimeoutHandler = -1;
 let fetchTagsTimeoutHandler = -1;
-let pressing = false;
 const fetchingPetaTags = ref(false);
 onMounted(() => {
   delayedLoadImage();
   delayedFetchPetaTags();
 });
 onUnmounted(() => {
-  window.removeEventListener("pointermove", pointermove);
-  window.removeEventListener("pointerup", pointerup);
   window.clearTimeout(loadOriginalTimeoutHandler);
   window.clearTimeout(loadThumbnailTimeoutHandler);
   window.clearTimeout(fetchTagsTimeoutHandler);
@@ -131,29 +128,9 @@ function dragstart(event: PointerEvent) {
     emit("drag", props.tile.petaImage);
   }
 }
-function pointerdown(event: PointerEvent) {
-  click.down(new Vec2(event.clientX, event.clientY));
-  window.addEventListener("pointermove", pointermove);
-  window.addEventListener("pointerup", pointerup);
-  switch (event.button) {
-    case MouseButton.LEFT: {
-      pressing = true;
-      break;
-    }
-  }
-}
-function pointermove(event: PointerEvent) {
-  if (!pressing) return;
-  click.move(new Vec2(event.clientX, event.clientY));
-  if (!click.isClick) {
-    pressing = false;
-  }
-}
-function pointerup(event: PointerEvent) {
-  window.removeEventListener("pointermove", pointermove);
-  window.removeEventListener("pointerup", pointerup);
-  pressing = false;
-  if (click.isClick) {
+function pointerdown() {
+  click.down();
+  click.on("click", (event) => {
     switch (event.button) {
       case MouseButton.LEFT:
         emit("select", props.tile);
@@ -162,7 +139,7 @@ function pointerup(event: PointerEvent) {
         emit("menu", props.tile, vec2FromPointerEvent(event));
         break;
     }
-  }
+  });
 }
 function dblclick() {
   if (props.tile.petaImage) {

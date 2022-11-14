@@ -2,7 +2,7 @@
 export class WorkerThreads<T> {
   private _idle = true;
   constructor(public readonly worker: T) {
-    // console.log("new worker_threads", worker);
+    //
   }
   use() {
     this._idle = false;

@@ -15,7 +15,11 @@
           :key="pPanel.id"
           :ref="(element) => setVLayerCellRef(element as any as VLayerCellInstance, pPanel.id)"
           :petaPanel="pPanel"
-          @startDrag="startDrag"
+          :selected="pPanel._selected"
+          :sorting="draggingData !== undefined"
+          @startDrag="pointerdown"
+          @onClick="clickLayer"
+          @update:petaPanel="updatePetaPanel"
           :style="{
             order: orders[pPanel.id] ?? props.pPanelsArray.length,
           }"
@@ -43,10 +47,7 @@ import {
   initSortHelper,
   SortHelperConstraint,
 } from "@/rendererProcess/components/browser/tags/sortHelper";
-type CellData = {
-  data: PetaPanel;
-  id: number;
-};
+import { MouseButton } from "@/commons/datas/mouseButton";
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
 const statesStore = useStateStore();
 const emit = defineEmits<{
@@ -78,37 +79,45 @@ const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
 }>({});
-const { startDrag } = initSortHelper<PetaPanel>({
-  getElementFromId: (id) => vLayerCells.value[id]?.$el as HTMLElement,
-  onChangeDraggingData: (data) => (draggingData.value = data),
-  getIsDraggableFromId: (id) => true,
-  onSort: () => {
-    // petaTagsStore.updatePetaTags(
-    //   Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
-    //     type: "petaTag",
-    //     petaTag: {
-    //       ...petaTag,
-    //       index: orders.value[petaTag.id] ?? 0,
-    //     },
-    //   })),
-    //   UpdateMode.UPDATE,
-    // );
+const { pointerdown } = initSortHelper<PetaPanel>(
+  {
+    getElementFromId: (id) => vLayerCells.value[id]?.$el as HTMLElement,
+    onChangeDraggingData: (data) => (draggingData.value = data),
+    getIsDraggableFromId: () => true,
+    onSort: () => {
+      const updatedPetaPanels: PetaPanel[] = [];
+      props.pPanelsArray.forEach((petaPanel) => {
+        const order = props.pPanelsArray.length - (orders.value[petaPanel.id] ?? 0);
+        if (petaPanel.index !== order) {
+          updatedPetaPanels.push({
+            ...petaPanel,
+            index: order,
+          });
+        }
+      });
+      emit("update:petaPanels", updatedPetaPanels);
+      if (updatedPetaPanels.length > 0) {
+        emit("sortIndex");
+      }
+    },
   },
-  onStartDrag: (data) => {
-    // rightClick(data)
+  {
+    orders,
+    constraints,
+    floatingCellElement,
+    dragTargetLineElement,
   },
-  orders,
-  constraints,
-  floatingCellElement,
-  dragTargetLineElement,
-});
+  {
+    flexGap: 0,
+  },
+);
 watch(
   () => props.pPanelsArray,
   () => {
     orders.value = {};
     constraints.value = {};
     props.pPanelsArray.forEach((petaTag) => {
-      orders.value[petaTag.id] = petaTag.index;
+      orders.value[petaTag.id] = props.pPanelsArray.length - petaTag.index;
       constraints.value[petaTag.id] = {
         insertToX: false,
         insertToY: true,
@@ -122,16 +131,17 @@ watch(
 //--------------------------------------------------------------------//
 // ドラッグここまで
 //--------------------------------------------------------------------//
-function rightClick(pPanel: PetaPanel, event: PointerEvent | MouseEvent) {
-  if (!pPanel._selected) {
+function clickLayer(event: PointerEvent, petaPanel: PetaPanel) {
+  if (event.button === MouseButton.LEFT) {
     clearSelectionAll();
+    petaPanel._selected = true;
+  } else if (event.button === MouseButton.RIGHT) {
+    if (!petaPanel._selected) {
+      clearSelectionAll();
+    }
+    petaPanel._selected = true;
+    emit("petaPanelMenu", petaPanel, vec2FromPointerEvent(event));
   }
-  pPanel._selected = true;
-  emit("petaPanelMenu", pPanel, vec2FromPointerEvent(event));
-}
-function leftClick(pPanel: PetaPanel) {
-  clearSelectionAll();
-  pPanel._selected = true;
 }
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
@@ -143,12 +153,15 @@ function clearSelectionAll(force = false) {
 function toggleVisible() {
   statesStore.state.value.visibleLayerPanel = !statesStore.state.value.visibleLayerPanel;
 }
-function updateCellData(cellData: CellData) {
+function updatePetaPanel(petaPanel: PetaPanel) {
   emit("update:petaPanels", [
     {
-      ...cellData.data,
+      ...petaPanel,
     },
   ]);
+}
+function scrollTo() {
+  //
 }
 defineExpose({
   scrollTo,
@@ -203,6 +216,7 @@ t-layer-root {
       margin: 0px;
       padding: 0px;
       position: relative;
+      overflow-anchor: none;
     }
     > t-drag-target-line {
       position: fixed;

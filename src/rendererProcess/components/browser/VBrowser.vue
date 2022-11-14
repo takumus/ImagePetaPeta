@@ -109,7 +109,7 @@ import * as ImageDecoder from "@/rendererProcess/utils/serialImageDecoder";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
-import { debounce, throttle } from "throttle-debounce";
+import { throttle } from "throttle-debounce";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -396,7 +396,6 @@ function sort(a: PetaImage, b: PetaImage) {
     }
     case "SIMILAR": {
       const rgb = hex2rgb(currentColor.value);
-      // console.log(rgb);
       const ciedeA = ciedeCache[a.id] ?? (ciedeCache[a.id] = calcCiedeFromPalette(a, rgb));
       const ciedeB = ciedeCache[b.id] ?? (ciedeCache[b.id] = calcCiedeFromPalette(b, rgb));
       return ciedeA - ciedeB;

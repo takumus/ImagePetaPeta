@@ -18,7 +18,7 @@
             'petaTag' in draggingData &&
             draggingData.petaTag === c.petaTag)
         "
-        @mousedown.left="startDrag($event, { petaTag: c.petaTag, id: c.petaTag.id })"
+        @mousedown.left="pointerdown($event, { petaTag: c.petaTag, id: c.petaTag.id })"
         :readonly="c.readonly"
         :value="c.petaTag.name"
         :look="`${c.petaTag.name}`"
@@ -34,7 +34,7 @@
         :value="p.name"
         :selected="false"
         :readonly="false"
-        @mousedown.left="startDrag($event, { petaTagPartition: p, id: p.id })"
+        @mousedown.left="pointerdown($event, { petaTagPartition: p, id: p.id })"
         @update:value="(name) => changePartition(p, name)"
         @contextmenu="partitionMenu($event, p)"
         :ref="(element) => setVPartitionRef(element as any as VTagPartitionInstance, p.id)"
@@ -141,44 +141,51 @@ const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
 }>({});
-const { startDrag } = initSortHelper<MergedSortHelperData>({
-  getElementFromId: (id) => (vCells.value[id]?.$el ?? vPartitions.value[id]?.$el) as HTMLElement,
-  onChangeDraggingData: (data) => (draggingData.value = data),
-  getIsDraggableFromId: (id) =>
-    vCells.value[id]?.isEditing() === true || vPartitions.value[id]?.isEditing() === true
-      ? false
-      : true,
-  onSort: () => {
-    petaTagsStore.updatePetaTags(
-      Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
-        type: "petaTag",
-        petaTag: {
-          ...petaTag,
-          index: orders.value[petaTag.id] ?? 0,
-        },
-      })),
-      UpdateMode.UPDATE,
-    );
-    petaTagPartitionsStore.updatePetaTagPartitions(
-      Object.values(petaTagPartitionsStore.state.petaTagPartitions.value).map(
-        (petaTagPartition) => ({
-          ...petaTagPartition,
-          index: orders.value[petaTagPartition.id] ?? 0,
-        }),
-      ),
-      UpdateMode.UPDATE,
-    );
+const { pointerdown } = initSortHelper<MergedSortHelperData>(
+  {
+    getElementFromId: (id) => (vCells.value[id]?.$el ?? vPartitions.value[id]?.$el) as HTMLElement,
+    onChangeDraggingData: (data) => (draggingData.value = data),
+    getIsDraggableFromId: (id) =>
+      vCells.value[id]?.isEditing() === true || vPartitions.value[id]?.isEditing() === true
+        ? false
+        : true,
+    onSort: () => {
+      petaTagsStore.updatePetaTags(
+        Object.values(petaTagsStore.state.petaTags.value).map((petaTag) => ({
+          type: "petaTag",
+          petaTag: {
+            ...petaTag,
+            index: orders.value[petaTag.id] ?? 0,
+          },
+        })),
+        UpdateMode.UPDATE,
+      );
+      petaTagPartitionsStore.updatePetaTagPartitions(
+        Object.values(petaTagPartitionsStore.state.petaTagPartitions.value).map(
+          (petaTagPartition) => ({
+            ...petaTagPartition,
+            index: orders.value[petaTagPartition.id] ?? 0,
+          }),
+        ),
+        UpdateMode.UPDATE,
+      );
+    },
+    onClick: (_event, data) => {
+      if ("petaTag" in data) {
+        selectPetaTag(data.petaTag);
+      }
+    },
   },
-  onStartDrag: (data) => {
-    if ("petaTag" in data) {
-      selectPetaTag(data.petaTag);
-    }
+  {
+    orders,
+    constraints,
+    floatingCellElement,
+    dragTargetLineElement,
   },
-  orders,
-  constraints,
-  floatingCellElement,
-  dragTargetLineElement,
-});
+  {
+    flexGap: 2,
+  },
+);
 //--------------------------------------------------------------------//
 // ドラッグここまで
 //--------------------------------------------------------------------//

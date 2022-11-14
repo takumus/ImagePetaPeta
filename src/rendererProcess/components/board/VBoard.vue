@@ -219,7 +219,7 @@ function pointerdown(e: PIXI.FederatedPointerEvent) {
     return;
   }
   const mouse = getMouseFromEvent(e);
-  click.down(mouse);
+  click.down();
   if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
     mouseRightPressing = true;
     dragging.value = true;
@@ -284,7 +284,6 @@ function pointerup(e: PIXI.FederatedPointerEvent) {
 function pointermove(e: PIXI.FederatedPointerEvent) {
   const mouse = getMouseFromEvent(e);
   mousePosition.set(mouse);
-  click.move(mousePosition);
   if (mouseLeftPressing || mouseRightPressing) {
     orderPIXIRender();
   }
@@ -772,7 +771,6 @@ function unselectedPPanels() {
   return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
 }
 function updatePetaBoard() {
-  console.log("update!");
   if (currentBoard.value) {
     emit("update:board", currentBoard.value);
   }

@@ -4,8 +4,9 @@
     :class="{
       drag: false,
       selected: selected,
+      sorting: sorting,
     }"
-    @pointerdown.left="pointerdown($event)"
+    @pointerdown="pointerdown($event)"
     ref="vLayerCellRoot"
   >
     <t-icon
@@ -41,17 +42,20 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ImageType } from "@/commons/datas/imageType";
 import { getImageURL } from "@/rendererProcess/utils/imageURL";
 import { ClickChecker } from "@/rendererProcess/utils/clickChecker";
-import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { useNSFWStore } from "@/rendererProcess/stores/nsfwStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
+import { MouseButton } from "@/commons/datas/mouseButton";
 // Others
 const emit = defineEmits<{
   (e: "startDrag", event: PointerEvent, petaPanel: PetaPanel): void;
   (e: "update:petaPanel", cellData: PetaPanel): void;
+  (e: "onClick", event: PointerEvent, petaPanel: PetaPanel): void;
 }>();
 const props = defineProps<{
   petaPanel?: PetaPanel;
+  selected?: boolean;
+  sorting?: boolean;
 }>();
 const petaImagesStore = usePetaImagesStore();
 const visibleIcon = ref<HTMLElement>();
@@ -59,22 +63,16 @@ const lockedIcon = ref<HTMLElement>();
 const nsfwStore = useNSFWStore();
 const click = new ClickChecker();
 const vLayerCellRoot = ref<HTMLElement>();
-let mouseIsDown = false;
 onMounted(() => {
-  window.addEventListener("pointerup", pointerup);
-  window.addEventListener("pointermove", pointermove);
+  //
 });
 onUnmounted(() => {
-  window.removeEventListener("pointerup", pointerup);
-  window.removeEventListener("pointermove", pointermove);
+  //
 });
 const url = computed(() => {
   return props.petaPanel
     ? getImageURL(petaImagesStore.getPetaImage(props.petaPanel.petaImageId), ImageType.THUMBNAIL)
     : undefined;
-});
-const selected = computed(() => {
-  return props.petaPanel?._selected;
 });
 const locked = computed(() => {
   return props.petaPanel?.locked;
@@ -86,32 +84,31 @@ const nsfwMask = computed(() => {
   return petaImagesStore.getPetaImage(props.petaPanel?.petaImageId)?.nsfw && !nsfwStore.state.value;
 });
 function pointerdown(event: PointerEvent) {
-  click.down(vec2FromPointerEvent(event));
-  mouseIsDown = true;
-}
-function pointerup(event: PointerEvent) {
-  mouseIsDown = false;
-  if (click.isClick && props.petaPanel) {
-    if (event.target === visibleIcon.value) {
-      // props.cellData.data.visible = !props.cellData.data?.visible;
-      emit("update:petaPanel", props.petaPanel);
-    } else if (event.target === lockedIcon.value) {
-      // props.cellData.data.locked = !props.cellData.data?.locked;
-      emit("update:petaPanel", props.petaPanel);
-    }
-  }
-}
-function pointermove(event: PointerEvent) {
-  if (!mouseIsDown) {
-    return;
-  }
-  click.move(vec2FromPointerEvent(event));
-  if (!click.isClick) {
-    mouseIsDown = false;
+  if (event.button === MouseButton.LEFT) {
     if (props.petaPanel && vLayerCellRoot.value) {
       emit("startDrag", { ...event, currentTarget: vLayerCellRoot.value }, props.petaPanel);
     }
   }
+  click.down();
+  click.on("click", (event) => {
+    if (props.petaPanel === undefined) {
+      return;
+    }
+    if (event.button === MouseButton.LEFT) {
+      if (event.target === visibleIcon.value) {
+        emit("update:petaPanel", {
+          ...props.petaPanel,
+          visible: !props.petaPanel.visible,
+        });
+      } else if (event.target === lockedIcon.value) {
+        emit("update:petaPanel", {
+          ...props.petaPanel,
+          locked: !props.petaPanel.locked,
+        });
+      }
+    }
+    emit("onClick", event, props.petaPanel);
+  });
 }
 </script>
 
@@ -131,6 +128,9 @@ function pointermove(event: PointerEvent) {
   &.drag,
   &:hover {
     background-color: var(--color-accent);
+    &.sorting {
+      background-color: var(--color-0);
+    }
   }
   &.drag {
     position: absolute;
