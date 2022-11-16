@@ -1,6 +1,5 @@
 import { InjectionKey, ref } from "vue";
 import { IPC } from "@/renderer/ipc";
-import { inject } from "@/renderer/utils/vue";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   createPetaBoard,
@@ -72,9 +71,6 @@ export async function createPetaBoardsStore() {
     addPetaBoard,
     getPetaBoards,
   };
-}
-export function usePetaBoardsStore() {
-  return inject(petaBoardsStoreKey);
 }
 export type PetaBoardsStore = Awaited<ReturnType<typeof createPetaBoardsStore>>;
 export const petaBoardsStoreKey: InjectionKey<PetaBoardsStore> = Symbol("petaBoardsStore");
