@@ -40,7 +40,7 @@ import { ref, onMounted, watch, computed } from "vue";
 import { Keyboards, Keys } from "@/renderer/utils/keyboards";
 import Fuse from "fuse.js";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { useTextsStore } from "@/renderer/stores/textsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import VFloating from "@/renderer/components/utils/VFloating.vue";
 const props = defineProps<{
   zIndex: number;

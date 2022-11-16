@@ -61,7 +61,7 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { useTextsStore } from "@/renderer/stores/textsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";

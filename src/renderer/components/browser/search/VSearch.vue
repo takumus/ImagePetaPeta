@@ -39,7 +39,7 @@
 import { PetaTag } from "@/commons/datas/petaTag";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { ref, computed } from "vue";
-import { useTextsStore } from "@/renderer/stores/textsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 

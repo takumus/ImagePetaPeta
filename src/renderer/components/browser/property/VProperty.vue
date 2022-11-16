@@ -159,7 +159,7 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaTag } from "@/commons/datas/petaTag";
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
-import { useTextsStore } from "@/renderer/stores/textsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";

@@ -38,7 +38,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 // Others
 import { v4 as uuid } from "uuid";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { useTextsStore } from "@/renderer/stores/textsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 
 const props = defineProps<{

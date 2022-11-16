@@ -1,5 +1,4 @@
 import { InjectionKey, readonly, ref } from "vue";
-import { inject } from "@/renderer/utils/vue";
 
 export async function createTextsStore() {
   return {
@@ -10,9 +9,6 @@ export async function createTextsStore() {
       }),
     ),
   };
-}
-export function useTextsStore() {
-  return inject(textsStoreKey);
 }
 export type TextsStore = Awaited<ReturnType<typeof createTextsStore>>;
 export const textsStoreKey: InjectionKey<TextsStore> = Symbol("textsStore");

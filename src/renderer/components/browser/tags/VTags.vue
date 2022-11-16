@@ -94,7 +94,7 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { Keyboards } from "@/renderer/utils/keyboards";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";
-import { useTextsStore } from "@/renderer/stores/textsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";

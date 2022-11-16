@@ -30,7 +30,7 @@ import {
   appInfoStoreKey,
   createAppInfoStore,
 } from "@/renderer/stores/appInfoStore/createAppInfoStore";
-import { textsStoreKey, createTextsStore } from "@/renderer/stores/textsStore";
+import { textsStoreKey, createTextsStore } from "@/renderer/stores/textsStore/createTextsStore";
 import {
   componentsStoreKey,
   createComponentsStore,
