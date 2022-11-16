@@ -18,7 +18,7 @@ import {
 } from "@/renderer/stores/definesStore/createDefinesStore";
 import { createSystemInfoStore, systemInfoStoreKey } from "@/renderer/stores/systemInfoStore";
 import { createWindowStatusStore, windowStatusStoreKey } from "@/renderer/stores/windowStatusStore";
-import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore";
+import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore/createStatesStore";
 import {
   settingsStoreKey,
   createSettingsStore,

@@ -72,7 +72,7 @@ import { logChunk } from "@/renderer/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
-import { useStateStore } from "@/renderer/stores/statesStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

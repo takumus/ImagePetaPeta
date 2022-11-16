@@ -99,7 +99,7 @@ import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { WindowType } from "@/commons/datas/windowType";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
-import { useStateStore } from "@/renderer/stores/statesStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

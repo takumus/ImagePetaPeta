@@ -41,7 +41,7 @@ import VLayerCell from "@/renderer/components/layer/VLayerCell.vue";
 import { Keyboards } from "@/renderer/utils/keyboards";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { useStateStore } from "@/renderer/stores/statesStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import {
   initSortHelper,
   SortHelperConstraint,

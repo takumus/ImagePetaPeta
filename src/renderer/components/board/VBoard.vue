@@ -70,7 +70,7 @@ import { PSelection } from "@/renderer/components/board/PSelection";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
-import { useStateStore } from "@/renderer/stores/statesStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
