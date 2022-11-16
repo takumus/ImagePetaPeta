@@ -7,7 +7,7 @@ import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import LOADINGImage from "@/@assets/loadingBackground.png";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
 usePetaImagesStore;
 export class PPanel extends PIXI.Sprite {

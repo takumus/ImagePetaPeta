@@ -23,7 +23,7 @@ import { PTransformerControlPoint } from "@/renderer/components/board/ppanels/pT
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useI18n } from "vue-i18n";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { useResizerStore } from "@/renderer/stores/resizerStore";
 const props = defineProps<{

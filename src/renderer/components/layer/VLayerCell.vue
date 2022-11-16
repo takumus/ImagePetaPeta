@@ -44,7 +44,7 @@ import { getImageURL } from "@/renderer/utils/imageURL";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { MouseButton } from "@/commons/datas/mouseButton";
 // Others
 const emit = defineEmits<{

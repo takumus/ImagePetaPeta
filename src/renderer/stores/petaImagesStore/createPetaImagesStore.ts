@@ -1,6 +1,5 @@
 import { InjectionKey, onUnmounted, ref } from "vue";
 import { IPC } from "@/renderer/ipc";
-import { inject } from "@/renderer/utils/vue";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
@@ -55,9 +54,6 @@ export async function createPetaImagesStore() {
       });
     },
   };
-}
-export function usePetaImagesStore() {
-  return inject(petaImagesStoreKey);
 }
 export type PetaImagesStore = Awaited<ReturnType<typeof createPetaImagesStore>>;
 export const petaImagesStoreKey: InjectionKey<PetaImagesStore> = Symbol("petaImagesStore");

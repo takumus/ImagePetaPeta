@@ -76,7 +76,7 @@ import { useStateStore } from "@/renderer/stores/statesStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { hasPetaImages } from "@/commons/utils/board";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
 import VFramerate from "@/renderer/components/utils/VFramerate.vue";

@@ -1,7 +1,10 @@
 import BoardIndex from "@/renderer/components/VWBoard.vue";
 import { create } from "@/renderer/windows/@base";
 import { WindowType } from "@/commons/datas/windowType";
-import { createPetaImagesStore, petaImagesStoreKey } from "@/renderer/stores/petaImagesStore";
+import {
+  createPetaImagesStore,
+  petaImagesStoreKey,
+} from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import {
   createPetaBoardsStore,
   petaBoardsStoreKey,

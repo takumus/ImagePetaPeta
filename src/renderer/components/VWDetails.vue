@@ -53,7 +53,7 @@ import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore"
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import VDetails from "@/renderer/components/details/VDetails.vue";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore";
