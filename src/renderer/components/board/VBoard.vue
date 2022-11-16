@@ -71,7 +71,7 @@ import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboards
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";

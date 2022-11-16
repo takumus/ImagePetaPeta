@@ -19,7 +19,10 @@ import {
 import { createSystemInfoStore, systemInfoStoreKey } from "@/renderer/stores/systemInfoStore";
 import { createWindowStatusStore, windowStatusStoreKey } from "@/renderer/stores/windowStatusStore";
 import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore";
-import { settingsStoreKey, createSettingsStore } from "@/renderer/stores/settingsStore";
+import {
+  settingsStoreKey,
+  createSettingsStore,
+} from "@/renderer/stores/settingsStore/createSettingsStore";
 import {
   appInfoStoreKey,
   createAppInfoStore,

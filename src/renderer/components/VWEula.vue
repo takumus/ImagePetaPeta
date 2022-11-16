@@ -36,7 +36,7 @@ import { IPC } from "@/renderer/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
-import { useSettingsStore } from "../stores/settingsStore";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { EULA } from "@/commons/defines";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore";

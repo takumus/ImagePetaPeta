@@ -20,7 +20,7 @@ import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 // Components

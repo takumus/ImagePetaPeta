@@ -80,7 +80,7 @@ import {
 } from "@/commons/defines";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";

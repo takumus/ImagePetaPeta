@@ -1,6 +1,5 @@
 import { InjectionKey, ref, watch as _watch } from "vue";
 import { IPC } from "@/renderer/ipc";
-import { inject } from "@/renderer/utils/vue";
 
 export async function createSettingsStore() {
   const states = ref(await IPC.send("getSettings"));
@@ -28,9 +27,6 @@ export async function createSettingsStore() {
   return {
     state: states,
   };
-}
-export function useSettingsStore() {
-  return inject(settingsStoreKey);
 }
 export type SettingsStore = Awaited<ReturnType<typeof createSettingsStore>>;
 export const settingsStoreKey: InjectionKey<SettingsStore> = Symbol("settingsStore");

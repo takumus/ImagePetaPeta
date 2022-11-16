@@ -24,7 +24,7 @@
 // Others
 import { IPC } from "@/renderer/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
