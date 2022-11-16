@@ -75,7 +75,7 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { useResizerStore } from "@/renderer/stores/resizerStore";
+import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { ppa } from "@/commons/utils/pp";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 const emit = defineEmits<{

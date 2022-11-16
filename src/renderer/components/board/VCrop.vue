@@ -25,7 +25,7 @@ import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { resizeImage } from "@/commons/utils/resizeImage";
-import { useResizerStore } from "@/renderer/stores/resizerStore";
+import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 const props = defineProps<{
   petaPanel?: PetaPanel;
 }>();

@@ -39,7 +39,7 @@ import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useI18n } from "vue-i18n";
 import { resizeImage } from "@/commons/utils/resizeImage";
-import { useResizerStore } from "@/renderer/stores/resizerStore";
+import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
   (e: "menu", petaImage: PetaImage, position: Vec2): void;

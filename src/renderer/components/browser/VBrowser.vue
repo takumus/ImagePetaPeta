@@ -106,7 +106,7 @@ import { useComponentsStore } from "@/renderer/stores/componentsStore/useCompone
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
-import { useResizerStore } from "@/renderer/stores/resizerStore";
+import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { throttle } from "throttle-debounce";
