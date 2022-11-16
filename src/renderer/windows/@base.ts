@@ -12,7 +12,10 @@ import {
 } from "@/renderer/stores/darkModeStore/createDarkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/renderer/stores/nsfwStore";
 import { createWindowTypeStore, windowTypeStoreKey } from "@/renderer/stores/windowTypeStore";
-import { createDefinesStore, definesStoreKey } from "@/renderer/stores/definesStore";
+import {
+  createDefinesStore,
+  definesStoreKey,
+} from "@/renderer/stores/definesStore/createDefinesStore";
 import { createSystemInfoStore, systemInfoStoreKey } from "@/renderer/stores/systemInfoStore";
 import { createWindowStatusStore, windowStatusStoreKey } from "@/renderer/stores/windowStatusStore";
 import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore";

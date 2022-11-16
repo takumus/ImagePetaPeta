@@ -98,7 +98,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { WindowType } from "@/commons/datas/windowType";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
-import { useDefinesStore } from "@/renderer/stores/definesStore";
+import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore";
 import { useI18n } from "vue-i18n";
