@@ -894,8 +894,11 @@ import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
           }
           return false;
         },
-        async setDetailsPetaImage(event, petaImage: PetaImage) {
-          detailsPetaImage = petaImage;
+        async setDetailsPetaImage(event, petaImageId: string) {
+          detailsPetaImage = await petaDatas.petaImages.getPetaImage(petaImageId);
+          if (detailsPetaImage === undefined) {
+            return;
+          }
           windows.emitMainEvent("detailsPetaImage", detailsPetaImage);
           return;
         },

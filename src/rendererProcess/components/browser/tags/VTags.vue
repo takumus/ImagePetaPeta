@@ -18,7 +18,7 @@
             'petaTag' in draggingData &&
             draggingData.petaTag === c.petaTag)
         "
-        @mousedown.left="sortHelper.pointerdown($event, { petaTag: c.petaTag, id: c.petaTag.id })"
+        @pointerdown.left="sortHelper.pointerdown($event, { petaTag: c.petaTag, id: c.petaTag.id })"
         :readonly="c.readonly"
         :value="c.petaTag.name"
         :look="`${c.petaTag.name}`"
@@ -34,7 +34,7 @@
         :value="p.name"
         :selected="false"
         :readonly="false"
-        @mousedown.left="sortHelper.pointerdown($event, { petaTagPartition: p, id: p.id })"
+        @pointerdown.left="sortHelper.pointerdown($event, { petaTagPartition: p, id: p.id })"
         @update:value="(name) => changePartition(p, name)"
         @contextmenu="partitionMenu($event, p)"
         :ref="(element) => setVPartitionRef(element as any as VTagPartitionInstance, p.id)"

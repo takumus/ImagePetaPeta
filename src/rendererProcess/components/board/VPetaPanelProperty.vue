@@ -16,13 +16,19 @@
       <button @click="flipPetaPanel('vertical')">{{ t("boards.panelMenu.flipVertical") }}</button>
       <button @click="resetPetaPanel()">{{ t("boards.panelMenu.reset") }}</button>
       <button @click="removeSelectedPanels()">{{ t("boards.panelMenu.remove") }}</button>
+      <button
+        v-if="singleSelectedPetaPanel"
+        @click="singleSelectedPetaPanel ? openDetails(singleSelectedPetaPanel) : false"
+      >
+        {{ t("boards.panelMenu.details") }}
+      </button>
     </t-content>
   </VFloating>
 </template>
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 // Others
 import VFloating from "@/rendererProcess/components/utils/VFloating.vue";
@@ -30,6 +36,8 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import { searchParentElement } from "@/rendererProcess/utils/searchParentElement";
 import { useI18n } from "vue-i18n";
+import { IPC } from "@/rendererProcess/ipc";
+import { WindowType } from "@/commons/datas/windowType";
 const props = defineProps<{
   zIndex: number;
   selectedPetaPanels: PetaPanel[];
@@ -104,10 +112,10 @@ function changeOrder(to: "front" | "back") {
   );
   emit("sortIndex");
 }
-// function openDetails(petaPanel: PetaPanel) {
-//   IPC.send("setDetailsPetaImage", petaImage);
-//   IPC.send("openWindow", WindowType.DETAILS);
-// }
+function openDetails(petaPanel: PetaPanel) {
+  IPC.send("setDetailsPetaImage", petaPanel.petaImageId);
+  IPC.send("openWindow", WindowType.DETAILS);
+}
 function resetPetaPanel() {
   emit(
     "update:petaPanels",
@@ -142,6 +150,9 @@ function flipPetaPanel(direction: "vertical" | "horizontal") {
 function close(): void {
   show.value = false;
 }
+const singleSelectedPetaPanel = computed(() =>
+  props.selectedPetaPanels.length === 1 ? props.selectedPetaPanels[0] : undefined,
+);
 defineExpose({
   open,
   close,

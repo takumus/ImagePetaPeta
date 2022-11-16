@@ -376,7 +376,7 @@ async function openDetail(petaImage: PetaImage) {
   ) {
     return;
   }
-  await IPC.send("setDetailsPetaImage", petaImage);
+  await IPC.send("setDetailsPetaImage", petaImage.id);
   await IPC.send("openWindow", WindowType.DETAILS);
 }
 function updateTileSize(value: number) {

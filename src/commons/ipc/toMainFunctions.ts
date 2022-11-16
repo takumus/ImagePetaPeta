@@ -67,7 +67,7 @@ export interface ToMainFunctions {
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
   openWindow: (windowType: WindowType) => Promise<void>;
   reloadWindow: () => Promise<void>;
-  setDetailsPetaImage: (petaImage: PetaImage) => Promise<void>;
+  setDetailsPetaImage: (petaImageId: string) => Promise<void>;
   getDetailsPetaImage: () => Promise<PetaImage | undefined>;
   windowToggleDevTools: () => Promise<void>;
   getShowNSFW: () => Promise<boolean>;

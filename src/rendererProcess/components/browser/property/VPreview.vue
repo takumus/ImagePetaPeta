@@ -78,7 +78,7 @@ function clearSelection() {
 function openDetails() {
   const petaImage = props.petaImages[0];
   if (petaImage) {
-    IPC.send("setDetailsPetaImage", petaImage);
+    IPC.send("setDetailsPetaImage", petaImage.id);
     IPC.send("openWindow", WindowType.DETAILS);
   }
 }

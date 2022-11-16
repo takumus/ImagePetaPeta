@@ -27,6 +27,15 @@
       @update="orderPIXIRender"
       @update:petaPanels="updatePetaPanelsFromLayer"
     />
+    <VPetaPanelProperty
+      :selectedPetaPanels="selectedPetaPanelsArray"
+      :petaPanels="petaPanelsArray"
+      @update:petaPanels="updatePetaPanelsFromLayer"
+      @sortIndex="sortIndex"
+      @removeSelectedPanels="removeSelectedPanels"
+      :zIndex="3"
+      ref="petaPanelsProperty"
+    />
   </t-board-root>
 </template>
 
@@ -67,8 +76,8 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/rendererProcess/stores/componentsStore";
 import { usePetaImagesStore } from "@/rendererProcess/stores/petaImagesStore";
 import { useResizerStore } from "@/rendererProcess/stores/resizerStore";
-import { PetaImage } from "@/commons/datas/petaImage";
 import { ppa } from "@/commons/utils/pp";
+import VPetaPanelProperty from "@/rendererProcess/components/board/VPetaPanelProperty.vue";
 const emit = defineEmits<{
   (e: "update:board", board: PetaBoard): void;
 }>();
@@ -96,6 +105,7 @@ const croppingPetaPanel = ref<PetaPanel>();
 const cropping = ref(false);
 const dragging = ref(false);
 const dragged = ref(false);
+const petaPanelsProperty = ref<InstanceType<typeof VPetaPanelProperty>>();
 
 const dragOffset = new Vec2();
 const click = new ClickChecker();
@@ -411,75 +421,42 @@ function petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
   if (!pPanel) {
     return;
   }
-  const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
-  const isMultiple = selectedPPanels().length > 1;
-  components.contextMenu.open(
-    [
-      { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
-      { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },
-      { separate: true },
-      { label: t("boards.panelMenu.details"), click: () => openDetails(petaImage) },
-      { separate: true },
-      {
-        skip: isMultiple || !pPanel.isGIF,
-        label: pPanel.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
-        click: () => {
-          pPanel.toggleGIF();
-          updatePetaBoard();
-        },
-      },
-      { skip: isMultiple || !pPanel?.isGIF, separate: true },
-      {
-        skip: isMultiple,
-        label: t("boards.panelMenu.crop"),
-        click: () => {
-          beginCrop(petaPanel);
-        },
-      },
-      { skip: isMultiple, separate: true },
-      { label: t("boards.panelMenu.flipHorizontal"), click: () => flipPetaPanel("horizontal") },
-      { label: t("boards.panelMenu.flipVertical"), click: () => flipPetaPanel("vertical") },
-      { separate: true },
-      { label: t("boards.panelMenu.reset"), click: resetPetaPanel },
-      { separate: true },
-      { label: t("boards.panelMenu.remove"), click: removeSelectedPanels },
-    ],
-    position,
-  );
-}
-function changeOrder(to: "front" | "back") {
-  selectedPPanels().forEach(
-    (pPanel) => (pPanel.petaPanel.index += pPanelsArray().length * (to === "front" ? 1 : -1)),
-  );
-  sortIndex();
-}
-function openDetails(petaImage?: PetaImage) {
-  if (petaImage === undefined) {
-    return;
-  }
-  IPC.send("setDetailsPetaImage", petaImage);
-  IPC.send("openWindow", WindowType.DETAILS);
-}
-function resetPetaPanel() {
-  selectedPPanels().forEach((pPanel) => {
-    pPanel.petaPanel.height = Math.abs(pPanel.petaPanel.height);
-    pPanel.petaPanel.width = Math.abs(pPanel.petaPanel.width);
-    pPanel.petaPanel.crop.position.set(0, 0);
-    pPanel.petaPanel.crop.width = 1;
-    pPanel.petaPanel.crop.height = 1;
-    pPanel.petaPanel.rotation = 0;
-    updateCrop(pPanel.petaPanel);
-  });
-}
-function flipPetaPanel(direction: "vertical" | "horizontal") {
-  selectedPPanels().forEach((pPanel) => {
-    if (direction === "vertical") {
-      pPanel.petaPanel.height = -pPanel.petaPanel.height;
-    } else {
-      pPanel.petaPanel.width = -pPanel.petaPanel.width;
-    }
-  });
-  updatePetaBoard();
+  petaPanelsProperty.value?.open(position);
+  // const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
+  // const isMultiple = selectedPPanels().length > 1;
+  // components.contextMenu.open(
+  //   [
+  //     { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
+  //     { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },
+  //     { separate: true },
+  //     { label: t("boards.panelMenu.details"), click: () => openDetails(petaImage) },
+  //     { separate: true },
+  //     {
+  //       skip: isMultiple || !pPanel.isGIF,
+  //       label: pPanel.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
+  //       click: () => {
+  //         pPanel.toggleGIF();
+  //         updatePetaBoard();
+  //       },
+  //     },
+  //     { skip: isMultiple || !pPanel?.isGIF, separate: true },
+  //     {
+  //       skip: isMultiple,
+  //       label: t("boards.panelMenu.crop"),
+  //       click: () => {
+  //         beginCrop(petaPanel);
+  //       },
+  //     },
+  //     { skip: isMultiple, separate: true },
+  //     { label: t("boards.panelMenu.flipHorizontal"), click: () => flipPetaPanel("horizontal") },
+  //     { label: t("boards.panelMenu.flipVertical"), click: () => flipPetaPanel("vertical") },
+  //     { separate: true },
+  //     { label: t("boards.panelMenu.reset"), click: resetPetaPanel },
+  //     { separate: true },
+  //     { label: t("boards.panelMenu.remove"), click: removeSelectedPanels },
+  //   ],
+  //   position,
+  // );
 }
 async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   if (!currentBoard.value) {
@@ -792,7 +769,9 @@ function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
     },
   });
   updatePetaPanels();
+  orderPIXIRender();
 }
+const selectedPetaPanelsArray = computed(() => petaPanelsArray.value.filter((p) => p._selected));
 const petaPanelsArray = computed(() => {
   if (!currentBoard.value) {
     return [];
