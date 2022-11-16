@@ -20,7 +20,7 @@ import VTask from "@/renderer/components/task/VTask.vue";
 // Others
 import { IPC } from "@/renderer/ipc";
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
+import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useI18n } from "vue-i18n";
 import { TASK_CLOSE_DELAY } from "@/commons/defines";
 

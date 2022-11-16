@@ -47,7 +47,7 @@ import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
+import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 const nsfwStore = useNSFWStore();

@@ -1,6 +1,5 @@
 import { InjectionKey, readonly, ref } from "vue";
 import { IPC } from "@/renderer/ipc";
-import { inject } from "@/renderer/utils/vue";
 import { WindowType } from "@/commons/datas/windowType";
 
 export async function createWindowStatusStore(myWindowType: WindowType) {
@@ -19,9 +18,6 @@ export async function createWindowStatusStore(myWindowType: WindowType) {
   return {
     state: readonly(state),
   };
-}
-export function useWindowStatusStore() {
-  return inject(windowStatusStoreKey);
 }
 export type WindowStatusStore = Awaited<ReturnType<typeof createWindowStatusStore>>;
 export const windowStatusStoreKey: InjectionKey<WindowStatusStore> = Symbol("windowStatusStore");
