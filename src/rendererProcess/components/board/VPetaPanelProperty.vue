@@ -15,6 +15,7 @@
       </button>
       <button @click="flipPetaPanel('vertical')">{{ t("boards.panelMenu.flipVertical") }}</button>
       <button @click="resetPetaPanel()">{{ t("boards.panelMenu.reset") }}</button>
+      <button @click="removeSelectedPanels()">{{ t("boards.panelMenu.remove") }}</button>
     </t-content>
   </VFloating>
 </template>
@@ -37,6 +38,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "update:petaPanels", updates: PetaPanel[]): void;
   (e: "sortIndex"): void;
+  (e: "removeSelectedPanels"): void;
 }>();
 const { t } = useI18n();
 const show = ref(false);
@@ -124,6 +126,9 @@ function resetPetaPanel() {
     })),
   );
 }
+function removeSelectedPanels() {
+  emit("removeSelectedPanels");
+}
 function flipPetaPanel(direction: "vertical" | "horizontal") {
   emit(
     "update:petaPanels",
@@ -147,5 +152,6 @@ defineExpose({
 t-content {
   display: block;
   padding: var(--px-2);
+  max-width: 256px;
 }
 </style>
