@@ -1,7 +1,7 @@
 <template>
   <t-floating-root
     class="complement-root"
-    ref="floating"
+    ref="rootElement"
     v-show="visible"
     :style="{
       transform: `translate(${position.x}px, ${position.y}px)`,
@@ -29,14 +29,14 @@ const props = defineProps<{
 const position = ref(new Vec2(0, 0));
 const height = ref(props.maxHeight);
 const width = ref(props.maxWidth);
-const floating = ref<HTMLElement>();
+const rootElement = ref<HTMLElement>();
 function updateFloating(targetRect: { x: number; y: number; width: number; height: number }) {
   position.value.x = targetRect.x;
   position.value.y = targetRect.y + targetRect.height;
   height.value = props.maxHeight;
   width.value = props.maxWidth;
   nextTick(() => {
-    const rect = floating.value?.getBoundingClientRect();
+    const rect = rootElement.value?.getBoundingClientRect();
     if (rect === undefined) {
       return;
     }
@@ -58,6 +58,7 @@ function updateFloating(targetRect: { x: number; y: number; width: number; heigh
 }
 defineExpose({
   updateFloating,
+  rootElement,
 });
 </script>
 
