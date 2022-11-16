@@ -73,7 +73,7 @@ import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
 import { useResizerStore } from "@/renderer/stores/resizerStore";
 import { ppa } from "@/commons/utils/pp";

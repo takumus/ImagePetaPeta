@@ -1,5 +1,4 @@
 import { InjectionKey, reactive } from "vue";
-import { inject } from "@/renderer/utils/vue";
 import { ContextMenuItem } from "@/renderer/components/utils/contextMenuItem";
 import { Vec2 } from "@/commons/utils/vec2";
 
@@ -14,9 +13,6 @@ export async function createComponentsStore() {
     },
   };
   return reactive(components as Components);
-}
-export function useComponentsStore() {
-  return inject(componentsStoreKey);
 }
 export type ComponentsStore = Awaited<ReturnType<typeof createComponentsStore>>;
 export const componentsStoreKey: InjectionKey<ComponentsStore> = Symbol("componentsStore");

@@ -49,7 +49,7 @@ import { useNSFWStore } from "@/renderer/stores/nsfwStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 const nsfwStore = useNSFWStore();
 const components = useComponentsStore();
 const { t } = useI18n();

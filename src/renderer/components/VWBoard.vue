@@ -75,7 +75,7 @@ import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
 import { hasPetaImages } from "@/commons/utils/board";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore";

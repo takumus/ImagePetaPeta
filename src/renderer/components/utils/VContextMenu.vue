@@ -31,7 +31,7 @@ import { ref, onMounted, computed } from "vue";
 import { Vec2 } from "@/commons/utils/vec2";
 import { v4 as uuid } from "uuid";
 import { ContextMenuItem } from "@/renderer/components/utils/contextMenuItem";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VFloating from "@/renderer/components/utils/VFloating.vue";
 defineProps<{
   zIndex: number;

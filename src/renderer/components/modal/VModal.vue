@@ -39,7 +39,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { v4 as uuid } from "uuid";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 
 const props = defineProps<{
   visible?: boolean;

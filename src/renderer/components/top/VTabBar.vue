@@ -63,7 +63,7 @@ import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { useTextsStore } from "@/renderer/stores/textsStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 
 const emit = defineEmits<{

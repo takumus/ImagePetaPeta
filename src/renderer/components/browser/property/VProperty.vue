@@ -161,7 +161,7 @@ import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
 import { useTextsStore } from "@/renderer/stores/textsStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";

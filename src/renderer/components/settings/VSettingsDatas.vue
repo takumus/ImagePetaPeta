@@ -23,7 +23,7 @@
 <script setup lang="ts">
 // Others
 import { IPC } from "@/renderer/ipc";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore";
 import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

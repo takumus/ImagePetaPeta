@@ -52,7 +52,7 @@ import { Keyboards } from "@/renderer/utils/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
 import VDetails from "@/renderer/components/details/VDetails.vue";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";

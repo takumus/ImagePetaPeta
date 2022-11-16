@@ -37,7 +37,7 @@ import VDialog from "@/renderer/components/utils/VDialog.vue";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore";
 const appInfoStore = useAppInfoStore();

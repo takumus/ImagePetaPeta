@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 // Vue
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { ref } from "vue";
 
 defineProps<{

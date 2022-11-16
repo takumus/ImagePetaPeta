@@ -19,7 +19,10 @@ import {
   createAppInfoStore,
 } from "@/renderer/stores/appInfoStore/createAppInfoStore";
 import { textsStoreKey, createTextsStore } from "@/renderer/stores/textsStore";
-import { componentsStoreKey, createComponentsStore } from "@/renderer/stores/componentsStore";
+import {
+  componentsStoreKey,
+  createComponentsStore,
+} from "@/renderer/stores/componentsStore/createComponentsStore";
 import { createWindowTitleStore, windowTitleStoreKey } from "@/renderer/stores/windowTitleStore";
 import { injectAnimatedGIFAsset } from "@/renderer/utils/pixi-gif/animatedGIFAsset";
 import { ClickChecker } from "@/renderer/utils/clickChecker";

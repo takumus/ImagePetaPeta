@@ -102,7 +102,7 @@ import { useDefinesStore } from "@/renderer/stores/definesStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore";
 import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
