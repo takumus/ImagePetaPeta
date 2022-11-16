@@ -9,7 +9,10 @@ import {
   createPetaBoardsStore,
   petaBoardsStoreKey,
 } from "@/renderer/stores/petaBoardsStore/createPetaBoardsStore";
-import { createPetaTagsStore, petaTagsStoreKey } from "@/renderer/stores/petaTagsStore";
+import {
+  createPetaTagsStore,
+  petaTagsStoreKey,
+} from "@/renderer/stores/petaTagsStore/createPetaTagsStore";
 import {
   createPetaTagPartitionsStore,
   petaTagPartitionsStoreKey,

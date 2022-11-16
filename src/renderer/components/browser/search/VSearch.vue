@@ -41,7 +41,7 @@ import { UNTAGGED_ID } from "@/commons/defines";
 import { ref, computed } from "vue";
 import { useTextsStore } from "@/renderer/stores/textsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
-import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore";
+import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 
 const searchInput = ref<InstanceType<typeof VTextarea>>();
 const petaTagsStore = usePetaTagsStore();

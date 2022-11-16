@@ -98,7 +98,7 @@ import { useTextsStore } from "@/renderer/stores/textsStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
-import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore";
+import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { usePetaTagPartitionsStore } from "@/renderer/stores/petaTagPartitionsStore/usePetaTagPartitionsStore";
 import VTagCell from "@/renderer/components/browser/tags/VTagCell.vue";
 import VTagPartition from "@/renderer/components/browser/tags/VTagPartition.vue";

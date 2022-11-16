@@ -83,7 +83,7 @@ import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore";
+import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;

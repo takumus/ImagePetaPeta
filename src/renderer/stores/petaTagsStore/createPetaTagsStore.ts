@@ -1,6 +1,5 @@
 import { InjectionKey, onUnmounted, ref } from "vue";
 import { IPC } from "@/renderer/ipc";
-import { inject } from "@/renderer/utils/vue";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
@@ -32,9 +31,6 @@ export async function createPetaTagsStore() {
       });
     },
   };
-}
-export function usePetaTagsStore() {
-  return inject(petaTagsStoreKey);
 }
 export type PetaTagsStore = Awaited<ReturnType<typeof createPetaTagsStore>>;
 export const petaTagsStoreKey: InjectionKey<PetaTagsStore> = Symbol("petaTagsStore");

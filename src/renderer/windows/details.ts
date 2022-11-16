@@ -5,7 +5,10 @@ import {
   createPetaImagesStore,
   petaImagesStoreKey,
 } from "@/renderer/stores/petaImagesStore/createPetaImagesStore";
-import { createPetaTagsStore, petaTagsStoreKey } from "@/renderer/stores/petaTagsStore";
+import {
+  createPetaTagsStore,
+  petaTagsStoreKey,
+} from "@/renderer/stores/petaTagsStore/createPetaTagsStore";
 import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
 create(DetailsIndex, WindowType.DETAILS, [
   keyStoreCreatorPair(petaImagesStoreKey, createPetaImagesStore),
