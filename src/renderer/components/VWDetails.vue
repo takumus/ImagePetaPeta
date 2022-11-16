@@ -55,7 +55,7 @@ import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import VDetails from "@/renderer/components/details/VDetails.vue";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();

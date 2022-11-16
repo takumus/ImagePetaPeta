@@ -40,7 +40,7 @@ import { computed } from "vue";
 // Others
 import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 const { windowType } = useWindowTypeStore();
 const { systemInfo } = useSystemInfoStore();

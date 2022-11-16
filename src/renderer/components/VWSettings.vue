@@ -30,7 +30,7 @@ import { IPC } from "@/renderer/ipc";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 const { t } = useI18n();

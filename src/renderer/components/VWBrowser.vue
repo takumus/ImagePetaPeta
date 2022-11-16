@@ -38,7 +38,7 @@ import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore"
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();

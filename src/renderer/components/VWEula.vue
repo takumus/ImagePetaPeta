@@ -38,7 +38,7 @@ import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeSto
 import { useI18n } from "vue-i18n";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { EULA } from "@/commons/defines";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();

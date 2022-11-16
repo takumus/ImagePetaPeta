@@ -80,7 +80,7 @@ import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaIma
 import { hasPetaImages } from "@/commons/utils/board";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
 import VFramerate from "@/renderer/components/utils/VFramerate.vue";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 const statesStore = useStateStore();
 const components = useComponentsStore();

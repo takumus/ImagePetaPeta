@@ -30,7 +30,7 @@ import VCapture from "@/renderer/components/capture/VCapture.vue";
 // Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
