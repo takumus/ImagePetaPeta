@@ -41,7 +41,7 @@ import { computed } from "vue";
 import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
-import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
+import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 const { windowType } = useWindowTypeStore();
 const { systemInfo } = useSystemInfoStore();
 defineProps<{

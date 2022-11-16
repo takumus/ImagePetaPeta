@@ -69,7 +69,7 @@ import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { PSelection } from "@/renderer/components/board/PSelection";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
+import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";

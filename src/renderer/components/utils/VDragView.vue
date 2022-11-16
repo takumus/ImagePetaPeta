@@ -21,7 +21,7 @@ import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
+import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 // Components
 const props = defineProps<{

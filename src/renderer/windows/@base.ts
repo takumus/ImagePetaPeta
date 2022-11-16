@@ -16,7 +16,10 @@ import {
   createDefinesStore,
   definesStoreKey,
 } from "@/renderer/stores/definesStore/createDefinesStore";
-import { createSystemInfoStore, systemInfoStoreKey } from "@/renderer/stores/systemInfoStore";
+import {
+  createSystemInfoStore,
+  systemInfoStoreKey,
+} from "@/renderer/stores/systemInfoStore/createSystemInfoStore";
 import { createWindowStatusStore, windowStatusStoreKey } from "@/renderer/stores/windowStatusStore";
 import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore/createStatesStore";
 import {
