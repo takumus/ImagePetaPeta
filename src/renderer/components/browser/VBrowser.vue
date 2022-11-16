@@ -97,7 +97,7 @@ import { Keyboards } from "@/renderer/utils/keyboards";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { WindowType } from "@/commons/datas/windowType";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore";

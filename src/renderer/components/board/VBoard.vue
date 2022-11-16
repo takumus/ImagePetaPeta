@@ -67,7 +67,7 @@ import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore";
 import { PSelection } from "@/renderer/components/board/PSelection";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore";
 import { useStateStore } from "@/renderer/stores/statesStore";

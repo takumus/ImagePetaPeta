@@ -37,7 +37,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 // Others
 import { v4 as uuid } from "uuid";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 

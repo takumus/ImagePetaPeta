@@ -27,7 +27,7 @@ import VSettings from "@/renderer/components/settings/VSettings.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
 // Others
 import { IPC } from "@/renderer/ipc";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";

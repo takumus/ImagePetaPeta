@@ -39,7 +39,7 @@ import { ref, onMounted, watch, computed } from "vue";
 // Others
 import { Keyboards, Keys } from "@/renderer/utils/keyboards";
 import Fuse from "fuse.js";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore";
 import VFloating from "@/renderer/components/utils/VFloating.vue";
 const props = defineProps<{
