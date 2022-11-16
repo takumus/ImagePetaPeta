@@ -6,7 +6,10 @@ import { IPC } from "@/renderer/ipc";
 import { logChunk } from "@/renderer/utils/rendererLogger";
 import { WindowType } from "@/commons/datas/windowType";
 
-import { createDarkModeStore, darkModeStoreKey } from "@/renderer/stores/darkModeStore";
+import {
+  createDarkModeStore,
+  darkModeStoreKey,
+} from "@/renderer/stores/darkModeStore/createDarkModeStore";
 import { createNSFWStore, nsfwStoreKey } from "@/renderer/stores/nsfwStore";
 import { createWindowTypeStore, windowTypeStoreKey } from "@/renderer/stores/windowTypeStore";
 import { createDefinesStore, definesStoreKey } from "@/renderer/stores/definesStore";

@@ -28,7 +28,7 @@ import VDialog from "@/renderer/components/utils/VDialog.vue";
 // Others
 import { IPC } from "@/renderer/ipc";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore";

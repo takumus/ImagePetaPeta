@@ -35,7 +35,7 @@ import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
 // Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";

@@ -70,7 +70,7 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { Vec2 } from "@/commons/utils/vec2";
 import { logChunk } from "@/renderer/utils/rendererLogger";
 import { minimId } from "@/commons/utils/utils";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";

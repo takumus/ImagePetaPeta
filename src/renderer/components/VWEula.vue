@@ -34,7 +34,7 @@ import VDialog from "@/renderer/components/utils/VDialog.vue";
 // Others
 import { IPC } from "@/renderer/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useSettingsStore } from "../stores/settingsStore";
 import { EULA } from "@/commons/defines";
