@@ -21,7 +21,7 @@ import { PPanel } from "@/renderer/components/board/ppanels/PPanel";
 import { PTransformerDashedLine } from "@/renderer/components/board/ppanels/pTransformer/PTransformerDashedLine";
 import { PTransformerControlPoint } from "@/renderer/components/board/ppanels/pTransformer/PTransformerControlPoint";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { useNSFWStore } from "@/renderer/stores/nsfwStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";
 import { resizeImage } from "@/commons/utils/resizeImage";

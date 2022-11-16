@@ -10,7 +10,7 @@ import {
   createDarkModeStore,
   darkModeStoreKey,
 } from "@/renderer/stores/darkModeStore/createDarkModeStore";
-import { createNSFWStore, nsfwStoreKey } from "@/renderer/stores/nsfwStore";
+import { createNSFWStore, nsfwStoreKey } from "@/renderer/stores/nsfwStore/createNSFWStore";
 import { createWindowTypeStore, windowTypeStoreKey } from "@/renderer/stores/windowTypeStore";
 import {
   createDefinesStore,

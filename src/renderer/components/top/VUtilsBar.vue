@@ -45,7 +45,7 @@ import { computed } from "vue";
 // Others
 import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
-import { useNSFWStore } from "@/renderer/stores/nsfwStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
 import { useI18n } from "vue-i18n";

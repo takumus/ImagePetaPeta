@@ -21,7 +21,7 @@ import { computed, ref, onMounted } from "vue";
 import { getImageURL } from "@/renderer/utils/imageURL";
 import { ImageType } from "@/commons/datas/imageType";
 import { PropertyThumbnail } from "@/renderer/components/browser/property/propertyThumbnail";
-import { useNSFWStore } from "@/renderer/stores/nsfwStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 const nsfwStore = useNSFWStore();
 const props = defineProps<{
   propertyThumbnail: PropertyThumbnail;

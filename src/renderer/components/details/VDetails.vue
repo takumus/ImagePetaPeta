@@ -27,7 +27,7 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 import VDragView from "@/renderer/components/utils/VDragView.vue";
-import { useNSFWStore } from "@/renderer/stores/nsfwStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { getImageURL } from "@/renderer/utils/imageURL";
 import { ref, watch, computed } from "vue";
 // Components
