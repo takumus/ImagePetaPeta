@@ -31,7 +31,7 @@ import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboards
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useI18n } from "vue-i18n";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
-import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore";
+import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();

@@ -38,7 +38,10 @@ import {
   componentsStoreKey,
   createComponentsStore,
 } from "@/renderer/stores/componentsStore/createComponentsStore";
-import { createWindowTitleStore, windowTitleStoreKey } from "@/renderer/stores/windowTitleStore";
+import {
+  createWindowTitleStore,
+  windowTitleStoreKey,
+} from "@/renderer/stores/windowTitleStore/createWindowTitleStore";
 import { injectAnimatedGIFAsset } from "@/renderer/utils/pixi-gif/animatedGIFAsset";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
