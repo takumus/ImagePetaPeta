@@ -28,7 +28,7 @@ import VDialog from "@/renderer/components/utils/VDialog.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
 import VCapture from "@/renderer/components/capture/VCapture.vue";
 // Others
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore";

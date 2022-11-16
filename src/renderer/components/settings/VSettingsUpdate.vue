@@ -20,7 +20,7 @@
 import { IPC } from "@/renderer/ipc";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { DOWNLOAD_URL } from "@/commons/defines";
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();

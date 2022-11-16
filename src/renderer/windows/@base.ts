@@ -14,7 +14,10 @@ import { createSystemInfoStore, systemInfoStoreKey } from "@/renderer/stores/sys
 import { createWindowStatusStore, windowStatusStoreKey } from "@/renderer/stores/windowStatusStore";
 import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore";
 import { settingsStoreKey, createSettingsStore } from "@/renderer/stores/settingsStore";
-import { appInfoStoreKey, createAppInfoStore } from "@/renderer/stores/appInfoStore";
+import {
+  appInfoStoreKey,
+  createAppInfoStore,
+} from "@/renderer/stores/appInfoStore/createAppInfoStore";
 import { textsStoreKey, createTextsStore } from "@/renderer/stores/textsStore";
 import { componentsStoreKey, createComponentsStore } from "@/renderer/stores/componentsStore";
 import { createWindowTitleStore, windowTitleStoreKey } from "@/renderer/stores/windowTitleStore";

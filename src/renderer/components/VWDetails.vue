@@ -49,7 +49,7 @@ import {
 } from "@/commons/defines";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Keyboards } from "@/renderer/utils/keyboards";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore";

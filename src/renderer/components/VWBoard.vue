@@ -73,7 +73,7 @@ import { minimId } from "@/commons/utils/utils";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore";
 import { useStateStore } from "@/renderer/stores/statesStore";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore";

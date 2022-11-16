@@ -31,7 +31,7 @@
 // Others
 import { IPC } from "@/renderer/ipc";
 import { useI18n } from "vue-i18n";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { SUPPORT_URL } from "@/commons/defines";
 import { LICENSES } from "@/@assets/licenses";
 import { DEBUGGERS } from "@/@assets/debuggers";
