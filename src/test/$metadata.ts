@@ -1,5 +1,5 @@
-import { generateMetadata } from "@/mainProcess/utils/generateMetadata";
-import * as file from "@/mainProcess/storages/file";
+import { generateMetadata } from "@/main/utils/generateMetadata";
+import * as file from "@/main/storages/file";
 import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 import { PetaColor } from "@/commons/datas/petaColor";
 import Path from "path";

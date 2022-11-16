@@ -2,12 +2,12 @@ module.exports = {
   input: {
     renderer: {
       windowTypes: "./src/commons/datas/windowType.ts",
-      windowsRoot: "./src/rendererProcess/windows",
-      template: "./src/rendererProcess/template.html",
+      windowsRoot: "./src/renderer/windows",
+      template: "./src/renderer/template.html",
     },
     main: {
-      preload: "./src/mainProcess/preload.ts",
-      index: "./src/mainProcess/index.ts",
+      preload: "./src/main/preload.ts",
+      index: "./src/main/index.ts",
     },
     appxConfig: "./electron.config.appx.js",
   },

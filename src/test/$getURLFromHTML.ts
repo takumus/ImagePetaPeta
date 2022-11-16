@@ -1,4 +1,4 @@
-import { getURLFromHTML } from "@/rendererProcess/utils/getURLFromHTML";
+import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
 
 url(`
   <img
