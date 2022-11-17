@@ -1,7 +1,7 @@
 import { DOMParser } from "@xmldom/xmldom";
 export function getURLFromHTML(html: string) {
   try {
-    const dom = new DOMParser().parseFromString(html, "text/html");
+    const dom = new DOMParser().parseFromString(`<wrapper>${html}</wrapper>`, "text/html");
     const imgDom = dom.getElementsByTagName("img")[0];
     const aDom = dom.getElementsByTagName("a")[0];
     if (imgDom !== undefined) {
