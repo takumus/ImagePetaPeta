@@ -374,10 +374,13 @@ function animate() {
       Object.values(pPanelRect).map((position) => {
         position.set(rootContainer.toLocal(pPanel.toGlobal(position)));
       });
-      pPanel.petaPanel.renderer.selected =
+      const newSelected =
         hitTest(pSelection.rect, pPanelRect) &&
         pPanel.petaPanel.visible &&
         !pPanel.petaPanel.locked;
+      if (pPanel.petaPanel.renderer.selected !== newSelected) {
+        pPanel.petaPanel.renderer.selected = newSelected;
+      }
     });
   }
   pPanelsArray().forEach((pp) => (pp.unselected = false));

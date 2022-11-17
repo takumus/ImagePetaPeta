@@ -53,6 +53,7 @@ const emit = defineEmits<{
   (e: "sortIndex"): void;
   (e: "petaPanelMenu", petaPanel: RPetaPanel, position: Vec2): void;
   (e: "update:petaPanels", updates: RPetaPanel[]): void;
+  (e: "orderRender"): void;
 }>();
 const props = defineProps<{
   zIndex: number;
@@ -135,6 +136,7 @@ function clickLayer(event: PointerEvent, petaPanel: RPetaPanel) {
   if (event.button === MouseButton.LEFT) {
     clearSelectionAll();
     petaPanel.renderer.selected = true;
+    emit("orderRender");
   } else if (event.button === MouseButton.RIGHT) {
     if (!petaPanel.renderer.selected) {
       clearSelectionAll();
