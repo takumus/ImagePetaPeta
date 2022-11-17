@@ -36,12 +36,12 @@
 </template>
 
 <script lang="ts" setup>
-import { PetaTag } from "@/commons/datas/petaTag";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { ref, computed } from "vue";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 
 const searchInput = ref<InstanceType<typeof VTextarea>>();
 const petaTagsStore = usePetaTagsStore();
@@ -54,7 +54,7 @@ const emit = defineEmits<{
   (e: "update:selectedPetaTagIds", value: string[]): void;
 }>();
 
-function editSearchTag(tag: PetaTag, value: string) {
+function editSearchTag(tag: RPetaTag, value: string) {
   const index = props.selectedPetaTagIds.findIndex((id) => id === tag.id);
   const _selectedPetaTagIds = [...props.selectedPetaTagIds];
   _selectedPetaTagIds.splice(index, 1);
@@ -111,7 +111,7 @@ const selectedPetaTags = computed(() => {
     .map((id) => {
       return petaTagsStore.state.petaTags.value.find((tag) => tag.id === id);
     })
-    .filter((petaTag) => petaTag !== undefined) as PetaTag[];
+    .filter((petaTag) => petaTag !== undefined) as RPetaTag[];
 });
 </script>
 

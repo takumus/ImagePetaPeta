@@ -68,7 +68,6 @@ import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { ImageType } from "@/commons/datas/imageType";
 import { IPC } from "@/renderer/ipc";
-import { PetaTag } from "@/commons/datas/petaTag";
 import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
 import {
   BROWSER_FETCH_TAGS_DELAY,
@@ -83,6 +82,7 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsSto
 import { useI18n } from "vue-i18n";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
@@ -105,7 +105,7 @@ const image = ref<HTMLImageElement>();
 const loadingThumbnail = ref(true);
 const loadingOriginal = ref(true);
 const loadingTags = ref(true);
-const myPetaTags = ref<PetaTag[]>([]);
+const myPetaTags = ref<RPetaTag[]>([]);
 const click: ClickChecker = new ClickChecker();
 let loadOriginalTimeoutHandler = -1;
 let loadThumbnailTimeoutHandler = -1;

@@ -93,7 +93,6 @@ import {
 import { Tile } from "@/renderer/components/browser/tile/tile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { Keyboards } from "@/renderer/utils/keyboards";
-import { PetaTag } from "@/commons/datas/petaTag";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { WindowType } from "@/commons/datas/windowType";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
@@ -110,6 +109,7 @@ import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { throttle } from "throttle-debounce";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -441,7 +441,7 @@ const fetchFilteredPetaImages = (() => {
     ).sort(sort);
   };
 })();
-function selectTag(tag: PetaTag) {
+function selectTag(tag: RPetaTag) {
   selectedPetaTagIds.value = [tag.id];
 }
 function updateVisibility(tile: Tile) {

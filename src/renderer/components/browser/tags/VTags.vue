@@ -86,7 +86,6 @@
 <script setup lang="ts">
 // Vue
 import { computed, onBeforeUpdate, onUnmounted, ref, watch } from "vue";
-import { PetaTag } from "@/commons/datas/petaTag";
 import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { BrowserTag } from "@/renderer/components/browser/browserTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
@@ -106,6 +105,7 @@ import {
   SortHelperConstraint,
 } from "@/renderer/components/browser/tags/sortHelper";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 type VTagCellInstance = InstanceType<typeof VTagCell>;
 type VTagPartitionInstance = InstanceType<typeof VTagPartition>;
 const emit = defineEmits<{
@@ -140,7 +140,7 @@ function setVPartitionRef(element: VTagPartitionInstance, id: string) {
 // ドラッグここから
 //--------------------------------------------------------------------//
 type MergedSortHelperData =
-  | { petaTag: PetaTag; id: string }
+  | { petaTag: RPetaTag; id: string }
   | { petaTagPartition: PetaTagPartition; id: string };
 const draggingData = ref<MergedSortHelperData>();
 const floatingCellElement = ref<HTMLElement>();
@@ -244,7 +244,7 @@ async function addPartition(name: string, index: number) {
   partition.index = index;
   await petaTagPartitionsStore.updatePetaTagPartitions([partition], UpdateMode.INSERT);
 }
-async function removeTag(petaTag: PetaTag) {
+async function removeTag(petaTag: RPetaTag) {
   if (
     (await components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [
       t("commons.yes"),
@@ -271,7 +271,7 @@ async function removeTagPartition(petaTag: PetaTagPartition) {
     await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], UpdateMode.REMOVE);
   }
 }
-async function changeTag(petaTag: PetaTag, newName: string) {
+async function changeTag(petaTag: RPetaTag, newName: string) {
   if (petaTag.name === newName) {
     return;
   }
@@ -289,9 +289,8 @@ async function changePartition(petaTag: PetaTagPartition, newName: string) {
   }
   petaTag.name = newName;
   await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], UpdateMode.UPDATE);
-  selectPetaTag(petaTag);
 }
-function selectPetaTag(petaTag?: PetaTag) {
+function selectPetaTag(petaTag?: RPetaTag) {
   const newData = [...props.selectedPetaTagIds];
   const prevTags = props.selectedPetaTagIds.join(",");
   let single = false;

@@ -155,7 +155,6 @@ import { IPC } from "@/renderer/ipc";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { PetaTag } from "@/commons/datas/petaTag";
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
@@ -167,9 +166,10 @@ import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaIma
 import { PetaColor } from "@/commons/datas/petaColor";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 
 const emit = defineEmits<{
-  (e: "selectTag", tag: PetaTag): void;
+  (e: "selectTag", tag: RPetaTag): void;
 }>();
 const props = defineProps<{
   petaImages: RPetaImage[];
@@ -181,7 +181,7 @@ const components = useComponentsStore();
 const { t } = useI18n();
 const fetchingTags = ref(false);
 const note = ref("");
-const mutualPetaTags = ref<PetaTag[]>([]);
+const mutualPetaTags = ref<RPetaTag[]>([]);
 const tagInput = ref<InstanceType<typeof VTextarea>>();
 const currentColor = ref<PetaColor | undefined>();
 async function addTag(name: string) {
@@ -195,7 +195,7 @@ async function addTag(name: string) {
     tagInput.value?.edit();
   }, 100);
 }
-async function removeTag(petaTag: PetaTag) {
+async function removeTag(petaTag: RPetaTag) {
   await IPC.send(
     "updatePetaImagesPetaTags",
     props.petaImages.map((petaImage) => petaImage.id),
@@ -223,7 +223,7 @@ function changeNSFW(value: boolean) {
   });
   petaImagesStore.updatePetaImages(props.petaImages, UpdateMode.UPDATE);
 }
-function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
+function tagMenu(event: PointerEvent | MouseEvent, tag: RPetaTag) {
   components.contextMenu.open(
     [
       {
@@ -236,7 +236,7 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: PetaTag) {
     vec2FromPointerEvent(event),
   );
 }
-function selectTag(tag: PetaTag) {
+function selectTag(tag: RPetaTag) {
   emit("selectTag", tag);
 }
 function changeCurrentColor(color: PetaColor | undefined) {

@@ -1,7 +1,7 @@
-import { PetaTag } from "@/commons/datas/petaTag";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 
 export interface BrowserTag {
-  petaTag: PetaTag;
+  petaTag: RPetaTag;
   count: number;
   selected: boolean;
   readonly: boolean;
