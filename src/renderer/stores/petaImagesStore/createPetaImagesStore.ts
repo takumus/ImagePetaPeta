@@ -20,7 +20,7 @@ export async function createPetaImagesStore() {
         if (oldPetaImage === undefined) {
           states.value[newRPetaImage.id] = newRPetaImage;
         } else {
-          Object.assign(oldPetaImage, newRPetaImage);
+          Object.assign(oldPetaImage, { ...newRPetaImage, renderer: oldPetaImage.renderer });
         }
       });
     } else if (mode === UpdateMode.REMOVE) {
