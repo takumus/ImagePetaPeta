@@ -1,4 +1,3 @@
-import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 // import { AnimatedGIF } from "@/renderer/utils/pixi-gif";
