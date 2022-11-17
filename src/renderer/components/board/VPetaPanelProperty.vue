@@ -32,19 +32,19 @@ import { ref, onMounted, computed } from "vue";
 
 // Others
 import VFloating from "@/renderer/components/utils/VFloating.vue";
-import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 import { searchParentElement } from "@/renderer/utils/searchParentElement";
 import { useI18n } from "vue-i18n";
 import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 const props = defineProps<{
   zIndex: number;
-  selectedPetaPanels: PetaPanel[];
-  petaPanels: PetaPanel[];
+  selectedPetaPanels: RPetaPanel[];
+  petaPanels: RPetaPanel[];
 }>();
 const emit = defineEmits<{
-  (e: "update:petaPanels", updates: PetaPanel[]): void;
+  (e: "update:petaPanels", updates: RPetaPanel[]): void;
   (e: "sortIndex"): void;
   (e: "removeSelectedPanels"): void;
 }>();
@@ -112,7 +112,7 @@ function changeOrder(to: "front" | "back") {
   );
   emit("sortIndex");
 }
-function openDetails(petaPanel: PetaPanel) {
+function openDetails(petaPanel: RPetaPanel) {
   IPC.send("setDetailsPetaImage", petaPanel.petaImageId);
   IPC.send("openWindow", WindowType.DETAILS);
 }

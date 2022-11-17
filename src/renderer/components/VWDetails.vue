@@ -35,19 +35,10 @@ import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
 import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
-import VBoard from "@/renderer/components/board/VBoard.vue";
 import VProperty from "@/renderer/components/browser/property/VProperty.vue";
 // Others
 // import { AnimatedGIFLoader } from "@/renderer/utils/pixi-gif";
 import { IPC } from "@/renderer/ipc";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { PetaBoard } from "@/commons/datas/petaBoard";
-import { Vec2 } from "@/commons/utils/vec2";
-import {
-  BOARD_DARK_BACKGROUND_FILL_COLOR,
-  BOARD_DARK_BACKGROUND_LINE_COLOR,
-} from "@/commons/defines";
-import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Keyboards } from "@/renderer/utils/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
@@ -64,27 +55,25 @@ const darkModeStore = useDarkModeStore();
 const petaImagesStore = usePetaImagesStore();
 const windowTypeStore = useWindowTypeStore();
 const windowTitleStore = useWindowTitleStore();
-const vPetaBoard = ref<InstanceType<typeof VBoard>>();
-const board = ref<PetaBoard>();
 const petaImageId = ref<string>();
 const keyboards = new Keyboards();
 onMounted(async () => {
   // AnimatedGIFLoader.add?.();
   petaImagesStore.onUpdate(async (newPetaImages, mode) => {
-    if (mode === UpdateMode.UPDATE) {
-      vPetaBoard.value?.orderPIXIRender();
-    } else if (mode === UpdateMode.REMOVE) {
-      newPetaImages.forEach((petaImage) => {
-        if (!board.value) {
-          return;
-        }
-        Object.values(board.value.petaPanels).forEach((petaPanel) => {
-          if (petaPanel.petaImageId === petaImage.id) {
-            IPC.send("windowClose");
-          }
-        });
-      });
-    }
+    // if (mode === UpdateMode.UPDATE) {
+    //   vPetaBoard.value?.orderPIXIRender();
+    // } else if (mode === UpdateMode.REMOVE) {
+    //   newPetaImages.forEach((petaImage) => {
+    //     if (!board.value) {
+    //       return;
+    //     }
+    //     Object.values(board.value.petaPanels).forEach((petaPanel) => {
+    //       if (petaPanel.petaImageId === petaImage.id) {
+    //         IPC.send("windowClose");
+    //       }
+    //     });
+    //   });
+    // }
   });
   IPC.on("detailsPetaImage", (event, petaImage) => {
     petaImageId.value = petaImage.id;
@@ -103,48 +92,6 @@ const singlePetaImages = computed(() => {
     return [];
   }
   return [petaImage.value];
-});
-watch(petaImage, () => {
-  if (petaImage.value === undefined) {
-    board.value = undefined;
-    return;
-  }
-  const width = 256;
-  const panel: PetaPanel = {
-    petaImageId: petaImage.value.id,
-    position: new Vec2(),
-    rotation: 0,
-    width: width,
-    height: (petaImage.value.height / petaImage.value.width) * width,
-    crop: {
-      position: new Vec2(0, 0),
-      width: 1,
-      height: 1,
-    },
-    id: "petaImage",
-    index: 0,
-    gif: {
-      stopped: false,
-      frame: 0,
-    },
-    visible: true,
-    locked: true,
-  };
-  board.value = {
-    petaPanels: { [panel.id]: panel },
-    id: "details",
-    name: "details",
-    transform: {
-      scale: 1,
-      position: new Vec2(0, 0),
-    },
-    background: {
-      fillColor: BOARD_DARK_BACKGROUND_FILL_COLOR,
-      lineColor: BOARD_DARK_BACKGROUND_LINE_COLOR,
-    },
-    index: 0,
-  };
-  vPetaBoard.value?.load({});
 });
 watch(
   () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,

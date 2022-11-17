@@ -16,7 +16,7 @@ import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
-import { createPetaPanel, PetaPanel } from "@/commons/datas/petaPanel";
+import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
 import { PPanel } from "@/renderer/components/board/ppanels/PPanel";
 import { PTransformerDashedLine } from "@/renderer/components/board/ppanels/pTransformer/PTransformerDashedLine";
 import { PTransformerControlPoint } from "@/renderer/components/board/ppanels/pTransformer/PTransformerControlPoint";
@@ -26,11 +26,12 @@ import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 const props = defineProps<{
-  petaPanel?: PetaPanel;
+  petaPanel?: RPetaPanel;
 }>();
 const emit = defineEmits<{
-  (e: "update", petaPanel?: PetaPanel): void;
+  (e: "update", petaPanel?: RPetaPanel): void;
 }>();
 const nsfwStore = useNSFWStore();
 const petaImagesStore = usePetaImagesStore();
@@ -284,7 +285,7 @@ function changePetaPanel() {
     cancelCrop();
     return;
   }
-  const petaPanel = createPetaPanel(petaImage, new Vec2(0, 0), 400);
+  const petaPanel = createRPetaPanel(petaImage, new Vec2(0, 0), 400);
   minX.value = props.petaPanel.crop.position.x;
   minY.value = props.petaPanel.crop.position.y;
   maxX.value = props.petaPanel.crop.width + props.petaPanel.crop.position.x;

@@ -9,6 +9,7 @@ import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 usePetaImagesStore;
 export class PPanel extends PIXI.Sprite {
   // public selected = false;
@@ -39,7 +40,7 @@ export class PPanel extends PIXI.Sprite {
   private static noImageTexture?: PIXI.Texture;
   private static loadingTexture?: PIXI.Texture;
   constructor(
-    public petaPanel: PetaPanel,
+    public petaPanel: RPetaPanel,
     private petaImagesStore: ReturnType<typeof usePetaImagesStore>,
   ) {
     super();
@@ -69,7 +70,7 @@ export class PPanel extends PIXI.Sprite {
     this.setZoomScale(this.zoomScale);
     this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
   }
-  public setPetaPanel(petaPanel: PetaPanel) {
+  public setPetaPanel(petaPanel: RPetaPanel) {
     this.petaPanel = petaPanel;
     this.defaultHeight = petaPanel.height / petaPanel.width;
   }
@@ -160,8 +161,8 @@ export class PPanel extends PIXI.Sprite {
           this.petaPanel.locked,
           "unselected",
           this.unselected,
-          "petaPanel._selected",
-          this.petaPanel._selected,
+          "petaPanel.renderer.selected",
+          this.petaPanel.renderer.selected,
           "noImage",
           this.noImage,
           "loading",

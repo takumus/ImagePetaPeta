@@ -10,12 +10,12 @@
 // Vue
 import { computed, ref } from "vue";
 // Others
-import { PetaBoard } from "@/commons/datas/petaBoard";
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 const props = defineProps<{
-  board: PetaBoard;
+  board: RPetaBoard;
 }>();
 const emit = defineEmits<{
-  (e: "update", board: PetaBoard): void;
+  (e: "update", board: RPetaBoard): void;
 }>();
 const inputFillColor = ref<HTMLInputElement>();
 const inputLineColor = ref<HTMLInputElement>();

@@ -58,7 +58,7 @@
 import { computed, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
 // Others
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { PetaBoard } from "@/commons/datas/petaBoard";
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
@@ -68,12 +68,12 @@ import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 
 const emit = defineEmits<{
   (e: "add"): void;
-  (e: "remove", board: PetaBoard): void;
-  (e: "select", board: PetaBoard): void;
-  (e: "update:board", board: PetaBoard): void;
+  (e: "remove", board: RPetaBoard): void;
+  (e: "select", board: RPetaBoard): void;
+  (e: "update:board", board: RPetaBoard): void;
 }>();
 const props = defineProps<{
-  boards: PetaBoard[];
+  boards: RPetaBoard[];
   currentPetaBoardId: string;
 }>();
 const textsStore = useTextsStore();
@@ -95,7 +95,7 @@ onUnmounted(() => {
   window.removeEventListener("pointermove", pointermove);
   window.removeEventListener("pointerup", pointerup);
 });
-function pointerdown(event: PointerEvent, board: PetaBoard, index: number) {
+function pointerdown(event: PointerEvent, board: RPetaBoard, index: number) {
   if (isKeyboardLocked()) return;
   if (event.button != MouseButton.LEFT) return;
   selectPetaBoard(board);
@@ -110,7 +110,7 @@ function pointerdown(event: PointerEvent, board: PetaBoard, index: number) {
   }
   beforeSortSelectedIndex.value = index;
 }
-function menu(event: PointerEvent, board: PetaBoard) {
+function menu(event: PointerEvent, board: RPetaBoard) {
   components.contextMenu.open(
     [
       {
@@ -170,10 +170,10 @@ onBeforeUpdate(() => {
 function setTabRef(element: HTMLElement, id: string) {
   tabs.value[id] = element;
 }
-function selectPetaBoard(board: PetaBoard) {
+function selectPetaBoard(board: RPetaBoard) {
   emit("select", board);
 }
-function changePetaBoardName(board: PetaBoard, name: string) {
+function changePetaBoardName(board: RPetaBoard, name: string) {
   if (name === "") {
     return;
   }
@@ -182,7 +182,7 @@ function changePetaBoardName(board: PetaBoard, name: string) {
     name,
   });
 }
-async function removePetaBoard(board: PetaBoard) {
+async function removePetaBoard(board: RPetaBoard) {
   emit("remove", board);
 }
 async function addPetaBoard() {

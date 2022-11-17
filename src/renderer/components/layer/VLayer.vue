@@ -15,7 +15,7 @@
           :key="pPanel.id"
           :ref="(element) => setVLayerCellRef(element as any as VLayerCellInstance, pPanel.id)"
           :petaPanel="pPanel"
-          :selected="pPanel._selected"
+          :selected="pPanel.renderer.selected"
           :sorting="draggingData !== undefined"
           @startDrag="sortHelper.pointerdown"
           @onClick="clickLayer"
@@ -40,23 +40,23 @@ import VLayerCell from "@/renderer/components/layer/VLayerCell.vue";
 // Others
 import { Keyboards } from "@/renderer/utils/keyboards";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { PetaPanel } from "@/commons/datas/petaPanel";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import {
   initSortHelper,
   SortHelperConstraint,
 } from "@/renderer/components/browser/tags/sortHelper";
 import { MouseButton } from "@/commons/datas/mouseButton";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
 const statesStore = useStateStore();
 const emit = defineEmits<{
   (e: "sortIndex"): void;
-  (e: "petaPanelMenu", petaPanel: PetaPanel, position: Vec2): void;
-  (e: "update:petaPanels", updates: PetaPanel[]): void;
+  (e: "petaPanelMenu", petaPanel: RPetaPanel, position: Vec2): void;
+  (e: "update:petaPanels", updates: RPetaPanel[]): void;
 }>();
 const props = defineProps<{
   zIndex: number;
-  pPanelsArray: PetaPanel[];
+  pPanelsArray: RPetaPanel[];
 }>();
 const layers = ref<HTMLElement>();
 const layersParent = ref<HTMLElement>();
@@ -74,19 +74,19 @@ function setVLayerCellRef(element: VLayerCellInstance, id: string) {
 //--------------------------------------------------------------------//
 // ドラッグここから
 //--------------------------------------------------------------------//
-const draggingData = ref<PetaPanel>();
+const draggingData = ref<RPetaPanel>();
 const floatingCellElement = ref<HTMLElement>();
 const orders = ref<{ [key: string]: number }>({});
 const constraints = ref<{
   [key: string]: SortHelperConstraint;
 }>({});
-const sortHelper = initSortHelper<PetaPanel>(
+const sortHelper = initSortHelper<RPetaPanel>(
   {
     getElementFromId: (id) => vLayerCells.value[id]?.$el as HTMLElement,
     onChangeDraggingData: (data) => (draggingData.value = data),
     getIsDraggableFromId: () => true,
     onSort: () => {
-      const updatedPetaPanels: PetaPanel[] = [];
+      const updatedPetaPanels: RPetaPanel[] = [];
       props.pPanelsArray.forEach((petaPanel) => {
         const order = props.pPanelsArray.length - (orders.value[petaPanel.id] ?? 0);
         if (petaPanel.index !== order) {
@@ -131,29 +131,29 @@ watch(
 //--------------------------------------------------------------------//
 // ドラッグここまで
 //--------------------------------------------------------------------//
-function clickLayer(event: PointerEvent, petaPanel: PetaPanel) {
+function clickLayer(event: PointerEvent, petaPanel: RPetaPanel) {
   if (event.button === MouseButton.LEFT) {
     clearSelectionAll();
-    petaPanel._selected = true;
+    petaPanel.renderer.selected = true;
   } else if (event.button === MouseButton.RIGHT) {
-    if (!petaPanel._selected) {
+    if (!petaPanel.renderer.selected) {
       clearSelectionAll();
     }
-    petaPanel._selected = true;
+    petaPanel.renderer.selected = true;
     emit("petaPanelMenu", petaPanel, vec2FromPointerEvent(event));
   }
 }
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
     props.pPanelsArray.forEach((p) => {
-      p._selected = false;
+      p.renderer.selected = false;
     });
   }
 }
 function toggleVisible() {
   statesStore.state.value.visibleLayerPanel = !statesStore.state.value.visibleLayerPanel;
 }
-function updatePetaPanel(petaPanel: PetaPanel) {
+function updatePetaPanel(petaPanel: RPetaPanel) {
   emit("update:petaPanels", [
     {
       ...petaPanel,

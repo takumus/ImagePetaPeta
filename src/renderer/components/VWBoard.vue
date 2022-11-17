@@ -64,8 +64,8 @@ import {
   BOARD_ADD_MULTIPLE_OFFSET_Y,
   DEFAULT_IMAGE_SIZE,
 } from "@/commons/defines";
-import { PetaBoard } from "@/commons/datas/petaBoard";
-import { createPetaPanel } from "@/commons/datas/petaPanel";
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
+import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { Vec2 } from "@/commons/utils/vec2";
 import { logChunk } from "@/renderer/utils/rendererLogger";
@@ -141,7 +141,7 @@ function addOrderedPetaPanels() {
   orderedAddPanelIds.value.forEach((id, i) => {
     const petaImage = petaImagesStore.getPetaImage(id);
     if (!petaImage) return;
-    const panel = createPetaPanel(
+    const panel = createRPetaPanel(
       petaImage,
       orderedAddPanelDragEvent.value
         .clone()
@@ -161,7 +161,7 @@ function addOrderedPetaPanels() {
   }
   orderedAddPanelIds.value = [];
 }
-async function selectPetaBoard(board: PetaBoard | undefined) {
+async function selectPetaBoard(board: RPetaBoard | undefined) {
   if (!board) {
     return;
   }
@@ -185,7 +185,7 @@ async function selectPetaBoard(board: PetaBoard | undefined) {
   }
   currentPetaBoardId.value = board.id;
 }
-async function removePetaBoard(board: PetaBoard) {
+async function removePetaBoard(board: RPetaBoard) {
   if (
     (await components.dialog.show(t("boards.removeDialog", [board.name]), [
       t("commons.yes"),
@@ -207,10 +207,10 @@ async function removePetaBoard(board: PetaBoard) {
 async function addPetaBoard() {
   selectPetaBoard(await petaBoardsStore.addPetaBoard(darkModeStore.state.value));
 }
-function updatePetaBoard(board: PetaBoard) {
+function updatePetaBoard(board: RPetaBoard) {
   petaBoardsStore.savePetaBoard(board);
 }
-const currentPetaBoard = computed((): PetaBoard | undefined => {
+const currentPetaBoard = computed((): RPetaBoard | undefined => {
   if (errorPetaBoardId.value === currentPetaBoardId.value) {
     return undefined;
   }

@@ -42,18 +42,18 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ImageType } from "@/commons/datas/imageType";
 import { getImageURL } from "@/renderer/utils/imageURL";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
-import { PetaPanel } from "@/commons/datas/petaPanel";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { MouseButton } from "@/commons/datas/mouseButton";
 // Others
 const emit = defineEmits<{
-  (e: "startDrag", event: PointerEvent, petaPanel: PetaPanel): void;
-  (e: "update:petaPanel", cellData: PetaPanel): void;
-  (e: "onClick", event: PointerEvent, petaPanel: PetaPanel): void;
+  (e: "startDrag", event: PointerEvent, petaPanel: RPetaPanel): void;
+  (e: "update:petaPanel", cellData: RPetaPanel): void;
+  (e: "onClick", event: PointerEvent, petaPanel: RPetaPanel): void;
 }>();
 const props = defineProps<{
-  petaPanel?: PetaPanel;
+  petaPanel?: RPetaPanel;
   selected?: boolean;
   sorting?: boolean;
 }>();

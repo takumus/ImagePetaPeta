@@ -49,8 +49,7 @@ import VLayer from "@/renderer/components/layer/VLayer.vue";
 // Others
 import { PBoardGrid } from "@/renderer/components/board/pGrid";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaPanel } from "@/commons/datas/petaPanel";
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
 import * as PIXI from "pixi.js";
@@ -78,11 +77,12 @@ import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaIma
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { ppa } from "@/commons/utils/pp";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 const emit = defineEmits<{
-  (e: "update:board", board: PetaBoard): void;
+  (e: "update:board", board: RPetaBoard): void;
 }>();
 const props = defineProps<{
-  board?: PetaBoard;
+  board?: RPetaBoard;
   zIndex: number;
 }>();
 const { systemInfo } = useSystemInfoStore();
@@ -101,7 +101,7 @@ const loading = ref(false);
 const extractingLog = ref("");
 const extractProgress = ref(0);
 const loadProgress = ref(0);
-const croppingPetaPanel = ref<PetaPanel>();
+const croppingPetaPanel = ref<RPetaPanel>();
 const cropping = ref(false);
 const dragging = ref(false);
 const dragged = ref(false);
@@ -131,7 +131,7 @@ const keyboards = useKeyboardsStore(true);
 let cancelExtract: (() => Promise<void>) | undefined;
 let resolution = -1;
 let changeResolutionIntervalHandler = -1;
-const currentBoard = ref<PetaBoard>();
+const currentBoard = ref<RPetaBoard>();
 let pixiView: HTMLCanvasElement | undefined;
 onMounted(() => {
   constructIfResolutionChanged();
@@ -374,7 +374,7 @@ function animate() {
       Object.values(pPanelRect).map((position) => {
         position.set(rootContainer.toLocal(pPanel.toGlobal(position)));
       });
-      pPanel.petaPanel._selected =
+      pPanel.petaPanel.renderer.selected =
         hitTest(pSelection.rect, pPanelRect) &&
         pPanel.petaPanel.visible &&
         !pPanel.petaPanel.locked;
@@ -416,7 +416,7 @@ function removePPanel(pPanel: PPanel) {
   pPanel.destroy();
   delete pPanels[pPanel.petaPanel.id];
 }
-function petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
+function petaPanelMenu(petaPanel: RPetaPanel, position: Vec2) {
   const pPanel = pPanels[petaPanel.id];
   if (!pPanel) {
     return;
@@ -458,7 +458,7 @@ function petaPanelMenu(petaPanel: PetaPanel, position: Vec2) {
   //   position,
   // );
 }
-async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
+async function addPanel(petaPanel: RPetaPanel, offsetIndex: number) {
   if (!currentBoard.value) {
     return;
   }
@@ -477,7 +477,7 @@ async function addPanel(petaPanel: PetaPanel, offsetIndex: number) {
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   updatePetaBoard();
 }
-function beginCrop(petaPanel: PetaPanel) {
+function beginCrop(petaPanel: RPetaPanel) {
   croppingPetaPanel.value = petaPanel;
   cropping.value = true;
   if (keyboards) {
@@ -491,7 +491,7 @@ function endCrop() {
     keyboards.enabled = true;
   }
 }
-function updateCrop(petaPanel?: PetaPanel) {
+function updateCrop(petaPanel?: RPetaPanel) {
   endCrop();
   const petaImage = petaImagesStore.getPetaImage(petaPanel?.petaImageId);
   if (petaImage === undefined || currentBoard.value === undefined || petaPanel === undefined) {
@@ -515,7 +515,7 @@ function updateCrop(petaPanel?: PetaPanel) {
 }
 function clearSelectionAll(force = false) {
   if (!Keyboards.pressedOR("ShiftLeft", "ShiftRight") || force) {
-    pPanelsArray().forEach((pPanel) => (pPanel.petaPanel._selected = false));
+    pPanelsArray().forEach((pPanel) => (pPanel.petaPanel.renderer.selected = false));
   }
 }
 function sortIndex() {
@@ -582,14 +582,14 @@ async function load(params: {
   }
   log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(currentBoard.value.id));
   let loaded = 0;
-  const extract = async (petaPanel: PetaPanel, index: number) => {
+  const extract = async (petaPanel: RPetaPanel, index: number) => {
     if (currentBoard.value === undefined) {
       return;
     }
     const progress = `${index + 1}/${petaPanels.length}`;
     let loadResult = "";
     try {
-      const onLoaded = (petaPanel: PetaPanel, error?: unknown) => {
+      const onLoaded = (petaPanel: RPetaPanel, error?: unknown) => {
         loaded++;
         if (currentBoard.value) {
           if (!petaPanel.gif.stopped) {
@@ -703,7 +703,7 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.FederatedPointerEvent) {
   }
   if (
     !Keyboards.pressedOR("ShiftLeft", "ShiftRight") &&
-    (selectedPPanels().length <= 1 || !pPanel.petaPanel._selected)
+    (selectedPPanels().length <= 1 || !pPanel.petaPanel.renderer.selected)
   ) {
     // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
     // 最前にして選択リセット
@@ -713,7 +713,7 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.FederatedPointerEvent) {
     // 選択が１つ以下の場合選択範囲リセット
     clearSelectionAll();
   }
-  pPanel.petaPanel._selected = true;
+  pPanel.petaPanel.renderer.selected = true;
   layer.value?.scrollTo(pPanel.petaPanel);
   pTransformer.pointerdownPPanel(pPanel, e);
 }
@@ -741,11 +741,12 @@ function pPanelsArray() {
 }
 function selectedPPanels() {
   return pPanelsArray().filter(
-    (pPanel) => pPanel.petaPanel._selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked,
+    (pPanel) =>
+      pPanel.petaPanel.renderer.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked,
   );
 }
 function unselectedPPanels() {
-  return pPanelsArray().filter((pPanel) => !pPanel.petaPanel._selected);
+  return pPanelsArray().filter((pPanel) => !pPanel.petaPanel.renderer.selected);
 }
 function updatePetaBoard() {
   if (currentBoard.value) {
@@ -755,7 +756,7 @@ function updatePetaBoard() {
 function updatePetaPanels() {
   updatePetaBoard();
 }
-function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
+function updatePetaPanelsFromLayer(petaPanels: RPetaPanel[]) {
   petaPanels.forEach((petaPanel) => {
     if (currentBoard.value === undefined) {
       return;
@@ -771,7 +772,9 @@ function updatePetaPanelsFromLayer(petaPanels: PetaPanel[]) {
   updatePetaPanels();
   orderPIXIRender();
 }
-const selectedPetaPanelsArray = computed(() => petaPanelsArray.value.filter((p) => p._selected));
+const selectedPetaPanelsArray = computed(() =>
+  petaPanelsArray.value.filter((p) => p.renderer.selected),
+);
 const petaPanelsArray = computed(() => {
   if (!currentBoard.value) {
     return [];
