@@ -90,7 +90,6 @@ import {
   THUMBNAILS_SELECTION_PERCENT,
   UNTAGGED_ID,
 } from "@/commons/defines";
-import { PetaImage } from "@/commons/datas/petaImage";
 import { Tile } from "@/renderer/components/browser/tile/tile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { Keyboards } from "@/renderer/utils/keyboards";
@@ -110,6 +109,7 @@ import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore"
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { throttle } from "throttle-debounce";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
@@ -135,7 +135,7 @@ const currentScrollTileId = ref("");
 const currentScrollTileOffset = ref(0);
 const keyboards = useKeyboardsStore();
 const defines = useDefinesStore().defines;
-const filteredPetaImages = ref<PetaImage[]>([]);
+const filteredPetaImages = ref<RPetaImage[]>([]);
 const ignoreScrollEvent = ref(false);
 const currentColor = ref("#ffffff");
 onMounted(() => {
@@ -223,7 +223,7 @@ function resizeScrollArea(rect: DOMRectReadOnly) {
 function resizeImages(rect: DOMRectReadOnly) {
   thumbnailsWidth.value = rect.width - BROWSER_THUMBNAIL_MARGIN;
 }
-function drag(petaImage: PetaImage) {
+function drag(petaImage: RPetaImage) {
   if (
     !Keyboards.pressedOR(
       "ShiftLeft",
@@ -233,11 +233,11 @@ function drag(petaImage: PetaImage) {
       "MetaLeft",
       "MetaRight",
     ) &&
-    !petaImagesStore.getSelected(petaImage)
+    !petaImage.renderer.selected
   ) {
     clearSelectionAll();
   }
-  const petaImages = petaImagesStore.getSelected(petaImage) ? [] : [petaImage];
+  const petaImages = petaImage.renderer.selected ? [] : [petaImage];
   petaImages.push(...selectedPetaImages.value);
   IPC.send("startDrag", petaImages, actualTileSize.value, "");
 }
@@ -261,14 +261,11 @@ function selectTile(thumb: Tile, force = false) {
   }
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     // 選択サムネイルを反転
-    petaImagesStore.setSelected(
-      thumb.petaImage,
-      !petaImagesStore.getSelected(thumb.petaImage) || force,
-    );
+    thumb.petaImage.renderer.selected = !thumb.petaImage.renderer.selected || force;
   } else {
     // コントロールキーが押されていなければ選択をリセット
     petaImagesStore.clearSelection();
-    petaImagesStore.setSelected(thumb.petaImage, true);
+    thumb.petaImage.renderer.selected = true;
   }
   if (firstSelectedTile.value && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
     // 最初の選択と、シフトキーが押されていれば、範囲選択。
@@ -307,18 +304,18 @@ function selectTile(thumb: Tile, force = false) {
       const hitArea = widthDiff * heightDiff;
       const ptArea = pt.width * pt.height;
       if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
-        petaImagesStore.setSelected(pt.petaImage, true);
+        pt.petaImage.renderer.selected = true;
       }
     });
   }
 }
 function clearSelectionAll() {
   petaImagesArray.value.forEach((pi) => {
-    petaImagesStore.setSelected(pi, false);
+    pi.renderer.selected = false;
   });
 }
-function petaImageMenu(petaImage: PetaImage, position: Vec2) {
-  if (!petaImagesStore.getSelected(petaImage)) {
+function petaImageMenu(petaImage: RPetaImage, position: Vec2) {
+  if (!petaImage.renderer.selected) {
     const tile = tiles.value.find((tile) => tile.petaImage?.id === petaImage.id);
     if (tile) {
       selectTile(tile, true);
@@ -363,7 +360,7 @@ function petaImageMenu(petaImage: PetaImage, position: Vec2) {
     position,
   );
 }
-async function openDetail(petaImage: PetaImage) {
+async function openDetail(petaImage: RPetaImage) {
   if (
     Keyboards.pressedOR(
       "ShiftLeft",
@@ -383,7 +380,7 @@ function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;
 }
 let ciedeCache: { [key: string]: number } = {};
-function sort(a: PetaImage, b: PetaImage) {
+function sort(a: RPetaImage, b: RPetaImage) {
   switch (sortMode.value) {
     case "ADD_DATE": {
       if (a.addDate === b.addDate) {
@@ -402,7 +399,7 @@ function sort(a: PetaImage, b: PetaImage) {
     }
   }
 }
-function calcCiedeFromPalette(petaImage: PetaImage, rgb: { r: number; g: number; b: number }) {
+function calcCiedeFromPalette(petaImage: RPetaImage, rgb: { r: number; g: number; b: number }) {
   const populations = petaImage.palette.reduce((num, color) => num + color.population, 0);
   return Math.min(
     ...petaImage.palette
@@ -440,7 +437,7 @@ const fetchFilteredPetaImages = (() => {
               return petaImage;
             }),
         ),
-      ) as PetaImage[]
+      ) as RPetaImage[]
     ).sort(sort);
   };
 })();
@@ -467,14 +464,14 @@ function keyA() {
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     clearSelectionAll();
     filteredPetaImages.value.forEach((pi) => {
-      petaImagesStore.setSelected(pi, true);
+      pi.renderer.selected = true;
     });
   }
 }
 const petaImages = computed(() => petaImagesStore.state.value);
 const petaImagesArray = computed(() => Object.values(petaImages.value));
 const selectedPetaImages = computed(() =>
-  petaImagesArray.value.filter((pi) => petaImagesStore.getSelected(pi)),
+  petaImagesArray.value.filter((pi) => pi.renderer.selected),
 );
 const thumbnailsRowCount = computed(() => {
   const c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);

@@ -33,20 +33,20 @@ import VPropertyThumbnail from "@/renderer/components/browser/property/VProperty
 // Others
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
-import { PetaImage } from "@/commons/datas/petaImage";
 import { PropertyThumbnail } from "@/renderer/components/browser/property/propertyThumbnail";
 import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useI18n } from "vue-i18n";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
-  (e: "menu", petaImage: PetaImage, position: Vec2): void;
-  (e: "drag", petaImage: PetaImage): void;
+  (e: "menu", petaImage: RPetaImage, position: Vec2): void;
+  (e: "drag", petaImage: RPetaImage): void;
 }>();
 const props = defineProps<{
-  petaImages: PetaImage[];
+  petaImages: RPetaImage[];
 }>();
 const { t } = useI18n();
 const previews = ref<HTMLElement>();

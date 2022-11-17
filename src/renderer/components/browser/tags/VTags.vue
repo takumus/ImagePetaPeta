@@ -86,7 +86,6 @@
 <script setup lang="ts">
 // Vue
 import { computed, onBeforeUpdate, onUnmounted, ref, watch } from "vue";
-import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { BrowserTag } from "@/renderer/components/browser/browserTag";
@@ -106,13 +105,14 @@ import {
   initSortHelper,
   SortHelperConstraint,
 } from "@/renderer/components/browser/tags/sortHelper";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 type VTagCellInstance = InstanceType<typeof VTagCell>;
 type VTagPartitionInstance = InstanceType<typeof VTagPartition>;
 const emit = defineEmits<{
   (e: "update:selectedPetaTagIds", selectedPetaTagIds: string[]): void;
 }>();
 const props = defineProps<{
-  petaImagesArray: PetaImage[];
+  petaImagesArray: RPetaImage[];
   selectedPetaTagIds: string[];
 }>();
 const textsStore = useTextsStore();

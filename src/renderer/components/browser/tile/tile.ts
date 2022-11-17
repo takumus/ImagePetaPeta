@@ -1,9 +1,8 @@
 import { Vec2 } from "@/commons/utils/vec2";
-import { PetaImage } from "@/commons/datas/petaImage";
-import { PetaTag } from "@/commons/datas/petaTag";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 
 export interface Tile {
-  petaImage?: PetaImage;
+  petaImage?: RPetaImage;
   position: Vec2;
   width: number;
   height: number;

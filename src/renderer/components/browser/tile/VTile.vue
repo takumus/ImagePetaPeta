@@ -78,18 +78,17 @@ import {
   BROWSER_LOAD_THUMBNAIL_DELAY,
   BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM,
 } from "@/commons/defines";
-import { PetaImage } from "@/commons/datas/petaImage";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
   (e: "menu", tile: Tile, position: Vec2): void;
-  (e: "drag", petaImage: PetaImage): void;
-  (e: "dblclick", petaImage: PetaImage): void;
+  (e: "drag", petaImage: RPetaImage): void;
+  (e: "dblclick", petaImage: RPetaImage): void;
 }>();
 const props = defineProps<{
   tile: Tile;
@@ -99,7 +98,6 @@ const props = defineProps<{
 }>();
 const nsfwStore = useNSFWStore();
 const settingsStore = useSettingsStore();
-const petaImagesStore = usePetaImagesStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const thumbnailURL = ref("");
@@ -215,7 +213,7 @@ function delayedLoadImage() {
 }
 const selected = computed(() => {
   if (props.tile.petaImage !== undefined) {
-    return petaImagesStore.getSelected(props.tile.petaImage);
+    return props.tile.petaImage.renderer.selected;
   }
   return false;
 });

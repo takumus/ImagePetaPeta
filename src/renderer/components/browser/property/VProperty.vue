@@ -154,7 +154,6 @@
 import { IPC } from "@/renderer/ipc";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { UNTAGGED_ID } from "@/commons/defines";
-import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaTag } from "@/commons/datas/petaTag";
 import dateFormat from "dateformat";
@@ -167,12 +166,13 @@ import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsSto
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { PetaColor } from "@/commons/datas/petaColor";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: PetaTag): void;
 }>();
 const props = defineProps<{
-  petaImages: PetaImage[];
+  petaImages: RPetaImage[];
 }>();
 const textsStore = useTextsStore();
 const petaTagsStore = usePetaTagsStore();
