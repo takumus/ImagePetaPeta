@@ -24,7 +24,7 @@
       :pPanelsArray="petaPanelsArray"
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
-      @update="orderPIXIRender"
+      @orderRender="orderPIXIRender"
       @update:petaPanels="updatePetaPanelsFromLayer"
     />
     <VPetaPanelProperty
