@@ -90,12 +90,12 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
   const thumbnails = petaImages.map((p): PropertyThumbnail => {
     let width = 0;
     let height = 0;
-    if (p.height / p.width < previewHeight.value / maxWidth) {
-      const size = resizeImage(p.width, p.height, maxWidth, "width");
+    if (p.metadata.height / p.metadata.width < previewHeight.value / maxWidth) {
+      const size = resizeImage(p.metadata.width, p.metadata.height, maxWidth, "width");
       width = size.width;
       height = size.height;
     } else {
-      const size = resizeImage(p.width, p.height, previewHeight.value, "height");
+      const size = resizeImage(p.metadata.width, p.metadata.height, previewHeight.value, "height");
       height = size.height;
       width = size.width;
     }

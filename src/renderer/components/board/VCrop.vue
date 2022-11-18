@@ -315,7 +315,7 @@ const height = computed(() => {
   if (!petaImage) {
     return 0;
   }
-  return width.value * (petaImage.height / petaImage.width);
+  return width.value * (petaImage.metadata.height / petaImage.metadata.width);
 });
 const width = computed(() => {
   const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
@@ -326,12 +326,22 @@ const width = computed(() => {
   let height = 0;
   const maxWidth = stageRect.x * 0.95;
   const maxHeight = stageRect.y * 0.7;
-  if (petaImage.height / petaImage.width < maxHeight / maxWidth) {
-    const size = resizeImage(petaImage.width, petaImage.height, maxWidth, "width");
+  if (petaImage.metadata.height / petaImage.metadata.width < maxHeight / maxWidth) {
+    const size = resizeImage(
+      petaImage.metadata.width,
+      petaImage.metadata.height,
+      maxWidth,
+      "width",
+    );
     width = size.width;
     height = size.height;
   } else {
-    const size = resizeImage(petaImage.width, petaImage.height, maxHeight, "height");
+    const size = resizeImage(
+      petaImage.metadata.width,
+      petaImage.metadata.height,
+      maxHeight,
+      "height",
+    );
     height = size.height;
     width = size.width;
   }

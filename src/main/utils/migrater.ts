@@ -7,103 +7,36 @@ import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
-import {
-  BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-  BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
-} from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
 import DB from "@/main/storages/db";
 import { v4 as uuid } from "uuid";
 const defaultSettings = getDefaultSettings();
 export function migratePetaImage(petaImage: PetaImage) {
-  // v0.2.0 (move to PetaImagePetaTag)
-  // if (petaImage.tags === undefined) {
-  //   petaImage.tags = [];
-  // }
-  // v1.5.1
-  if (petaImage.placeholder === undefined) {
-    petaImage.placeholder = "";
-  }
-  // v1.6.0
-  if (petaImage.nsfw === undefined) {
-    petaImage.nsfw = false;
-  }
-  // v1.8.1
-  if (petaImage.file === undefined) {
-    petaImage.file = {
-      original: (petaImage as any).fileName,
-      thumbnail: (petaImage as any).fileName + ".webp",
-    };
-  }
-  // v2.6.0
-  if (petaImage.palette === undefined) {
-    petaImage.palette = [];
-  }
-  // v2.8.0
-  if (petaImage.metadataVersion === undefined) {
-    petaImage.metadataVersion = 0;
-  }
-  petaImage.palette.map((color) => {
-    if (color.positionSD === undefined) {
-      color.positionSD = 0;
-    }
-  });
+  let migrated = false;
+  const anyPetaImage = petaImage as any;
   if (petaImage.note === undefined) {
     petaImage.note = "";
+    migrated = true;
   }
-  return petaImage;
+  // v3.0.0
+  if (petaImage.metadata === undefined) {
+    petaImage.metadata = {
+      type: "image",
+      width: anyPetaImage.width,
+      height: anyPetaImage.height,
+      palette: anyPetaImage.palette ?? [],
+      version: anyPetaImage.metadataVersion ?? 0,
+    };
+    delete anyPetaImage.width;
+    delete anyPetaImage.height;
+    delete anyPetaImage.palette;
+    delete anyPetaImage.metadataVersion;
+    migrated = true;
+  }
+  return migrated;
 }
 export function migrateSettings(settings: Settings) {
   let changed = false;
-  // v0.8.4
-  if (settings.zoomSensitivity === undefined) {
-    settings.zoomSensitivity = defaultSettings.zoomSensitivity;
-    changed = true;
-  }
-  if (settings.moveSensitivity === undefined) {
-    settings.moveSensitivity = defaultSettings.moveSensitivity;
-    changed = true;
-  }
-  // // v1.5.0 (move to states v2.6.0)
-  // if (settings.tileSize === undefined) {
-  //   settings.tileSize = defaultSettings.tileSize;
-  //   changed = true;
-  // }
-  // if (settings.loadTilesInOriginal === undefined) {
-  //   settings.loadTilesInOriginal = defaultSettings.loadTilesInOriginal;
-  //   changed = true;
-  // }
-  // v1.6.0
-  if (settings.alwaysShowNSFW === undefined) {
-    settings.alwaysShowNSFW = defaultSettings.alwaysShowNSFW;
-    changed = true;
-  }
-  if (settings.petaImageDirectory === undefined) {
-    settings.petaImageDirectory = {
-      default: defaultSettings.petaImageDirectory.default,
-      path: defaultSettings.petaImageDirectory.path,
-    };
-    changed = true;
-  }
-  // v1.7.0
-  // if (settings.autoAddTag === undefined) {
-  //   settings.autoAddTag = defaultSettings.autoAddTag;
-  //   changed = true;
-  // }
-  // v2.4.0
-  // if (settings.ignoreMinorUpdate === undefined) {
-  //   settings.ignoreMinorUpdate = defaultSettings.ignoreMinorUpdate;
-  //   changed = true;
-  // }
-  // v2.5.0 (move to states v2.6.0)
-  // if (settings.visibleLayerPanel === undefined) {
-  //   settings.visibleLayerPanel = defaultSettings.visibleLayerPanel;
-  //   changed = true;
-  // }
-  // if (settings.realESRGAN === undefined) {
-  //   settings.realESRGAN = deepcopy(defaultSettings.realESRGAN);
-  //   changed = true;
-  // }
   // v2.8.0
   if (settings.show === undefined) {
     settings.show = defaultSettings.show;
@@ -170,17 +103,6 @@ export function migrateWindowStates(states: WindowStates) {
   };
 }
 export function migratePetaBoard(board: PetaBoard) {
-  // v0.5.0
-  if (board.background === undefined) {
-    board.background = {
-      fillColor: BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-      lineColor: BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
-    };
-  }
-  // board.petaPanels.forEach((petaPanel) => {
-  //   migratePetaPanel(petaPanel);
-  // });
-
   // v3.0.0
   if (Array.isArray(board.petaPanels)) {
     const petaPanels = board.petaPanels as PetaPanel[];
@@ -190,7 +112,6 @@ export function migratePetaBoard(board: PetaBoard) {
     });
     board.petaPanels = newPetaPanels;
   }
-
   Object.values(board.petaPanels).forEach((petaPanel) => {
     migratePetaPanel(petaPanel);
   });

@@ -151,7 +151,7 @@ const nsfwMask = computed(() => {
   return props.tile.petaImage.nsfw && !nsfwStore.state.value;
 });
 const placeholderColor = computed(() => {
-  const petaColor = props.tile.petaImage?.palette[0];
+  const petaColor = props.tile.petaImage?.metadata.palette[0];
   if (petaColor) {
     return `rgb(${petaColor.r}, ${petaColor.g}, ${petaColor.b})`;
   }

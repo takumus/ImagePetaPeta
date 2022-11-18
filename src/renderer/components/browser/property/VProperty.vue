@@ -35,8 +35,8 @@
         <t-data>
           <t-name>{{ t("browser.property.infos.size") }}:</t-name>
           <t-value
-            >{{ singlePetaImageInfo.petaImage.width }}px,
-            {{ singlePetaImageInfo.petaImage.height }}px</t-value
+            >{{ singlePetaImageInfo.petaImage.metadata.width }}px,
+            {{ singlePetaImageInfo.petaImage.metadata.height }}px</t-value
           >
         </t-data>
         <!-- <t-data>
@@ -284,7 +284,7 @@ const singlePetaImageInfo = computed(() => {
     if (petaImage === undefined) {
       return undefined;
     }
-    const all = petaImage.palette.reduce((p, c) => {
+    const all = petaImage.metadata.palette.reduce((p, c) => {
       return p + c.population;
     }, 0);
     return {
@@ -292,7 +292,7 @@ const singlePetaImageInfo = computed(() => {
       petaImage: petaImage,
       fileDate: dateFormat(petaImage.fileDate, "yyyy/mm/dd hh:MM:ss"),
       addDate: dateFormat(petaImage.addDate, "yyyy/mm/dd hh:MM:ss"),
-      palette: petaImage.palette.map((color, i) => {
+      palette: petaImage.metadata.palette.map((color, i) => {
         return {
           color,
           population: color.population / all,

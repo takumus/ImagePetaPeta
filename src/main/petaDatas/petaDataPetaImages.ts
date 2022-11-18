@@ -83,13 +83,13 @@ export class PetaDataPetaImages {
     if (petaImage === undefined) {
       return undefined;
     }
-    return migratePetaImage(petaImage);
+    return petaImage;
   }
   async getPetaImages() {
     const data = this.parent.datas.dbPetaImages.getAll();
     const petaImages: PetaImages = {};
     data.forEach((pi) => {
-      petaImages[pi.id] = migratePetaImage(pi);
+      petaImages[pi.id] = pi;
     });
     return petaImages;
   }
@@ -281,7 +281,6 @@ export class PetaDataPetaImages {
     const images = Object.values(await this.getPetaImages());
     let completed = 0;
     const generate = async (image: PetaImage) => {
-      migratePetaImage(image);
       // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
       //   return;
       // }
@@ -294,12 +293,14 @@ export class PetaDataPetaImages {
         size: BROWSER_THUMBNAIL_SIZE,
         quality: BROWSER_THUMBNAIL_QUALITY,
       });
-      image.placeholder = result.placeholder;
-      image.palette = result.palette;
-      image.width = result.original.width;
-      image.height = result.original.height;
       image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
-      image.metadataVersion = PETAIMAGE_METADATA_VERSION;
+      image.metadata = {
+        type: "image",
+        palette: result.palette,
+        width: result.original.width,
+        height: result.original.height,
+        version: PETAIMAGE_METADATA_VERSION,
+      };
       await this.updatePetaImages([image], UpdateMode.UPDATE, true);
       log.log(`thumbnail (${++completed} / ${images.length})`);
       this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
@@ -352,13 +353,15 @@ export class PetaDataPetaImages {
       note: param.note,
       fileDate: fileDate.getTime(),
       addDate: addDate.getTime(),
-      width: petaMetaData.original.width,
-      height: petaMetaData.original.height,
-      placeholder: petaMetaData.placeholder,
-      palette: petaMetaData.palette,
       id: id,
       nsfw: false,
-      metadataVersion: PETAIMAGE_METADATA_VERSION,
+      metadata: {
+        type: "image",
+        width: petaMetaData.original.width,
+        height: petaMetaData.original.height,
+        palette: petaMetaData.palette,
+        version: PETAIMAGE_METADATA_VERSION,
+      },
     };
     await file.writeFile(Path.resolve(this.parent.paths.DIR_IMAGES, originalFileName), param.data);
     return {

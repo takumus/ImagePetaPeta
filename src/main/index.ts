@@ -233,8 +233,6 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
       });
       return;
     }
-    isDataInitialized = true;
-    windows.emitMainEvent("dataInitialized");
     //-------------------------------------------------------------------------------------------------//
     /*
       データのマイグレーション
@@ -244,7 +242,11 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
       const petaImagesArray = dbPetaImages.getAll();
       const petaImages: PetaImages = {};
       petaImagesArray.forEach((pi) => {
-        petaImages[pi.id] = migratePetaImage(pi);
+        petaImages[pi.id] = pi;
+        if (migratePetaImage(pi)) {
+          mainLogger.logChunk().log("Migrate PetaImage");
+          petaDatas.petaImages.updatePetaImages([pi], UpdateMode.UPDATE, true);
+        }
       });
       if (await migratePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Migrate PetaTags");
@@ -266,6 +268,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
       });
       return;
     }
+    isDataInitialized = true;
+    windows.emitMainEvent("dataInitialized");
     //-------------------------------------------------------------------------------------------------//
     /*
       Webhooks

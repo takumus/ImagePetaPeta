@@ -389,7 +389,7 @@ function sort(a: RPetaImage, b: RPetaImage) {
       return b.addDate - a.addDate;
     }
     case "COLOR_NUM": {
-      return b.palette.length - a.palette.length;
+      return b.metadata.palette.length - a.metadata.palette.length;
     }
     case "SIMILAR": {
       const rgb = hex2rgb(currentColor.value);
@@ -400,9 +400,9 @@ function sort(a: RPetaImage, b: RPetaImage) {
   }
 }
 function calcCiedeFromPalette(petaImage: RPetaImage, rgb: { r: number; g: number; b: number }) {
-  const populations = petaImage.palette.reduce((num, color) => num + color.population, 0);
+  const populations = petaImage.metadata.palette.reduce((num, color) => num + color.population, 0);
   return Math.min(
-    ...petaImage.palette
+    ...petaImage.metadata.palette
       .filter((pc) => pc.population / populations > 0.2)
       .map((pc) => ciede(pc, rgb)),
   );
@@ -544,7 +544,7 @@ const tiles = computed((): Tile[] => {
       mvi * actualTileSize.value + BROWSER_THUMBNAIL_MARGIN,
       (yList[mvi] || 0) + BROWSER_THUMBNAIL_MARGIN,
     );
-    const height = (p.height / p.width) * actualTileSize.value;
+    const height = (p.metadata.height / p.metadata.width) * actualTileSize.value;
     yList[mvi] += height;
     const tile: Tile = {
       petaImage: p,

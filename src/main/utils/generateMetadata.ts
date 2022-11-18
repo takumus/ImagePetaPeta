@@ -56,7 +56,6 @@ export async function generateMetadata(params: {
     },
     palette: palette,
     allPalette: [],
-    placeholder: "",
   };
   return data;
 }

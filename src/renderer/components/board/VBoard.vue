@@ -415,7 +415,8 @@ function updateCrop(petaPanel?: RPetaPanel) {
   petaPanel.height =
     Math.abs(
       petaPanel.width *
-        ((petaPanel.crop.height * petaImage.height) / (petaPanel.crop.width * petaImage.width)),
+        ((petaPanel.crop.height * petaImage.metadata.height) /
+          (petaPanel.crop.width * petaImage.metadata.width)),
     ) * sign;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   load({

@@ -147,7 +147,7 @@ function addOrderedPetaPanels() {
         .clone()
         .add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
       DEFAULT_IMAGE_SIZE,
-      (petaImage.height / petaImage.width) * DEFAULT_IMAGE_SIZE,
+      (petaImage.metadata.height / petaImage.metadata.width) * DEFAULT_IMAGE_SIZE,
     );
     vPetaBoard.value?.addPanel(panel, offsetIndex++);
   });
