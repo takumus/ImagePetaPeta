@@ -6,7 +6,15 @@
       zIndex: zIndex,
     }"
   >
-    <t-pixi-container ref="panelsBackground" class="panels-wrapper"> </t-pixi-container>
+    <t-pixi-container
+      ><VPIXI
+        ref="vPixi"
+        @construct="construct"
+        @destruct="destruct"
+        @tick="animate"
+        @loseContext="loseContext"
+        @resize="resize"
+    /></t-pixi-container>
     <t-crop v-if="cropping">
       <VCrop :petaPanel="croppingPetaPanel" @update="updateCrop" />
     </t-crop>
@@ -74,10 +82,10 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsSto
 import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { ppa } from "@/commons/utils/pp";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import VPIXI from "@/renderer/components/utils/VPIXI.vue";
 const emit = defineEmits<{
   (e: "update:board", board: RPetaBoard): void;
 }>();
@@ -91,10 +99,8 @@ const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
 const petaImagesStore = usePetaImagesStore();
-const resizerStore = useResizerStore();
+const keyboards = useKeyboardsStore(true);
 const { t } = useI18n();
-/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-const panelsBackground = ref<HTMLElement>();
 const layer = ref<typeof VLayer>();
 const extracting = ref(false);
 const loading = ref(false);
@@ -104,9 +110,7 @@ const loadProgress = ref(0);
 const croppingPetaPanel = ref<RPetaPanel>();
 const cropping = ref(false);
 const dragging = ref(false);
-const dragged = ref(false);
 const petaPanelsProperty = ref<InstanceType<typeof VPetaPanelProperty>>();
-
 const dragOffset = new Vec2();
 const click = new ClickChecker();
 const rootContainer = new PIXI.Container();
@@ -120,104 +124,59 @@ const mousePosition = new Vec2();
 let pPanels: { [key: string]: PPanel } = {};
 const pTransformer = new PTransformer(pPanels);
 const mouseOffset = new Vec2();
-// let draggingPanels = false;
-let pixi: PIXI.Application | undefined;
+const currentBoard = ref<RPetaBoard>();
+const vPixi = ref<InstanceType<typeof VPIXI>>();
 let mouseLeftPressing = false;
 let mouseRightPressing = false;
-let renderOrdered = false;
 let selecting = false;
-let requestAnimationFrameHandle = 0;
-const keyboards = useKeyboardsStore(true);
 let cancelExtract: (() => Promise<void>) | undefined;
-let resolution = -1;
-let changeResolutionIntervalHandler = -1;
-const currentBoard = ref<RPetaBoard>();
-let pixiView: HTMLCanvasElement | undefined;
 onMounted(() => {
-  constructIfResolutionChanged();
-  resizerStore.on("resize", resize);
-  resizerStore.observe(panelsBackground.value);
-  pTransformer.updatePetaPanels = updatePetaPanels;
+  pTransformer.updatePetaPanels = updatePetaBoard;
   keyboards.enabled = true;
   keyboards.keys("Delete").down(removeSelectedPanels);
   keyboards.keys("Backspace").down(removeSelectedPanels);
   keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
-  changeResolutionIntervalHandler = window.setInterval(constructIfResolutionChanged, 500);
+  vPixi.value?.canvasWrapper().addEventListener("dblclick", resetTransform);
+  vPixi.value?.canvasWrapper().addEventListener("pointerdown", preventWheelClick);
+  vPixi.value?.canvasWrapper().addEventListener("mousewheel", wheel as (e: Event) => void);
 });
 onUnmounted(() => {
-  destruct();
-  window.clearInterval(changeResolutionIntervalHandler);
+  vPixi.value?.canvasWrapper().removeEventListener("dblclick", resetTransform);
+  vPixi.value?.canvasWrapper().removeEventListener("pointerdown", preventWheelClick);
+  vPixi.value?.canvasWrapper().removeEventListener("mousewheel", wheel as (e: Event) => void);
 });
-function constructIfResolutionChanged() {
-  if (resolution != window.devicePixelRatio) {
-    resolution = window.devicePixelRatio;
-    destruct();
-    construct(resolution);
-  }
-}
-function construct(resolution?: number) {
+function construct() {
   logChunk().log("construct PIXI");
-  PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.OFF;
-  pixi = new PIXI.Application({
-    resolution,
-    antialias: true,
-    backgroundAlpha: 0,
-  });
-  pixiView = pixi.view as HTMLCanvasElement;
-  pixiView.addEventListener("dblclick", resetTransform);
-  pixiView.addEventListener("pointerdown", preventWheelClick);
-  pixi.stage.on("pointerdown", pointerdown);
-  pixi.stage.on("pointerup", pointerup);
-  pixi.stage.on("pointerupoutside", pointerup);
-  pixi.stage.on("pointermove", pointermove);
+  const pixiApp = vPixi.value?.app();
+  if (pixiApp === undefined) {
+    return;
+  }
+  pixiApp.stage.on("pointerdown", pointerdown);
+  pixiApp.stage.on("pointerup", pointerup);
+  pixiApp.stage.on("pointerupoutside", pointerup);
+  pixiApp.stage.on("pointermove", pointermove);
   // pixi.stage.on("pointermoveoutside", pointermove);
-  pixi.stage.on("pointerup", pTransformer.pointerup.bind(pTransformer));
-  pixi.stage.on("pointerupoutside", pTransformer.pointerup.bind(pTransformer));
-  pixi.stage.on("pointermove", pTransformer.pointermove.bind(pTransformer));
+  pixiApp.stage.on("pointerup", pTransformer.pointerup.bind(pTransformer));
+  pixiApp.stage.on("pointerupoutside", pTransformer.pointerup.bind(pTransformer));
+  pixiApp.stage.on("pointermove", pTransformer.pointermove.bind(pTransformer));
   // pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
-  panelsBackground.value?.addEventListener("mousewheel", wheel as (e: Event) => void);
-  pixi.stage.addChild(backgroundSprite);
-  // pixi.stage.addChild(crossLine);
-  pixi.stage.addChild(grid);
-  pixi.stage.addChild(centerWrapper);
+  pixiApp.stage.addChild(backgroundSprite, grid, centerWrapper);
   centerWrapper.addChild(rootContainer);
-  rootContainer.addChild(panelsCenterWrapper);
-  rootContainer.addChild(pTransformer);
-  rootContainer.addChild(pSelection);
-  panelsBackground.value?.appendChild(pixiView as HTMLCanvasElement);
-  pixi.stage.interactive = true;
-  pixi.ticker.stop();
-  pixiView.addEventListener("webglcontextlost", (e) => {
-    logChunk().error("WEBGL_lose_context", e);
-    IPC.send("reloadWindow");
-  });
-  resizerStore.forceEmit();
-  renderPIXI();
+  rootContainer.addChild(panelsCenterWrapper, pTransformer, pSelection);
+  pixiApp.stage.interactive = true;
 }
 function destruct() {
-  if (pixi) {
-    logChunk().log("destruct PIXI");
-    pixi.destroy(true);
-  }
-  panelsBackground.value?.removeEventListener("mousewheel", wheel as (e: Event) => void);
-  cancelAnimationFrame(requestAnimationFrameHandle);
+  //
+}
+function loseContext() {
+  logChunk().error("WEBGL_lose_context");
+  IPC.send("reloadWindow");
 }
 function resize(rect: DOMRectReadOnly) {
-  stageRect.x = rect.width;
-  stageRect.y = rect.height;
-  mouseOffset.set(panelsBackground.value?.getBoundingClientRect());
-  if (pixi) {
-    pixi.renderer.resize(rect.width, rect.height);
-    if (pixiView !== undefined) {
-      pixiView.style.width = rect.width + "px";
-      pixiView.style.height = rect.height + "px";
-    }
-  }
-  centerWrapper.x = rect.width / 2;
-  centerWrapper.y = rect.height / 2;
+  stageRect.set(rect.width, rect.height);
+  mouseOffset.set(vPixi.value?.canvasWrapper().getBoundingClientRect());
+  stageRect.clone().div(2).setTo(centerWrapper);
   updateRect();
-  orderPIXIRender();
-  renderPIXI();
 }
 function preventWheelClick(event: PointerEvent) {
   if (event.button === MouseButton.MIDDLE) {
@@ -228,12 +187,11 @@ function pointerdown(e: PIXI.FederatedPointerEvent) {
   if (!currentBoard.value) {
     return;
   }
-  const mouse = getMouseFromEvent(e);
+  const mouse = new Vec2(e.global);
   click.down();
   if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
     mouseRightPressing = true;
     dragging.value = true;
-    dragged.value = false;
     dragOffset.set(currentBoard.value.transform.position).sub(mouse);
   } else if (e.button === MouseButton.LEFT) {
     mouseLeftPressing = true;
@@ -253,13 +211,13 @@ function getPPanelFromObject(object: PIXI.DisplayObject | PIXI.FederatedEventTar
   if (!(object instanceof PPanel)) {
     return undefined;
   }
-  if (currentBoard.value?.petaPanels[object.petaPanel?.id]) {
-    return object as PPanel;
+  if (currentBoard.value?.petaPanels[object.petaPanel.id]) {
+    return object;
   }
   return undefined;
 }
 function pointerup(e: PIXI.FederatedPointerEvent) {
-  const mouse = getMouseFromEvent(e).add(mouseOffset);
+  const mouse = new Vec2(e.global).add(mouseOffset);
   if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
     mouseRightPressing = false;
     if (click.isClick && e.button === MouseButton.RIGHT) {
@@ -292,14 +250,11 @@ function pointerup(e: PIXI.FederatedPointerEvent) {
   orderPIXIRender();
 }
 function pointermove(e: PIXI.FederatedPointerEvent) {
-  const mouse = getMouseFromEvent(e);
+  const mouse = new Vec2(e.global);
   mousePosition.set(mouse);
   if (mouseLeftPressing || mouseRightPressing) {
     orderPIXIRender();
   }
-}
-function getMouseFromEvent(e: PIXI.FederatedPointerEvent) {
-  return new Vec2(e.data.global);
 }
 function wheel(event: WheelEvent) {
   if (!currentBoard.value) {
@@ -351,11 +306,7 @@ function animate() {
   pTransformer.update();
 
   if (dragging.value) {
-    const prev = currentBoard.value.transform.position.clone();
     currentBoard.value.transform.position.set(mousePosition).add(dragOffset);
-    if (!prev.equals(currentBoard.value.transform.position)) {
-      dragged.value = true;
-    }
   }
   currentBoard.value.transform.position.setTo(rootContainer);
   grid.setScale(boardScale);
@@ -399,10 +350,7 @@ function resetTransform() {
   updatePetaBoard();
 }
 function removeSelectedPanels() {
-  if (!currentBoard.value) {
-    return;
-  }
-  if (isKeyboardLocked()) {
+  if (!currentBoard.value || isKeyboardLocked()) {
     return;
   }
   selectedPPanels().forEach((pPanel) => {
@@ -425,41 +373,6 @@ function petaPanelMenu(petaPanel: RPetaPanel, position: Vec2) {
     return;
   }
   petaPanelsProperty.value?.open(position);
-  // const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
-  // const isMultiple = selectedPPanels().length > 1;
-  // components.contextMenu.open(
-  //   [
-  //     { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
-  //     { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },
-  //     { separate: true },
-  //     { label: t("boards.panelMenu.details"), click: () => openDetails(petaImage) },
-  //     { separate: true },
-  //     {
-  //       skip: isMultiple || !pPanel.isGIF,
-  //       label: pPanel.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
-  //       click: () => {
-  //         pPanel.toggleGIF();
-  //         updatePetaBoard();
-  //       },
-  //     },
-  //     { skip: isMultiple || !pPanel?.isGIF, separate: true },
-  //     {
-  //       skip: isMultiple,
-  //       label: t("boards.panelMenu.crop"),
-  //       click: () => {
-  //         beginCrop(petaPanel);
-  //       },
-  //     },
-  //     { skip: isMultiple, separate: true },
-  //     { label: t("boards.panelMenu.flipHorizontal"), click: () => flipPetaPanel("horizontal") },
-  //     { label: t("boards.panelMenu.flipVertical"), click: () => flipPetaPanel("vertical") },
-  //     { separate: true },
-  //     { label: t("boards.panelMenu.reset"), click: resetPetaPanel },
-  //     { separate: true },
-  //     { label: t("boards.panelMenu.remove"), click: removeSelectedPanels },
-  //   ],
-  //   position,
-  // );
 }
 async function addPanel(petaPanel: RPetaPanel, offsetIndex: number) {
   if (!currentBoard.value) {
@@ -720,22 +633,6 @@ function pointerdownPPanel(pPanel: PPanel, e: PIXI.FederatedPointerEvent) {
   layer.value?.scrollTo(pPanel.petaPanel);
   pTransformer.pointerdownPPanel(pPanel, e);
 }
-function orderPIXIRender() {
-  renderOrdered = true;
-}
-function renderPIXI() {
-  if (renderOrdered) {
-    animate();
-    pixi?.render();
-    renderOrdered = false;
-  }
-  requestAnimationFrameHandle = requestAnimationFrame(renderPIXI);
-}
-// function updateAnimatedGIF(deltaTime: number) {
-//   Object.values(pPanels)
-//     .filter((pPanel) => pPanel.isGIF)
-//     .forEach((pPanel) => pPanel.updateGIF(deltaTime));
-// }
 function keyShift(pressed: boolean) {
   pTransformer.fit = pressed;
 }
@@ -756,9 +653,6 @@ function updatePetaBoard() {
     emit("update:board", currentBoard.value);
   }
 }
-function updatePetaPanels() {
-  updatePetaBoard();
-}
 function updatePetaPanelsFromLayer(petaPanels: RPetaPanel[]) {
   petaPanels.forEach((petaPanel) => {
     if (currentBoard.value === undefined) {
@@ -772,7 +666,7 @@ function updatePetaPanelsFromLayer(petaPanels: RPetaPanel[]) {
       deletions: [],
     },
   });
-  updatePetaPanels();
+  updatePetaBoard();
   orderPIXIRender();
 }
 const selectedPetaPanelsArray = computed(() =>
@@ -784,13 +678,10 @@ const petaPanelsArray = computed(() => {
   }
   return Object.values(currentBoard.value?.petaPanels);
 });
-watch(
-  () => nsfwStore.state.value,
-  () => {
-    pPanelsArray().forEach((pp) => (pp.showNSFW = nsfwStore.state.value));
-    orderPIXIRender();
-  },
-);
+watch(nsfwStore.state, () => {
+  pPanelsArray().forEach((pp) => (pp.showNSFW = nsfwStore.state.value));
+  orderPIXIRender();
+});
 // ボードの変更をウォッチ
 watch(
   () => props.board,
@@ -817,7 +708,9 @@ watch(
     }
   },
 );
-
+function orderPIXIRender() {
+  vPixi.value?.orderPIXIRender();
+}
 defineExpose({
   load,
   addPanel,
