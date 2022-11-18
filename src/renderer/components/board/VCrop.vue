@@ -17,9 +17,9 @@ import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
-import { PPanel } from "@/renderer/components/board/ppanels/PPanel";
-import { PTransformerDashedLine } from "@/renderer/components/board/ppanels/pTransformer/PTransformerDashedLine";
-import { PTransformerControlPoint } from "@/renderer/components/board/ppanels/pTransformer/PTransformerControlPoint";
+import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
+import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
+import { PTransformerControlPoint } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerControlPoint";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useI18n } from "vue-i18n";
@@ -48,7 +48,7 @@ const mousePosition = new Vec2();
 const prevMousePosition = new Vec2();
 const keyboards = useKeyboardsStore();
 const selection = new PTransformerDashedLine();
-let pPanel: PPanel | undefined;
+let pPanel: PPetaPanel | undefined;
 const corners: PTransformerControlPoint[] = [];
 const blackMask = new PIXI.Graphics();
 let draggingControlPoint: PTransformerControlPoint | undefined;
@@ -291,7 +291,7 @@ function changePetaPanel() {
   maxX.value = props.petaPanel.crop.width + props.petaPanel.crop.position.x;
   maxY.value = props.petaPanel.crop.height + props.petaPanel.crop.position.y;
   if (!pPanel) {
-    pPanel = new PPanel(petaPanel, petaImagesStore);
+    pPanel = new PPetaPanel(petaPanel, petaImagesStore);
     pPanel.onUpdateGIF = () => {
       orderPIXIRender();
     };

@@ -67,7 +67,7 @@ function open(position: Vec2): void {
   show.value = true;
   floating.value?.updateFloating({ ...position, width: 0, height: 0 });
   // const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
-  // const isMultiple = selectedPPanels().length > 1;
+  // const isMultiple = selectedPPetaPanels().length > 1;
   // components.contextMenu.open(
   //   [
   //     { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },

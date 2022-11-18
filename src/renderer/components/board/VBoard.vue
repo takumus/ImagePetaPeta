@@ -18,13 +18,7 @@
     <t-crop v-if="cropping">
       <VCrop :petaPanel="croppingPetaPanel" @update="updateCrop" />
     </t-crop>
-    <VBoardLoading
-      :zIndex="2"
-      :loading="extracting || loading"
-      :log="extractingLog"
-      :extractProgress="extractProgress"
-      :loadProgress="loadProgress"
-    ></VBoardLoading>
+    <VBoardLoading :zIndex="2" :data="loadingStatus"></VBoardLoading>
     <VLayer
       ref="layer"
       :zIndex="1"
@@ -52,7 +46,7 @@
 import { ref, onMounted, onUnmounted, watch, toRaw, computed } from "vue";
 // Components
 import VCrop from "@/renderer/components/board/VCrop.vue";
-import VBoardLoading from "@/renderer/components/board/VBoardLoading.vue";
+import VBoardLoading from "@/renderer/components/board/loading/VBoardLoading.vue";
 import VLayer from "@/renderer/components/layer/VLayer.vue";
 // Others
 import { PBoardGrid } from "@/renderer/components/board/pGrid";
@@ -61,15 +55,14 @@ import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
 import * as PIXI from "pixi.js";
-import { PPanel } from "@/renderer/components/board/ppanels/PPanel";
-import { PTransformer } from "@/renderer/components/board/ppanels/pTransformer";
+import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
+import { PTransformer } from "@/renderer/components/board/pPetaPanels/pTransformer";
 import { hitTest } from "@/renderer/utils/hitTest";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { minimId } from "@/commons/utils/utils";
 import { Keyboards } from "@/renderer/utils/keyboards";
 import * as Cursor from "@/renderer/utils/cursor";
 import { logChunk } from "@/renderer/utils/rendererLogger";
-import { Rectangle } from "pixi.js";
 import { IPC } from "@/renderer/ipc";
 import { WindowType } from "@/commons/datas/windowType";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
@@ -85,7 +78,9 @@ import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaIma
 import { ppa } from "@/commons/utils/pp";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { PBackground } from "@/renderer/components/board/pBackground";
 import VPIXI from "@/renderer/components/utils/VPIXI.vue";
+import { VBoardLoadingStatus } from "@/renderer/components/board/loading/vBoardLoadingStatus";
 const emit = defineEmits<{
   (e: "update:board", board: RPetaBoard): void;
 }>();
@@ -102,30 +97,32 @@ const petaImagesStore = usePetaImagesStore();
 const keyboards = useKeyboardsStore(true);
 const { t } = useI18n();
 const layer = ref<typeof VLayer>();
-const extracting = ref(false);
-const loading = ref(false);
-const extractingLog = ref("");
-const extractProgress = ref(0);
-const loadProgress = ref(0);
+const loadingStatus = ref<VBoardLoadingStatus>({
+  loading: false,
+  extracting: false,
+  loadProgress: 0,
+  extractProgress: 0,
+  log: "",
+});
 const croppingPetaPanel = ref<RPetaPanel>();
 const cropping = ref(false);
 const dragging = ref(false);
 const petaPanelsProperty = ref<InstanceType<typeof VPetaPanelProperty>>();
+const currentBoard = ref<RPetaBoard>();
+const vPixi = ref<InstanceType<typeof VPIXI>>();
 const dragOffset = new Vec2();
 const click = new ClickChecker();
 const rootContainer = new PIXI.Container();
 const centerWrapper = new PIXI.Container();
-const panelsCenterWrapper = new PIXI.Container();
-const backgroundSprite = new PIXI.Graphics();
+const pPanelsContainer = new PIXI.Container();
+const pBackground = new PBackground();
 const pSelection = new PSelection();
-const grid = new PBoardGrid();
+const pBoardGrid = new PBoardGrid();
 const stageRect = new Vec2();
 const mousePosition = new Vec2();
-let pPanels: { [key: string]: PPanel } = {};
+let pPanels: { [key: string]: PPetaPanel } = {};
 const pTransformer = new PTransformer(pPanels);
 const mouseOffset = new Vec2();
-const currentBoard = ref<RPetaBoard>();
-const vPixi = ref<InstanceType<typeof VPIXI>>();
 let mouseLeftPressing = false;
 let mouseRightPressing = false;
 let selecting = false;
@@ -135,7 +132,9 @@ onMounted(() => {
   keyboards.enabled = true;
   keyboards.keys("Delete").down(removeSelectedPanels);
   keyboards.keys("Backspace").down(removeSelectedPanels);
-  keyboards.keys("ShiftLeft", "ShiftRight").change(keyShift);
+  keyboards.keys("ShiftLeft", "ShiftRight").change((pressed) => {
+    pTransformer.fit = pressed;
+  });
   vPixi.value?.canvasWrapper().addEventListener("dblclick", resetTransform);
   vPixi.value?.canvasWrapper().addEventListener("pointerdown", preventWheelClick);
   vPixi.value?.canvasWrapper().addEventListener("mousewheel", wheel as (e: Event) => void);
@@ -160,9 +159,9 @@ function construct() {
   pixiApp.stage.on("pointerupoutside", pTransformer.pointerup.bind(pTransformer));
   pixiApp.stage.on("pointermove", pTransformer.pointermove.bind(pTransformer));
   // pixi.stage.on("pointermoveoutside", pTransformer.pointermove.bind(pTransformer));
-  pixiApp.stage.addChild(backgroundSprite, grid, centerWrapper);
+  pixiApp.stage.addChild(pBackground, pBoardGrid, centerWrapper);
   centerWrapper.addChild(rootContainer);
-  rootContainer.addChild(panelsCenterWrapper, pTransformer, pSelection);
+  rootContainer.addChild(pPanelsContainer, pTransformer, pSelection);
   pixiApp.stage.interactive = true;
 }
 function destruct() {
@@ -195,9 +194,9 @@ function pointerdown(e: PIXI.FederatedPointerEvent) {
     dragOffset.set(currentBoard.value.transform.position).sub(mouse);
   } else if (e.button === MouseButton.LEFT) {
     mouseLeftPressing = true;
-    const pPanel = getPPanelFromObject(e.target);
+    const pPanel = getPPetaPanelFromObject(e.target);
     if (pPanel) {
-      pointerdownPPanel(pPanel, e);
+      pointerdownPPetaPanel(pPanel, e);
     } else if (e.target instanceof PIXI.Container && e.target.name != "transformer") {
       clearSelectionAll();
       selecting = true;
@@ -207,8 +206,8 @@ function pointerdown(e: PIXI.FederatedPointerEvent) {
   }
   orderPIXIRender();
 }
-function getPPanelFromObject(object: PIXI.DisplayObject | PIXI.FederatedEventTarget) {
-  if (!(object instanceof PPanel)) {
+function getPPetaPanelFromObject(object: PIXI.DisplayObject | PIXI.FederatedEventTarget) {
+  if (!(object instanceof PPetaPanel)) {
     return undefined;
   }
   if (currentBoard.value?.petaPanels[object.petaPanel.id]) {
@@ -221,9 +220,9 @@ function pointerup(e: PIXI.FederatedPointerEvent) {
   if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
     mouseRightPressing = false;
     if (click.isClick && e.button === MouseButton.RIGHT) {
-      const pPanel = getPPanelFromObject(e.target);
+      const pPanel = getPPetaPanelFromObject(e.target);
       if (pPanel) {
-        pointerdownPPanel(pPanel, e);
+        pointerdownPPetaPanel(pPanel, e);
         petaPanelMenu(pPanel.petaPanel, new Vec2(mouse));
       } else {
         components.contextMenu.open(
@@ -290,10 +289,11 @@ function updateRect() {
   if (!currentBoard.value) {
     return;
   }
-  backgroundSprite.clear();
-  backgroundSprite.hitArea = new Rectangle(0, 0, stageRect.x, stageRect.y);
-  backgroundSprite.beginFill(Number(currentBoard.value.background.fillColor.replace("#", "0x")));
-  backgroundSprite.drawRect(0, 0, stageRect.x, stageRect.y);
+  pBackground.renderRect(
+    stageRect.x,
+    stageRect.y,
+    Number(currentBoard.value.background.fillColor.replace("#", "0x")),
+  );
 }
 function animate() {
   if (!currentBoard.value) {
@@ -309,8 +309,8 @@ function animate() {
     currentBoard.value.transform.position.set(mousePosition).add(dragOffset);
   }
   currentBoard.value.transform.position.setTo(rootContainer);
-  grid.setScale(boardScale);
-  grid.update(
+  pBoardGrid.setScale(boardScale);
+  pBoardGrid.update(
     stageRect.x,
     stageRect.y,
     currentBoard.value.transform.position,
@@ -335,8 +335,8 @@ function animate() {
     });
   }
   pPanelsArray().forEach((pp) => (pp.unselected = false));
-  if (selectedPPanels().length > 0) {
-    unselectedPPanels().forEach((pp) => (pp.unselected = true));
+  if (selectedPPetaPanels().length > 0) {
+    unselectedPPetaPanels().forEach((pp) => (pp.unselected = true));
   }
   pPanelsArray().forEach((pPanel) => pPanel.orderRender());
 }
@@ -353,8 +353,8 @@ function removeSelectedPanels() {
   if (!currentBoard.value || isKeyboardLocked()) {
     return;
   }
-  selectedPPanels().forEach((pPanel) => {
-    removePPanel(pPanel);
+  selectedPPetaPanels().forEach((pPanel) => {
+    removePPetaPanel(pPanel);
     if (currentBoard.value) {
       delete currentBoard.value.petaPanels[pPanel.petaPanel.id];
     }
@@ -362,8 +362,8 @@ function removeSelectedPanels() {
   orderPIXIRender();
   updatePetaBoard();
 }
-function removePPanel(pPanel: PPanel) {
-  panelsCenterWrapper.removeChild(pPanel);
+function removePPetaPanel(pPanel: PPetaPanel) {
+  pPanelsContainer.removeChild(pPanel);
   pPanel.destroy();
   delete pPanels[pPanel.petaPanel.id];
 }
@@ -386,9 +386,7 @@ async function addPanel(petaPanel: RPetaPanel, offsetIndex: number) {
   petaPanel.width *= 1 / currentBoard.value.transform.scale;
   petaPanel.height *= 1 / currentBoard.value.transform.scale;
   petaPanel.position.sub(mouseOffset);
-  petaPanel.position = new Vec2(
-    panelsCenterWrapper.toLocal(petaPanel.position.clone().add(offset)),
-  );
+  petaPanel.position = new Vec2(pPanelsContainer.toLocal(petaPanel.position.clone().add(offset)));
   petaPanel.index = Math.max(...petaPanelsArray.value.map((petaPanel) => petaPanel.index)) + 1;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   updatePetaBoard();
@@ -441,8 +439,8 @@ function sortIndex() {
   Object.values(currentBoard.value.petaPanels)
     .sort((a, b) => a.index - b.index)
     .forEach((petaPanel, i) => (petaPanel.index = i));
-  panelsCenterWrapper.children.sort(
-    (a, b) => (a as PPanel).petaPanel.index - (b as PPanel).petaPanel.index,
+  pPanelsContainer.children.sort(
+    (a, b) => (a as PPetaPanel).petaPanel.index - (b as PPetaPanel).petaPanel.index,
   );
   updatePetaBoard();
   orderPIXIRender();
@@ -457,7 +455,7 @@ async function load(params: {
   endCrop();
   // リロードじゃないならクリア。
   if (params.reload === undefined) {
-    pPanelsArray().forEach(removePPanel);
+    pPanelsArray().forEach(removePPetaPanel);
     pTransformer.pPanels = pPanels = {};
   }
   if (currentBoard.value === undefined) {
@@ -478,10 +476,10 @@ async function load(params: {
     return;
   }
   Cursor.setCursor("wait");
-  extracting.value = true;
-  loading.value = true;
-  loadProgress.value = 0;
-  extractProgress.value = 0;
+  loadingStatus.value.extracting = true;
+  loadingStatus.value.loading = true;
+  loadingStatus.value.loadProgress = 0;
+  loadingStatus.value.extractProgress = 0;
   if (cancelExtract !== undefined) {
     log("vBoard", `canceling loading`);
     pPanelsArray().forEach((pPanel) => pPanel.cancelLoading());
@@ -490,8 +488,8 @@ async function load(params: {
     return load(params);
   }
   if (petaPanels.length === 0) {
-    extracting.value = false;
-    loading.value = false;
+    loadingStatus.value.extracting = false;
+    loadingStatus.value.loading = false;
     Cursor.setDefaultCursor();
     statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
     return;
@@ -511,30 +509,30 @@ async function load(params: {
           if (!petaPanel.gif.stopped) {
             pPanels[petaPanel.id]?.playGIF();
           }
-          loadProgress.value = Math.floor((loaded / petaPanels.length) * 100);
+          loadingStatus.value.loadProgress = Math.floor((loaded / petaPanels.length) * 100);
           const progress = `${loaded}/${petaPanels.length}`;
           log(
             "vBoard",
             `loaded[${error ?? "success"}](${minimId(petaPanel.petaImageId)}):`,
             progress,
           );
-          extractingLog.value =
+          loadingStatus.value.log =
             `load complete   (${minimId(petaPanel.petaImageId)}):${progress}\n` +
-            extractingLog.value;
+            loadingStatus.value.log;
           if (loaded == petaPanels.length) {
-            loading.value = false;
+            loadingStatus.value.loading = false;
           }
         }
       };
       let pPanel = pPanels[petaPanel.id];
       if (pPanel === undefined) {
         // pPanelが無ければ作成。
-        pPanel = pPanels[petaPanel.id] = new PPanel(petaPanel, petaImagesStore);
+        pPanel = pPanels[petaPanel.id] = new PPetaPanel(petaPanel, petaImagesStore);
         pPanel.setZoomScale(currentBoard.value?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
         pPanel.onUpdateGIF = onUpdateGif;
-        panelsCenterWrapper.addChild(pPanel);
+        pPanelsContainer.addChild(pPanel);
         pPanel.orderRender();
         orderPIXIRender();
         (async () => {
@@ -583,14 +581,16 @@ async function load(params: {
         loadResult = "skip";
       }
       log("vBoard", `extracted[${loadResult}](${minimId(petaPanel.petaImageId)}):`, progress);
-      extractingLog.value =
-        `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
+      loadingStatus.value.log =
+        `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` +
+        loadingStatus.value.log;
     } catch (error) {
       log("vBoard", `extract error(${minimId(petaPanel.petaImageId)}):`, progress, error);
-      extractingLog.value =
-        `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` + extractingLog.value;
+      loadingStatus.value.log =
+        `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` +
+        loadingStatus.value.log;
     }
-    extractProgress.value = ((index + 1) / petaPanels.length) * 100;
+    loadingStatus.value.extractProgress = ((index + 1) / petaPanels.length) * 100;
   };
   const extraction = ppa(extract, petaPanels);
   cancelExtract = extraction.cancel;
@@ -599,8 +599,8 @@ async function load(params: {
   } catch (error) {
     log("vBoard", "load error:", error);
   }
-  extracting.value = false;
-  extractingLog.value = "";
+  loadingStatus.value.extracting = false;
+  loadingStatus.value.log = "";
   cancelExtract = undefined;
   log("vBoard", "load complete");
   sortIndex();
@@ -608,44 +608,41 @@ async function load(params: {
   statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
 }
 function onUpdateGif() {
-  if (extracting.value) {
+  if (loadingStatus.value.extracting) {
     return;
   }
   orderPIXIRender();
 }
-function pointerdownPPanel(pPanel: PPanel, e: PIXI.FederatedPointerEvent) {
+function pointerdownPPetaPanel(pPanel: PPetaPanel, e: PIXI.FederatedPointerEvent) {
   if (!currentBoard.value) {
     return;
   }
   if (
     !Keyboards.pressedOR("ShiftLeft", "ShiftRight") &&
-    (selectedPPanels().length <= 1 || !pPanel.petaPanel.renderer.selected)
+    (selectedPPetaPanels().length <= 1 || !pPanel.petaPanel.renderer.selected)
   ) {
     // シフトなし。かつ、(１つ以下の選択か、自身が未選択の場合)
     // 最前にして選択リセット
     clearSelectionAll();
   }
-  if (selectedPPanels().length <= 1) {
+  if (selectedPPetaPanels().length <= 1) {
     // 選択が１つ以下の場合選択範囲リセット
     clearSelectionAll();
   }
   pPanel.petaPanel.renderer.selected = true;
   layer.value?.scrollTo(pPanel.petaPanel);
-  pTransformer.pointerdownPPanel(pPanel, e);
-}
-function keyShift(pressed: boolean) {
-  pTransformer.fit = pressed;
+  pTransformer.pointerdownPPetaPanel(pPanel, e);
 }
 function pPanelsArray() {
   return Object.values(pPanels);
 }
-function selectedPPanels() {
+function selectedPPetaPanels() {
   return pPanelsArray().filter(
     (pPanel) =>
       pPanel.petaPanel.renderer.selected && pPanel.petaPanel.visible && !pPanel.petaPanel.locked,
   );
 }
-function unselectedPPanels() {
+function unselectedPPetaPanels() {
   return pPanelsArray().filter((pPanel) => !pPanel.petaPanel.renderer.selected);
 }
 function updatePetaBoard() {

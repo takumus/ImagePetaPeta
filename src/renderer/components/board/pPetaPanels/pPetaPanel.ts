@@ -1,7 +1,7 @@
 import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
 // import { AnimatedGIF } from "@/renderer/utils/pixi-gif";
-import { getImage } from "@/renderer/components/board/ppanels/ImageLoader";
+import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
@@ -10,7 +10,7 @@ import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaIma
 import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 usePetaImagesStore;
-export class PPanel extends PIXI.Sprite {
+export class PPetaPanel extends PIXI.Sprite {
   // public selected = false;
   public unselected = false;
   public dragging = false;
@@ -53,19 +53,19 @@ export class PPanel extends PIXI.Sprite {
     this.orderRender();
   }
   async init() {
-    if (!PPanel.nsfwTexture) {
-      PPanel.nsfwTexture = await PIXI.Texture.fromURL(NSFWImage);
+    if (!PPetaPanel.nsfwTexture) {
+      PPetaPanel.nsfwTexture = await PIXI.Texture.fromURL(NSFWImage);
     }
-    if (!PPanel.noImageTexture) {
-      PPanel.noImageTexture = await PIXI.Texture.fromURL(NOIMAGEImage);
+    if (!PPetaPanel.noImageTexture) {
+      PPetaPanel.noImageTexture = await PIXI.Texture.fromURL(NOIMAGEImage);
     }
-    if (!PPanel.loadingTexture) {
-      PPanel.loadingTexture = await PIXI.Texture.fromURL(LOADINGImage);
+    if (!PPetaPanel.loadingTexture) {
+      PPetaPanel.loadingTexture = await PIXI.Texture.fromURL(LOADINGImage);
     }
-    this.nsfwTile = new PIXI.TilingSprite(PPanel.nsfwTexture, 100, 100);
+    this.nsfwTile = new PIXI.TilingSprite(PPetaPanel.nsfwTexture, 100, 100);
     this.nsfwTile.visible = false;
-    this.noImageTile = new PIXI.TilingSprite(PPanel.noImageTexture, 100, 100);
-    this.loadingTile = new PIXI.TilingSprite(PPanel.loadingTexture, 100, 100);
+    this.noImageTile = new PIXI.TilingSprite(PPetaPanel.noImageTexture, 100, 100);
+    this.loadingTile = new PIXI.TilingSprite(PPetaPanel.loadingTexture, 100, 100);
     this.setZoomScale(this.zoomScale);
     this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
   }
