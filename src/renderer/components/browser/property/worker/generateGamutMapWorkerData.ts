@@ -1,4 +1,4 @@
-// export interface GenerateColorCircleWorkerOutputData {
+// export interface generateGamutMapWorkerOutputData {
 //   progress: number;
 //   position: {
 //     x: number;
@@ -7,7 +7,7 @@
 //   color: { r: number; g: number; b: number };
 //   isLast: boolean;
 // }
-export type GenerateColorCircleWorkerOutputData = [
+export type generateGamutMapWorkerOutputData = [
   number, // 0 progress
   boolean, // 1 isLast
   number, // 2 positionX
@@ -19,7 +19,7 @@ export type GenerateColorCircleWorkerOutputData = [
   number, // 8 G2
   number, // 9 B2,
 ];
-export interface GenerateColorCircleWorkerInputData {
+export interface generateGamutMapWorkerInputData {
   pixels: Uint8ClampedArray;
   resolution: number;
 }

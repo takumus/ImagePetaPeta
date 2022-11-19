@@ -1,5 +1,5 @@
 <template>
-  <t-color-circle-root
+  <t-gamut-map-root
     ><t-circle>
       <VPIXI
         ref="vPixi"
@@ -12,13 +12,13 @@
       />
     </t-circle>
     <input type="range" min="0" max="100" v-model="amountFilterValue" />
-  </t-color-circle-root>
+  </t-gamut-map-root>
 </template>
 
 <script setup lang="ts">
 import { RPetaImage } from "@/commons/datas/rPetaImage";
-import { generateColorCircle } from "@/renderer/components/browser/property/worker/generateColorCircle";
-import { GenerateColorCircleWorkerOutputData } from "@/renderer/components/browser/property/worker/generateColorCircleWorkerData";
+import { generateGamutMap } from "@/renderer/components/browser/property/worker/generateGamutMap";
+import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
 import VPIXI from "@/renderer/components/utils/VPIXI.vue";
 import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
@@ -57,14 +57,14 @@ backgroundNormalizedSprite.alpha = 0.3;
 PIXI.Texture.fromURL(hsvCircleImage).then((texture) => {
   backgroundRawSprite.texture = backgroundNormalizedSprite.texture = texture;
 });
-let generateColorCircleCancel = () => {
+let generateGamutMapCancel = () => {
   //
 };
 onMounted(() => {
   //
 });
 onUnmounted(() => {
-  generateColorCircleCancel();
+  generateGamutMapCancel();
   backgroundNormalizedSprite.destroy({ texture: true, baseTexture: true });
   backgroundRawSprite.destroy({ texture: true, baseTexture: true });
   resultNormalizedSprite.destroy({ texture: true, baseTexture: true });
@@ -133,7 +133,7 @@ function reset() {
     resultAlphas[i] = 0;
   }
 }
-function setData(data: GenerateColorCircleWorkerOutputData) {
+function setData(data: generateGamutMapWorkerOutputData) {
   const x = Math.floor(data[2] * radius + size.width / 2);
   const y = Math.floor(data[3] * radius + size.height / 2);
   for (let xi = -dotSize; xi <= dotSize; xi++) {
@@ -152,15 +152,15 @@ function setData(data: GenerateColorCircleWorkerOutputData) {
   vPixi.value?.orderPIXIRender();
 }
 function generate() {
-  generateColorCircleCancel();
+  generateGamutMapCancel();
   reset();
-  const task = generateColorCircle(props.petaImage, pixelCount, setData);
+  const task = generateGamutMap(props.petaImage, pixelCount, setData);
   console.time("convert");
   task.promise.then(() => {
     console.timeEnd("convert");
     // generate(); ストレステスト
   });
-  generateColorCircleCancel = task.cancel;
+  generateGamutMapCancel = task.cancel;
 }
 const amountFilterValue0xff = computed(() => Math.pow(amountFilterValue.value / 100, 5) * 0xff);
 watch(amountFilterValue, () => {
@@ -169,7 +169,7 @@ watch(amountFilterValue, () => {
 watch(() => props.petaImage, generate, { immediate: true });
 </script>
 <style lang="scss" scoped>
-t-color-circle-root {
+t-gamut-map-root {
   display: flex;
   height: 100%;
   width: 100%;

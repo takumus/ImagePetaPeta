@@ -86,7 +86,7 @@
       </t-palette>
     </t-colors>
     <t-color-circle v-if="singlePetaImageInfo">
-      <VColorCircle :petaImage="singlePetaImageInfo.petaImage" />
+      <VGamutMap :petaImage="singlePetaImageInfo.petaImage" />
     </t-color-circle>
     <t-tags v-show="!noImage" class="content">
       <p>
@@ -170,7 +170,7 @@ import { PetaColor } from "@/commons/datas/petaColor";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
-import VColorCircle from "@/renderer/components/browser/property/VColorCircle.vue";
+import VGamutMap from "@/renderer/components/browser/property/VGamutMap.vue";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: RPetaTag): void;

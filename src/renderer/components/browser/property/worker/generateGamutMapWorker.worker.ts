@@ -1,12 +1,12 @@
 import {
-  GenerateColorCircleWorkerInputData,
-  GenerateColorCircleWorkerOutputData,
-} from "@/renderer/components/browser/property/worker/generateColorCircleWorkerData";
+  generateGamutMapWorkerInputData,
+  generateGamutMapWorkerOutputData,
+} from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
 import { initWebWorkerThreads } from "@/renderer/utils/initWebWorker";
 // import * as convert from "color-convert";
 export default initWebWorkerThreads<
-  GenerateColorCircleWorkerInputData,
-  GenerateColorCircleWorkerOutputData
+  generateGamutMapWorkerInputData,
+  generateGamutMapWorkerOutputData
 >(self, (worker) => {
   function rgb2hsv(r: number, g: number, b: number) {
     (r = r / 255), (g = g / 255), (b = b / 255);
@@ -107,7 +107,7 @@ export default initWebWorkerThreads<
         cColor[0],
         cColor[1],
         cColor[2],
-      ] as GenerateColorCircleWorkerOutputData);
+      ] as generateGamutMapWorkerOutputData);
     }
   });
 });
