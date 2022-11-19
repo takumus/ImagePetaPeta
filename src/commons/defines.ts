@@ -62,4 +62,5 @@ export const EULA = 2;
 export const TASK_CLOSE_DELAY = 200;
 export const WEBHOOK_PORT = 51915;
 export const WEBHOOK_WHITELIST_IP_LIST = ["127.0.0.1", "::ffff:127.0.0.1", "::1"];
+export const WEBHOOK_WHITELIST_ORIGIN_LIST = ["chrome-extension://"];
 export const ANIMATED_GIF_DECODE_THREAD = 4;
