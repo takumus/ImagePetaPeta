@@ -9,7 +9,6 @@ import LOADINGImage from "@/@assets/loadingBackground.png";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
-usePetaImagesStore;
 export class PPetaPanel extends PIXI.Sprite {
   // public selected = false;
   public unselected = false;
@@ -51,6 +50,10 @@ export class PPetaPanel extends PIXI.Sprite {
     this.cover.visible = false;
     this.setPetaPanel(this.petaPanel);
     this.orderRender();
+    // const test = new PFTest();
+    // test.
+    // test.padding = 0;
+    // this.filters = [test];
   }
   async init() {
     if (!PPetaPanel.nsfwTexture) {
