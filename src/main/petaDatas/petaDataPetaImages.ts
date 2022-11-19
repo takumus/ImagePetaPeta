@@ -7,7 +7,6 @@ import * as file from "@/main/storages/file";
 import * as Tasks from "@/main/tasks/task";
 import crypto from "crypto";
 import { ImageType } from "@/commons/datas/imageType";
-import { migratePetaImage } from "@/main/utils/migrater";
 import sharp from "sharp";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
 import { generateMetadata } from "@/main/utils/generateMetadata";
