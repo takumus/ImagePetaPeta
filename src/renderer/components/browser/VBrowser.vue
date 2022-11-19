@@ -597,14 +597,14 @@ t-browser-root {
   overflow: hidden;
   > t-left {
     padding: var(--px-2);
-    width: 200px;
-    min-width: 180px;
+    width: 250px;
+    min-width: 250px;
     display: block;
   }
   > t-center {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    flex: 1;
     height: 100%;
     padding: var(--px-2);
     > t-content {
@@ -647,8 +647,8 @@ t-browser-root {
     }
   }
   > t-right {
-    width: 200px;
-    min-width: 180px;
+    width: 250px;
+    min-width: 250px;
     padding: var(--px-2);
     display: flex;
     flex-direction: column;
