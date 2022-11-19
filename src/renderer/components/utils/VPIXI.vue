@@ -22,6 +22,9 @@ const emit = defineEmits<{
   (e: "tick"): void;
   (e: "resize", rect: DOMRect | DOMRectReadOnly): void;
 }>();
+const props = defineProps<{
+  antialias?: boolean;
+}>();
 onMounted(() => {
   resizerStore.on("resize", resize);
   resizerStore.observe(canvasWrapper.value);
@@ -43,7 +46,7 @@ function construct(resolution: number) {
   PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.OFF;
   app = new PIXI.Application({
     resolution,
-    antialias: true,
+    antialias: props.antialias,
     backgroundAlpha: 0,
   });
   app.ticker.stop();
@@ -60,11 +63,12 @@ function destruct() {
   if (app) {
     emit("destruct");
     app.destroy(true);
+    app = undefined;
   }
   cancelAnimationFrame(requestAnimationFrameHandle);
 }
 function renderPIXI(force = false) {
-  if (app == undefined) {
+  if (app === undefined) {
     throw new Error("app is not ready");
   }
   if (renderOrdered || force) {
