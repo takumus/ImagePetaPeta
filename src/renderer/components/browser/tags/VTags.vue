@@ -400,7 +400,7 @@ t-tags-root {
     padding: var(--px-1) var(--px-1) 0px 0px;
     width: 100%;
     text-align: left;
-    overflow-y: scroll;
+    overflow-y: auto;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
