@@ -11,7 +11,7 @@
         @resize="resize"
       />
     </t-circle>
-    <input type="range" min="0" max="100" v-model="alphaOffset" />
+    <input type="range" min="0" max="100" v-model="amountFilterValue" />
   </t-color-circle-root>
 </template>
 
@@ -30,20 +30,20 @@ const props = defineProps<{
 }>();
 const pixelCount = BROWSER_THUMBNAIL_SIZE * BROWSER_THUMBNAIL_SIZE;
 const vPixi = ref<InstanceType<typeof VPIXI>>();
-const alphaOffset = ref(100);
+const amountFilterValue = ref(100);
 const size: PIXI.ISize = {
   width: 256,
   height: 256,
 };
-const dotSize = 2;
-const radius = size.width / 2 - Math.sqrt(dotSize * dotSize);
+const dotSize = 1;
+const radius = size.width / 2 - Math.sqrt(Math.pow(dotSize * 2 + 1, 2));
 const resultRawPixels = new Uint8Array(
   Array.from(Array(size.width * size.height * 4)).map(() => 0x00),
 );
 const resultNormalizedPixels = new Uint8Array(
   Array.from(Array(size.width * size.height * 4)).map(() => 0x00),
 );
-const resultAlphas = new Uint8Array(Array.from(Array(size.width * size.height)).map(() => 0x00));
+const resultAlphas = Array.from(Array(size.width * size.height)).map(() => 0);
 const backgroundRawSprite = new PIXI.Sprite();
 const backgroundNormalizedSprite = new PIXI.Sprite();
 const resultRawSprite = new PIXI.Sprite(
@@ -89,9 +89,8 @@ function destruct() {
 function animate() {
   console.time("render");
   for (let i = 0; i < resultAlphas.length; i++) {
-    resultRawPixels[i * 4 + 3] = Math.min((resultAlphas[i] ?? 0) * alphaOffset255.value, 0xff);
-    resultNormalizedPixels[i * 4 + 3] = Math.min(
-      (resultAlphas[i] ?? 0) * alphaOffset255.value,
+    resultRawPixels[i * 4 + 3] = resultNormalizedPixels[i * 4 + 3] = Math.min(
+      (resultAlphas[i] ?? 1) * amountFilterValue0xff.value,
       0xff,
     );
   }
@@ -131,20 +130,20 @@ function reset() {
     resultNormalizedPixels[i] = resultRawPixels[i] = 0x00;
   }
   for (let i = 0; i < resultAlphas.length; i++) {
-    resultAlphas[i] = 0x00;
+    resultAlphas[i] = 0;
   }
 }
 function setData(data: GenerateColorCircleWorkerOutputData) {
   const x = Math.floor(data[2] * radius + size.width / 2);
   const y = Math.floor(data[3] * radius + size.height / 2);
-  for (let xi = 0; xi < dotSize; xi++) {
-    for (let yi = 0; yi < dotSize; yi++) {
-      const px = x + xi - dotSize / 2;
-      const py = y + yi - dotSize / 2;
+  for (let xi = -dotSize; xi <= dotSize; xi++) {
+    for (let yi = -dotSize; yi <= dotSize; yi++) {
+      const px = x + xi;
+      const py = y + yi;
       const aIndex = Math.floor(py) * size.width + Math.floor(px);
-      const alpha = (resultAlphas[aIndex] += 0x05);
-      if (alpha > 0xff) {
-        resultAlphas[aIndex] = 0xff;
+      resultAlphas[aIndex] += 1;
+      if (px == x && py == y) {
+        resultAlphas[aIndex] += 1;
       }
       setPixel(resultRawPixels, px, py, data[4], data[5], data[6]);
       setPixel(resultNormalizedPixels, px, py, data[7], data[8], data[9]);
@@ -163,8 +162,8 @@ function generate() {
   });
   generateColorCircleCancel = task.cancel;
 }
-const alphaOffset255 = computed(() => Math.pow(alphaOffset.value / 100, 5) * 255);
-watch(alphaOffset, () => {
+const amountFilterValue0xff = computed(() => Math.pow(amountFilterValue.value / 100, 5) * 0xff);
+watch(amountFilterValue, () => {
   vPixi.value?.orderPIXIRender();
 });
 watch(() => props.petaImage, generate, { immediate: true });
