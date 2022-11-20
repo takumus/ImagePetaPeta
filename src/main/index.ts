@@ -78,7 +78,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
     configSettings,
     configStates,
     configDBInfo,
-    petaDatas,
+    controllers,
     windows,
     mainLogger,
   } = constants;
@@ -249,12 +249,12 @@ import { MainLogger } from "@/main/utils/mainLogger";
         petaImages[pi.id] = pi;
         if (migratePetaImage(pi)) {
           mainLogger.logChunk().log("Migrate PetaImage");
-          petaDatas.petaImages.updatePetaImages([pi], UpdateMode.UPDATE, true);
+          controllers.petaImages.updatePetaImages([pi], UpdateMode.UPDATE, true);
         }
       });
       if (await migratePetaTag(dbPetaTags, petaImages)) {
         mainLogger.logChunk().log("Migrate PetaTags");
-        await petaDatas.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
+        await controllers.petaImages.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
       }
       if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
         mainLogger.logChunk().log("Migrate PetaImagesPetaTags");
@@ -303,7 +303,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
             const result = await dialog.showOpenDialog(windowInfo.window, {
               properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
             });
-            petaDatas.petaImages.importImagesFromFileInfos({
+            controllers.petaImages.importImagesFromFileInfos({
               fileInfos: result.filePaths.map((path) => ({ path })),
               extract: true,
             });
@@ -330,7 +330,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Get PetaImages");
-            const petaImages = await petaDatas.petaImages.getPetaImages();
+            const petaImages = await controllers.petaImages.getPetaImages();
             log.log("return:", true);
             return petaImages;
           } catch (e) {
@@ -348,7 +348,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Update PetaImages");
-            await petaDatas.petaImages.updatePetaImages(datas, mode);
+            await controllers.petaImages.updatePetaImages(datas, mode);
             log.log("return:", true);
             return true;
           } catch (err) {
@@ -366,12 +366,12 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Get PetaBoards");
-            const petaBoards = await petaDatas.petaBoards.getPetaBoards();
+            const petaBoards = await controllers.petaBoards.getPetaBoards();
             const length = Object.keys(petaBoards).length;
             if (length === 0) {
               log.log("no boards! create empty board");
               const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
-              await petaDatas.petaBoards.updatePetaBoards([board], UpdateMode.INSERT);
+              await controllers.petaBoards.updatePetaBoards([board], UpdateMode.INSERT);
               petaBoards[board.id] = board;
             }
             log.log("return:", length);
@@ -391,7 +391,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Update PetaBoards");
-            await petaDatas.petaBoards.updatePetaBoards(boards, mode);
+            await controllers.petaBoards.updatePetaBoards(boards, mode);
             log.log("return:", true);
             return true;
           } catch (e) {
@@ -409,7 +409,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Update PetaTags");
-            await petaDatas.petaTags.updatePetaTags(tags, mode);
+            await controllers.petaTags.updatePetaTags(tags, mode);
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -427,7 +427,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
-            await petaDatas.petaTags.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
+            await controllers.petaTags.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -445,7 +445,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
-            await petaDatas.petaTagPartitions.updatePetaTagPartitions(partitions, mode);
+            await controllers.petaTagPartitions.updatePetaTagPartitions(partitions, mode);
             log.log("return:", true);
             return true;
           } catch (error) {
@@ -463,7 +463,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Get PetaTagPartitions");
-            const petaTagPartitions = await petaDatas.petaTagPartitions.getPetaTagPartitions();
+            const petaTagPartitions = await controllers.petaTagPartitions.getPetaTagPartitions();
             log.log("return:", petaTagPartitions.length);
             return petaTagPartitions;
           } catch (error) {
@@ -482,7 +482,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           try {
             log.log("#Get PetaImageIds");
             log.log("type:", params.type);
-            const ids = await petaDatas.petaTags.getPetaImageIds(params);
+            const ids = await controllers.petaTags.getPetaImageIds(params);
             log.log("return:", ids.length);
             return ids;
           } catch (error) {
@@ -500,7 +500,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             // log.log("#Get PetaTagIds By PetaImageIds");
-            const petaTagIds = await petaDatas.petaTags.getPetaTagIdsByPetaImageIds(petaImageIds);
+            const petaTagIds = await controllers.petaTags.getPetaTagIdsByPetaImageIds(petaImageIds);
             // log.log("return:", petaTagIds.length);
             return petaTagIds;
           } catch (error) {
@@ -518,7 +518,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Get PetaTags");
-            const petaTags = await petaDatas.petaTags.getPetaTags();
+            const petaTags = await controllers.petaTags.getPetaTags();
             log.log("return:", petaTags.length);
             return petaTags;
           } catch (error) {
@@ -536,7 +536,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Get PetaTagCounts");
-            const petaTagCounts = await petaDatas.petaTags.getPetaTagCounts();
+            const petaTagCounts = await controllers.petaTags.getPetaTagCounts();
             log.log("return:", Object.values(petaTagCounts).length);
             return petaTagCounts;
           } catch (error) {
@@ -564,7 +564,9 @@ import { MainLogger } from "@/main/utils/mainLogger";
         async openImageFile(event, logger, petaImage) {
           const log = logger.logChunk();
           log.log("#Open Image File");
-          shell.showItemInFolder(petaDatas.petaImages.getImagePath(petaImage, ImageType.ORIGINAL));
+          shell.showItemInFolder(
+            controllers.petaImages.getImagePath(petaImage, ImageType.ORIGINAL),
+          );
         },
         async getAppInfo(event, logger) {
           const log = logger.logChunk();
@@ -591,7 +593,9 @@ import { MainLogger } from "@/main/utils/mainLogger";
         async showImageInFolder(event, logger, petaImage) {
           const log = logger.logChunk();
           log.log("#Show Image In Folder");
-          shell.showItemInFolder(petaDatas.petaImages.getImagePath(petaImage, ImageType.ORIGINAL));
+          shell.showItemInFolder(
+            controllers.petaImages.getImagePath(petaImage, ImageType.ORIGINAL),
+          );
           return true;
         },
         async updateSettings(event, logger, settings) {
@@ -675,7 +679,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Regenerate Thumbnails");
-            await petaDatas.petaImages.regenerateMetadatas();
+            await controllers.petaImages.regenerateMetadatas();
             return;
           } catch (err) {
             log.error(err);
@@ -743,7 +747,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           const log = logger.logChunk();
           try {
             log.log("#Real-ESRGAN Convert");
-            const result = await petaDatas.realESRGAN(petaImages, modelName);
+            const result = await controllers.realESRGAN(petaImages, modelName);
             log.log("return:", result);
             return result;
           } catch (error) {
@@ -828,7 +832,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
                     };
                   }
                   if (d?.type === "url") {
-                    const result = await petaDatas.petaImages.createFileInfoFromURL(d.url);
+                    const result = await controllers.petaImages.createFileInfoFromURL(d.url);
                     if (result !== undefined) {
                       return result;
                     }
@@ -836,14 +840,14 @@ import { MainLogger } from "@/main/utils/mainLogger";
                   if (d?.type === "html") {
                     const url = getURLFromHTML(d.html);
                     if (url !== undefined) {
-                      const result = await petaDatas.petaImages.createFileInfoFromURL(url);
+                      const result = await controllers.petaImages.createFileInfoFromURL(url);
                       if (result !== undefined) {
                         return result;
                       }
                     }
                   }
                   if (d?.type === "buffer") {
-                    const result = await petaDatas.petaImages.createFileInfoFromBuffer(d.buffer);
+                    const result = await controllers.petaImages.createFileInfoFromBuffer(d.buffer);
                     if (result !== undefined) {
                       return result;
                     }
@@ -853,7 +857,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
               }, datas).promise
             ).filter((info) => info !== undefined) as ImportFileInfo[];
             const petaImageIds = (
-              await petaDatas.petaImages.importImagesFromFileInfos({
+              await controllers.petaImages.importImagesFromFileInfos({
                 fileInfos,
                 extract: true,
               })
@@ -900,7 +904,7 @@ import { MainLogger } from "@/main/utils/mainLogger";
           return false;
         },
         async setDetailsPetaImage(event, logger, petaImageId: string) {
-          detailsPetaImage = await petaDatas.petaImages.getPetaImage(petaImageId);
+          detailsPetaImage = await controllers.petaImages.getPetaImage(petaImageId);
           if (detailsPetaImage === undefined) {
             return;
           }

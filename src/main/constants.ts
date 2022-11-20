@@ -53,7 +53,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
   let configSettings: Config<Settings>;
   let configStates: Config<States>;
   let configWindowStates: Config<WindowStates>;
-  let petaDatas: Controllers;
+  let controllers: Controllers;
   let windows: Windows;
   const i18n = createI18n({
     locale: "ja",
@@ -152,7 +152,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     Tasks.onEmitStatus((id, status) => {
       windows.emitMainEvent("taskStatus", id, status);
     });
-    petaDatas = new Controllers(
+    controllers = new Controllers(
       {
         dbPetaBoard,
         dbPetaImages,
@@ -195,7 +195,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     configSettings,
     configStates,
     configWindowStates,
-    petaDatas,
+    controllers,
     windows,
     i18n,
   };
