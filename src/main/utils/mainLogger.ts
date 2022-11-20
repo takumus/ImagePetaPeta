@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { Logger, LogFrom } from "@/main/storages/logger";
+import { createKey } from "@/main/utils/di";
 export class MainLogger {
   constructor(public logger?: Logger) {
     //
@@ -18,3 +19,4 @@ export class MainLogger {
     };
   }
 }
+export const mainLoggerKey = createKey<MainLogger>("mainLogger");

@@ -20,6 +20,7 @@ import Config from "@/main/storages/config";
 import { MainLogger } from "@/main/utils/mainLogger";
 import * as Path from "path";
 import { Vec2 } from "@/commons/utils/vec2";
+import { createKey } from "@/main/utils/di";
 export class Windows {
   windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   activeWindows: { [key in WindowType]?: boolean } = {};
@@ -319,3 +320,4 @@ export class Windows {
     });
   }
 }
+export const windowsKey = createKey<Windows>("windows");

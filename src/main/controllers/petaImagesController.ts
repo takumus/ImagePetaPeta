@@ -1,7 +1,6 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { minimId } from "@/commons/utils/utils";
-import { Controllers } from "@/main/controllers";
 import * as Path from "path";
 import * as file from "@/main/storages/file";
 import * as Tasks from "@/main/tasks/task";
@@ -24,9 +23,16 @@ import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
+import { createKey, inject } from "@/main/utils/di";
+import { petaTagsControllerKey } from "@/main/controllers/petaTagsController";
+import { dbPetaImagesKey, dbPetaImagesPetaTagsKey } from "@/main/databases";
+import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { emitMainEventKey } from "@/main/utils/emitMainEvent";
+import { pathsKey } from "@/main/utils/paths";
 export class PetaImagesController {
-  constructor(private parent: Controllers) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
+    const petaTagsController = inject(petaTagsControllerKey);
+    const emit = inject(emitMainEventKey);
     return Tasks.spawn(
       "UpdatePetaImages",
       async (handler) => {
@@ -50,16 +56,13 @@ export class PetaImagesController {
         await ppa(update, datas).promise;
         if (mode === UpdateMode.REMOVE) {
           // Tileの更新対象なし
-          this.parent.emitMainEvent("updatePetaTags", {
+          emit("updatePetaTags", {
             petaImageIds: [],
             petaTagIds: [],
           });
-          this.parent.emitMainEvent(
-            "updatePetaTagCounts",
-            await this.parent.petaTags.getPetaTagCounts(),
-          );
+          emit("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
         }
-        this.parent.emitMainEvent("updatePetaImages", datas, mode);
+        emit("updatePetaImages", datas, mode);
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           log: [],
@@ -71,21 +74,24 @@ export class PetaImagesController {
     );
   }
   getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
+    const paths = inject(pathsKey);
     if (thumbnail === ImageType.ORIGINAL) {
-      return Path.resolve(this.parent.paths.DIR_IMAGES, petaImage.file.original);
+      return Path.resolve(paths.DIR_IMAGES, petaImage.file.original);
     } else {
-      return Path.resolve(this.parent.paths.DIR_THUMBNAILS, petaImage.file.thumbnail);
+      return Path.resolve(paths.DIR_THUMBNAILS, petaImage.file.thumbnail);
     }
   }
   async getPetaImage(id: string) {
-    const petaImage = (await this.parent.datas.dbPetaImages.find({ id }))[0];
+    const dbPetaImages = inject(dbPetaImagesKey);
+    const petaImage = (await dbPetaImages.find({ id }))[0];
     if (petaImage === undefined) {
       return undefined;
     }
     return petaImage;
   }
   async getPetaImages() {
-    const data = this.parent.datas.dbPetaImages.getAll();
+    const dbPetaImages = inject(dbPetaImagesKey);
+    const data = dbPetaImages.getAll();
     const petaImages: PetaImages = {};
     data.forEach((pi) => {
       petaImages[pi.id] = pi;
@@ -93,13 +99,16 @@ export class PetaImagesController {
     return petaImages;
   }
   private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    const log = this.parent.mainLogger.logChunk();
+    const dbPetaImages = inject(dbPetaImagesKey);
+    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
+    const mainLogger = inject(mainLoggerKey);
+    const log = mainLogger.logChunk();
     log.log("##Update PetaImage");
     log.log("mode:", mode);
     log.log("image:", minimId(petaImage.id));
     if (mode === UpdateMode.REMOVE) {
-      await this.parent.datas.dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
-      await this.parent.datas.dbPetaImages.remove({ id: petaImage.id });
+      await dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
+      await dbPetaImages.remove({ id: petaImage.id });
       await file.rm(this.getImagePath(petaImage, ImageType.ORIGINAL)).catch(() => {
         //
       });
@@ -107,14 +116,16 @@ export class PetaImagesController {
         //
       });
     } else if (mode === UpdateMode.UPDATE) {
-      await this.parent.datas.dbPetaImages.update({ id: petaImage.id }, petaImage);
+      await dbPetaImages.update({ id: petaImage.id }, petaImage);
     } else {
-      await this.parent.datas.dbPetaImages.insert(petaImage);
+      await dbPetaImages.insert(petaImage);
     }
     return true;
   }
   async createFileInfoFromURL(url: string) {
-    const log = this.parent.mainLogger.logChunk();
+    const mainLogger = inject(mainLoggerKey);
+    const paths = inject(pathsKey);
+    const log = mainLogger.logChunk();
     try {
       log.log("## Create File Info URL");
       let data: Buffer;
@@ -127,7 +138,7 @@ export class PetaImagesController {
         data = (await axios.get(url, { responseType: "arraybuffer" })).data;
         remoteURL = url;
       }
-      const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
+      const dist = Path.resolve(paths.DIR_TEMP, uuid());
       await file.writeFile(dist, data);
       log.log("return:", true);
       return {
@@ -146,10 +157,12 @@ export class PetaImagesController {
     return undefined;
   }
   async createFileInfoFromBuffer(buffer: ArrayBuffer | Buffer) {
-    const log = this.parent.mainLogger.logChunk();
+    const mainLogger = inject(mainLoggerKey);
+    const paths = inject(pathsKey);
+    const log = mainLogger.logChunk();
     try {
       log.log("## Create File Info From ArrayBuffer");
-      const dist = Path.resolve(this.parent.paths.DIR_TEMP, uuid());
+      const dist = Path.resolve(paths.DIR_TEMP, uuid());
       await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
       log.log("return:", true);
       return {
@@ -170,13 +183,14 @@ export class PetaImagesController {
     },
     silent = false,
   ) {
+    const mainLogger = inject(mainLoggerKey);
     if (params.fileInfos.length == 0) {
       return [];
     }
     return Tasks.spawn(
       "ImportImagesFromFilePaths",
       async (handler) => {
-        const log = this.parent.mainLogger.logChunk();
+        const log = mainLogger.logChunk();
         log.log("## Import Images From File Paths");
         const fileInfos: ImportFileInfo[] = [];
         if (params.extract) {
@@ -275,20 +289,21 @@ export class PetaImagesController {
     );
   }
   async regenerateMetadatas() {
-    const log = this.parent.mainLogger.logChunk();
-    this.parent.emitMainEvent("regenerateMetadatasBegin");
+    const mainLogger = inject(mainLoggerKey);
+    const emit = inject(emitMainEventKey);
+    const paths = inject(pathsKey);
+    const log = mainLogger.logChunk();
+    emit("regenerateMetadatasBegin");
     const images = Object.values(await this.getPetaImages());
     let completed = 0;
     const generate = async (image: PetaImage) => {
       // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
       //   return;
       // }
-      const data = await file.readFile(
-        Path.resolve(this.parent.paths.DIR_IMAGES, image.file.original),
-      );
+      const data = await file.readFile(Path.resolve(paths.DIR_IMAGES, image.file.original));
       const result = await generateMetadataByWorker({
         data,
-        outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, image.file.original),
+        outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, image.file.original),
         size: BROWSER_THUMBNAIL_SIZE,
         quality: BROWSER_THUMBNAIL_QUALITY,
       });
@@ -302,10 +317,10 @@ export class PetaImagesController {
       };
       await this.updatePetaImages([image], UpdateMode.UPDATE, true);
       log.log(`thumbnail (${++completed} / ${images.length})`);
-      this.parent.emitMainEvent("regenerateMetadatasProgress", completed, images.length);
+      emit("regenerateMetadatasProgress", completed, images.length);
     };
     await ppa((image) => generate(image), images, CPU_LENGTH).promise;
-    this.parent.emitMainEvent("regenerateMetadatasComplete");
+    emit("regenerateMetadatasComplete");
   }
   private async addImage(param: {
     data: Buffer;
@@ -314,6 +329,7 @@ export class PetaImagesController {
     fileDate?: Date;
     addDate?: Date;
   }): Promise<{ exists: boolean; petaImage: PetaImage }> {
+    const paths = inject(pathsKey);
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await this.getPetaImage(id);
     if (exists)
@@ -339,7 +355,7 @@ export class PetaImagesController {
     const originalFileName = `${id}.${extName}`;
     const petaMetaData = await generateMetadata({
       data: param.data,
-      outputFilePath: Path.resolve(this.parent.paths.DIR_THUMBNAILS, originalFileName),
+      outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, originalFileName),
       size: BROWSER_THUMBNAIL_SIZE,
       quality: BROWSER_THUMBNAIL_QUALITY,
     });
@@ -362,10 +378,11 @@ export class PetaImagesController {
         version: PETAIMAGE_METADATA_VERSION,
       },
     };
-    await file.writeFile(Path.resolve(this.parent.paths.DIR_IMAGES, originalFileName), param.data);
+    await file.writeFile(Path.resolve(paths.DIR_IMAGES, originalFileName), param.data);
     return {
       petaImage: petaImage,
       exists: false,
     };
   }
 }
+export const petaImagesControllerKey = createKey<PetaImagesController>("petaImagesController");

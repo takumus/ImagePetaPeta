@@ -1,6 +1,7 @@
 import { createWriteStream, WriteStream } from "fs";
 import * as Path from "path";
 import dateFormat from "dateformat";
+import { createKey } from "@/main/utils/di";
 export class Logger {
   private logFile: WriteStream | undefined;
   private date = "";
@@ -57,3 +58,4 @@ export enum LogFrom {
   MAIN = "MAIN",
   RENDERER = "RENDERER",
 }
+export const loggerKey = createKey<Logger>("logger");

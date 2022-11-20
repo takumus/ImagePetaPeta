@@ -1,17 +1,21 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import * as Tasks from "@/main/tasks/task";
-import { Controllers } from "@/main/controllers";
 // import { migratePetaTagPartition } from "@/main/utils/migrater";
 import { ppa } from "@/commons/utils/pp";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { minimId } from "@/commons/utils/utils";
+import { createKey, inject } from "@/main/utils/di";
+import { dbPetaTagPartitionsKey } from "@/main/databases";
+import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { emitMainEventKey } from "@/main/utils/emitMainEvent";
 export class PetaTagPartitionsController {
-  constructor(private parent: Controllers) {}
   async getPetaTagPartitions() {
-    return this.parent.datas.dbPetaTagPartitions.getAll();
+    const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
+    return dbPetaTagPartitions.getAll();
   }
   async updatePetaTagPartitions(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
+    const emit = inject(emitMainEventKey);
     return Tasks.spawn(
       "UpdatePetaTagPartitions",
       async (handler) => {
@@ -34,7 +38,7 @@ export class PetaTagPartitionsController {
           i18nKey: "tasks.updateDatas",
           status: TaskStatusCode.COMPLETE,
         });
-        this.parent.emitMainEvent("updatePetaTagPartitions", tags, mode);
+        emit("updatePetaTagPartitions", tags, mode);
         return true;
       },
       {},
@@ -42,20 +46,22 @@ export class PetaTagPartitionsController {
     );
   }
   async updatePetaTagPartition(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
-    const log = this.parent.mainLogger.logChunk();
+    const mainLogger = inject(mainLoggerKey);
+    const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
+    const log = mainLogger.logChunk();
     log.log("##Update PetaTagPartition");
     log.log("mode:", mode);
     log.log("tag:", minimId(petaPetaTagPartition.id));
     if (mode === UpdateMode.REMOVE) {
-      await this.parent.datas.dbPetaTagPartitions.remove({ id: petaPetaTagPartition.id });
+      await dbPetaTagPartitions.remove({ id: petaPetaTagPartition.id });
     } else if (mode === UpdateMode.UPDATE) {
-      await this.parent.datas.dbPetaTagPartitions.update(
-        { id: petaPetaTagPartition.id },
-        petaPetaTagPartition,
-      );
+      await dbPetaTagPartitions.update({ id: petaPetaTagPartition.id }, petaPetaTagPartition);
     } else {
-      await this.parent.datas.dbPetaTagPartitions.insert(petaPetaTagPartition);
+      await dbPetaTagPartitions.insert(petaPetaTagPartition);
     }
     return petaPetaTagPartition.id;
   }
 }
+export const petaTagPartitionsControllerKey = createKey<PetaTagPartitionsController>(
+  "petaTagPartitionsController",
+);
