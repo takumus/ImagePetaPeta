@@ -1,6 +1,6 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { minimId } from "@/commons/utils/utils";
-import { PetaDatas } from "@/main/petaDatas";
+import { Controllers } from "@/main/controllers";
 import * as Tasks from "@/main/tasks/task";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
@@ -9,8 +9,8 @@ import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
-export class PetaDataPetaTags {
-  constructor(private parent: PetaDatas) {}
+export class PetaTagsController {
+  constructor(private parent: Controllers) {}
   async updatePetaTags(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
     return Tasks.spawn(
       "UpdatePetaTags",

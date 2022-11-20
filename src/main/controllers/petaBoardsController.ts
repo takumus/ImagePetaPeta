@@ -1,11 +1,11 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { minimId } from "@/commons/utils/utils";
-import { PetaDatas } from "@/main/petaDatas";
+import { Controllers } from "@/main/controllers";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { migratePetaBoard } from "@/main/utils/migrater";
 import { ppa } from "@/commons/utils/pp";
-export class PetaDataPetaBoards {
-  constructor(private parent: PetaDatas) {}
+export class PetaBoardsController {
+  constructor(private parent: Controllers) {}
   async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {
     return await ppa((board) => this.updatePetaBoard(board, mode), boards).promise;
   }

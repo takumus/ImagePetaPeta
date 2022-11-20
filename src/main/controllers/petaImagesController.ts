@@ -1,7 +1,7 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { minimId } from "@/commons/utils/utils";
-import { PetaDatas } from "@/main/petaDatas";
+import { Controllers } from "@/main/controllers";
 import * as Path from "path";
 import * as file from "@/main/storages/file";
 import * as Tasks from "@/main/tasks/task";
@@ -24,8 +24,8 @@ import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
-export class PetaDataPetaImages {
-  constructor(private parent: PetaDatas) {}
+export class PetaImagesController {
+  constructor(private parent: Controllers) {}
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
     return Tasks.spawn(
       "UpdatePetaImages",

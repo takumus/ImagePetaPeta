@@ -1,13 +1,13 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import * as Tasks from "@/main/tasks/task";
-import { PetaDatas } from "@/main/petaDatas";
+import { Controllers } from "@/main/controllers";
 // import { migratePetaTagPartition } from "@/main/utils/migrater";
 import { ppa } from "@/commons/utils/pp";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { minimId } from "@/commons/utils/utils";
-export class PetaDataPetaTagPartitions {
-  constructor(private parent: PetaDatas) {}
+export class PetaTagPartitionsController {
+  constructor(private parent: Controllers) {}
   async getPetaTagPartitions() {
     return this.parent.datas.dbPetaTagPartitions.getAll();
   }

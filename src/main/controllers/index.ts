@@ -12,9 +12,9 @@ import { Settings } from "@/commons/datas/settings";
 import Config from "@/main/storages/config";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 import * as Tasks from "@/main/tasks/task";
-import { PetaDataPetaImages } from "@/main/petaDatas/petaDataPetaImages";
-import { PetaDataPetaBoards } from "@/main/petaDatas/petaDataPetaBoards";
-import { PetaDataPetaTags } from "@/main/petaDatas/petaDataPetaTags";
+import { PetaImagesController } from "@/main/controllers/petaImagesController";
+import { PetaBoardsController } from "@/main/controllers/petaBoardsController";
+import { PetaTagsController } from "@/main/controllers/petaTagsController";
 import { I18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { DateTimeFormat, NumberFormat } from "@intlify/core-base";
@@ -25,12 +25,12 @@ import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { PetaDataPetaTagPartitions } from "@/main/petaDatas/petaDataPetaTagPartitions";
-export class PetaDatas {
-  petaImages: PetaDataPetaImages;
-  petaBoards: PetaDataPetaBoards;
-  petaTags: PetaDataPetaTags;
-  petaTagPartitions: PetaDataPetaTagPartitions;
+import { PetaTagPartitionsController } from "@/main/controllers/petaTagPartitionsController";
+export class Controllers {
+  petaImages: PetaImagesController;
+  petaBoards: PetaBoardsController;
+  petaTags: PetaTagsController;
+  petaTagPartitions: PetaTagPartitionsController;
   constructor(
     public datas: {
       dbPetaImages: DB<PetaImage>;
@@ -52,10 +52,10 @@ export class PetaDatas {
     ) => void,
     public mainLogger: MainLogger,
   ) {
-    this.petaImages = new PetaDataPetaImages(this);
-    this.petaBoards = new PetaDataPetaBoards(this);
-    this.petaTags = new PetaDataPetaTags(this);
-    this.petaTagPartitions = new PetaDataPetaTagPartitions(this);
+    this.petaImages = new PetaImagesController(this);
+    this.petaBoards = new PetaBoardsController(this);
+    this.petaTags = new PetaTagsController(this);
+    this.petaTagPartitions = new PetaTagPartitionsController(this);
   }
   async realESRGAN(petaImages: PetaImage[], modelName: RealESRGANModelName) {
     return Tasks.spawn(

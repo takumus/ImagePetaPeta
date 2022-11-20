@@ -6,7 +6,7 @@ import { PetaTag } from "@/commons/datas/petaTag";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
-import { PetaDatas } from "@/main/petaDatas";
+import { Controllers } from "@/main/controllers";
 import Config from "@/main/storages/config";
 import DB from "@/main/storages/db";
 import { Logger } from "@/main/storages/logger";
@@ -53,7 +53,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
   let configSettings: Config<Settings>;
   let configStates: Config<States>;
   let configWindowStates: Config<WindowStates>;
-  let petaDatas: PetaDatas;
+  let petaDatas: Controllers;
   let windows: Windows;
   const i18n = createI18n({
     locale: "ja",
@@ -152,7 +152,7 @@ export function getConstants(showError: (error: ErrorWindowParameters, quit?: bo
     Tasks.onEmitStatus((id, status) => {
       windows.emitMainEvent("taskStatus", id, status);
     });
-    petaDatas = new PetaDatas(
+    petaDatas = new Controllers(
       {
         dbPetaBoard,
         dbPetaImages,
