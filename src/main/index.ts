@@ -31,12 +31,11 @@ import Transparent from "@/@assets/transparent.png";
 import { WindowType } from "@/commons/datas/windowType";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { initDI } from "@/main/initDI";
-import { LogFrom, loggerKey } from "@/main/storages/logger";
 import { initWebhook } from "@/main/webhook/webhook";
 import { ppa } from "@/commons/utils/pp";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
-import { MainLogger, mainLoggerKey } from "@/main/utils/mainLogger";
+import { mainLoggerKey } from "@/main/utils/mainLogger";
 import { inject } from "@/main/utils/di";
 import { petaImagesControllerKey } from "@/main/controllers/petaImagesController";
 import { petaTagsControllerKey } from "@/main/controllers/petaTagsController";
@@ -53,6 +52,7 @@ import {
 import { configDBInfoKey, configSettingsKey, configStatesKey } from "@/main/configs";
 import { windowsKey } from "@/main/utils/windows";
 import { realESRGAN } from "@/main/utils/realESRGAN";
+import { LogFrom, loggerKey } from "@/main/storages/logger";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -194,7 +194,7 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ipcMain.handle(key, (event: Electron.IpcMainInvokeEvent, ...args: any[]) =>
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        (toMainFunctions as any)[key](event, mainLogger, ...args),
+        (toMainFunctions as any)[key](event, ...args),
       );
     });
     //-------------------------------------------------------------------------------------------------//
@@ -303,13 +303,12 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
     function getMainFunctions(): {
       [P in keyof ToMainFunctions]: (
         event: IpcMainInvokeEvent,
-        logger: MainLogger,
         ...args: Parameters<ToMainFunctions[P]>
       ) => ReturnType<ToMainFunctions[P]>;
     } {
       return {
-        async browseAndImportImageFiles(event, logger, type) {
-          const log = logger.logChunk();
+        async browseAndImportImageFiles(event, type) {
+          const log = mainLogger.logChunk();
           log.log("#Browse Image Files");
           const windowInfo = windows.getWindowByEvent(event);
           if (windowInfo) {
@@ -324,8 +323,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return 0;
         },
-        async cancelTasks(event, logger, ids) {
-          const log = logger.logChunk();
+        async cancelTasks(event, ids) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Cancel Tasks");
             ids.forEach((id) => {
@@ -339,8 +338,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return;
         },
-        async getPetaImages(event, logger) {
-          const log = logger.logChunk();
+        async getPetaImages() {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImages");
             const petaImages = await petaImagesController.getPetaImages();
@@ -357,8 +356,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return {};
         },
-        async updatePetaImages(event, logger, datas, mode) {
-          const log = logger.logChunk();
+        async updatePetaImages(event, datas, mode) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImages");
             await petaImagesController.updatePetaImages(datas, mode);
@@ -375,8 +374,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async getPetaBoards(event, logger) {
-          const log = logger.logChunk();
+        async getPetaBoards() {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaBoards");
             const petaBoards = await petaBoardsController.getPetaBoards();
@@ -400,8 +399,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return {};
         },
-        async updatePetaBoards(event, logger, boards, mode) {
-          const log = logger.logChunk();
+        async updatePetaBoards(event, boards, mode) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaBoards");
             await petaBoardsController.updatePetaBoards(boards, mode);
@@ -418,8 +417,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async updatePetaTags(event, logger, tags, mode) {
-          const log = logger.logChunk();
+        async updatePetaTags(event, tags, mode) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaTags");
             await petaTagsController.updatePetaTags(tags, mode);
@@ -436,8 +435,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async updatePetaImagesPetaTags(event, logger, petaImageIds, petaTagLikes, mode) {
-          const log = logger.logChunk();
+        async updatePetaImagesPetaTags(event, petaImageIds, petaTagLikes, mode) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
             await petaTagsController.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
@@ -454,8 +453,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async updatePetaTagPartitions(event, logger, partitions, mode) {
-          const log = logger.logChunk();
+        async updatePetaTagPartitions(event, partitions, mode) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
             await petaTagpartitionsController.updatePetaTagPartitions(partitions, mode);
@@ -472,8 +471,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async getPetaTagPartitions(event, logger) {
-          const log = logger.logChunk();
+        async getPetaTagPartitions() {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagPartitions");
             const petaTagPartitions = await petaTagpartitionsController.getPetaTagPartitions();
@@ -490,8 +489,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return [];
         },
-        async getPetaImageIds(event, logger, params) {
-          const log = logger.logChunk();
+        async getPetaImageIds(event, params) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaImageIds");
             log.log("type:", params.type);
@@ -509,8 +508,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return [];
         },
-        async getPetaTagIdsByPetaImageIds(event, logger, petaImageIds) {
-          const log = logger.logChunk();
+        async getPetaTagIdsByPetaImageIds(event, petaImageIds) {
+          const log = mainLogger.logChunk();
           try {
             // log.log("#Get PetaTagIds By PetaImageIds");
             const petaTagIds = await petaTagsController.getPetaTagIdsByPetaImageIds(petaImageIds);
@@ -527,8 +526,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return [];
         },
-        async getPetaTags(event, logger) {
-          const log = logger.logChunk();
+        async getPetaTags() {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTags");
             const petaTags = await petaTagsController.getPetaTags();
@@ -545,8 +544,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return [];
         },
-        async getPetaTagCounts(event, logger) {
-          const log = logger.logChunk();
+        async getPetaTagCounts() {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Get PetaTagCounts");
             const petaTagCounts = await petaTagsController.getPetaTagCounts();
@@ -563,24 +562,24 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return {};
         },
-        async log(event, logger, id: string, ...args: unknown[]) {
+        async log(event, id: string, ...args: unknown[]) {
           dataLogger.log(LogFrom.RENDERER, id, ...args);
           return true;
         },
-        async openURL(event, logger, url) {
-          const log = logger.logChunk();
+        async openURL(event, url) {
+          const log = mainLogger.logChunk();
           log.log("#Open URL");
           log.log("url:", url);
           shell.openExternal(url);
           return true;
         },
-        async openImageFile(event, logger, petaImage) {
-          const log = logger.logChunk();
+        async openImageFile(event, petaImage) {
+          const log = mainLogger.logChunk();
           log.log("#Open Image File");
           shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
         },
-        async getAppInfo(event, logger) {
-          const log = logger.logChunk();
+        async getAppInfo() {
+          const log = mainLogger.logChunk();
           log.log("#Get App Info");
           const info = {
             name: app.getName(),
@@ -589,26 +588,26 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           log.log("return:", info);
           return info;
         },
-        async showDBFolder(event, logger) {
-          const log = logger.logChunk();
+        async showDBFolder() {
+          const log = mainLogger.logChunk();
           log.log("#Show DB Folder");
           shell.showItemInFolder(paths.DIR_ROOT);
           return true;
         },
-        async showConfigFolder(event, logger) {
-          const log = logger.logChunk();
+        async showConfigFolder() {
+          const log = mainLogger.logChunk();
           log.log("#Show Config Folder");
           shell.showItemInFolder(paths.DIR_APP);
           return true;
         },
-        async showImageInFolder(event, logger, petaImage) {
-          const log = logger.logChunk();
+        async showImageInFolder(event, petaImage) {
+          const log = mainLogger.logChunk();
           log.log("#Show Image In Folder");
           shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
-        async updateSettings(event, logger, settings) {
-          const log = logger.logChunk();
+        async updateSettings(event, settings) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update Settings");
             configSettings.data = settings;
@@ -636,26 +635,26 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async getSettings(event, logger) {
-          const log = logger.logChunk();
+        async getSettings() {
+          const log = mainLogger.logChunk();
           log.log("#Get Settings");
           log.log("return:", configSettings.data);
           return configSettings.data;
         },
-        async getWindowIsFocused(event, logger) {
-          const log = logger.logChunk();
+        async getWindowIsFocused(event) {
+          const log = mainLogger.logChunk();
           log.log("#Get Window Is Focused");
           const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
-        async windowMinimize(event, logger) {
-          const log = logger.logChunk();
+        async windowMinimize(event) {
+          const log = mainLogger.logChunk();
           log.log("#Window Minimize");
           windows.getWindowByEvent(event)?.window.minimize();
         },
-        async windowMaximize(event, logger) {
-          const log = logger.logChunk();
+        async windowMaximize(event) {
+          const log = mainLogger.logChunk();
           log.log("#Window Maximize");
           const windowInfo = windows.getWindowByEvent(event);
           if (windowInfo?.window.isMaximized()) {
@@ -664,8 +663,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           windowInfo?.window.maximize();
         },
-        async windowClose(event, logger) {
-          const log = logger.logChunk();
+        async windowClose(event) {
+          const log = mainLogger.logChunk();
           log.log("#Window Close");
           windows.getWindowByEvent(event)?.window.close();
         },
@@ -673,19 +672,19 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           windows.getWindowByEvent(event)?.window.moveTop();
           windows.getWindowByEvent(event)?.window.focus();
         },
-        async windowToggleDevTools(event, logger) {
-          const log = logger.logChunk();
+        async windowToggleDevTools(event) {
+          const log = mainLogger.logChunk();
           log.log("#Toggle Dev Tools");
           windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
         },
-        async getPlatform(event, logger) {
-          const log = logger.logChunk();
+        async getPlatform() {
+          const log = mainLogger.logChunk();
           log.log("#Get Platform");
           log.log("return:", process.platform);
           return process.platform;
         },
-        async regenerateMetadatas(event, logger) {
-          const log = logger.logChunk();
+        async regenerateMetadatas() {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Regenerate Thumbnails");
             await petaImagesController.regenerateMetadatas();
@@ -701,8 +700,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return;
         },
-        async browsePetaImageDirectory(event, logger) {
-          const log = logger.logChunk();
+        async browsePetaImageDirectory(event) {
+          const log = mainLogger.logChunk();
           log.log("#Browse PetaImage Directory");
           const windowInfo = windows.getWindowByEvent(event);
           if (windowInfo) {
@@ -723,8 +722,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return "";
         },
-        async changePetaImageDirectory(event, logger, path) {
-          const log = logger.logChunk();
+        async changePetaImageDirectory(event, path) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Change PetaImage Directory");
             path = Path.resolve(path);
@@ -747,13 +746,13 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async getStates(event, logger) {
-          const log = logger.logChunk();
+        async getStates() {
+          const log = mainLogger.logChunk();
           log.log("#Get States");
           return configStates.data;
         },
-        async realESRGANConvert(event, logger, petaImages, modelName) {
-          const log = logger.logChunk();
+        async realESRGANConvert(event, petaImages, modelName) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Real-ESRGAN Convert");
             const result = await realESRGAN(petaImages, modelName);
@@ -764,7 +763,7 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async startDrag(event, logger, petaImages) {
+        async startDrag(event, petaImages) {
           const first = petaImages[0];
           if (!first) {
             return;
@@ -792,8 +791,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           // draggingPreviewWindow.setVisible(false);
           // draggingPreviewWindow.destroy();
         },
-        async updateStates(event, logger, states) {
-          const log = logger.logChunk();
+        async updateStates(event, states) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#Update States");
             configStates.data = states;
@@ -806,12 +805,12 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async importImages(event, logger, datas) {
-          const log = logger.logChunk();
+        async importImages(event, datas) {
+          const log = mainLogger.logChunk();
           try {
             log.log("#importImages");
             log.log(datas.length);
-            const logFromBrowser = logger.logChunk();
+            const logFromBrowser = mainLogger.logChunk();
             const ids = datas
               .filter(
                 (data) =>
@@ -878,14 +877,14 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return [];
         },
-        async openWindow(event, logger, windowType) {
-          const log = logger.logChunk();
+        async openWindow(event, windowType) {
+          const log = mainLogger.logChunk();
           log.log("#Open Window");
           log.log("type:", windowType);
           windows.openWindow(windowType, event);
         },
-        async reloadWindow(event, logger) {
-          const log = logger.logChunk();
+        async reloadWindow(event) {
+          const log = mainLogger.logChunk();
           log.log("#Reload Window");
           const type = windows.reloadWindowByEvent(event);
           log.log("type:", type);
@@ -896,12 +895,12 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
         async getShowNSFW() {
           return getShowNSFW();
         },
-        async setShowNSFW(event, logger, value) {
+        async setShowNSFW(event, value) {
           temporaryShowNSFW = value;
           windows.emitMainEvent("showNSFW", getShowNSFW());
         },
-        async searchImageByGoogle(event, logger, petaImage) {
-          const log = logger.logChunk();
+        async searchImageByGoogle(event, petaImage) {
+          const log = mainLogger.logChunk();
           log.log("#Search Image By Google");
           try {
             await searchImageByGoogle(petaImage, paths.DIR_THUMBNAILS);
@@ -912,7 +911,7 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
           }
           return false;
         },
-        async setDetailsPetaImage(event, logger, petaImageId: string) {
+        async setDetailsPetaImage(event, petaImageId: string) {
           detailsPetaImage = await petaImagesController.getPetaImage(petaImageId);
           if (detailsPetaImage === undefined) {
             return;
@@ -932,8 +931,8 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
         async getLatestVersion() {
           return getLatestVersion();
         },
-        async eula(event, logger, agree) {
-          const log = logger.logChunk();
+        async eula(event, agree) {
+          const log = mainLogger.logChunk();
           log.log("#EULA");
           log.log(agree ? "agree" : "disagree", EULA);
           if (configSettings.data.eula === EULA) {
