@@ -16,6 +16,7 @@ export function initWebhook(
   toMainFunctions: {
     [P in keyof ToMainFunctions]: (
       event: IpcMainInvokeEvent,
+      logger: MainLogger,
       ...args: Parameters<ToMainFunctions[P]>
     ) => ReturnType<ToMainFunctions[P]>;
   },
@@ -53,7 +54,7 @@ export function initWebhook(
         const event = toMainFunctions[eventName] as any;
         if (event) {
           executeLog.log(`$Webhook: execute`, eventName);
-          res.json(await event(undefined, ...(req.body.args ?? [])));
+          res.json(await event(undefined, mainLogger, ...(req.body.args ?? [])));
           executeLog.log(`$Webhook: done`, eventName);
           return;
         }

@@ -36,6 +36,7 @@ import { initWebhook } from "@/main/webhook/webhook";
 import { ppa } from "@/commons/utils/pp";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
+import { MainLogger } from "@/main/utils/mainLogger";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -178,7 +179,10 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
     const toMainFunctions = getMainFunctions();
     Object.keys(toMainFunctions).forEach((key) => {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      ipcMain.handle(key, (toMainFunctions as any)[key] as any);
+      ipcMain.handle(key, (event: Electron.IpcMainInvokeEvent, ...args: any[]) =>
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        (toMainFunctions as any)[key](event, mainLogger, ...args),
+      );
     });
     //-------------------------------------------------------------------------------------------------//
     /*
@@ -286,12 +290,13 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
     function getMainFunctions(): {
       [P in keyof ToMainFunctions]: (
         event: IpcMainInvokeEvent,
+        logger: MainLogger,
         ...args: Parameters<ToMainFunctions[P]>
       ) => ReturnType<ToMainFunctions[P]>;
     } {
       return {
-        async browseAndImportImageFiles(event, type) {
-          const log = mainLogger.logChunk();
+        async browseAndImportImageFiles(event, logger, type) {
+          const log = logger.logChunk();
           log.log("#Browse Image Files");
           const windowInfo = windows.getWindowByEvent(event);
           if (windowInfo) {
@@ -306,8 +311,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return 0;
         },
-        async cancelTasks(event, ids) {
-          const log = mainLogger.logChunk();
+        async cancelTasks(event, logger, ids) {
+          const log = logger.logChunk();
           try {
             log.log("#Cancel Tasks");
             ids.forEach((id) => {
@@ -321,8 +326,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return;
         },
-        async getPetaImages() {
-          const log = mainLogger.logChunk();
+        async getPetaImages(event, logger) {
+          const log = logger.logChunk();
           try {
             log.log("#Get PetaImages");
             const petaImages = await petaDatas.petaImages.getPetaImages();
@@ -339,8 +344,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return {};
         },
-        async updatePetaImages(event, datas, mode) {
-          const log = mainLogger.logChunk();
+        async updatePetaImages(event, logger, datas, mode) {
+          const log = logger.logChunk();
           try {
             log.log("#Update PetaImages");
             await petaDatas.petaImages.updatePetaImages(datas, mode);
@@ -357,8 +362,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async getPetaBoards() {
-          const log = mainLogger.logChunk();
+        async getPetaBoards(event, logger) {
+          const log = logger.logChunk();
           try {
             log.log("#Get PetaBoards");
             const petaBoards = await petaDatas.petaBoards.getPetaBoards();
@@ -382,8 +387,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return {};
         },
-        async updatePetaBoards(event, boards, mode) {
-          const log = mainLogger.logChunk();
+        async updatePetaBoards(event, logger, boards, mode) {
+          const log = logger.logChunk();
           try {
             log.log("#Update PetaBoards");
             await petaDatas.petaBoards.updatePetaBoards(boards, mode);
@@ -400,8 +405,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async updatePetaTags(event, tags, mode) {
-          const log = mainLogger.logChunk();
+        async updatePetaTags(event, logger, tags, mode) {
+          const log = logger.logChunk();
           try {
             log.log("#Update PetaTags");
             await petaDatas.petaTags.updatePetaTags(tags, mode);
@@ -418,8 +423,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async updatePetaImagesPetaTags(event, petaImageIds, petaTagLikes, mode) {
-          const log = mainLogger.logChunk();
+        async updatePetaImagesPetaTags(event, logger, petaImageIds, petaTagLikes, mode) {
+          const log = logger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
             await petaDatas.petaTags.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
@@ -436,8 +441,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async updatePetaTagPartitions(event, partitions, mode) {
-          const log = mainLogger.logChunk();
+        async updatePetaTagPartitions(event, logger, partitions, mode) {
+          const log = logger.logChunk();
           try {
             log.log("#Update PetaImagesPetaTags");
             await petaDatas.petaTagPartitions.updatePetaTagPartitions(partitions, mode);
@@ -454,8 +459,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async getPetaTagPartitions() {
-          const log = mainLogger.logChunk();
+        async getPetaTagPartitions(event, logger) {
+          const log = logger.logChunk();
           try {
             log.log("#Get PetaTagPartitions");
             const petaTagPartitions = await petaDatas.petaTagPartitions.getPetaTagPartitions();
@@ -472,8 +477,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return [];
         },
-        async getPetaImageIds(event, params) {
-          const log = mainLogger.logChunk();
+        async getPetaImageIds(event, logger, params) {
+          const log = logger.logChunk();
           try {
             log.log("#Get PetaImageIds");
             log.log("type:", params.type);
@@ -491,8 +496,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return [];
         },
-        async getPetaTagIdsByPetaImageIds(event, petaImageIds) {
-          const log = mainLogger.logChunk();
+        async getPetaTagIdsByPetaImageIds(event, logger, petaImageIds) {
+          const log = logger.logChunk();
           try {
             // log.log("#Get PetaTagIds By PetaImageIds");
             const petaTagIds = await petaDatas.petaTags.getPetaTagIdsByPetaImageIds(petaImageIds);
@@ -509,8 +514,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return [];
         },
-        async getPetaTags() {
-          const log = mainLogger.logChunk();
+        async getPetaTags(event, logger) {
+          const log = logger.logChunk();
           try {
             log.log("#Get PetaTags");
             const petaTags = await petaDatas.petaTags.getPetaTags();
@@ -527,8 +532,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return [];
         },
-        async getPetaTagCounts() {
-          const log = mainLogger.logChunk();
+        async getPetaTagCounts(event, logger) {
+          const log = logger.logChunk();
           try {
             log.log("#Get PetaTagCounts");
             const petaTagCounts = await petaDatas.petaTags.getPetaTagCounts();
@@ -545,24 +550,24 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return {};
         },
-        async log(event, id: string, ...args: unknown[]) {
+        async log(event, logger, id: string, ...args: unknown[]) {
           dataLogger.log(LogFrom.RENDERER, id, ...args);
           return true;
         },
-        async openURL(event, url) {
-          const log = mainLogger.logChunk();
+        async openURL(event, logger, url) {
+          const log = logger.logChunk();
           log.log("#Open URL");
           log.log("url:", url);
           shell.openExternal(url);
           return true;
         },
-        async openImageFile(event, petaImage) {
-          const log = mainLogger.logChunk();
+        async openImageFile(event, logger, petaImage) {
+          const log = logger.logChunk();
           log.log("#Open Image File");
           shell.showItemInFolder(petaDatas.petaImages.getImagePath(petaImage, ImageType.ORIGINAL));
         },
-        async getAppInfo() {
-          const log = mainLogger.logChunk();
+        async getAppInfo(event, logger) {
+          const log = logger.logChunk();
           log.log("#Get App Info");
           const info = {
             name: app.getName(),
@@ -571,26 +576,26 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           log.log("return:", info);
           return info;
         },
-        async showDBFolder() {
-          const log = mainLogger.logChunk();
+        async showDBFolder(event, logger) {
+          const log = logger.logChunk();
           log.log("#Show DB Folder");
           shell.showItemInFolder(DIR_ROOT);
           return true;
         },
-        async showConfigFolder() {
-          const log = mainLogger.logChunk();
+        async showConfigFolder(event, logger) {
+          const log = logger.logChunk();
           log.log("#Show Config Folder");
           shell.showItemInFolder(DIR_APP);
           return true;
         },
-        async showImageInFolder(event, petaImage) {
-          const log = mainLogger.logChunk();
+        async showImageInFolder(event, logger, petaImage) {
+          const log = logger.logChunk();
           log.log("#Show Image In Folder");
           shell.showItemInFolder(petaDatas.petaImages.getImagePath(petaImage, ImageType.ORIGINAL));
           return true;
         },
-        async updateSettings(event, settings) {
-          const log = mainLogger.logChunk();
+        async updateSettings(event, logger, settings) {
+          const log = logger.logChunk();
           try {
             log.log("#Update Settings");
             configSettings.data = settings;
@@ -618,26 +623,26 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async getSettings() {
-          const log = mainLogger.logChunk();
+        async getSettings(event, logger) {
+          const log = logger.logChunk();
           log.log("#Get Settings");
           log.log("return:", configSettings.data);
           return configSettings.data;
         },
-        async getWindowIsFocused(event) {
-          const log = mainLogger.logChunk();
+        async getWindowIsFocused(event, logger) {
+          const log = logger.logChunk();
           log.log("#Get Window Is Focused");
           const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
           log.log("return:", isFocued);
           return isFocued;
         },
-        async windowMinimize(event) {
-          const log = mainLogger.logChunk();
+        async windowMinimize(event, logger) {
+          const log = logger.logChunk();
           log.log("#Window Minimize");
           windows.getWindowByEvent(event)?.window.minimize();
         },
-        async windowMaximize(event) {
-          const log = mainLogger.logChunk();
+        async windowMaximize(event, logger) {
+          const log = logger.logChunk();
           log.log("#Window Maximize");
           const windowInfo = windows.getWindowByEvent(event);
           if (windowInfo?.window.isMaximized()) {
@@ -646,8 +651,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           windowInfo?.window.maximize();
         },
-        async windowClose(event) {
-          const log = mainLogger.logChunk();
+        async windowClose(event, logger) {
+          const log = logger.logChunk();
           log.log("#Window Close");
           windows.getWindowByEvent(event)?.window.close();
         },
@@ -655,19 +660,19 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           windows.getWindowByEvent(event)?.window.moveTop();
           windows.getWindowByEvent(event)?.window.focus();
         },
-        async windowToggleDevTools(event) {
-          const log = mainLogger.logChunk();
+        async windowToggleDevTools(event, logger) {
+          const log = logger.logChunk();
           log.log("#Toggle Dev Tools");
           windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
         },
-        async getPlatform() {
-          const log = mainLogger.logChunk();
+        async getPlatform(event, logger) {
+          const log = logger.logChunk();
           log.log("#Get Platform");
           log.log("return:", process.platform);
           return process.platform;
         },
-        async regenerateMetadatas() {
-          const log = mainLogger.logChunk();
+        async regenerateMetadatas(event, logger) {
+          const log = logger.logChunk();
           try {
             log.log("#Regenerate Thumbnails");
             await petaDatas.petaImages.regenerateMetadatas();
@@ -683,8 +688,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return;
         },
-        async browsePetaImageDirectory(event) {
-          const log = mainLogger.logChunk();
+        async browsePetaImageDirectory(event, logger) {
+          const log = logger.logChunk();
           log.log("#Browse PetaImage Directory");
           const windowInfo = windows.getWindowByEvent(event);
           if (windowInfo) {
@@ -705,8 +710,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return "";
         },
-        async changePetaImageDirectory(event, path) {
-          const log = mainLogger.logChunk();
+        async changePetaImageDirectory(event, logger, path) {
+          const log = logger.logChunk();
           try {
             log.log("#Change PetaImage Directory");
             path = Path.resolve(path);
@@ -729,13 +734,13 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async getStates() {
-          const log = mainLogger.logChunk();
+        async getStates(event, logger) {
+          const log = logger.logChunk();
           log.log("#Get States");
           return configStates.data;
         },
-        async realESRGANConvert(event, petaImages, modelName) {
-          const log = mainLogger.logChunk();
+        async realESRGANConvert(event, logger, petaImages, modelName) {
+          const log = logger.logChunk();
           try {
             log.log("#Real-ESRGAN Convert");
             const result = await petaDatas.realESRGAN(petaImages, modelName);
@@ -746,7 +751,7 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async startDrag(event, petaImages) {
+        async startDrag(event, logger, petaImages) {
           const first = petaImages[0];
           if (!first) {
             return;
@@ -774,8 +779,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           // draggingPreviewWindow.setVisible(false);
           // draggingPreviewWindow.destroy();
         },
-        async updateStates(event, states) {
-          const log = mainLogger.logChunk();
+        async updateStates(event, logger, states) {
+          const log = logger.logChunk();
           try {
             log.log("#Update States");
             configStates.data = states;
@@ -788,12 +793,12 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async importImages(event, datas) {
-          const log = mainLogger.logChunk();
+        async importImages(event, logger, datas) {
+          const log = logger.logChunk();
           try {
             log.log("#importImages");
             log.log(datas.length);
-            const logFromBrowser = mainLogger.logChunk();
+            const logFromBrowser = logger.logChunk();
             const ids = datas
               .filter(
                 (data) =>
@@ -860,14 +865,14 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return [];
         },
-        async openWindow(event, windowType) {
-          const log = mainLogger.logChunk();
+        async openWindow(event, logger, windowType) {
+          const log = logger.logChunk();
           log.log("#Open Window");
           log.log("type:", windowType);
           windows.openWindow(windowType, event);
         },
-        async reloadWindow(event) {
-          const log = mainLogger.logChunk();
+        async reloadWindow(event, logger) {
+          const log = logger.logChunk();
           log.log("#Reload Window");
           const type = windows.reloadWindowByEvent(event);
           log.log("type:", type);
@@ -878,12 +883,12 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
         async getShowNSFW() {
           return getShowNSFW();
         },
-        async setShowNSFW(event, value) {
+        async setShowNSFW(event, logger, value) {
           temporaryShowNSFW = value;
           windows.emitMainEvent("showNSFW", getShowNSFW());
         },
-        async searchImageByGoogle(event, petaImage) {
-          const log = mainLogger.logChunk();
+        async searchImageByGoogle(event, logger, petaImage) {
+          const log = logger.logChunk();
           log.log("#Search Image By Google");
           try {
             await searchImageByGoogle(petaImage, DIR_THUMBNAILS);
@@ -894,7 +899,7 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
           }
           return false;
         },
-        async setDetailsPetaImage(event, petaImageId: string) {
+        async setDetailsPetaImage(event, logger, petaImageId: string) {
           detailsPetaImage = await petaDatas.petaImages.getPetaImage(petaImageId);
           if (detailsPetaImage === undefined) {
             return;
@@ -914,8 +919,8 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
         async getLatestVersion() {
           return getLatestVersion();
         },
-        async eula(event, agree) {
-          const log = mainLogger.logChunk();
+        async eula(event, logger, agree) {
+          const log = logger.logChunk();
           log.log("#EULA");
           log.log(agree ? "agree" : "disagree", EULA);
           if (configSettings.data.eula === EULA) {
