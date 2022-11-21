@@ -26,8 +26,8 @@ export function inject<T>(key: Key<T>): T {
 export function createUseFunction<T>(key: Key<T>) {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   let instance: any = undefined;
-  return () => {
-    if (instance === undefined) {
+  return (cache = true) => {
+    if (instance === undefined || !cache) {
       instance = inject(key);
     }
     return instance;
