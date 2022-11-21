@@ -1,22 +1,22 @@
 import { app } from "electron";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { migratePetaImage, migratePetaTag, migratePetaImagesPetaTags } from "@/main/utils/migrater";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { loggerKey } from "@/main/provides/utils/logger";
 import { inject } from "@/main/utils/di";
-import { petaImagesControllerKey } from "@/main/controllers/petaImagesController";
+import { petaImagesControllerKey } from "@/main/provides/controllers/petaImagesController";
 import {
   dbPetaBoardsKey,
   dbPetaImagesKey,
   dbPetaImagesPetaTagsKey,
   dbPetaTagPartitionsKey,
   dbPetaTagsKey,
-} from "@/main/databases";
-import { configDBInfoKey } from "@/main/configs";
+} from "@/main/provides/databases";
+import { configDBInfoKey } from "@/main/provides/configs";
 import { showError } from "@/main/errors/errorWindow";
 import { PetaImages } from "@/commons/datas/petaImage";
 
 export async function initDB() {
-  const mainLogger = inject(mainLoggerKey);
+  const logger = inject(loggerKey);
   const dbPetaBoard = inject(dbPetaBoardsKey);
   const dbPetaImages = inject(dbPetaImagesKey);
   const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
@@ -77,16 +77,16 @@ export async function initDB() {
     petaImagesArray.forEach((pi) => {
       petaImages[pi.id] = pi;
       if (migratePetaImage(pi)) {
-        mainLogger.logChunk().log("Migrate PetaImage");
+        logger.logMainChunk().log("Migrate PetaImage");
         petaImagesController.updatePetaImages([pi], UpdateMode.UPDATE, true);
       }
     });
     if (await migratePetaTag(dbPetaTags, petaImages)) {
-      mainLogger.logChunk().log("Migrate PetaTags");
+      logger.logMainChunk().log("Migrate PetaTags");
       await petaImagesController.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
     }
     if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
-      mainLogger.logChunk().log("Migrate PetaImagesPetaTags");
+      logger.logMainChunk().log("Migrate PetaImagesPetaTags");
     }
     if (configDBInfo.data.version !== app.getVersion()) {
       configDBInfo.data.version = app.getVersion();
@@ -110,13 +110,13 @@ export async function initDB() {
     [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaTagPartitions, dbPetaImagesPetaTags] as const
   ).forEach((db) => {
     db.on("beginCompaction", () => {
-      mainLogger.logChunk().log(`begin compaction(${db.name})`);
+      logger.logMainChunk().log(`begin compaction(${db.name})`);
     });
     db.on("doneCompaction", () => {
-      mainLogger.logChunk().log(`done compaction(${db.name})`);
+      logger.logMainChunk().log(`done compaction(${db.name})`);
     });
     db.on("compactionError", (error) => {
-      mainLogger.logChunk().error(`compaction error(${db.name})`, error);
+      logger.logMainChunk().error(`compaction error(${db.name})`, error);
     });
   });
 }

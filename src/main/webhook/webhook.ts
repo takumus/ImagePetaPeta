@@ -4,24 +4,23 @@ import { IpFilter } from "express-ipfilter";
 import cors from "cors";
 import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
 import { IpcMainInvokeEvent } from "electron";
-import { MainLogger } from "@/main/utils/mainLogger";
 import {
   WEBHOOK_PORT,
   WEBHOOK_WHITELIST_IP_LIST,
   WEBHOOK_WHITELIST_ORIGIN_LIST,
 } from "@/commons/defines";
+import { inject } from "@/main/utils/di";
+import { loggerKey } from "@/main/provides/utils/logger";
 type EventNames = keyof ToMainFunctions;
 const allowedEvents: EventNames[] = ["importImages"];
-export function initWebhook(
-  toMainFunctions: {
-    [P in keyof ToMainFunctions]: (
-      event: IpcMainInvokeEvent,
-      ...args: Parameters<ToMainFunctions[P]>
-    ) => ReturnType<ToMainFunctions[P]>;
-  },
-  mainLogger: MainLogger,
-) {
-  const initLog = mainLogger.logChunk();
+export function initWebhook(toMainFunctions: {
+  [P in keyof ToMainFunctions]: (
+    event: IpcMainInvokeEvent,
+    ...args: Parameters<ToMainFunctions[P]>
+  ) => ReturnType<ToMainFunctions[P]>;
+}) {
+  const logger = inject(loggerKey);
+  const initLog = logger.logMainChunk();
   try {
     initLog.log(`$Webhook: init`);
     const http = express();
@@ -40,7 +39,7 @@ export function initWebhook(
         res.status(403).json({ error: `invalid origin: ${req.headers.origin}` });
         return;
       }
-      const executeLog = mainLogger.logChunk();
+      const executeLog = logger.logMainChunk();
       try {
         executeLog.log(`$Webhook: receive`, req.headers.origin, req.body);
         const eventName = req.body.event as EventNames;

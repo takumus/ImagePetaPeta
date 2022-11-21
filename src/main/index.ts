@@ -8,12 +8,12 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { WindowType } from "@/commons/datas/windowType";
 import { initDI } from "@/main/initDI";
 import { initWebhook } from "@/main/webhook/webhook";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { loggerKey } from "@/main/provides/utils/logger";
 import { inject } from "@/main/utils/di";
-import { pathsKey } from "@/main/utils/paths";
-import { dbStatusKey } from "@/main/databases";
-import { configSettingsKey } from "@/main/configs";
-import { windowsKey } from "@/main/utils/windows";
+import { pathsKey } from "@/main/provides/utils/paths";
+import { dbStatusKey } from "@/main/provides/databases";
+import { configSettingsKey } from "@/main/provides/configs";
+import { windowsKey } from "@/main/provides/utils/windows";
 import { isDarkMode } from "@/main/utils/isDarkMode";
 import { getMainFunctions } from "@/main/ipcFunctions";
 import { showError } from "@/main/errors/errorWindow";
@@ -36,7 +36,7 @@ import { initDB } from "@/main/initDB";
   if (!initDI(showError)) {
     return;
   }
-  const mainLogger = inject(mainLoggerKey);
+  const logger = inject(loggerKey);
   const paths = inject(pathsKey);
   const windows = inject(windowsKey);
   const configSettings = inject(configSettingsKey);
@@ -70,7 +70,7 @@ import { initDB } from "@/main/initDB";
     },
   ]);
   app.on("activate", async () => {
-    mainLogger.logChunk().log("$Electron event: activate");
+    logger.logMainChunk().log("$Electron event: activate");
     if (
       (windows.windows.board === undefined || windows.windows.board.isDestroyed()) &&
       (windows.windows.browser === undefined || windows.windows.browser.isDestroyed())
@@ -100,12 +100,12 @@ import { initDB } from "@/main/initDB";
   */
   //-------------------------------------------------------------------------------------------------//
   app.on("ready", async () => {
-    mainLogger
-      .logChunk()
+    logger
+      .logMainChunk()
       .log(
         `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
       );
-    mainLogger.logChunk().log(`verison: ${app.getVersion()}`);
+    logger.logMainChunk().log(`verison: ${app.getVersion()}`);
     //-------------------------------------------------------------------------------------------------//
     /*
       画像用URL作成
@@ -165,7 +165,7 @@ import { initDB } from "@/main/initDB";
     */
     //-------------------------------------------------------------------------------------------------//
     if (configSettings.data.developerMode) {
-      initWebhook(toMainFunctions, mainLogger);
+      initWebhook(toMainFunctions);
     }
   });
   //-------------------------------------------------------------------------------------------------//
@@ -177,7 +177,7 @@ import { initDB } from "@/main/initDB";
     if (checkUpdateTimeoutHandler) {
       clearTimeout(checkUpdateTimeoutHandler);
     }
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     log.log("$Check Update");
     if (process.platform != "win32") {
       log.log("mac os is not available");

@@ -6,9 +6,9 @@ import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { minimId } from "@/commons/utils/utils";
 import { createKey, inject } from "@/main/utils/di";
-import { dbPetaTagPartitionsKey } from "@/main/databases";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
-import { emitMainEventKey } from "@/main/utils/emitMainEvent";
+import { dbPetaTagPartitionsKey } from "@/main/provides/databases";
+import { loggerKey } from "@/main/provides/utils/logger";
+import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
 export class PetaTagPartitionsController {
   async getPetaTagPartitions() {
     const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
@@ -46,9 +46,9 @@ export class PetaTagPartitionsController {
     );
   }
   async updatePetaTagPartition(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     log.log("##Update PetaTagPartition");
     log.log("mode:", mode);
     log.log("tag:", minimId(petaPetaTagPartition.id));

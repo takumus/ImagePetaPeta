@@ -9,10 +9,10 @@ import { TaskStatusCode } from "@/commons/datas/task";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { createKey, inject } from "@/main/utils/di";
-import { dbPetaImagesKey, dbPetaImagesPetaTagsKey, dbPetaTagsKey } from "@/main/databases";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
-import { emitMainEventKey } from "@/main/utils/emitMainEvent";
-import { i18nKey } from "@/main/utils/i18n";
+import { dbPetaImagesKey, dbPetaImagesPetaTagsKey, dbPetaTagsKey } from "@/main/provides/databases";
+import { loggerKey } from "@/main/provides/utils/logger";
+import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
+import { i18nKey } from "@/main/provides/utils/i18n";
 export class PetaTagsController {
   async updatePetaTags(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
     const emit = inject(emitMainEventKey);
@@ -233,10 +233,10 @@ export class PetaTagsController {
     ];
   }
   private async updatePetaTag(petaTagLike: PetaTagLike, mode: UpdateMode) {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const dbPetaTags = inject(dbPetaTagsKey);
     const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     log.log("##Update PetaTag");
     if (petaTagLike.type === "petaTag") {
       log.log("mode:", mode);
@@ -284,9 +284,9 @@ export class PetaTagsController {
     return undefined;
   }
   private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     log.log("##Update PetaImagePetaTag");
     log.log("mode:", mode);
     log.log("tag:", minimId(petaImagePetaTag.id));

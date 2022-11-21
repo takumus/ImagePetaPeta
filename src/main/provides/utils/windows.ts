@@ -18,15 +18,15 @@ import * as Path from "path";
 import { Vec2 } from "@/commons/utils/vec2";
 import { createKey, inject } from "@/main/utils/di";
 import { isDarkMode } from "@/main/utils/isDarkMode";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
-import { configSettingsKey, configWindowStatesKey } from "@/main/configs";
+import { loggerKey } from "@/main/provides/utils/logger";
+import { configSettingsKey, configWindowStatesKey } from "@/main/provides/configs";
 export class Windows {
   windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   activeWindows: { [key in WindowType]?: boolean } = {};
   mainWindowType: WindowType | undefined;
   onCloseWindow(type: WindowType) {
-    const mainLogger = inject(mainLoggerKey);
-    mainLogger.logChunk().log("$Close Window:", type);
+    const logger = inject(loggerKey);
+    logger.logMainChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
     if (this.activeWindows.board) {
@@ -64,7 +64,7 @@ export class Windows {
   }
   createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = inject(configWindowStatesKey);
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -83,7 +83,7 @@ export class Windows {
     });
     this.activeWindows[type] = true;
     const state = configWindowStates.data[type];
-    mainLogger.logChunk().log("$Create Window:", type);
+    logger.logMainChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);
     if (state?.maximized) {
       window.maximize();
@@ -214,8 +214,8 @@ export class Windows {
   }
   saveWindowSize(windowType: WindowType) {
     const configWindowStates = inject(configWindowStatesKey);
-    const mainLogger = inject(mainLoggerKey);
-    mainLogger.logChunk().log("$Save Window States:", windowType);
+    const logger = inject(loggerKey);
+    logger.logMainChunk().log("$Save Window States:", windowType);
     let state = configWindowStates.data[windowType];
     if (state === undefined) {
       state = configWindowStates.data[windowType] = {

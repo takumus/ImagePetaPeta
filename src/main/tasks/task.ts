@@ -1,6 +1,6 @@
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { inject } from "@/main/utils/di";
-import { emitMainEventKey } from "@/main/utils/emitMainEvent";
+import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
 import { v4 as uuid } from "uuid";
 const tasks: { [id: string]: TaskHandler } = {};
 export async function spawn<T, K>(

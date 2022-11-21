@@ -1,12 +1,12 @@
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { loggerKey } from "@/main/provides/utils/logger";
 import * as Path from "path";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 import * as Tasks from "@/main/tasks/task";
-import { petaImagesControllerKey } from "@/main/controllers/petaImagesController";
-import { petaTagsControllerKey } from "@/main/controllers/petaTagsController";
+import { petaImagesControllerKey } from "@/main/provides/controllers/petaImagesController";
+import { petaTagsControllerKey } from "@/main/provides/controllers/petaTagsController";
 import { extraFiles } from "@/@assets/extraFiles";
 import * as fs from "fs";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
@@ -14,19 +14,19 @@ import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { inject } from "@/main/utils/di";
-import { dbPetaImagesPetaTagsKey } from "@/main/databases";
-import { pathsKey } from "@/main/utils/paths";
+import { dbPetaImagesPetaTagsKey } from "@/main/provides/databases";
+import { pathsKey } from "@/main/provides/utils/paths";
 
 export async function realESRGAN(petaImages: PetaImage[], modelName: RealESRGANModelName) {
   const petaImagesController = inject(petaImagesControllerKey);
   const petaTagsController = inject(petaTagsControllerKey);
   const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
   const paths = inject(pathsKey);
-  const mainLogger = inject(mainLoggerKey);
+  const logger = inject(loggerKey);
   return Tasks.spawn(
     "realESRGAN",
     async (handler) => {
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       const isMac = process.platform === "darwin";
       const execFilePath = resolveExtraFilesPath(
         isMac

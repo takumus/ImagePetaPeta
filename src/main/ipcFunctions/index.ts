@@ -25,17 +25,16 @@ import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { ppa } from "@/commons/utils/pp";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { LogFrom, loggerKey } from "@/main/provides/utils/logger";
 import { inject } from "@/main/utils/di";
-import { petaImagesControllerKey } from "@/main/controllers/petaImagesController";
-import { petaTagsControllerKey } from "@/main/controllers/petaTagsController";
-import { petaTagPartitionsControllerKey } from "@/main/controllers/petaTagPartitionsController";
-import { petaBoardsControllerKey } from "@/main/controllers/petaBoardsController";
-import { pathsKey } from "@/main/utils/paths";
-import { dbStatusKey } from "@/main/databases";
-import { configSettingsKey, configStatesKey } from "@/main/configs";
-import { windowsKey } from "@/main/utils/windows";
-import { LogFrom, loggerKey } from "@/main/storages/logger";
+import { petaImagesControllerKey } from "@/main/provides/controllers/petaImagesController";
+import { petaTagsControllerKey } from "@/main/provides/controllers/petaTagsController";
+import { petaTagPartitionsControllerKey } from "@/main/provides/controllers/petaTagPartitionsController";
+import { petaBoardsControllerKey } from "@/main/provides/controllers/petaBoardsController";
+import { pathsKey } from "@/main/provides/utils/paths";
+import { dbStatusKey } from "@/main/provides/databases";
+import { configSettingsKey, configStatesKey } from "@/main/provides/configs";
+import { windowsKey } from "@/main/provides/utils/windows";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { isDarkMode } from "@/main/utils/isDarkMode";
 let temporaryShowNSFW = false;
@@ -48,10 +47,10 @@ export function getMainFunctions(): {
 } {
   return {
     async browseAndImportImageFiles(event, type) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Browse Image Files");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo) {
@@ -67,8 +66,8 @@ export function getMainFunctions(): {
       return 0;
     },
     async cancelTasks(event, ids) {
-      const mainLogger = inject(mainLoggerKey);
-      const log = mainLogger.logChunk();
+      const logger = inject(loggerKey);
+      const log = logger.logMainChunk();
       try {
         log.log("#Cancel Tasks");
         ids.forEach((id) => {
@@ -83,9 +82,9 @@ export function getMainFunctions(): {
       return;
     },
     async getPetaImages() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Get PetaImages");
         const petaImages = await petaImagesController.getPetaImages();
@@ -103,9 +102,9 @@ export function getMainFunctions(): {
       return {};
     },
     async updatePetaImages(event, datas, mode) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImages");
         await petaImagesController.updatePetaImages(datas, mode);
@@ -123,9 +122,9 @@ export function getMainFunctions(): {
       return false;
     },
     async getPetaBoards() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaBoardsController = inject(petaBoardsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Get PetaBoards");
         const petaBoards = await petaBoardsController.getPetaBoards();
@@ -150,9 +149,9 @@ export function getMainFunctions(): {
       return {};
     },
     async updatePetaBoards(event, boards, mode) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaBoardsController = inject(petaBoardsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update PetaBoards");
         await petaBoardsController.updatePetaBoards(boards, mode);
@@ -170,9 +169,9 @@ export function getMainFunctions(): {
       return false;
     },
     async updatePetaTags(event, tags, mode) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagsController = inject(petaTagsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update PetaTags");
         await petaTagsController.updatePetaTags(tags, mode);
@@ -190,9 +189,9 @@ export function getMainFunctions(): {
       return false;
     },
     async updatePetaImagesPetaTags(event, petaImageIds, petaTagLikes, mode) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagsController = inject(petaTagsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImagesPetaTags");
         await petaTagsController.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
@@ -210,9 +209,9 @@ export function getMainFunctions(): {
       return false;
     },
     async updatePetaTagPartitions(event, partitions, mode) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagpartitionsController = inject(petaTagPartitionsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImagesPetaTags");
         await petaTagpartitionsController.updatePetaTagPartitions(partitions, mode);
@@ -230,9 +229,9 @@ export function getMainFunctions(): {
       return false;
     },
     async getPetaTagPartitions() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagpartitionsController = inject(petaTagPartitionsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTagPartitions");
         const petaTagPartitions = await petaTagpartitionsController.getPetaTagPartitions();
@@ -250,9 +249,9 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaImageIds(event, params) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagsController = inject(petaTagsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Get PetaImageIds");
         log.log("type:", params.type);
@@ -271,9 +270,9 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaTagIdsByPetaImageIds(event, petaImageIds) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagsController = inject(petaTagsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         // log.log("#Get PetaTagIds By PetaImageIds");
         const petaTagIds = await petaTagsController.getPetaTagIdsByPetaImageIds(petaImageIds);
@@ -291,9 +290,9 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaTags() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagsController = inject(petaTagsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTags");
         const petaTags = await petaTagsController.getPetaTags();
@@ -311,9 +310,9 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaTagCounts() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaTagsController = inject(petaTagsControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTagCounts");
         const petaTagCounts = await petaTagsController.getPetaTagCounts();
@@ -336,23 +335,23 @@ export function getMainFunctions(): {
       return true;
     },
     async openURL(event, url) {
-      const mainLogger = inject(mainLoggerKey);
-      const log = mainLogger.logChunk();
+      const logger = inject(loggerKey);
+      const log = logger.logMainChunk();
       log.log("#Open URL");
       log.log("url:", url);
       shell.openExternal(url);
       return true;
     },
     async openImageFile(event, petaImage) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Open Image File");
       shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
     },
     async getAppInfo() {
-      const mainLogger = inject(mainLoggerKey);
-      const log = mainLogger.logChunk();
+      const logger = inject(loggerKey);
+      const log = logger.logMainChunk();
       log.log("#Get App Info");
       const info = {
         name: app.getName(),
@@ -362,34 +361,34 @@ export function getMainFunctions(): {
       return info;
     },
     async showDBFolder() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const paths = inject(pathsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Show DB Folder");
       shell.showItemInFolder(paths.DIR_ROOT);
       return true;
     },
     async showConfigFolder() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const paths = inject(pathsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Show Config Folder");
       shell.showItemInFolder(paths.DIR_APP);
       return true;
     },
     async showImageInFolder(event, petaImage) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Show Image In Folder");
       shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
       return true;
     },
     async updateSettings(event, settings) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
       const configSettings = inject(configSettingsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update Settings");
         configSettings.data = settings;
@@ -418,33 +417,33 @@ export function getMainFunctions(): {
       return false;
     },
     async getSettings() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const configSettings = inject(configSettingsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Get Settings");
       log.log("return:", configSettings.data);
       return configSettings.data;
     },
     async getWindowIsFocused(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Get Window Is Focused");
       const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
       log.log("return:", isFocued);
       return isFocued;
     },
     async windowMinimize(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Window Minimize");
       windows.getWindowByEvent(event)?.window.minimize();
     },
     async windowMaximize(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Window Maximize");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo?.window.isMaximized()) {
@@ -454,9 +453,9 @@ export function getMainFunctions(): {
       windowInfo?.window.maximize();
     },
     async windowClose(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Window Close");
       windows.getWindowByEvent(event)?.window.close();
     },
@@ -466,23 +465,23 @@ export function getMainFunctions(): {
       windows.getWindowByEvent(event)?.window.focus();
     },
     async windowToggleDevTools(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Toggle Dev Tools");
       windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
     },
     async getPlatform() {
-      const mainLogger = inject(mainLoggerKey);
-      const log = mainLogger.logChunk();
+      const logger = inject(loggerKey);
+      const log = logger.logMainChunk();
       log.log("#Get Platform");
       log.log("return:", process.platform);
       return process.platform;
     },
     async regenerateMetadatas() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Regenerate Thumbnails");
         await petaImagesController.regenerateMetadatas();
@@ -499,9 +498,9 @@ export function getMainFunctions(): {
       return;
     },
     async browsePetaImageDirectory(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Browse PetaImage Directory");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo) {
@@ -523,10 +522,10 @@ export function getMainFunctions(): {
       return "";
     },
     async changePetaImageDirectory(event, path) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const paths = inject(pathsKey);
       const configSettings = inject(configSettingsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Change PetaImage Directory");
         path = Path.resolve(path);
@@ -550,15 +549,15 @@ export function getMainFunctions(): {
       return false;
     },
     async getStates() {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const configStates = inject(configStatesKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Get States");
       return configStates.data;
     },
     async realESRGANConvert(event, petaImages, modelName) {
-      const mainLogger = inject(mainLoggerKey);
-      const log = mainLogger.logChunk();
+      const logger = inject(loggerKey);
+      const log = logger.logMainChunk();
       try {
         log.log("#Real-ESRGAN Convert");
         const result = await realESRGAN(petaImages, modelName);
@@ -600,10 +599,10 @@ export function getMainFunctions(): {
       // draggingPreviewWindow.destroy();
     },
     async updateStates(event, states) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
       const configStates = inject(configStatesKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#Update States");
         configStates.data = states;
@@ -617,14 +616,14 @@ export function getMainFunctions(): {
       return false;
     },
     async importImages(event, datas) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const paths = inject(pathsKey);
       const petaImagesController = inject(petaImagesControllerKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       try {
         log.log("#importImages");
         log.log(datas.length);
-        const logFromBrowser = mainLogger.logChunk();
+        const logFromBrowser = logger.logMainChunk();
         const ids = datas
           .filter(
             (data) =>
@@ -691,17 +690,17 @@ export function getMainFunctions(): {
       return [];
     },
     async openWindow(event, windowType) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Open Window");
       log.log("type:", windowType);
       windows.openWindow(windowType, event);
     },
     async reloadWindow(event) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const windows = inject(windowsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Reload Window");
       const type = windows.reloadWindowByEvent(event);
       log.log("type:", type);
@@ -719,9 +718,9 @@ export function getMainFunctions(): {
       windows.emitMainEvent("showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, petaImage) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const paths = inject(pathsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#Search Image By Google");
       try {
         await searchImageByGoogle(petaImage, paths.DIR_THUMBNAILS);
@@ -756,9 +755,9 @@ export function getMainFunctions(): {
       return getLatestVersion();
     },
     async eula(event, agree) {
-      const mainLogger = inject(mainLoggerKey);
+      const logger = inject(loggerKey);
       const configSettings = inject(configSettingsKey);
-      const log = mainLogger.logChunk();
+      const log = logger.logMainChunk();
       log.log("#EULA");
       log.log(agree ? "agree" : "disagree", EULA);
       if (configSettings.data.eula === EULA) {

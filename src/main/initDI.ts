@@ -8,34 +8,36 @@ import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import Config from "@/main/storages/config";
 import DB from "@/main/storages/db";
-import { Logger, loggerKey } from "@/main/storages/logger";
-import { Windows, windowsKey } from "@/main/utils/windows";
+import { Logger, loggerKey } from "@/main/provides/utils/logger";
+import { Windows, windowsKey } from "@/main/provides/utils/windows";
 import * as file from "@/main/storages/file";
 import { app } from "electron";
 import isValidFilePath from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/commons/utils/versions";
 import { migrateSettings, migrateStates, migrateWindowStates } from "@/main/utils/migrater";
-import { MainLogger, mainLoggerKey } from "@/main/utils/mainLogger";
 import { v4 as uuid } from "uuid";
 import { ErrorWindowParameters } from "@/main/errors/errorWindow";
 import { createI18n } from "vue-i18n";
 import languages from "@/commons/languages";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { pathsKey, Paths } from "@/main/utils/paths";
+import { pathsKey, Paths } from "@/main/provides/utils/paths";
 import { provide } from "@/main/utils/di";
 import {
   PetaBoardsController,
   petaBoardsControllerKey,
-} from "@/main/controllers/petaBoardsController";
+} from "@/main/provides/controllers/petaBoardsController";
 import {
   PetaImagesController,
   petaImagesControllerKey,
-} from "@/main/controllers/petaImagesController";
-import { PetaTagsController, petaTagsControllerKey } from "@/main/controllers/petaTagsController";
+} from "@/main/provides/controllers/petaImagesController";
+import {
+  PetaTagsController,
+  petaTagsControllerKey,
+} from "@/main/provides/controllers/petaTagsController";
 import {
   PetaTagPartitionsController,
   petaTagPartitionsControllerKey,
-} from "@/main/controllers/petaTagPartitionsController";
+} from "@/main/provides/controllers/petaTagPartitionsController";
 import {
   dbPetaBoardsKey,
   dbPetaImagesKey,
@@ -43,15 +45,15 @@ import {
   dbPetaTagPartitionsKey,
   dbPetaTagsKey,
   dbStatusKey,
-} from "@/main/databases";
-import { emitMainEventKey } from "@/main/utils/emitMainEvent";
-import { i18nKey } from "@/main/utils/i18n";
+} from "@/main/provides/databases";
+import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
+import { i18nKey } from "@/main/provides/utils/i18n";
 import {
   configDBInfoKey,
   configSettingsKey,
   configStatesKey,
   configWindowStatesKey,
-} from "@/main/configs";
+} from "@/main/provides/configs";
 export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
   try {
     const i18n = createI18n({
@@ -61,8 +63,6 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     // ログは最優先で初期化
     const DIR_LOG = file.initDirectory(false, app.getPath("logs"));
     const dataLogger = new Logger(DIR_LOG);
-    const mainLogger = new MainLogger();
-    mainLogger.logger = dataLogger;
     // その他の初期化
     const DIR_APP = file.initDirectory(false, app.getPath("userData"));
     const DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
@@ -145,7 +145,6 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     provide(pathsKey, paths);
     provide(emitMainEventKey, windows.emitMainEvent.bind(windows));
     provide(loggerKey, dataLogger);
-    provide(mainLoggerKey, mainLogger);
     provide(i18nKey, i18n);
     provide(windowsKey, windows);
     provide(dbStatusKey, { initialized: false });

@@ -1,4 +1,4 @@
-import { configSettingsKey } from "@/main/configs";
+import { configSettingsKey } from "@/main/provides/configs";
 import { inject } from "@/main/utils/di";
 import { nativeTheme } from "electron";
 

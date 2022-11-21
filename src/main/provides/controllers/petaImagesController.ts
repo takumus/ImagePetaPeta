@@ -24,11 +24,11 @@ import { TaskStatusCode } from "@/commons/datas/task";
 import { v4 as uuid } from "uuid";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createKey, inject } from "@/main/utils/di";
-import { petaTagsControllerKey } from "@/main/controllers/petaTagsController";
-import { dbPetaImagesKey, dbPetaImagesPetaTagsKey } from "@/main/databases";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
-import { emitMainEventKey } from "@/main/utils/emitMainEvent";
-import { pathsKey } from "@/main/utils/paths";
+import { petaTagsControllerKey } from "@/main/provides/controllers/petaTagsController";
+import { dbPetaImagesKey, dbPetaImagesPetaTagsKey } from "@/main/provides/databases";
+import { loggerKey } from "@/main/provides/utils/logger";
+import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
+import { pathsKey } from "@/main/provides/utils/paths";
 export class PetaImagesController {
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
     const petaTagsController = inject(petaTagsControllerKey);
@@ -101,8 +101,8 @@ export class PetaImagesController {
   private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
     const dbPetaImages = inject(dbPetaImagesKey);
     const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-    const mainLogger = inject(mainLoggerKey);
-    const log = mainLogger.logChunk();
+    const logger = inject(loggerKey);
+    const log = logger.logMainChunk();
     log.log("##Update PetaImage");
     log.log("mode:", mode);
     log.log("image:", minimId(petaImage.id));
@@ -123,9 +123,9 @@ export class PetaImagesController {
     return true;
   }
   async createFileInfoFromURL(url: string) {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const paths = inject(pathsKey);
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     try {
       log.log("## Create File Info URL");
       let data: Buffer;
@@ -157,9 +157,9 @@ export class PetaImagesController {
     return undefined;
   }
   async createFileInfoFromBuffer(buffer: ArrayBuffer | Buffer) {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const paths = inject(pathsKey);
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     try {
       log.log("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
@@ -183,14 +183,14 @@ export class PetaImagesController {
     },
     silent = false,
   ) {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     if (params.fileInfos.length == 0) {
       return [];
     }
     return Tasks.spawn(
       "ImportImagesFromFilePaths",
       async (handler) => {
-        const log = mainLogger.logChunk();
+        const log = logger.logMainChunk();
         log.log("## Import Images From File Paths");
         const fileInfos: ImportFileInfo[] = [];
         if (params.extract) {
@@ -289,10 +289,10 @@ export class PetaImagesController {
     );
   }
   async regenerateMetadatas() {
-    const mainLogger = inject(mainLoggerKey);
+    const logger = inject(loggerKey);
     const emit = inject(emitMainEventKey);
     const paths = inject(pathsKey);
-    const log = mainLogger.logChunk();
+    const log = logger.logMainChunk();
     emit("regenerateMetadatasBegin");
     const images = Object.values(await this.getPetaImages());
     let completed = 0;

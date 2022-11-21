@@ -4,8 +4,8 @@ import { PetaBoard } from "@/commons/datas/petaBoard";
 import { migratePetaBoard } from "@/main/utils/migrater";
 import { ppa } from "@/commons/utils/pp";
 import { createKey, inject } from "@/main/utils/di";
-import { dbPetaBoardsKey } from "@/main/databases";
-import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { dbPetaBoardsKey } from "@/main/provides/databases";
+import { loggerKey } from "@/main/provides/utils/logger";
 export class PetaBoardsController {
   async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {
     return await ppa((board) => this.updatePetaBoard(board, mode), boards).promise;
@@ -22,8 +22,8 @@ export class PetaBoardsController {
   }
   private async updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
     const dbPetaBoards = inject(dbPetaBoardsKey);
-    const mainLogger = inject(mainLoggerKey);
-    const log = mainLogger.logChunk();
+    const logger = inject(loggerKey);
+    const log = logger.logMainChunk();
     log.log("##Update PetaBoard");
     log.log("mode:", mode);
     log.log("board:", minimId(board.id));

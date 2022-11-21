@@ -2,6 +2,7 @@ import { createWriteStream, WriteStream } from "fs";
 import * as Path from "path";
 import dateFormat from "dateformat";
 import { createKey } from "@/main/utils/di";
+import { v4 as uuid } from "uuid";
 export class Logger {
   private logFile: WriteStream | undefined;
   private date = "";
@@ -52,6 +53,25 @@ export class Logger {
   }
   getCurrentLogfilePath() {
     return this.logFile?.path.toString();
+  }
+  logMainChunk(label?: string) {
+    return this.logChunk(LogFrom.MAIN, label);
+  }
+  logRendererChunk(label?: string) {
+    return this.logChunk(LogFrom.RENDERER, label);
+  }
+  logChunk(logFrom: LogFrom, label?: string) {
+    const uid = uuid().substring(0, 4);
+    const id = label ? `${label}(${uid})` : uid;
+    return {
+      log: (...args: unknown[]) => {
+        this.log(logFrom, id, ...args);
+      },
+      error: (...args: unknown[]) => {
+        this.log(logFrom, id, "Error:", ...args);
+      },
+      uid,
+    };
   }
 }
 export enum LogFrom {

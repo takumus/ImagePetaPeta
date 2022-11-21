@@ -1,7 +1,7 @@
 import { SUPPORT_URL } from "@/commons/defines";
 import { noHtml } from "@/commons/utils/utils";
 import { inject } from "@/main/utils/di";
-import { windowsKey } from "@/main/utils/windows";
+import { windowsKey } from "@/main/provides/utils/windows";
 import { app, BrowserWindow } from "electron";
 export interface ErrorWindowParameters {
   category: "M" | "R";
