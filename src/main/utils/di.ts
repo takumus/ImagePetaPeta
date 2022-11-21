@@ -11,12 +11,25 @@ export function createKey<T>(key: string): Key<T> {
   };
 }
 export function provide<T>(key: Key<T>, instance: T) {
+  if (map[key.key] !== undefined) {
+    throw new Error(`DI: ${key.key} is already exists`);
+  }
   map[key.key] = instance;
 }
 export function inject<T>(key: Key<T>): T {
   const instance = map[key.key];
   if (instance === undefined) {
-    throw new Error(`Could not inject ${key.key}`);
+    throw new Error(`DI: Could not inject ${key.key}`);
   }
   return instance;
+}
+export function createUseFunction<T>(key: Key<T>) {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  let instance: any = undefined;
+  return () => {
+    if (instance === undefined) {
+      instance = inject(key);
+    }
+    return instance;
+  };
 }
