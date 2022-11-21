@@ -1,8 +1,6 @@
 import { app, ipcMain, session, protocol, nativeTheme } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { migratePetaImage, migratePetaTag, migratePetaImagesPetaTags } from "@/main/utils/migrater";
 import { arrLast } from "@/commons/utils/utils";
 import { getLatestVersion } from "@/commons/utils/versions";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
@@ -12,23 +10,15 @@ import { initDI } from "@/main/initDI";
 import { initWebhook } from "@/main/webhook/webhook";
 import { mainLoggerKey } from "@/main/utils/mainLogger";
 import { inject } from "@/main/utils/di";
-import { petaImagesControllerKey } from "@/main/controllers/petaImagesController";
 import { pathsKey } from "@/main/utils/paths";
-import {
-  dbPetaBoardsKey,
-  dbPetaImagesKey,
-  dbPetaImagesPetaTagsKey,
-  dbPetaTagPartitionsKey,
-  dbPetaTagsKey,
-  dbStatusKey,
-} from "@/main/databases";
-import { configDBInfoKey, configSettingsKey } from "@/main/configs";
+import { dbStatusKey } from "@/main/databases";
+import { configSettingsKey } from "@/main/configs";
 import { windowsKey } from "@/main/utils/windows";
 import { isDarkMode } from "@/main/utils/isDarkMode";
 import { getMainFunctions } from "@/main/ipcFunctions";
 import { showError } from "@/main/errors/errorWindow";
 import { PROTOCOLS, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
-import { PetaImages } from "@/commons/datas/petaImage";
+import { initDB } from "@/main/initDB";
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -55,14 +45,7 @@ import { PetaImages } from "@/commons/datas/petaImage";
   const mainLogger = inject(mainLoggerKey);
   const paths = inject(pathsKey);
   const windows = inject(windowsKey);
-  const dbPetaBoard = inject(dbPetaBoardsKey);
-  const dbPetaImages = inject(dbPetaImagesKey);
-  const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-  const dbPetaTags = inject(dbPetaTagsKey);
-  const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
-  const configDBInfo = inject(configDBInfoKey);
   const configSettings = inject(configSettingsKey);
-  const petaImagesController = inject(petaImagesControllerKey);
   const dbStatus = inject(dbStatusKey);
   //-------------------------------------------------------------------------------------------------//
   /*
@@ -179,81 +162,10 @@ import { PetaImages } from "@/commons/datas/petaImage";
     checkUpdate();
     //-------------------------------------------------------------------------------------------------//
     /*
-      データベースのロード
+      データベースの初期化
     */
     //-------------------------------------------------------------------------------------------------//
-    try {
-      // 時間かかったときのテスト
-      // await new Promise((res) => setTimeout(res, 5000));
-      await Promise.all([
-        dbPetaBoard.init(),
-        dbPetaImages.init(),
-        dbPetaTags.init(),
-        dbPetaTagPartitions.init(),
-        dbPetaImagesPetaTags.init(),
-      ]);
-      await Promise.all([
-        dbPetaTags.ensureIndex({
-          fieldName: "id",
-          unique: true,
-        }),
-        dbPetaImages.ensureIndex({
-          fieldName: "id",
-          unique: true,
-        }),
-        dbPetaTagPartitions.ensureIndex({
-          fieldName: "id",
-          unique: true,
-        }),
-        dbPetaImagesPetaTags.ensureIndex({
-          fieldName: "id",
-          unique: true,
-        }),
-      ]);
-    } catch (error) {
-      showError({
-        category: "M",
-        code: 2,
-        title: "Initialization Error",
-        message: String(error),
-      });
-      return;
-    }
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      データのマイグレーション
-    */
-    //-------------------------------------------------------------------------------------------------//
-    try {
-      const petaImagesArray = dbPetaImages.getAll();
-      const petaImages: PetaImages = {};
-      petaImagesArray.forEach((pi) => {
-        petaImages[pi.id] = pi;
-        if (migratePetaImage(pi)) {
-          mainLogger.logChunk().log("Migrate PetaImage");
-          petaImagesController.updatePetaImages([pi], UpdateMode.UPDATE, true);
-        }
-      });
-      if (await migratePetaTag(dbPetaTags, petaImages)) {
-        mainLogger.logChunk().log("Migrate PetaTags");
-        await petaImagesController.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
-      }
-      if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
-        mainLogger.logChunk().log("Migrate PetaImagesPetaTags");
-      }
-      if (configDBInfo.data.version !== app.getVersion()) {
-        configDBInfo.data.version = app.getVersion();
-        configDBInfo.save();
-      }
-    } catch (error) {
-      showError({
-        category: "M",
-        code: 3,
-        title: "Migration Error",
-        message: String(error),
-      });
-      return;
-    }
+    await initDB();
     dbStatus.initialized = true;
     windows.emitMainEvent("dataInitialized");
     //-------------------------------------------------------------------------------------------------//
