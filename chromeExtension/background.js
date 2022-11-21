@@ -2,10 +2,14 @@ import { clientScript } from "./clientScript.js";
 import { post } from "./post.js";
 chrome.runtime.onMessage.addListener((request, _, response) => {
   console.log(request);
-  post("importImages", [[{ type: "html", html: request.html }]]).then((ids) => {
-    console.log(ids);
-    response(ids);
-  });
+  post("importImages", [[{ type: "html", html: request.html }]])
+    .then((ids) => {
+      console.log(ids);
+      response(undefined, ids);
+    })
+    .catch((reason) => {
+      response(reason, undefined);
+    });
   return true;
 });
 chrome.action.onClicked.addListener((tab) => {

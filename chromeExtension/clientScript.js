@@ -23,7 +23,11 @@ export function clientScript() {
         type: "save",
         html: event.target.outerHTML,
       },
-      (res) => {
+      (error, res) => {
+        if (error) {
+          alert("タイムアウト");
+          return;
+        }
         if (res.length > 0) {
           event.target.setAttribute("data-imagepetapeta-saved", "true");
           event.target.style.filter = "invert(100%)";
