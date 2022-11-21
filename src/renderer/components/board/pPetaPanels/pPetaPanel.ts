@@ -161,6 +161,8 @@ export class PPetaPanel extends PIXI.Sprite {
           this.petaPanel.visible,
           "petaPanel.locked",
           this.petaPanel.locked,
+          "petaPanel.git.stopped",
+          this.petaPanel.gif.stopped,
           "unselected",
           this.unselected,
           "petaPanel.renderer.selected",
@@ -210,6 +212,11 @@ export class PPetaPanel extends PIXI.Sprite {
         this.gif.height = this.image.height;
         this.gif.x = this.image.x;
         this.gif.y = this.image.y;
+        if (this.petaPanel.gif.stopped) {
+          this.gif.stop();
+        } else {
+          this.gif.play();
+        }
       }
       if (this.imageWrapper.mask) {
         this.masker.clear();

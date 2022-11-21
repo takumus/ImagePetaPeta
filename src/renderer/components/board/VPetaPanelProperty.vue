@@ -22,6 +22,9 @@
       >
         {{ t("boards.panelMenu.details") }}
       </button>
+      <button v-if="singleSelectedPetaPanel" @click="playGIF">
+        {{ t(`boards.panelMenu.${singleSelectedPetaPanel.gif.stopped ? "playGIF" : "stopGIF"}`) }}
+      </button>
     </t-content>
   </VFloating>
 </template>
@@ -63,6 +66,12 @@ onMounted(() => {
     }
   });
 });
+function playGIF(): void {
+  if (singleSelectedPetaPanel.value !== undefined) {
+    singleSelectedPetaPanel.value.gif.stopped = !singleSelectedPetaPanel.value.gif.stopped;
+    emit("update:petaPanels", [singleSelectedPetaPanel.value]);
+  }
+}
 function open(position: Vec2): void {
   show.value = true;
   floating.value?.updateFloating({ ...position, width: 0, height: 0 });
