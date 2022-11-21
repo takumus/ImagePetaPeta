@@ -1,5 +1,7 @@
 import { SUPPORT_URL } from "@/commons/defines";
 import { noHtml } from "@/commons/utils/utils";
+import { inject } from "@/main/utils/di";
+import { windowsKey } from "@/main/utils/windows";
 import { app, BrowserWindow } from "electron";
 export interface ErrorWindowParameters {
   category: "M" | "R";
@@ -51,4 +53,17 @@ export function showErrorWindow(error: ErrorWindowParameters, quit = true) {
   } else {
     app.on("ready", createWindow);
   }
+}
+export function showError(error: ErrorWindowParameters, quit = true) {
+  try {
+    const windows = inject(windowsKey);
+    Object.values(windows.windows).forEach((window) => {
+      if (window !== undefined && !window.isDestroyed()) {
+        window.loadURL("about:blank");
+      }
+    });
+  } catch {
+    //
+  }
+  showErrorWindow(error, quit);
 }

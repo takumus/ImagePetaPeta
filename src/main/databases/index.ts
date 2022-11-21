@@ -11,3 +11,4 @@ export const dbPetaTagsKey = createKey<DB<PetaTag>>("dbPetaTags");
 export const dbPetaBoardsKey = createKey<DB<PetaBoard>>("dbPetaBoards");
 export const dbPetaTagPartitionsKey = createKey<DB<PetaTagPartition>>("dbPetaTagPartitions");
 export const dbPetaImagesPetaTagsKey = createKey<DB<PetaImagePetaTag>>("dbPetaImagesPetaTags");
+export const dbStatusKey = createKey<{ initialized: boolean }>("dbStatus");

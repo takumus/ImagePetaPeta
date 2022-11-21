@@ -43,6 +43,7 @@ import {
   dbPetaImagesPetaTagsKey,
   dbPetaTagPartitionsKey,
   dbPetaTagsKey,
+  dbStatusKey,
 } from "@/main/databases";
 import { emitMainEventKey } from "@/main/utils/emitMainEvent";
 import { i18nKey } from "@/main/utils/i18n";
@@ -176,6 +177,7 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     provide(mainLoggerKey, mainLogger);
     provide(i18nKey, i18n);
     provide(windowsKey, windows);
+    provide(dbStatusKey, { initialized: false });
     provide(configDBInfoKey, configDBInfo);
     provide(configSettingsKey, configSettings);
     provide(configStatesKey, configStates);
