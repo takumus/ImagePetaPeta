@@ -1,7 +1,8 @@
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
+import { inject } from "@/main/utils/di";
+import { emitMainEventKey } from "@/main/utils/emitMainEvent";
 import { v4 as uuid } from "uuid";
 const tasks: { [id: string]: TaskHandler } = {};
-let emitStatusCallback: ((taskId: string, status: TaskStatus) => void) | undefined;
 export async function spawn<T, K>(
   name: string,
   exec: (handler: TaskHandler, params: T) => Promise<K>,
@@ -9,6 +10,7 @@ export async function spawn<T, K>(
   silent: boolean,
 ) {
   const id = uuid();
+  const emitMainEvent = inject(emitMainEventKey);
   let done = false;
   const handler: TaskHandler = {
     name,
@@ -18,10 +20,8 @@ export async function spawn<T, K>(
       if (done) {
         return;
       }
-      if (emitStatusCallback) {
-        if (!silent) {
-          emitStatusCallback(id, status);
-        }
+      if (!silent) {
+        emitMainEvent("taskStatus", id, status);
       }
       if (status.status === TaskStatusCode.FAILED || status.status === TaskStatusCode.COMPLETE) {
         done = true;
@@ -63,9 +63,6 @@ export function cancel(id: string) {
 }
 export function getTask(id: string) {
   return tasks[id];
-}
-export function onEmitStatus(callback: typeof emitStatusCallback) {
-  emitStatusCallback = callback;
 }
 export interface TaskHandler {
   name: string;

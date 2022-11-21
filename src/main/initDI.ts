@@ -11,11 +11,10 @@ import DB from "@/main/storages/db";
 import { Logger, loggerKey } from "@/main/storages/logger";
 import { Windows, windowsKey } from "@/main/utils/windows";
 import * as file from "@/main/storages/file";
-import { app, nativeTheme } from "electron";
+import { app } from "electron";
 import isValidFilePath from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/commons/utils/versions";
 import { migrateSettings, migrateStates, migrateWindowStates } from "@/main/utils/migrater";
-import * as Tasks from "@/main/tasks/task";
 import { MainLogger, mainLoggerKey } from "@/main/utils/mainLogger";
 import { v4 as uuid } from "uuid";
 import { ErrorWindowParameters } from "@/main/errors/errorWindow";
@@ -54,70 +53,56 @@ import {
   configWindowStatesKey,
 } from "@/main/configs";
 export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
-  const paths: Paths = {
-    DIR_ROOT: "",
-    DIR_APP: "",
-    DIR_LOG: "",
-    DIR_IMAGES: "",
-    DIR_THUMBNAILS: "",
-    DIR_TEMP: "",
-    FILE_IMAGES_DB: "",
-    FILE_BOARDS_DB: "",
-    FILE_TAGS_DB: "",
-    FILE_TAG_PARTITIONS_DB: "",
-    FILE_IMAGES_TAGS_DB: "",
-    FILE_SETTINGS: "",
-    FILE_STATES: "",
-    FILE_WINDOW_STATES: "",
-    FILE_DBINFO: "",
-  };
-  const mainLogger = new MainLogger();
   try {
     const i18n = createI18n({
       locale: "ja",
       messages: languages,
     });
     // ログは最優先で初期化
-    paths.DIR_LOG = file.initDirectory(false, app.getPath("logs"));
-    const dataLogger = new Logger(paths.DIR_LOG);
+    const DIR_LOG = file.initDirectory(false, app.getPath("logs"));
+    const dataLogger = new Logger(DIR_LOG);
+    const mainLogger = new MainLogger();
     mainLogger.logger = dataLogger;
     // その他の初期化
-    paths.DIR_APP = file.initDirectory(false, app.getPath("userData"));
-    paths.DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
-    paths.FILE_SETTINGS = file.initFile(paths.DIR_APP, "settings.json");
+    const DIR_APP = file.initDirectory(false, app.getPath("userData"));
+    const DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
+    const FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
     const configSettings = new Config<Settings>(
-      paths.FILE_SETTINGS,
+      FILE_SETTINGS,
       getDefaultSettings(),
       migrateSettings,
     );
-    if (configSettings.data.petaImageDirectory.default) {
-      paths.DIR_ROOT = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
-      configSettings.data.petaImageDirectory.path = paths.DIR_ROOT;
-    } else {
-      try {
-        if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
-          throw new Error();
+    const DIR_ROOT = (() => {
+      if (configSettings.data.petaImageDirectory.default) {
+        const dir = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
+        configSettings.data.petaImageDirectory.path = dir;
+        return dir;
+      } else {
+        try {
+          if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
+            throw new Error();
+          }
+          return file.initDirectory(true, configSettings.data.petaImageDirectory.path);
+        } catch (error) {
+          configSettings.data.petaImageDirectory.default = true;
+          configSettings.save();
+          throw new Error(
+            `Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`,
+          );
         }
-        paths.DIR_ROOT = file.initDirectory(true, configSettings.data.petaImageDirectory.path);
-      } catch (error) {
-        configSettings.data.petaImageDirectory.default = true;
-        configSettings.save();
-        throw new Error(
-          `Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`,
-        );
       }
-    }
-    paths.DIR_IMAGES = file.initDirectory(true, paths.DIR_ROOT, "images");
-    paths.DIR_THUMBNAILS = file.initDirectory(true, paths.DIR_ROOT, "thumbnails");
-    paths.FILE_IMAGES_DB = file.initFile(paths.DIR_ROOT, "images.db");
-    paths.FILE_BOARDS_DB = file.initFile(paths.DIR_ROOT, "boards.db");
-    paths.FILE_TAGS_DB = file.initFile(paths.DIR_ROOT, "tags.db");
-    paths.FILE_TAG_PARTITIONS_DB = file.initFile(paths.DIR_ROOT, "tag_partitions.db");
-    paths.FILE_IMAGES_TAGS_DB = file.initFile(paths.DIR_ROOT, "images_tags.db");
-    paths.FILE_STATES = file.initFile(paths.DIR_APP, "states.json");
-    paths.FILE_DBINFO = file.initFile(paths.DIR_ROOT, "dbInfo.json");
-    paths.FILE_WINDOW_STATES = file.initFile(paths.DIR_APP, "windowStates.json");
-    const configDBInfo = new Config<DBInfo>(paths.FILE_DBINFO, { version: app.getVersion() });
+    })();
+    const DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
+    const DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, "thumbnails");
+    const FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
+    const FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
+    const FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
+    const FILE_TAG_PARTITIONS_DB = file.initFile(DIR_ROOT, "tag_partitions.db");
+    const FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
+    const FILE_STATES = file.initFile(DIR_APP, "states.json");
+    const FILE_DBINFO = file.initFile(DIR_ROOT, "dbInfo.json");
+    const FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
+    const configDBInfo = new Config<DBInfo>(FILE_DBINFO, { version: app.getVersion() });
     if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
       throw new Error(
         `DB version is higher than App version. \nDB version:${
@@ -125,52 +110,38 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
         }\nApp version:${app.getVersion()}`,
       );
     }
-    const dbPetaImages = new DB<PetaImage>("petaImages", paths.FILE_IMAGES_DB);
-    const dbPetaBoard = new DB<PetaBoard>("petaBoards", paths.FILE_BOARDS_DB);
-    const dbPetaTags = new DB<PetaTag>("petaTags", paths.FILE_TAGS_DB);
-    const dbPetaTagPartitions = new DB<PetaTagPartition>(
-      "petaTagPartitions",
-      paths.FILE_TAG_PARTITIONS_DB,
-    );
-    const dbPetaImagesPetaTags = new DB<PetaImagePetaTag>(
-      "petaImagePetaTag",
-      paths.FILE_IMAGES_TAGS_DB,
-    );
-    const configStates = new Config<States>(paths.FILE_STATES, defaultStates, migrateStates);
+    const configStates = new Config<States>(FILE_STATES, defaultStates, migrateStates);
     const configWindowStates = new Config<WindowStates>(
-      paths.FILE_WINDOW_STATES,
+      FILE_WINDOW_STATES,
       {},
       migrateWindowStates,
     );
-    (
-      [
-        dbPetaImages,
-        dbPetaBoard,
-        dbPetaTags,
-        dbPetaTagPartitions,
-        dbPetaImagesPetaTags,
-      ] as DB<unknown>[]
-    ).forEach((db) => {
-      db.on("beginCompaction", () => {
-        mainLogger.logChunk().log(`begin compaction(${db.name})`);
-      });
-      db.on("doneCompaction", () => {
-        mainLogger.logChunk().log(`done compaction(${db.name})`);
-      });
-      db.on("compactionError", (error) => {
-        mainLogger.logChunk().error(`compaction error(${db.name})`, error);
-      });
-    });
-    const isDarkMode = () => {
-      if (configSettings.data.autoDarkMode) {
-        return nativeTheme.shouldUseDarkColors;
-      }
-      return configSettings.data.darkMode;
+    const dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
+    const dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
+    const dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
+    const dbPetaTagPartitions = new DB<PetaTagPartition>(
+      "petaTagPartitions",
+      FILE_TAG_PARTITIONS_DB,
+    );
+    const dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
+    const windows = new Windows();
+    const paths: Paths = {
+      DIR_ROOT,
+      DIR_APP,
+      DIR_LOG,
+      DIR_IMAGES,
+      DIR_THUMBNAILS,
+      DIR_TEMP,
+      FILE_IMAGES_DB,
+      FILE_BOARDS_DB,
+      FILE_TAGS_DB,
+      FILE_TAG_PARTITIONS_DB,
+      FILE_IMAGES_TAGS_DB,
+      FILE_SETTINGS,
+      FILE_STATES,
+      FILE_WINDOW_STATES,
+      FILE_DBINFO,
     };
-    const windows = new Windows(mainLogger, configSettings, configWindowStates, isDarkMode);
-    Tasks.onEmitStatus((id, status) => {
-      windows.emitMainEvent("taskStatus", id, status);
-    });
     provide(pathsKey, paths);
     provide(emitMainEventKey, windows.emitMainEvent.bind(windows));
     provide(loggerKey, dataLogger);

@@ -101,4 +101,22 @@ export async function initDB() {
     });
     return;
   }
+  //-------------------------------------------------------------------------------------------------//
+  /*
+    自動圧縮
+  */
+  //-------------------------------------------------------------------------------------------------//
+  (
+    [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaTagPartitions, dbPetaImagesPetaTags] as const
+  ).forEach((db) => {
+    db.on("beginCompaction", () => {
+      mainLogger.logChunk().log(`begin compaction(${db.name})`);
+    });
+    db.on("doneCompaction", () => {
+      mainLogger.logChunk().log(`done compaction(${db.name})`);
+    });
+    db.on("compactionError", (error) => {
+      mainLogger.logChunk().error(`compaction error(${db.name})`, error);
+    });
+  });
 }

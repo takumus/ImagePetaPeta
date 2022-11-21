@@ -1,6 +1,4 @@
 import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
-import { Settings } from "@/commons/datas/settings";
-import { WindowStates } from "@/commons/datas/windowStates";
 import { WindowType } from "@/commons/datas/windowType";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
@@ -16,25 +14,19 @@ import {
   WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
 import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
-import Config from "@/main/storages/config";
-import { MainLogger } from "@/main/utils/mainLogger";
 import * as Path from "path";
 import { Vec2 } from "@/commons/utils/vec2";
-import { createKey } from "@/main/utils/di";
+import { createKey, inject } from "@/main/utils/di";
+import { isDarkMode } from "@/main/utils/isDarkMode";
+import { mainLoggerKey } from "@/main/utils/mainLogger";
+import { configSettingsKey, configWindowStatesKey } from "@/main/configs";
 export class Windows {
   windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   activeWindows: { [key in WindowType]?: boolean } = {};
   mainWindowType: WindowType | undefined;
-  constructor(
-    private mainLogger: MainLogger,
-    private configSettings: Config<Settings>,
-    private configWindowStates: Config<WindowStates>,
-    private isDarkMode: () => boolean,
-  ) {
-    //
-  }
   onCloseWindow(type: WindowType) {
-    this.mainLogger.logChunk().log("$Close Window:", type);
+    const mainLogger = inject(mainLoggerKey);
+    mainLogger.logChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
     if (this.activeWindows.board) {
@@ -52,7 +44,8 @@ export class Windows {
     }
   }
   showWindows() {
-    if (this.configSettings.data.eula < EULA) {
+    const configSettings = inject(configSettingsKey);
+    if (configSettings.data.eula < EULA) {
       if (this.windows.eula === undefined || this.windows.eula.isDestroyed()) {
         this.windows.eula = this.initEULAWindow();
       } else {
@@ -60,16 +53,18 @@ export class Windows {
       }
       return;
     }
-    if (this.configSettings.data.show === "both") {
+    if (configSettings.data.show === "both") {
       this.windows.board = this.initBoardWindow();
       this.windows.browser = this.initBrowserWindow();
-    } else if (this.configSettings.data.show === "browser") {
+    } else if (configSettings.data.show === "browser") {
       this.windows.browser = this.initBrowserWindow();
     } else {
       this.windows.board = this.initBoardWindow();
     }
   }
   createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
+    const configWindowStates = inject(configWindowStatesKey);
+    const mainLogger = inject(mainLoggerKey);
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -81,14 +76,14 @@ export class Windows {
         contextIsolation: true,
         preload: Path.join(__dirname, "preload.js"),
       },
-      backgroundColor: this.isDarkMode()
+      backgroundColor: isDarkMode()
         ? BOARD_DARK_BACKGROUND_FILL_COLOR
         : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
       ...options,
     });
     this.activeWindows[type] = true;
-    const state = this.configWindowStates.data[type];
-    this.mainLogger.logChunk().log("$Create Window:", type);
+    const state = configWindowStates.data[type];
+    mainLogger.logChunk().log("$Create Window:", type);
     window.setMenuBarVisibility(false);
     if (state?.maximized) {
       window.maximize();
@@ -123,19 +118,22 @@ export class Windows {
     this.emitMainEvent("mainWindowType", type);
   }
   initBrowserWindow(x?: number, y?: number) {
+    const configWindowStates = inject(configWindowStatesKey);
+    const configSettings = inject(configSettingsKey);
     return this.createWindow(WindowType.BROWSER, {
-      width: this.configWindowStates.data.browser?.width,
-      height: this.configWindowStates.data.browser?.height,
+      width: configWindowStates.data.browser?.width,
+      height: configWindowStates.data.browser?.height,
       trafficLightPosition: {
         x: 8,
         y: 8,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+      alwaysOnTop: configSettings.data.alwaysOnTop,
     });
   }
   initSettingsWindow(x?: number, y?: number) {
+    const configSettings = inject(configSettingsKey);
     return this.createWindow(WindowType.SETTINGS, {
       width: WINDOW_SETTINGS_WIDTH,
       height: WINDOW_SETTINGS_HEIGHT,
@@ -150,49 +148,56 @@ export class Windows {
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+      alwaysOnTop: configSettings.data.alwaysOnTop,
     });
   }
   initBoardWindow(x?: number, y?: number) {
+    const configWindowStates = inject(configWindowStatesKey);
+    const configSettings = inject(configSettingsKey);
     return this.createWindow(WindowType.BOARD, {
-      width: this.configWindowStates.data.board?.width,
-      height: this.configWindowStates.data.board?.height,
+      width: configWindowStates.data.board?.width,
+      height: configWindowStates.data.board?.height,
       trafficLightPosition: {
         x: 13,
         y: 13,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+      alwaysOnTop: configSettings.data.alwaysOnTop,
     });
   }
   initDetailsWindow(x?: number, y?: number) {
+    const configWindowStates = inject(configWindowStatesKey);
+    const configSettings = inject(configSettingsKey);
     return this.createWindow(WindowType.DETAILS, {
-      width: this.configWindowStates.data.details?.width,
-      height: this.configWindowStates.data.details?.height,
+      width: configWindowStates.data.details?.width,
+      height: configWindowStates.data.details?.height,
       trafficLightPosition: {
         x: 8,
         y: 8,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+      alwaysOnTop: configSettings.data.alwaysOnTop,
     });
   }
   initCaptureWindow(x?: number, y?: number) {
+    const configWindowStates = inject(configWindowStatesKey);
+    const configSettings = inject(configSettingsKey);
     return this.createWindow(WindowType.CAPTURE, {
-      width: this.configWindowStates.data.capture?.width,
-      height: this.configWindowStates.data.capture?.height,
+      width: configWindowStates.data.capture?.width,
+      height: configWindowStates.data.capture?.height,
       trafficLightPosition: {
         x: 8,
         y: 8,
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+      alwaysOnTop: configSettings.data.alwaysOnTop,
     });
   }
   initEULAWindow(x?: number, y?: number) {
+    const configSettings = inject(configSettingsKey);
     return this.createWindow(WindowType.EULA, {
       width: WINDOW_EULA_WIDTH,
       height: WINDOW_EULA_HEIGHT,
@@ -204,14 +209,16 @@ export class Windows {
       },
       x,
       y,
-      alwaysOnTop: this.configSettings.data.alwaysOnTop,
+      alwaysOnTop: configSettings.data.alwaysOnTop,
     });
   }
   saveWindowSize(windowType: WindowType) {
-    this.mainLogger.logChunk().log("$Save Window States:", windowType);
-    let state = this.configWindowStates.data[windowType];
+    const configWindowStates = inject(configWindowStatesKey);
+    const mainLogger = inject(mainLoggerKey);
+    mainLogger.logChunk().log("$Save Window States:", windowType);
+    let state = configWindowStates.data[windowType];
     if (state === undefined) {
-      state = this.configWindowStates.data[windowType] = {
+      state = configWindowStates.data[windowType] = {
         width: WINDOW_DEFAULT_WIDTH,
         height: WINDOW_DEFAULT_HEIGHT,
         maximized: false,
@@ -226,7 +233,7 @@ export class Windows {
       state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
     }
     state.maximized = false; //window.isMaximized();
-    this.configWindowStates.save();
+    configWindowStates.save();
   }
   getWindowByEvent(event: IpcMainInvokeEvent) {
     const windowSet = Object.keys(this.windows)
