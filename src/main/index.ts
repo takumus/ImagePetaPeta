@@ -27,12 +27,6 @@ import { initDB } from "@/main/initDB";
     app.quit();
     return;
   }
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    window, ファイルパス, DBの定義
-  */
-  //-------------------------------------------------------------------------------------------------//
-  // const draggingPreviewWindow = new DraggingPreviewWindow();
   let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
   //-------------------------------------------------------------------------------------------------//
   /*
@@ -84,9 +78,6 @@ import { initDB } from "@/main/initDB";
       windows.showWindows();
     }
   });
-  // app.on("before-quit", () => {
-  //   draggingPreviewWindow.destroy();
-  // });
   app.on("window-all-closed", () => {
     //
   });
