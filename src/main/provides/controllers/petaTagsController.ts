@@ -10,14 +10,13 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaImages, useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
-import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useI18n } from "@/main/provides/utils/i18n";
 import { useLogger } from "@/main/provides/utils/logger";
 import * as Tasks from "@/main/tasks/task";
 
 export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
-    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaTags",
       async (handler) => {
@@ -42,11 +41,11 @@ export class PetaTagsController {
           status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象は、PetaTagIdsのみ。
-        emit("updatePetaTags", {
+        emitMainEvent("updatePetaTags", {
           petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
           petaImageIds: [],
         });
-        emit("updatePetaTagCounts", await this.getPetaTagCounts());
+        emitMainEvent("updatePetaTagCounts", await this.getPetaTagCounts());
         return true;
       },
       {},
@@ -61,7 +60,6 @@ export class PetaTagsController {
   ) {
     const petaTagsController = usePetaTagsController();
     const dbPetaTags = useDBPetaTags();
-    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaImagesPetaTags",
       async (handler) => {
@@ -105,11 +103,11 @@ export class PetaTagsController {
           status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象はPetaImageIdsのみ。
-        emit("updatePetaTags", {
+        emitMainEvent("updatePetaTags", {
           petaTagIds: [],
           petaImageIds,
         });
-        emit("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
+        emitMainEvent("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
       },
       {},
       silent,

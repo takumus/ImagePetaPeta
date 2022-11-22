@@ -2,7 +2,7 @@ import { v4 as uuid } from "uuid";
 
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
-import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 const tasks: { [id: string]: TaskHandler } = {};
 export async function spawn<T, K>(
@@ -12,7 +12,6 @@ export async function spawn<T, K>(
   silent: boolean,
 ) {
   const id = uuid();
-  const emitMainEvent = useEmitMainEvent();
   let done = false;
   const handler: TaskHandler = {
     name,

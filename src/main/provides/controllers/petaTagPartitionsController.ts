@@ -7,7 +7,7 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
-import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useLogger } from "@/main/provides/utils/logger";
 import * as Tasks from "@/main/tasks/task";
 
@@ -17,7 +17,6 @@ export class PetaTagPartitionsController {
     return dbPetaTagPartitions.getAll();
   }
   async updateMultiple(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
-    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaTagPartitions",
       async (handler) => {
@@ -40,7 +39,7 @@ export class PetaTagPartitionsController {
           i18nKey: "tasks.updateDatas",
           status: TaskStatusCode.COMPLETE,
         });
-        emit("updatePetaTagPartitions", tags, mode);
+        emitMainEvent("updatePetaTagPartitions", tags, mode);
         return true;
       },
       {},

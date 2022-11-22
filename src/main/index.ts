@@ -16,6 +16,7 @@ import { useWindows } from "@/main/provides/utils/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { initWebhook } from "@/main/webhook/webhook";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
@@ -79,7 +80,9 @@ import { initWebhook } from "@/main/webhook/webhook";
     }
   });
   // これがないとだめ。
-  app.on("window-all-closed", () => {});
+  app.on("window-all-closed", () => {
+    //
+  });
   // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
   // electron準備OK
@@ -123,7 +126,7 @@ import { initWebhook } from "@/main/webhook/webhook";
     await initDB();
     // データ初期化完了通知
     dbStatus.initialized = true;
-    windows.emitMainEvent("dataInitialized");
+    emitMainEvent("dataInitialized");
     // webhook有効化
     if (configSettings.data.developerMode) {
       initWebhook(ipcFunctions);

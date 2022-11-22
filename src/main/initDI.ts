@@ -48,7 +48,6 @@ import {
   dbPetaTagsKey,
   dbStatusKey,
 } from "@/main/provides/databases";
-import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
@@ -156,7 +155,6 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     };
     // 注入
     provide(pathsKey, paths);
-    provide(emitMainEventKey, windows.emitMainEvent.bind(windows));
     provide(loggerKey, dataLogger);
     provide(i18nKey, i18n);
     provide(windowsKey, windows);

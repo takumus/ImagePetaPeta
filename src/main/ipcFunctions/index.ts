@@ -14,7 +14,6 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/datas/updateMode";
-// import { DraggingPreviewWindow } from "@/main/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
 import { DEFAULT_BOARD_NAME, EULA } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
@@ -38,6 +37,7 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { getLatestVersion } from "@/main/utils/versions";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 let temporaryShowNSFW = false;
 let detailsPetaImage: PetaImage | undefined;
@@ -402,9 +402,9 @@ export function getIpcFunctions(): {
           window.setAlwaysOnTop(configSettings.data.alwaysOnTop);
         });
         configSettings.save();
-        windows.emitMainEvent("updateSettings", settings);
-        windows.emitMainEvent("showNSFW", getShowNSFW());
-        windows.emitMainEvent("darkMode", isDarkMode());
+        emitMainEvent("updateSettings", settings);
+        emitMainEvent("showNSFW", getShowNSFW());
+        emitMainEvent("darkMode", isDarkMode());
         log.log("return:", configSettings.data);
         return true;
       } catch (e) {
@@ -592,14 +592,13 @@ export function getIpcFunctions(): {
     },
     async updateStates(event, states) {
       const logger = useLogger();
-      const windows = useWindows();
       const configStates = useConfigStates();
       const log = logger.logMainChunk();
       try {
         log.log("#Update States");
         configStates.data = states;
         configStates.save();
-        windows.emitMainEvent("updateStates", states);
+        emitMainEvent("updateStates", states);
         log.log("return:", configStates.data);
         return true;
       } catch (e) {
@@ -705,9 +704,8 @@ export function getIpcFunctions(): {
       return getShowNSFW();
     },
     async setShowNSFW(event, value) {
-      const windows = useWindows();
       temporaryShowNSFW = value;
-      windows.emitMainEvent("showNSFW", getShowNSFW());
+      emitMainEvent("showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, petaImage) {
       const logger = useLogger();
@@ -724,13 +722,12 @@ export function getIpcFunctions(): {
       return false;
     },
     async setDetailsPetaImage(event, petaImageId: string) {
-      const windows = useWindows();
       const petaImagesController = usePetaImagesController();
       detailsPetaImage = await petaImagesController.getPetaImage(petaImageId);
       if (detailsPetaImage === undefined) {
         return;
       }
-      windows.emitMainEvent("detailsPetaImage", detailsPetaImage);
+      emitMainEvent("detailsPetaImage", detailsPetaImage);
       return;
     },
     async getDetailsPetaImage() {

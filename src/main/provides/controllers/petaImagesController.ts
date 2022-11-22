@@ -24,7 +24,7 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
-import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import * as Tasks from "@/main/tasks/task";
@@ -34,7 +34,6 @@ import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
 export class PetaImagesController {
   public async updateMultiple(datas: PetaImage[], mode: UpdateMode, silent = false) {
     const petaTagsController = usePetaTagsController();
-    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaImages",
       async (handler) => {
@@ -58,13 +57,13 @@ export class PetaImagesController {
         await ppa(update, datas).promise;
         if (mode === UpdateMode.REMOVE) {
           // Tileの更新対象なし
-          emit("updatePetaTags", {
+          emitMainEvent("updatePetaTags", {
             petaImageIds: [],
             petaTagIds: [],
           });
-          emit("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
+          emitMainEvent("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
         }
-        emit("updatePetaImages", datas, mode);
+        emitMainEvent("updatePetaImages", datas, mode);
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           log: [],
@@ -292,10 +291,9 @@ export class PetaImagesController {
   }
   async regenerateMetadatas() {
     const logger = useLogger();
-    const emit = useEmitMainEvent();
     const paths = usePaths();
     const log = logger.logMainChunk();
-    emit("regenerateMetadatasBegin");
+    emitMainEvent("regenerateMetadatasBegin");
     const images = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (image: PetaImage) => {
@@ -319,10 +317,10 @@ export class PetaImagesController {
       };
       await this.updateMultiple([image], UpdateMode.UPDATE, true);
       log.log(`thumbnail (${++completed} / ${images.length})`);
-      emit("regenerateMetadatasProgress", completed, images.length);
+      emitMainEvent("regenerateMetadatasProgress", completed, images.length);
     };
     await ppa((image) => generate(image), images, CPU_LENGTH).promise;
-    emit("regenerateMetadatasComplete");
+    emitMainEvent("regenerateMetadatasComplete");
   }
   private async addImage(param: {
     data: Buffer;
