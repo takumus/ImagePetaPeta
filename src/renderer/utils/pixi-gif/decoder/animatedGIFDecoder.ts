@@ -1,10 +1,11 @@
-import DecompressWorker from "@/renderer/utils/pixi-gif/decoder/decompress.worker";
 import {
   AnimatedGIF,
   AnimatedGIFFrame,
   AnimatedGIFOptions,
 } from "@/renderer/utils/pixi-gif/animatedGIF";
+import DecompressWorker from "@/renderer/utils/pixi-gif/decoder/decompress.worker";
 import { createWebWorkerGroup } from "@/renderer/utils/workerGroup";
+
 const wtGroup = createWebWorkerGroup(DecompressWorker);
 export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {
   if (!buffer || buffer.byteLength === 0) {

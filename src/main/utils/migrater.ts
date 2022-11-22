@@ -1,15 +1,18 @@
+import { v4 as uuid } from "uuid";
+
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaImagePetaTag, createPetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { getDefaultSettings, Settings } from "@/commons/datas/settings";
-import { defaultStates, States } from "@/commons/datas/states";
+import { Settings, getDefaultSettings } from "@/commons/datas/settings";
+import { States, defaultStates } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import { ppa } from "@/commons/utils/pp";
+
 import DB from "@/main/storages/db";
-import { v4 as uuid } from "uuid";
+
 const defaultSettings = getDefaultSettings();
 export function migratePetaImage(petaImage: PetaImage) {
   let migrated = false;

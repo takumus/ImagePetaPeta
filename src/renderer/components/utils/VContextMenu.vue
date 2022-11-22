@@ -25,14 +25,17 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, computed } from "vue";
+import { v4 as uuid } from "uuid";
+import { computed, onMounted, ref } from "vue";
+
+import VFloating from "@/renderer/components/utils/VFloating.vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
-import { v4 as uuid } from "uuid";
+
 import { ContextMenuItem } from "@/renderer/components/utils/contextMenuItem";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import VFloating from "@/renderer/components/utils/VFloating.vue";
+
 defineProps<{
   zIndex: number;
 }>();

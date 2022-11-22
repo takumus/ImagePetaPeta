@@ -1,27 +1,26 @@
+import { app } from "electron";
+import { v4 as uuid } from "uuid";
+import { createI18n } from "vue-i18n";
+
 import { DBInfo } from "@/commons/datas/dbInfo";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
-import { getDefaultSettings, Settings } from "@/commons/datas/settings";
-import { defaultStates, States } from "@/commons/datas/states";
-import { WindowStates } from "@/commons/datas/windowStates";
-import Config from "@/main/storages/config";
-import DB from "@/main/storages/db";
-import { Logger, loggerKey } from "@/main/provides/utils/logger";
-import { Windows, windowsKey } from "@/main/provides/utils/windows";
-import * as file from "@/main/storages/file";
-import { app } from "electron";
-import isValidFilePath from "@/main/utils/isValidFilePath";
-import { isLatest } from "@/commons/utils/versions";
-import { migrateSettings, migrateStates, migrateWindowStates } from "@/main/utils/migrater";
-import { v4 as uuid } from "uuid";
-import { ErrorWindowParameters } from "@/main/errors/errorWindow";
-import { createI18n } from "vue-i18n";
-import languages from "@/commons/languages";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { pathsKey, Paths } from "@/main/provides/utils/paths";
-import { provide } from "@/main/utils/di";
+import { Settings, getDefaultSettings } from "@/commons/datas/settings";
+import { States, defaultStates } from "@/commons/datas/states";
+import { WindowStates } from "@/commons/datas/windowStates";
+import languages from "@/commons/languages";
+import { isLatest } from "@/commons/utils/versions";
+
+import { ErrorWindowParameters } from "@/main/errors/errorWindow";
+import {
+  configDBInfoKey,
+  configSettingsKey,
+  configStatesKey,
+  configWindowStatesKey,
+} from "@/main/provides/configs";
 import {
   PetaBoardsController,
   petaBoardsControllerKey,
@@ -31,13 +30,13 @@ import {
   petaImagesControllerKey,
 } from "@/main/provides/controllers/petaImagesController";
 import {
-  PetaTagsController,
-  petaTagsControllerKey,
-} from "@/main/provides/controllers/petaTagsController";
-import {
   PetaTagPartitionsController,
   petaTagPartitionsControllerKey,
 } from "@/main/provides/controllers/petaTagPartitionsController";
+import {
+  PetaTagsController,
+  petaTagsControllerKey,
+} from "@/main/provides/controllers/petaTagsController";
 import {
   dbPetaBoardsKey,
   dbPetaImagesKey,
@@ -48,12 +47,16 @@ import {
 } from "@/main/provides/databases";
 import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
 import { i18nKey } from "@/main/provides/utils/i18n";
-import {
-  configDBInfoKey,
-  configSettingsKey,
-  configStatesKey,
-  configWindowStatesKey,
-} from "@/main/provides/configs";
+import { Logger, loggerKey } from "@/main/provides/utils/logger";
+import { Paths, pathsKey } from "@/main/provides/utils/paths";
+import { Windows, windowsKey } from "@/main/provides/utils/windows";
+import Config from "@/main/storages/config";
+import DB from "@/main/storages/db";
+import * as file from "@/main/storages/file";
+import { provide } from "@/main/utils/di";
+import isValidFilePath from "@/main/utils/isValidFilePath";
+import { migrateSettings, migrateStates, migrateWindowStates } from "@/main/utils/migrater";
+
 export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
   try {
     const i18n = createI18n({

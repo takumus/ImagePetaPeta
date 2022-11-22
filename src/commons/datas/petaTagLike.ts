@@ -1,4 +1,5 @@
 import { PetaTag } from "@/commons/datas/petaTag";
+
 interface Base {
   type: string;
 }

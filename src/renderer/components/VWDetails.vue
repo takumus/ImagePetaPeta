@@ -29,25 +29,28 @@
 <script setup lang="ts">
 // Vue
 import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+import VProperty from "@/renderer/components/browser/property/VProperty.vue";
+import VDetails from "@/renderer/components/details/VDetails.vue";
 // Components
 import VTasks from "@/renderer/components/task/VTasks.vue";
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
 import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
-import VProperty from "@/renderer/components/browser/property/VProperty.vue";
+
 // Others
 // import { AnimatedGIFLoader } from "@/renderer/utils/pixi-gif";
 import { IPC } from "@/renderer/ipc";
-import { Keyboards } from "@/renderer/utils/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import VDetails from "@/renderer/components/details/VDetails.vue";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+import { Keyboards } from "@/renderer/utils/keyboards";
+
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();

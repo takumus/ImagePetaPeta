@@ -24,12 +24,16 @@
 
 <script setup lang="ts">
 // Vue
+import { computed, ref, watch } from "vue";
+
+import VDragView from "@/renderer/components/utils/VDragView.vue";
+
 import { ImageType } from "@/commons/datas/imageType";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
-import VDragView from "@/renderer/components/utils/VDragView.vue";
+
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { getImageURL } from "@/renderer/utils/imageURL";
-import { ref, watch, computed } from "vue";
+
 // Components
 const props = defineProps<{
   petaImage: RPetaImage;

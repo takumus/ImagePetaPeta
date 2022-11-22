@@ -35,8 +35,10 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, watch, onMounted, computed, nextTick } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+
 import VComplement from "@/renderer/components/utils/VComplement.vue";
+
 const props = defineProps<{
   value?: string;
   look?: string;

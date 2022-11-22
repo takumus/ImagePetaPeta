@@ -1,28 +1,29 @@
-import { UpdateMode } from "@/commons/datas/updateMode";
+import * as fs from "fs";
+import * as Path from "path";
+
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
-import { loggerKey } from "@/main/provides/utils/logger";
-import * as Path from "path";
-import { runExternalApplication } from "@/main/utils/runExternalApplication";
-import * as Tasks from "@/main/tasks/task";
-import { petaImagesControllerKey } from "@/main/provides/controllers/petaImagesController";
-import { petaTagsControllerKey } from "@/main/provides/controllers/petaTagsController";
-import { extraFiles } from "@/@assets/extraFiles";
-import * as fs from "fs";
-import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
-import { ppa } from "@/commons/utils/pp";
 import { TaskStatusCode } from "@/commons/datas/task";
-import { inject } from "@/main/utils/di";
-import { dbPetaImagesPetaTagsKey } from "@/main/provides/databases";
-import { pathsKey } from "@/main/provides/utils/paths";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { ppa } from "@/commons/utils/pp";
+
+import { extraFiles } from "@/@assets/extraFiles";
+import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
+import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
+import { useDBPetaImagesPetaTags } from "@/main/provides/databases";
+import { useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
+import * as Tasks from "@/main/tasks/task";
+import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
+import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
 export async function realESRGAN(petaImages: PetaImage[], modelName: RealESRGANModelName) {
-  const petaImagesController = inject(petaImagesControllerKey);
-  const petaTagsController = inject(petaTagsControllerKey);
-  const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-  const paths = inject(pathsKey);
-  const logger = inject(loggerKey);
+  const petaImagesController = usePetaImagesController();
+  const petaTagsController = usePetaTagsController();
+  const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+  const paths = usePaths();
+  const logger = useLogger();
   return Tasks.spawn(
     "realESRGAN",
     async (handler) => {

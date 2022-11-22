@@ -74,14 +74,21 @@
 
 <script setup lang="ts">
 // Vue
+import { throttle } from "throttle-debounce";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import VTile from "@/renderer/components/browser/tile/VTile.vue";
-import VProperty from "@/renderer/components/browser/property/VProperty.vue";
+import { useI18n } from "vue-i18n";
+
 import VPreview from "@/renderer/components/browser/property/VPreview.vue";
-import VTags from "@/renderer/components/browser/tags/VTags.vue";
+import VProperty from "@/renderer/components/browser/property/VProperty.vue";
 import VSearch from "@/renderer/components/browser/search/VSearch.vue";
-import { Vec2 } from "@/commons/utils/vec2";
-import { IPC } from "@/renderer/ipc";
+import VTags from "@/renderer/components/browser/tags/VTags.vue";
+import VTile from "@/renderer/components/browser/tile/VTile.vue";
+
+import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
+import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { WindowType } from "@/commons/datas/windowType";
 import {
   BROWSER_THUMBNAIL_MARGIN,
   BROWSER_THUMBNAIL_SIZE,
@@ -90,26 +97,23 @@ import {
   THUMBNAILS_SELECTION_PERCENT,
   UNTAGGED_ID,
 } from "@/commons/defines";
+import { ciede, hex2rgb } from "@/commons/utils/colors";
+import { Vec2 } from "@/commons/utils/vec2";
+
 import { Tile } from "@/renderer/components/browser/tile/tile";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { Keyboards } from "@/renderer/utils/keyboards";
-import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { WindowType } from "@/commons/datas/windowType";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
-import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { useI18n } from "vue-i18n";
+import { IPC } from "@/renderer/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
-import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
-import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
-import { ciede, hex2rgb } from "@/commons/utils/colors";
-import { throttle } from "throttle-debounce";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
-import { RPetaTag } from "@/commons/datas/rPetaTag";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
+import { Keyboards } from "@/renderer/utils/keyboards";
+import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
+
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();

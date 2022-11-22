@@ -1,9 +1,10 @@
 /* eslint-disable */
-import { Sprite } from "@pixi/sprite";
-import { Texture, Renderer } from "@pixi/core";
-import { settings } from "@pixi/settings";
 import { SCALE_MODES } from "@pixi/constants";
+import { Renderer, Texture } from "@pixi/core";
+import { settings } from "@pixi/settings";
+import { Sprite } from "@pixi/sprite";
 import { Ticker, UPDATE_PRIORITY } from "@pixi/ticker";
+
 export interface AnimatedGIFFrame {
   imageData: ImageData;
   start: number;

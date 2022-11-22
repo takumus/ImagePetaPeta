@@ -41,16 +41,19 @@
 <script setup lang="ts">
 // Vue
 import { onMounted, ref } from "vue";
-// Others
-import { IPC } from "@/renderer/ipc";
 import { useI18n } from "vue-i18n";
-import VSettingsGeneral from "@/renderer/components/settings/VSettingsGeneral.vue";
+
+import VSettingsBrowser from "@/renderer/components/settings/VSettingsBrowser.vue";
+import VSettingsControl from "@/renderer/components/settings/VSettingsControl.vue";
 import VSettingsDatas from "@/renderer/components/settings/VSettingsDatas.vue";
+import VSettingsGeneral from "@/renderer/components/settings/VSettingsGeneral.vue";
+import VSettingsInfo from "@/renderer/components/settings/VSettingsInfo.vue";
 import VSettingsOthers from "@/renderer/components/settings/VSettingsOthers.vue";
 import VSettingsUpdate from "@/renderer/components/settings/VSettingsUpdate.vue";
-import VSettingsInfo from "@/renderer/components/settings/VSettingsInfo.vue";
-import VSettingsControl from "@/renderer/components/settings/VSettingsControl.vue";
-import VSettingsBrowser from "@/renderer/components/settings/VSettingsBrowser.vue";
+
+// Others
+import { IPC } from "@/renderer/ipc";
+
 const { t } = useI18n();
 const tabNames = ["general", "control", "browser", "datas", "others", "update", "info"] as const;
 const tabs = ref<typeof tabNames[number][]>([...tabNames]);

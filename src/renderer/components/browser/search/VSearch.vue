@@ -36,12 +36,15 @@
 </template>
 
 <script lang="ts" setup>
-import { UNTAGGED_ID } from "@/commons/defines";
-import { ref, computed } from "vue";
-import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
+import { computed, ref } from "vue";
+
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
-import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
+
 import { RPetaTag } from "@/commons/datas/rPetaTag";
+import { UNTAGGED_ID } from "@/commons/defines";
+
+import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 
 const searchInput = ref<InstanceType<typeof VTextarea>>();
 const petaTagsStore = usePetaTagsStore();

@@ -1,17 +1,18 @@
-import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import { AppInfo } from "@/commons/datas/appInfo";
-import { Settings } from "@/commons/datas/settings";
-import { States } from "@/commons/datas/states";
-import { PetaTag } from "@/commons/datas/petaTag";
-import { WindowType } from "@/commons/datas/windowType";
-import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
-import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+import { PetaBoard } from "@/commons/datas/petaBoard";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
+import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
+import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
+import { Settings } from "@/commons/datas/settings";
+import { States } from "@/commons/datas/states";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { WindowType } from "@/commons/datas/windowType";
+
 export interface ToMainFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
   importImages: (

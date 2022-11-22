@@ -1,4 +1,6 @@
-import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
+import { BrowserWindow, IpcMainInvokeEvent, app, screen } from "electron";
+import * as Path from "path";
+
 import { WindowType } from "@/commons/datas/windowType";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
@@ -13,19 +15,20 @@ import {
   WINDOW_SETTINGS_HEIGHT,
   WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
-import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
-import * as Path from "path";
+import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
 import { Vec2 } from "@/commons/utils/vec2";
-import { createKey, inject } from "@/main/utils/di";
+
+import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
+import { useLogger } from "@/main/provides/utils/logger";
+import { createKey, createUseFunction } from "@/main/utils/di";
 import { isDarkMode } from "@/main/utils/isDarkMode";
-import { loggerKey } from "@/main/provides/utils/logger";
-import { configSettingsKey, configWindowStatesKey } from "@/main/provides/configs";
+
 export class Windows {
   windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
   activeWindows: { [key in WindowType]?: boolean } = {};
   mainWindowType: WindowType | undefined;
   onCloseWindow(type: WindowType) {
-    const logger = inject(loggerKey);
+    const logger = useLogger();
     logger.logMainChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
@@ -44,7 +47,7 @@ export class Windows {
     }
   }
   showWindows() {
-    const configSettings = inject(configSettingsKey);
+    const configSettings = useConfigSettings();
     if (configSettings.data.eula < EULA) {
       if (this.windows.eula === undefined || this.windows.eula.isDestroyed()) {
         this.windows.eula = this.initEULAWindow();
@@ -63,8 +66,8 @@ export class Windows {
     }
   }
   createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
-    const configWindowStates = inject(configWindowStatesKey);
-    const logger = inject(loggerKey);
+    const configWindowStates = useConfigWindowStates();
+    const logger = useLogger();
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -118,8 +121,8 @@ export class Windows {
     this.emitMainEvent("mainWindowType", type);
   }
   initBrowserWindow(x?: number, y?: number) {
-    const configWindowStates = inject(configWindowStatesKey);
-    const configSettings = inject(configSettingsKey);
+    const configWindowStates = useConfigWindowStates();
+    const configSettings = useConfigSettings();
     return this.createWindow(WindowType.BROWSER, {
       width: configWindowStates.data.browser?.width,
       height: configWindowStates.data.browser?.height,
@@ -133,7 +136,7 @@ export class Windows {
     });
   }
   initSettingsWindow(x?: number, y?: number) {
-    const configSettings = inject(configSettingsKey);
+    const configSettings = useConfigSettings();
     return this.createWindow(WindowType.SETTINGS, {
       width: WINDOW_SETTINGS_WIDTH,
       height: WINDOW_SETTINGS_HEIGHT,
@@ -152,8 +155,8 @@ export class Windows {
     });
   }
   initBoardWindow(x?: number, y?: number) {
-    const configWindowStates = inject(configWindowStatesKey);
-    const configSettings = inject(configSettingsKey);
+    const configWindowStates = useConfigWindowStates();
+    const configSettings = useConfigSettings();
     return this.createWindow(WindowType.BOARD, {
       width: configWindowStates.data.board?.width,
       height: configWindowStates.data.board?.height,
@@ -167,8 +170,8 @@ export class Windows {
     });
   }
   initDetailsWindow(x?: number, y?: number) {
-    const configWindowStates = inject(configWindowStatesKey);
-    const configSettings = inject(configSettingsKey);
+    const configWindowStates = useConfigWindowStates();
+    const configSettings = useConfigSettings();
     return this.createWindow(WindowType.DETAILS, {
       width: configWindowStates.data.details?.width,
       height: configWindowStates.data.details?.height,
@@ -182,8 +185,8 @@ export class Windows {
     });
   }
   initCaptureWindow(x?: number, y?: number) {
-    const configWindowStates = inject(configWindowStatesKey);
-    const configSettings = inject(configSettingsKey);
+    const configWindowStates = useConfigWindowStates();
+    const configSettings = useConfigSettings();
     return this.createWindow(WindowType.CAPTURE, {
       width: configWindowStates.data.capture?.width,
       height: configWindowStates.data.capture?.height,
@@ -197,7 +200,7 @@ export class Windows {
     });
   }
   initEULAWindow(x?: number, y?: number) {
-    const configSettings = inject(configSettingsKey);
+    const configSettings = useConfigSettings();
     return this.createWindow(WindowType.EULA, {
       width: WINDOW_EULA_WIDTH,
       height: WINDOW_EULA_HEIGHT,
@@ -213,8 +216,8 @@ export class Windows {
     });
   }
   saveWindowSize(windowType: WindowType) {
-    const configWindowStates = inject(configWindowStatesKey);
-    const logger = inject(loggerKey);
+    const configWindowStates = useConfigWindowStates();
+    const logger = useLogger();
     logger.logMainChunk().log("$Save Window States:", windowType);
     let state = configWindowStates.data[windowType];
     if (state === undefined) {
@@ -328,3 +331,4 @@ export class Windows {
   }
 }
 export const windowsKey = createKey<Windows>("windows");
+export const useWindows = createUseFunction(windowsKey);

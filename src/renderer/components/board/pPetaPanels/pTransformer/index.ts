@@ -1,12 +1,15 @@
-import * as PIXI from "pixi.js";
-import { Vec2 } from "@/commons/utils/vec2";
-import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
-import { PetaPanel } from "@/commons/datas/petaPanel";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
-import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
-import { PTransformerControlPoint } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerControlPoint";
 import deepcopy from "deepcopy";
+import * as PIXI from "pixi.js";
+
+import { PetaPanel } from "@/commons/datas/petaPanel";
 import { ROTATION_BLOCK_INCREMENT } from "@/commons/defines";
+import { Vec2 } from "@/commons/utils/vec2";
+
+import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
+import { PTransformerControlPoint } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerControlPoint";
+import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
+import { ClickChecker } from "@/renderer/utils/clickChecker";
+
 enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",

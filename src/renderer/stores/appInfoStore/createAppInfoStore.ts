@@ -1,4 +1,5 @@
 import { InjectionKey, readonly, ref } from "vue";
+
 import { IPC } from "@/renderer/ipc";
 
 export async function createAppInfoStore() {

@@ -25,6 +25,8 @@
 <script setup lang="ts">
 // Vue
 import { watch } from "vue";
+import { useI18n } from "vue-i18n";
+
 // Components
 import VBrowser from "@/renderer/components/browser/VBrowser.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
@@ -33,13 +35,14 @@ import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
 import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
+
 // Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const windowTypeStore = useWindowTypeStore();

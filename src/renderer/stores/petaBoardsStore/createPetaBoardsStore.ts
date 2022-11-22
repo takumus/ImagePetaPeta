@@ -1,14 +1,17 @@
 import { InjectionKey, ref } from "vue";
-import { IPC } from "@/renderer/ipc";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
-import { DelayUpdater } from "@/renderer/utils/delayUpdater";
-import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/commons/defines";
-import getNameAvoidDuplication from "@/renderer/utils/getNameAvoidDuplication";
+
+import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
+import { PetaPanel } from "@/commons/datas/petaPanel";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/commons/defines";
 import { Vec2 } from "@/commons/utils/vec2";
-import { PetaPanel } from "@/commons/datas/petaPanel";
+
+import { IPC } from "@/renderer/ipc";
+import { DelayUpdater } from "@/renderer/utils/delayUpdater";
+import getNameAvoidDuplication from "@/renderer/utils/getNameAvoidDuplication";
+
 export async function createPetaBoardsStore() {
   const states = ref<{ [petaBoardId: string]: RPetaBoard }>({});
   const boardUpdaters = ref<{ [key: string]: DelayUpdater<RPetaBoard> }>({});

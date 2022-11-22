@@ -16,15 +16,19 @@
 </template>
 
 <script setup lang="ts">
-import { RPetaImage } from "@/commons/datas/rPetaImage";
-import { generateGamutMap } from "@/renderer/components/browser/property/worker/generateGamutMap";
-import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
-import VPIXI from "@/renderer/components/utils/VPIXI.vue";
 import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import hsvCircleImage from "@/@assets/hsvCircle.png";
+
+import VPIXI from "@/renderer/components/utils/VPIXI.vue";
+
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
+
+import hsvCircleImage from "@/@assets/hsvCircle.png";
+import { generateGamutMap } from "@/renderer/components/browser/property/worker/generateGamutMap";
+import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
 import { IPC } from "@/renderer/ipc";
+
 const props = defineProps<{
   petaImage: RPetaImage;
 }>();

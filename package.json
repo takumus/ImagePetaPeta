@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@shockpkg/icon-encoder": "^2.1.1",
+    "@trivago/prettier-plugin-sort-imports": "^3.4.0",
     "@types/color-convert": "^2.0.0",
     "@types/color-diff": "^1.2.1",
     "@types/cors": "^2.8.12",

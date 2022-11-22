@@ -34,10 +34,14 @@
 
 <script setup lang="ts">
 // Vue
-import { IPC } from "@/renderer/ipc";
-import { ref, onMounted, watch } from "vue";
-import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+import { onMounted, ref, watch } from "vue";
+
 import VDragView from "@/renderer/components/utils/VDragView.vue";
+
+import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+
+import { IPC } from "@/renderer/ipc";
+
 // const props =
 defineProps<{
   zIndex: number;

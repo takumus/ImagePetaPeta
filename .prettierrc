@@ -6,5 +6,8 @@
   "trailingComma": "all",
   "semi": true,
   "arrowParens": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "importOrder": ["<THIRD_PARTY_MODULES>", "^(.*).vue$", "^@/commons/(.*)$", "^@/(.*)$"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

@@ -20,19 +20,22 @@
 <script setup lang="ts">
 // Vue
 import { onMounted, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+import VSettings from "@/renderer/components/settings/VSettings.vue";
 // Components
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
-import VSettings from "@/renderer/components/settings/VSettings.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
+
 // Others
 import { IPC } from "@/renderer/ipc";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { useI18n } from "vue-i18n";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
-import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
+import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const keyboards = useKeyboardsStore();

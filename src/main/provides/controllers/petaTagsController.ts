@@ -1,21 +1,23 @@
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { minimId } from "@/commons/utils/utils";
-import * as Tasks from "@/main/tasks/task";
-import { UNTAGGED_ID } from "@/commons/defines";
-import { createPetaImagePetaTag, PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { createPetaTag } from "@/commons/datas/petaTag";
-import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
+import { PetaImagePetaTag, createPetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { createPetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
-import { createKey, inject } from "@/main/utils/di";
-import { dbPetaImagesKey, dbPetaImagesPetaTagsKey, dbPetaTagsKey } from "@/main/provides/databases";
-import { loggerKey } from "@/main/provides/utils/logger";
-import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
-import { i18nKey } from "@/main/provides/utils/i18n";
+import { TaskStatusCode } from "@/commons/datas/task";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { UNTAGGED_ID } from "@/commons/defines";
+import { ppa } from "@/commons/utils/pp";
+import { minimId } from "@/commons/utils/utils";
+
+import { useDBPetaImages, useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
+import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { useI18n } from "@/main/provides/utils/i18n";
+import { useLogger } from "@/main/provides/utils/logger";
+import * as Tasks from "@/main/tasks/task";
+import { createKey, createUseFunction } from "@/main/utils/di";
+
 export class PetaTagsController {
   async updatePetaTags(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
-    const emit = inject(emitMainEventKey);
+    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaTags",
       async (handler) => {
@@ -57,9 +59,9 @@ export class PetaTagsController {
     mode: UpdateMode,
     silent = false,
   ) {
-    const petaTagsController = inject(petaTagsControllerKey);
-    const dbPetaTags = inject(dbPetaTagsKey);
-    const emit = inject(emitMainEventKey);
+    const petaTagsController = usePetaTagsController();
+    const dbPetaTags = useDBPetaTags();
+    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaImagesPetaTags",
       async (handler) => {
@@ -114,8 +116,8 @@ export class PetaTagsController {
     );
   }
   async getPetaImageIds(params: GetPetaImageIdsParams) {
-    const dbPetaImages = inject(dbPetaImagesKey);
-    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
+    const dbPetaImages = useDBPetaImages();
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
     // all
     if (params.type === "all") {
       const ids = dbPetaImages.getAll().map((pi) => pi.id);
@@ -166,7 +168,7 @@ export class PetaTagsController {
     return [];
   }
   async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
-    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
     const pipts = dbPetaImagesPetaTags
       .getAll()
       .filter((pipt) => petaImageIds.includes(pipt.petaImageId));
@@ -187,9 +189,9 @@ export class PetaTagsController {
     return petaTagIds;
   }
   async getPetaTagCounts() {
-    const dbPetaTags = inject(dbPetaTagsKey);
-    const dbPetaImages = inject(dbPetaImagesKey);
-    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
+    const dbPetaTags = useDBPetaTags();
+    const dbPetaImages = useDBPetaImages();
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
     const petaTags = dbPetaTags.getAll();
     const petaImagesPetaTags = dbPetaImagesPetaTags.getAll();
     const taggedIds = Array.from(
@@ -214,8 +216,8 @@ export class PetaTagsController {
     return petaTagCounts;
   }
   async getPetaTags() {
-    const dbPetaTags = inject(dbPetaTagsKey);
-    const i18n = inject(i18nKey);
+    const dbPetaTags = useDBPetaTags();
+    const i18n = useI18n();
     const petaTags = dbPetaTags.getAll();
     return [
       {
@@ -233,9 +235,9 @@ export class PetaTagsController {
     ];
   }
   private async updatePetaTag(petaTagLike: PetaTagLike, mode: UpdateMode) {
-    const logger = inject(loggerKey);
-    const dbPetaTags = inject(dbPetaTagsKey);
-    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
+    const logger = useLogger();
+    const dbPetaTags = useDBPetaTags();
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
     const log = logger.logMainChunk();
     log.log("##Update PetaTag");
     if (petaTagLike.type === "petaTag") {
@@ -284,8 +286,8 @@ export class PetaTagsController {
     return undefined;
   }
   private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
-    const logger = inject(loggerKey);
-    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
+    const logger = useLogger();
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
     const log = logger.logMainChunk();
     log.log("##Update PetaImagePetaTag");
     log.log("mode:", mode);
@@ -301,3 +303,4 @@ export class PetaTagsController {
   }
 }
 export const petaTagsControllerKey = createKey<PetaTagsController>("petaTagsController");
+export const usePetaTagsController = createUseFunction(petaTagsControllerKey);

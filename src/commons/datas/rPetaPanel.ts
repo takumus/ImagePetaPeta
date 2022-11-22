@@ -1,7 +1,9 @@
+import { v4 as uuid } from "uuid";
+
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
-import { v4 as uuid } from "uuid";
+
 export interface RPetaPanel extends PetaPanel {
   renderer: {
     selected: boolean;

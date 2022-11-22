@@ -3,9 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
-import { onMounted, onUnmounted, ref } from "vue";
 import * as PIXI from "pixi.js";
+import { onMounted, onUnmounted, ref } from "vue";
+
+import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
+
 const canvasWrapper = ref<HTMLElement>();
 const resizerStore = useResizerStore();
 let app: PIXI.Application | undefined;

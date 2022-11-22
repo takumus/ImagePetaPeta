@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Worker as WorkerThreads, MessagePort } from "worker_threads";
+import { MessagePort, Worker as WorkerThreads } from "worker_threads";
+
 type TypedWorkerThreads<I, O> = {
   postMessage(data: O): void;
   addListener(event: "message", callback: (e: I) => any): void;

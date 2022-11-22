@@ -3,8 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { onMounted, ref } from "vue";
+
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
+
 const fps = ref(999);
 const settingsStore = useSettingsStore();
 let count = 0;

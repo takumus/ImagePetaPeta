@@ -35,18 +35,22 @@
 <script setup lang="ts">
 // Vue
 import { onBeforeUpdate, onUnmounted, ref, watch } from "vue";
+
 // Components
 import VLayerCell from "@/renderer/components/layer/VLayerCell.vue";
-// Others
-import { Keyboards } from "@/renderer/utils/keyboards";
-import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
-import {
-  initSortHelper,
-  SortHelperConstraint,
-} from "@/renderer/components/browser/tags/sortHelper";
+
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
+
+import {
+  SortHelperConstraint,
+  initSortHelper,
+} from "@/renderer/components/browser/tags/sortHelper";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+// Others
+import { Keyboards } from "@/renderer/utils/keyboards";
+
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
 const statesStore = useStateStore();
 const emit = defineEmits<{

@@ -1,5 +1,6 @@
-import GenerateMetadataWorkerThreads from "@/main/workers/generateMetadata.worker-threads";
+import GenerateMetadataWorkerThreads from "@/main/utils/generateMetadata/generateMetadata.worker-threads";
 import { createWorkerThreadsGroup } from "@/main/utils/workerThreadsGroup";
+
 const wtGroup = createWorkerThreadsGroup(GenerateMetadataWorkerThreads);
 export async function generateMetadataByWorker(params: any) {
   return new Promise<any>((res, rej) => {

@@ -1,4 +1,5 @@
 import { PetaColor } from "@/commons/datas/petaColor";
+
 export interface PetaImageMetadata {
   type: string;
   version: number;

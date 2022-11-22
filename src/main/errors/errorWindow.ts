@@ -1,8 +1,10 @@
+import { BrowserWindow, app } from "electron";
+
 import { SUPPORT_URL } from "@/commons/defines";
 import { noHtml } from "@/commons/utils/utils";
-import { inject } from "@/main/utils/di";
-import { windowsKey } from "@/main/provides/utils/windows";
-import { app, BrowserWindow } from "electron";
+
+import { useWindows } from "@/main/provides/utils/windows";
+
 export interface ErrorWindowParameters {
   category: "M" | "R";
   code: number;
@@ -56,7 +58,7 @@ export function showErrorWindow(error: ErrorWindowParameters, quit = true) {
 }
 export function showError(error: ErrorWindowParameters, quit = true) {
   try {
-    const windows = inject(windowsKey);
+    const windows = useWindows();
     Object.values(windows.windows).forEach((window) => {
       if (window !== undefined && !window.isDestroyed()) {
         window.loadURL("about:blank");

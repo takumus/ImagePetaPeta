@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+
 export function runExternalApplication(
   cliToolPath: string,
   args: string[],

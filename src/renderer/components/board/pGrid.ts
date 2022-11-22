@@ -1,7 +1,9 @@
-import { BOARD_ZOOM_MAX } from "@/commons/defines";
-import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
+
+import { BOARD_ZOOM_MAX } from "@/commons/defines";
 import { valueChecker } from "@/commons/utils/valueChecker";
+import { Vec2 } from "@/commons/utils/vec2";
+
 const GRID_SIZE = 100;
 const DIVISION = 5;
 const SUB_GRID_SIZE = GRID_SIZE / DIVISION;

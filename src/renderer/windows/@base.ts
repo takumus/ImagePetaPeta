@@ -1,53 +1,55 @@
-import { Component, createApp, InjectionKey, Plugin } from "vue";
+import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
+import { Component, InjectionKey, Plugin, createApp } from "vue";
 import { createI18n } from "vue-i18n";
-import languages from "@/commons/languages";
-import { Keyboards } from "@/renderer/utils/keyboards";
-import { IPC } from "@/renderer/ipc";
-import { logChunk } from "@/renderer/utils/rendererLogger";
-import { WindowType } from "@/commons/datas/windowType";
 
-import {
-  createDarkModeStore,
-  darkModeStoreKey,
-} from "@/renderer/stores/darkModeStore/createDarkModeStore";
-import { createNSFWStore, nsfwStoreKey } from "@/renderer/stores/nsfwStore/createNSFWStore";
-import {
-  createWindowTypeStore,
-  windowTypeStoreKey,
-} from "@/renderer/stores/windowTypeStore/createWindowTypeStore";
-import {
-  createDefinesStore,
-  definesStoreKey,
-} from "@/renderer/stores/definesStore/createDefinesStore";
-import {
-  createSystemInfoStore,
-  systemInfoStoreKey,
-} from "@/renderer/stores/systemInfoStore/createSystemInfoStore";
-import {
-  createWindowStatusStore,
-  windowStatusStoreKey,
-} from "@/renderer/stores/windowStatusStore/createWindowStatusStore";
-import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore/createStatesStore";
-import {
-  settingsStoreKey,
-  createSettingsStore,
-} from "@/renderer/stores/settingsStore/createSettingsStore";
+import { WindowType } from "@/commons/datas/windowType";
+import languages from "@/commons/languages";
+
+import { IPC } from "@/renderer/ipc";
 import {
   appInfoStoreKey,
   createAppInfoStore,
 } from "@/renderer/stores/appInfoStore/createAppInfoStore";
-import { textsStoreKey, createTextsStore } from "@/renderer/stores/textsStore/createTextsStore";
 import {
   componentsStoreKey,
   createComponentsStore,
 } from "@/renderer/stores/componentsStore/createComponentsStore";
 import {
+  createDarkModeStore,
+  darkModeStoreKey,
+} from "@/renderer/stores/darkModeStore/createDarkModeStore";
+import {
+  createDefinesStore,
+  definesStoreKey,
+} from "@/renderer/stores/definesStore/createDefinesStore";
+import { createNSFWStore, nsfwStoreKey } from "@/renderer/stores/nsfwStore/createNSFWStore";
+import {
+  createSettingsStore,
+  settingsStoreKey,
+} from "@/renderer/stores/settingsStore/createSettingsStore";
+import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore/createStatesStore";
+import {
+  createSystemInfoStore,
+  systemInfoStoreKey,
+} from "@/renderer/stores/systemInfoStore/createSystemInfoStore";
+import { createTextsStore, textsStoreKey } from "@/renderer/stores/textsStore/createTextsStore";
+import {
+  createWindowStatusStore,
+  windowStatusStoreKey,
+} from "@/renderer/stores/windowStatusStore/createWindowStatusStore";
+import {
   createWindowTitleStore,
   windowTitleStoreKey,
 } from "@/renderer/stores/windowTitleStore/createWindowTitleStore";
-import { injectAnimatedGIFAsset } from "@/renderer/utils/pixi-gif/animatedGIFAsset";
+import {
+  createWindowTypeStore,
+  windowTypeStoreKey,
+} from "@/renderer/stores/windowTypeStore/createWindowTypeStore";
 import { ClickChecker } from "@/renderer/utils/clickChecker";
-import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
+import { Keyboards } from "@/renderer/utils/keyboards";
+import { injectAnimatedGIFAsset } from "@/renderer/utils/pixi-gif/animatedGIFAsset";
+import { logChunk } from "@/renderer/utils/rendererLogger";
+
 export async function create(
   component: Component,
   windowType: WindowType,

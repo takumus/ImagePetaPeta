@@ -42,14 +42,17 @@
 <script setup lang="ts">
 // Vue
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+import { WindowType } from "@/commons/datas/windowType";
+
 // Others
 import { IPC } from "@/renderer/ipc";
-import { WindowType } from "@/commons/datas/windowType";
-import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
-import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
+import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+
 const nsfwStore = useNSFWStore();
 const components = useComponentsStore();
 const { t } = useI18n();

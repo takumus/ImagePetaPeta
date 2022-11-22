@@ -43,44 +43,48 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, toRaw, computed } from "vue";
+import * as PIXI from "pixi.js";
+import { computed, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
 // Components
 import VCrop from "@/renderer/components/board/VCrop.vue";
+import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import VBoardLoading from "@/renderer/components/board/loading/VBoardLoading.vue";
 import VLayer from "@/renderer/components/layer/VLayer.vue";
+import VPIXI from "@/renderer/components/utils/VPIXI.vue";
+
+import { MouseButton } from "@/commons/datas/mouseButton";
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { WindowType } from "@/commons/datas/windowType";
+import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
+import { ppa } from "@/commons/utils/pp";
+import { minimId } from "@/commons/utils/utils";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
+
+import { PSelection } from "@/renderer/components/board/PSelection";
+import { VBoardLoadingStatus } from "@/renderer/components/board/loading/vBoardLoadingStatus";
+import { PBackground } from "@/renderer/components/board/pBackground";
 // Others
 import { PBoardGrid } from "@/renderer/components/board/pGrid";
-import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { RPetaBoard } from "@/commons/datas/rPetaBoard";
-import { MouseButton } from "@/commons/datas/mouseButton";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
-import * as PIXI from "pixi.js";
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
 import { PTransformer } from "@/renderer/components/board/pPetaPanels/pTransformer";
-import { hitTest } from "@/renderer/utils/hitTest";
-import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
-import { minimId } from "@/commons/utils/utils";
-import { Keyboards } from "@/renderer/utils/keyboards";
-import * as Cursor from "@/renderer/utils/cursor";
-import { logChunk } from "@/renderer/utils/rendererLogger";
 import { IPC } from "@/renderer/ipc";
-import { WindowType } from "@/commons/datas/windowType";
-import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { PSelection } from "@/renderer/components/board/PSelection";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
-import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { useI18n } from "vue-i18n";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { ppa } from "@/commons/utils/pp";
-import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
-import { RPetaPanel } from "@/commons/datas/rPetaPanel";
-import { PBackground } from "@/renderer/components/board/pBackground";
-import VPIXI from "@/renderer/components/utils/VPIXI.vue";
-import { VBoardLoadingStatus } from "@/renderer/components/board/loading/vBoardLoadingStatus";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
+import { ClickChecker } from "@/renderer/utils/clickChecker";
+import * as Cursor from "@/renderer/utils/cursor";
+import { hitTest } from "@/renderer/utils/hitTest";
+import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
+import { Keyboards } from "@/renderer/utils/keyboards";
+import { logChunk } from "@/renderer/utils/rendererLogger";
+
 const emit = defineEmits<{
   (e: "update:board", board: RPetaBoard): void;
 }>();

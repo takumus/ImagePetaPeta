@@ -1,4 +1,5 @@
 import { InjectionKey, readonly, ref } from "vue";
+
 import { WindowType } from "@/commons/datas/windowType";
 
 export async function createWindowTypeStore(windowType: WindowType) {

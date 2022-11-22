@@ -154,23 +154,26 @@
 // import { Prop, Ref, Watch } from "vue-property-decorator";
 // Components
 // Others
-import { IPC } from "@/renderer/ipc";
-import { vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { UNTAGGED_ID } from "@/commons/defines";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
-import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+
+import VGamutMap from "@/renderer/components/browser/property/VGamutMap.vue";
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
-import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+
 import { PetaColor } from "@/commons/datas/petaColor";
-import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
-import VGamutMap from "@/renderer/components/browser/property/VGamutMap.vue";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { UNTAGGED_ID } from "@/commons/defines";
+import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
+
+import { IPC } from "@/renderer/ipc";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 
 const emit = defineEmits<{
   (e: "selectTag", tag: RPetaTag): void;

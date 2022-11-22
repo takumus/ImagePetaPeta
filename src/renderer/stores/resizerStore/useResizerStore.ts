@@ -1,5 +1,6 @@
-import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 import { onUnmounted } from "vue";
+
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
 export function useResizerStore() {
   const eventEmitter = new TypedEventEmitter<{

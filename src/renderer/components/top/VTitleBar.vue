@@ -36,12 +36,15 @@
 <script setup lang="ts">
 // Vue
 import { computed } from "vue";
+
+import { WindowType } from "@/commons/datas/windowType";
+
 // Components
 // Others
 import { IPC } from "@/renderer/ipc";
-import { WindowType } from "@/commons/datas/windowType";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+
 const { windowType } = useWindowTypeStore();
 const { systemInfo } = useSystemInfoStore();
 defineProps<{

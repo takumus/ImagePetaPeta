@@ -10,23 +10,25 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, onUnmounted, watch, computed } from "vue";
-// Components
+import * as PIXI from "pixi.js";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
+import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { resizeImage } from "@/commons/utils/resizeImage";
+// Components
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
-import * as PIXI from "pixi.js";
-import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
+
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
-import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
 import { PTransformerControlPoint } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerControlPoint";
+import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { useI18n } from "vue-i18n";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { resizeImage } from "@/commons/utils/resizeImage";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
-import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+
 const props = defineProps<{
   petaPanel?: RPetaPanel;
 }>();

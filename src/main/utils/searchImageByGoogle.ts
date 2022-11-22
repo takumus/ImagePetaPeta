@@ -1,10 +1,13 @@
-import { PetaImage } from "@/commons/datas/petaImage";
-import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
-import { BrowserWindow, shell, WebContents } from "electron";
+import { BrowserWindow, WebContents, shell } from "electron";
 import * as Path from "path";
-import * as Tasks from "@/main/tasks/task";
-import { ppa } from "@/commons/utils/pp";
+
+import { PetaImage } from "@/commons/datas/petaImage";
 import { TaskStatusCode } from "@/commons/datas/task";
+import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
+import { ppa } from "@/commons/utils/pp";
+
+import * as Tasks from "@/main/tasks/task";
+
 type SearchImageByGoogleTaskStep = { js: string } | { wait: number };
 export interface SearchImageByGoogleTask {
   url: string;

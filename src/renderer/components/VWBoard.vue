@@ -46,42 +46,46 @@
 <script setup lang="ts">
 // Vue
 import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
 // Components
 import VBoard from "@/renderer/components/board/VBoard.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 import VTasks from "@/renderer/components/task/VTasks.vue";
+import VBoardProperty from "@/renderer/components/top/VBoardProperty.vue";
 import VTabBar from "@/renderer/components/top/VTabBar.vue";
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
-import VBoardProperty from "@/renderer/components/top/VBoardProperty.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
 import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
-// Others
-// import { AnimatedGIFLoader } from "@/renderer/utils/pixi-gif";
-import { IPC } from "@/renderer/ipc";
+import VFramerate from "@/renderer/components/utils/VFramerate.vue";
+
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
+import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BOARD_ADD_MULTIPLE_OFFSET_X,
   BOARD_ADD_MULTIPLE_OFFSET_Y,
   DEFAULT_IMAGE_SIZE,
 } from "@/commons/defines";
-import { RPetaBoard } from "@/commons/datas/rPetaBoard";
-import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { Vec2 } from "@/commons/utils/vec2";
-import { logChunk } from "@/renderer/utils/rendererLogger";
-import { minimId } from "@/commons/utils/utils";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
-import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useI18n } from "vue-i18n";
-import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { hasPetaImages } from "@/commons/utils/board";
+import { minimId } from "@/commons/utils/utils";
+import { Vec2 } from "@/commons/utils/vec2";
+
+// Others
+// import { AnimatedGIFLoader } from "@/renderer/utils/pixi-gif";
+import { IPC } from "@/renderer/ipc";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
-import VFramerate from "@/renderer/components/utils/VFramerate.vue";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+import { logChunk } from "@/renderer/utils/rendererLogger";
+
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();

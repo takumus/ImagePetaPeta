@@ -1,5 +1,7 @@
 import { InjectionKey, readonly, ref } from "vue";
+
 import * as defines from "@/commons/defines";
+
 export async function createDefinesStore() {
   return {
     defines: readonly(ref(defines)),

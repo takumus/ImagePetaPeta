@@ -17,11 +17,14 @@
 
 <script setup lang="ts">
 // Others
-import { IPC } from "@/renderer/ipc";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+
 import { DOWNLOAD_URL } from "@/commons/defines";
+
+import { IPC } from "@/renderer/ipc";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const updateAvailable = ref(false);

@@ -1,10 +1,13 @@
 import { InjectionKey, onUnmounted, ref } from "vue";
-import { IPC } from "@/renderer/ipc";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { PetaTagLike } from "@/commons/datas/petaTagLike";
-import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
+
 import { PetaTag } from "@/commons/datas/petaTag";
+import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
+import { UpdateMode } from "@/commons/datas/updateMode";
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
+
+import { IPC } from "@/renderer/ipc";
+
 export async function createPetaTagsStore() {
   const petaTags = ref(
     (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag)),

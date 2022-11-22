@@ -1,8 +1,10 @@
-import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
-import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
-import { IpcRendererEvent } from "electron/main";
 import deepcopy from "deepcopy";
+import { IpcRendererEvent } from "electron/main";
+
 import { IPC_GLOBAL_NAME } from "@/commons/defines";
+import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
+import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
+
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const WINDOW = window as any;
 export const IPC = {

@@ -1,9 +1,11 @@
+import * as PIXI from "pixi.js";
+
 import { ImageType } from "@/commons/datas/imageType";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
+
 import { getImageURL } from "@/renderer/utils/imageURL";
 import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
 import { AnimatedGIFResource } from "@/renderer/utils/pixi-gif/animatedGIFResource";
-import * as PIXI from "pixi.js";
 
 export function getImage(petaImage: RPetaImage | undefined) {
   let canceled = false;

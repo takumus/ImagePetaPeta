@@ -1,21 +1,23 @@
-import { UpdateMode } from "@/commons/datas/updateMode";
-import * as Tasks from "@/main/tasks/task";
-// import { migratePetaTagPartition } from "@/main/utils/migrater";
-import { ppa } from "@/commons/utils/pp";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { TaskStatusCode } from "@/commons/datas/task";
+import { UpdateMode } from "@/commons/datas/updateMode";
+// import { migratePetaTagPartition } from "@/main/utils/migrater";
+import { ppa } from "@/commons/utils/pp";
 import { minimId } from "@/commons/utils/utils";
-import { createKey, inject } from "@/main/utils/di";
-import { dbPetaTagPartitionsKey } from "@/main/provides/databases";
-import { loggerKey } from "@/main/provides/utils/logger";
-import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
+
+import { useDBPetaTagPartitions } from "@/main/provides/databases";
+import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { useLogger } from "@/main/provides/utils/logger";
+import * as Tasks from "@/main/tasks/task";
+import { createKey, createUseFunction } from "@/main/utils/di";
+
 export class PetaTagPartitionsController {
   async getPetaTagPartitions() {
-    const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
+    const dbPetaTagPartitions = useDBPetaTagPartitions();
     return dbPetaTagPartitions.getAll();
   }
   async updatePetaTagPartitions(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
-    const emit = inject(emitMainEventKey);
+    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaTagPartitions",
       async (handler) => {
@@ -46,8 +48,8 @@ export class PetaTagPartitionsController {
     );
   }
   async updatePetaTagPartition(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
-    const logger = inject(loggerKey);
-    const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
+    const logger = useLogger();
+    const dbPetaTagPartitions = useDBPetaTagPartitions();
     const log = logger.logMainChunk();
     log.log("##Update PetaTagPartition");
     log.log("mode:", mode);
@@ -65,3 +67,4 @@ export class PetaTagPartitionsController {
 export const petaTagPartitionsControllerKey = createKey<PetaTagPartitionsController>(
   "petaTagPartitionsController",
 );
+export const usePetaTagPartitionsCOntroller = createUseFunction(petaTagPartitionsControllerKey);

@@ -1,9 +1,12 @@
 import { InjectionKey, onUnmounted, ref } from "vue";
-import { IPC } from "@/renderer/ipc";
+
 import { PetaImage } from "@/commons/datas/petaImage";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+
+import { IPC } from "@/renderer/ipc";
+
 export async function createPetaImagesStore() {
   const states = ref<{ [key: string]: RPetaImage }>({});
   Object.values(await IPC.send("getPetaImages")).forEach((petaImage) => {

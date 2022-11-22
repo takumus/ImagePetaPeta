@@ -1,9 +1,9 @@
-import { configSettingsKey } from "@/main/provides/configs";
-import { inject } from "@/main/utils/di";
 import { nativeTheme } from "electron";
 
+import { useConfigSettings } from "@/main/provides/configs";
+
 export function isDarkMode() {
-  const configSettings = inject(configSettingsKey);
+  const configSettings = useConfigSettings();
   if (configSettings.data.autoDarkMode) {
     return nativeTheme.shouldUseDarkColors;
   }

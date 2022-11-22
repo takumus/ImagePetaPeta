@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+
 export class PFGrayScaleByLuminous extends PIXI.Filter {
   constructor() {
     super(

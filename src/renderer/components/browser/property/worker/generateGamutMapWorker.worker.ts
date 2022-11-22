@@ -3,6 +3,7 @@ import {
   generateGamutMapWorkerOutputData,
 } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
 import { initWebWorkerThreads } from "@/renderer/utils/initWebWorker";
+
 // import * as convert from "color-convert";
 export default initWebWorkerThreads<
   generateGamutMapWorkerInputData,

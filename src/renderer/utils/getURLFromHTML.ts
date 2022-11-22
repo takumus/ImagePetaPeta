@@ -1,4 +1,5 @@
 import { DOMParser } from "@xmldom/xmldom";
+
 export function getURLFromHTML(html: string) {
   try {
     const dom = new DOMParser().parseFromString(`<wrapper>${html}</wrapper>`, "text/html");

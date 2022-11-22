@@ -1,4 +1,5 @@
 import deepcopy from "deepcopy";
+
 const defaultSettings = {
   darkMode: true,
   autoDarkMode: false,

@@ -1,14 +1,17 @@
-import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
+
+import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { valueChecker } from "@/commons/utils/valueChecker";
+import { Vec2 } from "@/commons/utils/vec2";
+
+import LOADINGImage from "@/@assets/loadingBackground.png";
+import NOIMAGEImage from "@/@assets/noImageBackground.png";
+import NSFWImage from "@/@assets/nsfwBackground.png";
 // import { AnimatedGIF } from "@/renderer/utils/pixi-gif";
 import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
-import { valueChecker } from "@/commons/utils/valueChecker";
-import NSFWImage from "@/@assets/nsfwBackground.png";
-import NOIMAGEImage from "@/@assets/noImageBackground.png";
-import LOADINGImage from "@/@assets/loadingBackground.png";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
-import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+
 export class PPetaPanel extends PIXI.Sprite {
   // public selected = false;
   public unselected = false;

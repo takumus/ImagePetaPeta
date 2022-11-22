@@ -1,24 +1,26 @@
-import { app, ipcMain, session, protocol, nativeTheme } from "electron";
+import { app, ipcMain, nativeTheme, protocol, session } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import { arrLast } from "@/commons/utils/utils";
-import { getLatestVersion } from "@/commons/utils/versions";
+
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 // import { DraggingPreviewWindow } from "@/main/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
-import { initDI } from "@/main/initDI";
-import { initWebhook } from "@/main/webhook/webhook";
-import { loggerKey } from "@/main/provides/utils/logger";
-import { inject } from "@/main/utils/di";
-import { pathsKey } from "@/main/provides/utils/paths";
-import { dbStatusKey } from "@/main/provides/databases";
-import { configSettingsKey } from "@/main/provides/configs";
-import { windowsKey } from "@/main/provides/utils/windows";
-import { isDarkMode } from "@/main/utils/isDarkMode";
-import { getMainFunctions } from "@/main/ipcFunctions";
-import { showError } from "@/main/errors/errorWindow";
 import { PROTOCOLS, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
+import { arrLast } from "@/commons/utils/utils";
+import { getLatestVersion } from "@/commons/utils/versions";
+
+import { showError } from "@/main/errors/errorWindow";
 import { initDB } from "@/main/initDB";
+import { initDI } from "@/main/initDI";
+import { getMainFunctions } from "@/main/ipcFunctions";
+import { useConfigSettings } from "@/main/provides/configs";
+import { useDBStatus } from "@/main/provides/databases";
+import { useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
+import { useWindows } from "@/main/provides/utils/windows";
+import { isDarkMode } from "@/main/utils/isDarkMode";
+import { initWebhook } from "@/main/webhook/webhook";
+
 (() => {
   /*------------------------------------
     シングルインスタンス化
@@ -36,11 +38,11 @@ import { initDB } from "@/main/initDB";
   if (!initDI(showError)) {
     return;
   }
-  const logger = inject(loggerKey);
-  const paths = inject(pathsKey);
-  const windows = inject(windowsKey);
-  const configSettings = inject(configSettingsKey);
-  const dbStatus = inject(dbStatusKey);
+  const logger = useLogger();
+  const paths = usePaths();
+  const windows = useWindows();
+  const configSettings = useConfigSettings();
+  const dbStatus = useDBStatus();
   //-------------------------------------------------------------------------------------------------//
   /*
     electronのready前にやらないといけない事

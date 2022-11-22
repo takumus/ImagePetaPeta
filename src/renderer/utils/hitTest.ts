@@ -1,7 +1,6 @@
 /* eslint-disable */
 //
 // https://github.com/wise9/enchant.js/blob/master/dev/src/Entity.js
-
 import { Vec2 } from "@/commons/utils/vec2";
 
 //

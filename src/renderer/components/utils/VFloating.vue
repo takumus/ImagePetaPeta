@@ -16,10 +16,11 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, nextTick } from "vue";
+import { nextTick, ref } from "vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
+
 const props = defineProps<{
   zIndex: number;
   visible: boolean;

@@ -59,16 +59,13 @@
 
 <script setup lang="ts">
 // Vue
-import { computed, ref, watch, onMounted, onUnmounted } from "vue";
-// Others
-import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { getImageURL } from "@/renderer/utils/imageURL";
-import { Tile } from "@/renderer/components/browser/tile/tile";
-import { MouseButton } from "@/commons/datas/mouseButton";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
 import { ImageType } from "@/commons/datas/imageType";
-import { IPC } from "@/renderer/ipc";
-import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
+import { MouseButton } from "@/commons/datas/mouseButton";
+import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaTag } from "@/commons/datas/rPetaTag";
 import {
   BROWSER_FETCH_TAGS_DELAY,
   BROWSER_FETCH_TAGS_DELAY_RANDOM,
@@ -77,12 +74,17 @@ import {
   BROWSER_LOAD_THUMBNAIL_DELAY,
   BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM,
 } from "@/commons/defines";
+// Others
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
+
+import { Tile } from "@/renderer/components/browser/tile/tile";
+import { IPC } from "@/renderer/ipc";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { useI18n } from "vue-i18n";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
-import { RPetaTag } from "@/commons/datas/rPetaTag";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
+import { ClickChecker } from "@/renderer/utils/clickChecker";
+import { getImageURL } from "@/renderer/utils/imageURL";
+import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;

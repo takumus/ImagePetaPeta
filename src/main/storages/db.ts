@@ -1,6 +1,8 @@
-import { DB_COMPACTION_DELAY } from "@/commons/defines";
 import Nedb from "@seald-io/nedb";
+
+import { DB_COMPACTION_DELAY } from "@/commons/defines";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
+
 type MessageEvents = {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   compactionError: (error: any) => void;

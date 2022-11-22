@@ -1,4 +1,5 @@
-import { InjectionKey, ref, watch as _watch } from "vue";
+import { InjectionKey, watch as _watch, ref } from "vue";
+
 import { IPC } from "@/renderer/ipc";
 
 export async function createStatesStore() {

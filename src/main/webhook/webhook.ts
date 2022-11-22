@@ -1,16 +1,18 @@
-import express from "express";
 import bodyParser from "body-parser";
-import { IpFilter } from "express-ipfilter";
 import cors from "cors";
-import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
 import { IpcMainInvokeEvent } from "electron";
+import express from "express";
+import { IpFilter } from "express-ipfilter";
+
 import {
   WEBHOOK_PORT,
   WEBHOOK_WHITELIST_IP_LIST,
   WEBHOOK_WHITELIST_ORIGIN_LIST,
 } from "@/commons/defines";
-import { inject } from "@/main/utils/di";
-import { loggerKey } from "@/main/provides/utils/logger";
+import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
+
+import { useLogger } from "@/main/provides/utils/logger";
+
 type EventNames = keyof ToMainFunctions;
 const allowedEvents: EventNames[] = ["importImages"];
 export function initWebhook(toMainFunctions: {
@@ -19,7 +21,7 @@ export function initWebhook(toMainFunctions: {
     ...args: Parameters<ToMainFunctions[P]>
   ) => ReturnType<ToMainFunctions[P]>;
 }) {
-  const logger = inject(loggerKey);
+  const logger = useLogger();
   const initLog = logger.logMainChunk();
   try {
     initLog.log(`$Webhook: init`);

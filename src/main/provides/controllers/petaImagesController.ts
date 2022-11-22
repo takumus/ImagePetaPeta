@@ -1,37 +1,40 @@
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
-import { minimId } from "@/commons/utils/utils";
-import * as Path from "path";
-import * as file from "@/main/storages/file";
-import * as Tasks from "@/main/tasks/task";
+import axios, { AxiosError } from "axios";
 import crypto from "crypto";
-import { ImageType } from "@/commons/datas/imageType";
+import dataUriToBuffer from "data-uri-to-buffer";
+import * as Path from "path";
 import sharp from "sharp";
-import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
-import { generateMetadataByWorker } from "@/main/utils/generateMetadataByWorker";
+import { v4 as uuid } from "uuid";
+
+import { ImageType } from "@/commons/datas/imageType";
+import { ImportFileInfo } from "@/commons/datas/importFileInfo";
+import { ImportImageResult } from "@/commons/datas/importImageResult";
+import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { TaskStatusCode } from "@/commons/datas/task";
+import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BROWSER_THUMBNAIL_QUALITY,
   BROWSER_THUMBNAIL_SIZE,
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
-import { ImportImageResult } from "@/commons/datas/importImageResult";
-import dataUriToBuffer from "data-uri-to-buffer";
-import axios, { AxiosError } from "axios";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
-import { TaskStatusCode } from "@/commons/datas/task";
-import { v4 as uuid } from "uuid";
-import { ImportFileInfo } from "@/commons/datas/importFileInfo";
-import { createKey, inject } from "@/main/utils/di";
-import { petaTagsControllerKey } from "@/main/provides/controllers/petaTagsController";
-import { dbPetaImagesKey, dbPetaImagesPetaTagsKey } from "@/main/provides/databases";
-import { loggerKey } from "@/main/provides/utils/logger";
-import { emitMainEventKey } from "@/main/provides/utils/emitMainEvent";
-import { pathsKey } from "@/main/provides/utils/paths";
+import { minimId } from "@/commons/utils/utils";
+
+import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
+import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
+import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
+import { useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
+import * as file from "@/main/storages/file";
+import * as Tasks from "@/main/tasks/task";
+import { createKey, createUseFunction } from "@/main/utils/di";
+import { generateMetadataByWorker } from "@/main/utils/generateMetadata/generateMetadata";
+import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
+
 export class PetaImagesController {
   public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
-    const petaTagsController = inject(petaTagsControllerKey);
-    const emit = inject(emitMainEventKey);
+    const petaTagsController = usePetaTagsController();
+    const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaImages",
       async (handler) => {
@@ -73,7 +76,7 @@ export class PetaImagesController {
     );
   }
   getImagePath(petaImage: PetaImage, thumbnail: ImageType) {
-    const paths = inject(pathsKey);
+    const paths = usePaths();
     if (thumbnail === ImageType.ORIGINAL) {
       return Path.resolve(paths.DIR_IMAGES, petaImage.file.original);
     } else {
@@ -81,7 +84,7 @@ export class PetaImagesController {
     }
   }
   async getPetaImage(id: string) {
-    const dbPetaImages = inject(dbPetaImagesKey);
+    const dbPetaImages = useDBPetaImages();
     const petaImage = (await dbPetaImages.find({ id }))[0];
     if (petaImage === undefined) {
       return undefined;
@@ -89,7 +92,7 @@ export class PetaImagesController {
     return petaImage;
   }
   async getPetaImages() {
-    const dbPetaImages = inject(dbPetaImagesKey);
+    const dbPetaImages = useDBPetaImages();
     const data = dbPetaImages.getAll();
     const petaImages: PetaImages = {};
     data.forEach((pi) => {
@@ -98,9 +101,9 @@ export class PetaImagesController {
     return petaImages;
   }
   private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
-    const dbPetaImages = inject(dbPetaImagesKey);
-    const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-    const logger = inject(loggerKey);
+    const dbPetaImages = useDBPetaImages();
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+    const logger = useLogger();
     const log = logger.logMainChunk();
     log.log("##Update PetaImage");
     log.log("mode:", mode);
@@ -122,8 +125,8 @@ export class PetaImagesController {
     return true;
   }
   async createFileInfoFromURL(url: string) {
-    const logger = inject(loggerKey);
-    const paths = inject(pathsKey);
+    const logger = useLogger();
+    const paths = usePaths();
     const log = logger.logMainChunk();
     try {
       log.log("## Create File Info URL");
@@ -156,8 +159,8 @@ export class PetaImagesController {
     return undefined;
   }
   async createFileInfoFromBuffer(buffer: ArrayBuffer | Buffer) {
-    const logger = inject(loggerKey);
-    const paths = inject(pathsKey);
+    const logger = useLogger();
+    const paths = usePaths();
     const log = logger.logMainChunk();
     try {
       log.log("## Create File Info From ArrayBuffer");
@@ -182,7 +185,7 @@ export class PetaImagesController {
     },
     silent = false,
   ) {
-    const logger = inject(loggerKey);
+    const logger = useLogger();
     if (params.fileInfos.length == 0) {
       return [];
     }
@@ -288,9 +291,9 @@ export class PetaImagesController {
     );
   }
   async regenerateMetadatas() {
-    const logger = inject(loggerKey);
-    const emit = inject(emitMainEventKey);
-    const paths = inject(pathsKey);
+    const logger = useLogger();
+    const emit = useEmitMainEvent();
+    const paths = usePaths();
     const log = logger.logMainChunk();
     emit("regenerateMetadatasBegin");
     const images = Object.values(await this.getPetaImages());
@@ -328,7 +331,7 @@ export class PetaImagesController {
     fileDate?: Date;
     addDate?: Date;
   }): Promise<{ exists: boolean; petaImage: PetaImage }> {
-    const paths = inject(pathsKey);
+    const paths = usePaths();
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await this.getPetaImage(id);
     if (exists)
@@ -385,3 +388,4 @@ export class PetaImagesController {
   }
 }
 export const petaImagesControllerKey = createKey<PetaImagesController>("petaImagesController");
+export const usePetaImagesController = createUseFunction(petaImagesControllerKey);

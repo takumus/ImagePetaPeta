@@ -1,6 +1,9 @@
 import * as PIXI from "pixi.js";
-import Logo from "@/@assets/dashedLineTexture.png";
+
 import { Vec2 } from "@/commons/utils/vec2";
+
+import Logo from "@/@assets/dashedLineTexture.png";
+
 export class PTransformerDashedLine extends PIXI.Container {
   texture?: PIXI.TilingSprite;
   graphics: PIXI.Graphics = new PIXI.Graphics();

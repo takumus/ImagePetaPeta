@@ -21,18 +21,21 @@
 <script setup lang="ts">
 // Vue
 import { watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+import VCapture from "@/renderer/components/capture/VCapture.vue";
 // Components
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
+import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
 import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
 import VDialog from "@/renderer/components/utils/VDialog.vue";
-import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VCapture from "@/renderer/components/capture/VCapture.vue";
+
 // Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
-import { useI18n } from "vue-i18n";
+import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const windowTypeStore = useWindowTypeStore();

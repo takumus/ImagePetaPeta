@@ -31,16 +31,19 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, computed } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 // Others
 import VFloating from "@/renderer/components/utils/VFloating.vue";
-import { Vec2 } from "@/commons/utils/vec2";
-import { searchParentElement } from "@/renderer/utils/searchParentElement";
-import { useI18n } from "vue-i18n";
-import { IPC } from "@/renderer/ipc";
-import { WindowType } from "@/commons/datas/windowType";
+
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
+import { WindowType } from "@/commons/datas/windowType";
+import { Vec2 } from "@/commons/utils/vec2";
+
+import { IPC } from "@/renderer/ipc";
+import { searchParentElement } from "@/renderer/utils/searchParentElement";
+
 const props = defineProps<{
   zIndex: number;
   selectedPetaPanels: RPetaPanel[];

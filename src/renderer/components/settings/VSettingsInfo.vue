@@ -29,14 +29,17 @@
 
 <script setup lang="ts">
 // Others
-import { IPC } from "@/renderer/ipc";
-import { useI18n } from "vue-i18n";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { SUPPORT_URL } from "@/commons/defines";
-import { LICENSES } from "@/@assets/licenses";
-import { DEBUGGERS } from "@/@assets/debuggers";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
 import { WindowType } from "@/commons/datas/windowType";
+import { SUPPORT_URL } from "@/commons/defines";
+
+import { DEBUGGERS } from "@/@assets/debuggers";
+import { LICENSES } from "@/@assets/licenses";
+import { IPC } from "@/renderer/ipc";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const licenses = computed(() => {

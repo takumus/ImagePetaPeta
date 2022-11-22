@@ -22,8 +22,9 @@
 
 <script setup lang="ts">
 // Vue
-import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { ref } from "vue";
+
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 
 defineProps<{
   zIndex: number;

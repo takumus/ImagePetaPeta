@@ -56,15 +56,18 @@
 <script setup lang="ts">
 // Vue
 import { computed, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+import VTextarea from "@/renderer/components/utils/VTextarea.vue";
+
+import { MouseButton } from "@/commons/datas/mouseButton";
+import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 // Others
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { RPetaBoard } from "@/commons/datas/rPetaBoard";
-import { MouseButton } from "@/commons/datas/mouseButton";
-import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
-import { useI18n } from "vue-i18n";
+
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import VTextarea from "@/renderer/components/utils/VTextarea.vue";
+import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
+import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 
 const emit = defineEmits<{
   (e: "add"): void;

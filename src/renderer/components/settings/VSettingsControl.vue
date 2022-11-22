@@ -15,8 +15,9 @@
 
 <script setup lang="ts">
 // Others
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useI18n } from "vue-i18n";
+
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const settingsStore = useSettingsStore();
 const { t } = useI18n();

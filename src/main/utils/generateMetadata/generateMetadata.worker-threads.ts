@@ -1,9 +1,11 @@
 // import { generateMetadata } from "@/main/utils/generateMetadata";
-import { initWorkerThreads } from "@/main/utils/initWorkerThreads";
-import { parentPort } from "worker_threads";
 import sharp from "sharp";
+import { parentPort } from "worker_threads";
+
 import * as file from "@/main/storages/file";
-import { getSimplePalette } from "@/main/utils/generatePalette";
+import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
+import { initWorkerThreads } from "@/main/utils/initWorkerThreads";
+
 export default initWorkerThreads<
   { data: Buffer; outputFilePath: string; size: number; quality: number },
   Awaited<ReturnType<typeof generateMetadata>>

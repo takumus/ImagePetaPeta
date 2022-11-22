@@ -17,10 +17,13 @@
 
 <script setup lang="ts">
 // Components
-import { VBoardLoadingStatus } from "@/renderer/components/board/loading/vBoardLoadingStatus";
+import { useI18n } from "vue-i18n";
+
 import VModal from "@/renderer/components/modal/VModal.vue";
 import VProgressBar from "@/renderer/components/utils/VProgressBar.vue";
-import { useI18n } from "vue-i18n";
+
+import { VBoardLoadingStatus } from "@/renderer/components/board/loading/vBoardLoadingStatus";
+
 const { t } = useI18n();
 
 defineProps<{

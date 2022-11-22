@@ -1,5 +1,7 @@
-import { Vec2 } from "@/commons/utils/vec2";
 import * as PIXI from "pixi.js";
+
+import { Vec2 } from "@/commons/utils/vec2";
+
 export class PSelection extends PIXI.Graphics {
   public topLeft = new Vec2();
   public bottomRight = new Vec2();

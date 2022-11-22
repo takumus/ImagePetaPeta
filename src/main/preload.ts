@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer, webFrame } from "electron";
+
 import { IPC_GLOBAL_NAME } from "@/commons/defines";
+
 const listeners: { [key: string]: { key: string; cb: (...argv: unknown[]) => void } } = {};
 webFrame.setZoomLevel(1);
 let listenerId = 0;

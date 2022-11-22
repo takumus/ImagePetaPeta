@@ -1,12 +1,13 @@
 import { v4 as uuid } from "uuid";
+
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { Vec2 } from "@/commons/utils/vec2";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
   BOARD_DARK_BACKGROUND_LINE_COLOR,
   BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
   BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
 } from "@/commons/defines";
+import { Vec2 } from "@/commons/utils/vec2";
 
 export interface PetaBoard {
   petaPanels: { [petaPanelId: string]: PetaPanel };

@@ -1,29 +1,30 @@
 import { app } from "electron";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { migratePetaImage, migratePetaTag, migratePetaImagesPetaTags } from "@/main/utils/migrater";
-import { loggerKey } from "@/main/provides/utils/logger";
-import { inject } from "@/main/utils/di";
-import { petaImagesControllerKey } from "@/main/provides/controllers/petaImagesController";
-import {
-  dbPetaBoardsKey,
-  dbPetaImagesKey,
-  dbPetaImagesPetaTagsKey,
-  dbPetaTagPartitionsKey,
-  dbPetaTagsKey,
-} from "@/main/provides/databases";
-import { configDBInfoKey } from "@/main/provides/configs";
-import { showError } from "@/main/errors/errorWindow";
+
 import { PetaImages } from "@/commons/datas/petaImage";
+import { UpdateMode } from "@/commons/datas/updateMode";
+
+import { showError } from "@/main/errors/errorWindow";
+import { useConfigDBInfo } from "@/main/provides/configs";
+import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
+import {
+  useDBPetaBoards,
+  useDBPetaImages,
+  useDBPetaImagesPetaTags,
+  useDBPetaTagPartitions,
+  useDBPetaTags,
+} from "@/main/provides/databases";
+import { useLogger } from "@/main/provides/utils/logger";
+import { migratePetaImage, migratePetaImagesPetaTags, migratePetaTag } from "@/main/utils/migrater";
 
 export async function initDB() {
-  const logger = inject(loggerKey);
-  const dbPetaBoard = inject(dbPetaBoardsKey);
-  const dbPetaImages = inject(dbPetaImagesKey);
-  const dbPetaImagesPetaTags = inject(dbPetaImagesPetaTagsKey);
-  const dbPetaTags = inject(dbPetaTagsKey);
-  const dbPetaTagPartitions = inject(dbPetaTagPartitionsKey);
-  const configDBInfo = inject(configDBInfoKey);
-  const petaImagesController = inject(petaImagesControllerKey);
+  const logger = useLogger();
+  const dbPetaBoard = useDBPetaBoards();
+  const dbPetaImages = useDBPetaImages();
+  const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+  const dbPetaTags = useDBPetaTags();
+  const dbPetaTagPartitions = useDBPetaTagPartitions();
+  const configDBInfo = useConfigDBInfo();
+  const petaImagesController = usePetaImagesController();
   //-------------------------------------------------------------------------------------------------//
   /*
     ロード

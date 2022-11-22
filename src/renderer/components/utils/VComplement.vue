@@ -34,14 +34,16 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, onMounted, watch, computed } from "vue";
-
-// Others
-import { Keyboards, Keys } from "@/renderer/utils/keyboards";
 import Fuse from "fuse.js";
+import { computed, onMounted, ref, watch } from "vue";
+
+import VFloating from "@/renderer/components/utils/VFloating.vue";
+
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
-import VFloating from "@/renderer/components/utils/VFloating.vue";
+// Others
+import { Keyboards, Keys } from "@/renderer/utils/keyboards";
+
 const props = defineProps<{
   zIndex: number;
   value: string;

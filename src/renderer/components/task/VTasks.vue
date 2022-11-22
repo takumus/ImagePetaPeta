@@ -14,15 +14,18 @@
 <script setup lang="ts">
 // Vue
 import { computed, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
 // Components
 import VModal from "@/renderer/components/modal/VModal.vue";
 import VTask from "@/renderer/components/task/VTask.vue";
+
+import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
+import { TASK_CLOSE_DELAY } from "@/commons/defines";
+
 // Others
 import { IPC } from "@/renderer/ipc";
-import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
-import { useI18n } from "vue-i18n";
-import { TASK_CLOSE_DELAY } from "@/commons/defines";
 
 const windowStatus = useWindowStatusStore();
 const { t } = useI18n();

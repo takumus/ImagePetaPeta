@@ -1,6 +1,8 @@
 import { InjectionKey, readonly, ref } from "vue";
-import { IPC } from "@/renderer/ipc";
+
 import { WindowType } from "@/commons/datas/windowType";
+
+import { IPC } from "@/renderer/ipc";
 
 export async function createWindowStatusStore(myWindowType: WindowType) {
   const state = ref({

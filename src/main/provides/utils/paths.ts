@@ -1,4 +1,5 @@
-import { createKey } from "@/main/utils/di";
+import { createKey, createUseFunction } from "@/main/utils/di";
+
 export interface Paths {
   DIR_ROOT: string;
   DIR_APP: string;
@@ -17,3 +18,4 @@ export interface Paths {
   FILE_DBINFO: string;
 }
 export const pathsKey = createKey<Paths>("paths");
+export const usePaths = createUseFunction(pathsKey);

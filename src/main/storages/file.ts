@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as Path from "path";
+
 export function writeFile(filePath: string, buffer: NodeJS.ArrayBufferView): Promise<boolean> {
   return new Promise((res, rej) => {
     fs.writeFile(filePath, buffer, (err) => {

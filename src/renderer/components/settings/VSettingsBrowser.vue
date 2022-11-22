@@ -22,10 +22,11 @@
 
 <script setup lang="ts">
 // Others
-import { IPC } from "@/renderer/ipc";
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { IPC } from "@/renderer/ipc";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const settingsStore = useSettingsStore();
 const { t } = useI18n();

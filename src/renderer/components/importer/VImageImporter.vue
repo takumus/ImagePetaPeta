@@ -4,12 +4,15 @@
 
 <script setup lang="ts">
 // Vue
+import { Buffer } from "buffer";
 import { onMounted } from "vue";
+
+import { ppa } from "@/commons/utils/pp";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
+
 // Others
 import { IPC } from "@/renderer/ipc";
-import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
-import { Buffer } from "buffer";
-import { ppa } from "@/commons/utils/pp";
+
 const emit = defineEmits<{
   (e: "addPanelByDragAndDrop", ids: string[], position: Vec2, fromBrowser: boolean): void;
 }>();

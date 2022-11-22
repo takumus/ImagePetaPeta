@@ -1,9 +1,11 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
+
 import Worker from "@/renderer/components/browser/property/worker/generateGamutMapWorker.worker";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
 import { getImageURL } from "@/renderer/utils/imageURL";
 import { createWebWorkerGroup } from "@/renderer/utils/workerGroup";
+
 const wtGroup = createWebWorkerGroup(Worker);
 const image = new Image();
 const canvas = new OffscreenCanvas(0, 0);

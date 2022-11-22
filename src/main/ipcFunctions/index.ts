@@ -1,42 +1,44 @@
 import {
-  app,
-  dialog,
   IpcMainInvokeEvent,
-  shell,
-  nativeImage,
+  app,
   desktopCapturer,
+  dialog,
+  nativeImage,
   screen,
+  shell,
 } from "electron";
 import * as Path from "path";
-import { DEFAULT_BOARD_NAME, EULA } from "@/commons/defines";
-import * as file from "@/main/storages/file";
-import { PetaImage } from "@/commons/datas/petaImage";
-import { createPetaBoard } from "@/commons/datas/petaBoard";
-import { UpdateMode } from "@/commons/datas/updateMode";
-import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
+
 import { ImageType } from "@/commons/datas/imageType";
-import { showError } from "@/main/errors/errorWindow";
-import * as Tasks from "@/main/tasks/task";
-import { getLatestVersion } from "@/commons/utils/versions";
-import Transparent from "@/@assets/transparent.png";
+import { ImportFileInfo } from "@/commons/datas/importFileInfo";
+import { createPetaBoard } from "@/commons/datas/petaBoard";
+import { PetaImage } from "@/commons/datas/petaImage";
+import { UpdateMode } from "@/commons/datas/updateMode";
 // import { DraggingPreviewWindow } from "@/main/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
-import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
+import { DEFAULT_BOARD_NAME, EULA } from "@/commons/defines";
+import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
 import { ppa } from "@/commons/utils/pp";
-import { ImportFileInfo } from "@/commons/datas/importFileInfo";
-import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
-import { LogFrom, loggerKey } from "@/main/provides/utils/logger";
-import { inject } from "@/main/utils/di";
-import { petaImagesControllerKey } from "@/main/provides/controllers/petaImagesController";
-import { petaTagsControllerKey } from "@/main/provides/controllers/petaTagsController";
-import { petaTagPartitionsControllerKey } from "@/main/provides/controllers/petaTagPartitionsController";
-import { petaBoardsControllerKey } from "@/main/provides/controllers/petaBoardsController";
-import { pathsKey } from "@/main/provides/utils/paths";
-import { dbStatusKey } from "@/main/provides/databases";
-import { configSettingsKey, configStatesKey } from "@/main/provides/configs";
-import { windowsKey } from "@/main/provides/utils/windows";
-import { realESRGAN } from "@/main/utils/realESRGAN";
+import { getLatestVersion } from "@/commons/utils/versions";
+
+import Transparent from "@/@assets/transparent.png";
+import { showError } from "@/main/errors/errorWindow";
+import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
+import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
+import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
+import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
+import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
+import { useDBStatus } from "@/main/provides/databases";
+import { LogFrom, useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
+import { useWindows } from "@/main/provides/utils/windows";
+import * as file from "@/main/storages/file";
+import * as Tasks from "@/main/tasks/task";
 import { isDarkMode } from "@/main/utils/isDarkMode";
+import { realESRGAN } from "@/main/utils/realESRGAN";
+import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
+import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
+
 let temporaryShowNSFW = false;
 let detailsPetaImage: PetaImage | undefined;
 export function getMainFunctions(): {
@@ -47,9 +49,9 @@ export function getMainFunctions(): {
 } {
   return {
     async browseAndImportImageFiles(event, type) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const windows = useWindows();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       log.log("#Browse Image Files");
       const windowInfo = windows.getWindowByEvent(event);
@@ -66,7 +68,7 @@ export function getMainFunctions(): {
       return 0;
     },
     async cancelTasks(event, ids) {
-      const logger = inject(loggerKey);
+      const logger = useLogger();
       const log = logger.logMainChunk();
       try {
         log.log("#Cancel Tasks");
@@ -82,8 +84,8 @@ export function getMainFunctions(): {
       return;
     },
     async getPetaImages() {
-      const logger = inject(loggerKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaImages");
@@ -102,8 +104,8 @@ export function getMainFunctions(): {
       return {};
     },
     async updatePetaImages(event, datas, mode) {
-      const logger = inject(loggerKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImages");
@@ -122,8 +124,8 @@ export function getMainFunctions(): {
       return false;
     },
     async getPetaBoards() {
-      const logger = inject(loggerKey);
-      const petaBoardsController = inject(petaBoardsControllerKey);
+      const logger = useLogger();
+      const petaBoardsController = usePetaBoardsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaBoards");
@@ -149,8 +151,8 @@ export function getMainFunctions(): {
       return {};
     },
     async updatePetaBoards(event, boards, mode) {
-      const logger = inject(loggerKey);
-      const petaBoardsController = inject(petaBoardsControllerKey);
+      const logger = useLogger();
+      const petaBoardsController = usePetaBoardsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaBoards");
@@ -169,8 +171,8 @@ export function getMainFunctions(): {
       return false;
     },
     async updatePetaTags(event, tags, mode) {
-      const logger = inject(loggerKey);
-      const petaTagsController = inject(petaTagsControllerKey);
+      const logger = useLogger();
+      const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaTags");
@@ -189,8 +191,8 @@ export function getMainFunctions(): {
       return false;
     },
     async updatePetaImagesPetaTags(event, petaImageIds, petaTagLikes, mode) {
-      const logger = inject(loggerKey);
-      const petaTagsController = inject(petaTagsControllerKey);
+      const logger = useLogger();
+      const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImagesPetaTags");
@@ -209,8 +211,8 @@ export function getMainFunctions(): {
       return false;
     },
     async updatePetaTagPartitions(event, partitions, mode) {
-      const logger = inject(loggerKey);
-      const petaTagpartitionsController = inject(petaTagPartitionsControllerKey);
+      const logger = useLogger();
+      const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImagesPetaTags");
@@ -229,8 +231,8 @@ export function getMainFunctions(): {
       return false;
     },
     async getPetaTagPartitions() {
-      const logger = inject(loggerKey);
-      const petaTagpartitionsController = inject(petaTagPartitionsControllerKey);
+      const logger = useLogger();
+      const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTagPartitions");
@@ -249,8 +251,8 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaImageIds(event, params) {
-      const logger = inject(loggerKey);
-      const petaTagsController = inject(petaTagsControllerKey);
+      const logger = useLogger();
+      const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaImageIds");
@@ -270,8 +272,8 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaTagIdsByPetaImageIds(event, petaImageIds) {
-      const logger = inject(loggerKey);
-      const petaTagsController = inject(petaTagsControllerKey);
+      const logger = useLogger();
+      const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
         // log.log("#Get PetaTagIds By PetaImageIds");
@@ -290,8 +292,8 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaTags() {
-      const logger = inject(loggerKey);
-      const petaTagsController = inject(petaTagsControllerKey);
+      const logger = useLogger();
+      const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTags");
@@ -310,8 +312,8 @@ export function getMainFunctions(): {
       return [];
     },
     async getPetaTagCounts() {
-      const logger = inject(loggerKey);
-      const petaTagsController = inject(petaTagsControllerKey);
+      const logger = useLogger();
+      const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTagCounts");
@@ -330,12 +332,12 @@ export function getMainFunctions(): {
       return {};
     },
     async log(event, id: string, ...args: unknown[]) {
-      const dataLogger = inject(loggerKey);
+      const dataLogger = useLogger();
       dataLogger.log(LogFrom.RENDERER, id, ...args);
       return true;
     },
     async openURL(event, url) {
-      const logger = inject(loggerKey);
+      const logger = useLogger();
       const log = logger.logMainChunk();
       log.log("#Open URL");
       log.log("url:", url);
@@ -343,14 +345,14 @@ export function getMainFunctions(): {
       return true;
     },
     async openImageFile(event, petaImage) {
-      const logger = inject(loggerKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       log.log("#Open Image File");
       shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
     },
     async getAppInfo() {
-      const logger = inject(loggerKey);
+      const logger = useLogger();
       const log = logger.logMainChunk();
       log.log("#Get App Info");
       const info = {
@@ -361,33 +363,33 @@ export function getMainFunctions(): {
       return info;
     },
     async showDBFolder() {
-      const logger = inject(loggerKey);
-      const paths = inject(pathsKey);
+      const logger = useLogger();
+      const paths = usePaths();
       const log = logger.logMainChunk();
       log.log("#Show DB Folder");
       shell.showItemInFolder(paths.DIR_ROOT);
       return true;
     },
     async showConfigFolder() {
-      const logger = inject(loggerKey);
-      const paths = inject(pathsKey);
+      const logger = useLogger();
+      const paths = usePaths();
       const log = logger.logMainChunk();
       log.log("#Show Config Folder");
       shell.showItemInFolder(paths.DIR_APP);
       return true;
     },
     async showImageInFolder(event, petaImage) {
-      const logger = inject(loggerKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       log.log("#Show Image In Folder");
       shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
       return true;
     },
     async updateSettings(event, settings) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
-      const configSettings = inject(configSettingsKey);
+      const logger = useLogger();
+      const windows = useWindows();
+      const configSettings = useConfigSettings();
       const log = logger.logMainChunk();
       try {
         log.log("#Update Settings");
@@ -417,16 +419,16 @@ export function getMainFunctions(): {
       return false;
     },
     async getSettings() {
-      const logger = inject(loggerKey);
-      const configSettings = inject(configSettingsKey);
+      const logger = useLogger();
+      const configSettings = useConfigSettings();
       const log = logger.logMainChunk();
       log.log("#Get Settings");
       log.log("return:", configSettings.data);
       return configSettings.data;
     },
     async getWindowIsFocused(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Get Window Is Focused");
       const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
@@ -434,15 +436,15 @@ export function getMainFunctions(): {
       return isFocued;
     },
     async windowMinimize(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Window Minimize");
       windows.getWindowByEvent(event)?.window.minimize();
     },
     async windowMaximize(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Window Maximize");
       const windowInfo = windows.getWindowByEvent(event);
@@ -453,34 +455,34 @@ export function getMainFunctions(): {
       windowInfo?.window.maximize();
     },
     async windowClose(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Window Close");
       windows.getWindowByEvent(event)?.window.close();
     },
     async windowActivate(event) {
-      const windows = inject(windowsKey);
+      const windows = useWindows();
       windows.getWindowByEvent(event)?.window.moveTop();
       windows.getWindowByEvent(event)?.window.focus();
     },
     async windowToggleDevTools(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Toggle Dev Tools");
       windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
     },
     async getPlatform() {
-      const logger = inject(loggerKey);
+      const logger = useLogger();
       const log = logger.logMainChunk();
       log.log("#Get Platform");
       log.log("return:", process.platform);
       return process.platform;
     },
     async regenerateMetadatas() {
-      const logger = inject(loggerKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       try {
         log.log("#Regenerate Thumbnails");
@@ -498,8 +500,8 @@ export function getMainFunctions(): {
       return;
     },
     async browsePetaImageDirectory(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Browse PetaImage Directory");
       const windowInfo = windows.getWindowByEvent(event);
@@ -522,9 +524,9 @@ export function getMainFunctions(): {
       return "";
     },
     async changePetaImageDirectory(event, path) {
-      const logger = inject(loggerKey);
-      const paths = inject(pathsKey);
-      const configSettings = inject(configSettingsKey);
+      const logger = useLogger();
+      const paths = usePaths();
+      const configSettings = useConfigSettings();
       const log = logger.logMainChunk();
       try {
         log.log("#Change PetaImage Directory");
@@ -549,14 +551,14 @@ export function getMainFunctions(): {
       return false;
     },
     async getStates() {
-      const logger = inject(loggerKey);
-      const configStates = inject(configStatesKey);
+      const logger = useLogger();
+      const configStates = useConfigStates();
       const log = logger.logMainChunk();
       log.log("#Get States");
       return configStates.data;
     },
     async realESRGANConvert(event, petaImages, modelName) {
-      const logger = inject(loggerKey);
+      const logger = useLogger();
       const log = logger.logMainChunk();
       try {
         log.log("#Real-ESRGAN Convert");
@@ -569,8 +571,8 @@ export function getMainFunctions(): {
       return false;
     },
     async startDrag(event, petaImages) {
-      const paths = inject(pathsKey);
-      const windows = inject(windowsKey);
+      const paths = usePaths();
+      const windows = useWindows();
       const first = petaImages[0];
       if (!first) {
         return;
@@ -599,9 +601,9 @@ export function getMainFunctions(): {
       // draggingPreviewWindow.destroy();
     },
     async updateStates(event, states) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
-      const configStates = inject(configStatesKey);
+      const logger = useLogger();
+      const windows = useWindows();
+      const configStates = useConfigStates();
       const log = logger.logMainChunk();
       try {
         log.log("#Update States");
@@ -616,9 +618,9 @@ export function getMainFunctions(): {
       return false;
     },
     async importImages(event, datas) {
-      const logger = inject(loggerKey);
-      const paths = inject(pathsKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const logger = useLogger();
+      const paths = usePaths();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       try {
         log.log("#importImages");
@@ -690,36 +692,36 @@ export function getMainFunctions(): {
       return [];
     },
     async openWindow(event, windowType) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Open Window");
       log.log("type:", windowType);
       windows.openWindow(windowType, event);
     },
     async reloadWindow(event) {
-      const logger = inject(loggerKey);
-      const windows = inject(windowsKey);
+      const logger = useLogger();
+      const windows = useWindows();
       const log = logger.logMainChunk();
       log.log("#Reload Window");
       const type = windows.reloadWindowByEvent(event);
       log.log("type:", type);
     },
     async getMainWindowType() {
-      const windows = inject(windowsKey);
+      const windows = useWindows();
       return windows.mainWindowType;
     },
     async getShowNSFW() {
       return getShowNSFW();
     },
     async setShowNSFW(event, value) {
-      const windows = inject(windowsKey);
+      const windows = useWindows();
       temporaryShowNSFW = value;
       windows.emitMainEvent("showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, petaImage) {
-      const logger = inject(loggerKey);
-      const paths = inject(pathsKey);
+      const logger = useLogger();
+      const paths = usePaths();
       const log = logger.logMainChunk();
       log.log("#Search Image By Google");
       try {
@@ -732,8 +734,8 @@ export function getMainFunctions(): {
       return false;
     },
     async setDetailsPetaImage(event, petaImageId: string) {
-      const windows = inject(windowsKey);
-      const petaImagesController = inject(petaImagesControllerKey);
+      const windows = useWindows();
+      const petaImagesController = usePetaImagesController();
       detailsPetaImage = await petaImagesController.getPetaImage(petaImageId);
       if (detailsPetaImage === undefined) {
         return;
@@ -748,15 +750,15 @@ export function getMainFunctions(): {
       return isDarkMode();
     },
     async getIsDataInitialized() {
-      const dbStatus = inject(dbStatusKey);
+      const dbStatus = useDBStatus();
       return dbStatus.initialized;
     },
     async getLatestVersion() {
       return getLatestVersion();
     },
     async eula(event, agree) {
-      const logger = inject(loggerKey);
-      const configSettings = inject(configSettingsKey);
+      const logger = useLogger();
+      const configSettings = useConfigSettings();
       const log = logger.logMainChunk();
       log.log("#EULA");
       log.log(agree ? "agree" : "disagree", EULA);
@@ -793,7 +795,7 @@ export function getMainFunctions(): {
   };
 }
 function getShowNSFW() {
-  const configSettings = inject(configSettingsKey);
+  const configSettings = useConfigSettings();
   return temporaryShowNSFW || configSettings.data.alwaysShowNSFW;
 }
 function relaunch() {

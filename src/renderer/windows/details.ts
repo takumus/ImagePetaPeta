@@ -1,6 +1,8 @@
 import DetailsIndex from "@/renderer/components/VWDetails.vue";
-import { create } from "@/renderer/windows/@base";
+
 import { WindowType } from "@/commons/datas/windowType";
+
+import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
 import {
   createPetaImagesStore,
   petaImagesStoreKey,
@@ -9,7 +11,8 @@ import {
   createPetaTagsStore,
   petaTagsStoreKey,
 } from "@/renderer/stores/petaTagsStore/createPetaTagsStore";
-import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
+import { create } from "@/renderer/windows/@base";
+
 create(DetailsIndex, WindowType.DETAILS, [
   keyStoreCreatorPair(petaImagesStoreKey, createPetaImagesStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),

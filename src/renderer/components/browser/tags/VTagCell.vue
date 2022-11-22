@@ -15,8 +15,10 @@
 
 <script setup lang="ts">
 // Vue
-import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 import { ref } from "vue";
+
+import VTextarea from "@/renderer/components/utils/VTextarea.vue";
+
 const emit = defineEmits<{
   (e: "update:value", value: string): void;
 }>();

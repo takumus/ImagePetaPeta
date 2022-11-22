@@ -1,8 +1,10 @@
-import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
-import { PACKAGE_JSON_URL } from "@/commons/defines";
-import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { app } from "electron";
+import { v4 as uuid } from "uuid";
+
+import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
+import { PACKAGE_JSON_URL } from "@/commons/defines";
+
 export function isLatest(meVersion: string, remoteVersion: string) {
   if (meVersion === remoteVersion) {
     return true;

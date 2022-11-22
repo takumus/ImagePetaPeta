@@ -1,6 +1,8 @@
+import quantize from "quantize";
+
 import { PetaColor } from "@/commons/datas/petaColor";
 import { ciede } from "@/commons/utils/colors";
-import quantize from "quantize";
+
 function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
   for (let i = 0; i < pixelCount; i += 1) {

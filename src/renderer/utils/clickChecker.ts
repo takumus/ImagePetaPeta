@@ -1,6 +1,7 @@
 import { CLICK_OFFSET } from "@/commons/defines";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
+
 type MessageEvents = {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   startDrag: (event: PointerEvent) => void;
