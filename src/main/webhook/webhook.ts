@@ -9,17 +9,17 @@ import {
   WEBHOOK_WHITELIST_IP_LIST,
   WEBHOOK_WHITELIST_ORIGIN_LIST,
 } from "@/commons/defines";
-import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
+import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 
 import { useLogger } from "@/main/provides/utils/logger";
 
-type EventNames = keyof ToMainFunctions;
+type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = ["importImages"];
-export function initWebhook(toMainFunctions: {
-  [P in keyof ToMainFunctions]: (
+export function initWebhook(ipcFunctions: {
+  [P in keyof IpcFunctions]: (
     event: IpcMainInvokeEvent,
-    ...args: Parameters<ToMainFunctions[P]>
-  ) => ReturnType<ToMainFunctions[P]>;
+    ...args: Parameters<IpcFunctions[P]>
+  ) => ReturnType<IpcFunctions[P]>;
 }) {
   const logger = useLogger();
   const initLog = logger.logMainChunk();
@@ -51,7 +51,7 @@ export function initWebhook(toMainFunctions: {
           return;
         }
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        const event = toMainFunctions[eventName] as any;
+        const event = ipcFunctions[eventName] as any;
         if (event) {
           executeLog.log(`$Webhook: execute`, eventName);
           res.json(await event(undefined, ...(req.body.args ?? [])));

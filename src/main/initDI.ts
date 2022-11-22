@@ -12,9 +12,12 @@ import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { States, defaultStates } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import languages from "@/commons/languages";
-import { isLatest } from "@/commons/utils/versions";
 
 import { ErrorWindowParameters } from "@/main/errors/errorWindow";
+import Config from "@/main/libs/config";
+import DB from "@/main/libs/db";
+import { provide } from "@/main/libs/di";
+import * as file from "@/main/libs/file";
 import {
   configDBInfoKey,
   configSettingsKey,
@@ -50,12 +53,9 @@ import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
 import { Windows, windowsKey } from "@/main/provides/utils/windows";
-import Config from "@/main/storages/config";
-import DB from "@/main/storages/db";
-import * as file from "@/main/storages/file";
-import { provide } from "@/main/utils/di";
 import isValidFilePath from "@/main/utils/isValidFilePath";
 import { migrateSettings, migrateStates, migrateWindowStates } from "@/main/utils/migrater";
+import { isLatest } from "@/main/utils/versions";
 
 export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
   try {
@@ -66,21 +66,25 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     // ログは最優先で初期化
     const DIR_LOG = file.initDirectory(false, app.getPath("logs"));
     const dataLogger = new Logger(DIR_LOG);
-    // その他の初期化
+    // その他パス初期化
     const DIR_APP = file.initDirectory(false, app.getPath("userData"));
     const DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
     const FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
+    // 設定ロード
     const configSettings = new Config<Settings>(
       FILE_SETTINGS,
       getDefaultSettings(),
       migrateSettings,
     );
+    // ルートディレクトリは試行錯誤して決定する。
     const DIR_ROOT = (() => {
+      // デフォルトならピクチャーズ
       if (configSettings.data.petaImageDirectory.default) {
         const dir = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
         configSettings.data.petaImageDirectory.path = dir;
         return dir;
       } else {
+        // ちがうなら設定ファイルパス
         try {
           if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
             throw new Error();
@@ -105,6 +109,7 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     const FILE_STATES = file.initFile(DIR_APP, "states.json");
     const FILE_DBINFO = file.initFile(DIR_ROOT, "dbInfo.json");
     const FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
+    // データベースバージョンを読んで、アプリのバージョンよりも高かったらダメ
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, { version: app.getVersion() });
     if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
       throw new Error(
@@ -113,12 +118,14 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
         }\nApp version:${app.getVersion()}`,
       );
     }
+    // コンフィグ
     const configStates = new Config<States>(FILE_STATES, defaultStates, migrateStates);
     const configWindowStates = new Config<WindowStates>(
       FILE_WINDOW_STATES,
       {},
       migrateWindowStates,
     );
+    // データベース
     const dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
     const dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
     const dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
@@ -127,7 +134,9 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
       FILE_TAG_PARTITIONS_DB,
     );
     const dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
+    // 画面初期化
     const windows = new Windows();
+    // パスまとめ
     const paths: Paths = {
       DIR_ROOT,
       DIR_APP,
@@ -145,6 +154,7 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
       FILE_WINDOW_STATES,
       FILE_DBINFO,
     };
+    // 注入
     provide(pathsKey, paths);
     provide(emitMainEventKey, windows.emitMainEvent.bind(windows));
     provide(loggerKey, dataLogger);
@@ -165,12 +175,7 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     provide(dbPetaTagsKey, dbPetaTags);
     provide(dbPetaTagPartitionsKey, dbPetaTagPartitions);
   } catch (err) {
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      何らかの原因でファイルとディレクトリの準備が失敗した場合
-      エラー画面を出してアプリ終了
-    */
-    //-------------------------------------------------------------------------------------------------//
+    // どこかで失敗したら強制終了
     showError({
       category: "M",
       code: 1,

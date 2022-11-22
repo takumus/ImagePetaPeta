@@ -13,7 +13,7 @@ import { States } from "@/commons/datas/states";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 
-export interface ToMainFunctions {
+export interface IpcFunctions {
   browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
   importImages: (
     datas: (

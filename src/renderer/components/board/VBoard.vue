@@ -59,8 +59,8 @@ import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { WindowType } from "@/commons/datas/windowType";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
+import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
-import { minimId } from "@/commons/utils/utils";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { PSelection } from "@/renderer/components/board/PSelection";
@@ -499,7 +499,7 @@ async function load(params: {
     statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
     return;
   }
-  log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimId(currentBoard.value.id));
+  log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimizeID(currentBoard.value.id));
   let loaded = 0;
   const extract = async (petaPanel: RPetaPanel, index: number) => {
     if (currentBoard.value === undefined) {
@@ -518,11 +518,11 @@ async function load(params: {
           const progress = `${loaded}/${petaPanels.length}`;
           log(
             "vBoard",
-            `loaded[${error ?? "success"}](${minimId(petaPanel.petaImageId)}):`,
+            `loaded[${error ?? "success"}](${minimizeID(petaPanel.petaImageId)}):`,
             progress,
           );
           loadingStatus.value.log =
-            `load complete   (${minimId(petaPanel.petaImageId)}):${progress}\n` +
+            `load complete   (${minimizeID(petaPanel.petaImageId)}):${progress}\n` +
             loadingStatus.value.log;
           if (loaded == petaPanels.length) {
             loadingStatus.value.loading = false;
@@ -585,14 +585,14 @@ async function load(params: {
         onLoaded(petaPanel);
         loadResult = "skip";
       }
-      log("vBoard", `extracted[${loadResult}](${minimId(petaPanel.petaImageId)}):`, progress);
+      log("vBoard", `extracted[${loadResult}](${minimizeID(petaPanel.petaImageId)}):`, progress);
       loadingStatus.value.log =
-        `extract complete(${minimId(petaPanel.petaImageId)}):${progress}\n` +
+        `extract complete(${minimizeID(petaPanel.petaImageId)}):${progress}\n` +
         loadingStatus.value.log;
     } catch (error) {
-      log("vBoard", `extract error(${minimId(petaPanel.petaImageId)}):`, progress, error);
+      log("vBoard", `extract error(${minimizeID(petaPanel.petaImageId)}):`, progress, error);
       loadingStatus.value.log =
-        `extract error   (${minimId(petaPanel.petaImageId)}):${progress}\n` +
+        `extract error   (${minimizeID(petaPanel.petaImageId)}):${progress}\n` +
         loadingStatus.value.log;
     }
     loadingStatus.value.extractProgress = ((index + 1) / petaPanels.length) * 100;

@@ -7,10 +7,10 @@ function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
   for (let i = 0; i < pixelCount; i += 1) {
     const offset = i * 4;
-    const r = buffer[offset + 0]!;
-    const g = buffer[offset + 1]!;
-    const b = buffer[offset + 2]!;
-    const a = buffer[offset + 3]!;
+    const r = buffer[offset + 0] as number;
+    const g = buffer[offset + 1] as number;
+    const b = buffer[offset + 2] as number;
+    const a = buffer[offset + 3] as number;
     if (a === undefined || a >= 125) {
       pixels.push([r, g, b]);
     }
@@ -48,7 +48,9 @@ export function getPalette(imageData: {
 }): PetaColor[] {
   const pixelCount = imageData.width * imageData.height;
   const pixels = createPixels(imageData.buffer, imageData.width * imageData.height);
+  // 量子化
   const qPalette = quantize(pixels, 256).palette();
+  // 色に変換
   const colors = qPalette.map(
     (color): PetaColor => ({
       r: color[0],
@@ -58,6 +60,7 @@ export function getPalette(imageData: {
       positionSD: 0,
     }),
   );
+  // 似た色を除去
   for (let i = 0; i < colors.length; i++) {
     for (let ii = i + 1; ii < colors.length; ii++) {
       const cieDiff = ciede(colors[i], colors[ii]);
@@ -67,10 +70,12 @@ export function getPalette(imageData: {
       }
     }
   }
+  // 解像度計算
   let resolution = Math.floor(pixelCount / imageData.sample);
   if (resolution < 1) {
     resolution = 1;
   }
+  // 色の人口を計算し、色を補正
   colors.forEach((color) => {
     const similars: { [key: string]: { count: number; color: [number, number, number] } } = {};
     for (let i = 0; i < pixels.length; i += resolution) {
@@ -95,6 +100,7 @@ export function getPalette(imageData: {
       color.b = similar.color[2];
     }
   });
+  // 人口0は削除し、人口順にソート
   const palette = colors
     .filter((color) => {
       return color.population > 0;
@@ -102,6 +108,7 @@ export function getPalette(imageData: {
     .sort((a, b) => {
       return b.population - a.population;
     });
+  // 似た色を再び削除。人口を統合
   for (let i = 0; i < palette.length; i++) {
     for (let ii = i + 1; ii < palette.length; ii++) {
       const cieDiff = ciede(palette[i], palette[ii]);
@@ -112,6 +119,7 @@ export function getPalette(imageData: {
       }
     }
   }
+  // 人口順にソート
   return palette.sort((a, b) => {
     return b.population - a.population;
   });

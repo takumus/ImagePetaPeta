@@ -58,22 +58,19 @@ async function steps(
   }, steps).promise;
 }
 export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: string) {
-  const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
-  let taskCount = 0;
   return Tasks.spawn(
     "Search Image By Google",
     async (handler, petaImage: PetaImage) => {
+      const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
+      let taskCount = 0;
       handler.emitStatus({
         i18nKey: "tasks.searchImageByGoogle",
         progress: {
           all: taskAllCount,
           current: taskCount++,
         },
-        log: [],
         status: TaskStatusCode.BEGIN,
-        cancelable: false,
       });
-      const imageFilePath = Path.resolve(dirThumbnails, petaImage.file.thumbnail);
       const window = new BrowserWindow({
         show: false,
         webPreferences: {
@@ -83,6 +80,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
         },
       });
       try {
+        // ロード
         await window.loadURL(task.url);
         handler.emitStatus({
           i18nKey: "tasks.searchImageByGoogle",
@@ -92,8 +90,8 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
           },
           log: [`loaded: ${task.url}`],
           status: TaskStatusCode.PROGRESS,
-          cancelable: false,
         });
+        // デバッガ
         window.webContents.debugger.attach("1.1");
         // ルート取る
         const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
@@ -107,7 +105,6 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             },
             log: [JSON.stringify(step)],
             status: TaskStatusCode.PROGRESS,
-            cancelable: false,
           });
         });
         // インプット取得
@@ -118,7 +115,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
         // ファイル選択
         await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
           nodeId: input.nodeId,
-          files: [imageFilePath],
+          files: [Path.resolve(dirThumbnails, petaImage.file.thumbnail)],
         });
         // 後処理
         await steps(window.webContents, task.afterSteps, (step) => {
@@ -130,7 +127,6 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             },
             log: [JSON.stringify(step)],
             status: TaskStatusCode.PROGRESS,
-            cancelable: false,
           });
         });
         handler.emitStatus({
@@ -141,13 +137,15 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
           },
           log: [`uploading`],
           status: TaskStatusCode.PROGRESS,
-          cancelable: false,
         });
+        // アップロード完了待ち
         await new Promise((res, rej) => {
+          // タイムアウト
           const timeoutHandler = setTimeout(() => {
             rej("timeout");
           }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
           window.webContents.addListener("did-finish-load", () => {
+            // アップロード完了
             if (
               !window.webContents
                 .getURL()
@@ -155,6 +153,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             ) {
               return;
             }
+            // ブラウザ起動
             shell.openExternal(window.webContents.getURL());
             clearTimeout(timeoutHandler);
             handler.emitStatus({
@@ -165,7 +164,6 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
               },
               log: [`uploaded`],
               status: TaskStatusCode.COMPLETE,
-              cancelable: false,
             });
             res(true);
           });
@@ -178,9 +176,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
             all: taskAllCount,
             current: taskCount++,
           },
-          log: [],
           status: TaskStatusCode.FAILED,
-          cancelable: false,
         });
         throw error;
       }

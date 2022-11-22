@@ -3,8 +3,8 @@ import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 
-import Config from "@/main/storages/config";
-import { createKey, createUseFunction } from "@/main/utils/di";
+import Config from "@/main/libs/config";
+import { createKey, createUseFunction } from "@/main/libs/di";
 
 export const configDBInfoKey = createKey<Config<DBInfo>>("configDBInfo");
 export const configSettingsKey = createKey<Config<Settings>>("configSettings");

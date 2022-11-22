@@ -1,9 +1,9 @@
-import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
+import { IpcEvents } from "@/commons/ipc/ipcEvents";
 
-import { createKey, createUseFunction } from "@/main/utils/di";
+import { createKey, createUseFunction } from "@/main/libs/di";
 
 export const emitMainEventKey =
-  createKey<
-    <U extends keyof ToFrontFunctions>(key: U, ...args: Parameters<ToFrontFunctions[U]>) => void
-  >("emitMainEvent");
+  createKey<<U extends keyof IpcEvents>(key: U, ...args: Parameters<IpcEvents[U]>) => void>(
+    "emitMainEvent",
+  );
 export const useEmitMainEvent = createUseFunction(emitMainEventKey);

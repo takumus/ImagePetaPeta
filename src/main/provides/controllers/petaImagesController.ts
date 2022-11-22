@@ -17,22 +17,22 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
+import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
-import { minimId } from "@/commons/utils/utils";
 
+import { createKey, createUseFunction } from "@/main/libs/di";
+import * as file from "@/main/libs/file";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
 import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import * as file from "@/main/storages/file";
 import * as Tasks from "@/main/tasks/task";
-import { createKey, createUseFunction } from "@/main/utils/di";
 import { generateMetadataByWorker } from "@/main/utils/generateMetadata/generateMetadata";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
 
 export class PetaImagesController {
-  public async updatePetaImages(datas: PetaImage[], mode: UpdateMode, silent = false) {
+  public async updateMultiple(datas: PetaImage[], mode: UpdateMode, silent = false) {
     const petaTagsController = usePetaTagsController();
     const emit = useEmitMainEvent();
     return Tasks.spawn(
@@ -44,7 +44,7 @@ export class PetaImagesController {
           status: TaskStatusCode.BEGIN,
         });
         const update = async (data: PetaImage, index: number) => {
-          await this.updatePetaImage(data, mode);
+          await this.update(data, mode);
           handler.emitStatus({
             i18nKey: "tasks.updateDatas",
             progress: {
@@ -91,7 +91,7 @@ export class PetaImagesController {
     }
     return petaImage;
   }
-  async getPetaImages() {
+  async getAll() {
     const dbPetaImages = useDBPetaImages();
     const data = dbPetaImages.getAll();
     const petaImages: PetaImages = {};
@@ -100,14 +100,14 @@ export class PetaImagesController {
     });
     return petaImages;
   }
-  private async updatePetaImage(petaImage: PetaImage, mode: UpdateMode) {
+  private async update(petaImage: PetaImage, mode: UpdateMode) {
     const dbPetaImages = useDBPetaImages();
     const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
     const logger = useLogger();
     const log = logger.logMainChunk();
     log.log("##Update PetaImage");
     log.log("mode:", mode);
-    log.log("image:", minimId(petaImage.id));
+    log.log("image:", minimizeID(petaImage.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaImagesPetaTags.remove({ petaImageId: petaImage.id });
       await dbPetaImages.remove({ id: petaImage.id });
@@ -250,7 +250,7 @@ export class PetaImagesController {
               result = ImportImageResult.EXISTS;
               petaImages.push(addResult.petaImage);
             } else {
-              await this.updatePetaImages([addResult.petaImage], UpdateMode.INSERT, true);
+              await this.updateMultiple([addResult.petaImage], UpdateMode.INSERT, true);
               addedFileCount++;
               petaImages.push(addResult.petaImage);
             }
@@ -296,7 +296,7 @@ export class PetaImagesController {
     const paths = usePaths();
     const log = logger.logMainChunk();
     emit("regenerateMetadatasBegin");
-    const images = Object.values(await this.getPetaImages());
+    const images = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (image: PetaImage) => {
       // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
@@ -317,7 +317,7 @@ export class PetaImagesController {
         height: result.original.height,
         version: PETAIMAGE_METADATA_VERSION,
       };
-      await this.updatePetaImages([image], UpdateMode.UPDATE, true);
+      await this.updateMultiple([image], UpdateMode.UPDATE, true);
       log.log(`thumbnail (${++completed} / ${images.length})`);
       emit("regenerateMetadatasProgress", completed, images.length);
     };

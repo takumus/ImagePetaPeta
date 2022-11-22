@@ -1,40 +1,28 @@
-import { app, ipcMain, nativeTheme, protocol, session } from "electron";
+import { app, ipcMain, protocol, session } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
-import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
-// import { DraggingPreviewWindow } from "@/main/draggingPreviewWindow/draggingPreviewWindow";
-import { WindowType } from "@/commons/datas/windowType";
-import { PROTOCOLS, UPDATE_CHECK_INTERVAL } from "@/commons/defines";
-import { arrLast } from "@/commons/utils/utils";
-import { getLatestVersion } from "@/commons/utils/versions";
+import { PROTOCOLS } from "@/commons/defines";
 
 import { showError } from "@/main/errors/errorWindow";
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
-import { getMainFunctions } from "@/main/ipcFunctions";
+import { getIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useDBStatus } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useWindows } from "@/main/provides/utils/windows";
-import { isDarkMode } from "@/main/utils/isDarkMode";
+import { observeDarkMode } from "@/main/utils/darkMode";
+import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { initWebhook } from "@/main/webhook/webhook";
 
 (() => {
-  /*------------------------------------
-    シングルインスタンス化
-  ------------------------------------*/
   if (!app.requestSingleInstanceLock()) {
     app.quit();
     return;
   }
-  let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    DIへ注入
-  */
-  //-------------------------------------------------------------------------------------------------//
+  // DI準備
   if (!initDI(showError)) {
     return;
   }
@@ -43,11 +31,7 @@ import { initWebhook } from "@/main/webhook/webhook";
   const windows = useWindows();
   const configSettings = useConfigSettings();
   const dbStatus = useDBStatus();
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    electronのready前にやらないといけない事
-  */
-  //-------------------------------------------------------------------------------------------------//
+  // プロトコル準備
   protocol.registerSchemesAsPrivileged([
     {
       scheme: "app",
@@ -71,6 +55,7 @@ import { initWebhook } from "@/main/webhook/webhook";
       },
     },
   ]);
+  // Macでドックアイコン押した時。
   app.on("activate", async () => {
     logger.logMainChunk().log("$Electron event: activate");
     if (
@@ -80,9 +65,7 @@ import { initWebhook } from "@/main/webhook/webhook";
       windows.showWindows();
     }
   });
-  app.on("window-all-closed", () => {
-    //
-  });
+  // 既に起動してるのに起動した場合
   app.on("second-instance", () => {
     const count = Object.values(windows.windows)
       .filter((window) => {
@@ -95,29 +78,24 @@ import { initWebhook } from "@/main/webhook/webhook";
       windows.showWindows();
     }
   });
+  // これがないとだめ。
+  app.on("window-all-closed", () => {});
+  // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    electronのready
-  */
-  //-------------------------------------------------------------------------------------------------//
-  app.on("ready", async () => {
+  // electron準備OK
+  async function appReady() {
     logger
       .logMainChunk()
       .log(
         `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
       );
     logger.logMainChunk().log(`verison: ${app.getVersion()}`);
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      画像用URL作成
-    */
-    //-------------------------------------------------------------------------------------------------//
+    // プロトコル登録
     session.defaultSession.protocol.registerFileProtocol(
       PROTOCOLS.FILE.IMAGE_ORIGINAL,
       (req, res) => {
         res({
-          path: Path.resolve(paths.DIR_IMAGES, arrLast(req.url.split("/"), "")),
+          path: Path.resolve(paths.DIR_IMAGES, req.url.split("/").pop() as string),
         });
       },
     );
@@ -125,75 +103,31 @@ import { initWebhook } from "@/main/webhook/webhook";
       PROTOCOLS.FILE.IMAGE_THUMBNAIL,
       (req, res) => {
         res({
-          path: Path.resolve(paths.DIR_THUMBNAILS, arrLast(req.url.split("/"), "")),
+          path: Path.resolve(paths.DIR_THUMBNAILS, req.url.split("/").pop() as string),
         });
       },
     );
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      ipcへ関数を登録
-    */
-    //-------------------------------------------------------------------------------------------------//
-    const toMainFunctions = getMainFunctions();
-    Object.keys(toMainFunctions).forEach((key) => {
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      ipcMain.handle(key, (event: Electron.IpcMainInvokeEvent, ...args: any[]) =>
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        (toMainFunctions as any)[key](event, ...args),
-      );
+    // ipcの関数登録
+    const ipcFunctions = getIpcFunctions();
+    Object.keys(ipcFunctions).forEach((key) => {
+      ipcMain.handle(key, ipcFunctions[key as keyof typeof ipcFunctions]);
     });
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      メインウインドウ・プレビューウインドウを初期化
-    */
-    //-------------------------------------------------------------------------------------------------//
     createProtocol("app");
-    nativeTheme.on("updated", () => {
-      windows.emitMainEvent("darkMode", isDarkMode());
-    });
+    // 初期ウインドウ表示
     windows.showWindows();
-    checkUpdate();
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      データベースの初期化
-    */
-    //-------------------------------------------------------------------------------------------------//
+    // ダークモード監視開始
+    observeDarkMode();
+    // アップデート確認と通知
+    checkAndNotifySoftwareUpdate();
+    // dbの初期化
     await initDB();
+    // データ初期化完了通知
     dbStatus.initialized = true;
     windows.emitMainEvent("dataInitialized");
-    //-------------------------------------------------------------------------------------------------//
-    /*
-      Webhooks
-    */
-    //-------------------------------------------------------------------------------------------------//
+    // webhook有効化
     if (configSettings.data.developerMode) {
-      initWebhook(toMainFunctions);
+      initWebhook(ipcFunctions);
     }
-  });
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    色々な関数
-  */
-  //-------------------------------------------------------------------------------------------------//
-  async function checkUpdate() {
-    if (checkUpdateTimeoutHandler) {
-      clearTimeout(checkUpdateTimeoutHandler);
-    }
-    const log = logger.logMainChunk();
-    log.log("$Check Update");
-    if (process.platform != "win32") {
-      log.log("mac os is not available");
-      return;
-    }
-    const remote: RemoteBinaryInfo = await getLatestVersion();
-    log.log(remote);
-    if (!remote.isLatest) {
-      log.log("this version is old");
-      windows.openWindow(WindowType.SETTINGS);
-      windows.emitMainEvent("foundLatestVersion", remote);
-    } else {
-      log.log("this version is latest");
-    }
-    checkUpdateTimeoutHandler = setTimeout(checkUpdate, UPDATE_CHECK_INTERVAL);
   }
+  app.on("ready", appReady);
 })();

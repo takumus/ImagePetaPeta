@@ -11,7 +11,7 @@ import { States, defaultStates } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import { ppa } from "@/commons/utils/pp";
 
-import DB from "@/main/storages/db";
+import DB from "@/main/libs/db";
 
 const defaultSettings = getDefaultSettings();
 export function migratePetaImage(petaImage: PetaImage) {

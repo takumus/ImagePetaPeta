@@ -1,18 +1,18 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { UpdateMode } from "@/commons/datas/updateMode";
+import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
-import { minimId } from "@/commons/utils/utils";
 
+import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaBoards } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
-import { createKey, createUseFunction } from "@/main/utils/di";
 import { migratePetaBoard } from "@/main/utils/migrater";
 
 export class PetaBoardsController {
-  async updatePetaBoards(boards: PetaBoard[], mode: UpdateMode) {
-    return await ppa((board) => this.updatePetaBoard(board, mode), boards).promise;
+  async updateMultiple(boards: PetaBoard[], mode: UpdateMode) {
+    return await ppa((board) => this.update(board, mode), boards).promise;
   }
-  async getPetaBoards() {
+  async getAll() {
     const dbPetaBoards = useDBPetaBoards();
     const boards: { [id: string]: PetaBoard } = {};
     dbPetaBoards.getAll().forEach((board) => {
@@ -22,13 +22,13 @@ export class PetaBoardsController {
     });
     return boards;
   }
-  private async updatePetaBoard(board: PetaBoard, mode: UpdateMode) {
+  private async update(board: PetaBoard, mode: UpdateMode) {
     const dbPetaBoards = useDBPetaBoards();
     const logger = useLogger();
     const log = logger.logMainChunk();
     log.log("##Update PetaBoard");
     log.log("mode:", mode);
-    log.log("board:", minimId(board.id));
+    log.log("board:", minimizeID(board.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaBoards.remove({ id: board.id });
     } else if (mode === UpdateMode.UPDATE) {

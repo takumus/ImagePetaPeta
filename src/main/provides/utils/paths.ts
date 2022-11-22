@@ -1,4 +1,4 @@
-import { createKey, createUseFunction } from "@/main/utils/di";
+import { createKey, createUseFunction } from "@/main/libs/di";
 
 export interface Paths {
   DIR_ROOT: string;

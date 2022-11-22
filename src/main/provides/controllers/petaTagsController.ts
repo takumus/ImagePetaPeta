@@ -5,18 +5,18 @@ import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { UNTAGGED_ID } from "@/commons/defines";
+import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
-import { minimId } from "@/commons/utils/utils";
 
+import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaImages, useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
 import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
 import { useI18n } from "@/main/provides/utils/i18n";
 import { useLogger } from "@/main/provides/utils/logger";
 import * as Tasks from "@/main/tasks/task";
-import { createKey, createUseFunction } from "@/main/utils/di";
 
 export class PetaTagsController {
-  async updatePetaTags(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
+  async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
     const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaTags",
@@ -242,7 +242,7 @@ export class PetaTagsController {
     log.log("##Update PetaTag");
     if (petaTagLike.type === "petaTag") {
       log.log("mode:", mode);
-      log.log("tag:", minimId(petaTagLike.petaTag.id));
+      log.log("tag:", minimizeID(petaTagLike.petaTag.id));
       if (mode === UpdateMode.REMOVE) {
         await dbPetaImagesPetaTags.remove({ petaTagId: petaTagLike.petaTag.id });
         await dbPetaTags.remove({ id: petaTagLike.petaTag.id });
@@ -291,7 +291,7 @@ export class PetaTagsController {
     const log = logger.logMainChunk();
     log.log("##Update PetaImagePetaTag");
     log.log("mode:", mode);
-    log.log("tag:", minimId(petaImagePetaTag.id));
+    log.log("tag:", minimizeID(petaImagePetaTag.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
     } else if (mode === UpdateMode.UPDATE) {

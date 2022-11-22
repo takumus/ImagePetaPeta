@@ -6,9 +6,10 @@
   "author": "takumus",
   "scripts": {
     "serve": "vue-cli-service electron:serve",
-    "build:win": "yarn prebuild && vue-cli-service electron:build --publish never --win --x64",
-    "build:mac-intel": "yarn prebuild && vue-cli-service electron:build --publish never --mac --x64",
-    "build:mac-arm64": "yarn prebuild && vue-cli-service electron:build --publish never --mac --arm64",
+    "build": "vue-cli-service electron:build --publish never",
+    "build:win": "yarn build --win --x64",
+    "build:mac-intel": "yarn build --mac --x64",
+    "build:mac-arm64": "yarn build --mac --arm64",
     "lint": "vue-cli-service lint",
     "generate-assets": "run-s generate-assets:*",
     "generate-assets:cursors": "node ./scripts/generateCursors.js",

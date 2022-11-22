@@ -69,7 +69,7 @@ import {
   DEFAULT_IMAGE_SIZE,
 } from "@/commons/defines";
 import { hasPetaImages } from "@/commons/utils/board";
-import { minimId } from "@/commons/utils/utils";
+import { minimizeID } from "@/commons/utils/minimizeID";
 import { Vec2 } from "@/commons/utils/vec2";
 
 // Others
@@ -172,7 +172,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
   if (currentPetaBoard.value?.id === board.id) {
     return;
   }
-  logChunk().log("vIndex", "PetaBoard Selected", minimId(board.id));
+  logChunk().log("vIndex", "PetaBoard Selected", minimizeID(board.id));
   statesStore.state.value.selectedPetaBoardId = board.id;
   statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {

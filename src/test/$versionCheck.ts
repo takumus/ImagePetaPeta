@@ -1,4 +1,4 @@
-import { isLatest } from "@/commons/utils/versions";
+import { isLatest } from "@/main/utils/versions";
 
 for (let i = 0; i < 100; i++) {
   const v1 =

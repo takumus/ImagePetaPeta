@@ -3,7 +3,7 @@ import { WriteStream, createWriteStream } from "fs";
 import * as Path from "path";
 import { v4 as uuid } from "uuid";
 
-import { createKey, createUseFunction } from "@/main/utils/di";
+import { createKey, createUseFunction } from "@/main/libs/di";
 
 export class Logger {
   private logFile: WriteStream | undefined;

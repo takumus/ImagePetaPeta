@@ -17,12 +17,12 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 // import { DraggingPreviewWindow } from "@/main/draggingPreviewWindow/draggingPreviewWindow";
 import { WindowType } from "@/commons/datas/windowType";
 import { DEFAULT_BOARD_NAME, EULA } from "@/commons/defines";
-import { ToMainFunctions } from "@/commons/ipc/toMainFunctions";
+import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { ppa } from "@/commons/utils/pp";
-import { getLatestVersion } from "@/commons/utils/versions";
 
 import Transparent from "@/@assets/transparent.png";
 import { showError } from "@/main/errors/errorWindow";
+import * as file from "@/main/libs/file";
 import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
 import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
@@ -32,20 +32,20 @@ import { useDBStatus } from "@/main/provides/databases";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useWindows } from "@/main/provides/utils/windows";
-import * as file from "@/main/storages/file";
 import * as Tasks from "@/main/tasks/task";
-import { isDarkMode } from "@/main/utils/isDarkMode";
+import { isDarkMode } from "@/main/utils/darkMode";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
+import { getLatestVersion } from "@/main/utils/versions";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
 
 let temporaryShowNSFW = false;
 let detailsPetaImage: PetaImage | undefined;
-export function getMainFunctions(): {
-  [P in keyof ToMainFunctions]: (
+export function getIpcFunctions(): {
+  [P in keyof IpcFunctions]: (
     event: IpcMainInvokeEvent,
-    ...args: Parameters<ToMainFunctions[P]>
-  ) => ReturnType<ToMainFunctions[P]>;
+    ...args: Parameters<IpcFunctions[P]>
+  ) => ReturnType<IpcFunctions[P]>;
 } {
   return {
     async browseAndImportImageFiles(event, type) {
@@ -89,7 +89,7 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaImages");
-        const petaImages = await petaImagesController.getPetaImages();
+        const petaImages = await petaImagesController.getAll();
         log.log("return:", true);
         return petaImages;
       } catch (e) {
@@ -109,7 +109,7 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImages");
-        await petaImagesController.updatePetaImages(datas, mode);
+        await petaImagesController.updateMultiple(datas, mode);
         log.log("return:", true);
         return true;
       } catch (err) {
@@ -129,12 +129,12 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaBoards");
-        const petaBoards = await petaBoardsController.getPetaBoards();
+        const petaBoards = await petaBoardsController.getAll();
         const length = Object.keys(petaBoards).length;
         if (length === 0) {
           log.log("no boards! create empty board");
           const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
-          await petaBoardsController.updatePetaBoards([board], UpdateMode.INSERT);
+          await petaBoardsController.updateMultiple([board], UpdateMode.INSERT);
           petaBoards[board.id] = board;
         }
         log.log("return:", length);
@@ -156,7 +156,7 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaBoards");
-        await petaBoardsController.updatePetaBoards(boards, mode);
+        await petaBoardsController.updateMultiple(boards, mode);
         log.log("return:", true);
         return true;
       } catch (e) {
@@ -176,7 +176,7 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaTags");
-        await petaTagsController.updatePetaTags(tags, mode);
+        await petaTagsController.updateMultiple(tags, mode);
         log.log("return:", true);
         return true;
       } catch (error) {
@@ -216,7 +216,7 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Update PetaImagesPetaTags");
-        await petaTagpartitionsController.updatePetaTagPartitions(partitions, mode);
+        await petaTagpartitionsController.updateMultiple(partitions, mode);
         log.log("return:", true);
         return true;
       } catch (error) {
@@ -236,7 +236,7 @@ export function getMainFunctions(): {
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaTagPartitions");
-        const petaTagPartitions = await petaTagpartitionsController.getPetaTagPartitions();
+        const petaTagPartitions = await petaTagpartitionsController.getAll();
         log.log("return:", petaTagPartitions.length);
         return petaTagPartitions;
       } catch (error) {
@@ -578,27 +578,17 @@ export function getMainFunctions(): {
         return;
       }
       const firstPath = Path.resolve(paths.DIR_IMAGES, first.file.original);
-      // draggingPreviewWindow.createWindow();
-      // draggingPreviewWindow.setPetaImages(petaImages, configSettings.data.alwaysShowNSFW);
-      // draggingPreviewWindow.setSize(iconSize, (first.height / first.width) * iconSize);
-      // draggingPreviewWindow.setVisible(true);
       const files = petaImages.map((petaImage) =>
         Path.resolve(paths.DIR_IMAGES, petaImage.file.original),
       );
       if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
         windows.windows.board.moveTop();
       }
-      // draggingPreviewWindow.window?.moveTop();
-      // await new Promise((res) => {
-      //   setTimeout(res, 100);
-      // });
       event.sender.startDrag({
         file: firstPath,
         files: files,
         icon: nativeImage.createFromDataURL(Transparent),
       });
-      // draggingPreviewWindow.setVisible(false);
-      // draggingPreviewWindow.destroy();
     },
     async updateStates(event, states) {
       const logger = useLogger();

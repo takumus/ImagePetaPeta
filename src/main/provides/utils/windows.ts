@@ -15,13 +15,13 @@ import {
   WINDOW_SETTINGS_HEIGHT,
   WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
-import { ToFrontFunctions } from "@/commons/ipc/toFrontFunctions";
+import { IpcEvents } from "@/commons/ipc/ipcEvents";
 import { Vec2 } from "@/commons/utils/vec2";
 
+import { createKey, createUseFunction } from "@/main/libs/di";
 import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
-import { createKey, createUseFunction } from "@/main/utils/di";
-import { isDarkMode } from "@/main/utils/isDarkMode";
+import { isDarkMode } from "@/main/utils/darkMode";
 
 export class Windows {
   windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
@@ -319,10 +319,7 @@ export class Windows {
       this.windows[windowType]?.focus();
     }
   }
-  emitMainEvent<U extends keyof ToFrontFunctions>(
-    key: U,
-    ...args: Parameters<ToFrontFunctions[U]>
-  ): void {
+  emitMainEvent<U extends keyof IpcEvents>(key: U, ...args: Parameters<IpcEvents[U]>): void {
     Object.values(this.windows).forEach((window) => {
       if (window !== undefined && !window.isDestroyed()) {
         window.webContents.send(key, ...args);

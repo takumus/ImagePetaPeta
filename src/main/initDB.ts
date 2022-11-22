@@ -25,12 +25,8 @@ export async function initDB() {
   const dbPetaTagPartitions = useDBPetaTagPartitions();
   const configDBInfo = useConfigDBInfo();
   const petaImagesController = usePetaImagesController();
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    ロード
-  */
-  //-------------------------------------------------------------------------------------------------//
   try {
+    // ロード
     // 時間かかったときのテスト
     // await new Promise((res) => setTimeout(res, 5000));
     await Promise.all([
@@ -40,6 +36,7 @@ export async function initDB() {
       dbPetaTagPartitions.init(),
       dbPetaImagesPetaTags.init(),
     ]);
+    // インデックス作成
     await Promise.all([
       dbPetaTags.ensureIndex({
         fieldName: "id",
@@ -67,24 +64,20 @@ export async function initDB() {
     });
     return;
   }
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    マイグレーション
-  */
-  //-------------------------------------------------------------------------------------------------//
   try {
+    // 旧バージョンからのマイグレーション
     const petaImagesArray = dbPetaImages.getAll();
     const petaImages: PetaImages = {};
     petaImagesArray.forEach((pi) => {
       petaImages[pi.id] = pi;
       if (migratePetaImage(pi)) {
         logger.logMainChunk().log("Migrate PetaImage");
-        petaImagesController.updatePetaImages([pi], UpdateMode.UPDATE, true);
+        petaImagesController.updateMultiple([pi], UpdateMode.UPDATE, true);
       }
     });
     if (await migratePetaTag(dbPetaTags, petaImages)) {
       logger.logMainChunk().log("Migrate PetaTags");
-      await petaImagesController.updatePetaImages(petaImagesArray, UpdateMode.UPDATE, true);
+      await petaImagesController.updateMultiple(petaImagesArray, UpdateMode.UPDATE, true);
     }
     if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
       logger.logMainChunk().log("Migrate PetaImagesPetaTags");
@@ -102,11 +95,7 @@ export async function initDB() {
     });
     return;
   }
-  //-------------------------------------------------------------------------------------------------//
-  /*
-    自動圧縮
-  */
-  //-------------------------------------------------------------------------------------------------//
+  // 自動圧縮登録
   (
     [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaTagPartitions, dbPetaImagesPetaTags] as const
   ).forEach((db) => {

@@ -20,32 +20,14 @@ import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
 export async function realESRGAN(petaImages: PetaImage[], modelName: RealESRGANModelName) {
   const petaImagesController = usePetaImagesController();
-  const petaTagsController = usePetaTagsController();
-  const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
   const paths = usePaths();
   const logger = useLogger();
   return Tasks.spawn(
     "realESRGAN",
     async (handler) => {
       const log = logger.logMainChunk();
-      const isMac = process.platform === "darwin";
-      const execFilePath = resolveExtraFilesPath(
-        isMac
-          ? extraFiles["realesrgan.darwin"]["realesrgan-ncnn-vulkan"]
-          : extraFiles["realesrgan.win32"]["realesrgan-ncnn-vulkan.exe"],
-      );
-      const modelFilePath = resolveExtraFilesPath(
-        isMac
-          ? extraFiles["realesrgan.darwin"]["models/"]
-          : extraFiles["realesrgan.win32"]["models/"],
-      );
-      if (isMac) {
-        try {
-          fs.accessSync(execFilePath, fs.constants.X_OK);
-        } catch {
-          fs.chmodSync(execFilePath, "755");
-        }
-      }
+      const { execFilePath, modelFilePath } = getFilePath();
+      setPermisionTo755(execFilePath);
       let success = true;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
@@ -100,42 +82,10 @@ export async function realESRGAN(petaImages: PetaImage[], modelName: RealESRGANM
           });
           const result = await childProcess.promise;
           if (result) {
-            const newPetaImages = await petaImagesController.importImagesFromFileInfos(
-              {
-                fileInfos: [{ path: outputFile }],
-              },
-              true,
-            );
-            if (newPetaImages.length < 1) {
-              log.log("return: false");
-              return false;
-            }
-            const newPetaImage = newPetaImages[0];
-            if (!newPetaImage) {
-              log.log("return: false");
-              return false;
-            }
-            newPetaImage.addDate = petaImage.addDate + 1;
-            newPetaImage.fileDate = petaImage.fileDate;
-            newPetaImage.name = `${petaImage.name}(RealESRGAN-${modelName})`;
-            newPetaImage.note = petaImage.note;
-            newPetaImage.nsfw = petaImage.nsfw;
-            log.log("update new petaImage");
-            await petaImagesController.updatePetaImages([newPetaImage], UpdateMode.UPDATE, true);
-            log.log("get tags");
-            const pipts = await dbPetaImagesPetaTags.find({
-              petaImageId: petaImage.id,
-            });
-            log.log("tags:", pipts.length);
-            log.log("copy tags");
-            await petaTagsController.updatePetaImagesPetaTags(
-              [newPetaImage.id],
-              pipts.map((pipt) => ({
-                type: "id",
-                id: pipt.petaTagId,
-              })),
-              UpdateMode.INSERT,
-              true,
+            success = await importImage(
+              outputFile,
+              petaImage,
+              `${petaImage.name}(RealESRGAN-${modelName})`,
             );
           } else {
             success = false;
@@ -155,4 +105,60 @@ export async function realESRGAN(petaImages: PetaImage[], modelName: RealESRGANM
     {},
     false,
   );
+}
+function getFilePath() {
+  const isMac = process.platform === "darwin";
+  const execFilePath = resolveExtraFilesPath(
+    isMac
+      ? extraFiles["realesrgan.darwin"]["realesrgan-ncnn-vulkan"]
+      : extraFiles["realesrgan.win32"]["realesrgan-ncnn-vulkan.exe"],
+  );
+  const modelFilePath = resolveExtraFilesPath(
+    isMac ? extraFiles["realesrgan.darwin"]["models/"] : extraFiles["realesrgan.win32"]["models/"],
+  );
+  return { execFilePath, modelFilePath };
+}
+
+function setPermisionTo755(execFilePath: string) {
+  if (process.platform === "darwin") {
+    try {
+      fs.accessSync(execFilePath, fs.constants.X_OK);
+    } catch {
+      fs.chmodSync(execFilePath, "755");
+    }
+  }
+}
+
+async function importImage(outputFile: string, petaImage: PetaImage, newName: string) {
+  const petaImagesController = usePetaImagesController();
+  const petaTagsController = usePetaTagsController();
+  const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+  const newPetaImages = await petaImagesController.importImagesFromFileInfos({
+    fileInfos: [{ path: outputFile }],
+  });
+  if (newPetaImages.length < 1) {
+    return false;
+  }
+  const newPetaImage = newPetaImages[0];
+  if (!newPetaImage) {
+    return false;
+  }
+  newPetaImage.addDate = petaImage.addDate + 1;
+  newPetaImage.fileDate = petaImage.fileDate;
+  newPetaImage.name = newName;
+  newPetaImage.note = petaImage.note;
+  newPetaImage.nsfw = petaImage.nsfw;
+  await petaImagesController.updateMultiple([newPetaImage], UpdateMode.UPDATE);
+  const pipts = await dbPetaImagesPetaTags.find({
+    petaImageId: petaImage.id,
+  });
+  await petaTagsController.updatePetaImagesPetaTags(
+    [newPetaImage.id],
+    pipts.map((pipt) => ({
+      type: "id",
+      id: pipt.petaTagId,
+    })),
+    UpdateMode.INSERT,
+  );
+  return true;
 }

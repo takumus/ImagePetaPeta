@@ -1,22 +1,22 @@
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
+import { minimizeID } from "@/commons/utils/minimizeID";
 // import { migratePetaTagPartition } from "@/main/utils/migrater";
 import { ppa } from "@/commons/utils/pp";
-import { minimId } from "@/commons/utils/utils";
 
+import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
 import { useEmitMainEvent } from "@/main/provides/utils/emitMainEvent";
 import { useLogger } from "@/main/provides/utils/logger";
 import * as Tasks from "@/main/tasks/task";
-import { createKey, createUseFunction } from "@/main/utils/di";
 
 export class PetaTagPartitionsController {
-  async getPetaTagPartitions() {
+  async getAll() {
     const dbPetaTagPartitions = useDBPetaTagPartitions();
     return dbPetaTagPartitions.getAll();
   }
-  async updatePetaTagPartitions(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
+  async updateMultiple(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
     const emit = useEmitMainEvent();
     return Tasks.spawn(
       "UpdatePetaTagPartitions",
@@ -53,7 +53,7 @@ export class PetaTagPartitionsController {
     const log = logger.logMainChunk();
     log.log("##Update PetaTagPartition");
     log.log("mode:", mode);
-    log.log("tag:", minimId(petaPetaTagPartition.id));
+    log.log("tag:", minimizeID(petaPetaTagPartition.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaTagPartitions.remove({ id: petaPetaTagPartition.id });
     } else if (mode === UpdateMode.UPDATE) {

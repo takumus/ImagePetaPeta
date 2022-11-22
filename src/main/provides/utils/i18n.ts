@@ -3,7 +3,7 @@ import { I18n } from "vue-i18n";
 
 import languages from "@/commons/languages";
 
-import { createKey, createUseFunction } from "@/main/utils/di";
+import { createKey, createUseFunction } from "@/main/libs/di";
 
 export const i18nKey =
   createKey<I18n<typeof languages, DateTimeFormat, NumberFormat, string, true>>("i18n");

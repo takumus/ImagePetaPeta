@@ -7,7 +7,7 @@ import { TaskStatus } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 
-export interface ToFrontFunctions {
+export interface IpcEvents {
   updatePetaImages: (petaImages: PetaImage[], mode: UpdateMode) => void;
   updatePetaTags: (updates: { petaTagIds: string[]; petaImageIds: string[] }) => void;
   updatePetaTagPartitions: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;

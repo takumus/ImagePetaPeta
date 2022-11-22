@@ -4,8 +4,8 @@ import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 
-import DB from "@/main/storages/db";
-import { createKey, createUseFunction } from "@/main/utils/di";
+import DB from "@/main/libs/db";
+import { createKey, createUseFunction } from "@/main/libs/di";
 
 export const dbPetaImagesKey = createKey<DB<PetaImage>>("dbPetaImages");
 export const dbPetaTagsKey = createKey<DB<PetaTag>>("dbPetaTags");

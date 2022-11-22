@@ -1,7 +1,6 @@
 import { BrowserWindow, app } from "electron";
 
 import { SUPPORT_URL } from "@/commons/defines";
-import { noHtml } from "@/commons/utils/utils";
 
 import { useWindows } from "@/main/provides/utils/windows";
 
@@ -68,4 +67,7 @@ export function showError(error: ErrorWindowParameters, quit = true) {
     //
   }
   showErrorWindow(error, quit);
+}
+export function noHtml(str: string | null | undefined) {
+  return String(str).replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
