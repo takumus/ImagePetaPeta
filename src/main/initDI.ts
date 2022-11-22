@@ -2,7 +2,7 @@ import { app } from "electron";
 import { v4 as uuid } from "uuid";
 import { createI18n } from "vue-i18n";
 
-import { DBInfo } from "@/commons/datas/dbInfo";
+import { DBInfo, getDefaultDBInfo } from "@/commons/datas/dbInfo";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
@@ -121,8 +121,13 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     const FILE_STATES = file.initFile(DIR_APP, FILENAME_STATES);
     const FILE_DBINFO = file.initFile(DIR_ROOT, FILENAME_DB_INFO);
     const FILE_WINDOW_STATES = file.initFile(DIR_APP, FILENAME_WINDOW_STATES);
+    const configDBInfo = new Config<DBInfo>(FILE_DBINFO, getDefaultDBInfo());
+    // デフォルト値だったらバージョン付与。
+    if (configDBInfo.data.version === getDefaultDBInfo().version) {
+      configDBInfo.data.version = app.getVersion();
+      configDBInfo.save();
+    }
     // データベースバージョンを読んで、アプリのバージョンよりも高かったらダメ
-    const configDBInfo = new Config<DBInfo>(FILE_DBINFO, { version: app.getVersion() });
     if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
       throw new Error(
         `DB version is higher than App version. \nDB version:${
