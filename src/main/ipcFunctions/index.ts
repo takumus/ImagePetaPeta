@@ -15,7 +15,7 @@ import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaImage } from "@/commons/datas/petaImage";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
-import { DEFAULT_BOARD_NAME, EULA } from "@/commons/defines";
+import { DEFAULT_BOARD_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { ppa } from "@/commons/utils/pp";
 
@@ -512,10 +512,15 @@ export function getIpcFunctions(): {
           })
         ).filePaths[0];
         if (filePath === undefined) {
-          return null;
+          return undefined;
         }
         let path = Path.resolve(filePath);
-        if (Path.basename(path) != "PetaImage") {
+        // if (Path.basename(path) != "PetaImage") {
+        //   path = Path.resolve(path, "PetaImage");
+        // }
+        try {
+          await file.readFile(Path.resolve(filePath, FILENAME_DB_INFO));
+        } catch {
           path = Path.resolve(path, "PetaImage");
         }
         log.log("return:", path);

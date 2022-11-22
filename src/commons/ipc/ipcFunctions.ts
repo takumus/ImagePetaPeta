@@ -62,7 +62,7 @@ export interface IpcFunctions {
   windowActivate: () => Promise<void>;
   getPlatform: () => Promise<NodeJS.Platform>;
   regenerateMetadatas: () => Promise<void>;
-  browsePetaImageDirectory: () => Promise<string | null>;
+  browsePetaImageDirectory: () => Promise<string | undefined>;
   changePetaImageDirectory: (path: string) => Promise<boolean>;
   realESRGANConvert: (petaImages: PetaImage[], modelName: RealESRGANModelName) => Promise<boolean>;
   startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
