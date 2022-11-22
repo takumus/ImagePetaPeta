@@ -92,9 +92,11 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     const DIR_ROOT = (() => {
       // デフォルトならピクチャーズ
       if (configSettings.data.petaImageDirectory.default) {
-        const dir = file.initDirectory(true, app.getPath("pictures"), "imagePetaPeta");
-        configSettings.data.petaImageDirectory.path = dir;
-        return dir;
+        return (configSettings.data.petaImageDirectory.path = file.initDirectory(
+          true,
+          app.getPath("pictures"),
+          "imagePetaPeta",
+        ));
       } else {
         // ちがうなら設定ファイルパス
         try {
