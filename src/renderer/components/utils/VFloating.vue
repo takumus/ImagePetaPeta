@@ -8,8 +8,7 @@
       maxHeight: height,
       maxWidth: width,
       zIndex: zIndex,
-    }"
-  >
+    }">
     <slot></slot>
   </t-floating-root>
 </template>

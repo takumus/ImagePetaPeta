@@ -4,8 +4,7 @@
       <input
         type="checkbox"
         v-model="settingsStore.state.value.darkMode"
-        :disabled="settingsStore.state.value.autoDarkMode"
-      />
+        :disabled="settingsStore.state.value.autoDarkMode" />
       {{ t("settings.darkMode") }}
     </label>
     <br />

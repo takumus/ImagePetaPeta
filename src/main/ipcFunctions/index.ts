@@ -33,11 +33,11 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
 import * as Tasks from "@/main/tasks/task";
 import { isDarkMode } from "@/main/utils/darkMode";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { getLatestVersion } from "@/main/utils/versions";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 let temporaryShowNSFW = false;
 let detailsPetaImage: PetaImage | undefined;

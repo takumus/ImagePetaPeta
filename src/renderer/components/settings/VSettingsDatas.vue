@@ -10,8 +10,7 @@
       :textAreaStyle="{ width: '100%' }"
       :outerStyle="{ width: '100%' }"
       :value="tempPetaImageDirectory"
-      @update:value="(value) => (tempPetaImageDirectory = value)"
-    />
+      @update:value="(value) => (tempPetaImageDirectory = value)" />
     <br />
     <button @click="changePetaImageDirectory" :disabled="tempPetaImageDirectory === ''">
       {{ t("settings.changePetaImageDirectoryButton") }}

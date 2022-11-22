@@ -5,8 +5,7 @@
     }"
     :style="{
       zIndex: zIndex,
-    }"
-  >
+    }">
     <t-header @click.left="toggleVisible"> </t-header>
     <t-layers-parent v-show="statesStore.state.value.visibleLayerPanel" ref="layersParent">
       <t-layers ref="layers">
@@ -22,8 +21,7 @@
           @update:petaPanel="updatePetaPanel"
           :style="{
             order: orders[pPanel.id] ?? props.pPanelsArray.length,
-          }"
-        />
+          }" />
       </t-layers>
       <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
         <VLayerCell ref="cellDrag" :petaPanel="draggingData" :drag="true" />

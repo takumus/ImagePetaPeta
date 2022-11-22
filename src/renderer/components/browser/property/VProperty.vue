@@ -14,8 +14,7 @@
               :outerStyle="{ width: '100%' }"
               :value="singlePetaImageInfo.petaImage.name"
               :look="singlePetaImageInfo.petaImage.name"
-              @update:value="changeName"
-            />
+              @update:value="changeName" />
           </t-value>
         </t-data>
         <t-data>
@@ -28,8 +27,7 @@
               :textAreaStyle="{ width: '100%', overflowY: 'auto', maxHeight: '64px' }"
               :outerStyle="{ width: '100%' }"
               :value="note"
-              @update:value="changeNote"
-            />
+              @update:value="changeNote" />
           </t-value>
         </t-data>
         <t-data>
@@ -60,8 +58,7 @@
               backgroundColor: `rgb(${color.color.r}, ${color.color.g}, ${color.color.b})`,
               flex: Math.floor(color.population * 90 + 10),
             }"
-            @click="changeCurrentColor(color.color)"
-          >
+            @click="changeCurrentColor(color.color)">
           </t-color>
         </t-color-wrapper>
         <t-current-color v-if="currentColor">
@@ -79,8 +76,7 @@
               :style="{
                 backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
                 flex: 1,
-              }"
-            ></t-color
+              }"></t-color
           ></t-color-wrapper>
         </t-current-color>
       </t-palette>
@@ -109,8 +105,7 @@
             :value="tag.name"
             :look="tag.name"
             @click="selectTag(tag)"
-            @contextmenu="tagMenu($event, tag)"
-          />
+            @contextmenu="tagMenu($event, tag)" />
         </t-tag>
         <t-tag class="last">
           <VTextarea
@@ -124,8 +119,7 @@
             :textAreaStyle="{ width: '100%' }"
             :outerStyle="{ width: '100%' }"
             :noOutline="true"
-            @update:value="addTag"
-          />
+            @update:value="addTag" />
         </t-tag>
       </t-search-box>
       <ul v-else>
@@ -141,8 +135,7 @@
           type="checkbox"
           tabindex="-1"
           :checked="nsfw"
-          @change="changeNSFW(Boolean(($event.target as HTMLInputElement).checked))"
-        />
+          @change="changeNSFW(Boolean(($event.target as HTMLInputElement).checked))" />
       </label>
     </t-nsfw>
   </t-property-root>

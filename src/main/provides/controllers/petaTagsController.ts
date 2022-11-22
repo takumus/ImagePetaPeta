@@ -4,18 +4,18 @@ import { createPetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
+import { WindowType } from "@/commons/datas/windowType";
 import { UNTAGGED_ID } from "@/commons/defines";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaImages, useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useI18n } from "@/main/provides/utils/i18n";
 import { useLogger } from "@/main/provides/utils/logger";
-import * as Tasks from "@/main/tasks/task";
 import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
-import { WindowType } from "@/commons/datas/windowType";
+import * as Tasks from "@/main/tasks/task";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {

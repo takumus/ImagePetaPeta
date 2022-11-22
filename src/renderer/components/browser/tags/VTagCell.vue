@@ -8,8 +8,7 @@
       :value="value"
       :look="look"
       :clickToEdit="clickToEdit"
-      @update:value="(name) => updateName(name)"
-    />
+      @update:value="(name) => updateName(name)" />
   </t-tag-cell-root>
 </template>
 

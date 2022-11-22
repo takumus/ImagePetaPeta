@@ -7,8 +7,7 @@
         :class="{
           selected: currentTab === tab,
         }"
-        @click="currentTab = tab"
-      >
+        @click="currentTab = tab">
         {{ t("settings." + tab) }}
       </li>
     </ul>

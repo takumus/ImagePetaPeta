@@ -4,8 +4,7 @@
       transform: `translate(${tile.position.x + 'px'}, ${tile.position.y + 'px'})`,
       width: tile.width + 'px',
       height: tile.height + 'px',
-    }"
-  >
+    }">
     <t-tile-wrapper v-if="tile.group === undefined && tile.petaImage !== undefined">
       <t-images
         @pointerdown="pointerdown"
@@ -14,8 +13,7 @@
         draggable="true"
         :class="{
           selected,
-        }"
-      >
+        }">
         <t-nsfw v-if="nsfwMask"> </t-nsfw>
         <t-placeholder
           class="placeholder"
@@ -24,15 +22,13 @@
           }"
           :style="{
             backgroundColor: placeholderColor,
-          }"
-        ></t-placeholder>
+          }"></t-placeholder>
         <img
           draggable="false"
           :src="thumbnailURL"
           @load="loadingThumbnail = false"
           v-if="loadingOriginal"
-          decoding="async"
-        />
+          decoding="async" />
         <img ref="image" draggable="false" v-show="!loadingOriginal" />
         <t-background> </t-background>
       </t-images>
@@ -40,8 +36,7 @@
         v-if="settingsStore.state.value.showTagsOnTile"
         :class="{
           selected,
-        }"
-      >
+        }">
         <t-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
           {{ petaTag.name }}
         </t-tag>

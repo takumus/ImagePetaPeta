@@ -3,8 +3,7 @@
     v-show="visible"
     :style="{
       zIndex: zIndex,
-    }"
-  >
+    }">
     <t-modal>
       <t-content>
         <p>

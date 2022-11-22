@@ -7,15 +7,13 @@
       <button
         v-if="windowType === 'browser' || windowType === 'details' || windowType === 'capture'"
         tabindex="-1"
-        @click="openBoard()"
-      >
+        @click="openBoard()">
         <t-icon class="board"></t-icon>
       </button>
       <button
         v-if="windowType === 'board' || windowType === 'details' || windowType === 'capture'"
         tabindex="-1"
-        @click="openBrowser()"
-      >
+        @click="openBrowser()">
         <t-icon class="browser"></t-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="browseAndImportImageFiles()">

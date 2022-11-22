@@ -18,8 +18,7 @@
                   statesStore.state.value.groupingByDate = Boolean(
                     ($event.target as HTMLInputElement).checked,
                   )
-                "
-              />
+                " />
               <span>{{ t("browser.grouping") }}</span>
             </label>
             <select v-model="sortMode">
@@ -33,15 +32,13 @@
               @change="updateTileSize(Number(($event.target as HTMLInputElement).value))"
               :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
               :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX"
-              :step="defines.BROWSER_THUMBNAIL_ZOOM_STEP"
-            />
+              :step="defines.BROWSER_THUMBNAIL_ZOOM_STEP" />
           </t-buttons>
         </t-top>
         <t-tiles ref="thumbnails">
           <t-tiles-content
             ref="thumbsWrapper"
-            :style="{ height: scrollHeight + defines.BROWSER_THUMBNAIL_MARGIN + 'px' }"
-          >
+            :style="{ height: scrollHeight + defines.BROWSER_THUMBNAIL_MARGIN + 'px' }">
             <VTile
               v-for="data in visibleTiles"
               :key="data.id"
@@ -54,8 +51,7 @@
                 (tile, position) => (tile.petaImage ? petaImageMenu(tile.petaImage, position) : 0)
               "
               @drag="drag"
-              @dblclick="openDetail"
-            />
+              @dblclick="openDetail" />
           </t-tiles-content>
         </t-tiles>
       </t-content>
@@ -65,8 +61,7 @@
         :petaImages="selectedPetaImages"
         @clearSelectionAll="clearSelectionAll"
         @menu="petaImageMenu"
-        @drag="drag"
-      />
+        @drag="drag" />
       <VProperty :petaImages="selectedPetaImages" @selectTag="selectTag" />
     </t-right>
   </t-browser-root>

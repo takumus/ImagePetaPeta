@@ -5,8 +5,7 @@
       left: propertyThumbnail.position.x + 'px',
       width: propertyThumbnail.width + 'px',
       height: propertyThumbnail.height + 'px',
-    }"
-  >
+    }">
     <t-image-wrapper>
       <t-nsfw v-if="nsfwMask"> </t-nsfw>
       <img draggable="false" :src="imageURL" v-if="!nsfwMask && imageURL !== undefined" />

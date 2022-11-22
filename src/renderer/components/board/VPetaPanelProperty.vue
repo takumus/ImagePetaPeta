@@ -4,8 +4,7 @@
     :zIndex="zIndex"
     :maxWidth="'512px'"
     :maxHeight="'unset'"
-    ref="floating"
-  >
+    ref="floating">
     <t-content>
       <p v-for="p in selectedPetaPanels" :key="p.id">{{ p.id }}</p>
       <button @click="changeOrder('front')">{{ t("boards.panelMenu.toFront") }}</button>
@@ -18,8 +17,7 @@
       <button @click="removeSelectedPanels()">{{ t("boards.panelMenu.remove") }}</button>
       <button
         v-if="singleSelectedPetaPanel"
-        @click="singleSelectedPetaPanel ? openDetails(singleSelectedPetaPanel) : false"
-      >
+        @click="singleSelectedPetaPanel ? openDetails(singleSelectedPetaPanel) : false">
         {{ t("boards.panelMenu.details") }}
       </button>
       <button v-if="singleSelectedPetaPanel" @click="playGIF">

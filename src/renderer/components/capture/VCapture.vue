@@ -3,8 +3,7 @@
     ref="detailsRoot"
     :style="{
       zIndex: zIndex,
-    }"
-  >
+    }">
     <!-- <select v-model="currentSource">
       <option v-for="source in sources" :key="source.id" :value="source">{{ source.name }}</option>
     </select> -->
@@ -12,8 +11,7 @@
       <VDragView
         v-if="currentSource?.size"
         :contentWidth="currentSource.size.width"
-        :contentHeight="currentSource.size.height"
-      >
+        :contentHeight="currentSource.size.height">
         <video ref="video"></video>
       </VDragView>
     </t-video>
@@ -26,8 +24,7 @@
         :class="{
           selected: source === currentSource,
         }"
-        draggable="false"
-      />
+        draggable="false" />
     </t-thumbnails>
   </t-details-root>
 </template>

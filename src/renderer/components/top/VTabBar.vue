@@ -7,16 +7,14 @@
       @pointerdown="pointerdown($event, b, index)"
       @contextmenu="menu($event, b)"
       :key="b.id"
-      :ref="(element: HTMLElement) => setTabRef(element, b.id)"
-    >
+      :ref="(element: HTMLElement) => setTabRef(element, b.id)">
       <t-label-wrapper>
         <t-label>
           <VTextarea
             :type="'single'"
             :trim="true"
             :value="b.name"
-            @update:value="(v) => changePetaBoardName(b, v)"
-          />
+            @update:value="(v) => changePetaBoardName(b, v)" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
@@ -27,8 +25,7 @@
             :type="'single'"
             :trim="true"
             :readonly="true"
-            :value="textsStore.state.value.plus"
-          />
+            :value="textsStore.state.value.plus" />
         </t-label>
       </t-label-wrapper>
     </t-tab>
@@ -36,8 +33,7 @@
       class="selected drag"
       ref="draggingTab"
       :style="{ display: dragging ? 'block' : 'none' }"
-      v-show="dragging"
-    >
+      v-show="dragging">
       <t-label-wrapper>
         <t-label>
           <VTextarea
@@ -45,8 +41,7 @@
             :trim="true"
             :readonly="true"
             :value="board.name"
-            v-if="board"
-          />
+            v-if="board" />
         </t-label>
       </t-label-wrapper>
     </t-tab>

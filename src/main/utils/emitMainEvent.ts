@@ -1,4 +1,5 @@
 import { IpcEvents } from "@/commons/ipc/ipcEvents";
+
 import { EmitMainEventTarget, useWindows } from "@/main/provides/utils/windows";
 
 export function emitMainEvent<U extends keyof IpcEvents>(

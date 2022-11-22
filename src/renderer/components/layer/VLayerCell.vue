@@ -7,30 +7,26 @@
       sorting: sorting,
     }"
     @pointerdown="pointerdown($event)"
-    ref="vLayerCellRoot"
-  >
+    ref="vLayerCellRoot">
     <t-icon
       class="visible"
       ref="visibleIcon"
       :class="{
         disabled: !visible,
-      }"
-    >
+      }">
     </t-icon>
     <t-icon
       class="lock"
       ref="lockedIcon"
       :class="{
         disabled: !locked,
-      }"
-    >
+      }">
     </t-icon>
     <t-thumb
       v-if="url"
       :style="{
         backgroundImage: `url(${url})`,
-      }"
-    >
+      }">
       <t-nsfw v-if="nsfwMask"></t-nsfw>
     </t-thumb>
   </li>

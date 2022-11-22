@@ -8,8 +8,7 @@
         @destruct="destruct"
         @tick="animate"
         @loseContext="loseContext"
-        @resize="resize"
-      />
+        @resize="resize" />
     </t-circle>
     <input type="range" min="0" max="100" v-model="amountFilterValue" />
   </t-gamut-map-root>

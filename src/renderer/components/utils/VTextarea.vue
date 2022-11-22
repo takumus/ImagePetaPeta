@@ -18,8 +18,7 @@
         outline: props.noOutline === false,
       }"
       spellcheck="false"
-      :style="textAreaStyle"
-    >
+      :style="textAreaStyle">
     </t-textarea>
     <VComplement
       v-if="complements"
@@ -28,8 +27,7 @@
       @select="inputFromComplement"
       :zIndex="10"
       :editing="editing"
-      :textArea="textArea"
-    />
+      :textArea="textArea" />
   </t-textarea-root>
 </template>
 

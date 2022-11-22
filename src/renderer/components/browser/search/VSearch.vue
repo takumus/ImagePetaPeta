@@ -12,8 +12,7 @@
           :value="tag.name"
           :look="tag.name"
           @update:value="(value) => editSearchTag(tag, value)"
-          @deleteOfEmpty="editSearchTag(tag, '')"
-        />
+          @deleteOfEmpty="editSearchTag(tag, '')" />
       </t-tag>
       <t-tag class="last">
         <VTextarea
@@ -28,8 +27,7 @@
           :noOutline="true"
           @update:value="addSelectedTag"
           @deleteOfEmpty="removeLastPetaTag()"
-          ref="searchInput"
-        />
+          ref="searchInput" />
       </t-tag>
     </t-search-box>
   </t-search-root>

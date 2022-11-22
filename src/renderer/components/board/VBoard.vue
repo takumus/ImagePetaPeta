@@ -4,8 +4,7 @@
     v-show="currentBoard"
     :style="{
       zIndex: zIndex,
-    }"
-  >
+    }">
     <t-pixi-container
       ><VPIXI
         ref="vPixi"
@@ -27,8 +26,7 @@
       @sortIndex="sortIndex"
       @petaPanelMenu="petaPanelMenu"
       @orderRender="orderPIXIRender"
-      @update:petaPanels="updatePetaPanelsFromLayer"
-    />
+      @update:petaPanels="updatePetaPanelsFromLayer" />
     <VPetaPanelProperty
       :selectedPetaPanels="selectedPetaPanelsArray"
       :petaPanels="petaPanelsArray"
@@ -36,8 +34,7 @@
       @sortIndex="sortIndex"
       @removeSelectedPanels="removeSelectedPanels"
       :zIndex="3"
-      ref="petaPanelsProperty"
-    />
+      ref="petaPanelsProperty" />
   </t-board-root>
 </template>
 

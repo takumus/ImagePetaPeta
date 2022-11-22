@@ -3,8 +3,7 @@
     <t-bar
       :style="{
         width: `${progress}%`,
-      }"
-    >
+      }">
     </t-bar>
   </t-progress-bar-root>
 </template>

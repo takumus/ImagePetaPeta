@@ -4,8 +4,7 @@
     :visible="props.editing && matched"
     :maxWidth="'256px'"
     :maxHeight="'unset'"
-    ref="floating"
-  >
+    ref="floating">
     <t-complement-root class="complement-root" ref="complement">
       <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
       <t-tag
@@ -16,15 +15,13 @@
         @mouseleave="moveSelectionAbsolute(-1)"
         :class="{
           selected: i === currentIndex,
-        }"
-      >
+        }">
         <t-char
           v-for="co in item.value.split('').map((c, i) => ({ c, i }))"
           :key="co.i"
           :class="{
             match: item.matches.find((range) => range[0] <= co.i && co.i <= range[1]) !== undefined,
-          }"
-        >
+          }">
           {{ co.c }}
         </t-char>
       </t-tag>

@@ -2,8 +2,8 @@ import { v4 as uuid } from "uuid";
 
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 const tasks: { [id: string]: TaskHandler } = {};
 export async function spawn<T, K>(

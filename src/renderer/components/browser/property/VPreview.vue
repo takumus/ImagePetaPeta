@@ -5,13 +5,11 @@
       v-show="!noImage"
       @contextmenu="menu"
       @dragstart="dragstart($event)"
-      draggable="true"
-    >
+      draggable="true">
       <VPropertyThumbnail
         v-for="data in propertyThumbnails"
         :key="data.petaImage.id"
-        :propertyThumbnail="data"
-      />
+        :propertyThumbnail="data" />
     </t-previews>
     <p>{{ t("browser.property.selectedImage", [petaImages.length]) }}</p>
     <t-buttons v-show="!noImage">

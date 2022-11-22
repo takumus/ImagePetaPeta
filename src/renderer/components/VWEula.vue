@@ -2,8 +2,7 @@
   <t-root
     :class="{
       dark: darkModeStore.state.value,
-    }"
-  >
+    }">
     <t-content>
       <t-top>
         <VTitleBar :title="t('titles.eula')"> </VTitleBar>

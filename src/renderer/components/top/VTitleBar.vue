@@ -12,8 +12,7 @@
           class="left"
           :class="{
             mac: systemInfo.platform === 'darwin',
-          }"
-        >
+          }">
         </t-draggable>
         <slot></slot>
         <t-draggable class="right"> </t-draggable>

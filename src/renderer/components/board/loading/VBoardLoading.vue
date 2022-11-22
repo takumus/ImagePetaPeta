@@ -3,8 +3,7 @@
     :visible="data.loading || data.extracting"
     :center="true"
     :defaultZIndex="zIndex"
-    :ignore="true"
-  >
+    :ignore="true">
     <t-board-loading-root>
       <p>{{ t("boards.extracting") }}{{ Math.floor(data.extractProgress) }}%</p>
       <VProgressBar :progress="data.extractProgress"></VProgressBar>

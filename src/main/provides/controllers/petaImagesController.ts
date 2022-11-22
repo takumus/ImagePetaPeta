@@ -11,6 +11,7 @@ import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
+import { WindowType } from "@/commons/datas/windowType";
 import {
   BROWSER_THUMBNAIL_QUALITY,
   BROWSER_THUMBNAIL_SIZE,
@@ -24,14 +25,13 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
+import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
 import * as Tasks from "@/main/tasks/task";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { generateMetadataByWorker } from "@/main/utils/generateMetadata/generateMetadata";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
-import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
-import { WindowType } from "@/commons/datas/windowType";
 
 export class PetaImagesController {
   public async updateMultiple(datas: PetaImage[], mode: UpdateMode, silent = false) {

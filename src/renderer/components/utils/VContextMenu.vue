@@ -4,8 +4,7 @@
     :zIndex="zIndex"
     :maxWidth="'512px'"
     :maxHeight="'unset'"
-    ref="floating"
-  >
+    ref="floating">
     <ul v-show="show" class="context-menu-root" ref="contextMenu">
       <li
         v-for="item in filteredItems"
@@ -15,8 +14,7 @@
           item: !item.separate,
           separate: item.separate,
           disabled: item.disabled,
-        }"
-      >
+        }">
         {{ item.label }}
       </li>
     </ul>

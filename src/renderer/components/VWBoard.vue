@@ -2,8 +2,7 @@
   <t-root
     :class="{
       dark: darkModeStore.state.value,
-    }"
-  >
+    }">
     <t-content>
       <t-top>
         <VTitleBar>
@@ -13,15 +12,13 @@
             @remove="removePetaBoard"
             @add="addPetaBoard"
             @select="selectPetaBoard"
-            @update:board="updatePetaBoard"
-          />
+            @update:board="updatePetaBoard" />
         </VTitleBar>
         <VUtilsBar>
           <VBoardProperty
             v-if="currentPetaBoard"
             :board="currentPetaBoard"
-            @update="updatePetaBoard"
-          />
+            @update="updatePetaBoard" />
         </VUtilsBar>
       </t-top>
       <t-browser>
@@ -29,8 +26,7 @@
           :zIndex="1"
           :board="currentPetaBoard"
           ref="vPetaBoard"
-          @update:board="updatePetaBoard"
-        />
+          @update:board="updatePetaBoard" />
       </t-browser>
     </t-content>
     <t-modals v-show="components.modal.modalIds.length > 0">

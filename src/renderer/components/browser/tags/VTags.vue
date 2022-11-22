@@ -5,8 +5,7 @@
         @click="selectPetaTag()"
         :selected="selectedAll"
         :readonly="true"
-        :look="`${t('browser.all')}(${petaImagesArray.length})`"
-      />
+        :look="`${t('browser.all')}(${petaImagesArray.length})`" />
     </t-tags-top>
     <t-tags ref="tagsRoot">
       <VTagCell
@@ -27,8 +26,7 @@
         @contextmenu="tagMenu($event, c)"
         :style="{
           order: orders[c.petaTag.id] ?? browserTags.length,
-        }"
-      />
+        }" />
       <VTagPartition
         v-for="p in partitions"
         :value="p.name"
@@ -41,13 +39,11 @@
         :key="p.id"
         :style="{
           order: orders[p.id] ?? browserTags.length,
-        }"
-      />
+        }" />
       <t-drag-target-linea
         class="t-drag-target-line"
         ref="dragTargetLineElement"
-        v-if="draggingData"
-      ></t-drag-target-linea>
+        v-if="draggingData"></t-drag-target-linea>
     </t-tags>
     <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
       <VTagCell
@@ -56,16 +52,14 @@
         :selected="true"
         :readonly="true"
         :value="draggingData.petaTag.name"
-        :look="`${draggingData.petaTag.name}`"
-      />
+        :look="`${draggingData.petaTag.name}`" />
       <VTagPartition
         v-if="'petaTagPartition' in draggingData"
         :key="draggingData.petaTagPartition.id"
         :selected="true"
         :readonly="true"
         :value="draggingData.petaTagPartition.name"
-        :look="`${draggingData.petaTagPartition.name}`"
-      />
+        :look="`${draggingData.petaTagPartition.name}`" />
     </t-drag-floating-tag-cell>
     <t-tag-add>
       <t-tag>
@@ -76,8 +70,7 @@
           :textAreaStyle="{ width: '100%' }"
           :outerStyle="{ width: '100%' }"
           :look="textsStore.state.value.plus"
-          @update:value="addTag"
-        />
+          @update:value="addTag" />
       </t-tag>
     </t-tag-add>
   </t-tags-root>

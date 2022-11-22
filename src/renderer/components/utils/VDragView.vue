@@ -7,8 +7,7 @@
         }px) scale(${scale})`,
         width: `${contentWidth}px`,
         height: `${contentHeight}px`,
-      }"
-    >
+      }">
       <slot></slot>
     </t-img>
   </t-drag-view-root>

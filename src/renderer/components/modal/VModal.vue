@@ -8,8 +8,7 @@
       ...(parentStyle ? parentStyle : {}),
       zIndex: zIndex,
     }"
-    ref="background"
-  >
+    ref="background">
     <t-modal
       :style="
         childStyle
@@ -20,8 +19,7 @@
           : center
           ? centerStyle
           : {}
-      "
-    >
+      ">
       <t-buttons v-if="visibleCloseButton">
         <t-button @click="close" v-html="textsStore.state.value.close"></t-button>
       </t-buttons>

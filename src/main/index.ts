@@ -14,9 +14,9 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { initWebhook } from "@/main/webhook/webhook";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
