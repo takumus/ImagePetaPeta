@@ -8,13 +8,12 @@ import crypto from "crypto";
 import { ImageType } from "@/commons/datas/imageType";
 import sharp from "sharp";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
-import { generateMetadata } from "@/main/utils/generateMetadata";
+import { generateMetadataByWorker } from "@/main/utils/generateMetadataByWorker";
 import {
   BROWSER_THUMBNAIL_QUALITY,
   BROWSER_THUMBNAIL_SIZE,
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
-import { generateMetadataByWorker } from "@/main/utils/generateMetadataByWorker";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import dataUriToBuffer from "data-uri-to-buffer";
 import axios, { AxiosError } from "axios";
@@ -353,7 +352,7 @@ export class PetaImagesController {
     const addDate = param.addDate || new Date();
     const fileDate = param.fileDate || new Date();
     const originalFileName = `${id}.${extName}`;
-    const petaMetaData = await generateMetadata({
+    const petaMetaData = await generateMetadataByWorker({
       data: param.data,
       outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, originalFileName),
       size: BROWSER_THUMBNAIL_SIZE,

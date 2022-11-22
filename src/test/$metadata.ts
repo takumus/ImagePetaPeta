@@ -1,83 +1,83 @@
-import { generateMetadata } from "@/main/utils/generateMetadata";
-import * as file from "@/main/storages/file";
-import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
-import { PetaColor } from "@/commons/datas/petaColor";
-import Path from "path";
-import { promiseSerial } from "@/commons/utils/promiseSerial";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fileConfig = require("../../files.config");
-(async () => {
-  const files = await file.readdir("./src/test/sample_images");
-  console.time("time");
-  const palettes: { palette: PetaColor[]; allPalette: PetaColor[]; path: string }[] = [];
-  await promiseSerial(async (f) => {
-    try {
-      const label = f.substring(0, 10);
-      console.time(label);
-      const data = await file.readFile("./src/test/sample_images/" + f);
-      const metadata = await generateMetadata({
-        data,
-        outputFilePath: Path.resolve(fileConfig.output.testDir, "metadata_tile_" + f),
-        size: BROWSER_THUMBNAIL_SIZE,
-        quality: BROWSER_THUMBNAIL_QUALITY,
-      });
-      palettes.push({
-        palette: metadata.palette,
-        allPalette: [...metadata.palette].sort((a, b) => b.positionSD - a.positionSD),
-        path: "./metadata_tile_" + f + ".webp",
-      });
-      console.timeEnd(label);
-    } catch (error) {
-      console.log(error);
-    }
-  }, files).promise;
-  console.timeEnd("time");
-  const htmlPath = Path.resolve(fileConfig.output.testDir, "metadata_color.html");
-  console.log("output:", htmlPath);
-  await file.writeFile(
-    htmlPath,
-    Buffer.from(
-      `<html>
-      <head>
-      <style>
-      body {
-        font-family: consolas;
-        text-align: center;
-        background-color: #333333;
-        color: #ffffff;
-        font-weight: bold;
-        word-break: break-word;
-      }
-      span {
-        letter-spacing: -0.03em;
-        font-size: var(--size-0);
-      }
-      </style>
-      </head>
-      <body>
-      ${palettes
-        .map(
-          (p) =>
-            `<img src="${p.path}" width="256"><br><br>Compressed(${p.palette.length})<div>[` +
-            p.palette
-              .map(
-                (c) =>
-                  `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`,
-              )
-              .join("") +
-            `]</div><br>All(${p.allPalette.length})<div>[` +
-            p.allPalette
-              .map(
-                (c) =>
-                  `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`,
-              )
-              .join("") +
-            `]</div><br><br>`,
-        )
-        .join("")}
-      </body>
-      </html>`,
-      "utf-8",
-    ),
-  );
-})();
+// import { generateMetadata } from "@/main/utils/generateMetadata";
+// import * as file from "@/main/storages/file";
+// import { BROWSER_THUMBNAIL_QUALITY, BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
+// import { PetaColor } from "@/commons/datas/petaColor";
+// import Path from "path";
+// import { promiseSerial } from "@/commons/utils/promiseSerial";
+// // eslint-disable-next-line @typescript-eslint/no-var-requires
+// const fileConfig = require("../../files.config");
+// (async () => {
+//   const files = await file.readdir("./src/test/sample_images");
+//   console.time("time");
+//   const palettes: { palette: PetaColor[]; allPalette: PetaColor[]; path: string }[] = [];
+//   await promiseSerial(async (f) => {
+//     try {
+//       const label = f.substring(0, 10);
+//       console.time(label);
+//       const data = await file.readFile("./src/test/sample_images/" + f);
+//       const metadata = await generateMetadata({
+//         data,
+//         outputFilePath: Path.resolve(fileConfig.output.testDir, "metadata_tile_" + f),
+//         size: BROWSER_THUMBNAIL_SIZE,
+//         quality: BROWSER_THUMBNAIL_QUALITY,
+//       });
+//       palettes.push({
+//         palette: metadata.palette,
+//         allPalette: [...metadata.palette].sort((a, b) => b.positionSD - a.positionSD),
+//         path: "./metadata_tile_" + f + ".webp",
+//       });
+//       console.timeEnd(label);
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   }, files).promise;
+//   console.timeEnd("time");
+//   const htmlPath = Path.resolve(fileConfig.output.testDir, "metadata_color.html");
+//   console.log("output:", htmlPath);
+//   await file.writeFile(
+//     htmlPath,
+//     Buffer.from(
+//       `<html>
+//       <head>
+//       <style>
+//       body {
+//         font-family: consolas;
+//         text-align: center;
+//         background-color: #333333;
+//         color: #ffffff;
+//         font-weight: bold;
+//         word-break: break-word;
+//       }
+//       span {
+//         letter-spacing: -0.03em;
+//         font-size: var(--size-0);
+//       }
+//       </style>
+//       </head>
+//       <body>
+//       ${palettes
+//         .map(
+//           (p) =>
+//             `<img src="${p.path}" width="256"><br><br>Compressed(${p.palette.length})<div>[` +
+//             p.palette
+//               .map(
+//                 (c) =>
+//                   `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.population}</span>`,
+//               )
+//               .join("") +
+//             `]</div><br>All(${p.allPalette.length})<div>[` +
+//             p.allPalette
+//               .map(
+//                 (c) =>
+//                   `<span style="color:rgb(${c.r}, ${c.g}, ${c.b})">███</span><span>${c.positionSD}</span>`,
+//               )
+//               .join("") +
+//             `]</div><br><br>`,
+//         )
+//         .join("")}
+//       </body>
+//       </html>`,
+//       "utf-8",
+//     ),
+//   );
+// })();
