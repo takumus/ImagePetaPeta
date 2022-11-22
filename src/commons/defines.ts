@@ -64,3 +64,15 @@ export const WEBHOOK_PORT = 51915;
 export const WEBHOOK_WHITELIST_IP_LIST = ["127.0.0.1", "::ffff:127.0.0.1", "::1"];
 export const WEBHOOK_WHITELIST_ORIGIN_LIST = ["chrome-extension://"];
 export const ANIMATED_GIF_DECODE_THREAD = 4;
+
+export const FILENAME_SETTINGS = "settings.json";
+export const FILENAME_IMAGES_DB = "images.db";
+export const FILENAME_BOARDS_DB = "boards.db";
+export const FILENAME_TAGS_DB = "tags.db";
+export const FILENAME_IMAGES_TAGS_DB = "images_tags.db";
+export const FILENAME_TAG_PARTITIONS_DB = "tag_partitions.db";
+export const FILENAME_STATES = "states.json";
+export const FILENAME_DB_INFO = "dbInfo.json";
+export const FILENAME_WINDOW_STATES = "windowStates.json";
+export const DIRNAME_IMAGES = "images";
+export const DIRNAME_THUMBNAILS = "thumbnails";

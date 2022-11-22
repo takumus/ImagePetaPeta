@@ -11,6 +11,19 @@ import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { States, defaultStates } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
+import {
+  DIRNAME_IMAGES,
+  DIRNAME_THUMBNAILS,
+  FILENAME_BOARDS_DB,
+  FILENAME_DB_INFO,
+  FILENAME_IMAGES_DB,
+  FILENAME_IMAGES_TAGS_DB,
+  FILENAME_SETTINGS,
+  FILENAME_STATES,
+  FILENAME_TAGS_DB,
+  FILENAME_TAG_PARTITIONS_DB,
+  FILENAME_WINDOW_STATES,
+} from "@/commons/defines";
 import languages from "@/commons/languages";
 
 import { ErrorWindowParameters } from "@/main/errors/errorWindow";
@@ -68,7 +81,7 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     // その他パス初期化
     const DIR_APP = file.initDirectory(false, app.getPath("userData"));
     const DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
-    const FILE_SETTINGS = file.initFile(DIR_APP, "settings.json");
+    const FILE_SETTINGS = file.initFile(DIR_APP, FILENAME_SETTINGS);
     // 設定ロード
     const configSettings = new Config<Settings>(
       FILE_SETTINGS,
@@ -98,16 +111,16 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
         }
       }
     })();
-    const DIR_IMAGES = file.initDirectory(true, DIR_ROOT, "images");
-    const DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, "thumbnails");
-    const FILE_IMAGES_DB = file.initFile(DIR_ROOT, "images.db");
-    const FILE_BOARDS_DB = file.initFile(DIR_ROOT, "boards.db");
-    const FILE_TAGS_DB = file.initFile(DIR_ROOT, "tags.db");
-    const FILE_TAG_PARTITIONS_DB = file.initFile(DIR_ROOT, "tag_partitions.db");
-    const FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, "images_tags.db");
-    const FILE_STATES = file.initFile(DIR_APP, "states.json");
-    const FILE_DBINFO = file.initFile(DIR_ROOT, "dbInfo.json");
-    const FILE_WINDOW_STATES = file.initFile(DIR_APP, "windowStates.json");
+    const DIR_IMAGES = file.initDirectory(true, DIR_ROOT, DIRNAME_IMAGES);
+    const DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, DIRNAME_THUMBNAILS);
+    const FILE_IMAGES_DB = file.initFile(DIR_ROOT, FILENAME_IMAGES_DB);
+    const FILE_BOARDS_DB = file.initFile(DIR_ROOT, FILENAME_BOARDS_DB);
+    const FILE_TAGS_DB = file.initFile(DIR_ROOT, FILENAME_TAGS_DB);
+    const FILE_TAG_PARTITIONS_DB = file.initFile(DIR_ROOT, FILENAME_TAG_PARTITIONS_DB);
+    const FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, FILENAME_IMAGES_TAGS_DB);
+    const FILE_STATES = file.initFile(DIR_APP, FILENAME_STATES);
+    const FILE_DBINFO = file.initFile(DIR_ROOT, FILENAME_DB_INFO);
+    const FILE_WINDOW_STATES = file.initFile(DIR_APP, FILENAME_WINDOW_STATES);
     // データベースバージョンを読んで、アプリのバージョンよりも高かったらダメ
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, { version: app.getVersion() });
     if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
