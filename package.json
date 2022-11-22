@@ -24,7 +24,8 @@
     "prepare": "husky install && yarn generate-assets",
     "preserve": "yarn generate-assets",
     "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
-    "tsc": "tsc -p ./tsconfig.json --noEmit && vue-tsc --noEmit"
+    "tsc": "tsc -p ./tsconfig.json --noEmit && vue-tsc --noEmit",
+    "format": "yarn prettier ./src --write"
   },
   "dependencies": {
     "@araki-packages/promise-serial": "^2.0.2",
