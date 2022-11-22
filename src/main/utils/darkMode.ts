@@ -2,6 +2,7 @@ import { nativeTheme } from "electron";
 
 import { useConfigSettings } from "@/main/provides/configs";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
 
 export function isDarkMode() {
   const configSettings = useConfigSettings();
@@ -12,6 +13,6 @@ export function isDarkMode() {
 }
 export function observeDarkMode() {
   nativeTheme.on("updated", () => {
-    emitMainEvent("darkMode", isDarkMode());
+    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "darkMode", isDarkMode());
   });
 }

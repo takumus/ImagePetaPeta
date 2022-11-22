@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
 
 const tasks: { [id: string]: TaskHandler } = {};
 export async function spawn<T, K>(
@@ -22,7 +23,7 @@ export async function spawn<T, K>(
         return;
       }
       if (!silent) {
-        emitMainEvent("taskStatus", id, status);
+        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "taskStatus", id, status);
       }
       if (status.status === TaskStatusCode.FAILED || status.status === TaskStatusCode.COMPLETE) {
         done = true;

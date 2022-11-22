@@ -14,6 +14,8 @@ import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useI18n } from "@/main/provides/utils/i18n";
 import { useLogger } from "@/main/provides/utils/logger";
 import * as Tasks from "@/main/tasks/task";
+import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { WindowType } from "@/commons/datas/windowType";
 
 export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
@@ -41,11 +43,25 @@ export class PetaTagsController {
           status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象は、PetaTagIdsのみ。
-        emitMainEvent("updatePetaTags", {
-          petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
-          petaImageIds: [],
-        });
-        emitMainEvent("updatePetaTagCounts", await this.getPetaTagCounts());
+        emitMainEvent(
+          {
+            type: EmitMainEventTargetType.WINDOW_TYPES,
+            windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+          },
+          "updatePetaTags",
+          {
+            petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
+            petaImageIds: [],
+          },
+        );
+        emitMainEvent(
+          {
+            type: EmitMainEventTargetType.WINDOW_TYPES,
+            windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+          },
+          "updatePetaTagCounts",
+          await this.getPetaTagCounts(),
+        );
         return true;
       },
       {},
@@ -103,11 +119,15 @@ export class PetaTagsController {
           status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象はPetaImageIdsのみ。
-        emitMainEvent("updatePetaTags", {
+        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
           petaTagIds: [],
           petaImageIds,
         });
-        emitMainEvent("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
+        emitMainEvent(
+          { type: EmitMainEventTargetType.ALL },
+          "updatePetaTagCounts",
+          await petaTagsController.getPetaTagCounts(),
+        );
       },
       {},
       silent,

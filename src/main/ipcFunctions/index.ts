@@ -30,7 +30,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBStatus } from "@/main/provides/databases";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { useWindows } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
 import * as Tasks from "@/main/tasks/task";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { realESRGAN } from "@/main/utils/realESRGAN";
@@ -402,9 +402,9 @@ export function getIpcFunctions(): {
           window.setAlwaysOnTop(configSettings.data.alwaysOnTop);
         });
         configSettings.save();
-        emitMainEvent("updateSettings", settings);
-        emitMainEvent("showNSFW", getShowNSFW());
-        emitMainEvent("darkMode", isDarkMode());
+        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateSettings", settings);
+        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
+        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "darkMode", isDarkMode());
         log.log("return:", configSettings.data);
         return true;
       } catch (e) {
@@ -598,7 +598,7 @@ export function getIpcFunctions(): {
         log.log("#Update States");
         configStates.data = states;
         configStates.save();
-        emitMainEvent("updateStates", states);
+        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateStates", states);
         log.log("return:", configStates.data);
         return true;
       } catch (e) {
@@ -705,7 +705,7 @@ export function getIpcFunctions(): {
     },
     async setShowNSFW(event, value) {
       temporaryShowNSFW = value;
-      emitMainEvent("showNSFW", getShowNSFW());
+      emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, petaImage) {
       const logger = useLogger();
@@ -727,7 +727,11 @@ export function getIpcFunctions(): {
       if (detailsPetaImage === undefined) {
         return;
       }
-      emitMainEvent("detailsPetaImage", detailsPetaImage);
+      emitMainEvent(
+        { type: EmitMainEventTargetType.WINDOW_TYPES, windowTypes: [WindowType.DETAILS] },
+        "detailsPetaImage",
+        detailsPetaImage,
+      );
       return;
     },
     async getDetailsPetaImage() {

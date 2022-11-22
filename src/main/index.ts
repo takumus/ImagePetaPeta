@@ -12,7 +12,7 @@ import { useConfigSettings } from "@/main/provides/configs";
 import { useDBStatus } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { useWindows } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { initWebhook } from "@/main/webhook/webhook";
@@ -126,7 +126,7 @@ import { emitMainEvent } from "@/main/utils/emitMainEvent";
     await initDB();
     // データ初期化完了通知
     dbStatus.initialized = true;
-    emitMainEvent("dataInitialized");
+    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
     // webhook有効化
     if (configSettings.data.developerMode) {
       initWebhook(ipcFunctions);

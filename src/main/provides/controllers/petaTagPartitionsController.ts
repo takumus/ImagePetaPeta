@@ -10,6 +10,8 @@ import { useDBPetaTagPartitions } from "@/main/provides/databases";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { useLogger } from "@/main/provides/utils/logger";
 import * as Tasks from "@/main/tasks/task";
+import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { WindowType } from "@/commons/datas/windowType";
 
 export class PetaTagPartitionsController {
   async getAll() {
@@ -39,7 +41,12 @@ export class PetaTagPartitionsController {
           i18nKey: "tasks.updateDatas",
           status: TaskStatusCode.COMPLETE,
         });
-        emitMainEvent("updatePetaTagPartitions", tags, mode);
+        emitMainEvent(
+          { type: EmitMainEventTargetType.WINDOW_TYPES, windowTypes: [WindowType.BROWSER] },
+          "updatePetaTagPartitions",
+          tags,
+          mode,
+        );
         return true;
       },
       {},

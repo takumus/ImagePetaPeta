@@ -3,7 +3,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 
 import { useLogger } from "@/main/provides/utils/logger";
-import { useWindows } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { getLatestVersion } from "@/main/utils/versions";
 
@@ -25,7 +25,7 @@ export async function checkAndNotifySoftwareUpdate() {
   if (!remote.isLatest) {
     log.log("this version is old");
     windows.openWindow(WindowType.SETTINGS);
-    emitMainEvent("foundLatestVersion", remote);
+    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "foundLatestVersion", remote);
   } else {
     log.log("this version is latest");
   }

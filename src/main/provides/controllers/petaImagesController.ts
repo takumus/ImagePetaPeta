@@ -30,6 +30,8 @@ import { usePaths } from "@/main/provides/utils/paths";
 import * as Tasks from "@/main/tasks/task";
 import { generateMetadataByWorker } from "@/main/utils/generateMetadata/generateMetadata";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
+import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { WindowType } from "@/commons/datas/windowType";
 
 export class PetaImagesController {
   public async updateMultiple(datas: PetaImage[], mode: UpdateMode, silent = false) {
@@ -57,13 +59,35 @@ export class PetaImagesController {
         await ppa(update, datas).promise;
         if (mode === UpdateMode.REMOVE) {
           // Tileの更新対象なし
-          emitMainEvent("updatePetaTags", {
-            petaImageIds: [],
-            petaTagIds: [],
-          });
-          emitMainEvent("updatePetaTagCounts", await petaTagsController.getPetaTagCounts());
+          emitMainEvent(
+            {
+              type: EmitMainEventTargetType.WINDOW_TYPES,
+              windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+            },
+            "updatePetaTags",
+            {
+              petaImageIds: [],
+              petaTagIds: [],
+            },
+          );
+          emitMainEvent(
+            {
+              type: EmitMainEventTargetType.WINDOW_TYPES,
+              windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+            },
+            "updatePetaTagCounts",
+            await petaTagsController.getPetaTagCounts(),
+          );
         }
-        emitMainEvent("updatePetaImages", datas, mode);
+        emitMainEvent(
+          {
+            type: EmitMainEventTargetType.WINDOW_TYPES,
+            windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+          },
+          "updatePetaImages",
+          datas,
+          mode,
+        );
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           log: [],
@@ -293,7 +317,7 @@ export class PetaImagesController {
     const logger = useLogger();
     const paths = usePaths();
     const log = logger.logMainChunk();
-    emitMainEvent("regenerateMetadatasBegin");
+    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasBegin");
     const images = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (image: PetaImage) => {
@@ -317,10 +341,15 @@ export class PetaImagesController {
       };
       await this.updateMultiple([image], UpdateMode.UPDATE, true);
       log.log(`thumbnail (${++completed} / ${images.length})`);
-      emitMainEvent("regenerateMetadatasProgress", completed, images.length);
+      emitMainEvent(
+        { type: EmitMainEventTargetType.ALL },
+        "regenerateMetadatasProgress",
+        completed,
+        images.length,
+      );
     };
     await ppa((image) => generate(image), images, CPU_LENGTH).promise;
-    emitMainEvent("regenerateMetadatasComplete");
+    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
   }
   private async addImage(param: {
     data: Buffer;

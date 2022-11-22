@@ -95,10 +95,10 @@ export class Windows {
       this.onCloseWindow(type);
     });
     window.addListener("blur", () => {
-      this.emitMainEvent("windowFocused", false, type);
+      this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", false, type);
     });
     window.addListener("focus", () => {
-      this.emitMainEvent("windowFocused", true, type);
+      this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", true, type);
       if (
         type === WindowType.BOARD ||
         type === WindowType.BROWSER ||
@@ -118,7 +118,7 @@ export class Windows {
   }
   changeMainWindow(type: WindowType) {
     this.mainWindowType = type;
-    this.emitMainEvent("mainWindowType", type);
+    this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "mainWindowType", type);
   }
   initBrowserWindow(x?: number, y?: number) {
     const configWindowStates = useConfigWindowStates();
@@ -319,13 +319,41 @@ export class Windows {
       this.windows[windowType]?.focus();
     }
   }
-  emitMainEvent<U extends keyof IpcEvents>(key: U, ...args: Parameters<IpcEvents[U]>): void {
-    Object.values(this.windows).forEach((window) => {
-      if (window !== undefined && !window.isDestroyed()) {
-        window.webContents.send(key, ...args);
-      }
-    });
+  emitMainEvent<U extends keyof IpcEvents>(
+    target: EmitMainEventTarget,
+    key: U,
+    ...args: Parameters<IpcEvents[U]>
+  ): void {
+    if (target.type === EmitMainEventTargetType.ALL) {
+      Object.values(this.windows).forEach((window) => {
+        if (window !== undefined && !window.isDestroyed()) {
+          window.webContents.send(key, ...args);
+        }
+      });
+    } else if (target.type === EmitMainEventTargetType.WINDOWS) {
+      target.windows.forEach((window) => {
+        if (!window.isDestroyed()) {
+          window.webContents.send(key, ...args);
+        }
+      });
+    } else if (target.type === EmitMainEventTargetType.WINDOW_TYPES) {
+      target.windowTypes.forEach((type) => {
+        const window = this.windows[type];
+        if (window !== undefined && !window.isDestroyed()) {
+          window.webContents.send(key, ...args);
+        }
+      });
+    }
   }
 }
+export enum EmitMainEventTargetType {
+  ALL = "all",
+  WINDOWS = "windows",
+  WINDOW_TYPES = "windowTypes",
+}
+export type EmitMainEventTarget =
+  | { type: EmitMainEventTargetType.ALL }
+  | { type: EmitMainEventTargetType.WINDOWS; windows: BrowserWindow[] }
+  | { type: EmitMainEventTargetType.WINDOW_TYPES; windowTypes: WindowType[] };
 export const windowsKey = createKey<Windows>("windows");
 export const useWindows = createUseFunction(windowsKey);
