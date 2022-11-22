@@ -3,13 +3,12 @@ import Nedb from "@seald-io/nedb";
 import { DB_COMPACTION_DELAY } from "@/commons/defines";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
-type MessageEvents = {
+export default class DB<T> extends TypedEventEmitter<{
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   compactionError: (error: any) => void;
   beginCompaction: () => void;
   doneCompaction: () => void;
-};
-export default class DB<T> extends TypedEventEmitter<MessageEvents> {
+}> {
   nedb: Nedb<T> | null = null;
   loaded = false;
   execCompationIntervalId!: NodeJS.Timeout;

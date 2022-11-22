@@ -1,12 +1,12 @@
 import { Frame, decompressFrame, parseGIF } from "gifuct-js";
 
-import { initWebWorkerThreads } from "@/renderer/utils/initWebWorker";
+import { initWebWorker } from "@/renderer/utils/initWebWorker";
 import {
   DecompressWorkerInputData,
   DecompressWorkerOutputData,
 } from "@/renderer/utils/pixi-gif/decoder/decompressWorkerData";
 
-export default initWebWorkerThreads<DecompressWorkerInputData, DecompressWorkerOutputData>(
+export default initWebWorker<DecompressWorkerInputData, DecompressWorkerOutputData>(
   self,
   (worker) => {
     worker.addEventListener("message", async (e) => {

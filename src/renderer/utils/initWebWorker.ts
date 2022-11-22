@@ -6,7 +6,7 @@ type TypedWebWorker<I, O> = {
   postMessage(data: O): void;
   addEventListener(event: "message", callback: (e: MessageEvent<I>) => void): void;
 } & OnMessage<I>;
-export function initWebWorkerThreads<ToWorker, ToMain>(
+export function initWebWorker<ToWorker, ToMain>(
   self: any,
   init: (self: TypedWebWorker<ToWorker, ToMain>) => void,
 ) {
