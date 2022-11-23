@@ -1,12 +1,12 @@
 import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
-import { Component, InjectionKey, Plugin, createApp } from "vue";
+import { Component, Plugin, createApp } from "vue";
 import { createI18n } from "vue-i18n";
 
 import { WindowType } from "@/commons/datas/windowType";
 import languages from "@/commons/languages";
 
-import { IPC } from "@/renderer/ipc";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import { logChunk } from "@/renderer/libs/rendererLogger";
@@ -53,7 +53,7 @@ import {
 export async function create(
   component: Component,
   windowType: WindowType,
-  stores?: KeyStoreCreatorPair<any>[],
+  stores?: KeyStoreCreatorPair<unknown>[],
 ) {
   let initialized = false;
   const initVue = async () => {

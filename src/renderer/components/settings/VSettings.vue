@@ -51,7 +51,7 @@ import VSettingsOthers from "@/renderer/components/settings/VSettingsOthers.vue"
 import VSettingsUpdate from "@/renderer/components/settings/VSettingsUpdate.vue";
 
 // Others
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 const { t } = useI18n();
 const tabNames = ["general", "control", "browser", "datas", "others", "update", "info"] as const;

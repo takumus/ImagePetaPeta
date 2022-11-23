@@ -37,7 +37,7 @@ import { SUPPORT_URL } from "@/commons/defines";
 
 import { DEBUGGERS } from "@/@assets/debuggers";
 import { LICENSES } from "@/@assets/licenses";
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 
 const { t } = useI18n();

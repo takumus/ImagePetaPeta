@@ -8,8 +8,8 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/commons/defines";
 import { Vec2 } from "@/commons/utils/vec2";
 
-import { IPC } from "@/renderer/ipc";
 import { DelayUpdater } from "@/renderer/libs/delayUpdater";
+import { IPC } from "@/renderer/libs/ipc";
 import getNameAvoidDuplication from "@/renderer/utils/getNameAvoidDuplication";
 
 export async function createPetaBoardsStore() {

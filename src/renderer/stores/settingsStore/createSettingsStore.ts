@@ -1,6 +1,6 @@
 import { InjectionKey, watch as _watch, ref } from "vue";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 export async function createSettingsStore() {
   const states = ref(await IPC.send("getSettings"));

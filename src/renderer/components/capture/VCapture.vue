@@ -37,7 +37,7 @@ import VDragView from "@/renderer/components/commons/utils/dragView/VDragView.vu
 
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 // const props =
 defineProps<{

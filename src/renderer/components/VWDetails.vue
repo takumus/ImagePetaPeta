@@ -41,7 +41,7 @@ import VDetails from "@/renderer/components/details/VDetails.vue";
 
 // Others
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

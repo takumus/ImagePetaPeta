@@ -68,7 +68,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 
 // Others
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

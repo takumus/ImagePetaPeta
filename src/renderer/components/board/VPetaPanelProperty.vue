@@ -39,7 +39,7 @@ import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { WindowType } from "@/commons/datas/windowType";
 import { Vec2 } from "@/commons/utils/vec2";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { searchParentElement } from "@/renderer/utils/searchParentElement";
 
 const props = defineProps<{

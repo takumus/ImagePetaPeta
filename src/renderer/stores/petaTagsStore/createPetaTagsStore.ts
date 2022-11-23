@@ -6,7 +6,7 @@ import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaTagsStore() {
   const petaTags = ref(

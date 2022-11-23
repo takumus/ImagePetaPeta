@@ -22,7 +22,7 @@ import VProgressBar from "@/renderer/components/commons/utils/progressBar/VProgr
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
 // Others
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import * as Cursor from "@/renderer/utils/cursor";
 
 const props = defineProps<{

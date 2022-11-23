@@ -45,7 +45,7 @@ import { useI18n } from "vue-i18n";
 import { WindowType } from "@/commons/datas/windowType";
 
 // Others
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";

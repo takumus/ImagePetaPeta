@@ -24,7 +24,7 @@ import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { TASK_CLOSE_DELAY } from "@/commons/defines";
 
 // Others
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 
 const windowStatus = useWindowStatusStore();

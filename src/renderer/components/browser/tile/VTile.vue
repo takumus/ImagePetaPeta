@@ -73,8 +73,8 @@ import {
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { Tile } from "@/renderer/components/browser/tile/tile";
-import { IPC } from "@/renderer/ipc";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { IPC } from "@/renderer/libs/ipc";
 import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";

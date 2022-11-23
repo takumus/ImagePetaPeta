@@ -3,7 +3,7 @@ import { InjectionKey, ref } from "vue";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { UpdateMode } from "@/commons/datas/updateMode";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaTagPartitionsStore() {
   const petaTagPartitions = ref(await IPC.send("getPetaTagPartitions"));

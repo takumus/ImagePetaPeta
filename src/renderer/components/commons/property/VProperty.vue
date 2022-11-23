@@ -161,7 +161,7 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";

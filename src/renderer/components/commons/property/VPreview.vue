@@ -39,7 +39,7 @@ import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 
 const emit = defineEmits<{

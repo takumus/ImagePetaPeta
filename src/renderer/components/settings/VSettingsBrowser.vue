@@ -25,7 +25,7 @@
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const settingsStore = useSettingsStore();

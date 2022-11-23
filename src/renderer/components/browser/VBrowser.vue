@@ -101,7 +101,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 
 import { FilterType } from "@/renderer/components/browser/filterType";
 import { Tile } from "@/renderer/components/browser/tile/tile";
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

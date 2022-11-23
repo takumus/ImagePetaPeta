@@ -5,7 +5,7 @@ import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaImagesStore() {
   const states = ref<{ [key: string]: RPetaImage }>({});

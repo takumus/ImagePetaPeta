@@ -26,7 +26,7 @@ import { BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 import hsvCircleImage from "@/@assets/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 const props = defineProps<{
   petaImage: RPetaImage;

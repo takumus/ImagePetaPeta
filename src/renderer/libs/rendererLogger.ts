@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 export function logChunk() {
   const uid = uuid().substring(0, 4);

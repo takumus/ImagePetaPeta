@@ -22,7 +22,7 @@ import { useI18n } from "vue-i18n";
 
 import { DOWNLOAD_URL } from "@/commons/defines";
 
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 
 const { t } = useI18n();

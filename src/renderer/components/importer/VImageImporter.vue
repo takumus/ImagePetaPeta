@@ -11,7 +11,7 @@ import { ppa } from "@/commons/utils/pp";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 // Others
-import { IPC } from "@/renderer/ipc";
+import { IPC } from "@/renderer/libs/ipc";
 
 const emit = defineEmits<{
   (e: "addPanelByDragAndDrop", ids: string[], position: Vec2, fromBrowser: boolean): void;
