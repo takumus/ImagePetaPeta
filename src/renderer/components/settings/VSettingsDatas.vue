@@ -5,10 +5,10 @@
     ><br />
     <VTextarea
       :type="'single'"
-      :clickToEdit="true"
+      :click-to-edit="true"
       :trim="true"
-      :textAreaStyle="{ width: '100%' }"
-      :outerStyle="{ width: '100%' }"
+      :text-area-style="{ width: '100%' }"
+      :outer-style="{ width: '100%' }"
       :value="tempPetaImageDirectory"
       @update:value="(value) => (tempPetaImageDirectory = value)" />
     <br />

@@ -1,9 +1,9 @@
 <template>
   <VFloating
     :visible="true"
-    :zIndex="zIndex"
-    :maxWidth="'512px'"
-    :maxHeight="'unset'"
+    :z-index="zIndex"
+    :max-width="'512px'"
+    :max-height="'unset'"
     ref="floating">
     <ul v-show="show" class="context-menu-root" ref="contextMenu">
       <li

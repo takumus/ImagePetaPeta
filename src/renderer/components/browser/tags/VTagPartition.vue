@@ -9,7 +9,7 @@
           :trim="true"
           :value="value"
           :look="look"
-          :clickToEdit="clickToEdit"
+          :click-to-edit="clickToEdit"
           @update:value="(name) => updateName(name)" /></t-label
       ><t-border
     /></t-content>

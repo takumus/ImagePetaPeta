@@ -25,9 +25,9 @@
       :value="rawValue"
       :items="complements"
       @select="inputFromComplement"
-      :zIndex="10"
+      :z-index="10"
       :editing="editing"
-      :textArea="textArea" />
+      :text-area="textArea" />
   </t-textarea-root>
 </template>
 

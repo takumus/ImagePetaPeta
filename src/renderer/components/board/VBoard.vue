@@ -11,29 +11,29 @@
         @construct="construct"
         @destruct="destruct"
         @tick="animate"
-        @loseContext="loseContext"
+        @lose-context="loseContext"
         @resize="resize"
     /></t-pixi-container>
     <t-crop v-if="cropping">
-      <VCrop :petaPanel="croppingPetaPanel" @update="updateCrop" />
+      <VCrop :peta-panel="croppingPetaPanel" @update="updateCrop" />
     </t-crop>
-    <VBoardLoading :zIndex="2" :data="loadingStatus"></VBoardLoading>
+    <VBoardLoading :z-index="2" :data="loadingStatus"></VBoardLoading>
     <VLayer
       ref="layer"
-      :zIndex="1"
+      :z-index="1"
       :visible="true"
-      :pPanelsArray="petaPanelsArray"
-      @sortIndex="sortIndex"
-      @petaPanelMenu="petaPanelMenu"
-      @orderRender="orderPIXIRender"
-      @update:petaPanels="updatePetaPanelsFromLayer" />
+      :p-panels-array="petaPanelsArray"
+      @sort-index="sortIndex"
+      @peta-panel-menu="petaPanelMenu"
+      @order-render="orderPIXIRender"
+      @update:peta-panels="updatePetaPanelsFromLayer" />
     <VPetaPanelProperty
-      :selectedPetaPanels="selectedPetaPanelsArray"
-      :petaPanels="petaPanelsArray"
-      @update:petaPanels="updatePetaPanelsFromLayer"
-      @sortIndex="sortIndex"
-      @removeSelectedPanels="removeSelectedPanels"
-      :zIndex="3"
+      :selected-peta-panels="selectedPetaPanelsArray"
+      :peta-panels="petaPanelsArray"
+      @update:peta-panels="updatePetaPanelsFromLayer"
+      @sort-index="sortIndex"
+      @remove-selected-panels="removeSelectedPanels"
+      :z-index="3"
       ref="petaPanelsProperty" />
   </t-board-root>
 </template>

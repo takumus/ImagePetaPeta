@@ -8,10 +8,10 @@
           <t-value>
             <VTextarea
               :type="'single'"
-              :clickToEdit="true"
-              :allowEmpty="true"
-              :textAreaStyle="{ width: '100%' }"
-              :outerStyle="{ width: '100%' }"
+              :click-to-edit="true"
+              :allow-empty="true"
+              :text-area-style="{ width: '100%' }"
+              :outer-style="{ width: '100%' }"
               :value="singlePetaImageInfo.petaImage.name"
               :look="singlePetaImageInfo.petaImage.name"
               @update:value="changeName" />
@@ -22,10 +22,10 @@
           <t-value>
             <VTextarea
               :type="'multi'"
-              :clickToEdit="true"
-              :allowEmpty="true"
-              :textAreaStyle="{ width: '100%', overflowY: 'auto', maxHeight: '64px' }"
-              :outerStyle="{ width: '100%' }"
+              :click-to-edit="true"
+              :allow-empty="true"
+              :text-area-style="{ width: '100%', overflowY: 'auto', maxHeight: '64px' }"
+              :outer-style="{ width: '100%' }"
               :value="note"
               @update:value="changeNote" />
           </t-value>
@@ -82,7 +82,7 @@
       </t-palette>
     </t-colors>
     <t-color-circle v-if="singlePetaImageInfo">
-      <VGamutMap :petaImage="singlePetaImageInfo.petaImage" />
+      <VGamutMap :peta-image="singlePetaImageInfo.petaImage" />
     </t-color-circle>
     <t-tags v-show="!noImage" class="content">
       <p>
@@ -97,10 +97,10 @@
           <VTextarea
             :type="'single'"
             :trim="true"
-            :clickToEdit="true"
-            :allowEmpty="true"
+            :click-to-edit="true"
+            :allow-empty="true"
             :readonly="true"
-            :blurToReset="true"
+            :blur-to-reset="true"
             :complements="complements"
             :value="tag.name"
             :look="tag.name"
@@ -113,12 +113,12 @@
             :type="'single'"
             :trim="true"
             :look="textsStore.state.value.plus + '       '"
-            :clickToEdit="true"
-            :blurToReset="true"
+            :click-to-edit="true"
+            :blur-to-reset="true"
             :complements="complements"
-            :textAreaStyle="{ width: '100%' }"
-            :outerStyle="{ width: '100%' }"
-            :noOutline="true"
+            :text-area-style="{ width: '100%' }"
+            :outer-style="{ width: '100%' }"
+            :no-outline="true"
             @update:value="addTag" />
         </t-tag>
       </t-search-box>

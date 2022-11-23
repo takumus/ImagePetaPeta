@@ -2,7 +2,7 @@
   <VModal
     :visible="data.loading || data.extracting"
     :center="true"
-    :defaultZIndex="zIndex"
+    :default-z-index="zIndex"
     :ignore="true">
     <t-board-loading-root>
       <p>{{ t("boards.extracting") }}{{ Math.floor(data.extractProgress) }}%</p>

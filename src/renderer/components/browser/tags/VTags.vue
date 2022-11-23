@@ -71,9 +71,9 @@
         <VTextarea
           :type="'single'"
           :trim="true"
-          :clickToEdit="true"
-          :textAreaStyle="{ width: '100%' }"
-          :outerStyle="{ width: '100%' }"
+          :click-to-edit="true"
+          :text-area-style="{ width: '100%' }"
+          :outer-style="{ width: '100%' }"
           :look="textsStore.state.value.plus"
           @update:value="addTag" />
       </t-tag>

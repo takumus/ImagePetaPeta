@@ -1,9 +1,9 @@
 <template>
   <VFloating
-    :zIndex="zIndex"
+    :z-index="zIndex"
     :visible="props.editing && matched"
-    :maxWidth="'256px'"
-    :maxHeight="'unset'"
+    :max-width="'256px'"
+    :max-height="'unset'"
     ref="floating">
     <t-complement-root class="complement-root" ref="complement">
       <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>

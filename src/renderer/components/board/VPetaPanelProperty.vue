@@ -1,9 +1,9 @@
 <template>
   <VFloating
     :visible="show"
-    :zIndex="zIndex"
-    :maxWidth="'512px'"
-    :maxHeight="'unset'"
+    :z-index="zIndex"
+    :max-width="'512px'"
+    :max-height="'unset'"
     ref="floating">
     <t-content>
       <p v-for="p in selectedPetaPanels" :key="p.id">{{ p.id }}</p>

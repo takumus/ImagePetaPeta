@@ -10,18 +10,18 @@
       </t-top>
       <t-browser>
         <t-board v-if="petaImage">
-          <VDetails :petaImage="petaImage" :zIndex="1" />
+          <VDetails :peta-image="petaImage" :z-index="1" />
         </t-board>
         <t-property>
-          <VProperty :petaImages="singlePetaImages" @selectTag="() => {}" />
+          <VProperty :peta-images="singlePetaImages" @select-tag="() => {}" />
         </t-property>
       </t-browser>
     </t-content>
     <t-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
     </t-modals>
-    <VDialog :zIndex="6"></VDialog>
-    <VContextMenu :zIndex="4" />
+    <VDialog :z-index="6"></VDialog>
+    <VContextMenu :z-index="4" />
   </t-root>
 </template>
 

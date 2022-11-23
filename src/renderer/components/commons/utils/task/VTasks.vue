@@ -1,8 +1,8 @@
 <template>
-  <VModal :visible="visible" :center="true" :visibleCloseButton="false">
+  <VModal :visible="visible" :center="true" :visible-close-button="false">
     <t-tasks-root>
       <t-tasks>
-        <VTask v-for="t in taskStatusArray" :key="t.id" :taskId="t.id" :taskStatus="t.status" />
+        <VTask v-for="t in taskStatusArray" :key="t.id" :task-id="t.id" :task-status="t.status" />
       </t-tasks>
       <button tabindex="-1" @click="close" v-if="closable">
         {{ t("commons.closeButton") }}

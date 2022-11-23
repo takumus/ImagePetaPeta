@@ -9,7 +9,7 @@
       <VPropertyThumbnail
         v-for="data in propertyThumbnails"
         :key="data.petaImage.id"
-        :propertyThumbnail="data" />
+        :property-thumbnail="data" />
     </t-previews>
     <p>{{ t("browser.property.selectedImage", [petaImages.length]) }}</p>
     <t-buttons v-show="!noImage">

@@ -8,7 +8,7 @@
         <VTitleBar>
           <VTabBar
             :boards="sortedPetaBoards"
-            :currentPetaBoardId="currentPetaBoardId"
+            :current-peta-board-id="currentPetaBoardId"
             @remove="removePetaBoard"
             @add="addPetaBoard"
             @select="selectPetaBoard"
@@ -23,18 +23,18 @@
       </t-top>
       <t-browser>
         <VBoard
-          :zIndex="1"
+          :z-index="1"
           :board="currentPetaBoard"
           ref="vPetaBoard"
           @update:board="updatePetaBoard" />
       </t-browser>
     </t-content>
     <t-modals v-show="components.modal.modalIds.length > 0">
-      <VImageImporter @addPanelByDragAndDrop="addPanelByDragAndDrop" />
+      <VImageImporter @add-panel-by-drag-and-drop="addPanelByDragAndDrop" />
       <VTasks />
     </t-modals>
-    <VDialog :zIndex="6"></VDialog>
-    <VContextMenu :zIndex="4" />
+    <VDialog :z-index="6"></VDialog>
+    <VContextMenu :z-index="4" />
   </t-root>
 </template>
 

@@ -3,7 +3,9 @@
     :style="{
       zIndex: zIndex,
     }">
-    <VDragView :contentWidth="petaImage.metadata.width" :contentHeight="petaImage.metadata.height">
+    <VDragView
+      :content-width="petaImage.metadata.width"
+      :content-height="petaImage.metadata.height">
       <img v-show="loaded" :src="url" draggable="false" @load="loaded = true" />
       <t-nsfw v-if="nsfwMask"></t-nsfw>
     </VDragView>

@@ -10,8 +10,8 @@
     <t-video>
       <VDragView
         v-if="currentSource?.size"
-        :contentWidth="currentSource.size.width"
-        :contentHeight="currentSource.size.height">
+        :content-width="currentSource.size.width"
+        :content-height="currentSource.size.height">
         <video ref="video"></video>
       </VDragView>
     </t-video>

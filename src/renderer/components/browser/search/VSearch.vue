@@ -5,14 +5,14 @@
         <VTextarea
           :type="'single'"
           :trim="true"
-          :clickToEdit="true"
-          :allowEmpty="true"
+          :click-to-edit="true"
+          :allow-empty="true"
           :complements="complementItems"
-          :blurToReset="true"
+          :blur-to-reset="true"
           :value="tag.name"
           :look="tag.name"
           @update:value="(value) => editSearchTag(tag, value)"
-          @deleteOfEmpty="editSearchTag(tag, '')" />
+          @delete-of-empty="editSearchTag(tag, '')" />
       </t-tag>
       <t-tag v-if="selectedFilterType === FilterType.ALL">
         <VTextarea :type="'single'" :trim="true" :value="t('browser.all')" :readonly="true" />
@@ -24,15 +24,15 @@
         <VTextarea
           :type="'single'"
           :trim="true"
-          :clickToEdit="true"
+          :click-to-edit="true"
           :complements="complementItems"
-          :textAreaStyle="{ width: '100%' }"
-          :outerStyle="{ width: '100%' }"
-          :blurToReset="true"
+          :text-area-style="{ width: '100%' }"
+          :outer-style="{ width: '100%' }"
+          :blur-to-reset="true"
           :look="textsStore.state.value.plus"
-          :noOutline="true"
+          :no-outline="true"
           @update:value="addSelectedTag"
-          @deleteOfEmpty="removeLastPetaTag()"
+          @delete-of-empty="removeLastPetaTag()"
           ref="searchInput" />
       </t-tag>
     </t-search-box>

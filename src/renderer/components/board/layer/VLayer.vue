@@ -13,18 +13,18 @@
           v-for="pPanel in props.pPanelsArray"
           :key="pPanel.id"
           :ref="(element) => setVLayerCellRef(element as any as VLayerCellInstance, pPanel.id)"
-          :petaPanel="pPanel"
+          :peta-panel="pPanel"
           :selected="pPanel.renderer.selected"
           :sorting="draggingData !== undefined"
-          @startDrag="sortHelper.pointerdown"
-          @onClick="clickLayer"
-          @update:petaPanel="updatePetaPanel"
+          @start-drag="sortHelper.pointerdown"
+          @on-click="clickLayer"
+          @update:peta-panel="updatePetaPanel"
           :style="{
             order: orders[pPanel.id] ?? props.pPanelsArray.length,
           }" />
       </t-layers>
       <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
-        <VLayerCell ref="cellDrag" :petaPanel="draggingData" :drag="true" />
+        <VLayerCell ref="cellDrag" :peta-panel="draggingData" :drag="true" />
       </t-drag-floating-tag-cell>
     </t-layers-parent>
   </t-layer-root>

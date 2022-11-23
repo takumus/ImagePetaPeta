@@ -2,17 +2,17 @@
   <t-browser-root>
     <t-left>
       <VTags
-        :petaImagesArray="petaImagesArray"
-        v-model:selectedFilterType="selectedFilterType"
-        v-model:selectedPetaTagIds="selectedPetaTagIds" />
+        :peta-images-array="petaImagesArray"
+        v-model:selected-filter-type="selectedFilterType"
+        v-model:selected-peta-tag-ids="selectedPetaTagIds" />
     </t-left>
     <t-center>
       <t-content>
         <t-top>
           <t-search>
             <VSearch
-              v-model:selectedPetaTagIds="selectedPetaTagIds"
-              v-model:selectedFilterType="selectedFilterType" />
+              v-model:selected-peta-tag-ids="selectedPetaTagIds"
+              v-model:selected-filter-type="selectedFilterType" />
           </t-search>
           <t-buttons>
             <label>
@@ -49,8 +49,8 @@
               :key="data.id"
               :tile="data"
               :original="original"
-              :parentAreaMinY="areaMinY"
-              :parentAreaMaxY="areaMaxY"
+              :parent-area-min-y="areaMinY"
+              :parent-area-max-y="areaMaxY"
               @select="selectTile"
               @menu="
                 (tile, position) => (tile.petaImage ? petaImageMenu(tile.petaImage, position) : 0)
@@ -63,11 +63,11 @@
     </t-center>
     <t-right>
       <VPreview
-        :petaImages="selectedPetaImages"
-        @clearSelectionAll="clearSelectionAll"
+        :peta-images="selectedPetaImages"
+        @clear-selection-all="clearSelectionAll"
         @menu="petaImageMenu"
         @drag="drag" />
-      <VProperty :petaImages="selectedPetaImages" @selectTag="selectTag" />
+      <VProperty :peta-images="selectedPetaImages" @select-tag="selectTag" />
     </t-right>
   </t-browser-root>
 </template>

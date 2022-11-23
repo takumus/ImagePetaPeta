@@ -16,8 +16,8 @@
       <VImageImporter />
       <VTasks />
     </t-modals>
-    <VDialog :zIndex="6"></VDialog>
-    <VContextMenu :zIndex="4" />
+    <VDialog :z-index="6"></VDialog>
+    <VContextMenu :z-index="4" />
   </t-root>
 </template>
 

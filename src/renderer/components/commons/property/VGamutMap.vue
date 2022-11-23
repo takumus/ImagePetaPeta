@@ -7,7 +7,7 @@
         @construct="construct"
         @destruct="destruct"
         @tick="animate"
-        @loseContext="loseContext"
+        @lose-context="loseContext"
         @resize="resize" />
     </t-circle>
     <input type="range" min="0" max="100" v-model="amountFilterValue" />
