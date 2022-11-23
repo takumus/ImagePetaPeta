@@ -574,7 +574,7 @@ const original = computed(
 watch(filteredPetaImages, () => {
   ImageDecoder.clear();
 });
-watch([selectedPetaTagIds, selectedFilterType], () => {
+watch([selectedPetaTagIds, selectedFilterType, sortMode], () => {
   currentScrollTileId.value = "";
   nextTick(() => {
     if (thumbnails.value) {
@@ -588,6 +588,12 @@ watch(petaTagsStore.state.petaTags, fetchFilteredPetaImages);
 watch(sortMode, fetchFilteredPetaImages);
 const f = throttle(100, fetchFilteredPetaImages);
 watch(currentColor, () => {
+  currentScrollTileId.value = "";
+  nextTick(() => {
+    if (thumbnails.value) {
+      thumbnails.value.scrollTo(0, 0);
+    }
+  });
   if (sortMode.value === "SIMILAR") {
     f();
   }
