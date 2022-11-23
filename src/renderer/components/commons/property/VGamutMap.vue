@@ -27,11 +27,11 @@ import hsvCircleImage from "@/@assets/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { IPC } from "@/renderer/libs/ipc";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const props = defineProps<{
   petaImage: RPetaImage;
 }>();
-const pixelCount = BROWSER_THUMBNAIL_SIZE * BROWSER_THUMBNAIL_SIZE;
 const vPixi = ref<InstanceType<typeof VPIXI>>();
 const amountFilterValue = ref(100);
 const size: PIXI.ISize = {
@@ -55,6 +55,7 @@ const resultRawSprite = new PIXI.Sprite(
 const resultNormalizedSprite = new PIXI.Sprite(
   new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultNormalizedPixels, size))),
 );
+const settings = useSettingsStore();
 backgroundRawSprite.alpha = 0.3;
 backgroundNormalizedSprite.alpha = 0.3;
 PIXI.Texture.fromURL(hsvCircleImage).then((texture) => {
@@ -157,7 +158,7 @@ function setData(data: generateGamutMapWorkerOutputData) {
 function generate() {
   generateGamutMapCancel();
   reset();
-  const task = generateGamutMap(props.petaImage, pixelCount, setData);
+  const task = generateGamutMap(props.petaImage, settings.state.value.gamutMapSampling, setData);
   console.time("convert");
   task.promise.then(() => {
     console.timeEnd("convert");

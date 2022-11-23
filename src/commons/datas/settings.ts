@@ -18,6 +18,7 @@ const defaultSettings = {
   show: "board" as "board" | "browser" | "both",
   eula: 0,
   developerMode: false,
+  gamutMapSampling: 5000,
 };
 export function getDefaultSettings() {
   const settings = deepcopy(defaultSettings);

@@ -11,6 +11,14 @@
     </label>
     <p>{{ t("settings.showFPSDescriptions") }}</p>
     <label>
+      {{ t("settings.gamutMapSampling") }}:<input
+        type="number"
+        v-model="settingsStore.state.value.gamutMapSampling"
+        min="100"
+        max="65536" />
+    </label>
+    <p>{{ t("settings.gamutMapSamplingDescriptions") }}</p>
+    <label>
       <input type="checkbox" v-model="settingsStore.state.value.developerMode" />
       {{ t("settings.developerMode") }}
     </label>

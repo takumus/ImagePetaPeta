@@ -202,6 +202,9 @@ const ja = {
     checkUpdateButton: "アップデート確認",
     releaseNoteButton: "リリースノートを確認",
     developerMode: "開発者モード",
+    gamutMapSampling: "ガマットマップのサンプリング数",
+    gamutMapSamplingDescriptions:
+      "ガマットマップを作る際に読み込むピクセルの量です。最大は65536です。多くすればするほど重くなります。",
     developerModeDescriptions:
       "開発者モードを有効にすると51915ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。",
     changePetaImageDirectoryDialog: (ctx: any) => {

@@ -25,5 +25,9 @@ export const migrateSettings = createMigrater<Settings>(async (data, update) => 
     data.developerMode = false;
     update();
   }
+  if (data.gamutMapSampling === undefined) {
+    data.gamutMapSampling = defaultSettings.gamutMapSampling;
+    update();
+  }
   return data;
 });
