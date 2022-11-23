@@ -4,13 +4,11 @@ import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
-import { UNTAGGED_ID } from "@/commons/defines";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
-import { useI18n } from "@/main/provides/utils/i18n";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
 import * as Tasks from "@/main/tasks/task";
@@ -146,22 +144,7 @@ export class PetaTagsController {
   }
   async getPetaTags() {
     const dbPetaTags = useDBPetaTags();
-    const i18n = useI18n();
-    const petaTags = dbPetaTags.getAll();
-    return [
-      {
-        index: 0,
-        id: UNTAGGED_ID,
-        name: i18n.global.t("browser.untagged"),
-      },
-      ...petaTags.sort((a, b) => {
-        if (a.name < b.name) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }),
-    ];
+    return dbPetaTags.getAll();
   }
   private async updatePetaTag(petaTagLike: PetaTagLike, mode: UpdateMode) {
     const logger = useLogger();

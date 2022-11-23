@@ -14,6 +14,12 @@
           @update:value="(value) => editSearchTag(tag, value)"
           @deleteOfEmpty="editSearchTag(tag, '')" />
       </t-tag>
+      <t-tag v-if="selectedFilterType === FilterType.ALL">
+        <VTextarea :type="'single'" :trim="true" :value="t('browser.all')" :readonly="true" />
+      </t-tag>
+      <t-tag v-if="selectedFilterType === FilterType.UNTAGGED">
+        <VTextarea :type="'single'" :trim="true" :value="t('browser.untagged')" :readonly="true" />
+      </t-tag>
       <t-tag class="last">
         <VTextarea
           :type="'single'"
@@ -35,24 +41,28 @@
 
 <script lang="ts" setup>
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import VTextarea from "@/renderer/components/utils/VTextarea.vue";
 
 import { RPetaTag } from "@/commons/datas/rPetaTag";
-import { UNTAGGED_ID } from "@/commons/defines";
 
+import { FilterType } from "@/renderer/components/browser/filterType";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 
+const { t } = useI18n();
 const searchInput = ref<InstanceType<typeof VTextarea>>();
 const petaTagsStore = usePetaTagsStore();
 const textsStore = useTextsStore();
 const props = defineProps<{
   selectedPetaTagIds: string[];
+  selectedFilterType: FilterType;
 }>();
 
 const emit = defineEmits<{
   (e: "update:selectedPetaTagIds", value: string[]): void;
+  (e: "update:selectedFilterType", selectedFilterType: FilterType): void;
 }>();
 
 function editSearchTag(tag: RPetaTag, value: string) {
@@ -69,6 +79,9 @@ function editSearchTag(tag: RPetaTag, value: string) {
 }
 
 function removeLastPetaTag() {
+  if (props.selectedFilterType !== FilterType.TAGS) {
+    emit("update:selectedFilterType", FilterType.TAGS);
+  }
   const last = props.selectedPetaTagIds[props.selectedPetaTagIds.length - 1];
   if (last) {
     const petaTag = petaTagsStore.state.petaTags.value.find((tag) => tag.id === last);
@@ -82,14 +95,8 @@ function removeLastPetaTag() {
 
 function addSelectedTag(tagName: string) {
   const petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === tagName);
-  if (petaTag?.id === UNTAGGED_ID) {
-    emit("update:selectedPetaTagIds", [UNTAGGED_ID]);
-  } else if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
-    if (props.selectedPetaTagIds.includes(UNTAGGED_ID)) {
-      emit("update:selectedPetaTagIds", [petaTag.id]);
-    } else {
-      emit("update:selectedPetaTagIds", [...props.selectedPetaTagIds, petaTag.id]);
-    }
+  if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
+    emit("update:selectedPetaTagIds", [...props.selectedPetaTagIds, petaTag.id]);
   }
 
   setTimeout(() => {
@@ -98,16 +105,18 @@ function addSelectedTag(tagName: string) {
 }
 
 const complementItems = computed(() => {
+  if (props.selectedFilterType !== FilterType.TAGS) {
+    return petaTagsStore.state.petaTags.value.map((pti) => pti.name);
+  }
   return petaTagsStore.state.petaTags.value
-    .filter((pti) => {
-      return !props.selectedPetaTagIds.includes(pti.id);
-    })
-    .map((pti) => {
-      return pti.name;
-    });
+    .filter((pti) => !props.selectedPetaTagIds.includes(pti.id))
+    .map((pti) => pti.name);
 });
 
 const selectedPetaTags = computed(() => {
+  if (props.selectedFilterType !== FilterType.TAGS) {
+    return [];
+  }
   return props.selectedPetaTagIds
     .map((id) => {
       return petaTagsStore.state.petaTags.value.find((tag) => tag.id === id);
@@ -142,11 +151,13 @@ t-search-root {
       border-radius: var(--rounded);
       padding: var(--px-1);
       background-color: var(--color-1);
+      box-shadow: var(--shadow-small);
       // border: solid 1.2px var(--color-border);
       &.last {
         width: 100%;
         background-color: unset;
         flex: 1 1 64px;
+        box-shadow: unset;
       }
     }
   }

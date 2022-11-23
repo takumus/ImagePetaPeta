@@ -158,7 +158,6 @@ import { PetaColor } from "@/commons/datas/petaColor";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { UNTAGGED_ID } from "@/commons/defines";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
@@ -326,9 +325,6 @@ const nsfw = computed(() => {
 const complements = computed(() => {
   return petaTagsStore.state.petaTags.value
     .filter((pti) => {
-      return pti.id !== UNTAGGED_ID;
-    })
-    .filter((pti) => {
       return mutualPetaTags.value.find((tag) => pti.id === tag.id) === undefined;
     })
     .map((pti) => {
@@ -472,10 +468,12 @@ t-property-root {
         border-radius: var(--rounded);
         padding: var(--px-1);
         background-color: var(--color-1);
+        box-shadow: var(--shadow-small);
         &.last {
           width: 100%;
           background-color: unset;
           flex: 1 1 64px;
+          box-shadow: unset;
         }
       }
     }

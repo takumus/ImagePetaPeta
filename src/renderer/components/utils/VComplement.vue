@@ -181,6 +181,7 @@ t-complement-root {
     border-radius: var(--rounded);
     padding: var(--px-1);
     background-color: var(--color-1);
+    box-shadow: var(--shadow-small);
     cursor: pointer;
     &.selected,
     &.close:hover {

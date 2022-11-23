@@ -1,13 +1,18 @@
 <template>
   <t-browser-root>
     <t-left>
-      <VTags :petaImagesArray="petaImagesArray" v-model:selectedPetaTagIds="selectedPetaTagIds" />
+      <VTags
+        :petaImagesArray="petaImagesArray"
+        v-model:selectedFilterType="selectedFilterType"
+        v-model:selectedPetaTagIds="selectedPetaTagIds" />
     </t-left>
     <t-center>
       <t-content>
         <t-top>
           <t-search>
-            <VSearch v-model:selectedPetaTagIds="selectedPetaTagIds" />
+            <VSearch
+              v-model:selectedPetaTagIds="selectedPetaTagIds"
+              v-model:selectedFilterType="selectedFilterType" />
           </t-search>
           <t-buttons>
             <label>
@@ -90,11 +95,11 @@ import {
   BROWSER_THUMBNAIL_ZOOM_MAX,
   BROWSER_THUMBNAIL_ZOOM_MIN,
   THUMBNAILS_SELECTION_PERCENT,
-  UNTAGGED_ID,
 } from "@/commons/defines";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { Vec2 } from "@/commons/utils/vec2";
 
+import { FilterType } from "@/renderer/components/browser/filterType";
 import { Tile } from "@/renderer/components/browser/tile/tile";
 import { IPC } from "@/renderer/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
@@ -118,6 +123,7 @@ const { t } = useI18n();
 const thumbnails = ref<HTMLDivElement>();
 const thumbsWrapper = ref<HTMLDivElement>();
 const selectedPetaTagIds = ref<string[]>([]);
+const selectedFilterType = ref<FilterType>(FilterType.ALL);
 const thumbnailsWidth = ref(0);
 const areaMaxY = ref(0);
 const areaMinY = ref(0);
@@ -151,6 +157,7 @@ onMounted(() => {
   petaImagesStore.onUpdate((petaImages, mode) => {
     if (mode === UpdateMode.INSERT) {
       selectedPetaTagIds.value = [];
+      selectedFilterType.value = FilterType.ALL;
     }
   });
 });
@@ -410,13 +417,12 @@ const fetchFilteredPetaImages = (() => {
   let fetchId = 0;
   return async () => {
     const currentFetchId = ++fetchId;
-    const selectedUntagged = selectedPetaTagIds.value.find((id) => id === UNTAGGED_ID);
     console.time("fetch" + currentFetchId);
     const results = await IPC.send(
       "getPetaImageIds",
-      selectedUntagged !== undefined
+      selectedFilterType.value === FilterType.UNTAGGED
         ? { type: "untagged" }
-        : selectedPetaTagIds.value.length > 0
+        : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0
         ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
         : { type: "all" },
     );
@@ -442,6 +448,7 @@ const fetchFilteredPetaImages = (() => {
 })();
 function selectTag(tag: RPetaTag) {
   selectedPetaTagIds.value = [tag.id];
+  selectedFilterType.value === FilterType.TAGS;
 }
 function updateVisibility(tile: Tile) {
   tile.visible =
@@ -567,7 +574,7 @@ const original = computed(
 watch(filteredPetaImages, () => {
   ImageDecoder.clear();
 });
-watch(selectedPetaTagIds, () => {
+watch([selectedPetaTagIds, selectedFilterType], () => {
   currentScrollTileId.value = "";
   nextTick(() => {
     if (thumbnails.value) {

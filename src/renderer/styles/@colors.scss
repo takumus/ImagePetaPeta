@@ -15,7 +15,7 @@ t-root {
   & {
     --color-0: #ffffff;
     --color-0-floating: #ffffff;
-    --color-1: #eeeeee;
+    --color-1: #f4f4f4;
     --color-2: #dedede;
     --color-accent-1: rgb(189, 229, 246);
     --color-accent-2: #9cdcfe;
@@ -24,12 +24,13 @@ t-root {
     --color-font: #1a1a1a;
     --filter-icon: brightness(0.7) invert(100%);
     --shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3);
-    --floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    --floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+    --shadow-small: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
   }
   // ダークモード
   &.dark {
     --color-0: #141414;
-    --color-0-floating: #202020;
+    --color-0-floating: #1b1b1b;
     --color-1: #272727;
     --color-2: #343434;
     --color-accent-1: rgb(41, 85, 112);
@@ -39,6 +40,7 @@ t-root {
     --color-font: #d3d3d3;
     --filter-icon: unset;
     --shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.5);
-    --floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    --floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+    --shadow-small: 0px 1px 2px 0px rgba(0, 0, 0, 0.5);
   }
 }

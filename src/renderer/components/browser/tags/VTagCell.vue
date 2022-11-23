@@ -48,6 +48,7 @@ t-tag-cell-root {
   border-radius: var(--rounded);
   padding: var(--px-1);
   background-color: var(--color-1);
+  box-shadow: var(--shadow-small);
   &.selected {
     // font-weight: bold;
     // font-size: var(--size-2);

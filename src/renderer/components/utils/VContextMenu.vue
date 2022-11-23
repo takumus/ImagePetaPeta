@@ -83,7 +83,6 @@ defineExpose({
 .context-menu-root {
   padding: 0px;
   margin: 0px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   color: var(--color-font);
   border-radius: var(--rounded);
   overflow: hidden;

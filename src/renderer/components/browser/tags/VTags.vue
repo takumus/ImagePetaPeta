@@ -2,17 +2,22 @@
   <t-tags-root>
     <t-tags-top>
       <VTagCell
-        @click="selectPetaTag()"
-        :selected="selectedAll"
+        @click="changeFilterType(FilterType.ALL)"
+        :selected="selectedFilterType === FilterType.ALL"
         :readonly="true"
         :look="`${t('browser.all')}(${petaImagesArray.length})`" />
+      <VTagCell
+        @click="changeFilterType(FilterType.UNTAGGED)"
+        :selected="selectedFilterType === FilterType.UNTAGGED"
+        :readonly="true"
+        :look="`${t('browser.untagged')}`" />
     </t-tags-top>
     <t-tags ref="tagsRoot">
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
         :selected="
-          c.selected ||
+          (c.selected && selectedFilterType === FilterType.TAGS) ||
           (draggingData !== undefined &&
             'petaTag' in draggingData &&
             draggingData.petaTag === c.petaTag)
@@ -25,7 +30,7 @@
         @update:value="(name) => changeTag(c.petaTag, name)"
         @contextmenu="tagMenu($event, c)"
         :style="{
-          order: orders[c.petaTag.id] ?? browserTags.length,
+          order: orders[c.petaTag.id] ?? 0,
         }" />
       <VTagPartition
         v-for="p in partitions"
@@ -38,7 +43,7 @@
         :ref="(element) => setVPartitionRef(element as any as VTagPartitionInstance, p.id)"
         :key="p.id"
         :style="{
-          order: orders[p.id] ?? browserTags.length,
+          order: orders[p.id] ?? 0,
         }" />
       <t-drag-target-linea
         class="t-drag-target-line"
@@ -89,10 +94,10 @@ import { PetaTagPartition, createPetaTagPartition } from "@/commons/datas/petaTa
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { UNTAGGED_ID } from "@/commons/defines";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { BrowserTag } from "@/renderer/components/browser/browserTag";
+import { FilterType } from "@/renderer/components/browser/filterType";
 import {
   SortHelperConstraint,
   initSortHelper,
@@ -107,10 +112,12 @@ type VTagCellInstance = InstanceType<typeof VTagCell>;
 type VTagPartitionInstance = InstanceType<typeof VTagPartition>;
 const emit = defineEmits<{
   (e: "update:selectedPetaTagIds", selectedPetaTagIds: string[]): void;
+  (e: "update:selectedFilterType", selectedFilterType: FilterType): void;
 }>();
 const props = defineProps<{
   petaImagesArray: RPetaImage[];
   selectedPetaTagIds: string[];
+  selectedFilterType: FilterType;
 }>();
 const textsStore = useTextsStore();
 const components = useComponentsStore();
@@ -287,7 +294,11 @@ async function changePartition(petaTag: PetaTagPartition, newName: string) {
   petaTag.name = newName;
   await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], UpdateMode.UPDATE);
 }
+function changeFilterType(filterType: FilterType) {
+  emit("update:selectedFilterType", filterType);
+}
 function selectPetaTag(petaTag?: RPetaTag) {
+  changeFilterType(FilterType.TAGS);
   const newData = [...props.selectedPetaTagIds];
   const prevTags = props.selectedPetaTagIds.join(",");
   let single = false;
@@ -303,10 +314,6 @@ function selectPetaTag(petaTag?: RPetaTag) {
   ) {
     newData.length = 0;
     single = true;
-  }
-  const untaggedId = props.selectedPetaTagIds.findIndex((id) => id === UNTAGGED_ID);
-  if (untaggedId >= 0 || petaTag?.id === UNTAGGED_ID) {
-    newData.length = 0;
   }
   if (petaTag) {
     if (!single) {
@@ -329,7 +336,7 @@ const browserTags = computed((): BrowserTag[] => {
       petaTag: petaTag,
       count: 0,
       selected: props.selectedPetaTagIds.find((id) => id === petaTag.id) !== undefined,
-      readonly: petaTag.id === UNTAGGED_ID,
+      readonly: false,
     };
   });
   return browserTags;
@@ -363,9 +370,6 @@ watch(
   },
   { immediate: true },
 );
-const selectedAll = computed(() => {
-  return props.selectedPetaTagIds.length === 0;
-});
 </script>
 
 <style lang="scss" scoped>
@@ -382,7 +386,7 @@ t-tags-root {
   }
   > t-tags-top {
     outline: none;
-    padding: var(--px-1) var(--px-1) 0px 0px;
+    padding: var(--px-1);
     width: 100%;
     text-align: left;
     display: flex;
@@ -393,7 +397,7 @@ t-tags-root {
   }
   > t-tags {
     outline: none;
-    padding: var(--px-1) var(--px-1) 0px 0px;
+    padding: var(--px-1);
     width: 100%;
     text-align: left;
     overflow-y: auto;
