@@ -1,6 +1,5 @@
-import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { PetaImagePetaTag, createPetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
-import { createPetaTag } from "@/commons/datas/petaTag";
+import { PetaTag, createPetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
@@ -10,7 +9,7 @@ import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { useDBPetaImages, useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
+import { useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
 import { useI18n } from "@/main/provides/utils/i18n";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
@@ -54,14 +53,6 @@ export class PetaTagsController {
             petaImageIds: [],
           },
         );
-        emitMainEvent(
-          {
-            type: EmitMainEventTargetType.WINDOW_TYPES,
-            windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
-          },
-          "updatePetaTagCounts",
-          await this.getPetaTagCounts(),
-        );
         return true;
       },
       {},
@@ -74,7 +65,6 @@ export class PetaTagsController {
     mode: UpdateMode,
     silent = false,
   ) {
-    const petaTagsController = usePetaTagsController();
     const dbPetaTags = useDBPetaTags();
     return Tasks.spawn(
       "UpdatePetaImagesPetaTags",
@@ -123,67 +113,10 @@ export class PetaTagsController {
           petaTagIds: [],
           petaImageIds,
         });
-        emitMainEvent(
-          { type: EmitMainEventTargetType.ALL },
-          "updatePetaTagCounts",
-          await petaTagsController.getPetaTagCounts(),
-        );
       },
       {},
       silent,
     );
-  }
-  async getPetaImageIds(params: GetPetaImageIdsParams) {
-    const dbPetaImages = useDBPetaImages();
-    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
-    // all
-    if (params.type === "all") {
-      const ids = dbPetaImages.getAll().map((pi) => pi.id);
-      return ids;
-    }
-    // untagged
-    if (params.type === "untagged") {
-      const taggedIds = Array.from(
-        new Set(
-          dbPetaImagesPetaTags.getAll().map((pipt) => {
-            return pipt.petaImageId;
-          }),
-        ),
-      );
-      const ids = (
-        await dbPetaImages.find({
-          id: {
-            $nin: taggedIds,
-          },
-        })
-      ).map((pi) => pi.id);
-      return ids;
-    }
-    // filter by ids
-    if (params.type === "petaTag") {
-      const pipts = await dbPetaImagesPetaTags.find({
-        $or: params.petaTagIds.map((id) => {
-          return {
-            petaTagId: id,
-          };
-        }),
-      });
-      const ids = Array.from(
-        new Set(
-          pipts.map((pipt) => {
-            return pipt.petaImageId;
-          }),
-        ),
-      ).filter((id) => {
-        return (
-          pipts.filter((pipt) => {
-            return pipt.petaImageId === id;
-          }).length === params.petaTagIds.length
-        );
-      });
-      return ids;
-    }
-    return [];
   }
   async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
     const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
@@ -206,32 +139,10 @@ export class PetaTagsController {
     });
     return petaTagIds;
   }
-  async getPetaTagCounts() {
-    const dbPetaTags = useDBPetaTags();
-    const dbPetaImages = useDBPetaImages();
+  async getPetaTagCount(petaTag: PetaTag) {
     const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
-    const petaTags = dbPetaTags.getAll();
     const petaImagesPetaTags = dbPetaImagesPetaTags.getAll();
-    const taggedIds = Array.from(
-      new Set(
-        petaImagesPetaTags.map((pipt) => {
-          return pipt.petaImageId;
-        }),
-      ),
-    );
-    const count = await dbPetaImages.count({
-      id: {
-        $nin: taggedIds,
-      },
-    });
-    const petaTagCounts = petaTags.reduce((counts, petaTag) => {
-      counts[petaTag.id] = petaImagesPetaTags.filter(
-        (pipt) => pipt.petaTagId === petaTag.id,
-      ).length;
-      return counts;
-    }, {} as { [id: string]: number });
-    petaTagCounts[UNTAGGED_ID] = count;
-    return petaTagCounts;
+    return petaImagesPetaTags.filter((pipt) => pipt.petaTagId === petaTag.id).length;
   }
   async getPetaTags() {
     const dbPetaTags = useDBPetaTags();

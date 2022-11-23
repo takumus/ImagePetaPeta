@@ -252,12 +252,12 @@ export function getIpcFunctions(): {
     },
     async getPetaImageIds(event, params) {
       const logger = useLogger();
-      const petaTagsController = usePetaTagsController();
+      const petaImagesController = usePetaImagesController();
       const log = logger.logMainChunk();
       try {
         log.log("#Get PetaImageIds");
         log.log("type:", params.type);
-        const ids = await petaTagsController.getPetaImageIds(params);
+        const ids = await petaImagesController.getPetaImageIds(params);
         log.log("return:", ids.length);
         return ids;
       } catch (error) {
@@ -311,15 +311,15 @@ export function getIpcFunctions(): {
       }
       return [];
     },
-    async getPetaTagCounts() {
+    async getPetaTagCount(event, petaTag) {
       const logger = useLogger();
       const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
-        log.log("#Get PetaTagCounts");
-        const petaTagCounts = await petaTagsController.getPetaTagCounts();
-        log.log("return:", Object.values(petaTagCounts).length);
-        return petaTagCounts;
+        log.log("#Get PetaTagCount");
+        const petaTagCount = await petaTagsController.getPetaTagCount(petaTag);
+        log.log("return:", petaTagCount);
+        return petaTagCount;
       } catch (error) {
         log.error(error);
         showError({
@@ -329,7 +329,7 @@ export function getIpcFunctions(): {
           message: String(error),
         });
       }
-      return {};
+      return -1;
     },
     async log(event, id: string, ...args: unknown[]) {
       const dataLogger = useLogger();

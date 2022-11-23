@@ -31,7 +31,7 @@ export interface IpcFunctions {
   updatePetaTags: (tags: PetaTagLike[], mode: UpdateMode) => Promise<boolean>;
   getPetaImageIds: (params: GetPetaImageIdsParams) => Promise<string[]>;
   getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
-  getPetaTagCounts: () => Promise<{ [petaTagId: string]: number }>;
+  getPetaTagCount: (petaTag: PetaTag) => Promise<number>;
   getPetaTags: () => Promise<PetaTag[]>;
   updatePetaImagesPetaTags: (
     petaImageIds: string[],

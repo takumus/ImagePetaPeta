@@ -325,10 +325,9 @@ function selectPetaTag(petaTag?: RPetaTag) {
 }
 const browserTags = computed((): BrowserTag[] => {
   const browserTags = petaTagsStore.state.petaTags.value.map((petaTag): BrowserTag => {
-    const count = petaTagsStore.state.petaTagCounts.value[petaTag.id];
     return {
       petaTag: petaTag,
-      count: count !== undefined ? count : -1,
+      count: 0,
       selected: props.selectedPetaTagIds.find((id) => id === petaTag.id) !== undefined,
       readonly: petaTag.id === UNTAGGED_ID,
     };

@@ -12,7 +12,6 @@ export async function createPetaTagsStore() {
   const petaTags = ref(
     (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag)),
   );
-  const petaTagCounts = ref(await IPC.send("getPetaTagCounts"));
   const eventEmitter = new TypedEventEmitter<{
     update: (petaImageIds: string[], petaTagIds: string[]) => void;
   }>();
@@ -20,13 +19,9 @@ export async function createPetaTagsStore() {
     petaTags.value = (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag));
     eventEmitter.emit("update", petaTagIds, petaImageIds);
   });
-  IPC.on("updatePetaTagCounts", async (event, _petaTagCounts) => {
-    petaTagCounts.value = _petaTagCounts;
-  });
   return {
     state: {
       petaTags,
-      petaTagCounts,
     },
     updatePetaTags(petaTagLikes: PetaTagLike[], mode: UpdateMode) {
       petaTagLikes.map((petaTagLike): PetaTagLike => {

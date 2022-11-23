@@ -5,6 +5,7 @@ import * as Path from "path";
 import sharp from "sharp";
 import { v4 as uuid } from "uuid";
 
+import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
 import { ImageType } from "@/commons/datas/imageType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
@@ -23,7 +24,6 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
-import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
@@ -35,7 +35,6 @@ import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
 
 export class PetaImagesController {
   public async updateMultiple(datas: PetaImage[], mode: UpdateMode, silent = false) {
-    const petaTagsController = usePetaTagsController();
     return Tasks.spawn(
       "UpdatePetaImages",
       async (handler) => {
@@ -69,14 +68,6 @@ export class PetaImagesController {
               petaImageIds: [],
               petaTagIds: [],
             },
-          );
-          emitMainEvent(
-            {
-              type: EmitMainEventTargetType.WINDOW_TYPES,
-              windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
-            },
-            "updatePetaTagCounts",
-            await petaTagsController.getPetaTagCounts(),
           );
         }
         emitMainEvent(
@@ -122,6 +113,58 @@ export class PetaImagesController {
       petaImages[pi.id] = pi;
     });
     return petaImages;
+  }
+  async getPetaImageIds(params: GetPetaImageIdsParams) {
+    const dbPetaImages = useDBPetaImages();
+    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+    // all
+    if (params.type === "all") {
+      const ids = dbPetaImages.getAll().map((pi) => pi.id);
+      return ids;
+    }
+    // untagged
+    if (params.type === "untagged") {
+      const taggedIds = Array.from(
+        new Set(
+          dbPetaImagesPetaTags.getAll().map((pipt) => {
+            return pipt.petaImageId;
+          }),
+        ),
+      );
+      const ids = (
+        await dbPetaImages.find({
+          id: {
+            $nin: taggedIds,
+          },
+        })
+      ).map((pi) => pi.id);
+      return ids;
+    }
+    // filter by ids
+    if (params.type === "petaTag") {
+      const pipts = await dbPetaImagesPetaTags.find({
+        $or: params.petaTagIds.map((id) => {
+          return {
+            petaTagId: id,
+          };
+        }),
+      });
+      const ids = Array.from(
+        new Set(
+          pipts.map((pipt) => {
+            return pipt.petaImageId;
+          }),
+        ),
+      ).filter((id) => {
+        return (
+          pipts.filter((pipt) => {
+            return pipt.petaImageId === id;
+          }).length === params.petaTagIds.length
+        );
+      });
+      return ids;
+    }
+    return [];
   }
   private async update(petaImage: PetaImage, mode: UpdateMode) {
     const dbPetaImages = useDBPetaImages();

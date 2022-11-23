@@ -11,7 +11,6 @@ export interface IpcEvents {
   updatePetaImages: (petaImages: PetaImage[], mode: UpdateMode) => void;
   updatePetaTags: (updates: { petaTagIds: string[]; petaImageIds: string[] }) => void;
   updatePetaTagPartitions: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
-  updatePetaTagCounts: (petaTagCounts: { [petaTagId: string]: number }) => void;
   taskStatus: (id: string, task: TaskStatus) => void;
   foundLatestVersion: (remote: RemoteBinaryInfo) => void;
   windowFocused: (focused: boolean, windowType: WindowType) => void;
