@@ -2,7 +2,7 @@ import { Ref, nextTick } from "vue";
 
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
-import { ClickChecker } from "@/renderer/utils/clickChecker";
+import { ClickChecker } from "@/renderer/libs/clickChecker";
 
 export type SortHelperData = {
   id: string;

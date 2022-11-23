@@ -26,7 +26,7 @@ import {
 } from "@/commons/defines";
 import languages from "@/commons/languages";
 
-import { ErrorWindowParameters } from "@/main/errors/errorWindow";
+import { ErrorWindowParameters } from "@/main/errorWindow";
 import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";

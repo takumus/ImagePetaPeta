@@ -16,9 +16,9 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Components
-import VModal from "@/renderer/components/modal/VModal.vue";
 import VTask from "@/renderer/components/task/VTask.vue";
+// Components
+import VModal from "@/renderer/components/utils/modal/VModal.vue";
 
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 import { TASK_CLOSE_DELAY } from "@/commons/defines";

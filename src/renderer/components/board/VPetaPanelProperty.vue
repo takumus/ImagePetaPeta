@@ -33,7 +33,7 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 // Others
-import VFloating from "@/renderer/components/utils/VFloating.vue";
+import VFloating from "@/renderer/components/utils/floating/VFloating.vue";
 
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { WindowType } from "@/commons/datas/windowType";

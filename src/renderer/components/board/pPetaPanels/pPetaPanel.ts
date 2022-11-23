@@ -7,10 +7,10 @@ import { Vec2 } from "@/commons/utils/vec2";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import NSFWImage from "@/@assets/nsfwBackground.png";
-// import { AnimatedGIF } from "@/renderer/utils/pixi-gif";
+// import { AnimatedGIF } from "@/renderer/libs/pixi-gif";
 import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
+import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
 
 export class PPetaPanel extends PIXI.Sprite {
   // public selected = false;

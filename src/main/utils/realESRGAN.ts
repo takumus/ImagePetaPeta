@@ -9,12 +9,12 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
 import { extraFiles } from "@/@assets/extraFiles";
+import * as Tasks from "@/main/libs/task";
 import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaImagesPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import * as Tasks from "@/main/tasks/task";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 

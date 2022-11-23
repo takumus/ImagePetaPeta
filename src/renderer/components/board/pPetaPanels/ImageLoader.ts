@@ -3,9 +3,9 @@ import * as PIXI from "pixi.js";
 import { ImageType } from "@/commons/datas/imageType";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 
+import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
+import { AnimatedGIFResource } from "@/renderer/libs/pixi-gif/animatedGIFResource";
 import { getImageURL } from "@/renderer/utils/imageURL";
-import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
-import { AnimatedGIFResource } from "@/renderer/utils/pixi-gif/animatedGIFResource";
 
 export function getImage(petaImage: RPetaImage | undefined) {
   let canceled = false;

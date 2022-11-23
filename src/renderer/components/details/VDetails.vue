@@ -24,7 +24,7 @@
 // Vue
 import { computed, ref, watch } from "vue";
 
-import VDragView from "@/renderer/components/utils/VDragView.vue";
+import VDragView from "@/renderer/components/utils/dragView/VDragView.vue";
 
 import { ImageType } from "@/commons/datas/imageType";
 import { RPetaImage } from "@/commons/datas/rPetaImage";

@@ -2,7 +2,7 @@ import {
   generateGamutMapWorkerInputData,
   generateGamutMapWorkerOutputData,
 } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
-import { initWebWorker } from "@/renderer/utils/initWebWorker";
+import { initWebWorker } from "@/renderer/libs/initWebWorker";
 
 // import * as convert from "color-convert";
 export default initWebWorker<generateGamutMapWorkerInputData, generateGamutMapWorkerOutputData>(

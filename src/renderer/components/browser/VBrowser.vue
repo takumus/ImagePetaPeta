@@ -102,6 +102,8 @@ import { Vec2 } from "@/commons/utils/vec2";
 import { FilterType } from "@/renderer/components/browser/filterType";
 import { Tile } from "@/renderer/components/browser/tile/tile";
 import { IPC } from "@/renderer/ipc";
+import { Keyboards } from "@/renderer/libs/keyboards";
+import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
@@ -111,8 +113,6 @@ import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore"
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { Keyboards } from "@/renderer/utils/keyboards";
-import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
 
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();

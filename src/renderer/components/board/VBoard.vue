@@ -49,7 +49,7 @@ import VCrop from "@/renderer/components/board/VCrop.vue";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import VBoardLoading from "@/renderer/components/board/loading/VBoardLoading.vue";
 import VLayer from "@/renderer/components/layer/VLayer.vue";
-import VPIXI from "@/renderer/components/utils/VPIXI.vue";
+import VPIXI from "@/renderer/components/utils/pixi/VPIXI.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
@@ -68,6 +68,9 @@ import { PBoardGrid } from "@/renderer/components/board/pGrid";
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
 import { PTransformer } from "@/renderer/components/board/pPetaPanels/pTransformer";
 import { IPC } from "@/renderer/ipc";
+import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { Keyboards } from "@/renderer/libs/keyboards";
+import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
@@ -75,12 +78,9 @@ import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaIma
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
 import * as Cursor from "@/renderer/utils/cursor";
 import { hitTest } from "@/renderer/utils/hitTest";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
-import { Keyboards } from "@/renderer/utils/keyboards";
-import { logChunk } from "@/renderer/utils/rendererLogger";
 
 const emit = defineEmits<{
   (e: "update:board", board: RPetaBoard): void;

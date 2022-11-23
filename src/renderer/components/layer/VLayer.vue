@@ -45,9 +45,9 @@ import {
   SortHelperConstraint,
   initSortHelper,
 } from "@/renderer/components/browser/tags/sortHelper";
-import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 // Others
-import { Keyboards } from "@/renderer/utils/keyboards";
+import { Keyboards } from "@/renderer/libs/keyboards";
+import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 
 type VLayerCellInstance = InstanceType<typeof VLayerCell>;
 const statesStore = useStateStore();

@@ -36,19 +36,19 @@ import VDetails from "@/renderer/components/details/VDetails.vue";
 import VTasks from "@/renderer/components/task/VTasks.vue";
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/VDialog.vue";
+import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
 
 // Others
-// import { AnimatedGIFLoader } from "@/renderer/utils/pixi-gif";
+// import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
 import { IPC } from "@/renderer/ipc";
+import { Keyboards } from "@/renderer/libs/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
-import { Keyboards } from "@/renderer/utils/keyboards";
 
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();

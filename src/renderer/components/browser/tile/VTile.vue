@@ -74,12 +74,12 @@ import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { Tile } from "@/renderer/components/browser/tile/tile";
 import { IPC } from "@/renderer/ipc";
+import { ClickChecker } from "@/renderer/libs/clickChecker";
+import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { getImageURL } from "@/renderer/utils/imageURL";
-import * as ImageDecoder from "@/renderer/utils/serialImageDecoder";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;

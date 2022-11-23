@@ -43,7 +43,7 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VTextarea from "@/renderer/components/utils/VTextarea.vue";
+import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
 
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 
@@ -94,6 +94,9 @@ function removeLastPetaTag() {
 }
 
 function addSelectedTag(tagName: string) {
+  if (props.selectedFilterType !== FilterType.TAGS) {
+    emit("update:selectedFilterType", FilterType.TAGS);
+  }
   const petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === tagName);
   if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
     emit("update:selectedPetaTagIds", [...props.selectedPetaTagIds, petaTag.id]);

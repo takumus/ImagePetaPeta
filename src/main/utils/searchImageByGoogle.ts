@@ -6,7 +6,7 @@ import { TaskStatusCode } from "@/commons/datas/task";
 import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
 
-import * as Tasks from "@/main/tasks/task";
+import * as Tasks from "@/main/libs/task";
 
 type SearchImageByGoogleTaskStep = { js: string } | { wait: number };
 export interface SearchImageByGoogleTask {

@@ -1,6 +1,6 @@
 import { app } from "electron";
 
-import { showError } from "@/main/errors/errorWindow";
+import { showError } from "@/main/errorWindow";
 import { migrate } from "@/main/migration";
 import { useConfigDBInfo } from "@/main/provides/configs";
 import {

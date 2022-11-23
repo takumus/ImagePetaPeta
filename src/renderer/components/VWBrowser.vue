@@ -32,8 +32,8 @@ import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 import VTasks from "@/renderer/components/task/VTasks.vue";
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/VDialog.vue";
+import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
 
 // Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";

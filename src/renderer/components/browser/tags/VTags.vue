@@ -88,7 +88,7 @@ import { useI18n } from "vue-i18n";
 
 import VTagCell from "@/renderer/components/browser/tags/VTagCell.vue";
 import VTagPartition from "@/renderer/components/browser/tags/VTagPartition.vue";
-import VTextarea from "@/renderer/components/utils/VTextarea.vue";
+import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
 
 import { PetaTagPartition, createPetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RPetaImage } from "@/commons/datas/rPetaImage";
@@ -102,11 +102,11 @@ import {
   SortHelperConstraint,
   initSortHelper,
 } from "@/renderer/components/browser/tags/sortHelper";
+import { Keyboards } from "@/renderer/libs/keyboards";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaTagPartitionsStore } from "@/renderer/stores/petaTagPartitionsStore/usePetaTagPartitionsStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
-import { Keyboards } from "@/renderer/utils/keyboards";
 
 type VTagCellInstance = InstanceType<typeof VTagCell>;
 type VTagPartitionInstance = InstanceType<typeof VTagPartition>;

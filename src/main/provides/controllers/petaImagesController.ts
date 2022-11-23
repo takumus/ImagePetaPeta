@@ -24,13 +24,13 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
+import * as Tasks from "@/main/libs/task";
 import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
-import * as Tasks from "@/main/tasks/task";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
-import { generateMetadataByWorker } from "@/main/utils/generateMetadata/generateMetadata";
+import { generateMetadataByWorker } from "@/main/utils/generateMetadata";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
 
 export class PetaImagesController {

@@ -20,8 +20,9 @@ import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { ppa } from "@/commons/utils/pp";
 
 import Transparent from "@/@assets/transparent.png";
-import { showError } from "@/main/errors/errorWindow";
+import { showError } from "@/main/errorWindow";
 import * as file from "@/main/libs/file";
+import * as Tasks from "@/main/libs/task";
 import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
 import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
@@ -31,7 +32,6 @@ import { useDBStatus } from "@/main/provides/databases";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
-import * as Tasks from "@/main/tasks/task";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { realESRGAN } from "@/main/utils/realESRGAN";

@@ -4,7 +4,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
 import { PROTOCOLS } from "@/commons/defines";
 
-import { showError } from "@/main/errors/errorWindow";
+import { showError } from "@/main/errorWindow";
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { getIpcFunctions } from "@/main/ipcFunctions";
@@ -16,7 +16,7 @@ import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windo
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
-import { initWebhook } from "@/main/webhook/webhook";
+import { initWebhook } from "@/main/webhook";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {

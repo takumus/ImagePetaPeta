@@ -35,7 +35,6 @@
     </t-modals>
     <VDialog :zIndex="6"></VDialog>
     <VContextMenu :zIndex="4" />
-    <VFramerate />
   </t-root>
 </template>
 
@@ -52,9 +51,8 @@ import VBoardProperty from "@/renderer/components/top/VBoardProperty.vue";
 import VTabBar from "@/renderer/components/top/VTabBar.vue";
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
 import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/VDialog.vue";
-import VFramerate from "@/renderer/components/utils/VFramerate.vue";
+import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
 
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
@@ -69,8 +67,9 @@ import { minimizeID } from "@/commons/utils/minimizeID";
 import { Vec2 } from "@/commons/utils/vec2";
 
 // Others
-// import { AnimatedGIFLoader } from "@/renderer/utils/pixi-gif";
+// import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
 import { IPC } from "@/renderer/ipc";
+import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
@@ -80,7 +79,6 @@ import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
-import { logChunk } from "@/renderer/utils/rendererLogger";
 
 const statesStore = useStateStore();
 const components = useComponentsStore();

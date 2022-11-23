@@ -2,9 +2,9 @@ import {
   AnimatedGIF,
   AnimatedGIFFrame,
   AnimatedGIFOptions,
-} from "@/renderer/utils/pixi-gif/animatedGIF";
-import DecompressWorker from "@/renderer/utils/pixi-gif/decoder/decompress.worker";
-import { createWebWorkerGroup } from "@/renderer/utils/workerGroup";
+} from "@/renderer/libs/pixi-gif/animatedGIF";
+import DecompressWorker from "@/renderer/libs/pixi-gif/decoder/decompress.worker";
+import { createWebWorkerGroup } from "@/renderer/libs/workerGroup";
 
 const wtGroup = createWebWorkerGroup(DecompressWorker);
 export function decodeFromBuffer(buffer: ArrayBuffer, options?: Partial<AnimatedGIFOptions>) {

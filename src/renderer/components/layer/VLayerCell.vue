@@ -40,9 +40,9 @@ import { ImageType } from "@/commons/datas/imageType";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 
+import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
 import { getImageURL } from "@/renderer/utils/imageURL";
 
 // Others

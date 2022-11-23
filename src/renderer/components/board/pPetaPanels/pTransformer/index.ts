@@ -8,7 +8,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
 import { PTransformerControlPoint } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerControlPoint";
 import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
+import { ClickChecker } from "@/renderer/libs/clickChecker";
 
 enum ControlStatus {
   PANEL_DRAG = "p_drag",

@@ -6,10 +6,10 @@ import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
+import * as Tasks from "@/main/libs/task";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
-import * as Tasks from "@/main/tasks/task";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 export class PetaTagPartitionsController {

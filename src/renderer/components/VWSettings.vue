@@ -24,8 +24,8 @@ import { useI18n } from "vue-i18n";
 import VSettings from "@/renderer/components/settings/VSettings.vue";
 // Components
 import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
-import VContextMenu from "@/renderer/components/utils/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/VDialog.vue";
+import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
 
 // Others
 import { IPC } from "@/renderer/ipc";

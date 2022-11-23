@@ -3,8 +3,8 @@ import { PetaImage } from "@/commons/datas/petaImage";
 
 import Worker from "@/renderer/components/browser/property/worker/generateGamutMapWorker.worker";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
+import { createWebWorkerGroup } from "@/renderer/libs/workerGroup";
 import { getImageURL } from "@/renderer/utils/imageURL";
-import { createWebWorkerGroup } from "@/renderer/utils/workerGroup";
 
 const wtGroup = createWebWorkerGroup(Worker);
 const image = new Image();

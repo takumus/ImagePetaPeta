@@ -18,7 +18,7 @@
 import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
-import VPIXI from "@/renderer/components/utils/VPIXI.vue";
+import VPIXI from "@/renderer/components/utils/pixi/VPIXI.vue";
 
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";

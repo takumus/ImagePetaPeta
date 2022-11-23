@@ -24,7 +24,7 @@
 import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VTextarea from "@/renderer/components/utils/VTextarea.vue";
+import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
 
 import { IPC } from "@/renderer/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

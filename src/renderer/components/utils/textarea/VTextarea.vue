@@ -35,7 +35,7 @@
 // Vue
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
-import VComplement from "@/renderer/components/utils/VComplement.vue";
+import VComplement from "@/renderer/components/utils/complement/VComplement.vue";
 
 const props = defineProps<{
   value?: string;

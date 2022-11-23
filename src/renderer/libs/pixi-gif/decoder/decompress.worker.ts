@@ -1,10 +1,10 @@
 import { Frame, decompressFrame, parseGIF } from "gifuct-js";
 
-import { initWebWorker } from "@/renderer/utils/initWebWorker";
+import { initWebWorker } from "@/renderer/libs/initWebWorker";
 import {
   DecompressWorkerInputData,
   DecompressWorkerOutputData,
-} from "@/renderer/utils/pixi-gif/decoder/decompressWorkerData";
+} from "@/renderer/libs/pixi-gif/decoder/decompressWorkerData";
 
 export default initWebWorker<DecompressWorkerInputData, DecompressWorkerOutputData>(
   self,

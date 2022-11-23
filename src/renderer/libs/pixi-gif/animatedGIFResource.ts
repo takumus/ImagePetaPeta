@@ -2,8 +2,8 @@ import pLimit from "p-limit";
 
 import { ANIMATED_GIF_DECODE_THREAD } from "@/commons/defines";
 
-import { AnimatedGIF } from "@/renderer/utils/pixi-gif/animatedGIF";
-import { decodeFromBuffer } from "@/renderer/utils/pixi-gif/decoder/animatedGIFDecoder";
+import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
+import { decodeFromBuffer } from "@/renderer/libs/pixi-gif/decoder/animatedGIFDecoder";
 
 export class AnimatedGIFResource {
   private deocded = false;

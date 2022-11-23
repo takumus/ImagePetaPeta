@@ -6,6 +6,10 @@ import { WindowType } from "@/commons/datas/windowType";
 import languages from "@/commons/languages";
 
 import { IPC } from "@/renderer/ipc";
+import { ClickChecker } from "@/renderer/libs/clickChecker";
+import { Keyboards } from "@/renderer/libs/keyboards";
+import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
+import { logChunk } from "@/renderer/libs/rendererLogger";
 import {
   appInfoStoreKey,
   createAppInfoStore,
@@ -45,10 +49,6 @@ import {
   createWindowTypeStore,
   windowTypeStoreKey,
 } from "@/renderer/stores/windowTypeStore/createWindowTypeStore";
-import { ClickChecker } from "@/renderer/utils/clickChecker";
-import { Keyboards } from "@/renderer/utils/keyboards";
-import { injectAnimatedGIFAsset } from "@/renderer/utils/pixi-gif/animatedGIFAsset";
-import { logChunk } from "@/renderer/utils/rendererLogger";
 
 export async function create(
   component: Component,
