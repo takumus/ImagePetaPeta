@@ -214,26 +214,26 @@ function tagMenu(event: PointerEvent | MouseEvent, tag: BrowserTag) {
       {
         label: t("browser.addTagPartition"),
         click: () => {
-          addPartition("test", tag.petaTag.index + 1);
+          addPartition("test", tag.petaTag.index);
         },
       },
     ],
     vec2FromPointerEvent(event),
   );
 }
-function partitionMenu(event: PointerEvent | MouseEvent, tag: PetaTagPartition) {
+function partitionMenu(event: PointerEvent | MouseEvent, ptp: PetaTagPartition) {
   components.contextMenu.open(
     [
       {
-        label: t("browser.tagPartitionMenu.remove", [tag.name]),
+        label: t("browser.tagPartitionMenu.remove", [ptp.name]),
         click: () => {
-          removeTagPartition(tag);
+          removeTagPartition(ptp);
         },
       },
       {
         label: t("browser.addTagPartition"),
         click: () => {
-          addPartition("test", tag.index + 1);
+          addPartition("test", ptp.index);
         },
       },
     ],
