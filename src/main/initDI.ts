@@ -31,6 +31,9 @@ import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
+import { migrateSettings } from "@/main/migration/migrateSettings";
+import { migrateStates } from "@/main/migration/migrateStates";
+import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
 import {
   configDBInfoKey,
   configSettingsKey,
@@ -66,7 +69,6 @@ import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
 import { Windows, windowsKey } from "@/main/provides/utils/windows";
 import isValidFilePath from "@/main/utils/isValidFilePath";
-import { migrateSettings, migrateStates, migrateWindowStates } from "@/main/utils/migrater";
 import { isLatest } from "@/main/utils/versions";
 
 export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {

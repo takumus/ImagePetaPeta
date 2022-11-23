@@ -3,7 +3,6 @@ import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 import { minimizeID } from "@/commons/utils/minimizeID";
-// import { migratePetaTagPartition } from "@/main/utils/migrater";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";

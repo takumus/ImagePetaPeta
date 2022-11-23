@@ -6,7 +6,6 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaBoards } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
-import { migratePetaBoard } from "@/main/utils/migrater";
 
 export class PetaBoardsController {
   async updateMultiple(boards: PetaBoard[], mode: UpdateMode) {
@@ -17,7 +16,6 @@ export class PetaBoardsController {
     const boards: { [id: string]: PetaBoard } = {};
     dbPetaBoards.getAll().forEach((board) => {
       // バージョンアップ時のプロパティ更新
-      migratePetaBoard(board);
       boards[board.id] = board;
     });
     return boards;

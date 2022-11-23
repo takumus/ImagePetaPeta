@@ -1,19 +1,17 @@
 import deepcopy from "deepcopy";
 import fs from "fs";
 
+import { Migrater } from "@/main/libs/createMigrater";
+
 export default class Config<T> {
   data: T;
-  constructor(
-    private path: string,
-    private defaultData: T,
-    migrater?: (data: T) => { changed: boolean; data: T },
-  ) {
+  constructor(private path: string, private defaultData: T, migrater?: Migrater<T>) {
     this.data = deepcopy(defaultData);
     this.load();
     if (migrater) {
       const result = migrater(this.data);
       this.data = result.data;
-      if (result.changed) {
+      if (result.updated) {
         this.save();
       }
     }

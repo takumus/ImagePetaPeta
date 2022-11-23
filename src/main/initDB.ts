@@ -1,11 +1,8 @@
 import { app } from "electron";
 
-import { PetaImages } from "@/commons/datas/petaImage";
-import { UpdateMode } from "@/commons/datas/updateMode";
-
 import { showError } from "@/main/errors/errorWindow";
+import { migrate } from "@/main/migration";
 import { useConfigDBInfo } from "@/main/provides/configs";
-import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
 import {
   useDBPetaBoards,
   useDBPetaImages,
@@ -14,7 +11,6 @@ import {
   useDBPetaTags,
 } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
-import { migratePetaImage, migratePetaImagesPetaTags, migratePetaTag } from "@/main/utils/migrater";
 
 export async function initDB() {
   const logger = useLogger();
@@ -24,7 +20,7 @@ export async function initDB() {
   const dbPetaTags = useDBPetaTags();
   const dbPetaTagPartitions = useDBPetaTagPartitions();
   const configDBInfo = useConfigDBInfo();
-  const petaImagesController = usePetaImagesController();
+
   try {
     // ロード
     // 時間かかったときのテスト
@@ -66,22 +62,7 @@ export async function initDB() {
   }
   try {
     // 旧バージョンからのマイグレーション
-    const petaImagesArray = dbPetaImages.getAll();
-    const petaImages: PetaImages = {};
-    petaImagesArray.forEach((pi) => {
-      petaImages[pi.id] = pi;
-      if (migratePetaImage(pi)) {
-        logger.logMainChunk().log("Migrate PetaImage");
-        petaImagesController.updateMultiple([pi], UpdateMode.UPDATE, true);
-      }
-    });
-    if (await migratePetaTag(dbPetaTags, petaImages)) {
-      logger.logMainChunk().log("Migrate PetaTags");
-      await petaImagesController.updateMultiple(petaImagesArray, UpdateMode.UPDATE, true);
-    }
-    if (await migratePetaImagesPetaTags(dbPetaTags, dbPetaImagesPetaTags, petaImages)) {
-      logger.logMainChunk().log("Migrate PetaImagesPetaTags");
-    }
+    migrate();
     if (configDBInfo.data.version !== app.getVersion()) {
       configDBInfo.data.version = app.getVersion();
       configDBInfo.save();

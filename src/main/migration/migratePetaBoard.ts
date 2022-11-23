@@ -1,0 +1,28 @@
+import { PetaBoard } from "@/commons/datas/petaBoard";
+import { PetaPanel } from "@/commons/datas/petaPanel";
+
+import { createMigrater } from "@/main/libs/createMigrater";
+
+export const migratePetaBoard = createMigrater<PetaBoard>(async (data, update) => {
+  // v3.0.0
+  if (Array.isArray(data.petaPanels)) {
+    const petaPanels = data.petaPanels as PetaPanel[];
+    const newPetaPanels: { [id: string]: PetaPanel } = {};
+    petaPanels.forEach((petaPanel) => {
+      newPetaPanels[petaPanel.id] = petaPanel;
+    });
+    data.petaPanels = newPetaPanels;
+    update();
+  }
+  Object.values(data.petaPanels).forEach((petaPanel) => {
+    const result = migratePetaPanel(petaPanel);
+    if (result.updated) {
+      data.petaPanels[result.data.id] = result.data;
+      update();
+    }
+  });
+  return data;
+});
+export const migratePetaPanel = createMigrater<PetaPanel>(async (data) => {
+  return data;
+});
