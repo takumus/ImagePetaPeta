@@ -28,7 +28,7 @@ import * as Tasks from "@/main/libs/task";
 import { useDBPetaImages, useDBPetaImagesPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { generateMetadataByWorker } from "@/main/utils/generateMetadata";
 import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";

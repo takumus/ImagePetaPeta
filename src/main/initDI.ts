@@ -67,7 +67,7 @@ import {
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
-import { Windows, windowsKey } from "@/main/provides/utils/windows";
+import { Windows, windowsKey } from "@/main/provides/windows";
 import isValidFilePath from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/main/utils/versions";
 

@@ -2,7 +2,7 @@ import { BrowserWindow, app } from "electron";
 
 import { SUPPORT_URL } from "@/commons/defines";
 
-import { useWindows } from "@/main/provides/utils/windows";
+import { useWindows } from "@/main/provides/windows";
 
 export interface ErrorWindowParameters {
   category: "M" | "R";

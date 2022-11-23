@@ -9,7 +9,7 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import * as Tasks from "@/main/libs/task";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 export class PetaTagPartitionsController {

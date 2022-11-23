@@ -8,12 +8,8 @@ import {
   EULA,
   WINDOW_DEFAULT_HEIGHT,
   WINDOW_DEFAULT_WIDTH,
-  WINDOW_EULA_HEIGHT,
-  WINDOW_EULA_WIDTH,
   WINDOW_MIN_HEIGHT,
   WINDOW_MIN_WIDTH,
-  WINDOW_SETTINGS_HEIGHT,
-  WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
 import { IpcEvents } from "@/commons/ipc/ipcEvents";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -21,6 +17,8 @@ import { Vec2 } from "@/commons/utils/vec2";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
+import { keepAliveWindowTypes } from "@/main/provides/windows/keepAliveWindowTypes";
+import { getWindowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { isDarkMode } from "@/main/utils/darkMode";
 
 export class Windows {
@@ -32,38 +30,66 @@ export class Windows {
     logger.logMainChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
-    if (this.activeWindows.board) {
-      this.changeMainWindow(WindowType.BOARD);
-    } else if (this.activeWindows.browser) {
-      this.changeMainWindow(WindowType.BROWSER);
-    } else if (this.activeWindows.details) {
-      this.changeMainWindow(WindowType.DETAILS);
-    } else if (this.activeWindows.capture) {
-      this.changeMainWindow(WindowType.CAPTURE);
-    } else {
-      if (process.platform !== "darwin") {
-        app.quit();
-      }
+    const activeMainWindowType = keepAliveWindowTypes.reduce<WindowType | undefined>(
+      (activeMainWindowType, windowType) =>
+        this.activeWindows[windowType] ? windowType : activeMainWindowType,
+      undefined,
+    );
+    if (activeMainWindowType !== undefined) {
+      this.changeMainWindow(activeMainWindowType);
+    } else if (process.platform !== "darwin") {
+      app.quit();
     }
   }
   showWindows() {
     const configSettings = useConfigSettings();
     if (configSettings.data.eula < EULA) {
       if (this.windows.eula === undefined || this.windows.eula.isDestroyed()) {
-        this.windows.eula = this.initEULAWindow();
+        this.openWindow(WindowType.EULA);
       } else {
         this.windows.eula.moveTop();
       }
       return;
     }
     if (configSettings.data.show === "both") {
-      this.windows.board = this.initBoardWindow();
-      this.windows.browser = this.initBrowserWindow();
+      this.openWindow(WindowType.BOARD);
+      this.openWindow(WindowType.BROWSER);
     } else if (configSettings.data.show === "browser") {
-      this.windows.browser = this.initBrowserWindow();
+      this.openWindow(WindowType.BROWSER);
     } else {
-      this.windows.board = this.initBoardWindow();
+      this.openWindow(WindowType.BOARD);
     }
+  }
+  openWindow(windowType: WindowType, event?: IpcMainInvokeEvent) {
+    const logger = useLogger();
+    logger.logMainChunk().log("$Open Window:", windowType);
+    const position = new Vec2();
+    try {
+      const parentWindowBounds = event
+        ? this.getWindowByEvent(event)?.window.getBounds()
+        : undefined;
+      if (parentWindowBounds) {
+        const display = screen.getDisplayNearestPoint({
+          x: parentWindowBounds.x + parentWindowBounds.width / 2,
+          y: parentWindowBounds.y + parentWindowBounds.height / 2,
+        });
+        position.set(display.bounds);
+      }
+    } catch (error) {
+      //
+    }
+    if (this.windows[windowType] === undefined || this.windows[windowType]?.isDestroyed()) {
+      this.windows[windowType] = this.createWindow(windowType, {
+        ...getWindowCustomOptions(windowType),
+        x: position.x,
+        y: position.y,
+      });
+      this.windows[windowType]?.center();
+    } else {
+      this.windows[windowType]?.moveTop();
+      this.windows[windowType]?.focus();
+    }
+    return this.windows[windowType] as BrowserWindow;
   }
   createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
@@ -82,6 +108,12 @@ export class Windows {
       backgroundColor: isDarkMode()
         ? BOARD_DARK_BACKGROUND_FILL_COLOR
         : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+      trafficLightPosition: {
+        x: 8,
+        y: 8,
+      },
+      width: configWindowStates.data[type]?.width,
+      height: configWindowStates.data[type]?.height,
       ...options,
     });
     this.activeWindows[type] = true;
@@ -91,20 +123,13 @@ export class Windows {
     if (state?.maximized) {
       window.maximize();
     }
-    window.on("close", () => {
-      this.onCloseWindow(type);
-    });
-    window.addListener("blur", () => {
-      this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", false, type);
-    });
+    window.on("close", () => this.onCloseWindow(type));
+    window.addListener("blur", () =>
+      this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", false, type),
+    );
     window.addListener("focus", () => {
       this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", true, type);
-      if (
-        type === WindowType.BOARD ||
-        type === WindowType.BROWSER ||
-        type === WindowType.DETAILS ||
-        type === WindowType.CAPTURE
-      ) {
+      if (keepAliveWindowTypes.includes(type)) {
         this.changeMainWindow(type);
       }
       window.moveTop();
@@ -119,101 +144,6 @@ export class Windows {
   changeMainWindow(type: WindowType) {
     this.mainWindowType = type;
     this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "mainWindowType", type);
-  }
-  initBrowserWindow(x?: number, y?: number) {
-    const configWindowStates = useConfigWindowStates();
-    const configSettings = useConfigSettings();
-    return this.createWindow(WindowType.BROWSER, {
-      width: configWindowStates.data.browser?.width,
-      height: configWindowStates.data.browser?.height,
-      trafficLightPosition: {
-        x: 8,
-        y: 8,
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop,
-    });
-  }
-  initSettingsWindow(x?: number, y?: number) {
-    const configSettings = useConfigSettings();
-    return this.createWindow(WindowType.SETTINGS, {
-      width: WINDOW_SETTINGS_WIDTH,
-      height: WINDOW_SETTINGS_HEIGHT,
-      minWidth: WINDOW_SETTINGS_WIDTH,
-      minHeight: WINDOW_SETTINGS_HEIGHT,
-      maximizable: false,
-      minimizable: false,
-      fullscreenable: false,
-      trafficLightPosition: {
-        x: 8,
-        y: 8,
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop,
-    });
-  }
-  initBoardWindow(x?: number, y?: number) {
-    const configWindowStates = useConfigWindowStates();
-    const configSettings = useConfigSettings();
-    return this.createWindow(WindowType.BOARD, {
-      width: configWindowStates.data.board?.width,
-      height: configWindowStates.data.board?.height,
-      trafficLightPosition: {
-        x: 13,
-        y: 13,
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop,
-    });
-  }
-  initDetailsWindow(x?: number, y?: number) {
-    const configWindowStates = useConfigWindowStates();
-    const configSettings = useConfigSettings();
-    return this.createWindow(WindowType.DETAILS, {
-      width: configWindowStates.data.details?.width,
-      height: configWindowStates.data.details?.height,
-      trafficLightPosition: {
-        x: 8,
-        y: 8,
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop,
-    });
-  }
-  initCaptureWindow(x?: number, y?: number) {
-    const configWindowStates = useConfigWindowStates();
-    const configSettings = useConfigSettings();
-    return this.createWindow(WindowType.CAPTURE, {
-      width: configWindowStates.data.capture?.width,
-      height: configWindowStates.data.capture?.height,
-      trafficLightPosition: {
-        x: 8,
-        y: 8,
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop,
-    });
-  }
-  initEULAWindow(x?: number, y?: number) {
-    const configSettings = useConfigSettings();
-    return this.createWindow(WindowType.EULA, {
-      width: WINDOW_EULA_WIDTH,
-      height: WINDOW_EULA_HEIGHT,
-      minWidth: WINDOW_EULA_WIDTH,
-      minHeight: WINDOW_EULA_HEIGHT,
-      trafficLightPosition: {
-        x: 8,
-        y: 8,
-      },
-      x,
-      y,
-      alwaysOnTop: configSettings.data.alwaysOnTop,
-    });
   }
   saveWindowSize(windowType: WindowType) {
     const configWindowStates = useConfigWindowStates();
@@ -262,10 +192,8 @@ export class Windows {
     return undefined;
   }
   reloadWindow(type: WindowType) {
-    try {
+    if (!this.windows[type]?.isDestroyed()) {
       this.windows[type]?.reload();
-    } catch {
-      //
     }
   }
   reloadWindowByEvent(event: IpcMainInvokeEvent) {
@@ -275,49 +203,6 @@ export class Windows {
     }
     this.reloadWindow(type);
     return type;
-  }
-  openWindow(windowType: WindowType, event?: IpcMainInvokeEvent) {
-    const position = new Vec2();
-    try {
-      const parentWindowBounds = event
-        ? this.getWindowByEvent(event)?.window.getBounds()
-        : undefined;
-      if (parentWindowBounds) {
-        const display = screen.getDisplayNearestPoint({
-          x: parentWindowBounds.x + parentWindowBounds.width / 2,
-          y: parentWindowBounds.y + parentWindowBounds.height / 2,
-        });
-        position.set(display.bounds);
-      }
-    } catch (error) {
-      //
-    }
-    if (this.windows[windowType] === undefined || this.windows[windowType]?.isDestroyed()) {
-      switch (windowType) {
-        case WindowType.BOARD:
-          this.windows[windowType] = this.initBoardWindow(position.x, position.y);
-          break;
-        case WindowType.BROWSER:
-          this.windows[windowType] = this.initBrowserWindow(position.x, position.y);
-          break;
-        case WindowType.SETTINGS:
-          this.windows[windowType] = this.initSettingsWindow(position.x, position.y);
-          break;
-        case WindowType.DETAILS:
-          this.windows[windowType] = this.initDetailsWindow(position.x, position.y);
-          break;
-        case WindowType.CAPTURE:
-          this.windows[windowType] = this.initCaptureWindow(position.x, position.y);
-          break;
-        case WindowType.EULA:
-          this.windows[windowType] = this.initEULAWindow(position.x, position.y);
-          break;
-      }
-      this.windows[windowType]?.center();
-    } else {
-      this.windows[windowType]?.moveTop();
-      this.windows[windowType]?.focus();
-    }
   }
   emitMainEvent<U extends keyof IpcEvents>(
     target: EmitMainEventTarget,

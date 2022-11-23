@@ -12,7 +12,7 @@ import { useConfigSettings } from "@/main/provides/configs";
 import { useDBStatus } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";

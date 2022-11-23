@@ -3,7 +3,7 @@ import { WindowType } from "@/commons/datas/windowType";
 import { UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { getLatestVersion } from "@/main/utils/versions";
 

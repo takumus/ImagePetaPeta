@@ -2,7 +2,7 @@ import { v4 as uuid } from "uuid";
 
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
-import { EmitMainEventTargetType } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 const tasks: { [id: string]: TaskHandler } = {};

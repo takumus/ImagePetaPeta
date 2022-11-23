@@ -31,7 +31,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBStatus } from "@/main/provides/databases";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/utils/windows";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { realESRGAN } from "@/main/utils/realESRGAN";
