@@ -16,7 +16,7 @@
 // Vue
 import { ref } from "vue";
 
-import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
+import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 const emit = defineEmits<{
   (e: "update:value", value: string): void;

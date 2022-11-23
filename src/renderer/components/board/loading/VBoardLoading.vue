@@ -18,8 +18,8 @@
 // Components
 import { useI18n } from "vue-i18n";
 
-import VModal from "@/renderer/components/utils/modal/VModal.vue";
-import VProgressBar from "@/renderer/components/utils/progressBar/VProgressBar.vue";
+import VModal from "@/renderer/components/commons/utils/modal/VModal.vue";
+import VProgressBar from "@/renderer/components/commons/utils/progressBar/VProgressBar.vue";
 
 import { VBoardLoadingStatus } from "@/renderer/components/board/loading/vBoardLoadingStatus";
 

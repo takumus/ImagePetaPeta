@@ -53,7 +53,7 @@
 import { computed, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
+import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";

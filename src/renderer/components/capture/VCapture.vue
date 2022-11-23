@@ -33,7 +33,7 @@
 // Vue
 import { onMounted, ref, watch } from "vue";
 
-import VDragView from "@/renderer/components/utils/dragView/VDragView.vue";
+import VDragView from "@/renderer/components/commons/utils/dragView/VDragView.vue";
 
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 

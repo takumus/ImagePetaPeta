@@ -34,7 +34,7 @@
 import Fuse from "fuse.js";
 import { computed, onMounted, ref, watch } from "vue";
 
-import VFloating from "@/renderer/components/utils/floating/VFloating.vue";
+import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
 // Others
 import { Keyboards, Keys } from "@/renderer/libs/keyboards";

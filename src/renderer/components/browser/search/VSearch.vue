@@ -43,7 +43,7 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
+import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 

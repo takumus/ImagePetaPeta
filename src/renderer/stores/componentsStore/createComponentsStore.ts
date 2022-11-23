@@ -2,7 +2,7 @@ import { InjectionKey, reactive } from "vue";
 
 import { Vec2 } from "@/commons/utils/vec2";
 
-import { ContextMenuItem } from "@/renderer/components/utils/contextMenu/contextMenuItem";
+import { ContextMenuItem } from "@/renderer/components/commons/utils/contextMenu/contextMenuItem";
 
 export async function createComponentsStore() {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

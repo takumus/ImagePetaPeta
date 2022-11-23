@@ -151,8 +151,8 @@ import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VGamutMap from "@/renderer/components/browser/property/VGamutMap.vue";
-import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
+import VGamutMap from "@/renderer/components/commons/property/VGamutMap.vue";
+import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { PetaColor } from "@/commons/datas/petaColor";
 import { RPetaImage } from "@/commons/datas/rPetaImage";

@@ -29,7 +29,7 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 // Components
-import VPropertyThumbnail from "@/renderer/components/browser/property/VPropertyThumbnail.vue";
+import VPropertyThumbnail from "@/renderer/components/commons/property/VPropertyThumbnail.vue";
 
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { WindowType } from "@/commons/datas/windowType";
@@ -38,7 +38,7 @@ import { resizeImage } from "@/commons/utils/resizeImage";
 // Others
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
-import { PropertyThumbnail } from "@/renderer/components/browser/property/propertyThumbnail";
+import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";
 import { IPC } from "@/renderer/ipc";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 

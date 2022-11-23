@@ -35,7 +35,7 @@
 import { onBeforeUpdate, onUnmounted, ref, watch } from "vue";
 
 // Components
-import VLayerCell from "@/renderer/components/layer/VLayerCell.vue";
+import VLayerCell from "@/renderer/components/board/layer/VLayerCell.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";

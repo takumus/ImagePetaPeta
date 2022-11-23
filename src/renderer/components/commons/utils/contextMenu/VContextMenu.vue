@@ -26,12 +26,12 @@
 import { v4 as uuid } from "uuid";
 import { computed, onMounted, ref } from "vue";
 
-import VFloating from "@/renderer/components/utils/floating/VFloating.vue";
+import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
 // Others
 import { Vec2 } from "@/commons/utils/vec2";
 
-import { ContextMenuItem } from "@/renderer/components/utils/contextMenu/contextMenuItem";
+import { ContextMenuItem } from "@/renderer/components/commons/utils/contextMenu/contextMenuItem";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 
 defineProps<{

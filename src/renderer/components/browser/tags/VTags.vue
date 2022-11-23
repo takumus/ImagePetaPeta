@@ -88,7 +88,7 @@ import { useI18n } from "vue-i18n";
 
 import VTagCell from "@/renderer/components/browser/tags/VTagCell.vue";
 import VTagPartition from "@/renderer/components/browser/tags/VTagPartition.vue";
-import VTextarea from "@/renderer/components/utils/textarea/VTextarea.vue";
+import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { PetaTagPartition, createPetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RPetaImage } from "@/commons/datas/rPetaImage";

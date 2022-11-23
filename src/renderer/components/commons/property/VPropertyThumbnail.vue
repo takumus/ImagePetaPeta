@@ -19,7 +19,7 @@ import { computed, onMounted, ref } from "vue";
 
 import { ImageType } from "@/commons/datas/imageType";
 
-import { PropertyThumbnail } from "@/renderer/components/browser/property/propertyThumbnail";
+import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 // Others
 import { getImageURL } from "@/renderer/utils/imageURL";

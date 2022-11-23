@@ -14,12 +14,12 @@
             @select="selectPetaBoard"
             @update:board="updatePetaBoard" />
         </VTitleBar>
-        <VUtilsBar>
+        <VHeaderBar>
           <VBoardProperty
             v-if="currentPetaBoard"
             :board="currentPetaBoard"
             @update="updatePetaBoard" />
-        </VUtilsBar>
+        </VHeaderBar>
       </t-top>
       <t-browser>
         <VBoard
@@ -45,14 +45,14 @@ import { useI18n } from "vue-i18n";
 
 // Components
 import VBoard from "@/renderer/components/board/VBoard.vue";
+import VBoardProperty from "@/renderer/components/board/VBoardProperty.vue";
+import VTabBar from "@/renderer/components/board/VTabBar.vue";
+import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
+import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
+import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
+import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
-import VTasks from "@/renderer/components/task/VTasks.vue";
-import VBoardProperty from "@/renderer/components/top/VBoardProperty.vue";
-import VTabBar from "@/renderer/components/top/VTabBar.vue";
-import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
-import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
 
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { createRPetaPanel } from "@/commons/datas/rPetaPanel";

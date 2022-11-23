@@ -1,7 +1,7 @@
 import {
   generateGamutMapWorkerInputData,
   generateGamutMapWorkerOutputData,
-} from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
+} from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { initWebWorker } from "@/renderer/libs/initWebWorker";
 
 // import * as convert from "color-convert";

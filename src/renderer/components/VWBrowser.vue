@@ -6,7 +6,7 @@
     <t-content>
       <t-top>
         <VTitleBar :title="t('titles.browser')"> </VTitleBar>
-        <VUtilsBar> </VUtilsBar>
+        <VHeaderBar> </VHeaderBar>
       </t-top>
       <t-browser>
         <VBrowser />
@@ -28,12 +28,12 @@ import { useI18n } from "vue-i18n";
 
 // Components
 import VBrowser from "@/renderer/components/browser/VBrowser.vue";
+import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
+import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
+import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
+import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
-import VTasks from "@/renderer/components/task/VTasks.vue";
-import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
-import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
 
 // Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";

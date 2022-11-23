@@ -47,9 +47,9 @@ import { useI18n } from "vue-i18n";
 // Components
 import VCrop from "@/renderer/components/board/VCrop.vue";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
+import VLayer from "@/renderer/components/board/layer/VLayer.vue";
 import VBoardLoading from "@/renderer/components/board/loading/VBoardLoading.vue";
-import VLayer from "@/renderer/components/layer/VLayer.vue";
-import VPIXI from "@/renderer/components/utils/pixi/VPIXI.vue";
+import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";

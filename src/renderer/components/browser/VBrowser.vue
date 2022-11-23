@@ -78,11 +78,11 @@ import { throttle } from "throttle-debounce";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VPreview from "@/renderer/components/browser/property/VPreview.vue";
-import VProperty from "@/renderer/components/browser/property/VProperty.vue";
 import VSearch from "@/renderer/components/browser/search/VSearch.vue";
 import VTags from "@/renderer/components/browser/tags/VTags.vue";
 import VTile from "@/renderer/components/browser/tile/VTile.vue";
+import VPreview from "@/renderer/components/commons/property/VPreview.vue";
+import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { RPetaTag } from "@/commons/datas/rPetaTag";

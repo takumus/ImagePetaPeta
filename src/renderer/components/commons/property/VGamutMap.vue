@@ -18,14 +18,14 @@
 import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
-import VPIXI from "@/renderer/components/utils/pixi/VPIXI.vue";
+import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
 
 import { RPetaImage } from "@/commons/datas/rPetaImage";
 import { BROWSER_THUMBNAIL_SIZE } from "@/commons/defines";
 
 import hsvCircleImage from "@/@assets/hsvCircle.png";
-import { generateGamutMap } from "@/renderer/components/browser/property/worker/generateGamutMap";
-import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
+import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
+import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { IPC } from "@/renderer/ipc";
 
 const props = defineProps<{

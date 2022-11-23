@@ -6,7 +6,7 @@
     <t-content>
       <t-top>
         <VTitleBar :title="t('titles.details')"> </VTitleBar>
-        <VUtilsBar> </VUtilsBar>
+        <VHeaderBar> </VHeaderBar>
       </t-top>
       <t-browser>
         <t-board v-if="petaImage">
@@ -30,14 +30,14 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VProperty from "@/renderer/components/browser/property/VProperty.vue";
-import VDetails from "@/renderer/components/details/VDetails.vue";
+import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
+import VProperty from "@/renderer/components/commons/property/VProperty.vue";
+import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
+import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
+import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 // Components
-import VTasks from "@/renderer/components/task/VTasks.vue";
-import VTitleBar from "@/renderer/components/top/VTitleBar.vue";
-import VUtilsBar from "@/renderer/components/top/VUtilsBar.vue";
-import VContextMenu from "@/renderer/components/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/utils/dialog/VDialog.vue";
+import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
+import VDetails from "@/renderer/components/details/VDetails.vue";
 
 // Others
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";

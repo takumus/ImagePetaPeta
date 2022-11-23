@@ -1,8 +1,8 @@
 import { ImageType } from "@/commons/datas/imageType";
 import { PetaImage } from "@/commons/datas/petaImage";
 
-import Worker from "@/renderer/components/browser/property/worker/generateGamutMapWorker.worker";
-import { generateGamutMapWorkerOutputData } from "@/renderer/components/browser/property/worker/generateGamutMapWorkerData";
+import Worker from "@/renderer/components/commons/property/worker/generateGamutMapWorker.worker";
+import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { createWebWorkerGroup } from "@/renderer/libs/workerGroup";
 import { getImageURL } from "@/renderer/utils/imageURL";
 
