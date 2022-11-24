@@ -9,7 +9,7 @@ import {
 } from "electron";
 import * as Path from "path";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";

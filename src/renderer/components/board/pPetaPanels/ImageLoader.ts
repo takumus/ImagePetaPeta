@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { AnimatedGIFResource } from "@/renderer/libs/pixi-gif/animatedGIFResource";
-import { getImageURL } from "@/renderer/utils/imageURL";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 export function getImage(petaFile: RPetaFile | undefined) {
   let canceled = false;
@@ -25,8 +25,8 @@ export function getImage(petaFile: RPetaFile | undefined) {
       rej("petaFile is undefined");
       return;
     }
-    const imageURL = getImageURL(petaFile, FileType.ORIGINAL);
-    PIXI.Assets.load(imageURL)
+    const fileURL = getFileURL(petaFile, FileType.ORIGINAL);
+    PIXI.Assets.load(fileURL)
       .then(async (resource) => {
         if (canceled) {
           rej("canceled");
@@ -47,7 +47,7 @@ export function getImage(petaFile: RPetaFile | undefined) {
           res({ texture: resource });
           return;
         }
-        rej(`unknown resource: ${imageURL}`);
+        rej(`unknown resource: ${fileURL}`);
       })
       .catch((reason) => {
         rej(`could not load resource: ${reason}`);

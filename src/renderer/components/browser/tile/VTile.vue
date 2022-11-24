@@ -57,7 +57,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
@@ -79,7 +79,7 @@ import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { getImageURL } from "@/renderer/utils/imageURL";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
@@ -188,12 +188,12 @@ function delayedLoadImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
   window.clearTimeout(loadThumbnailTimeoutHandler);
   loadThumbnailTimeoutHandler = window.setTimeout(() => {
-    thumbnailURL.value = getImageURL(props.tile.petaFile, FileType.THUMBNAIL);
+    thumbnailURL.value = getFileURL(props.tile.petaFile, FileType.THUMBNAIL);
     if (props.original) {
       loadOriginalTimeoutHandler = window.setTimeout(() => {
         if (props.tile.visible) {
           const img = image.value;
-          const url = getImageURL(props.tile.petaFile, FileType.ORIGINAL);
+          const url = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
           if (img === undefined) {
             return;
           }

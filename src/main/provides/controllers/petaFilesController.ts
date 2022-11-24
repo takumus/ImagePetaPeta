@@ -5,8 +5,8 @@ import * as Path from "path";
 import sharp from "sharp";
 import { v4 as uuid } from "uuid";
 
+import { FileType } from "@/commons/datas/fileType";
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
-import { FileType } from "@/commons/datas/imageType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
@@ -361,37 +361,37 @@ export class PetaFilesController {
     const paths = usePaths();
     const log = logger.logMainChunk();
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasBegin");
-    const images = Object.values(await this.getAll());
+    const petaFiles = Object.values(await this.getAll());
     let completed = 0;
-    const generate = async (image: PetaFile) => {
+    const generate = async (petaFile: PetaFile) => {
       // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
       //   return;
       // }
-      const data = await file.readFile(Path.resolve(paths.DIR_IMAGES, image.file.original));
+      const data = await file.readFile(Path.resolve(paths.DIR_IMAGES, petaFile.file.original));
       const result = await generateMetadataByWorker({
         data,
-        outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, image.file.original),
+        outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, petaFile.file.original),
         size: BROWSER_THUMBNAIL_SIZE,
         quality: BROWSER_THUMBNAIL_QUALITY,
       });
-      image.file.thumbnail = `${image.file.original}.${result.thumbnail.format}`;
-      image.metadata = {
+      petaFile.file.thumbnail = `${petaFile.file.original}.${result.thumbnail.format}`;
+      petaFile.metadata = {
         type: "image",
         palette: result.palette,
         width: result.original.width,
         height: result.original.height,
         version: PETAIMAGE_METADATA_VERSION,
       };
-      await this.updateMultiple([image], UpdateMode.UPDATE, true);
-      log.log(`thumbnail (${++completed} / ${images.length})`);
+      await this.updateMultiple([petaFile], UpdateMode.UPDATE, true);
+      log.log(`thumbnail (${++completed} / ${petaFiles.length})`);
       emitMainEvent(
         { type: EmitMainEventTargetType.ALL },
         "regenerateMetadatasProgress",
         completed,
-        images.length,
+        petaFiles.length,
       );
     };
-    await ppa((image) => generate(image), images, CPU_LENGTH).promise;
+    await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
   }
   private async addImage(param: {

@@ -1,10 +1,10 @@
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { PetaFile } from "@/commons/datas/petaFile";
 
 import Worker from "@/renderer/components/commons/property/worker/generateGamutMapWorker.worker";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { createWebWorkerGroup } from "@/renderer/libs/workerGroup";
-import { getImageURL } from "@/renderer/utils/imageURL";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 const wtGroup = createWebWorkerGroup(Worker);
 const image = new Image();
@@ -22,7 +22,7 @@ export function generateGamutMap(
   const wt = wtGroup.getWT();
   wt.use();
   const promise = new Promise<boolean>((res, rej) => {
-    image.src = getImageURL(petaFile, FileType.THUMBNAIL);
+    image.src = getFileURL(petaFile, FileType.THUMBNAIL);
     image.onload = () => {
       if (completed) {
         return;

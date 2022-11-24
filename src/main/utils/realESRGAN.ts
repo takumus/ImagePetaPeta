@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as Path from "path";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { TaskStatusCode } from "@/commons/datas/task";

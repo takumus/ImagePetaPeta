@@ -36,14 +36,14 @@
 // Vue
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
-import { getImageURL } from "@/renderer/utils/imageURL";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 // Others
 const emit = defineEmits<{
@@ -70,7 +70,7 @@ onUnmounted(() => {
 });
 const url = computed(() => {
   return props.petaPanel
-    ? getImageURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), FileType.THUMBNAIL)
+    ? getFileURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), FileType.THUMBNAIL)
     : undefined;
 });
 const locked = computed(() => {

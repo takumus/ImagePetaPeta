@@ -26,11 +26,11 @@ import { computed, ref, watch } from "vue";
 
 import VDragView from "@/renderer/components/commons/utils/dragView/VDragView.vue";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { getImageURL } from "@/renderer/utils/imageURL";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 // Components
 const props = defineProps<{
@@ -40,7 +40,7 @@ const props = defineProps<{
 const nsfwStore = useNSFWStore();
 const loaded = ref(false);
 const url = computed(() => {
-  return getImageURL(props.petaFile, FileType.ORIGINAL);
+  return getFileURL(props.petaFile, FileType.ORIGINAL);
 });
 const nsfwMask = computed(() => {
   return props.petaFile.nsfw && !nsfwStore.state.value;

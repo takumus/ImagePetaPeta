@@ -8,7 +8,7 @@
     }">
     <t-image-wrapper>
       <t-nsfw v-if="nsfwMask"> </t-nsfw>
-      <img draggable="false" :src="imageURL" v-if="!nsfwMask && imageURL !== undefined" />
+      <img draggable="false" :src="fileURL" v-if="!nsfwMask && fileURL !== undefined" />
     </t-image-wrapper>
   </t-property-thumbnail-root>
 </template>
@@ -17,20 +17,20 @@
 // Vue
 import { computed, onMounted, ref } from "vue";
 
-import { FileType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/fileType";
 
 import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 // Others
-import { getImageURL } from "@/renderer/utils/imageURL";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 const nsfwStore = useNSFWStore();
 const props = defineProps<{
   propertyThumbnail: PropertyThumbnail;
 }>();
-const imageURL = ref<string | undefined>(undefined);
+const fileURL = ref<string | undefined>(undefined);
 onMounted(() => {
-  imageURL.value = getImageURL(props.propertyThumbnail.petaFile, FileType.THUMBNAIL);
+  fileURL.value = getFileURL(props.propertyThumbnail.petaFile, FileType.THUMBNAIL);
 });
 const nsfwMask = computed(() => {
   return props.propertyThumbnail.petaFile.nsfw && !nsfwStore.state.value;
