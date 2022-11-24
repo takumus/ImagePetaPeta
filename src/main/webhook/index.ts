@@ -14,7 +14,7 @@ import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { useLogger } from "@/main/provides/utils/logger";
 
 type EventNames = keyof IpcFunctions;
-const allowedEvents: EventNames[] = ["importImages"];
+const allowedEvents: EventNames[] = ["importFiles"];
 export function initWebhook(ipcFunctions: {
   [P in keyof IpcFunctions]: (
     event: IpcMainInvokeEvent,

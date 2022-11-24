@@ -57,7 +57,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
@@ -188,12 +188,12 @@ function delayedLoadImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
   window.clearTimeout(loadThumbnailTimeoutHandler);
   loadThumbnailTimeoutHandler = window.setTimeout(() => {
-    thumbnailURL.value = getImageURL(props.tile.petaFile, ImageType.THUMBNAIL);
+    thumbnailURL.value = getImageURL(props.tile.petaFile, FileType.THUMBNAIL);
     if (props.original) {
       loadOriginalTimeoutHandler = window.setTimeout(() => {
         if (props.tile.visible) {
           const img = image.value;
-          const url = getImageURL(props.tile.petaFile, ImageType.ORIGINAL);
+          const url = getImageURL(props.tile.petaFile, FileType.ORIGINAL);
           if (img === undefined) {
             return;
           }

@@ -14,8 +14,8 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 
 export interface IpcFunctions {
-  browseAndImportImageFiles: (type: "files" | "directories") => Promise<number>;
-  importImages: (
+  browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
+  importFiles: (
     datas: (
       | { type: "html"; html: string }
       | { type: "url"; url: string }
@@ -45,7 +45,7 @@ export interface IpcFunctions {
   ) => Promise<boolean>;
   log: (id: string, ...args: unknown[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
-  openImageFile: (petaFile: PetaFile) => Promise<void>;
+  openFile: (petaFile: PetaFile) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;
   getStates: () => Promise<States>;
   updateStates: (states: States) => Promise<boolean>;

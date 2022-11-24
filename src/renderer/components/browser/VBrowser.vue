@@ -343,9 +343,9 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         },
       },
       {
-        label: t("browser.petaFileMenu.openImageFile"),
+        label: t("browser.petaFileMenu.openFile"),
         click: async () => {
-          await IPC.send("openImageFile", petaFile);
+          await IPC.send("openFile", petaFile);
         },
       },
       ...realESRGANModelNames.map((modelName) => {

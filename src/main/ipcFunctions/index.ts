@@ -9,7 +9,7 @@ import {
 } from "electron";
 import * as Path from "path";
 
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
@@ -48,7 +48,7 @@ export function getIpcFunctions(): {
   ) => ReturnType<IpcFunctions[P]>;
 } {
   return {
-    async browseAndImportImageFiles(event, type) {
+    async browseAndImportFiles(event, type) {
       const logger = useLogger();
       const windows = useWindows();
       const petaFilesController = usePetaFilesController();
@@ -59,7 +59,7 @@ export function getIpcFunctions(): {
         const result = await dialog.showOpenDialog(windowInfo.window, {
           properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
         });
-        petaFilesController.importImagesFromFileInfos({
+        petaFilesController.importFilesFromFileInfos({
           fileInfos: result.filePaths.map((path) => ({ path })),
           extract: true,
         });
@@ -344,12 +344,12 @@ export function getIpcFunctions(): {
       shell.openExternal(url);
       return true;
     },
-    async openImageFile(event, petaFile) {
+    async openFile(event, petaFile) {
       const logger = useLogger();
       const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       log.log("#Open Image File");
-      shell.showItemInFolder(petaFilesController.getImagePath(petaFile, ImageType.ORIGINAL));
+      shell.showItemInFolder(petaFilesController.getFilePath(petaFile, FileType.ORIGINAL));
     },
     async getAppInfo() {
       const logger = useLogger();
@@ -383,7 +383,7 @@ export function getIpcFunctions(): {
       const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       log.log("#Show Image In Folder");
-      shell.showItemInFolder(petaFilesController.getImagePath(petaFile, ImageType.ORIGINAL));
+      shell.showItemInFolder(petaFilesController.getFilePath(petaFile, FileType.ORIGINAL));
       return true;
     },
     async updateSettings(event, settings) {
@@ -611,13 +611,13 @@ export function getIpcFunctions(): {
       }
       return false;
     },
-    async importImages(event, datas) {
+    async importFiles(event, datas) {
       const logger = useLogger();
       const paths = usePaths();
       const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       try {
-        log.log("#importImages");
+        log.log("#importFiles");
         log.log(datas.length);
         const logFromBrowser = logger.logMainChunk();
         const ids = datas
@@ -673,7 +673,7 @@ export function getIpcFunctions(): {
           }, datas).promise
         ).filter((info) => info !== undefined) as ImportFileInfo[];
         const petaFileIds = (
-          await petaFilesController.importImagesFromFileInfos({
+          await petaFilesController.importFilesFromFileInfos({
             fileInfos,
             extract: true,
           })

@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { v4 as uuid } from "uuid";
 
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
@@ -89,9 +89,9 @@ export class PetaFilesController {
       silent,
     );
   }
-  getImagePath(petaFile: PetaFile, thumbnail: ImageType) {
+  getFilePath(petaFile: PetaFile, thumbnail: FileType) {
     const paths = usePaths();
-    if (thumbnail === ImageType.ORIGINAL) {
+    if (thumbnail === FileType.ORIGINAL) {
       return Path.resolve(paths.DIR_IMAGES, petaFile.file.original);
     } else {
       return Path.resolve(paths.DIR_THUMBNAILS, petaFile.file.thumbnail);
@@ -177,10 +177,10 @@ export class PetaFilesController {
     if (mode === UpdateMode.REMOVE) {
       await dbPetaFilesPetaTags.remove({ petaFileId: petaFile.id });
       await dbPetaFiles.remove({ id: petaFile.id });
-      await file.rm(this.getImagePath(petaFile, ImageType.ORIGINAL)).catch(() => {
+      await file.rm(this.getFilePath(petaFile, FileType.ORIGINAL)).catch(() => {
         //
       });
-      await file.rm(this.getImagePath(petaFile, ImageType.THUMBNAIL)).catch(() => {
+      await file.rm(this.getFilePath(petaFile, FileType.THUMBNAIL)).catch(() => {
         //
       });
     } else if (mode === UpdateMode.UPDATE) {
@@ -244,7 +244,7 @@ export class PetaFilesController {
     log.log("return:", false);
     return undefined;
   }
-  async importImagesFromFileInfos(
+  async importFilesFromFileInfos(
     params: {
       fileInfos: ImportFileInfo[];
       extract?: boolean;
@@ -256,7 +256,7 @@ export class PetaFilesController {
       return [];
     }
     return Tasks.spawn(
-      "ImportImagesFromFilePaths",
+      "importFilesFromFilePaths",
       async (handler) => {
         const log = logger.logMainChunk();
         log.log("## Import Images From File Paths");

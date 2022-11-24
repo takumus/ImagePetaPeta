@@ -28,7 +28,7 @@ onMounted(() => {
       const { buffers, filePaths } = await getDataFromFileList(event.dataTransfer.files);
       let ids: string[] = [];
       if (html !== "") {
-        ids = await IPC.send("importImages", [
+        ids = await IPC.send("importFiles", [
           [
             {
               type: "html",
@@ -46,7 +46,7 @@ onMounted(() => {
         ]);
       } else {
         ids = await IPC.send(
-          "importImages",
+          "importFiles",
           filePaths !== undefined
             ? filePaths.map((filePath) => [
                 {
@@ -71,7 +71,7 @@ onMounted(() => {
     const mousePosition = currentMousePosition.clone();
     const { buffers, filePaths } = await getDataFromFileList(event.clipboardData?.files);
     const ids = await IPC.send(
-      "importImages",
+      "importFiles",
       filePaths !== undefined
         ? filePaths.map((filePath) => [
             {

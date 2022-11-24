@@ -27,8 +27,8 @@ const ja = {
   home: {
     infoButton: "情報",
     settingsButton: "設定",
-    importImagesFromFilesButton: "ファイル",
-    importImagesFromDirectoriesButton: "フォルダ",
+    importFilesFromFilesButton: "ファイル",
+    importFilesFromDirectoriesButton: "フォルダ",
     openBrowserButton: "ブラウザ",
   },
   boards: {
@@ -83,7 +83,7 @@ const ja = {
       remove: (ctx: any) => {
         return `${ctx.list(0)}枚の画像を削除`;
       },
-      openImageFile: "画像ファイルの場所を開く",
+      openFile: "画像ファイルの場所を開く",
       realESRGAN: "Real-ESRGANで変換する",
       searchImageByGoogle: "Googleで類似画像を検索",
     },
@@ -216,7 +216,7 @@ const ja = {
       )}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`;
     },
   },
-  imageImporter: {
+  fileImporter: {
     cancel: "中止",
   },
   tasks: {

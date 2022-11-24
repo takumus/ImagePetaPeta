@@ -17,7 +17,7 @@
 // Vue
 import { computed, onMounted, ref } from "vue";
 
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 
 import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
@@ -30,7 +30,7 @@ const props = defineProps<{
 }>();
 const imageURL = ref<string | undefined>(undefined);
 onMounted(() => {
-  imageURL.value = getImageURL(props.propertyThumbnail.petaFile, ImageType.THUMBNAIL);
+  imageURL.value = getImageURL(props.propertyThumbnail.petaFile, FileType.THUMBNAIL);
 });
 const nsfwMask = computed(() => {
   return props.propertyThumbnail.petaFile.nsfw && !nsfwStore.state.value;

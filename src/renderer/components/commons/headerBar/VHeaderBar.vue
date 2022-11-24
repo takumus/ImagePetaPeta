@@ -16,7 +16,7 @@
         @click="openBrowser()">
         <t-icon class="browser"></t-icon>
       </button>
-      <button v-if="windowType !== 'details'" tabindex="-1" @click="browseAndImportImageFiles()">
+      <button v-if="windowType !== 'details'" tabindex="-1" @click="browseAndImportFiles()">
         <t-icon class="import-file"></t-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
@@ -68,11 +68,11 @@ function openSettings() {
 function openCapture() {
   IPC.send("openWindow", WindowType.CAPTURE);
 }
-function browseAndImportImageFiles() {
-  IPC.send("browseAndImportImageFiles", "files");
+function browseAndImportFiles() {
+  IPC.send("browseAndImportFiles", "files");
 }
 function importImageDirectories() {
-  IPC.send("browseAndImportImageFiles", "directories");
+  IPC.send("browseAndImportFiles", "directories");
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {

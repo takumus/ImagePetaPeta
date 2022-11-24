@@ -36,7 +36,7 @@
 // Vue
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 
@@ -70,7 +70,7 @@ onUnmounted(() => {
 });
 const url = computed(() => {
   return props.petaPanel
-    ? getImageURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), ImageType.THUMBNAIL)
+    ? getImageURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), FileType.THUMBNAIL)
     : undefined;
 });
 const locked = computed(() => {

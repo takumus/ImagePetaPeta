@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
@@ -25,7 +25,7 @@ export function getImage(petaFile: RPetaFile | undefined) {
       rej("petaFile is undefined");
       return;
     }
-    const imageURL = getImageURL(petaFile, ImageType.ORIGINAL);
+    const imageURL = getImageURL(petaFile, FileType.ORIGINAL);
     PIXI.Assets.load(imageURL)
       .then(async (resource) => {
         if (canceled) {

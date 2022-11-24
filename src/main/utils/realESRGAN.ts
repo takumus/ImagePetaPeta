@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as Path from "path";
 
-import { ImageType } from "@/commons/datas/imageType";
+import { FileType } from "@/commons/datas/imageType";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { TaskStatusCode } from "@/commons/datas/task";
@@ -38,7 +38,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
       log.log("execFilePath:", execFilePath);
       const tasks = ppa(
         async (petaFile, index) => {
-          const inputFile = petaFilesController.getImagePath(petaFile, ImageType.ORIGINAL);
+          const inputFile = petaFilesController.getFilePath(petaFile, FileType.ORIGINAL);
           const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.webp`;
           const parameters = [
             "-i",
@@ -133,7 +133,7 @@ async function importImage(outputFile: string, petaFile: PetaFile, newName: stri
   const petaFilesController = usePetaFilesController();
   const petaTagsController = usePetaTagsController();
   const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
-  const newPetaFiles = await petaFilesController.importImagesFromFileInfos({
+  const newPetaFiles = await petaFilesController.importFilesFromFileInfos({
     fileInfos: [{ path: outputFile }],
   });
   if (newPetaFiles.length < 1) {

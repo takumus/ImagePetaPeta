@@ -1,4 +1,4 @@
-export enum ImageType {
+export enum FileType {
   THUMBNAIL = "thumbnail",
   ORIGINAL = "original",
 }

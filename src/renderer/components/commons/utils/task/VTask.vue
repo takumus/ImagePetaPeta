@@ -5,7 +5,7 @@
     <pre class="log">{{ log }}</pre>
     <t-cancel>
       <button tabindex="-1" @click="cancel" v-if="cancelable">
-        {{ t("imageImporter.cancel") }}
+        {{ t("fileImporter.cancel") }}
       </button>
     </t-cancel>
   </t-task-root>
