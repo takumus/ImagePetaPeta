@@ -32,6 +32,9 @@ module.exports = {
     read(path) {
       return fs.readFileSync(path);
     },
+    mv(pathFrom, pathTo) {
+      return fs.renameSync(pathFrom, pathTo);
+    },
     readdir(path) {
       return fs.readdirSync(path);
     },
