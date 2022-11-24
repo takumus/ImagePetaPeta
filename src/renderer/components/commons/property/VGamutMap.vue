@@ -20,7 +20,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
 
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import hsvCircleImage from "@/@assets/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
@@ -29,7 +29,7 @@ import { IPC } from "@/renderer/libs/ipc";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const props = defineProps<{
-  petaImage: RPetaImage;
+  petaFile: RPetaFile;
 }>();
 const vPixi = ref<InstanceType<typeof VPIXI>>();
 const amountFilterValue = ref(100);
@@ -157,7 +157,7 @@ function setData(data: generateGamutMapWorkerOutputData) {
 function generate() {
   generateGamutMapCancel();
   reset();
-  const task = generateGamutMap(props.petaImage, settings.state.value.gamutMapSampling, setData);
+  const task = generateGamutMap(props.petaFile, settings.state.value.gamutMapSampling, setData);
   console.time("convert");
   task.promise.then(() => {
     console.timeEnd("convert");
@@ -169,7 +169,7 @@ const amountFilterValue0xff = computed(() => Math.pow(amountFilterValue.value / 
 watch(amountFilterValue, () => {
   vPixi.value?.orderPIXIRender();
 });
-watch(() => props.petaImage, generate, { immediate: true });
+watch(() => props.petaFile, generate, { immediate: true });
 </script>
 <style lang="scss" scoped>
 t-gamut-map-root {

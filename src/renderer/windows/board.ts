@@ -8,12 +8,12 @@ import {
   petaBoardsStoreKey,
 } from "@/renderer/stores/petaBoardsStore/createPetaBoardsStore";
 import {
-  createPetaImagesStore,
-  petaImagesStoreKey,
-} from "@/renderer/stores/petaImagesStore/createPetaImagesStore";
+  createPetaFilesStore,
+  petaFilesStoreKey,
+} from "@/renderer/stores/petaFilesStore/createPetaFilesStore";
 import { create } from "@/renderer/windows/@base";
 
 create(BoardIndex, WindowType.BOARD, [
-  keyStoreCreatorPair(petaImagesStoreKey, createPetaImagesStore),
+  keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),
 ]);

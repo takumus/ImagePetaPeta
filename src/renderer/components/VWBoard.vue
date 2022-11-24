@@ -62,7 +62,7 @@ import {
   BOARD_ADD_MULTIPLE_OFFSET_Y,
   DEFAULT_IMAGE_SIZE,
 } from "@/commons/defines";
-import { hasPetaImages } from "@/commons/utils/board";
+import { hasPetaFiles } from "@/commons/utils/board";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { Vec2 } from "@/commons/utils/vec2";
 
@@ -74,7 +74,7 @@ import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore"
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
@@ -88,7 +88,7 @@ const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
 const windowTypeStore = useWindowTypeStore();
 const windowTitleStore = useWindowTitleStore();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const petaBoardsStore = usePetaBoardsStore();
 const vPetaBoard = ref<InstanceType<typeof VBoard>>();
 const orderedAddPanelIds = ref<string[]>([]);
@@ -97,14 +97,14 @@ const currentPetaBoardId = ref("");
 const errorPetaBoardId = ref("");
 onMounted(async () => {
   // AnimatedGIFLoader.add?.();
-  petaImagesStore.onUpdate(async (newPetaImages, mode) => {
+  petaFilesStore.onUpdate(async (newPetaFiles, mode) => {
     const needReload =
       currentPetaBoard.value === undefined
         ? false
-        : hasPetaImages(currentPetaBoard.value, newPetaImages);
+        : hasPetaFiles(currentPetaBoard.value, newPetaFiles);
     if (mode === UpdateMode.INSERT || mode === UpdateMode.REMOVE) {
       if (needReload) {
-        const ids = newPetaImages.map((petaImage) => petaImage.id);
+        const ids = newPetaFiles.map((petaFile) => petaFile.id);
         vPetaBoard.value?.load({
           reload: {
             additions: mode === UpdateMode.INSERT ? ids : [],
@@ -137,15 +137,15 @@ function addPanelByDragAndDrop(ids: string[], mouse: Vec2) {
 function addOrderedPetaPanels() {
   let offsetIndex = 0;
   orderedAddPanelIds.value.forEach((id, i) => {
-    const petaImage = petaImagesStore.getPetaImage(id);
-    if (!petaImage) return;
+    const petaFile = petaFilesStore.getPetaFile(id);
+    if (!petaFile) return;
     const panel = createRPetaPanel(
-      petaImage,
+      petaFile,
       orderedAddPanelDragEvent.value
         .clone()
         .add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
       DEFAULT_IMAGE_SIZE,
-      (petaImage.metadata.height / petaImage.metadata.width) * DEFAULT_IMAGE_SIZE,
+      (petaFile.metadata.height / petaFile.metadata.width) * DEFAULT_IMAGE_SIZE,
     );
     vPetaBoard.value?.addPanel(panel, offsetIndex++);
   });

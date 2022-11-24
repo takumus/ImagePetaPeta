@@ -74,7 +74,7 @@ import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
@@ -94,7 +94,7 @@ const nsfwStore = useNSFWStore();
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const keyboards = useKeyboardsStore(true);
 const { t } = useI18n();
 const layer = ref<typeof VLayer>();
@@ -408,16 +408,16 @@ function endCrop() {
 }
 function updateCrop(petaPanel?: RPetaPanel) {
   endCrop();
-  const petaImage = petaImagesStore.getPetaImage(petaPanel?.petaImageId);
-  if (petaImage === undefined || currentBoard.value === undefined || petaPanel === undefined) {
+  const petaFile = petaFilesStore.getPetaFile(petaPanel?.petaFileId);
+  if (petaFile === undefined || currentBoard.value === undefined || petaPanel === undefined) {
     return;
   }
   const sign = petaPanel.height < 0 ? -1 : 1;
   petaPanel.height =
     Math.abs(
       petaPanel.width *
-        ((petaPanel.crop.height * petaImage.metadata.height) /
-          (petaPanel.crop.width * petaImage.metadata.width)),
+        ((petaPanel.crop.height * petaFile.metadata.height) /
+          (petaPanel.crop.width * petaFile.metadata.width)),
     ) * sign;
   currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
   load({
@@ -515,11 +515,11 @@ async function load(params: {
           const progress = `${loaded}/${petaPanels.length}`;
           log(
             "vBoard",
-            `loaded[${error ?? "success"}](${minimizeID(petaPanel.petaImageId)}):`,
+            `loaded[${error ?? "success"}](${minimizeID(petaPanel.petaFileId)}):`,
             progress,
           );
           loadingStatus.value.log =
-            `load complete   (${minimizeID(petaPanel.petaImageId)}):${progress}\n` +
+            `load complete   (${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
             loadingStatus.value.log;
           if (loaded == petaPanels.length) {
             loadingStatus.value.loading = false;
@@ -529,7 +529,7 @@ async function load(params: {
       let pPanel = pPanels[petaPanel.id];
       if (pPanel === undefined) {
         // pPanelが無ければ作成。
-        pPanel = pPanels[petaPanel.id] = new PPetaPanel(petaPanel, petaImagesStore);
+        pPanel = pPanels[petaPanel.id] = new PPetaPanel(petaPanel, petaFilesStore);
         pPanel.setZoomScale(currentBoard.value?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
@@ -552,15 +552,15 @@ async function load(params: {
           setTimeout(res);
         });
         loadResult = "create";
-      } else if (params.reload && params.reload.deletions.includes(petaPanel.petaImageId)) {
-        // petaImageが無ければnoImageに。
+      } else if (params.reload && params.reload.deletions.includes(petaPanel.petaFileId)) {
+        // petaFileが無ければnoImageに。
         pPanel.noImage = true;
         loadResult = "delete";
         onLoaded(petaPanel);
       } else if (
         params.reload &&
         pPanel.noImage &&
-        params.reload.additions.includes(petaPanel.petaImageId)
+        params.reload.additions.includes(petaPanel.petaFileId)
       ) {
         // pPanelはあるが、noImageだったら再ロードトライ。
         (async () => {
@@ -582,14 +582,14 @@ async function load(params: {
         onLoaded(petaPanel);
         loadResult = "skip";
       }
-      log("vBoard", `extracted[${loadResult}](${minimizeID(petaPanel.petaImageId)}):`, progress);
+      log("vBoard", `extracted[${loadResult}](${minimizeID(petaPanel.petaFileId)}):`, progress);
       loadingStatus.value.log =
-        `extract complete(${minimizeID(petaPanel.petaImageId)}):${progress}\n` +
+        `extract complete(${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
         loadingStatus.value.log;
     } catch (error) {
-      log("vBoard", `extract error(${minimizeID(petaPanel.petaImageId)}):`, progress, error);
+      log("vBoard", `extract error(${minimizeID(petaPanel.petaFileId)}):`, progress, error);
       loadingStatus.value.log =
-        `extract error   (${minimizeID(petaPanel.petaImageId)}):${progress}\n` +
+        `extract error   (${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
         loadingStatus.value.log;
     }
     loadingStatus.value.extractProgress = ((index + 1) / petaPanels.length) * 100;

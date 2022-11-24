@@ -9,11 +9,11 @@
         <VHeaderBar> </VHeaderBar>
       </t-top>
       <t-browser>
-        <t-board v-if="petaImage">
-          <VDetails :peta-image="petaImage" :z-index="1" />
+        <t-board v-if="petaFile">
+          <VDetails :peta-file="petaFile" :z-index="1" />
         </t-board>
         <t-property>
-          <VProperty :peta-images="singlePetaImages" @select-tag="() => {}" />
+          <VProperty :peta-files="singlePetaFiles" @select-tag="() => {}" />
         </t-property>
       </t-browser>
     </t-content>
@@ -46,7 +46,7 @@ import { Keyboards } from "@/renderer/libs/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 
@@ -54,46 +54,46 @@ const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const windowTypeStore = useWindowTypeStore();
 const windowTitleStore = useWindowTitleStore();
-const petaImageId = ref<string>();
+const petaFileId = ref<string>();
 const keyboards = new Keyboards();
 onMounted(async () => {
   // AnimatedGIFLoader.add?.();
-  petaImagesStore.onUpdate(async (newPetaImages, mode) => {
+  petaFilesStore.onUpdate(async (newPetaFiles, mode) => {
     // if (mode === UpdateMode.UPDATE) {
     //   vPetaBoard.value?.orderPIXIRender();
     // } else if (mode === UpdateMode.REMOVE) {
-    //   newPetaImages.forEach((petaImage) => {
+    //   newPetaFiles.forEach((petaFile) => {
     //     if (!board.value) {
     //       return;
     //     }
     //     Object.values(board.value.petaPanels).forEach((petaPanel) => {
-    //       if (petaPanel.petaImageId === petaImage.id) {
+    //       if (petaPanel.petaFileId === petaFile.id) {
     //         IPC.send("windowClose");
     //       }
     //     });
     //   });
     // }
   });
-  IPC.on("detailsPetaImage", (event, petaImage) => {
-    petaImageId.value = petaImage.id;
+  IPC.on("detailsPetaFile", (event, petaFile) => {
+    petaFileId.value = petaFile.id;
   });
-  petaImageId.value = (await IPC.send("getDetailsPetaImage"))?.id;
+  petaFileId.value = (await IPC.send("getDetailsPetaFile"))?.id;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
     IPC.send("windowClose");
   });
 });
-const petaImage = computed(() => {
-  return petaImagesStore.getPetaImage(petaImageId.value);
+const petaFile = computed(() => {
+  return petaFilesStore.getPetaFile(petaFileId.value);
 });
-const singlePetaImages = computed(() => {
-  if (petaImage.value === undefined) {
+const singlePetaFiles = computed(() => {
+  if (petaFile.value === undefined) {
     return [];
   }
-  return [petaImage.value];
+  return [petaFile.value];
 });
 watch(
   () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,

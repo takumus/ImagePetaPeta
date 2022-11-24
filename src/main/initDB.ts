@@ -5,52 +5,56 @@ import { migrate } from "@/main/migration";
 import { useConfigDBInfo } from "@/main/provides/configs";
 import {
   useDBPetaBoards,
-  useDBPetaImages,
-  useDBPetaImagesPetaTags,
+  useDBPetaFiles,
+  useDBPetaFilesPetaTags,
   useDBPetaTagPartitions,
   useDBPetaTags,
 } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
+import { EmitMainEventTargetType } from "@/main/provides/windows";
+import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 export async function initDB() {
   const logger = useLogger();
   const dbPetaBoard = useDBPetaBoards();
-  const dbPetaImages = useDBPetaImages();
-  const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+  const dbPetaFiles = useDBPetaFiles();
+  const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
   const dbPetaTags = useDBPetaTags();
   const dbPetaTagPartitions = useDBPetaTagPartitions();
   const configDBInfo = useConfigDBInfo();
-
+  function emitInitialization(log: string) {
+    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
+    logger.logMainChunk().log("$Init DB:", log);
+  }
   try {
     // ロード
-    // 時間かかったときのテスト
-    // await new Promise((res) => setTimeout(res, 5000));
-    await Promise.all([
-      dbPetaBoard.init(),
-      dbPetaImages.init(),
-      dbPetaTags.init(),
-      dbPetaTagPartitions.init(),
-      dbPetaImagesPetaTags.init(),
-    ]);
+    const dbs = [
+      dbPetaBoard,
+      dbPetaFiles,
+      dbPetaTags,
+      dbPetaTagPartitions,
+      dbPetaFilesPetaTags,
+    ] as const;
+    await Promise.all(
+      dbs.map((db) => {
+        return (async () => {
+          await db.init();
+          emitInitialization(`initialize: ${db.name}`);
+        })();
+      }),
+    );
     // インデックス作成
-    await Promise.all([
-      dbPetaTags.ensureIndex({
-        fieldName: "id",
-        unique: true,
+    await Promise.all(
+      dbs.map((db) => {
+        return (async () => {
+          await db.ensureIndex({
+            fieldName: "id",
+            unique: true,
+          }),
+            emitInitialization(`ensure index: ${db.name}`);
+        })();
       }),
-      dbPetaImages.ensureIndex({
-        fieldName: "id",
-        unique: true,
-      }),
-      dbPetaTagPartitions.ensureIndex({
-        fieldName: "id",
-        unique: true,
-      }),
-      dbPetaImagesPetaTags.ensureIndex({
-        fieldName: "id",
-        unique: true,
-      }),
-    ]);
+    );
   } catch (error) {
     showError({
       category: "M",
@@ -62,7 +66,11 @@ export async function initDB() {
   }
   try {
     // 旧バージョンからのマイグレーション
-    migrate();
+    await migrate((log: string) => {
+      emitInitialization(`migrate: ${log}`);
+      logger.logMainChunk().log(log);
+    });
+    // バージョンアップ時、バージョン情報更新
     if (configDBInfo.data.version !== app.getVersion()) {
       configDBInfo.data.version = app.getVersion();
       configDBInfo.save();
@@ -78,7 +86,7 @@ export async function initDB() {
   }
   // 自動圧縮登録
   (
-    [dbPetaImages, dbPetaBoard, dbPetaTags, dbPetaTagPartitions, dbPetaImagesPetaTags] as const
+    [dbPetaFiles, dbPetaBoard, dbPetaTags, dbPetaTagPartitions, dbPetaFilesPetaTags] as const
   ).forEach((db) => {
     db.on("beginCompaction", () => {
       logger.logMainChunk().log(`begin compaction(${db.name})`);

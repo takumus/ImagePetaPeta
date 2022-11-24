@@ -8,9 +8,9 @@ import {
   petaBoardsStoreKey,
 } from "@/renderer/stores/petaBoardsStore/createPetaBoardsStore";
 import {
-  createPetaImagesStore,
-  petaImagesStoreKey,
-} from "@/renderer/stores/petaImagesStore/createPetaImagesStore";
+  createPetaFilesStore,
+  petaFilesStoreKey,
+} from "@/renderer/stores/petaFilesStore/createPetaFilesStore";
 import {
   createPetaTagPartitionsStore,
   petaTagPartitionsStoreKey,
@@ -22,7 +22,7 @@ import {
 import { create } from "@/renderer/windows/@base";
 
 create(BrowserIndex, WindowType.BROWSER, [
-  keyStoreCreatorPair(petaImagesStoreKey, createPetaImagesStore),
+  keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),
   keyStoreCreatorPair(petaTagPartitionsStoreKey, createPetaTagPartitionsStore),

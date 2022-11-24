@@ -30,10 +30,10 @@ const props = defineProps<{
 }>();
 const imageURL = ref<string | undefined>(undefined);
 onMounted(() => {
-  imageURL.value = getImageURL(props.propertyThumbnail.petaImage, ImageType.THUMBNAIL);
+  imageURL.value = getImageURL(props.propertyThumbnail.petaFile, ImageType.THUMBNAIL);
 });
 const nsfwMask = computed(() => {
-  return props.propertyThumbnail.petaImage.nsfw && !nsfwStore.state.value;
+  return props.propertyThumbnail.petaFile.nsfw && !nsfwStore.state.value;
 });
 </script>
 

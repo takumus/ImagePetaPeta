@@ -8,10 +8,10 @@
       draggable="true">
       <VPropertyThumbnail
         v-for="data in propertyThumbnails"
-        :key="data.petaImage.id"
+        :key="data.petaFile.id"
         :property-thumbnail="data" />
     </t-previews>
-    <p>{{ t("browser.property.selectedImage", [petaImages.length]) }}</p>
+    <p>{{ t("browser.property.selectedImage", [petaFiles.length]) }}</p>
     <t-buttons v-show="!noImage">
       <button tabindex="-1" @click="clearSelection">
         {{ t("browser.property.clearSelectionButton") }}
@@ -31,7 +31,7 @@ import { useI18n } from "vue-i18n";
 // Components
 import VPropertyThumbnail from "@/renderer/components/commons/property/VPropertyThumbnail.vue";
 
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { WindowType } from "@/commons/datas/windowType";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
@@ -44,11 +44,11 @@ import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore"
 
 const emit = defineEmits<{
   (e: "clearSelectionAll"): void;
-  (e: "menu", petaImage: RPetaImage, position: Vec2): void;
-  (e: "drag", petaImage: RPetaImage): void;
+  (e: "menu", petaFile: RPetaFile, position: Vec2): void;
+  (e: "drag", petaFile: RPetaFile): void;
 }>();
 const props = defineProps<{
-  petaImages: RPetaImage[];
+  petaFiles: RPetaFile[];
 }>();
 const { t } = useI18n();
 const previews = ref<HTMLElement>();
@@ -60,15 +60,15 @@ onMounted(() => {
   resizerStore.observe(previews.value);
 });
 function menu(e: MouseEvent) {
-  const petaImage = props.petaImages[0];
-  if (petaImage === undefined) return;
-  emit("menu", petaImage, vec2FromPointerEvent(e));
+  const petaFile = props.petaFiles[0];
+  if (petaFile === undefined) return;
+  emit("menu", petaFile, vec2FromPointerEvent(e));
 }
 function dragstart(event: PointerEvent) {
   event.preventDefault();
-  const petaImage = props.petaImages[0];
-  if (petaImage === undefined) return;
-  emit("drag", petaImage);
+  const petaFile = props.petaFiles[0];
+  if (petaFile === undefined) return;
+  emit("drag", petaFile);
 }
 function resizePreviews(rect: DOMRectReadOnly) {
   previewWidth.value = rect.width;
@@ -78,18 +78,18 @@ function clearSelection() {
   emit("clearSelectionAll");
 }
 function openDetails() {
-  const petaImage = props.petaImages[0];
-  if (petaImage) {
-    IPC.send("setDetailsPetaImage", petaImage.id);
+  const petaFile = props.petaFiles[0];
+  if (petaFile) {
+    IPC.send("setDetailsPetaFile", petaFile.id);
     IPC.send("openWindow", WindowType.DETAILS);
   }
 }
 const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
-  const maxWidth = props.petaImages.length === 1 ? previewWidth.value : previewWidth.value * 0.7;
-  const petaImages = [...props.petaImages];
+  const maxWidth = props.petaFiles.length === 1 ? previewWidth.value : previewWidth.value * 0.7;
+  const petaFiles = [...props.petaFiles];
   // プレビュー数の最大を抑える。
-  petaImages.splice(0, petaImages.length - MAX_PREVIEW_COUNT);
-  const thumbnails = petaImages.map((p): PropertyThumbnail => {
+  petaFiles.splice(0, petaFiles.length - MAX_PREVIEW_COUNT);
+  const thumbnails = petaFiles.map((p): PropertyThumbnail => {
     let width = 0;
     let height = 0;
     if (p.metadata.height / p.metadata.width < previewHeight.value / maxWidth) {
@@ -102,7 +102,7 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
       width = size.width;
     }
     return {
-      petaImage: p,
+      petaFile: p,
       position: new Vec2(0, 0),
       width: width,
       height: height,
@@ -114,8 +114,8 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
   }
   thumbnails.forEach((thumb, i) => {
     thumb.position = new Vec2(
-      petaImages.length > 1
-        ? (previewWidth.value - last.width) * (i / (petaImages.length - 1))
+      petaFiles.length > 1
+        ? (previewWidth.value - last.width) * (i / (petaFiles.length - 1))
         : previewWidth.value / 2 - thumb.width / 2,
       previewHeight.value / 2 - thumb.height / 2,
     );
@@ -123,7 +123,7 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
   return thumbnails;
 });
 const noImage = computed<boolean>(() => {
-  return props.petaImages.length === 0;
+  return props.petaFiles.length === 0;
 });
 </script>
 

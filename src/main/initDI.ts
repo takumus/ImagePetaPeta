@@ -4,8 +4,8 @@ import { createI18n } from "vue-i18n";
 
 import { DBInfo, getDefaultDBInfo } from "@/commons/datas/dbInfo";
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage } from "@/commons/datas/petaImage";
-import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaFile } from "@/commons/datas/petaFile";
+import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
@@ -45,9 +45,9 @@ import {
   petaBoardsControllerKey,
 } from "@/main/provides/controllers/petaBoardsController";
 import {
-  PetaImagesController,
-  petaImagesControllerKey,
-} from "@/main/provides/controllers/petaImagesController";
+  PetaFilesController,
+  petaFilesControllerKey,
+} from "@/main/provides/controllers/petaFilesController";
 import {
   PetaTagPartitionsController,
   petaTagPartitionsControllerKey,
@@ -58,8 +58,8 @@ import {
 } from "@/main/provides/controllers/petaTagsController";
 import {
   dbPetaBoardsKey,
-  dbPetaImagesKey,
-  dbPetaImagesPetaTagsKey,
+  dbPetaFilesKey,
+  dbPetaFilesPetaTagsKey,
   dbPetaTagPartitionsKey,
   dbPetaTagsKey,
   dbStatusKey,
@@ -93,8 +93,8 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     // ルートディレクトリは試行錯誤して決定する。
     const DIR_ROOT = (() => {
       // デフォルトならピクチャーズ
-      if (configSettings.data.petaImageDirectory.default) {
-        return (configSettings.data.petaImageDirectory.path = file.initDirectory(
+      if (configSettings.data.petaFileDirectory.default) {
+        return (configSettings.data.petaFileDirectory.path = file.initDirectory(
           true,
           app.getPath("pictures"),
           "imagePetaPeta",
@@ -102,15 +102,15 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
       } else {
         // ちがうなら設定ファイルパス
         try {
-          if (!isValidFilePath(configSettings.data.petaImageDirectory.path)) {
+          if (!isValidFilePath(configSettings.data.petaFileDirectory.path)) {
             throw new Error();
           }
-          return file.initDirectory(true, configSettings.data.petaImageDirectory.path);
+          return file.initDirectory(true, configSettings.data.petaFileDirectory.path);
         } catch (error) {
-          configSettings.data.petaImageDirectory.default = true;
+          configSettings.data.petaFileDirectory.default = true;
           configSettings.save();
           throw new Error(
-            `Cannot access PetaImage directory: "${configSettings.data.petaImageDirectory.path}"\nChanged to default directory. Please restart application.`,
+            `Cannot access PetaFile directory: "${configSettings.data.petaFileDirectory.path}"\nChanged to default directory. Please restart application.`,
           );
         }
       }
@@ -147,14 +147,14 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
       migrateWindowStates,
     );
     // データベース
-    const dbPetaImages = new DB<PetaImage>("petaImages", FILE_IMAGES_DB);
+    const dbPetaFiles = new DB<PetaFile>("petaFiles", FILE_IMAGES_DB);
     const dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
     const dbPetaTags = new DB<PetaTag>("petaTags", FILE_TAGS_DB);
     const dbPetaTagPartitions = new DB<PetaTagPartition>(
       "petaTagPartitions",
       FILE_TAG_PARTITIONS_DB,
     );
-    const dbPetaImagesPetaTags = new DB<PetaImagePetaTag>("petaImagePetaTag", FILE_IMAGES_TAGS_DB);
+    const dbPetaFilesPetaTags = new DB<PetaFilePetaTag>("petaFilePetaTag", FILE_IMAGES_TAGS_DB);
     // 画面初期化
     const windows = new Windows();
     // パスまとめ
@@ -186,12 +186,12 @@ export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean)
     provide(configStatesKey, configStates);
     provide(configWindowStatesKey, configWindowStates);
     provide(petaBoardsControllerKey, new PetaBoardsController());
-    provide(petaImagesControllerKey, new PetaImagesController());
+    provide(petaFilesControllerKey, new PetaFilesController());
     provide(petaTagsControllerKey, new PetaTagsController());
     provide(petaTagPartitionsControllerKey, new PetaTagPartitionsController());
     provide(dbPetaBoardsKey, dbPetaBoard);
-    provide(dbPetaImagesKey, dbPetaImages);
-    provide(dbPetaImagesPetaTagsKey, dbPetaImagesPetaTags);
+    provide(dbPetaFilesKey, dbPetaFiles);
+    provide(dbPetaFilesPetaTagsKey, dbPetaFilesPetaTags);
     provide(dbPetaTagsKey, dbPetaTags);
     provide(dbPetaTagPartitionsKey, dbPetaTagPartitions);
   } catch (err) {

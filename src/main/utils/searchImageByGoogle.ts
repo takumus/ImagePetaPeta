@@ -1,7 +1,7 @@
 import { BrowserWindow, WebContents, shell } from "electron";
 import * as Path from "path";
 
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaFile } from "@/commons/datas/petaFile";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
@@ -57,10 +57,10 @@ async function steps(
     progress(step);
   }, steps).promise;
 }
-export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: string) {
+export async function searchImageByGoogle(petaFile: PetaFile, dirThumbnails: string) {
   return Tasks.spawn(
     "Search Image By Google",
-    async (handler, petaImage: PetaImage) => {
+    async (handler, petaFile: PetaFile) => {
       const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
       let taskCount = 0;
       handler.emitStatus({
@@ -115,7 +115,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
         // ファイル選択
         await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
           nodeId: input.nodeId,
-          files: [Path.resolve(dirThumbnails, petaImage.file.thumbnail)],
+          files: [Path.resolve(dirThumbnails, petaFile.file.thumbnail)],
         });
         // 後処理
         await steps(window.webContents, task.afterSteps, (step) => {
@@ -183,7 +183,7 @@ export async function searchImageByGoogle(petaImage: PetaImage, dirThumbnails: s
       window.destroy();
       return true;
     },
-    petaImage,
+    petaFile,
     false,
   );
 }

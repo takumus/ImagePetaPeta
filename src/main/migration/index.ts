@@ -1,45 +1,48 @@
-import { UpdateMode } from "@/commons/datas/updateMode";
+import { minimizeID } from "@/commons/utils/minimizeID";
+import { ppa } from "@/commons/utils/pp";
 
 import { migratePetaBoard } from "@/main/migration/migratePetaBoard";
-import { migratePetaImage } from "@/main/migration/migratePetaImage";
+import { migratePetaFile } from "@/main/migration/migratePetaFile";
+import { migratePetaFilesPetaTags } from "@/main/migration/migratePetaFilesPetaTags";
 import { migratePetaTag } from "@/main/migration/migratePetaTag";
-import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
-import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
-import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
-import { useDBPetaBoards, useDBPetaImages, useDBPetaTags } from "@/main/provides/databases";
-import { useLogger } from "@/main/provides/utils/logger";
+import {
+  useDBPetaBoards,
+  useDBPetaFiles,
+  useDBPetaFilesPetaTags,
+  useDBPetaTags,
+} from "@/main/provides/databases";
 
-export function migrate() {
-  const logger = useLogger();
-  const petaImagesController = usePetaImagesController();
-  const petaBoardsController = usePetaBoardsController();
-  const petaTagsController = usePetaTagsController();
+export async function migrate(onProgress: (log: string) => void) {
   const dbPetaBoard = useDBPetaBoards();
-  const dbPetaImages = useDBPetaImages();
+  const dbPetaFiles = useDBPetaFiles();
   const dbPetaTags = useDBPetaTags();
-  dbPetaImages.getAll().forEach((pi) => {
-    const result = migratePetaImage(pi);
+  const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
+  await ppa(async (pi) => {
+    const result = migratePetaFile(pi);
     if (result.updated) {
-      logger.logMainChunk().log("Migrate PetaImage");
-      petaImagesController.updateMultiple([result.data], UpdateMode.UPDATE, true);
+      onProgress(`PetaFile(${minimizeID(result.data.id)})`);
+      await dbPetaFiles.update({ id: result.data.id }, result.data);
     }
-  });
-  dbPetaTags.getAll().forEach((pt) => {
+  }, dbPetaFiles.getAll()).promise;
+  await ppa(async (pt) => {
     const result = migratePetaTag(pt);
     if (result.updated) {
-      logger.logMainChunk().log("Migrate PetaTag");
-      petaTagsController.updateMultiple(
-        [{ type: "petaTag", petaTag: result.data }],
-        UpdateMode.UPDATE,
-        true,
-      );
+      onProgress(`PetaTag(${minimizeID(result.data.id)})`);
+      await dbPetaTags.update({ id: result.data.id }, result.data);
     }
-  });
-  dbPetaBoard.getAll().forEach((pb) => {
+  }, dbPetaTags.getAll()).promise;
+  await ppa(async (pfpt) => {
+    const result = migratePetaFilesPetaTags(pfpt);
+    if (result.updated) {
+      onProgress(`PetaFilesPetaTags(${minimizeID(result.data.id)})`);
+      await dbPetaFilesPetaTags.update({ id: result.data.id }, result.data);
+    }
+  }, dbPetaFilesPetaTags.getAll()).promise;
+  await ppa(async (pb) => {
     const result = migratePetaBoard(pb);
     if (result.updated) {
-      logger.logMainChunk().log("Migrate PetaBoard");
-      petaBoardsController.updateMultiple([result.data], UpdateMode.UPDATE);
+      onProgress(`PetaBoard(${minimizeID(result.data.id)})`);
+      await dbPetaBoard.update({ id: result.data.id }, result.data);
     }
-  });
+  }, dbPetaBoard.getAll()).promise;
 }

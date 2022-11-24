@@ -1,22 +1,22 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage } from "@/commons/datas/petaImage";
-import { PetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaFile } from "@/commons/datas/petaFile";
+import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 
 import DB from "@/main/libs/db";
 import { createKey, createUseFunction } from "@/main/libs/di";
 
-export const dbPetaImagesKey = createKey<DB<PetaImage>>("dbPetaImages");
+export const dbPetaFilesKey = createKey<DB<PetaFile>>("dbPetaFiles");
 export const dbPetaTagsKey = createKey<DB<PetaTag>>("dbPetaTags");
 export const dbPetaBoardsKey = createKey<DB<PetaBoard>>("dbPetaBoards");
 export const dbPetaTagPartitionsKey = createKey<DB<PetaTagPartition>>("dbPetaTagPartitions");
-export const dbPetaImagesPetaTagsKey = createKey<DB<PetaImagePetaTag>>("dbPetaImagesPetaTags");
+export const dbPetaFilesPetaTagsKey = createKey<DB<PetaFilePetaTag>>("dbPetaFilesPetaTags");
 export const dbStatusKey = createKey<{ initialized: boolean }>("dbStatus");
 
-export const useDBPetaImages = createUseFunction(dbPetaImagesKey);
+export const useDBPetaFiles = createUseFunction(dbPetaFilesKey);
 export const useDBPetaTags = createUseFunction(dbPetaTagsKey);
 export const useDBPetaBoards = createUseFunction(dbPetaBoardsKey);
 export const useDBPetaTagPartitions = createUseFunction(dbPetaTagPartitionsKey);
-export const useDBPetaImagesPetaTags = createUseFunction(dbPetaImagesPetaTagsKey);
+export const useDBPetaFilesPetaTags = createUseFunction(dbPetaFilesPetaTagsKey);
 export const useDBStatus = createUseFunction(dbStatusKey);

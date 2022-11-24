@@ -1,8 +1,8 @@
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { Vec2 } from "@/commons/utils/vec2";
 
 export interface PropertyThumbnail {
-  petaImage: RPetaImage;
+  petaFile: RPetaFile;
   position: Vec2;
   width: number;
   height: number;

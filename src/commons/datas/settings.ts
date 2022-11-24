@@ -11,7 +11,7 @@ const defaultSettings = {
   loadTilesInOriginal: true,
   showTagsOnTile: true,
   alwaysShowNSFW: false,
-  petaImageDirectory: {
+  petaFileDirectory: {
     default: true,
     path: "",
   },

@@ -1,13 +1,13 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaFile } from "@/commons/datas/petaFile";
 
-export function hasPetaImages(board: PetaBoard, petaImages: PetaImage[]) {
-  return petaImages.reduce((need, petaImage) => {
+export function hasPetaFiles(board: PetaBoard, petaFiles: PetaFile[]) {
+  return petaFiles.reduce((need, petaFile) => {
     return need
       ? true
       : board
       ? Object.values(board.petaPanels).find(
-          (petaPanel) => petaPanel.petaImageId === petaImage.id,
+          (petaPanel) => petaPanel.petaFileId === petaFile.id,
         ) !== undefined
       : false;
   }, false);

@@ -1,13 +1,13 @@
 import * as PIXI from "pixi.js";
 
 import { ImageType } from "@/commons/datas/imageType";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { AnimatedGIFResource } from "@/renderer/libs/pixi-gif/animatedGIFResource";
 import { getImageURL } from "@/renderer/utils/imageURL";
 
-export function getImage(petaImage: RPetaImage | undefined) {
+export function getImage(petaFile: RPetaFile | undefined) {
   let canceled = false;
   let cancelAnimatedGIFLoader = () => {
     //
@@ -21,11 +21,11 @@ export function getImage(petaImage: RPetaImage | undefined) {
       return;
     }
     cancelResourcesLoader = rej;
-    if (!petaImage) {
-      rej("petaImage is undefined");
+    if (!petaFile) {
+      rej("petaFile is undefined");
       return;
     }
-    const imageURL = getImageURL(petaImage, ImageType.ORIGINAL);
+    const imageURL = getImageURL(petaFile, ImageType.ORIGINAL);
     PIXI.Assets.load(imageURL)
       .then(async (resource) => {
         if (canceled) {

@@ -26,7 +26,7 @@ import { PTransformerControlPoint } from "@/renderer/components/board/pPetaPanel
 import { PTransformerDashedLine } from "@/renderer/components/board/pPetaPanels/pTransformer/PTransformerDashedLine";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 
 const props = defineProps<{
@@ -36,7 +36,7 @@ const emit = defineEmits<{
   (e: "update", petaPanel?: RPetaPanel): void;
 }>();
 const nsfwStore = useNSFWStore();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const { t } = useI18n();
 const resizerStore = useResizerStore();
 const cropRoot = ref<HTMLElement>();
@@ -282,18 +282,18 @@ function resetCrop() {
   orderPIXIRender();
 }
 function changePetaPanel() {
-  const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
-  if (petaImage === undefined || props.petaPanel === undefined) {
+  const petaFile = petaFilesStore.getPetaFile(props.petaPanel?.petaFileId);
+  if (petaFile === undefined || props.petaPanel === undefined) {
     cancelCrop();
     return;
   }
-  const petaPanel = createRPetaPanel(petaImage, new Vec2(0, 0), 400);
+  const petaPanel = createRPetaPanel(petaFile, new Vec2(0, 0), 400);
   minX.value = props.petaPanel.crop.position.x;
   minY.value = props.petaPanel.crop.position.y;
   maxX.value = props.petaPanel.crop.width + props.petaPanel.crop.position.x;
   maxY.value = props.petaPanel.crop.height + props.petaPanel.crop.position.y;
   if (!pPanel) {
-    pPanel = new PPetaPanel(petaPanel, petaImagesStore);
+    pPanel = new PPetaPanel(petaPanel, petaFilesStore);
     pPanel.onUpdateGIF = () => {
       orderPIXIRender();
     };
@@ -313,34 +313,29 @@ function changePetaPanel() {
   })();
 }
 const height = computed(() => {
-  const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
-  if (!petaImage) {
+  const petaFile = petaFilesStore.getPetaFile(props.petaPanel?.petaFileId);
+  if (!petaFile) {
     return 0;
   }
-  return width.value * (petaImage.metadata.height / petaImage.metadata.width);
+  return width.value * (petaFile.metadata.height / petaFile.metadata.width);
 });
 const width = computed(() => {
-  const petaImage = petaImagesStore.getPetaImage(props.petaPanel?.petaImageId);
-  if (pPanel === undefined || petaImage === undefined || props.petaPanel === undefined) {
+  const petaFile = petaFilesStore.getPetaFile(props.petaPanel?.petaFileId);
+  if (pPanel === undefined || petaFile === undefined || props.petaPanel === undefined) {
     return 0;
   }
   let width = 0;
   let height = 0;
   const maxWidth = stageRect.x * 0.95;
   const maxHeight = stageRect.y * 0.7;
-  if (petaImage.metadata.height / petaImage.metadata.width < maxHeight / maxWidth) {
-    const size = resizeImage(
-      petaImage.metadata.width,
-      petaImage.metadata.height,
-      maxWidth,
-      "width",
-    );
+  if (petaFile.metadata.height / petaFile.metadata.width < maxHeight / maxWidth) {
+    const size = resizeImage(petaFile.metadata.width, petaFile.metadata.height, maxWidth, "width");
     width = size.width;
     height = size.height;
   } else {
     const size = resizeImage(
-      petaImage.metadata.width,
-      petaImage.metadata.height,
+      petaFile.metadata.width,
+      petaFile.metadata.height,
       maxHeight,
       "height",
     );

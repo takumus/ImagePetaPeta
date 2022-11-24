@@ -5,7 +5,7 @@
         @click="changeFilterType(FilterType.ALL)"
         :selected="selectedFilterType === FilterType.ALL"
         :readonly="true"
-        :look="`${t('browser.all')}(${petaImagesArray.length})`" />
+        :look="`${t('browser.all')}(${petaFilesArray.length})`" />
       <VTagCell
         @click="changeFilterType(FilterType.UNTAGGED)"
         :selected="selectedFilterType === FilterType.UNTAGGED"
@@ -91,7 +91,7 @@ import VTagPartition from "@/renderer/components/browser/tags/VTagPartition.vue"
 import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { PetaTagPartition, createPetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
@@ -115,7 +115,7 @@ const emit = defineEmits<{
   (e: "update:selectedFilterType", selectedFilterType: FilterType): void;
 }>();
 const props = defineProps<{
-  petaImagesArray: RPetaImage[];
+  petaFilesArray: RPetaFile[];
   selectedPetaTagIds: string[];
   selectedFilterType: FilterType;
 }>();

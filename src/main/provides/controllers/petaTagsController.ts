@@ -1,4 +1,4 @@
-import { PetaImagePetaTag, createPetaImagePetaTag } from "@/commons/datas/petaImagesPetaTags";
+import { PetaFilePetaTag, createPetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { PetaTag, createPetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
@@ -9,7 +9,7 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as Tasks from "@/main/libs/task";
-import { useDBPetaImagesPetaTags, useDBPetaTags } from "@/main/provides/databases";
+import { useDBPetaFilesPetaTags, useDBPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
@@ -48,7 +48,7 @@ export class PetaTagsController {
           "updatePetaTags",
           {
             petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
-            petaImageIds: [],
+            petaFileIds: [],
           },
         );
         return true;
@@ -57,21 +57,21 @@ export class PetaTagsController {
       silent,
     );
   }
-  async updatePetaImagesPetaTags(
-    petaImageIds: string[],
+  async updatePetaFilesPetaTags(
+    petaFileIds: string[],
     petaTagLikes: PetaTagLike[],
     mode: UpdateMode,
     silent = false,
   ) {
     const dbPetaTags = useDBPetaTags();
     return Tasks.spawn(
-      "UpdatePetaImagesPetaTags",
+      "UpdatePetaFilesPetaTags",
       async (handler) => {
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           status: TaskStatusCode.BEGIN,
         });
-        await ppa(async (petaImageId, iIndex) => {
+        await ppa(async (petaFileId, iIndex) => {
           await ppa(async (petaTagLike, tIndex) => {
             let petaTagId: string | undefined = undefined;
             if (petaTagLike.type === "id") {
@@ -91,36 +91,36 @@ export class PetaTagsController {
             if (petaTagId === undefined) {
               throw new Error(`PetaTagLike is wrong: ${JSON.stringify(petaTagLike)}`);
             }
-            await this.updatePetaImagePetaTag(createPetaImagePetaTag(petaImageId, petaTagId), mode);
+            await this.updatePetaFilePetaTag(createPetaFilePetaTag(petaFileId, petaTagId), mode);
             handler.emitStatus({
               i18nKey: "tasks.updateDatas",
               progress: {
-                all: petaImageIds.length * petaTagLikes.length,
+                all: petaFileIds.length * petaTagLikes.length,
                 current: iIndex * petaTagLikes.length + tIndex + 1,
               },
               status: TaskStatusCode.PROGRESS,
             });
           }, petaTagLikes).promise;
-        }, petaImageIds).promise;
+        }, petaFileIds).promise;
         handler.emitStatus({
           i18nKey: "tasks.updateDatas",
           status: TaskStatusCode.COMPLETE,
         });
-        // Tileの更新対象はPetaImageIdsのみ。
+        // Tileの更新対象はPetaFileIdsのみ。
         emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
           petaTagIds: [],
-          petaImageIds,
+          petaFileIds,
         });
       },
       {},
       silent,
     );
   }
-  async getPetaTagIdsByPetaImageIds(petaImageIds: string[]) {
-    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
-    const pipts = dbPetaImagesPetaTags
+  async getPetaTagIdsByPetaFileIds(petaFileIds: string[]) {
+    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
+    const pipts = dbPetaFilesPetaTags
       .getAll()
-      .filter((pipt) => petaImageIds.includes(pipt.petaImageId));
+      .filter((pipt) => petaFileIds.includes(pipt.petaFileId));
     const ids = Array.from(
       new Set(
         pipts.map((pipt) => {
@@ -132,15 +132,15 @@ export class PetaTagsController {
       return (
         pipts.filter((pipt) => {
           return pipt.petaTagId === id;
-        }).length === petaImageIds.length
+        }).length === petaFileIds.length
       );
     });
     return petaTagIds;
   }
   async getPetaTagCount(petaTag: PetaTag) {
-    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
-    const petaImagesPetaTags = dbPetaImagesPetaTags.getAll();
-    return petaImagesPetaTags.filter((pipt) => pipt.petaTagId === petaTag.id).length;
+    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
+    const petaFilesPetaTags = dbPetaFilesPetaTags.getAll();
+    return petaFilesPetaTags.filter((pipt) => pipt.petaTagId === petaTag.id).length;
   }
   async getPetaTags() {
     const dbPetaTags = useDBPetaTags();
@@ -149,14 +149,14 @@ export class PetaTagsController {
   private async updatePetaTag(petaTagLike: PetaTagLike, mode: UpdateMode) {
     const logger = useLogger();
     const dbPetaTags = useDBPetaTags();
-    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
     const log = logger.logMainChunk();
     log.log("##Update PetaTag");
     if (petaTagLike.type === "petaTag") {
       log.log("mode:", mode);
       log.log("tag:", minimizeID(petaTagLike.petaTag.id));
       if (mode === UpdateMode.REMOVE) {
-        await dbPetaImagesPetaTags.remove({ petaTagId: petaTagLike.petaTag.id });
+        await dbPetaFilesPetaTags.remove({ petaTagId: petaTagLike.petaTag.id });
         await dbPetaTags.remove({ id: petaTagLike.petaTag.id });
       } else if (mode === UpdateMode.UPDATE) {
         await dbPetaTags.update({ id: petaTagLike.petaTag.id }, petaTagLike.petaTag);
@@ -166,7 +166,7 @@ export class PetaTagsController {
       return petaTagLike.petaTag.id;
     } else if (petaTagLike.type === "id") {
       if (mode === UpdateMode.REMOVE) {
-        await dbPetaImagesPetaTags.remove({ petaTagId: petaTagLike.id });
+        await dbPetaFilesPetaTags.remove({ petaTagId: petaTagLike.id });
         await dbPetaTags.remove({ id: petaTagLike.id });
       } else {
         throw new Error(`Could not "${mode}" PetaTag by id`);
@@ -176,7 +176,7 @@ export class PetaTagsController {
       if (mode === UpdateMode.REMOVE) {
         const petaTag = (await dbPetaTags.find({ name: petaTagLike.name }))[0];
         if (petaTag) {
-          await dbPetaImagesPetaTags.remove({ petaTagId: petaTag.id });
+          await dbPetaFilesPetaTags.remove({ petaTagId: petaTag.id });
           await dbPetaTags.remove({ id: petaTag.id });
           return petaTag.id;
         }
@@ -197,19 +197,19 @@ export class PetaTagsController {
     }
     return undefined;
   }
-  private async updatePetaImagePetaTag(petaImagePetaTag: PetaImagePetaTag, mode: UpdateMode) {
+  private async updatePetaFilePetaTag(petaFilePetaTag: PetaFilePetaTag, mode: UpdateMode) {
     const logger = useLogger();
-    const dbPetaImagesPetaTags = useDBPetaImagesPetaTags();
+    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
     const log = logger.logMainChunk();
-    log.log("##Update PetaImagePetaTag");
+    log.log("##Update PetaFilePetaTag");
     log.log("mode:", mode);
-    log.log("tag:", minimizeID(petaImagePetaTag.id));
+    log.log("tag:", minimizeID(petaFilePetaTag.id));
     if (mode === UpdateMode.REMOVE) {
-      await dbPetaImagesPetaTags.remove({ id: petaImagePetaTag.id });
+      await dbPetaFilesPetaTags.remove({ id: petaFilePetaTag.id });
     } else if (mode === UpdateMode.UPDATE) {
-      await dbPetaImagesPetaTags.update({ id: petaImagePetaTag.id }, petaImagePetaTag);
+      await dbPetaFilesPetaTags.update({ id: petaFilePetaTag.id }, petaFilePetaTag);
     } else {
-      await dbPetaImagesPetaTags.insert(petaImagePetaTag);
+      await dbPetaFilesPetaTags.insert(petaFilePetaTag);
     }
     return true;
   }

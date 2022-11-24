@@ -5,7 +5,7 @@
       width: tile.width + 'px',
       height: tile.height + 'px',
     }">
-    <t-tile-wrapper v-if="tile.group === undefined && tile.petaImage !== undefined">
+    <t-tile-wrapper v-if="tile.group === undefined && tile.petaFile !== undefined">
       <t-images
         @pointerdown="pointerdown"
         @dragstart="dragstart($event)"
@@ -59,7 +59,7 @@ import { useI18n } from "vue-i18n";
 
 import { ImageType } from "@/commons/datas/imageType";
 import { MouseButton } from "@/commons/datas/mouseButton";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import {
   BROWSER_FETCH_TAGS_DELAY,
@@ -84,8 +84,8 @@ import { getImageURL } from "@/renderer/utils/imageURL";
 const emit = defineEmits<{
   (e: "select", tile: Tile): void;
   (e: "menu", tile: Tile, position: Vec2): void;
-  (e: "drag", petaImage: RPetaImage): void;
-  (e: "dblclick", petaImage: RPetaImage): void;
+  (e: "drag", petaFile: RPetaFile): void;
+  (e: "dblclick", petaFile: RPetaFile): void;
 }>();
 const props = defineProps<{
   tile: Tile;
@@ -119,8 +119,8 @@ onUnmounted(() => {
 });
 function dragstart(event: PointerEvent) {
   event.preventDefault();
-  if (props.tile.petaImage) {
-    emit("drag", props.tile.petaImage);
+  if (props.tile.petaFile) {
+    emit("drag", props.tile.petaFile);
   }
 }
 function pointerdown() {
@@ -137,18 +137,18 @@ function pointerdown() {
   });
 }
 function dblclick() {
-  if (props.tile.petaImage) {
-    emit("dblclick", props.tile.petaImage);
+  if (props.tile.petaFile) {
+    emit("dblclick", props.tile.petaFile);
   }
 }
 const nsfwMask = computed(() => {
-  if (props.tile.petaImage === undefined) {
+  if (props.tile.petaFile === undefined) {
     return false;
   }
-  return props.tile.petaImage.nsfw && !nsfwStore.state.value;
+  return props.tile.petaFile.nsfw && !nsfwStore.state.value;
 });
 const placeholderColor = computed(() => {
-  const petaColor = props.tile.petaImage?.metadata.palette[0];
+  const petaColor = props.tile.petaFile?.metadata.palette[0];
   if (petaColor) {
     return `rgb(${petaColor.r}, ${petaColor.g}, ${petaColor.b})`;
   }
@@ -161,10 +161,10 @@ const fetchPetaTags = (() => {
     if (!settingsStore.state.value.showTagsOnTile) {
       return;
     }
-    if (props.tile.petaImage === undefined) {
+    if (props.tile.petaFile === undefined) {
       return;
     }
-    const result = await IPC.send("getPetaTagIdsByPetaImageIds", [props.tile.petaImage.id]);
+    const result = await IPC.send("getPetaTagIdsByPetaFileIds", [props.tile.petaFile.id]);
     if (currentFetchId !== fetchId) {
       return;
     }
@@ -188,12 +188,12 @@ function delayedLoadImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
   window.clearTimeout(loadThumbnailTimeoutHandler);
   loadThumbnailTimeoutHandler = window.setTimeout(() => {
-    thumbnailURL.value = getImageURL(props.tile.petaImage, ImageType.THUMBNAIL);
+    thumbnailURL.value = getImageURL(props.tile.petaFile, ImageType.THUMBNAIL);
     if (props.original) {
       loadOriginalTimeoutHandler = window.setTimeout(() => {
         if (props.tile.visible) {
           const img = image.value;
-          const url = getImageURL(props.tile.petaImage, ImageType.ORIGINAL);
+          const url = getImageURL(props.tile.petaFile, ImageType.ORIGINAL);
           if (img === undefined) {
             return;
           }
@@ -209,8 +209,8 @@ function delayedLoadImage() {
   }, Math.random() * BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM + BROWSER_LOAD_THUMBNAIL_DELAY);
 }
 const selected = computed(() => {
-  if (props.tile.petaImage !== undefined) {
-    return props.tile.petaImage.renderer.selected;
+  if (props.tile.petaFile !== undefined) {
+    return props.tile.petaFile.renderer.selected;
   }
   return false;
 });
@@ -220,9 +220,9 @@ watch([() => props.tile.visible, () => props.original], () => {
 watch([() => props.tile.visible, () => settingsStore.state.value.showTagsOnTile], () => {
   delayedFetchPetaTags();
 });
-petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
+petaTagsStore.onUpdate((petaTagIds, petaFileIds) => {
   if (
-    petaImageIds.find((id) => id === props.tile.petaImage?.id) ||
+    petaFileIds.find((id) => id === props.tile.petaFile?.id) ||
     petaTagIds.find((id) => myPetaTags.value.find((petaTag) => petaTag.id === id)) ||
     fetchingPetaTags.value
   ) {

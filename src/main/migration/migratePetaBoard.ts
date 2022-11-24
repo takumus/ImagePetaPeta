@@ -23,6 +23,12 @@ export const migratePetaBoard = createMigrater<PetaBoard>(async (data, update) =
   });
   return data;
 });
-export const migratePetaPanel = createMigrater<PetaPanel>(async (data) => {
+export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) => {
+  const anyData = data as any;
+  if (data.petaFileId === undefined) {
+    data.petaFileId = anyData.petaImageId;
+    delete anyData.petaImageId;
+    update();
+  }
   return data;
 });

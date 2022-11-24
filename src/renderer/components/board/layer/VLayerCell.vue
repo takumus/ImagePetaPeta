@@ -42,7 +42,7 @@ import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { getImageURL } from "@/renderer/utils/imageURL";
 
 // Others
@@ -56,7 +56,7 @@ const props = defineProps<{
   selected?: boolean;
   sorting?: boolean;
 }>();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const visibleIcon = ref<HTMLElement>();
 const lockedIcon = ref<HTMLElement>();
 const nsfwStore = useNSFWStore();
@@ -70,7 +70,7 @@ onUnmounted(() => {
 });
 const url = computed(() => {
   return props.petaPanel
-    ? getImageURL(petaImagesStore.getPetaImage(props.petaPanel.petaImageId), ImageType.THUMBNAIL)
+    ? getImageURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), ImageType.THUMBNAIL)
     : undefined;
 });
 const locked = computed(() => {
@@ -80,7 +80,7 @@ const visible = computed(() => {
   return props.petaPanel?.visible;
 });
 const nsfwMask = computed(() => {
-  return petaImagesStore.getPetaImage(props.petaPanel?.petaImageId)?.nsfw && !nsfwStore.state.value;
+  return petaFilesStore.getPetaFile(props.petaPanel?.petaFileId)?.nsfw && !nsfwStore.state.value;
 });
 function pointerdown(event: PointerEvent) {
   if (event.button === MouseButton.LEFT) {

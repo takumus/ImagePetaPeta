@@ -76,14 +76,14 @@ function playGIF(): void {
 function open(position: Vec2): void {
   show.value = true;
   floating.value?.updateFloating({ ...position, width: 0, height: 0 });
-  // const petaImage = petaImagesStore.getPetaImage(petaPanel.petaImageId);
+  // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
   // const isMultiple = selectedPPetaPanels().length > 1;
   // components.contextMenu.open(
   //   [
   //     { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
   //     { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },
   //     { separate: true },
-  //     { label: t("boards.panelMenu.details"), click: () => openDetails(petaImage) },
+  //     { label: t("boards.panelMenu.details"), click: () => openDetails(petaFile) },
   //     { separate: true },
   //     {
   //       skip: isMultiple || !pPanel.isGIF,
@@ -123,7 +123,7 @@ function changeOrder(to: "front" | "back") {
   emit("sortIndex");
 }
 function openDetails(petaPanel: RPetaPanel) {
-  IPC.send("setDetailsPetaImage", petaPanel.petaImageId);
+  IPC.send("setDetailsPetaFile", petaPanel.petaFileId);
   IPC.send("openWindow", WindowType.DETAILS);
 }
 function resetPetaPanel() {

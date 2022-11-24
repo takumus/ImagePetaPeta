@@ -1,5 +1,5 @@
 import { ImageType } from "@/commons/datas/imageType";
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaFile } from "@/commons/datas/petaFile";
 
 import Worker from "@/renderer/components/commons/property/worker/generateGamutMapWorker.worker";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
@@ -11,7 +11,7 @@ const image = new Image();
 const canvas = new OffscreenCanvas(0, 0);
 const context = canvas.getContext("2d");
 export function generateGamutMap(
-  petaImage: PetaImage,
+  petaFile: PetaFile,
   resolution: number,
   progress: (data: generateGamutMapWorkerOutputData) => void,
 ) {
@@ -22,7 +22,7 @@ export function generateGamutMap(
   const wt = wtGroup.getWT();
   wt.use();
   const promise = new Promise<boolean>((res, rej) => {
-    image.src = getImageURL(petaImage, ImageType.THUMBNAIL);
+    image.src = getImageURL(petaFile, ImageType.THUMBNAIL);
     image.onload = () => {
       if (completed) {
         return;

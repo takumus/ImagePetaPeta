@@ -49,17 +49,21 @@ import {
   createWindowTypeStore,
   windowTypeStoreKey,
 } from "@/renderer/stores/windowTypeStore/createWindowTypeStore";
+import { createInitialization } from "@/renderer/utils/createInitialization";
 
 export async function create(
   component: Component,
   windowType: WindowType,
   stores?: KeyStoreCreatorPair<unknown>[],
 ) {
+  const initialization = createInitialization();
+  await initialization.initialize();
   let initialized = false;
   const initVue = async () => {
     if (initialized) {
       return;
     }
+    initialization.destroy();
     initialized = true;
     logChunk().log(`$Window "${windowType}" init`);
     const app = createApp(component);

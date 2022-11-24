@@ -3,9 +3,7 @@
     :style="{
       zIndex: zIndex,
     }">
-    <VDragView
-      :content-width="petaImage.metadata.width"
-      :content-height="petaImage.metadata.height">
+    <VDragView :content-width="petaFile.metadata.width" :content-height="petaFile.metadata.height">
       <img v-show="loaded" :src="url" draggable="false" @load="loaded = true" />
       <t-nsfw v-if="nsfwMask"></t-nsfw>
     </VDragView>
@@ -15,8 +13,8 @@
         :src="url"
         draggable="false"
         :style="{
-          width: petaImage.metadata.width + 'px',
-          height: petaImage.metadata.height + 'px',
+          width: petaFile.metadata.width + 'px',
+          height: petaFile.metadata.height + 'px',
         }" />
     </t-smooth>
   </t-details-root>
@@ -29,26 +27,26 @@ import { computed, ref, watch } from "vue";
 import VDragView from "@/renderer/components/commons/utils/dragView/VDragView.vue";
 
 import { ImageType } from "@/commons/datas/imageType";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { getImageURL } from "@/renderer/utils/imageURL";
 
 // Components
 const props = defineProps<{
-  petaImage: RPetaImage;
+  petaFile: RPetaFile;
   zIndex: number;
 }>();
 const nsfwStore = useNSFWStore();
 const loaded = ref(false);
 const url = computed(() => {
-  return getImageURL(props.petaImage, ImageType.ORIGINAL);
+  return getImageURL(props.petaFile, ImageType.ORIGINAL);
 });
 const nsfwMask = computed(() => {
-  return props.petaImage.nsfw && !nsfwStore.state.value;
+  return props.petaFile.nsfw && !nsfwStore.state.value;
 });
 watch(
-  () => props.petaImage,
+  () => props.petaFile,
   () => {
     loaded.value = false;
   },

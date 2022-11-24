@@ -1,16 +1,16 @@
 import { PetaColor } from "@/commons/datas/petaColor";
 
-export interface PetaImageMetadata {
+export interface PetaFileMetadata {
   type: string;
   version: number;
 }
-export interface PetaImageImageMetadata extends PetaImageMetadata {
+export interface PetaFileImageMetadata extends PetaFileMetadata {
   type: "image";
   width: number;
   height: number;
   palette: PetaColor[];
 }
-export interface PetaImage {
+export interface PetaFile {
   file: {
     original: string;
     thumbnail: string;
@@ -21,6 +21,6 @@ export interface PetaImage {
   addDate: number;
   note: string;
   nsfw: boolean;
-  metadata: PetaImageImageMetadata;
+  metadata: PetaFileImageMetadata;
 }
-export type PetaImages = { [id: string]: PetaImage };
+export type PetaFiles = { [id: string]: PetaFile };

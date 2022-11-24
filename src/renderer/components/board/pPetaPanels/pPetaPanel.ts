@@ -10,7 +10,7 @@ import NSFWImage from "@/@assets/nsfwBackground.png";
 // import { AnimatedGIF } from "@/renderer/libs/pixi-gif";
 import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 
 export class PPetaPanel extends PIXI.Sprite {
   // public selected = false;
@@ -42,7 +42,7 @@ export class PPetaPanel extends PIXI.Sprite {
   private static loadingTexture?: PIXI.Texture;
   constructor(
     public petaPanel: RPetaPanel,
-    private petaImagesStore: ReturnType<typeof usePetaImagesStore>,
+    private petaFilesStore: ReturnType<typeof usePetaFilesStore>,
   ) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -83,7 +83,7 @@ export class PPetaPanel extends PIXI.Sprite {
     try {
       this.noImage = true;
       this.loading = true;
-      const result = getImage(this.petaImagesStore.getPetaImage(this.petaPanel.petaImageId));
+      const result = getImage(this.petaFilesStore.getPetaFile(this.petaPanel.petaFileId));
       this._cancelLoading = result.cancel;
       const image = await result.promise;
       this.loading = false;
@@ -138,8 +138,8 @@ export class PPetaPanel extends PIXI.Sprite {
   public orderRender() {
     try {
       // 前回の描画時と値に変更があるかチェック
-      const petaImage = this.petaImagesStore.getPetaImage(this.petaPanel.petaImageId);
-      const showNSFW = petaImage?.nsfw && !this.showNSFW ? true : false;
+      const petaFile = this.petaFilesStore.getPetaFile(this.petaPanel.petaFileId);
+      const showNSFW = petaFile?.nsfw && !this.showNSFW ? true : false;
       if (
         this.needToRender(
           "petaPanel.width",
@@ -202,8 +202,8 @@ export class PPetaPanel extends PIXI.Sprite {
         this.masker.visible = false;
       }
       const imageWidth = panelWidth * (1 / this.petaPanel.crop.width);
-      const tempImageHeight = petaImage ? petaImage.metadata.height : this.defaultHeight;
-      const tempImageWidth = petaImage ? petaImage.metadata.width : this.defaultHeight;
+      const tempImageHeight = petaFile ? petaFile.metadata.height : this.defaultHeight;
+      const tempImageWidth = petaFile ? petaFile.metadata.width : this.defaultHeight;
       const imageHeight =
         panelWidth * (tempImageHeight / tempImageWidth) * (1 / this.petaPanel.crop.width);
       this.image.width = imageWidth;

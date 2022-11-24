@@ -79,7 +79,7 @@ const ja = {
       },
     },
     addTagPartition: `区切りを追加`,
-    petaImageMenu: {
+    petaFileMenu: {
       remove: (ctx: any) => {
         return `${ctx.list(0)}枚の画像を削除`;
       },
@@ -191,9 +191,9 @@ const ja = {
     showTagsOnTileDescriptions: "タグが邪魔な場合・ブラウザが重い場合はチェックを外すと良いです。",
     alwaysShowNSFW: "NSFWな画像を常に表示",
     alwaysShowNSFWDescriptions: "NSFWとしてマークした画像を常に表示します。気をつけてくださいね。",
-    browsePetaImageDirectoryButton: "データの保存先を選ぶ",
-    changePetaImageDirectoryButton: "データの保存先を適用",
-    changePetaImageDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
+    browsePetaFileDirectoryButton: "データの保存先を選ぶ",
+    changePetaFileDirectoryButton: "データの保存先を適用",
+    changePetaFileDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
     updateAvailable: "新しいバージョンがあります。",
     thisIsLatest: "既に最新バージョンです。",
     latestVersion: "最新バージョン",
@@ -207,10 +207,10 @@ const ja = {
       "ガマットマップを作る際に読み込むピクセルの量です。最大は65536です。多くすればするほど重くなります。",
     developerModeDescriptions:
       "開発者モードを有効にすると51915ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。",
-    changePetaImageDirectoryDialog: (ctx: any) => {
+    changePetaFileDirectoryDialog: (ctx: any) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;
     },
-    changePetaImageDirectoryErrorDialog: (ctx: any) => {
+    changePetaFileDirectoryErrorDialog: (ctx: any) => {
       return `データの保存先を\n"${ctx.list(
         0,
       )}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`;

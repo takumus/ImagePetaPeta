@@ -1,4 +1,4 @@
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { Settings } from "@/commons/datas/settings";
@@ -8,8 +8,8 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 
 export interface IpcEvents {
-  updatePetaImages: (petaImages: PetaImage[], mode: UpdateMode) => void;
-  updatePetaTags: (updates: { petaTagIds: string[]; petaImageIds: string[] }) => void;
+  updatePetaFiles: (petaFiles: PetaFile[], mode: UpdateMode) => void;
+  updatePetaTags: (updates: { petaTagIds: string[]; petaFileIds: string[] }) => void;
   updatePetaTagPartitions: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
   taskStatus: (id: string, task: TaskStatus) => void;
   foundLatestVersion: (remote: RemoteBinaryInfo) => void;
@@ -21,7 +21,8 @@ export interface IpcEvents {
   updateSettings: (settings: Settings) => void;
   updateStates: (states: States) => void;
   showNSFW: (value: boolean) => void;
-  detailsPetaImage: (petaImage: PetaImage) => void;
+  detailsPetaFile: (petaFile: PetaFile) => void;
   darkMode: (value: boolean) => void;
   dataInitialized: () => void;
+  initializationProgress: (log: string) => void;
 }

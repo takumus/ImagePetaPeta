@@ -1,8 +1,8 @@
 import { AppInfo } from "@/commons/datas/appInfo";
-import { GetPetaImageIdsParams } from "@/commons/datas/getPetaImageIdsParams";
+import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import { PetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage, PetaImages } from "@/commons/datas/petaImage";
+import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
@@ -24,17 +24,17 @@ export interface IpcFunctions {
     )[][],
   ) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
-  getPetaImages: () => Promise<PetaImages>;
-  updatePetaImages: (datas: PetaImage[], mode: UpdateMode) => Promise<boolean>;
+  getPetaFiles: () => Promise<PetaFiles>;
+  updatePetaFiles: (datas: PetaFile[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<{ [petaBoardId: string]: PetaBoard }>;
   updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   updatePetaTags: (tags: PetaTagLike[], mode: UpdateMode) => Promise<boolean>;
-  getPetaImageIds: (params: GetPetaImageIdsParams) => Promise<string[]>;
-  getPetaTagIdsByPetaImageIds: (petaImageIds: string[]) => Promise<string[]>;
+  getPetaFileIds: (params: GetPetaFileIdsParams) => Promise<string[]>;
+  getPetaTagIdsByPetaFileIds: (petaFileIds: string[]) => Promise<string[]>;
   getPetaTagCount: (petaTag: PetaTag) => Promise<number>;
   getPetaTags: () => Promise<PetaTag[]>;
-  updatePetaImagesPetaTags: (
-    petaImageIds: string[],
+  updatePetaFilesPetaTags: (
+    petaFileIds: string[],
     petaTagLikes: PetaTagLike[],
     mode: UpdateMode,
   ) => Promise<boolean>;
@@ -45,13 +45,13 @@ export interface IpcFunctions {
   ) => Promise<boolean>;
   log: (id: string, ...args: unknown[]) => Promise<boolean>;
   openURL: (url: string) => Promise<boolean>;
-  openImageFile: (petaImage: PetaImage) => Promise<void>;
+  openImageFile: (petaFile: PetaFile) => Promise<void>;
   getAppInfo: () => Promise<AppInfo>;
   getStates: () => Promise<States>;
   updateStates: (states: States) => Promise<boolean>;
   showDBFolder: () => Promise<boolean>;
   showConfigFolder: () => Promise<boolean>;
-  showImageInFolder: (petaImage: PetaImage) => Promise<boolean>;
+  showImageInFolder: (petaFile: PetaFile) => Promise<boolean>;
   updateSettings: (settings: Settings) => Promise<boolean>;
   getSettings: () => Promise<Settings>;
   getWindowIsFocused: () => Promise<boolean>;
@@ -62,18 +62,18 @@ export interface IpcFunctions {
   windowActivate: () => Promise<void>;
   getPlatform: () => Promise<NodeJS.Platform>;
   regenerateMetadatas: () => Promise<void>;
-  browsePetaImageDirectory: () => Promise<string | undefined>;
-  changePetaImageDirectory: (path: string) => Promise<boolean>;
-  realESRGANConvert: (petaImages: PetaImage[], modelName: RealESRGANModelName) => Promise<boolean>;
-  startDrag: (petaImages: PetaImage[], iconSize: number, iconData: string) => Promise<void>;
+  browsePetaFileDirectory: () => Promise<string | undefined>;
+  changePetaFileDirectory: (path: string) => Promise<boolean>;
+  realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<boolean>;
+  startDrag: (petaFiles: PetaFile[], iconSize: number, iconData: string) => Promise<void>;
   openWindow: (windowType: WindowType) => Promise<void>;
   reloadWindow: () => Promise<void>;
-  setDetailsPetaImage: (petaImageId: string) => Promise<void>;
-  getDetailsPetaImage: () => Promise<PetaImage | undefined>;
+  setDetailsPetaFile: (petaFileId: string) => Promise<void>;
+  getDetailsPetaFile: () => Promise<PetaFile | undefined>;
   windowToggleDevTools: () => Promise<void>;
   getShowNSFW: () => Promise<boolean>;
   setShowNSFW: (value: boolean) => Promise<void>;
-  searchImageByGoogle: (petaImage: PetaImage) => Promise<boolean>;
+  searchImageByGoogle: (petaFile: PetaFile) => Promise<boolean>;
   getIsDarkMode: () => Promise<boolean>;
   getIsDataInitialized: () => Promise<boolean>;
   getLatestVersion: () => Promise<RemoteBinaryInfo>;

@@ -4,9 +4,9 @@ import { WindowType } from "@/commons/datas/windowType";
 
 import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
 import {
-  createPetaImagesStore,
-  petaImagesStoreKey,
-} from "@/renderer/stores/petaImagesStore/createPetaImagesStore";
+  createPetaFilesStore,
+  petaFilesStoreKey,
+} from "@/renderer/stores/petaFilesStore/createPetaFilesStore";
 import {
   createPetaTagsStore,
   petaTagsStoreKey,
@@ -14,6 +14,6 @@ import {
 import { create } from "@/renderer/windows/@base";
 
 create(DetailsIndex, WindowType.DETAILS, [
-  keyStoreCreatorPair(petaImagesStoreKey, createPetaImagesStore),
+  keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),
 ]);

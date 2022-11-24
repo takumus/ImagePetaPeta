@@ -13,11 +13,11 @@ export async function createPetaTagsStore() {
     (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag)),
   );
   const eventEmitter = new TypedEventEmitter<{
-    update: (petaImageIds: string[], petaTagIds: string[]) => void;
+    update: (petaFileIds: string[], petaTagIds: string[]) => void;
   }>();
-  IPC.on("updatePetaTags", async (event, { petaTagIds, petaImageIds }) => {
+  IPC.on("updatePetaTags", async (event, { petaTagIds, petaFileIds }) => {
     petaTags.value = (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag));
-    eventEmitter.emit("update", petaTagIds, petaImageIds);
+    eventEmitter.emit("update", petaTagIds, petaFileIds);
   });
   return {
     state: {
@@ -35,7 +35,7 @@ export async function createPetaTagsStore() {
       });
       return IPC.send("updatePetaTags", petaTagLikes, mode);
     },
-    onUpdate: (callback: (petaTagIds: string[], petaImageIds: string[]) => void) => {
+    onUpdate: (callback: (petaTagIds: string[], petaFileIds: string[]) => void) => {
       eventEmitter.on("update", callback);
       onUnmounted(() => {
         eventEmitter.off("update", callback);

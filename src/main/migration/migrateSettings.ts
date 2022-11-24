@@ -4,6 +4,7 @@ import { createMigrater } from "@/main/libs/createMigrater";
 
 const defaultSettings = getDefaultSettings();
 export const migrateSettings = createMigrater<Settings>(async (data, update) => {
+  const anyData = data as any;
   // v2.8.0
   if (data.show === undefined) {
     data.show = defaultSettings.show;
@@ -27,6 +28,11 @@ export const migrateSettings = createMigrater<Settings>(async (data, update) => 
   }
   if (data.gamutMapSampling === undefined) {
     data.gamutMapSampling = defaultSettings.gamutMapSampling;
+    update();
+  }
+  if (data.petaFileDirectory === undefined) {
+    data.petaFileDirectory = anyData.petaImageDirectory;
+    delete anyData.petaImageDirectory;
     update();
   }
   return data;

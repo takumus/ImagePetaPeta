@@ -1,7 +1,7 @@
 <template>
   <t-settings-content-root>
-    <button @click="browsePetaImageDirectory">
-      {{ t("settings.browsePetaImageDirectoryButton") }}</button
+    <button @click="browsePetaFileDirectory">
+      {{ t("settings.browsePetaFileDirectoryButton") }}</button
     ><br />
     <VTextarea
       :type="'single'"
@@ -9,13 +9,13 @@
       :trim="true"
       :text-area-style="{ width: '100%' }"
       :outer-style="{ width: '100%' }"
-      :value="tempPetaImageDirectory"
-      @update:value="(value) => (tempPetaImageDirectory = value)" />
+      :value="tempPetaFileDirectory"
+      @update:value="(value) => (tempPetaFileDirectory = value)" />
     <br />
-    <button @click="changePetaImageDirectory" :disabled="tempPetaImageDirectory === ''">
-      {{ t("settings.changePetaImageDirectoryButton") }}
+    <button @click="changePetaFileDirectory" :disabled="tempPetaFileDirectory === ''">
+      {{ t("settings.changePetaFileDirectoryButton") }}
     </button>
-    <p>{{ t("settings.changePetaImageDirectoryDescriptions") }}</p>
+    <p>{{ t("settings.changePetaFileDirectoryDescriptions") }}</p>
   </t-settings-content-root>
 </template>
 
@@ -33,40 +33,40 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsSto
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
 const { t } = useI18n();
-const tempPetaImageDirectory = ref("");
+const tempPetaFileDirectory = ref("");
 onMounted(() => {
-  restorePetaImageDirectory();
+  restorePetaFileDirectory();
 });
-async function changePetaImageDirectory() {
+async function changePetaFileDirectory() {
   const result = await components.dialog.show(
-    t("settings.changePetaImageDirectoryDialog", [tempPetaImageDirectory.value]),
+    t("settings.changePetaFileDirectoryDialog", [tempPetaFileDirectory.value]),
     [t("commons.yes"), t("commons.no")],
   );
   if (result === 0) {
-    if (!(await IPC.send("changePetaImageDirectory", tempPetaImageDirectory.value))) {
+    if (!(await IPC.send("changePetaFileDirectory", tempPetaFileDirectory.value))) {
       await components.dialog.show(
-        t("settings.changePetaImageDirectoryErrorDialog", [tempPetaImageDirectory.value]),
+        t("settings.changePetaFileDirectoryErrorDialog", [tempPetaFileDirectory.value]),
         [t("commons.yes")],
       );
-      restorePetaImageDirectory();
+      restorePetaFileDirectory();
     }
   } else {
-    restorePetaImageDirectory();
+    restorePetaFileDirectory();
   }
 }
-function restorePetaImageDirectory() {
-  tempPetaImageDirectory.value = settingsStore.state.value.petaImageDirectory.path;
+function restorePetaFileDirectory() {
+  tempPetaFileDirectory.value = settingsStore.state.value.petaFileDirectory.path;
 }
-async function browsePetaImageDirectory() {
-  const path = await IPC.send("browsePetaImageDirectory");
+async function browsePetaFileDirectory() {
+  const path = await IPC.send("browsePetaFileDirectory");
   if (path) {
-    tempPetaImageDirectory.value = path;
+    tempPetaFileDirectory.value = path;
   }
 }
 watch(
-  () => settingsStore.state.value.petaImageDirectory.path,
+  () => settingsStore.state.value.petaFileDirectory.path,
   () => {
-    restorePetaImageDirectory();
+    restorePetaFileDirectory();
   },
 );
 </script>

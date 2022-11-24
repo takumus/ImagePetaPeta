@@ -1,7 +1,7 @@
 import { Vec2 } from "@/commons/utils/vec2";
 
 export interface PetaPanel {
-  petaImageId: string;
+  petaFileId: string;
   position: Vec2;
   rotation: number;
   width: number;

@@ -12,7 +12,7 @@ import * as Path from "path";
 import { ImageType } from "@/commons/datas/imageType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
-import { PetaImage } from "@/commons/datas/petaImage";
+import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 import { DEFAULT_BOARD_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
@@ -25,7 +25,7 @@ import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
 import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
-import { usePetaImagesController } from "@/main/provides/controllers/petaImagesController";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController";
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
@@ -40,7 +40,7 @@ import { getLatestVersion } from "@/main/utils/versions";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
 
 let temporaryShowNSFW = false;
-let detailsPetaImage: PetaImage | undefined;
+let detailsPetaFile: PetaFile | undefined;
 export function getIpcFunctions(): {
   [P in keyof IpcFunctions]: (
     event: IpcMainInvokeEvent,
@@ -51,7 +51,7 @@ export function getIpcFunctions(): {
     async browseAndImportImageFiles(event, type) {
       const logger = useLogger();
       const windows = useWindows();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       log.log("#Browse Image Files");
       const windowInfo = windows.getWindowByEvent(event);
@@ -59,7 +59,7 @@ export function getIpcFunctions(): {
         const result = await dialog.showOpenDialog(windowInfo.window, {
           properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
         });
-        petaImagesController.importImagesFromFileInfos({
+        petaFilesController.importImagesFromFileInfos({
           fileInfos: result.filePaths.map((path) => ({ path })),
           extract: true,
         });
@@ -83,33 +83,33 @@ export function getIpcFunctions(): {
       }
       return;
     },
-    async getPetaImages() {
+    async getPetaFiles() {
       const logger = useLogger();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       try {
-        log.log("#Get PetaImages");
-        const petaImages = await petaImagesController.getAll();
+        log.log("#Get PetaFiles");
+        const petaFiles = await petaFilesController.getAll();
         log.log("return:", true);
-        return petaImages;
+        return petaFiles;
       } catch (e) {
         log.error(e);
         showError({
           category: "M",
           code: 100,
-          title: "Get PetaImages Error",
+          title: "Get PetaFiles Error",
           message: String(e),
         });
       }
       return {};
     },
-    async updatePetaImages(event, datas, mode) {
+    async updatePetaFiles(event, datas, mode) {
       const logger = useLogger();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       try {
-        log.log("#Update PetaImages");
-        await petaImagesController.updateMultiple(datas, mode);
+        log.log("#Update PetaFiles");
+        await petaFilesController.updateMultiple(datas, mode);
         log.log("return:", true);
         return true;
       } catch (err) {
@@ -117,7 +117,7 @@ export function getIpcFunctions(): {
         showError({
           category: "M",
           code: 200,
-          title: "Update PetaImages Error",
+          title: "Update PetaFiles Error",
           message: String(err),
         });
       }
@@ -190,13 +190,13 @@ export function getIpcFunctions(): {
       }
       return false;
     },
-    async updatePetaImagesPetaTags(event, petaImageIds, petaTagLikes, mode) {
+    async updatePetaFilesPetaTags(event, petaFileIds, petaTagLikes, mode) {
       const logger = useLogger();
       const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
-        log.log("#Update PetaImagesPetaTags");
-        await petaTagsController.updatePetaImagesPetaTags(petaImageIds, petaTagLikes, mode);
+        log.log("#Update PetaFilesPetaTags");
+        await petaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
         log.log("return:", true);
         return true;
       } catch (error) {
@@ -204,7 +204,7 @@ export function getIpcFunctions(): {
         showError({
           category: "M",
           code: 200,
-          title: "Update PetaImagesPetaTags Error",
+          title: "Update PetaFilesPetaTags Error",
           message: String(error),
         });
       }
@@ -215,7 +215,7 @@ export function getIpcFunctions(): {
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
       const log = logger.logMainChunk();
       try {
-        log.log("#Update PetaImagesPetaTags");
+        log.log("#Update PetaFilesPetaTags");
         await petaTagpartitionsController.updateMultiple(partitions, mode);
         log.log("return:", true);
         return true;
@@ -224,7 +224,7 @@ export function getIpcFunctions(): {
         showError({
           category: "M",
           code: 200,
-          title: "Update PetaImagesPetaTags Error",
+          title: "Update PetaFilesPetaTags Error",
           message: String(error),
         });
       }
@@ -250,14 +250,14 @@ export function getIpcFunctions(): {
       }
       return [];
     },
-    async getPetaImageIds(event, params) {
+    async getPetaFileIds(event, params) {
       const logger = useLogger();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       try {
-        log.log("#Get PetaImageIds");
+        log.log("#Get PetaFileIds");
         log.log("type:", params.type);
-        const ids = await petaImagesController.getPetaImageIds(params);
+        const ids = await petaFilesController.getPetaFileIds(params);
         log.log("return:", ids.length);
         return ids;
       } catch (error) {
@@ -265,19 +265,19 @@ export function getIpcFunctions(): {
         showError({
           category: "M",
           code: 100,
-          title: "Get PetaImageIds Error",
+          title: "Get PetaFileIds Error",
           message: String(error),
         });
       }
       return [];
     },
-    async getPetaTagIdsByPetaImageIds(event, petaImageIds) {
+    async getPetaTagIdsByPetaFileIds(event, petaFileIds) {
       const logger = useLogger();
       const petaTagsController = usePetaTagsController();
       const log = logger.logMainChunk();
       try {
-        // log.log("#Get PetaTagIds By PetaImageIds");
-        const petaTagIds = await petaTagsController.getPetaTagIdsByPetaImageIds(petaImageIds);
+        // log.log("#Get PetaTagIds By PetaFileIds");
+        const petaTagIds = await petaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
         // log.log("return:", petaTagIds.length);
         return petaTagIds;
       } catch (error) {
@@ -285,7 +285,7 @@ export function getIpcFunctions(): {
         showError({
           category: "M",
           code: 100,
-          title: "Get PetaTagIds By PetaImageIds Error",
+          title: "Get PetaTagIds By PetaFileIds Error",
           message: String(error),
         });
       }
@@ -344,12 +344,12 @@ export function getIpcFunctions(): {
       shell.openExternal(url);
       return true;
     },
-    async openImageFile(event, petaImage) {
+    async openImageFile(event, petaFile) {
       const logger = useLogger();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       log.log("#Open Image File");
-      shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
+      shell.showItemInFolder(petaFilesController.getImagePath(petaFile, ImageType.ORIGINAL));
     },
     async getAppInfo() {
       const logger = useLogger();
@@ -378,12 +378,12 @@ export function getIpcFunctions(): {
       shell.showItemInFolder(paths.DIR_APP);
       return true;
     },
-    async showImageInFolder(event, petaImage) {
+    async showImageInFolder(event, petaFile) {
       const logger = useLogger();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       log.log("#Show Image In Folder");
-      shell.showItemInFolder(petaImagesController.getImagePath(petaImage, ImageType.ORIGINAL));
+      shell.showItemInFolder(petaFilesController.getImagePath(petaFile, ImageType.ORIGINAL));
       return true;
     },
     async updateSettings(event, settings) {
@@ -482,11 +482,11 @@ export function getIpcFunctions(): {
     },
     async regenerateMetadatas() {
       const logger = useLogger();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       try {
         log.log("#Regenerate Thumbnails");
-        await petaImagesController.regenerateMetadatas();
+        await petaFilesController.regenerateMetadatas();
         return;
       } catch (err) {
         log.error(err);
@@ -499,11 +499,11 @@ export function getIpcFunctions(): {
       }
       return;
     },
-    async browsePetaImageDirectory(event) {
+    async browsePetaFileDirectory(event) {
       const logger = useLogger();
       const windows = useWindows();
       const log = logger.logMainChunk();
-      log.log("#Browse PetaImage Directory");
+      log.log("#Browse PetaFile Directory");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo) {
         const filePath = (
@@ -515,26 +515,26 @@ export function getIpcFunctions(): {
           return undefined;
         }
         let path = Path.resolve(filePath);
-        // if (Path.basename(path) != "PetaImage") {
-        //   path = Path.resolve(path, "PetaImage");
+        // if (Path.basename(path) != "PetaFile") {
+        //   path = Path.resolve(path, "PetaFile");
         // }
         try {
           await file.readFile(Path.resolve(filePath, FILENAME_DB_INFO));
         } catch {
-          path = Path.resolve(path, "PetaImage");
+          path = Path.resolve(path, "PetaFile");
         }
         log.log("return:", path);
         return path;
       }
       return "";
     },
-    async changePetaImageDirectory(event, path) {
+    async changePetaFileDirectory(event, path) {
       const logger = useLogger();
       const paths = usePaths();
       const configSettings = useConfigSettings();
       const log = logger.logMainChunk();
       try {
-        log.log("#Change PetaImage Directory");
+        log.log("#Change PetaFile Directory");
         path = Path.resolve(path);
         if (Path.resolve() === path) {
           log.error("Invalid file path:", path);
@@ -545,8 +545,8 @@ export function getIpcFunctions(): {
           return false;
         }
         path = file.initDirectory(true, path);
-        configSettings.data.petaImageDirectory.default = false;
-        configSettings.data.petaImageDirectory.path = path;
+        configSettings.data.petaFileDirectory.default = false;
+        configSettings.data.petaFileDirectory.path = path;
         configSettings.save();
         relaunch();
         return true;
@@ -562,12 +562,12 @@ export function getIpcFunctions(): {
       log.log("#Get States");
       return configStates.data;
     },
-    async realESRGANConvert(event, petaImages, modelName) {
+    async realESRGANConvert(event, petaFiles, modelName) {
       const logger = useLogger();
       const log = logger.logMainChunk();
       try {
         log.log("#Real-ESRGAN Convert");
-        const result = await realESRGAN(petaImages, modelName);
+        const result = await realESRGAN(petaFiles, modelName);
         log.log("return:", result);
         return result;
       } catch (error) {
@@ -575,16 +575,16 @@ export function getIpcFunctions(): {
       }
       return false;
     },
-    async startDrag(event, petaImages) {
+    async startDrag(event, petaFiles) {
       const paths = usePaths();
       const windows = useWindows();
-      const first = petaImages[0];
+      const first = petaFiles[0];
       if (!first) {
         return;
       }
       const firstPath = Path.resolve(paths.DIR_IMAGES, first.file.original);
-      const files = petaImages.map((petaImage) =>
-        Path.resolve(paths.DIR_IMAGES, petaImage.file.original),
+      const files = petaFiles.map((petaFile) =>
+        Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
       );
       if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
         windows.windows.board.moveTop();
@@ -614,7 +614,7 @@ export function getIpcFunctions(): {
     async importImages(event, datas) {
       const logger = useLogger();
       const paths = usePaths();
-      const petaImagesController = usePetaImagesController();
+      const petaFilesController = usePetaFilesController();
       const log = logger.logMainChunk();
       try {
         log.log("#importImages");
@@ -648,7 +648,7 @@ export function getIpcFunctions(): {
                 };
               }
               if (d?.type === "url") {
-                const result = await petaImagesController.createFileInfoFromURL(d.url);
+                const result = await petaFilesController.createFileInfoFromURL(d.url);
                 if (result !== undefined) {
                   return result;
                 }
@@ -656,14 +656,14 @@ export function getIpcFunctions(): {
               if (d?.type === "html") {
                 const url = getURLFromHTML(d.html);
                 if (url !== undefined) {
-                  const result = await petaImagesController.createFileInfoFromURL(url);
+                  const result = await petaFilesController.createFileInfoFromURL(url);
                   if (result !== undefined) {
                     return result;
                   }
                 }
               }
               if (d?.type === "buffer") {
-                const result = await petaImagesController.createFileInfoFromBuffer(d.buffer);
+                const result = await petaFilesController.createFileInfoFromBuffer(d.buffer);
                 if (result !== undefined) {
                   return result;
                 }
@@ -672,14 +672,14 @@ export function getIpcFunctions(): {
             return undefined;
           }, datas).promise
         ).filter((info) => info !== undefined) as ImportFileInfo[];
-        const petaImageIds = (
-          await petaImagesController.importImagesFromFileInfos({
+        const petaFileIds = (
+          await petaFilesController.importImagesFromFileInfos({
             fileInfos,
             extract: true,
           })
-        ).map((petaImage) => petaImage.id);
-        log.log("return:", petaImageIds.length);
-        return petaImageIds;
+        ).map((petaFile) => petaFile.id);
+        log.log("return:", petaFileIds.length);
+        return petaFileIds;
       } catch (e) {
         log.error(e);
       }
@@ -712,13 +712,13 @@ export function getIpcFunctions(): {
       temporaryShowNSFW = value;
       emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
     },
-    async searchImageByGoogle(event, petaImage) {
+    async searchImageByGoogle(event, petaFile) {
       const logger = useLogger();
       const paths = usePaths();
       const log = logger.logMainChunk();
       log.log("#Search Image By Google");
       try {
-        await searchImageByGoogle(petaImage, paths.DIR_THUMBNAILS);
+        await searchImageByGoogle(petaFile, paths.DIR_THUMBNAILS);
         log.log("return:", true);
         return true;
       } catch (error) {
@@ -726,21 +726,21 @@ export function getIpcFunctions(): {
       }
       return false;
     },
-    async setDetailsPetaImage(event, petaImageId: string) {
-      const petaImagesController = usePetaImagesController();
-      detailsPetaImage = await petaImagesController.getPetaImage(petaImageId);
-      if (detailsPetaImage === undefined) {
+    async setDetailsPetaFile(event, petaFileId: string) {
+      const petaFilesController = usePetaFilesController();
+      detailsPetaFile = await petaFilesController.getPetaFile(petaFileId);
+      if (detailsPetaFile === undefined) {
         return;
       }
       emitMainEvent(
         { type: EmitMainEventTargetType.WINDOW_TYPES, windowTypes: [WindowType.DETAILS] },
-        "detailsPetaImage",
-        detailsPetaImage,
+        "detailsPetaFile",
+        detailsPetaFile,
       );
       return;
     },
-    async getDetailsPetaImage() {
-      return detailsPetaImage;
+    async getDetailsPetaFile() {
+      return detailsPetaFile;
     },
     async getIsDarkMode() {
       return isDarkMode();

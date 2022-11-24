@@ -1,6 +1,6 @@
 <template>
   <t-property-root>
-    <t-infos v-if="singlePetaImageInfo" class="content">
+    <t-infos v-if="singlePetaFileInfo" class="content">
       <p>{{ t("browser.property.infos.label") }}</p>
       <t-datas>
         <t-data>
@@ -12,8 +12,8 @@
               :allow-empty="true"
               :text-area-style="{ width: '100%' }"
               :outer-style="{ width: '100%' }"
-              :value="singlePetaImageInfo.petaImage.name"
-              :look="singlePetaImageInfo.petaImage.name"
+              :value="singlePetaFileInfo.petaFile.name"
+              :look="singlePetaFileInfo.petaFile.name"
               @update:value="changeName" />
           </t-value>
         </t-data>
@@ -33,26 +33,26 @@
         <t-data>
           <t-name>{{ t("browser.property.infos.size") }}:</t-name>
           <t-value
-            >{{ singlePetaImageInfo.petaImage.metadata.width }}px,
-            {{ singlePetaImageInfo.petaImage.metadata.height }}px</t-value
+            >{{ singlePetaFileInfo.petaFile.metadata.width }}px,
+            {{ singlePetaFileInfo.petaFile.metadata.height }}px</t-value
           >
         </t-data>
         <!-- <t-data>
           <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
-          <t-value>{{ singlePetaImageInfo.fileDate }}</t-value>
+          <t-value>{{ singlePetaFileInfo.fileDate }}</t-value>
         </t-data> -->
         <t-data>
           <t-name>{{ t("browser.property.infos.addDate") }}:</t-name>
-          <t-value>{{ singlePetaImageInfo.addDate }}</t-value>
+          <t-value>{{ singlePetaFileInfo.addDate }}</t-value>
         </t-data>
       </t-datas>
     </t-infos>
-    <t-colors v-if="singlePetaImageInfo" class="content">
+    <t-colors v-if="singlePetaFileInfo" class="content">
       <p>{{ t("browser.property.colors.label") }}</p>
       <t-palette>
         <t-color-wrapper>
           <t-color
-            v-for="color in singlePetaImageInfo.palette"
+            v-for="color in singlePetaFileInfo.palette"
             :key="color.id"
             :style="{
               backgroundColor: `rgb(${color.color.r}, ${color.color.g}, ${color.color.b})`,
@@ -81,13 +81,13 @@
         </t-current-color>
       </t-palette>
     </t-colors>
-    <t-color-circle v-if="singlePetaImageInfo">
-      <VGamutMap :peta-image="singlePetaImageInfo.petaImage" />
+    <t-color-circle v-if="singlePetaFileInfo">
+      <VGamutMap :peta-file="singlePetaFileInfo.petaFile" />
     </t-color-circle>
     <t-tags v-show="!noImage" class="content">
       <p>
         {{
-          singlePetaImageInfo !== undefined
+          singlePetaFileInfo !== undefined
             ? t("browser.property.tags")
             : t("browser.property.mutualTags")
         }}
@@ -155,7 +155,7 @@ import VGamutMap from "@/renderer/components/commons/property/VGamutMap.vue";
 import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { PetaColor } from "@/commons/datas/petaColor";
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
@@ -163,7 +163,7 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";
 
@@ -171,11 +171,11 @@ const emit = defineEmits<{
   (e: "selectTag", tag: RPetaTag): void;
 }>();
 const props = defineProps<{
-  petaImages: RPetaImage[];
+  petaFiles: RPetaFile[];
 }>();
 const textsStore = useTextsStore();
 const petaTagsStore = usePetaTagsStore();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const fetchingTags = ref(false);
@@ -185,8 +185,8 @@ const tagInput = ref<InstanceType<typeof VTextarea>>();
 const currentColor = ref<PetaColor | undefined>();
 async function addTag(name: string) {
   await IPC.send(
-    "updatePetaImagesPetaTags",
-    props.petaImages.map((petaImage) => petaImage.id),
+    "updatePetaFilesPetaTags",
+    props.petaFiles.map((petaFile) => petaFile.id),
     [{ type: "name", name }],
     UpdateMode.INSERT,
   );
@@ -196,31 +196,31 @@ async function addTag(name: string) {
 }
 async function removeTag(petaTag: RPetaTag) {
   await IPC.send(
-    "updatePetaImagesPetaTags",
-    props.petaImages.map((petaImage) => petaImage.id),
+    "updatePetaFilesPetaTags",
+    props.petaFiles.map((petaFile) => petaFile.id),
     [{ type: "id", id: petaTag.id }],
     UpdateMode.REMOVE,
   );
 }
 function changeName(name: string) {
-  if (singlePetaImageInfo.value === undefined) {
+  if (singlePetaFileInfo.value === undefined) {
     return;
   }
-  singlePetaImageInfo.value.petaImage.name = name;
-  petaImagesStore.updatePetaImages([singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
+  singlePetaFileInfo.value.petaFile.name = name;
+  petaFilesStore.updatePetaFiles([singlePetaFileInfo.value.petaFile], UpdateMode.UPDATE);
 }
 function changeNote(note: string) {
-  if (singlePetaImageInfo.value === undefined) {
+  if (singlePetaFileInfo.value === undefined) {
     return;
   }
-  singlePetaImageInfo.value.petaImage.note = note;
-  petaImagesStore.updatePetaImages([singlePetaImageInfo.value.petaImage], UpdateMode.UPDATE);
+  singlePetaFileInfo.value.petaFile.note = note;
+  petaFilesStore.updatePetaFiles([singlePetaFileInfo.value.petaFile], UpdateMode.UPDATE);
 }
 function changeNSFW(value: boolean) {
-  props.petaImages.forEach((pi) => {
+  props.petaFiles.forEach((pi) => {
     pi.nsfw = value;
   });
-  petaImagesStore.updatePetaImages(props.petaImages, UpdateMode.UPDATE);
+  petaFilesStore.updatePetaFiles(props.petaFiles, UpdateMode.UPDATE);
 }
 function tagMenu(event: PointerEvent | MouseEvent, tag: RPetaTag) {
   components.contextMenu.open(
@@ -265,8 +265,8 @@ const fetchPetaTags = (() => {
       return;
     }
     const result = await IPC.send(
-      "getPetaTagIdsByPetaImageIds",
-      props.petaImages.map((petaImage) => petaImage.id),
+      "getPetaTagIdsByPetaFileIds",
+      props.petaFiles.map((petaFile) => petaFile.id),
     );
     if (currentFetchId !== fetchId) {
       return;
@@ -277,21 +277,21 @@ const fetchPetaTags = (() => {
     fetchingTags.value = false;
   };
 })();
-const singlePetaImageInfo = computed(() => {
-  if (props.petaImages.length === 1) {
-    const petaImage = props.petaImages[0];
-    if (petaImage === undefined) {
+const singlePetaFileInfo = computed(() => {
+  if (props.petaFiles.length === 1) {
+    const petaFile = props.petaFiles[0];
+    if (petaFile === undefined) {
       return undefined;
     }
-    const all = petaImage.metadata.palette.reduce((p, c) => {
+    const all = petaFile.metadata.palette.reduce((p, c) => {
       return p + c.population;
     }, 0);
     return {
-      name: petaImage.name,
-      petaImage: petaImage,
-      fileDate: dateFormat(petaImage.fileDate, "yyyy/mm/dd hh:MM:ss"),
-      addDate: dateFormat(petaImage.addDate, "yyyy/mm/dd hh:MM:ss"),
-      palette: petaImage.metadata.palette.map((color, i) => {
+      name: petaFile.name,
+      petaFile: petaFile,
+      fileDate: dateFormat(petaFile.fileDate, "yyyy/mm/dd hh:MM:ss"),
+      addDate: dateFormat(petaFile.addDate, "yyyy/mm/dd hh:MM:ss"),
+      palette: petaFile.metadata.palette.map((color, i) => {
         return {
           color,
           population: color.population / all,
@@ -303,12 +303,12 @@ const singlePetaImageInfo = computed(() => {
   return undefined;
 });
 const noImage = computed(() => {
-  return props.petaImages.length === 0;
+  return props.petaFiles.length === 0;
 });
 const nsfw = computed(() => {
   let nsfw = false;
   let same = true;
-  props.petaImages.forEach((pi, i) => {
+  props.petaFiles.forEach((pi, i) => {
     if (i === 0) {
       nsfw = pi.nsfw;
       return;
@@ -332,21 +332,21 @@ const complements = computed(() => {
     });
 });
 watch(
-  () => props.petaImages,
+  () => props.petaFiles,
   () => {
     fetchPetaTags();
-    if (singlePetaImageInfo.value) {
-      note.value = singlePetaImageInfo.value.petaImage.note;
-      changeCurrentColor(singlePetaImageInfo.value.palette[0]?.color);
+    if (singlePetaFileInfo.value) {
+      note.value = singlePetaFileInfo.value.petaFile.note;
+      changeCurrentColor(singlePetaFileInfo.value.palette[0]?.color);
     } else {
       note.value = "";
     }
   },
   { deep: true },
 );
-petaTagsStore.onUpdate((petaTagIds, petaImageIds) => {
+petaTagsStore.onUpdate((petaTagIds, petaFileIds) => {
   if (
-    petaImageIds.find((id) => props.petaImages.find((petaImage) => petaImage.id === id)) ||
+    petaFileIds.find((id) => props.petaFiles.find((petaFile) => petaFile.id === id)) ||
     petaTagIds.find((id) => mutualPetaTags.value.find((petaTag) => petaTag.id === id)) ||
     fetchingTags.value
   ) {

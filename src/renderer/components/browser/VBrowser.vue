@@ -2,7 +2,7 @@
   <t-browser-root>
     <t-left>
       <VTags
-        :peta-images-array="petaImagesArray"
+        :peta-files-array="petaFilesArray"
         v-model:selected-filter-type="selectedFilterType"
         v-model:selected-peta-tag-ids="selectedPetaTagIds" />
     </t-left>
@@ -53,7 +53,7 @@
               :parent-area-max-y="areaMaxY"
               @select="selectTile"
               @menu="
-                (tile, position) => (tile.petaImage ? petaImageMenu(tile.petaImage, position) : 0)
+                (tile, position) => (tile.petaFile ? petaFileMenu(tile.petaFile, position) : 0)
               "
               @drag="drag"
               @dblclick="openDetail" />
@@ -63,11 +63,11 @@
     </t-center>
     <t-right>
       <VPreview
-        :peta-images="selectedPetaImages"
+        :peta-files="selectedPetaFiles"
         @clear-selection-all="clearSelectionAll"
-        @menu="petaImageMenu"
+        @menu="petaFileMenu"
         @drag="drag" />
-      <VProperty :peta-images="selectedPetaImages" @select-tag="selectTag" />
+      <VProperty :peta-files="selectedPetaFiles" @select-tag="selectTag" />
     </t-right>
   </t-browser-root>
 </template>
@@ -84,7 +84,7 @@ import VTile from "@/renderer/components/browser/tile/VTile.vue";
 import VPreview from "@/renderer/components/commons/property/VPreview.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 
-import { RPetaImage } from "@/commons/datas/rPetaImage";
+import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { UpdateMode } from "@/commons/datas/updateMode";
@@ -107,7 +107,7 @@ import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { usePetaImagesStore } from "@/renderer/stores/petaImagesStore/usePetaImagesStore";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
@@ -117,7 +117,7 @@ import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 const statesStore = useStateStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
-const petaImagesStore = usePetaImagesStore();
+const petaFilesStore = usePetaFilesStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const thumbnails = ref<HTMLDivElement>();
@@ -140,7 +140,7 @@ const currentScrollTileId = ref("");
 const currentScrollTileOffset = ref(0);
 const keyboards = useKeyboardsStore();
 const defines = useDefinesStore().defines;
-const filteredPetaImages = ref<RPetaImage[]>([]);
+const filteredPetaFiles = ref<RPetaFile[]>([]);
 const ignoreScrollEvent = ref(false);
 const currentColor = ref("#ffffff");
 onMounted(() => {
@@ -153,8 +153,8 @@ onMounted(() => {
   thumbnailsSize.value = statesStore.state.value.browserTileSize;
   keyboards.enabled = true;
   keyboards.keys("KeyA").down(keyA);
-  fetchFilteredPetaImages();
-  petaImagesStore.onUpdate((petaImages, mode) => {
+  fetchFilteredPetaFiles();
+  petaFilesStore.onUpdate((petaFiles, mode) => {
     if (mode === UpdateMode.INSERT) {
       selectedPetaTagIds.value = [];
       selectedFilterType.value = FilterType.ALL;
@@ -179,7 +179,7 @@ function mouseWheel(e: WheelEvent) {
 function saveScrollPosition() {
   let minDistance = Infinity;
   tiles.value.forEach((t) => {
-    if (t.petaImage === undefined || thumbnails.value === undefined) {
+    if (t.petaFile === undefined || thumbnails.value === undefined) {
       return;
     }
     const offset = thumbnails.value.scrollTop - t.position.y;
@@ -187,13 +187,13 @@ function saveScrollPosition() {
     if (distance < minDistance) {
       minDistance = distance;
       currentScrollTileOffset.value = offset;
-      currentScrollTileId.value = t.petaImage.id;
+      currentScrollTileId.value = t.petaFile.id;
     }
   });
 }
 
 function restoreScrollPosition() {
-  const current = tiles.value.find((bt) => bt.petaImage?.id === currentScrollTileId.value);
+  const current = tiles.value.find((bt) => bt.petaFile?.id === currentScrollTileId.value);
   if (current) {
     ignoreScrollEvent.value = true;
     thumbnails.value?.scrollTo(0, current.position.y + currentScrollTileOffset.value);
@@ -229,7 +229,7 @@ function resizeScrollArea(rect: DOMRectReadOnly) {
 function resizeImages(rect: DOMRectReadOnly) {
   thumbnailsWidth.value = rect.width - BROWSER_THUMBNAIL_MARGIN;
 }
-function drag(petaImage: RPetaImage) {
+function drag(petaFile: RPetaFile) {
   if (
     !Keyboards.pressedOR(
       "ShiftLeft",
@@ -239,20 +239,20 @@ function drag(petaImage: RPetaImage) {
       "MetaLeft",
       "MetaRight",
     ) &&
-    !petaImage.renderer.selected
+    !petaFile.renderer.selected
   ) {
     clearSelectionAll();
   }
-  const petaImages = petaImage.renderer.selected ? [] : [petaImage];
-  petaImages.push(...selectedPetaImages.value);
-  IPC.send("startDrag", petaImages, actualTileSize.value, "");
+  const petaFiles = petaFile.renderer.selected ? [] : [petaFile];
+  petaFiles.push(...selectedPetaFiles.value);
+  IPC.send("startDrag", petaFiles, actualTileSize.value, "");
 }
 function selectTile(thumb: Tile, force = false) {
-  if (thumb.petaImage === undefined) {
+  if (thumb.petaFile === undefined) {
     return;
   }
   if (
-    selectedPetaImages.value.length < 1 ||
+    selectedPetaFiles.value.length < 1 ||
     !Keyboards.pressedOR(
       "ShiftLeft",
       "ShiftRight",
@@ -267,11 +267,11 @@ function selectTile(thumb: Tile, force = false) {
   }
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     // 選択サムネイルを反転
-    thumb.petaImage.renderer.selected = !thumb.petaImage.renderer.selected || force;
+    thumb.petaFile.renderer.selected = !thumb.petaFile.renderer.selected || force;
   } else {
     // コントロールキーが押されていなければ選択をリセット
-    petaImagesStore.clearSelection();
-    thumb.petaImage.renderer.selected = true;
+    petaFilesStore.clearSelection();
+    thumb.petaFile.renderer.selected = true;
   }
   if (firstSelectedTile.value && Keyboards.pressedOR("ShiftLeft", "ShiftRight")) {
     // 最初の選択と、シフトキーが押されていれば、範囲選択。
@@ -292,7 +292,7 @@ function selectTile(thumb: Tile, force = false) {
       .clone()
       .sub(topLeft);
     tiles.value.forEach((pt) => {
-      if (pt.petaImage === undefined) {
+      if (pt.petaFile === undefined) {
         return;
       }
       const widthDiff = Math.min(
@@ -310,19 +310,19 @@ function selectTile(thumb: Tile, force = false) {
       const hitArea = widthDiff * heightDiff;
       const ptArea = pt.width * pt.height;
       if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
-        pt.petaImage.renderer.selected = true;
+        pt.petaFile.renderer.selected = true;
       }
     });
   }
 }
 function clearSelectionAll() {
-  petaImagesArray.value.forEach((pi) => {
+  petaFilesArray.value.forEach((pi) => {
     pi.renderer.selected = false;
   });
 }
-function petaImageMenu(petaImage: RPetaImage, position: Vec2) {
-  if (!petaImage.renderer.selected) {
-    const tile = tiles.value.find((tile) => tile.petaImage?.id === petaImage.id);
+function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
+  if (!petaFile.renderer.selected) {
+    const tile = tiles.value.find((tile) => tile.petaFile?.id === petaFile.id);
     if (tile) {
       selectTile(tile, true);
     }
@@ -330,43 +330,43 @@ function petaImageMenu(petaImage: RPetaImage, position: Vec2) {
   components.contextMenu.open(
     [
       {
-        label: t("browser.petaImageMenu.remove", [selectedPetaImages.value.length]),
+        label: t("browser.petaFileMenu.remove", [selectedPetaFiles.value.length]),
         click: async () => {
           if (
             (await components.dialog.show(
-              t("browser.removeImageDialog", [selectedPetaImages.value.length]),
+              t("browser.removeImageDialog", [selectedPetaFiles.value.length]),
               [t("commons.yes"), t("commons.no")],
             )) === 0
           ) {
-            petaImagesStore.updatePetaImages(selectedPetaImages.value, UpdateMode.REMOVE);
+            petaFilesStore.updatePetaFiles(selectedPetaFiles.value, UpdateMode.REMOVE);
           }
         },
       },
       {
-        label: t("browser.petaImageMenu.openImageFile"),
+        label: t("browser.petaFileMenu.openImageFile"),
         click: async () => {
-          await IPC.send("openImageFile", petaImage);
+          await IPC.send("openImageFile", petaFile);
         },
       },
       ...realESRGANModelNames.map((modelName) => {
         return {
-          label: `${t("browser.petaImageMenu.realESRGAN")}(${modelName})`,
+          label: `${t("browser.petaFileMenu.realESRGAN")}(${modelName})`,
           click: async () => {
-            await IPC.send("realESRGANConvert", selectedPetaImages.value, modelName);
+            await IPC.send("realESRGANConvert", selectedPetaFiles.value, modelName);
           },
         };
       }),
       {
-        label: t("browser.petaImageMenu.searchImageByGoogle"),
+        label: t("browser.petaFileMenu.searchImageByGoogle"),
         click: async () => {
-          await IPC.send("searchImageByGoogle", petaImage);
+          await IPC.send("searchImageByGoogle", petaFile);
         },
       },
     ],
     position,
   );
 }
-async function openDetail(petaImage: RPetaImage) {
+async function openDetail(petaFile: RPetaFile) {
   if (
     Keyboards.pressedOR(
       "ShiftLeft",
@@ -379,14 +379,14 @@ async function openDetail(petaImage: RPetaImage) {
   ) {
     return;
   }
-  await IPC.send("setDetailsPetaImage", petaImage.id);
+  await IPC.send("setDetailsPetaFile", petaFile.id);
   await IPC.send("openWindow", WindowType.DETAILS);
 }
 function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;
 }
 let ciedeCache: { [key: string]: number } = {};
-function sort(a: RPetaImage, b: RPetaImage) {
+function sort(a: RPetaFile, b: RPetaFile) {
   switch (sortMode.value) {
     case "ADD_DATE": {
       if (a.addDate === b.addDate) {
@@ -405,21 +405,21 @@ function sort(a: RPetaImage, b: RPetaImage) {
     }
   }
 }
-function calcCiedeFromPalette(petaImage: RPetaImage, rgb: { r: number; g: number; b: number }) {
-  const populations = petaImage.metadata.palette.reduce((num, color) => num + color.population, 0);
+function calcCiedeFromPalette(petaFile: RPetaFile, rgb: { r: number; g: number; b: number }) {
+  const populations = petaFile.metadata.palette.reduce((num, color) => num + color.population, 0);
   return Math.min(
-    ...petaImage.metadata.palette
+    ...petaFile.metadata.palette
       .filter((pc) => pc.population / populations > 0.2)
       .map((pc) => ciede(pc, rgb)),
   );
 }
-const fetchFilteredPetaImages = (() => {
+const fetchFilteredPetaFiles = (() => {
   let fetchId = 0;
   return async () => {
     const currentFetchId = ++fetchId;
     console.time("fetch" + currentFetchId);
     const results = await IPC.send(
-      "getPetaImageIds",
+      "getPetaFileIds",
       selectedFilterType.value === FilterType.UNTAGGED
         ? { type: "untagged" }
         : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0
@@ -431,18 +431,18 @@ const fetchFilteredPetaImages = (() => {
       return;
     }
     ciedeCache = {};
-    filteredPetaImages.value = (
+    filteredPetaFiles.value = (
       Array.from(
         new Set(
           results
             .map((id) => {
-              return petaImages.value[id];
+              return petaFiles.value[id];
             })
-            .filter((petaImage) => {
-              return petaImage;
+            .filter((petaFile) => {
+              return petaFile;
             }),
         ),
-      ) as RPetaImage[]
+      ) as RPetaFile[]
     ).sort(sort);
   };
 })();
@@ -469,16 +469,14 @@ function keyA() {
   }
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     clearSelectionAll();
-    filteredPetaImages.value.forEach((pi) => {
+    filteredPetaFiles.value.forEach((pi) => {
       pi.renderer.selected = true;
     });
   }
 }
-const petaImages = computed(() => petaImagesStore.state.value);
-const petaImagesArray = computed(() => Object.values(petaImages.value));
-const selectedPetaImages = computed(() =>
-  petaImagesArray.value.filter((pi) => pi.renderer.selected),
-);
+const petaFiles = computed(() => petaFilesStore.state.value);
+const petaFilesArray = computed(() => Object.values(petaFiles.value));
+const selectedPetaFiles = computed(() => petaFilesArray.value.filter((pi) => pi.renderer.selected));
 const thumbnailsRowCount = computed(() => {
   const c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);
   if (c < 1) {
@@ -506,7 +504,7 @@ const tiles = computed((): Tile[] => {
   }
   let prevDateString = "";
   const tiles: Tile[] = [];
-  filteredPetaImages.value.map((p) => {
+  filteredPetaFiles.value.map((p) => {
     let minY = Number.MAX_VALUE;
     let maxY = Number.MIN_VALUE;
     let mvi = 0;
@@ -553,7 +551,7 @@ const tiles = computed((): Tile[] => {
     const height = (p.metadata.height / p.metadata.width) * actualTileSize.value;
     yList[mvi] += height;
     const tile: Tile = {
-      petaImage: p,
+      petaFile: p,
       position: position,
       width: actualTileSize.value - BROWSER_THUMBNAIL_MARGIN,
       height: height - BROWSER_THUMBNAIL_MARGIN,
@@ -571,7 +569,7 @@ const original = computed(
   () =>
     settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE,
 );
-watch(filteredPetaImages, () => {
+watch(filteredPetaFiles, () => {
   ImageDecoder.clear();
 });
 watch([selectedPetaTagIds, selectedFilterType, sortMode], () => {
@@ -581,12 +579,12 @@ watch([selectedPetaTagIds, selectedFilterType, sortMode], () => {
       thumbnails.value.scrollTo(0, 0);
     }
   });
-  fetchFilteredPetaImages();
+  fetchFilteredPetaFiles();
 });
-watch(petaImagesArray, fetchFilteredPetaImages);
-watch(petaTagsStore.state.petaTags, fetchFilteredPetaImages);
-watch(sortMode, fetchFilteredPetaImages);
-const f = throttle(100, fetchFilteredPetaImages);
+watch(petaFilesArray, fetchFilteredPetaFiles);
+watch(petaTagsStore.state.petaTags, fetchFilteredPetaFiles);
+watch(sortMode, fetchFilteredPetaFiles);
+const f = throttle(100, fetchFilteredPetaFiles);
 watch(currentColor, () => {
   currentScrollTileId.value = "";
   nextTick(() => {
