@@ -24,6 +24,7 @@ export const migratePetaBoard = createMigrater<PetaBoard>(async (data, update) =
   return data;
 });
 export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const anyData = data as any;
   if (data.petaFileId === undefined) {
     data.petaFileId = anyData.petaImageId;

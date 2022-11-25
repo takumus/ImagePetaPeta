@@ -4,6 +4,7 @@ import { createMigrater } from "@/main/libs/createMigrater";
 
 const defaultSettings = getDefaultSettings();
 export const migrateSettings = createMigrater<Settings>(async (data, update) => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const anyData = data as any;
   // v2.8.0
   if (data.show === undefined) {
@@ -18,6 +19,7 @@ export const migrateSettings = createMigrater<Settings>(async (data, update) => 
     data.showTagsOnTile = defaultSettings.showTagsOnTile;
     update();
   }
+  // v3.0.0
   if (data.eula === undefined) {
     data.eula = 0;
     update();
