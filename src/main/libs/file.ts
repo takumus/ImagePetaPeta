@@ -23,6 +23,20 @@ export function readFile(path: string): Promise<Buffer> {
     });
   });
 }
+export function copyFile(from: string, to: string) {
+  return new Promise<boolean>((res, rej) => {
+    fs.copyFile(from, to, (err) => {
+      if (err) {
+        rej(err.message);
+        return;
+      }
+      res(true);
+    });
+  });
+}
+export function readStream(path: string) {
+  return fs.createReadStream(path);
+}
 export function mkdir(path: string, recursive = false): Promise<string> {
   return new Promise((res, rej) => {
     fs.mkdir(path, { recursive }, (err) => {

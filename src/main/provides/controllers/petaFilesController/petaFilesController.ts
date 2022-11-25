@@ -1,9 +1,6 @@
 import axios, { AxiosError } from "axios";
-import crypto from "crypto";
 import dataUriToBuffer from "data-uri-to-buffer";
-import { fileTypeFromBuffer } from "file-type";
 import * as Path from "path";
-import sharp from "sharp";
 import { v4 as uuid } from "uuid";
 
 import { FileType } from "@/commons/datas/fileType";
@@ -26,13 +23,17 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
+import {
+  addFile,
+  isSupportedFile,
+} from "@/main/provides/controllers/petaFilesController/addFile/addFile";
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
+import { fileSHA256 } from "@/main/provides/utils/fileSHA256";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { generateMetadataByWorker } from "@/main/utils/generateMetadata";
-import { imageFormatToExtention } from "@/main/utils/imageFormatToExtention";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
@@ -304,11 +305,10 @@ export class PetaFilesController {
           log.log("import:", index + 1, "/", fileInfos.length);
           let result = ImportImageResult.SUCCESS;
           try {
-            const data = await file.readFile(fileInfo.path);
             const name = Path.basename(fileInfo.path);
             const fileDate = (await file.stat(fileInfo.path)).mtime;
             const addResult = await this.addFile({
-              data,
+              path: fileInfo.path,
               name: fileInfo.name ?? name,
               fileDate,
               note: fileInfo.note ?? "",
@@ -396,14 +396,21 @@ export class PetaFilesController {
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
   }
   private async addFile(param: {
-    data: Buffer;
+    path: string;
     name: string;
     note: string;
     fileDate?: Date;
     addDate?: Date;
   }): Promise<{ exists: boolean; petaFile: PetaFile }> {
+    const logger = useLogger().logMainChunk();
+    logger.log("#Add File");
+    if (!(await isSupportedFile(param.path))) {
+      throw new Error("unsupported file");
+    }
     const paths = usePaths();
-    const id = crypto.createHash("sha256").update(param.data).digest("hex");
+    const id = await fileSHA256(param.path);
+    const addDate = param.addDate || new Date();
+    const fileDate = param.fileDate || new Date();
     const exists = await this.getPetaFile(id);
     if (exists) {
       return {
@@ -411,32 +418,13 @@ export class PetaFilesController {
         exists: true,
       };
     }
-    const filetype = await fileTypeFromBuffer(param.data);
-    if (filetype !== undefined) {
-      if (!filetype.mime.startsWith("image/")) {
-        throw new Error(`unsupported file type (${JSON.stringify(filetype)})`);
-      }
-    } else {
-      throw new Error(`unsupported file type (unknown file type)`);
+    const fileInfo = await addFile(param.path);
+    if (fileInfo === undefined) {
+      throw new Error("unsupported file");
     }
-    const metadata = await sharp(param.data, { limitInputPixels: false }).metadata();
-    let extName: string | undefined | null = undefined;
-    if (metadata.orientation !== undefined) {
-      // jpegの角度情報があったら回転する。pngにする。
-      param.data = await sharp(param.data, { limitInputPixels: false }).rotate().png().toBuffer();
-      extName = "png";
-    } else {
-      // formatを拡張子にする。
-      extName = imageFormatToExtention(metadata.format);
-    }
-    if (extName === undefined) {
-      throw new Error("invalid image file type");
-    }
-    const addDate = param.addDate || new Date();
-    const fileDate = param.fileDate || new Date();
-    const originalFileName = `${id}.${extName}`;
+    const originalFileName = `${id}.${fileInfo.ext}`;
     const petaMetaData = await generateMetadataByWorker({
-      data: param.data,
+      data: fileInfo.thumbnailsBuffer,
       outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, originalFileName),
       size: BROWSER_THUMBNAIL_SIZE,
       quality: BROWSER_THUMBNAIL_QUALITY,
@@ -454,13 +442,13 @@ export class PetaFilesController {
       nsfw: false,
       metadata: {
         type: "image",
-        width: petaMetaData.original.width,
-        height: petaMetaData.original.height,
+        width: fileInfo.width,
+        height: fileInfo.height,
         palette: petaMetaData.palette,
         version: PETAIMAGE_METADATA_VERSION,
       },
     };
-    await file.writeFile(Path.resolve(paths.DIR_IMAGES, originalFileName), param.data);
+    await file.copyFile(param.path, Path.resolve(paths.DIR_IMAGES, originalFileName));
     return {
       petaFile: petaFile,
       exists: false,

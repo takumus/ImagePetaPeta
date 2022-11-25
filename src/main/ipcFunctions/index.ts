@@ -25,7 +25,7 @@ import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
 import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";

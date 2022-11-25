@@ -10,7 +10,7 @@ import { ppa } from "@/commons/utils/pp";
 
 import { extraFiles } from "@/@assets/extraFiles";
 import * as Tasks from "@/main/libs/task";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";

@@ -47,7 +47,7 @@ import {
 import {
   PetaFilesController,
   petaFilesControllerKey,
-} from "@/main/provides/controllers/petaFilesController";
+} from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import {
   PetaTagPartitionsController,
   petaTagPartitionsControllerKey,
