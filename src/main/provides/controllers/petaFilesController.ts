@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import crypto from "crypto";
 import dataUriToBuffer from "data-uri-to-buffer";
+import { fileTypeFromBuffer } from "file-type";
 import * as Path from "path";
 import sharp from "sharp";
 import { v4 as uuid } from "uuid";
@@ -306,7 +307,7 @@ export class PetaFilesController {
             const data = await file.readFile(fileInfo.path);
             const name = Path.basename(fileInfo.path);
             const fileDate = (await file.stat(fileInfo.path)).mtime;
-            const addResult = await this.addImage({
+            const addResult = await this.addFile({
               data,
               name: fileInfo.name ?? name,
               fileDate,
@@ -394,7 +395,7 @@ export class PetaFilesController {
     await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
   }
-  private async addImage(param: {
+  private async addFile(param: {
     data: Buffer;
     name: string;
     note: string;
@@ -404,11 +405,20 @@ export class PetaFilesController {
     const paths = usePaths();
     const id = crypto.createHash("sha256").update(param.data).digest("hex");
     const exists = await this.getPetaFile(id);
-    if (exists)
+    if (exists) {
       return {
         petaFile: exists,
         exists: true,
       };
+    }
+    const filetype = await fileTypeFromBuffer(param.data);
+    if (filetype !== undefined) {
+      if (!filetype.mime.startsWith("image/")) {
+        throw new Error(`unsupported file type (${JSON.stringify(filetype)})`);
+      }
+    } else {
+      throw new Error(`unsupported file type (unknown file type)`);
+    }
     const metadata = await sharp(param.data, { limitInputPixels: false }).metadata();
     let extName: string | undefined | null = undefined;
     if (metadata.orientation !== undefined) {
