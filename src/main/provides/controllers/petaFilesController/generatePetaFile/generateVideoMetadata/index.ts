@@ -8,6 +8,7 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 
+import { noHtml } from "@/main/errorWindow";
 import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
 
 export async function generateVideoMetadata(path: string, ext: string): Promise<GeneratedFileInfo> {
@@ -18,17 +19,32 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
     titleBarStyle: "hiddenInset",
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true,
+      contextIsolation: false,
+      webSecurity: false,
       offscreen: !debug,
     },
   });
   window.webContents.setAudioMuted(true);
   try {
-    try {
-      await window.loadFile(path);
-    } catch (err) {
-      // console.log(err);
-    }
+    await window.loadURL(`
+      data:text/html;charset=utf-8,
+      <head>
+      <style>
+      body, html {
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+      }
+      video {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      </style>
+      </head>
+      <body>
+      <video src="${noHtml(path)}"></video>
+      </body>`);
     window.webContents.debugger.attach("1.1");
     const size = await new Promise<{ width: number; height: number }>((res, rej) => {
       let result = { width: 0, height: 0 };

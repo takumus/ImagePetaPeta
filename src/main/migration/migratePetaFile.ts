@@ -11,6 +11,7 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
       type: "image",
       width: anyPetaFile.width,
       height: anyPetaFile.height,
+      gif: false,
       palette: anyPetaFile.palette ?? [],
       version: anyPetaFile.metadataVersion ?? 0,
     };
@@ -18,6 +19,10 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
     delete anyPetaFile.height;
     delete anyPetaFile.palette;
     delete anyPetaFile.metadataVersion;
+    update();
+  }
+  if (data.metadata.type === "image" && data.metadata.gif === undefined) {
+    data.metadata.gif = false;
     update();
   }
   return data;

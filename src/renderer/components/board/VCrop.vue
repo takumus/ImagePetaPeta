@@ -308,7 +308,7 @@ function changePetaPanel() {
     await pPanel.init();
     pPanel.showNSFW = nsfwStore.state.value;
     await pPanel.load();
-    pPanel.playGIF();
+    // pPanel.playGIF();
     loaded.value = true;
   })();
 }

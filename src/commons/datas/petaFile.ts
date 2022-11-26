@@ -6,6 +6,7 @@ interface _PetaFileMetadata {
 }
 export interface PetaFileImageMetadata extends _PetaFileMetadata {
   type: "image";
+  gif: boolean;
   width: number;
   height: number;
   palette: PetaColor[];

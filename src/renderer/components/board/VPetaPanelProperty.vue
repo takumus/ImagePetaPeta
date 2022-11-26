@@ -20,7 +20,13 @@
         @click="singleSelectedPetaPanel ? openDetails(singleSelectedPetaPanel) : false">
         {{ t("boards.panelMenu.details") }}
       </button>
-      <button v-if="singleSelectedPetaPanel" @click="playGIF">
+      <button
+        v-if="
+          singleSelectedPetaPanel &&
+          singleSelectedPetaFile?.metadata.type === 'image' &&
+          singleSelectedPetaFile.metadata.gif
+        "
+        @click="playGIF">
         {{
           t(
             `boards.panelMenu.${
@@ -32,7 +38,9 @@
           )
         }}
       </button>
-      <button v-if="singleSelectedPetaPanel" @click="playVideo">
+      <button
+        v-if="singleSelectedPetaPanel && singleSelectedPetaFile?.metadata.type === 'video'"
+        @click="playVideo">
         {{
           t(
             `boards.panelMenu.${
@@ -61,8 +69,10 @@ import { WindowType } from "@/commons/datas/windowType";
 import { Vec2 } from "@/commons/utils/vec2";
 
 import { IPC } from "@/renderer/libs/ipc";
+import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { searchParentElement } from "@/renderer/utils/searchParentElement";
 
+const petaFilesStore = usePetaFilesStore();
 const props = defineProps<{
   zIndex: number;
   selectedPetaPanels: RPetaPanel[];
@@ -207,6 +217,11 @@ function close(): void {
 }
 const singleSelectedPetaPanel = computed(() =>
   props.selectedPetaPanels.length === 1 ? props.selectedPetaPanels[0] : undefined,
+);
+const singleSelectedPetaFile = computed(() =>
+  singleSelectedPetaPanel.value !== undefined
+    ? petaFilesStore.getPetaFile(singleSelectedPetaPanel.value.petaFileId)
+    : undefined,
 );
 defineExpose({
   open,

@@ -60,6 +60,7 @@ async function generateImageMetaData(param: {
     extention: param.ext,
     metadata: {
       type: "image",
+      gif: param.ext === "gif",
       width: metadata.width,
       height: metadata.height,
       palette: palette,
