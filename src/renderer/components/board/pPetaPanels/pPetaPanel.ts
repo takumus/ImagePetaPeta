@@ -114,9 +114,11 @@ export class PPetaPanel extends PIXI.Sprite {
         this.videoElement.loop = true;
         this.updateVideo();
         await this.videoElement.play();
-        this.videoElement.pause();
-        if (this.petaPanel.status.type === "video" && !this.petaPanel.status.stopped) {
-          this.videoElement.play();
+        if (
+          this.petaPanel.status.type !== "video" ||
+          (this.petaPanel.status.type === "video" && this.petaPanel.status.stopped)
+        ) {
+          this.videoElement.pause();
         }
         const resource = new PIXI.VideoResource(this.videoElement, {
           autoPlay: false,
@@ -254,7 +256,7 @@ export class PPetaPanel extends PIXI.Sprite {
       this.image.height = imageHeight;
       this.image.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
       this.image.y = -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
-      if (this.gif) {
+      if (this.gif && !this.loading) {
         this.gif.width = this.image.width;
         this.gif.height = this.image.height;
         this.gif.x = this.image.x;
@@ -267,7 +269,7 @@ export class PPetaPanel extends PIXI.Sprite {
           }
         }
       }
-      if (this.petaPanel.status.type === "video") {
+      if (this.petaPanel.status.type === "video" && !this.loading) {
         if (this.petaPanel.status.stopped) {
           this.videoElement?.pause();
         } else {
