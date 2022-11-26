@@ -31,5 +31,10 @@ export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) =
     delete anyData.petaImageId;
     update();
   }
+  if (data.status === undefined) {
+    data.status = {
+      type: "none",
+    };
+  }
   return data;
 });

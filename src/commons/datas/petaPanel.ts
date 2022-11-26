@@ -13,10 +13,21 @@ export interface PetaPanel {
   };
   id: string;
   index: number;
-  gif: {
-    stopped: boolean;
-    frame: number;
-  };
+  status:
+    | {
+        type: "gif";
+        stopped: boolean;
+        frame: number;
+      }
+    | {
+        type: "video";
+        stopped: boolean;
+        time: number;
+      }
+    | {
+        type: "none";
+      };
+
   visible: boolean;
   locked: boolean;
 }

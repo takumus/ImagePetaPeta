@@ -28,9 +28,8 @@ export function createRPetaPanel(
     },
     id: uuid(),
     index: 0,
-    gif: {
-      stopped: false,
-      frame: 0,
+    status: {
+      type: "none",
     },
     visible: true,
     locked: false,

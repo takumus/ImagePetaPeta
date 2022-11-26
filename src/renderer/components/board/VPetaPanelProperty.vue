@@ -21,7 +21,28 @@
         {{ t("boards.panelMenu.details") }}
       </button>
       <button v-if="singleSelectedPetaPanel" @click="playGIF">
-        {{ t(`boards.panelMenu.${singleSelectedPetaPanel.gif.stopped ? "playGIF" : "stopGIF"}`) }}
+        {{
+          t(
+            `boards.panelMenu.${
+              singleSelectedPetaPanel.status.type === "gif" &&
+              singleSelectedPetaPanel.status.stopped
+                ? "playGIF"
+                : "stopGIF"
+            }`,
+          )
+        }}
+      </button>
+      <button v-if="singleSelectedPetaPanel" @click="playVideo">
+        {{
+          t(
+            `boards.panelMenu.${
+              singleSelectedPetaPanel.status.type === "video" &&
+              singleSelectedPetaPanel.status.stopped
+                ? "playVideo"
+                : "stopVideo"
+            }`,
+          )
+        }}
       </button>
     </t-content>
   </VFloating>
@@ -69,7 +90,31 @@ onMounted(() => {
 });
 function playGIF(): void {
   if (singleSelectedPetaPanel.value !== undefined) {
-    singleSelectedPetaPanel.value.gif.stopped = !singleSelectedPetaPanel.value.gif.stopped;
+    const isGIF = singleSelectedPetaPanel.value.status.type === "gif";
+    const stopped =
+      singleSelectedPetaPanel.value.status.type === "gif"
+        ? singleSelectedPetaPanel.value.status.stopped
+        : true;
+    singleSelectedPetaPanel.value.status = {
+      type: "gif",
+      frame: 0,
+      stopped: !isGIF ? false : !stopped,
+    };
+    emit("update:petaPanels", [singleSelectedPetaPanel.value]);
+  }
+}
+function playVideo(): void {
+  if (singleSelectedPetaPanel.value !== undefined) {
+    const isGIF = singleSelectedPetaPanel.value.status.type === "video";
+    const stopped =
+      singleSelectedPetaPanel.value.status.type === "video"
+        ? singleSelectedPetaPanel.value.status.stopped
+        : true;
+    singleSelectedPetaPanel.value.status = {
+      type: "video",
+      time: 0,
+      stopped: !isGIF ? false : !stopped,
+    };
     emit("update:petaPanels", [singleSelectedPetaPanel.value]);
   }
 }

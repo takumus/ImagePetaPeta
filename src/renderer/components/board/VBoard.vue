@@ -508,9 +508,9 @@ async function load(params: {
       const onLoaded = (petaPanel: RPetaPanel, error?: unknown) => {
         loaded++;
         if (currentBoard.value) {
-          if (!petaPanel.gif.stopped) {
-            pPanels[petaPanel.id]?.playGIF();
-          }
+          // if (!petaPanel.gif.stopped) {
+          //   pPanels[petaPanel.id]?.playGIF();
+          // }
           loadingStatus.value.loadProgress = Math.floor((loaded / petaPanels.length) * 100);
           const progress = `${loaded}/${petaPanels.length}`;
           log(
