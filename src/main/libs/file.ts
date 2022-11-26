@@ -34,6 +34,17 @@ export function copyFile(from: string, to: string) {
     });
   });
 }
+export function moveFile(from: string, to: string) {
+  return new Promise<boolean>((res, rej) => {
+    fs.rename(from, to, (err) => {
+      if (err) {
+        rej(err.message);
+        return;
+      }
+      res(true);
+    });
+  });
+}
 export function readStream(path: string) {
   return fs.createReadStream(path);
 }

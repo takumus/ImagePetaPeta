@@ -1,12 +1,12 @@
 import { WorkerThreadsInputType, WorkerThreadsOutputType } from "@/main/libs/initWorkerThreads";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
-import GenerateMetadataWorkerThreads from "@/main/utils/generateMetadata/generateMetadata.worker-threads";
+import WorkerThreads from "@/main/provides/controllers/petaFilesController/generatePetaFile/generatePetaFile.worker-threads";
 
-const wtGroup = createWorkerThreadsGroup(GenerateMetadataWorkerThreads);
-export async function generateMetadataByWorker(
-  params: WorkerThreadsInputType<typeof GenerateMetadataWorkerThreads>,
+const wtGroup = createWorkerThreadsGroup(WorkerThreads);
+export async function generatePetaFileByWorker(
+  params: WorkerThreadsInputType<typeof WorkerThreads>,
 ) {
-  return new Promise<WorkerThreadsOutputType<typeof GenerateMetadataWorkerThreads>>((res, rej) => {
+  return new Promise<WorkerThreadsOutputType<typeof WorkerThreads>>((res, rej) => {
     const wt = wtGroup.getWT();
     wt.use();
     wt.worker.postMessage(params);

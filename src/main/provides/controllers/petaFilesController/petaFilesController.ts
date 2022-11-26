@@ -11,11 +11,6 @@ import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
-import {
-  BROWSER_THUMBNAIL_QUALITY,
-  BROWSER_THUMBNAIL_SIZE,
-  PETAIMAGE_METADATA_VERSION,
-} from "@/commons/defines";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
@@ -23,17 +18,14 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
-import {
-  addFile,
-  isSupportedFile,
-} from "@/main/provides/controllers/petaFilesController/addFile/addFile";
+import { generatePetaFileByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
+import { isSupportedFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile/addFile";
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { fileSHA256 } from "@/main/provides/utils/fileSHA256";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
-import { generateMetadataByWorker } from "@/main/utils/generateMetadata";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
@@ -254,6 +246,7 @@ export class PetaFilesController {
     silent = false,
   ) {
     const logger = useLogger();
+    const paths = usePaths();
     if (params.fileInfos.length == 0) {
       return [];
     }
@@ -307,19 +300,31 @@ export class PetaFilesController {
           try {
             const name = Path.basename(fileInfo.path);
             const fileDate = (await file.stat(fileInfo.path)).mtime;
-            const addResult = await this.addFile({
-              path: fileInfo.path,
-              name: fileInfo.name ?? name,
-              fileDate,
-              note: fileInfo.note ?? "",
-            });
-            if (addResult.exists) {
+            if (!(await isSupportedFile(fileInfo.path))) {
+              throw new Error("unsupported file");
+            }
+            const id = await fileSHA256(fileInfo.path);
+            const exists = await this.getPetaFile(id);
+            if (exists !== undefined) {
               result = ImportImageResult.EXISTS;
-              petaFiles.push(addResult.petaFile);
+              petaFiles.push(exists);
             } else {
-              await this.updateMultiple([addResult.petaFile], UpdateMode.INSERT, true);
+              const petaFile = await generatePetaFileByWorker({
+                path: fileInfo.path,
+                dirOriginals: paths.DIR_IMAGES,
+                dirThumbnails: paths.DIR_THUMBNAILS,
+                name: fileInfo.name ?? name,
+                fileDate: fileDate.getTime(),
+                note: fileInfo.note,
+                id,
+                type: "add",
+              });
+              if (petaFile === undefined) {
+                throw new Error("unsupported file");
+              }
+              await this.updateMultiple([petaFile], UpdateMode.INSERT, true);
               addedFileCount++;
-              petaFiles.push(addResult.petaFile);
+              petaFiles.push(petaFile);
             }
             log.log("imported", result);
           } catch (err) {
@@ -365,25 +370,22 @@ export class PetaFilesController {
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
-      // if (image.metadataVersion >= PETAIMAGE_METADATA_VERSION) {
-      //   return;
-      // }
-      const data = await file.readFile(Path.resolve(paths.DIR_IMAGES, petaFile.file.original));
-      const result = await generateMetadataByWorker({
-        data,
-        outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, petaFile.file.original),
-        size: BROWSER_THUMBNAIL_SIZE,
-        quality: BROWSER_THUMBNAIL_QUALITY,
+      const newPetaFile = await generatePetaFileByWorker({
+        path: Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
+        type: "update",
+        id: petaFile.id,
+        dirOriginals: paths.DIR_IMAGES,
+        dirThumbnails: paths.DIR_THUMBNAILS,
+        name: petaFile.name,
+        note: petaFile.note,
+        addDate: petaFile.addDate,
+        fileDate: petaFile.fileDate,
+        nsfw: petaFile.nsfw,
       });
-      petaFile.file.thumbnail = `${petaFile.file.original}.${result.thumbnail.format}`;
-      petaFile.metadata = {
-        type: "image",
-        palette: result.palette,
-        width: result.original.width,
-        height: result.original.height,
-        version: PETAIMAGE_METADATA_VERSION,
-      };
-      await this.updateMultiple([petaFile], UpdateMode.UPDATE, true);
+      if (newPetaFile === undefined) {
+        return;
+      }
+      await this.update(newPetaFile, UpdateMode.UPDATE);
       log.log(`thumbnail (${++completed} / ${petaFiles.length})`);
       emitMainEvent(
         { type: EmitMainEventTargetType.ALL },
@@ -394,65 +396,6 @@ export class PetaFilesController {
     };
     await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
-  }
-  private async addFile(param: {
-    path: string;
-    name: string;
-    note: string;
-    fileDate?: Date;
-    addDate?: Date;
-  }): Promise<{ exists: boolean; petaFile: PetaFile }> {
-    const logger = useLogger().logMainChunk();
-    logger.log("#Add File");
-    if (!(await isSupportedFile(param.path))) {
-      throw new Error("unsupported file");
-    }
-    const paths = usePaths();
-    const id = await fileSHA256(param.path);
-    const addDate = param.addDate || new Date();
-    const fileDate = param.fileDate || new Date();
-    const exists = await this.getPetaFile(id);
-    if (exists) {
-      return {
-        petaFile: exists,
-        exists: true,
-      };
-    }
-    const fileInfo = await addFile(param.path);
-    if (fileInfo === undefined) {
-      throw new Error("unsupported file");
-    }
-    const originalFileName = `${id}.${fileInfo.ext}`;
-    const petaMetaData = await generateMetadataByWorker({
-      data: fileInfo.thumbnailsBuffer,
-      outputFilePath: Path.resolve(paths.DIR_THUMBNAILS, originalFileName),
-      size: BROWSER_THUMBNAIL_SIZE,
-      quality: BROWSER_THUMBNAIL_QUALITY,
-    });
-    const petaFile: PetaFile = {
-      file: {
-        original: originalFileName,
-        thumbnail: `${originalFileName}.${petaMetaData.thumbnail.format}`,
-      },
-      name: param.name,
-      note: param.note,
-      fileDate: fileDate.getTime(),
-      addDate: addDate.getTime(),
-      id: id,
-      nsfw: false,
-      metadata: {
-        type: "image",
-        width: fileInfo.width,
-        height: fileInfo.height,
-        palette: petaMetaData.palette,
-        version: PETAIMAGE_METADATA_VERSION,
-      },
-    };
-    await file.copyFile(param.path, Path.resolve(paths.DIR_IMAGES, originalFileName));
-    return {
-      petaFile: petaFile,
-      exists: false,
-    };
   }
 }
 export const petaFilesControllerKey = createKey<PetaFilesController>("petaFilesController");

@@ -1,15 +1,23 @@
 import { PetaColor } from "@/commons/datas/petaColor";
 
-export interface PetaFileMetadata {
+interface _PetaFileMetadata {
   type: string;
   version: number;
 }
-export interface PetaFileImageMetadata extends PetaFileMetadata {
+export interface PetaFileImageMetadata extends _PetaFileMetadata {
   type: "image";
   width: number;
   height: number;
   palette: PetaColor[];
 }
+export interface PetaFileVideoMetadata extends _PetaFileMetadata {
+  type: "video";
+  width: number;
+  height: number;
+  lengthMS: number;
+  palette: PetaColor[];
+}
+export type PetaFileMetadata = PetaFileImageMetadata | PetaFileVideoMetadata;
 export interface PetaFile {
   file: {
     original: string;
@@ -21,6 +29,6 @@ export interface PetaFile {
   addDate: number;
   note: string;
   nsfw: boolean;
-  metadata: PetaFileImageMetadata;
+  metadata: PetaFileMetadata;
 }
 export type PetaFiles = { [id: string]: PetaFile };
