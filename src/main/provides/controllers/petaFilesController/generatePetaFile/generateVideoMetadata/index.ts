@@ -8,44 +8,66 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 
-import { noHtml } from "@/main/errorWindow";
 import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
 
 export async function generateVideoMetadata(path: string, ext: string): Promise<GeneratedFileInfo> {
   const debug = false;
   const window = new BrowserWindow({
     show: debug,
-    frame: false,
+    frame: debug,
     titleBarStyle: "hiddenInset",
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: false,
-      webSecurity: false,
+      contextIsolation: true,
       offscreen: !debug,
     },
   });
   window.webContents.setAudioMuted(true);
   try {
-    await window.loadURL(`
-      data:text/html;charset=utf-8,
-      <head>
-      <style>
-      body, html {
-        margin: 0px;
-        padding: 0px;
-        overflow: hidden;
-      }
-      video {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-      </style>
-      </head>
-      <body>
-      <video src="${noHtml(path)}"></video>
-      </body>`);
+    const url = `data:text/html;charset=utf-8,
+    <head>
+    <style>
+    body, html {
+      margin: 0px;
+      padding: 0px;
+      overflow: hidden;
+    }
+    video {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    input {
+      display: none;
+    }
+    </style>
+    </head>
+    <body>
+    <input type="file" id="videoUpload" />
+    <video>
+    </video>
+    <script>
+    document.getElementById("videoUpload")
+    .onchange = function(event) {
+      let file = event.target.files[0];
+      let blobURL = URL.createObjectURL(file);
+      document.querySelector("video").src = blobURL;
+    }
+    </script>
+    </body>`.replace(/\n/g, "");
+    await window.loadURL(url);
     window.webContents.debugger.attach("1.1");
+    const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
+    // インプット取得
+    const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
+      nodeId: document.root.nodeId,
+      selector: "input",
+    });
+    // ファイル選択
+    await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
+      nodeId: input.nodeId,
+      files: [path],
+    });
     const size = await new Promise<{ width: number; height: number }>((res, rej) => {
       let result = { width: 0, height: 0 };
       let retryCount = 0;
@@ -82,7 +104,7 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
       }, 100);
     });
     const height = (size.height / size.width) * BROWSER_THUMBNAIL_SIZE;
-    window.setSize(BROWSER_THUMBNAIL_SIZE, height);
+    window.setSize(Math.floor(BROWSER_THUMBNAIL_SIZE), Math.floor(height));
     const buffer = (await window.capturePage()).toPNG();
     const thumbnailsBuffer = await sharp(buffer, { limitInputPixels: false })
       .resize(BROWSER_THUMBNAIL_SIZE)
