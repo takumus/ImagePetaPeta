@@ -292,6 +292,7 @@ export class PetaFilesController {
           fileInfos.push(...params.fileInfos);
         }
         let addedFileCount = 0;
+        let processedFileCount = 0;
         let error = false;
         const petaFiles: PetaFile[] = [];
         const importImage = async (fileInfo: ImportFileInfo, index: number) => {
@@ -313,10 +314,12 @@ export class PetaFilesController {
                 path: fileInfo.path,
                 dirOriginals: paths.DIR_IMAGES,
                 dirThumbnails: paths.DIR_THUMBNAILS,
-                name: fileInfo.name ?? name,
-                fileDate: fileDate.getTime(),
-                note: fileInfo.note,
-                id,
+                extends: {
+                  name: fileInfo.name ?? name,
+                  fileDate: fileDate.getTime(),
+                  note: fileInfo.note,
+                  id,
+                },
                 type: "add",
               });
               if (petaFile === undefined) {
@@ -332,18 +335,19 @@ export class PetaFilesController {
             result = ImportImageResult.ERROR;
             error = true;
           }
+          processedFileCount++;
           handler.emitStatus({
             i18nKey: "tasks.importingFiles",
             progress: {
               all: fileInfos.length,
-              current: index + 1,
+              current: processedFileCount,
             },
             log: [result, fileInfo.path],
             status: TaskStatusCode.PROGRESS,
             cancelable: true,
           });
         };
-        const result = ppa(importImage, fileInfos);
+        const result = ppa(importImage, fileInfos, CPU_LENGTH);
         handler.onCancel = result.cancel;
         try {
           await result.promise;
@@ -373,14 +377,9 @@ export class PetaFilesController {
       const newPetaFile = await generatePetaFileByWorker({
         path: Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
         type: "update",
-        id: petaFile.id,
         dirOriginals: paths.DIR_IMAGES,
         dirThumbnails: paths.DIR_THUMBNAILS,
-        name: petaFile.name,
-        note: petaFile.note,
-        addDate: petaFile.addDate,
-        fileDate: petaFile.fileDate,
-        nsfw: petaFile.nsfw,
+        extends: petaFile,
       });
       if (newPetaFile === undefined) {
         return;

@@ -7,33 +7,28 @@ import { addFile } from "@/main/provides/controllers/petaFilesController/generat
 
 export async function generatePetaFile(param: {
   path: string;
-  name?: string;
-  note?: string;
-  fileDate?: number;
-  addDate?: number;
-  nsfw?: boolean;
+  extends: Partial<PetaFile> & { id: string };
   dirOriginals: string;
   dirThumbnails: string;
-  id: string;
   type: "update" | "add";
 }): Promise<PetaFile> {
   const fileInfo = await addFile(param.path);
   if (fileInfo === undefined) {
     throw new Error("unsupported file");
   }
-  const originalFileName = `${param.id}.${fileInfo.extention}`; // xxxxxxxx.png
-  const thumbnailFileName = `${param.id}.${fileInfo.extention}.${fileInfo.thumbnail.extention}`; // xxxxxxxx.png.webp
+  const originalFileName = `${param.extends.id}.${fileInfo.extention}`; // xxxxxxxx.png
+  const thumbnailFileName = `${param.extends.id}.${fileInfo.extention}.${fileInfo.thumbnail.extention}`; // xxxxxxxx.png.webp
   const petaFile: PetaFile = {
-    id: param.id,
+    id: param.extends.id,
     file: {
       original: originalFileName,
       thumbnail: thumbnailFileName,
     },
-    name: param.name ?? "",
-    note: param.note ?? "",
-    fileDate: param.fileDate ?? new Date().getTime(),
-    addDate: param.addDate ?? new Date().getTime(),
-    nsfw: param.nsfw ?? false,
+    name: param.extends.name ?? "",
+    note: param.extends.note ?? "",
+    fileDate: param.extends.fileDate ?? new Date().getTime(),
+    addDate: param.extends.addDate ?? new Date().getTime(),
+    nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
   };
   if (param.type === "add") {
