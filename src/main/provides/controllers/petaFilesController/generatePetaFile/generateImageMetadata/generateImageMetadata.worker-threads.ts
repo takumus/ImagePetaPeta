@@ -1,25 +1,44 @@
 import sharp from "sharp";
+import { parentPort } from "worker_threads";
 
+import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
 import {
   BROWSER_THUMBNAIL_QUALITY,
   BROWSER_THUMBNAIL_SIZE,
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 
-import { AddFileInfo } from "@/main/provides/controllers/petaFilesController/generatePetaFile/addFile";
+import { initWorkerThreads } from "@/main/libs/initWorkerThreads";
 import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
 
-export async function addImage(buffer: Buffer, ext: string): Promise<AddFileInfo> {
-  const metadata = await sharp(buffer, { limitInputPixels: false }).metadata();
+export default initWorkerThreads<
+  Parameters<typeof generateImageMetaData>[0],
+  Awaited<ReturnType<typeof generateImageMetaData> | undefined>
+>(parentPort, (parentPort) => {
+  parentPort.on("message", async (params) => {
+    try {
+      const petaFile = await generateImageMetaData(params);
+      parentPort.postMessage(petaFile);
+    } catch {
+      parentPort.postMessage(undefined);
+    }
+  });
+});
+
+async function generateImageMetaData(param: {
+  buffer: Buffer;
+  ext: string;
+}): Promise<GeneratedFileInfo> {
+  const metadata = await sharp(param.buffer, { limitInputPixels: false }).metadata();
   if (metadata.orientation !== undefined) {
     // jpegの角度情報があったら回転する。pngにする。
-    buffer = await sharp(buffer, { limitInputPixels: false }).rotate().png().toBuffer();
-    ext = "png";
+    param.buffer = await sharp(param.buffer, { limitInputPixels: false }).rotate().png().toBuffer();
+    param.ext = "png";
   }
   if (metadata.width === undefined || metadata.height === undefined) {
     throw new Error("unsupported image");
   }
-  const thumbnailsBuffer = await sharp(buffer, { limitInputPixels: false })
+  const thumbnailsBuffer = await sharp(param.buffer, { limitInputPixels: false })
     .resize(BROWSER_THUMBNAIL_SIZE)
     .webp({ quality: BROWSER_THUMBNAIL_QUALITY })
     .toBuffer({ resolveWithObject: true });
@@ -38,7 +57,7 @@ export async function addImage(buffer: Buffer, ext: string): Promise<AddFileInfo
       buffer: thumbnailsBuffer.data,
       extention: "webp",
     },
-    extention: ext,
+    extention: param.ext,
     metadata: {
       type: "image",
       width: metadata.width,

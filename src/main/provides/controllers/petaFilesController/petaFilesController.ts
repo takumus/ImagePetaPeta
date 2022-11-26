@@ -18,8 +18,10 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
-import { generatePetaFileByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
-import { isSupportedFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile/addFile";
+import {
+  generatePetaFile,
+  isSupportedFile,
+} from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { fileSHA256 } from "@/main/provides/utils/fileSHA256";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -310,7 +312,7 @@ export class PetaFilesController {
               result = ImportImageResult.EXISTS;
               petaFiles.push(exists);
             } else {
-              const petaFile = await generatePetaFileByWorker({
+              const petaFile = await generatePetaFile({
                 path: fileInfo.path,
                 dirOriginals: paths.DIR_IMAGES,
                 dirThumbnails: paths.DIR_THUMBNAILS,
@@ -374,7 +376,7 @@ export class PetaFilesController {
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
-      const newPetaFile = await generatePetaFileByWorker({
+      const newPetaFile = await generatePetaFile({
         path: Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
         type: "update",
         dirOriginals: paths.DIR_IMAGES,
