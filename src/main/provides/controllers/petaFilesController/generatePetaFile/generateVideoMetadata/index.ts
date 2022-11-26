@@ -11,16 +11,18 @@ import {
 import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
 
 export async function generateVideoMetadata(path: string, ext: string): Promise<GeneratedFileInfo> {
+  const debug = false;
   const window = new BrowserWindow({
-    show: false,
+    show: debug,
     frame: false,
     titleBarStyle: "hiddenInset",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      offscreen: true,
+      offscreen: !debug,
     },
   });
+  window.webContents.setAudioMuted(true);
   try {
     try {
       await window.loadFile(path);
@@ -34,13 +36,16 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
       const handler = setInterval(async () => {
         try {
           await window.webContents.executeJavaScript(
-            `document.querySelector('video').controls = false;`,
+            `var videoElement = document.querySelector('video');`,
+          );
+          await window.webContents.executeJavaScript(
+            `videoElement.autoplay = false; videoElement.controls = false; videoElement.muted = true;`,
           );
           result = JSON.parse(
             await window.webContents.executeJavaScript(`
               JSON.stringify({
-                width: document.querySelector('video').videoWidth,
-                height: document.querySelector('video').videoHeight
+                width: videoElement.videoWidth,
+                height: videoElement.videoHeight
               })`),
           );
           if (result.width > 0 && result.height > 0) {
@@ -57,7 +62,8 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
         }
       }, 100);
     });
-    window.setSize(size.width, size.height);
+    const height = (size.height / size.width) * BROWSER_THUMBNAIL_SIZE;
+    window.setSize(BROWSER_THUMBNAIL_SIZE, height);
     const buffer = (await window.capturePage()).toPNG();
     const thumbnailsBuffer = await sharp(buffer, { limitInputPixels: false })
       .resize(BROWSER_THUMBNAIL_SIZE)
