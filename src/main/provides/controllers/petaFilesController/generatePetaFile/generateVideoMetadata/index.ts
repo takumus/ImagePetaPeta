@@ -35,18 +35,21 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
       let retryCount = 0;
       const handler = setInterval(async () => {
         try {
-          await window.webContents.executeJavaScript(
-            `var videoElement = document.querySelector('video');`,
-          );
-          await window.webContents.executeJavaScript(
-            `videoElement.autoplay = false; videoElement.controls = false; videoElement.muted = true;`,
-          );
+          await window.webContents.executeJavaScript(`
+            var videoElement = document.querySelector('video');
+            videoElement.autoplay = false;
+            videoElement.controls = false;
+            videoElement.muted = true;
+            videoElement.cuttentTime = 0;
+            videoElement.pause();
+          `);
           result = JSON.parse(
             await window.webContents.executeJavaScript(`
               JSON.stringify({
                 width: videoElement.videoWidth,
                 height: videoElement.videoHeight
-              })`),
+              })
+            `),
           );
           if (result.width > 0 && result.height > 0) {
             clearInterval(handler);
