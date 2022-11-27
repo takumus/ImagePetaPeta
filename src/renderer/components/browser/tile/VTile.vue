@@ -29,7 +29,11 @@
           @load="loadingThumbnail = false"
           v-if="loadingOriginal"
           decoding="async" />
-        <img ref="image" draggable="false" v-show="!loadingOriginal" />
+        <img
+          ref="image"
+          draggable="false"
+          v-show="!loadingOriginal && tile.petaFile.metadata.type === 'image'" />
+        <video ref="video" v-show="tile.petaFile.metadata.type === 'video'"></video>
         <t-background> </t-background>
       </t-images>
       <t-tags
@@ -99,6 +103,7 @@ const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const thumbnailURL = ref("");
 const image = ref<HTMLImageElement>();
+const video = ref<HTMLVideoElement>();
 const loadingThumbnail = ref(true);
 const loadingOriginal = ref(true);
 const loadingTags = ref(true);
@@ -192,16 +197,24 @@ function delayedLoadImage() {
     if (props.original) {
       loadOriginalTimeoutHandler = window.setTimeout(() => {
         if (props.tile.visible) {
-          const img = image.value;
-          const url = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
-          if (img === undefined) {
-            return;
-          }
-          if (img.src !== url) {
-            loadingOriginal.value = true;
-            ImageDecoder.decode(img, url, (failed) => {
-              loadingOriginal.value = failed;
-            });
+          if (props.tile.petaFile?.metadata.type === "image") {
+            const img = image.value;
+            const url = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
+            if (img === undefined) {
+              return;
+            }
+            if (img.src !== url) {
+              loadingOriginal.value = true;
+              ImageDecoder.decode(img, url, (failed) => {
+                loadingOriginal.value = failed;
+              });
+            }
+          } else if (props.tile.petaFile?.metadata.type === "video") {
+            const v = video.value;
+            if (v === undefined) {
+              return;
+            }
+            v.src = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
           }
         }
       }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
@@ -266,6 +279,15 @@ t-tile-root {
         padding: 2px;
       }
       > img {
+        z-index: 1;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      > video {
         z-index: 1;
         position: absolute;
         top: 0px;
