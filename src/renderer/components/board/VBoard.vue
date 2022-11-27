@@ -323,7 +323,7 @@ function animate() {
   boardLoader.pPanelsArray().forEach((pPanel) => pPanel.orderRender());
 }
 function petaPanelMenu(petaPanel: RPetaPanel, position: Vec2) {
-  const pPanel = boardLoader.pPanels[petaPanel.id];
+  const pPanel = boardLoader.getPPanelFromId(petaPanel.id);
   if (!pPanel) {
     return;
   }

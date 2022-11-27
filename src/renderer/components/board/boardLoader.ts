@@ -301,10 +301,12 @@ export function initBoardLoader(
     orderPIXIRender();
     updatePetaBoard();
   }
+  function getPPanelFromId(id: string) {
+    return pPanels[id];
+  }
   return {
     load,
     pPanelsArray,
-    pPanels,
     loadingStatus,
     sortIndex,
     addPanel,
@@ -317,5 +319,6 @@ export function initBoardLoader(
     getPPetaPanelFromObject,
     updatePetaPanelsFromLayer,
     resetTransform,
+    getPPanelFromId,
   };
 }
