@@ -1,5 +1,20 @@
 import { Vec2 } from "@/commons/utils/vec2";
 
+export type PetaPanelStatus =
+  | {
+      type: "gif";
+      stopped: boolean;
+      time: number;
+    }
+  | {
+      type: "video";
+      stopped: boolean;
+      time: number;
+      volume: number;
+    }
+  | {
+      type: "none";
+    };
 export interface PetaPanel {
   petaFileId: string;
   position: Vec2;
@@ -13,21 +28,7 @@ export interface PetaPanel {
   };
   id: string;
   index: number;
-  status:
-    | {
-        type: "gif";
-        stopped: boolean;
-        time: number;
-      }
-    | {
-        type: "video";
-        stopped: boolean;
-        time: number;
-        volume: number;
-      }
-    | {
-        type: "none";
-      };
+  status: PetaPanelStatus;
 
   visible: boolean;
   locked: boolean;

@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 
 import { PetaFile } from "@/commons/datas/petaFile";
-import { PetaPanel } from "@/commons/datas/petaPanel";
+import { PetaPanel, PetaPanelStatus } from "@/commons/datas/petaPanel";
 import { Vec2 } from "@/commons/utils/vec2";
 
 export interface RPetaPanel extends PetaPanel {
@@ -15,6 +15,15 @@ export function createRPetaPanel(
   width: number,
   height?: number,
 ) {
+  const status = ((): PetaPanelStatus => {
+    if (petaFile.metadata.type === "image" && petaFile.metadata.gif) {
+      return { type: "gif", stopped: true, time: 0 };
+    }
+    if (petaFile.metadata.type === "video") {
+      return { type: "video", stopped: true, time: 0, volume: 0 };
+    }
+    return { type: "none" };
+  })();
   const panel: RPetaPanel = {
     petaFileId: petaFile.id,
     position: position,
@@ -28,9 +37,7 @@ export function createRPetaPanel(
     },
     id: uuid(),
     index: 0,
-    status: {
-      type: "none",
-    },
+    status,
     visible: true,
     locked: false,
     renderer: {
