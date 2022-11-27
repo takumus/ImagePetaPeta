@@ -5,7 +5,11 @@
       width: tile.width + 'px',
       height: tile.height + 'px',
     }">
-    <t-tile-wrapper v-if="tile.group === undefined && tile.petaFile !== undefined">
+    <t-tile-wrapper
+      v-if="tile.group === undefined && tile.petaFile !== undefined"
+      @pointermove="seekVideo"
+      @pointerenter="pointerEnter"
+      @pointerleave="pointerLeave">
       <t-images
         @pointerdown="pointerdown"
         @dragstart="dragstart($event)"
@@ -33,7 +37,11 @@
           ref="image"
           draggable="false"
           v-show="!loadingOriginal && tile.petaFile.metadata.type === 'image'" />
-        <video ref="video" v-show="tile.petaFile.metadata.type === 'video'"></video>
+        <video
+          ref="video"
+          v-show="tile.petaFile.metadata.type === 'video'"
+          v-if="showVideo"
+          :src="getFileURL(props.tile.petaFile, FileType.ORIGINAL)"></video>
         <t-background> </t-background>
       </t-images>
       <t-tags
@@ -58,6 +66,7 @@
 
 <script setup lang="ts">
 // Vue
+import { debounce } from "throttle-debounce";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -113,6 +122,10 @@ let loadOriginalTimeoutHandler = -1;
 let loadThumbnailTimeoutHandler = -1;
 let fetchTagsTimeoutHandler = -1;
 const fetchingPetaTags = ref(false);
+const showVideo = ref(false);
+const setVideoVisibleDebounce = debounce(500, (visible: boolean) => {
+  showVideo.value = visible;
+});
 onMounted(() => {
   delayedLoadImage();
   delayedFetchPetaTags();
@@ -122,6 +135,29 @@ onUnmounted(() => {
   window.clearTimeout(loadThumbnailTimeoutHandler);
   window.clearTimeout(fetchTagsTimeoutHandler);
 });
+function pointerEnter() {
+  showVideo.value = true;
+  setVideoVisibleDebounce(true);
+}
+function pointerLeave() {
+  setVideoVisibleDebounce(false);
+}
+function seekVideo(event: PointerEvent) {
+  if (props.tile.petaFile?.metadata.type !== "video") {
+    return;
+  }
+  const rect = (event.target as HTMLElement).getBoundingClientRect();
+  const progress = event.offsetX / rect.width;
+  if (
+    video.value === undefined ||
+    !video.value.seekable ||
+    video.value.seeking ||
+    video.value.readyState < 2
+  ) {
+    return;
+  }
+  video.value.currentTime = progress * video.value.duration;
+}
 function dragstart(event: PointerEvent) {
   event.preventDefault();
   if (props.tile.petaFile) {
@@ -214,7 +250,7 @@ function delayedLoadImage() {
             if (v === undefined) {
               return;
             }
-            v.src = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
+            // v.src = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
           }
         }
       }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
@@ -295,6 +331,7 @@ t-tile-root {
         display: block;
         width: 100%;
         height: 100%;
+        object-fit: cover;
       }
       > t-background {
         z-index: 0;
