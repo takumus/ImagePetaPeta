@@ -107,7 +107,7 @@ function playGIF(): void {
         : true;
     singleSelectedPetaPanel.value.status = {
       type: "gif",
-      frame: 0,
+      time: 0,
       stopped: !isGIF ? false : !stopped,
     };
     emit("update:petaPanels", [singleSelectedPetaPanel.value]);
@@ -123,6 +123,7 @@ function playVideo(): void {
     singleSelectedPetaPanel.value.status = {
       type: "video",
       time: 0,
+      volume: 0,
       stopped: !isGIF ? false : !stopped,
     };
     emit("update:petaPanels", [singleSelectedPetaPanel.value]);

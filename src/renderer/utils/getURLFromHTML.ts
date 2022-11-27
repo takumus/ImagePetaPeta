@@ -5,6 +5,7 @@ export function getURLFromHTML(html: string) {
     const dom = new DOMParser().parseFromString(`<wrapper>${html}</wrapper>`, "text/html");
     const imgDom = dom.getElementsByTagName("img")[0];
     const aDom = dom.getElementsByTagName("a")[0];
+    const videoDom = dom.getElementsByTagName("video")[0];
     if (imgDom !== undefined) {
       const url = fromImg(imgDom);
       if (url !== undefined) {
@@ -12,6 +13,11 @@ export function getURLFromHTML(html: string) {
       }
     } else if (aDom !== undefined) {
       const url = fromA(aDom);
+      if (url !== undefined) {
+        return url;
+      }
+    } else if (videoDom !== undefined) {
+      const url = fromVideo(videoDom);
       if (url !== undefined) {
         return url;
       }
@@ -55,6 +61,11 @@ function fromImg(dom: HTMLImageElement) {
     );
   const src = getValueFromAttrs("src", attrs);
   return max?.src ?? src;
+}
+function fromVideo(dom: HTMLVideoElement) {
+  const attrs = Array.from(dom.attributes);
+  const src = getValueFromAttrs("src", attrs);
+  return src;
 }
 
 function getValueFromAttrs(name: string, attrs: Attr[]) {

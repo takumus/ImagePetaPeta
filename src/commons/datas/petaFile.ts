@@ -1,3 +1,5 @@
+import { MimeType } from "file-type";
+
 import { PetaColor } from "@/commons/datas/petaColor";
 
 interface _PetaFileMetadata {
@@ -30,6 +32,7 @@ export interface PetaFile {
   addDate: number;
   note: string;
   nsfw: boolean;
+  mimeType: MimeType | "unknown/unknown";
   metadata: PetaFileMetadata;
 }
 export type PetaFiles = { [id: string]: PetaFile };

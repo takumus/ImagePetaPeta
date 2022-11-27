@@ -1,4 +1,4 @@
-import { FileTypeResult, fileTypeFromFile } from "file-type";
+import { fileTypeFromFile } from "file-type";
 import * as Path from "path";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
@@ -8,6 +8,7 @@ import * as file from "@/main/libs/file";
 import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata";
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
+import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
 export async function generatePetaFile(param: {
   path: string;
@@ -22,8 +23,8 @@ export async function generatePetaFile(param: {
   if (fileInfo === undefined) {
     throw new Error("unsupported file");
   }
-  const originalFileName = `${param.extends.id}.${fileInfo.extention}`; // xxxxxxxx.png
-  const thumbnailFileName = `${param.extends.id}.${fileInfo.extention}.${fileInfo.thumbnail.extention}`; // xxxxxxxx.png.webp
+  const originalFileName = `${param.extends.id}.${fileInfo.original.extention}`; // xxxxxxxx.png
+  const thumbnailFileName = `${param.extends.id}.${fileInfo.original.extention}.${fileInfo.thumbnail.extention}`; // xxxxxxxx.png.webp
   const petaFile: PetaFile = {
     id: param.extends.id,
     file: {
@@ -34,6 +35,7 @@ export async function generatePetaFile(param: {
     note: param.extends.note ?? "",
     fileDate: param.extends.fileDate ?? new Date().getTime(),
     addDate: param.extends.addDate ?? new Date().getTime(),
+    mimeType: fileInfo.original.mimeType,
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
   };
@@ -54,39 +56,19 @@ export async function generatePetaFile(param: {
   return petaFile;
 }
 export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {
-  const filetype = await fileTypeFromFile(path);
+  const fileType = await fileTypeFromFile(path);
   const logger = useLogger().logMainChunk();
-  logger.log("#Generate Metadata", filetype?.mime);
-  if (filetype !== undefined) {
-    if (supportedFileConditions.image(filetype)) {
+  logger.log("#Generate Metadata", fileType?.mime);
+  if (fileType !== undefined) {
+    if (supportedFileConditions.image(fileType)) {
       return generateImageMetadataByWorker({
         buffer: await file.readFile(path),
-        ext: filetype.ext,
+        fileType: fileType,
       });
     }
-    if (supportedFileConditions.video(filetype)) {
-      return generateVideoMetadata(path, filetype.ext);
+    if (supportedFileConditions.video(fileType)) {
+      return generateVideoMetadata(path, fileType);
     }
   }
   return undefined;
 }
-export async function isSupportedFile(path: string) {
-  const fileType = await fileTypeFromFile(path);
-  if (fileType === undefined) {
-    return false;
-  }
-  return Object.values(supportedFileConditions).reduce((supported: boolean, checker) => {
-    if (supported) {
-      return true;
-    }
-    return checker(fileType);
-  }, false);
-}
-const supportedFileConditions = {
-  image: (fileType: FileTypeResult) => {
-    return fileType.mime.startsWith("image/");
-  },
-  video: (fileType: FileTypeResult) => {
-    return fileType.mime.startsWith("video/");
-  },
-};

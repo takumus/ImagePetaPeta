@@ -1,3 +1,4 @@
+import { FileTypeResult } from "file-type";
 import sharp from "sharp";
 import { parentPort } from "worker_threads";
 
@@ -27,13 +28,16 @@ export default initWorkerThreads<
 
 async function generateImageMetaData(param: {
   buffer: Buffer;
-  ext: string;
+  fileType: FileTypeResult;
 }): Promise<GeneratedFileInfo> {
   const metadata = await sharp(param.buffer, { limitInputPixels: false }).metadata();
+  let extention = param.fileType.ext;
+  let mimeType = param.fileType.mime;
   if (metadata.orientation !== undefined) {
     // jpegの角度情報があったら回転する。pngにする。
     param.buffer = await sharp(param.buffer, { limitInputPixels: false }).rotate().png().toBuffer();
-    param.ext = "png";
+    extention = "png";
+    mimeType = "image/png";
   }
   if (metadata.width === undefined || metadata.height === undefined) {
     throw new Error("unsupported image");
@@ -57,10 +61,13 @@ async function generateImageMetaData(param: {
       buffer: thumbnailsBuffer.data,
       extention: "webp",
     },
-    extention: param.ext,
+    original: {
+      extention,
+      mimeType,
+    },
     metadata: {
       type: "image",
-      gif: param.ext === "gif",
+      gif: extention === "gif",
       width: metadata.width,
       height: metadata.height,
       palette: palette,

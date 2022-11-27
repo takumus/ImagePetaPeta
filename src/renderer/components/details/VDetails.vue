@@ -4,7 +4,13 @@
       zIndex: zIndex,
     }">
     <VDragView :content-width="petaFile.metadata.width" :content-height="petaFile.metadata.height">
-      <img v-show="loaded" :src="url" draggable="false" @load="loaded = true" />
+      <img
+        v-if="petaFile.metadata.type === 'image'"
+        v-show="loaded"
+        :src="url"
+        draggable="false"
+        @load="loaded = true" />
+      <video v-else :src="url" autoplay controls></video>
       <t-nsfw v-if="nsfwMask"></t-nsfw>
     </VDragView>
     <!-- 1pxだけ右下から出すとスムーズなズームが出来る。ブラウザの仕様。 -->

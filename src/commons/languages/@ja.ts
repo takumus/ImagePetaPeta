@@ -123,6 +123,7 @@ const ja = {
         note: "ノート",
         name: "名前",
         size: "サイズ",
+        mimeType: "MIME",
       },
       colors: {
         label: "色",

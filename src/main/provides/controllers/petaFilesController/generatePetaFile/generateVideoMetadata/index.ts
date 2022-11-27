@@ -1,4 +1,5 @@
 import { BrowserWindow } from "electron";
+import { FileTypeResult } from "file-type";
 import sharp from "sharp";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
@@ -10,7 +11,10 @@ import {
 
 import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
 
-export async function generateVideoMetadata(path: string, ext: string): Promise<GeneratedFileInfo> {
+export async function generateVideoMetadata(
+  path: string,
+  fileType: FileTypeResult,
+): Promise<GeneratedFileInfo> {
   const debug = false;
   const window = new BrowserWindow({
     show: debug,
@@ -24,37 +28,6 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
   });
   window.webContents.setAudioMuted(true);
   try {
-    const url = `data:text/html;charset=utf-8,
-    <head>
-    <style>
-    body, html {
-      margin: 0px;
-      padding: 0px;
-      overflow: hidden;
-    }
-    video {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-    input {
-      display: none;
-    }
-    </style>
-    </head>
-    <body>
-    <input type="file" id="videoUpload" />
-    <video>
-    </video>
-    <script>
-    document.getElementById("videoUpload")
-    .onchange = function(event) {
-      let file = event.target.files[0];
-      let blobURL = URL.createObjectURL(file);
-      document.querySelector("video").src = blobURL;
-    }
-    </script>
-    </body>`.replace(/\n/g, "");
     await window.loadURL(url);
     window.webContents.debugger.attach("1.1");
     const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
@@ -97,11 +70,11 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
           //
         }
         retryCount++;
-        if (retryCount >= 50) {
+        if (retryCount >= 10) {
           clearInterval(handler);
           rej("could not get size");
         }
-      }, 100);
+      }, 500);
     });
     const height = (size.height / size.width) * BROWSER_THUMBNAIL_SIZE;
     window.setSize(Math.floor(BROWSER_THUMBNAIL_SIZE), Math.floor(height));
@@ -126,7 +99,10 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
         buffer: thumbnailsBuffer.data,
         extention: "webp",
       },
-      extention: ext,
+      original: {
+        extention: fileType.ext,
+        mimeType: fileType.mime,
+      },
       metadata: {
         type: "video",
         width: size.width,
@@ -141,3 +117,35 @@ export async function generateVideoMetadata(path: string, ext: string): Promise<
     throw error;
   }
 }
+
+const url = `data:text/html;charset=utf-8,
+    <head>
+    <style>
+    body, html {
+      margin: 0px;
+      padding: 0px;
+      overflow: hidden;
+    }
+    video {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    input {
+      display: none;
+    }
+    </style>
+    </head>
+    <body>
+    <input type="file" id="videoUpload" />
+    <video>
+    </video>
+    <script>
+    document.getElementById("videoUpload")
+    .onchange = function(event) {
+      let file = event.target.files[0];
+      let blobURL = URL.createObjectURL(file);
+      document.querySelector("video").src = blobURL;
+    }
+    </script>
+    </body>`.replace(/\n/g, "");

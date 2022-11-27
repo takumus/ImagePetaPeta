@@ -37,6 +37,10 @@
             {{ singlePetaFileInfo.petaFile.metadata.height }}px</t-value
           >
         </t-data>
+        <t-data>
+          <t-name>{{ t("browser.property.infos.mimeType") }}:</t-name>
+          <t-value>{{ singlePetaFileInfo.petaFile.mimeType }}</t-value>
+        </t-data>
         <!-- <t-data>
           <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
           <t-value>{{ singlePetaFileInfo.fileDate }}</t-value>

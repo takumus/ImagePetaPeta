@@ -18,16 +18,14 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
-import {
-  generatePetaFile,
-  isSupportedFile,
-} from "@/main/provides/controllers/petaFilesController/generatePetaFile";
+import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { fileSHA256 } from "@/main/provides/utils/fileSHA256";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {

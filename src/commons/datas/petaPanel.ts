@@ -17,12 +17,13 @@ export interface PetaPanel {
     | {
         type: "gif";
         stopped: boolean;
-        frame: number;
+        time: number;
       }
     | {
         type: "video";
         stopped: boolean;
         time: number;
+        volume: number;
       }
     | {
         type: "none";

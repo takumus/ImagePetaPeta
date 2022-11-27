@@ -159,6 +159,9 @@ export class AnimatedGIF extends Sprite {
   get currentFrame(): number {
     return this._currentFrame;
   }
+  get currentTime(): number {
+    return this._currentTime;
+  }
   set currentFrame(value: number) {
     this.updateFrameIndex(value);
     this._currentTime = this._frames[value]!.start;

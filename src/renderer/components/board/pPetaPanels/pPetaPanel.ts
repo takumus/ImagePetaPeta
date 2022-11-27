@@ -144,7 +144,7 @@ export class PPetaPanel extends PIXI.Sprite {
           this.imageWrapper.addChild(this.gif);
           if (this.petaPanel.status.type === "gif" && this.petaPanel.status.stopped) {
             this.gif.stop();
-            this.gif.currentFrame = this.petaPanel.status.frame;
+            // this.gif.tim = this.petaPanel.status.frame;
           }
           this.noImage = false;
         } else if (image.texture) {
@@ -269,11 +269,16 @@ export class PPetaPanel extends PIXI.Sprite {
           }
         }
       }
-      if (this.petaPanel.status.type === "video" && !this.loading) {
+      if (
+        this.petaPanel.status.type === "video" &&
+        !this.loading &&
+        this.videoElement !== undefined
+      ) {
+        this.videoElement.volume = this.petaPanel.status.volume;
         if (this.petaPanel.status.stopped) {
-          this.videoElement?.pause();
+          this.videoElement.pause();
         } else {
-          this.videoElement?.play();
+          this.videoElement.play();
         }
       }
       if (this.imageWrapper.mask) {

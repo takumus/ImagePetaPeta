@@ -25,5 +25,9 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
     data.metadata.gif = false;
     update();
   }
+  if (data.mimeType === undefined) {
+    data.mimeType = "unknown/unknown";
+    update();
+  }
   return data;
 });
