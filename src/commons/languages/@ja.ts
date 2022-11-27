@@ -50,6 +50,8 @@ const ja = {
       details: "詳細を見る",
       playGIF: "GIFを再生",
       stopGIF: "GIFを停止",
+      playVideo: "動画を再生",
+      stopVideo: "動画を停止",
       crop: "トリミング",
       flipHorizontal: "左右反転",
       flipVertical: "上下反転",
