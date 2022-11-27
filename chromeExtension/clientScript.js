@@ -18,19 +18,38 @@ export function clientScript() {
     if (event.target.getAttribute("data-imagepetapeta-saved") === "true") {
       return;
     }
+    const elements = [...document.querySelectorAll("*")].filter((element) => {
+      const rect = element.getBoundingClientRect();
+      if (
+        rect.left < event.clientX &&
+        rect.right > event.clientX &&
+        rect.top < event.clientY &&
+        rect.bottom > event.clientY
+      ) {
+        if (element.src !== undefined || element.srcset !== undefined) {
+          return true;
+        }
+      }
+      return false;
+    });
+    const element =
+      elements[elements.indexOf(document.elementFromPoint(event.clientX, event.clientY))] ??
+      elements[0];
+    console.log(element);
     chrome.runtime.sendMessage(
       {
         type: "save",
-        html: event.target.outerHTML,
+        html: element.outerHTML,
       },
-      (error, res) => {
-        if (error) {
+      (res) => {
+        if (res === undefined) {
           alert("タイムアウト");
           return;
         }
+        console.log(res);
         if (res.length > 0) {
-          event.target.setAttribute("data-imagepetapeta-saved", "true");
-          event.target.style.filter = "invert(100%)";
+          element.setAttribute("data-imagepetapeta-saved", "true");
+          element.style.filter = "invert(100%)";
         }
       },
     );

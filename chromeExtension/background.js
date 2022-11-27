@@ -6,10 +6,10 @@ chrome.runtime.onMessage.addListener((request, _, response) => {
   post("importFiles", [[{ type: "html", html: request.html }]])
     .then((ids) => {
       console.log(ids);
-      response(undefined, ids);
+      response(ids);
     })
     .catch((reason) => {
-      response(reason, undefined);
+      response(undefined);
     });
   return true;
 });
