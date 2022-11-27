@@ -529,11 +529,10 @@ async function load(params: {
       let pPanel = pPanels[petaPanel.id];
       if (pPanel === undefined) {
         // pPanelが無ければ作成。
-        pPanel = pPanels[petaPanel.id] = new PPetaPanel(petaPanel, petaFilesStore);
+        pPanel = pPanels[petaPanel.id] = new PPetaPanel(petaPanel, petaFilesStore, onUpdateGif);
         pPanel.setZoomScale(currentBoard.value?.transform.scale || 1);
         await pPanel.init();
         pPanel.showNSFW = nsfwStore.state.value;
-        pPanel.onUpdateGIF = onUpdateGif;
         pPanelsContainer.addChild(pPanel);
         pPanel.orderRender();
         orderPIXIRender();

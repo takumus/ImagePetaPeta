@@ -293,10 +293,7 @@ function changePetaPanel() {
   maxX.value = props.petaPanel.crop.width + props.petaPanel.crop.position.x;
   maxY.value = props.petaPanel.crop.height + props.petaPanel.crop.position.y;
   if (!pPanel) {
-    pPanel = new PPetaPanel(petaPanel, petaFilesStore);
-    pPanel.onUpdateGIF = () => {
-      orderPIXIRender();
-    };
+    pPanel = new PPetaPanel(petaPanel, petaFilesStore, orderPIXIRender);
     rootContainer.addChildAt(pPanel, 0);
   } else {
     pPanel.setPetaPanel(petaPanel);

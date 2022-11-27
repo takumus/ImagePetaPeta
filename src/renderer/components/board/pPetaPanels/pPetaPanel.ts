@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 
-import { FileType } from "@/commons/datas/fileType";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -10,9 +9,9 @@ import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 // import { AnimatedGIF } from "@/renderer/libs/pixi-gif";
 import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
+import { VideoLoaderResult, loadVideo } from "@/renderer/components/board/pPetaPanels/videoLoader";
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
-import { getFileURL } from "@/renderer/utils/fileURL";
 
 export class PPetaPanel extends PIXI.Sprite {
   // public selected = false;
@@ -24,7 +23,6 @@ export class PPetaPanel extends PIXI.Sprite {
   public imageWrapper = new PIXI.Sprite();
   public noImage = true;
   public loading = true;
-  public onUpdateGIF: ((frame: number) => void) | undefined;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
   private cover = new PIXI.Sprite();
@@ -35,7 +33,7 @@ export class PPetaPanel extends PIXI.Sprite {
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
   private zoomScale = 1;
-  private videoElement: HTMLVideoElement | undefined;
+  private video: VideoLoaderResult | undefined;
   private _cancelLoading? = () => {
     return;
   };
@@ -47,6 +45,7 @@ export class PPetaPanel extends PIXI.Sprite {
   constructor(
     public petaPanel: RPetaPanel,
     private petaFilesStore: ReturnType<typeof usePetaFilesStore>,
+    public onUpdateRenderer: () => void,
   ) {
     super();
     this.anchor.set(0.5, 0.5);
@@ -62,21 +61,6 @@ export class PPetaPanel extends PIXI.Sprite {
     // test.padding = 0;
     // this.filters = [test];
   }
-  private updateVideo = () => {
-    window.cancelAnimationFrame(this.updateVideoHandler);
-    const petaFile = this.petaFilesStore.getPetaFile(this.petaPanel.petaFileId);
-    if (petaFile !== undefined) {
-      if (
-        petaFile.metadata.type === "video" &&
-        this.petaPanel.status.type === "video" &&
-        !this.petaPanel.status.stopped
-      ) {
-        console.log("video");
-        this.onUpdateGIF?.(0);
-      }
-    }
-    this.updateVideoHandler = window.requestAnimationFrame(this.updateVideo);
-  };
   async init() {
     if (!PPetaPanel.nsfwTexture) {
       PPetaPanel.nsfwTexture = await PIXI.Texture.fromURL(NSFWImage);
@@ -103,28 +87,17 @@ export class PPetaPanel extends PIXI.Sprite {
       this.noImage = true;
       this.loading = true;
       const petaFile = this.petaFilesStore.getPetaFile(this.petaPanel.petaFileId);
-      if (this.videoElement !== undefined) {
-        this.videoElement?.removeAttribute("src");
-        this.videoElement?.load();
-        this.videoElement?.remove();
+      if (this.video !== undefined) {
+        this.video.destroy();
       }
       if (petaFile?.metadata.type === "video") {
-        this.videoElement = document.createElement("video");
-        this.videoElement.src = getFileURL(petaFile, FileType.ORIGINAL);
-        this.videoElement.loop = true;
-        this.updateVideo();
-        await this.videoElement.play();
-        if (
+        this.video = await loadVideo(
+          petaFile,
           this.petaPanel.status.type !== "video" ||
-          (this.petaPanel.status.type === "video" && this.petaPanel.status.stopped)
-        ) {
-          this.videoElement.pause();
-        }
-        const resource = new PIXI.VideoResource(this.videoElement, {
-          autoPlay: false,
-          autoLoad: true,
-        });
-        this.image.texture = new PIXI.Texture(new PIXI.BaseTexture(resource));
+            (this.petaPanel.status.type === "video" && this.petaPanel.status.stopped),
+          this.onUpdateRenderer,
+        );
+        this.image.texture = this.video.texture;
         this.noImage = false;
         this.loading = false;
       } else if (petaFile?.metadata.type === "image") {
@@ -140,7 +113,7 @@ export class PPetaPanel extends PIXI.Sprite {
         }
         if (image.animatedGIF) {
           this.gif = image.animatedGIF;
-          this.gif.onFrameChange = this.onUpdateGIF;
+          this.gif.onFrameChange = this.onUpdateRenderer;
           this.imageWrapper.addChild(this.gif);
           if (this.petaPanel.status.type === "gif" && this.petaPanel.status.stopped) {
             this.gif.stop();
@@ -148,11 +121,7 @@ export class PPetaPanel extends PIXI.Sprite {
           }
           this.noImage = false;
         } else if (image.texture) {
-          try {
-            this.image.texture = image.texture;
-          } catch (error) {
-            //
-          }
+          this.image.texture = image.texture;
           this.noImage = false;
         }
       }
@@ -269,16 +238,12 @@ export class PPetaPanel extends PIXI.Sprite {
           }
         }
       }
-      if (
-        this.petaPanel.status.type === "video" &&
-        !this.loading &&
-        this.videoElement !== undefined
-      ) {
-        this.videoElement.volume = this.petaPanel.status.volume;
+      if (this.petaPanel.status.type === "video" && !this.loading && this.video !== undefined) {
+        this.video.videoElement.volume = this.petaPanel.status.volume;
         if (this.petaPanel.status.stopped) {
-          this.videoElement.pause();
+          this.video.pause();
         } else {
-          this.videoElement.play();
+          this.video.play();
         }
       }
       if (this.imageWrapper.mask) {
@@ -352,10 +317,7 @@ export class PPetaPanel extends PIXI.Sprite {
   public destroy() {
     this.image.destroy();
     this.gif?.destroy();
-    this.videoElement?.removeAttribute("src");
-    this.videoElement?.load();
-    this.videoElement?.remove();
-    this.videoElement = undefined;
+    this.video?.destroy();
     this.cancelLoading();
     super.destroy();
     window.cancelAnimationFrame(this.updateVideoHandler);
