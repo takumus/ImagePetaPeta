@@ -1,8 +1,9 @@
-import { app, ipcMain, protocol, session } from "electron";
+import { app, ipcMain, protocol } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
 import { PROTOCOLS } from "@/commons/defines";
+import { getLastSegmentFromURL } from "@/commons/utils/getLastSegmentFromURL";
 
 import { showError } from "@/main/errorWindow";
 import { initDB } from "@/main/initDB";
@@ -44,14 +45,12 @@ import { initWebhook } from "@/main/webhook";
     {
       scheme: PROTOCOLS.FILE.IMAGE_THUMBNAIL,
       privileges: {
-        secure: true,
         supportFetchAPI: true,
       },
     },
     {
       scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
       privileges: {
-        secure: true,
         supportFetchAPI: true,
       },
     },
@@ -94,22 +93,16 @@ import { initWebhook } from "@/main/webhook";
       );
     logger.logMainChunk().log(`verison: ${app.getVersion()}`);
     // プロトコル登録
-    session.defaultSession.protocol.registerFileProtocol(
-      PROTOCOLS.FILE.IMAGE_ORIGINAL,
-      (req, res) => {
-        res({
-          path: Path.resolve(paths.DIR_IMAGES, req.url.split("/").pop() as string),
-        });
-      },
-    );
-    session.defaultSession.protocol.registerFileProtocol(
-      PROTOCOLS.FILE.IMAGE_THUMBNAIL,
-      (req, res) => {
-        res({
-          path: Path.resolve(paths.DIR_THUMBNAILS, req.url.split("/").pop() as string),
-        });
-      },
-    );
+    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, (req, res) => {
+      res({
+        path: Path.resolve(paths.DIR_IMAGES, getLastSegmentFromURL(req.url)),
+      });
+    });
+    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, (req, res) => {
+      res({
+        path: Path.resolve(paths.DIR_THUMBNAILS, getLastSegmentFromURL(req.url)),
+      });
+    });
     // ipcの関数登録
     const ipcFunctions = getIpcFunctions();
     Object.keys(ipcFunctions).forEach((key) => {
