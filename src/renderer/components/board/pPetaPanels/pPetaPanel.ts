@@ -93,8 +93,7 @@ export class PPetaPanel extends PIXI.Sprite {
       if (petaFile?.metadata.type === "video") {
         this.video = await loadVideo(
           petaFile,
-          this.petaPanel.status.type !== "video" ||
-            (this.petaPanel.status.type === "video" && this.petaPanel.status.stopped),
+          this.petaPanel.status.type === "video" && !this.petaPanel.status.stopped,
           this.onUpdateRenderer,
         );
         this.image.texture = this.video.texture;
