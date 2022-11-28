@@ -15,6 +15,9 @@ export async function generateVideoMetadata(
   path: string,
   fileType: FileTypeResult,
 ): Promise<GeneratedFileInfo> {
+  if (fileType.mime === "video/quicktime") {
+    throw new Error(".mov is not supported");
+  }
   const debug = false;
   const window = new BrowserWindow({
     show: debug,
@@ -70,7 +73,7 @@ export async function generateVideoMetadata(
           //
         }
         retryCount++;
-        if (retryCount >= 10) {
+        if (retryCount >= 5) {
           clearInterval(handler);
           rej("could not get size");
         }
@@ -119,33 +122,33 @@ export async function generateVideoMetadata(
 }
 
 const url = `data:text/html;charset=utf-8,
-    <head>
-    <style>
-    body, html {
-      margin: 0px;
-      padding: 0px;
-      overflow: hidden;
-    }
-    video {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-    input {
-      display: none;
-    }
-    </style>
-    </head>
-    <body>
-    <input type="file" id="videoUpload" />
-    <video>
-    </video>
-    <script>
-    document.getElementById("videoUpload")
-    .onchange = function(event) {
-      let file = event.target.files[0];
-      let blobURL = URL.createObjectURL(file);
-      document.querySelector("video").src = blobURL;
-    }
-    </script>
-    </body>`.replace(/\n/g, "");
+  <head>
+  <style>
+  body, html {
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+  }
+  video {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  input {
+    display: none;
+  }
+  </style>
+  </head>
+  <body>
+  <input type="file" id="videoUpload" />
+  <video>
+  </video>
+  <script>
+  document.getElementById("videoUpload")
+  .onchange = function(event) {
+    let file = event.target.files[0];
+    let blobURL = URL.createObjectURL(file);
+    document.querySelector("video").src = blobURL;
+  }
+  </script>
+  </body>`.replace(/\n/g, "");
