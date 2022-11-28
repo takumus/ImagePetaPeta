@@ -63,11 +63,11 @@ function changeTaskStatus() {
     log.value = "";
   }
   addLog(
-    `[${task.status}]${
+    `${
       task.status === TaskStatusCode.PROGRESS && task.progress
         ? `(${task.progress.current}/${task.progress.all})`
         : ""
-    }:${localized}`,
+    }${localized}`,
   );
   Cursor.setCursor("wait");
   if (task.status === TaskStatusCode.COMPLETE) {

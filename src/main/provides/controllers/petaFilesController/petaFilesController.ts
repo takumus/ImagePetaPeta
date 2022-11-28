@@ -282,7 +282,7 @@ export class PetaFilesController {
             handler.emitStatus({
               i18nKey: "tasks.listingFiles",
               status: TaskStatusCode.FAILED,
-              log: ["tasks.listingFiles.logs.failed"],
+              log: [],
               cancelable: true,
             });
             return [];
@@ -298,6 +298,7 @@ export class PetaFilesController {
         const importImage = async (fileInfo: ImportFileInfo, index: number) => {
           log.log("import:", index + 1, "/", fileInfos.length);
           let result = ImportImageResult.SUCCESS;
+          let errorReason = "";
           try {
             const name = Path.basename(fileInfo.path);
             const fileDate = (await file.stat(fileInfo.path)).mtime;
@@ -332,6 +333,7 @@ export class PetaFilesController {
             log.log("imported", result);
           } catch (err) {
             log.error(err);
+            errorReason = String(err);
             result = ImportImageResult.ERROR;
             error = true;
           }
@@ -342,7 +344,7 @@ export class PetaFilesController {
               all: fileInfos.length,
               current: processedFileCount,
             },
-            log: [result, fileInfo.path],
+            log: [result, `${errorReason !== "" ? `(${errorReason})` : ""}${fileInfo.path}`],
             status: TaskStatusCode.PROGRESS,
             cancelable: true,
           });
