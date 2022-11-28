@@ -9,7 +9,10 @@ import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 // import { AnimatedGIF } from "@/renderer/libs/pixi-gif";
 import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
-import { VideoLoaderResult, loadVideo } from "@/renderer/components/board/pPetaPanels/videoLoader";
+import {
+  VideoLoaderResult,
+  videoLoader,
+} from "@/renderer/components/board/pPetaPanels/videoLoader";
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 
@@ -41,7 +44,6 @@ export class PPetaPanel extends PIXI.Sprite {
   private static nsfwTexture?: PIXI.Texture;
   private static noImageTexture?: PIXI.Texture;
   private static loadingTexture?: PIXI.Texture;
-  private updateVideoHandler = -1;
   constructor(
     public petaPanel: RPetaPanel,
     private petaFilesStore: ReturnType<typeof usePetaFilesStore>,
@@ -91,12 +93,12 @@ export class PPetaPanel extends PIXI.Sprite {
         this.video.destroy();
       }
       if (petaFile?.metadata.type === "video") {
-        this.video = await loadVideo(
+        this.video = videoLoader(
           petaFile,
           this.petaPanel.status.type === "video" && !this.petaPanel.status.stopped,
           this.onUpdateRenderer,
         );
-        this.image.texture = this.video.texture;
+        this.image.texture = await this.video.load();
         this.noImage = false;
         this.loading = false;
       } else if (petaFile?.metadata.type === "image") {
@@ -314,12 +316,19 @@ export class PPetaPanel extends PIXI.Sprite {
     this._cancelLoading = undefined;
   }
   public destroy() {
-    this.image.destroy();
-    this.gif?.destroy();
-    this.video?.destroy();
-    this.cancelLoading();
-    super.destroy();
-    window.cancelAnimationFrame(this.updateVideoHandler);
+    [
+      this.image.destroy,
+      this.gif?.destroy,
+      this.video?.destroy,
+      this.cancelLoading,
+      super.destroy,
+    ].forEach((destroy) => {
+      try {
+        destroy?.();
+      } catch {
+        //
+      }
+    });
   }
   private absPanelWidth() {
     return Math.abs(this.petaPanel.width);
