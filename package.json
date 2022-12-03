@@ -108,7 +108,7 @@
   },
   "lint-staged": {
     "*.{ts,js,vue}": [
-      "yarn pretty-quick --staged",
+      "yarn prettier --write",
       "git add"
     ]
   },
