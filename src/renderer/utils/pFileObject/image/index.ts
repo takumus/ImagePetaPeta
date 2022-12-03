@@ -19,11 +19,8 @@ export class PImageFileObjectContent extends PFileObjectContent {
     return true;
   }
   destroy() {
-    super.destroy();
-  }
-  cancelLoading(): void {
     this._canceledLoading = true;
     this._cancelLoading?.();
-    return;
+    super.destroy();
   }
 }

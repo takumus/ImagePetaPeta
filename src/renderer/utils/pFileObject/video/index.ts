@@ -20,6 +20,7 @@ export class PVideoFileObjectContent extends PFileObjectContent {
   }
   destroy() {
     this.video?.destroy();
+    this._canceledLoading = true;
     super.destroy();
   }
   play() {
@@ -32,9 +33,5 @@ export class PVideoFileObjectContent extends PFileObjectContent {
     if (this.video !== undefined) {
       this.video.videoElement.volume = volume;
     }
-  }
-  cancelLoading(): void {
-    this._canceledLoading = true;
-    return;
   }
 }

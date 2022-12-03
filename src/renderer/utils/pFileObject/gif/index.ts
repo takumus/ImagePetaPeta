@@ -28,6 +28,8 @@ export class PGIFFileObjectContent extends PFileObjectContent {
     return true;
   }
   destroy() {
+    this._canceledLoading = true;
+    this._cancelLoading?.();
     super.destroy();
   }
   play() {
@@ -35,10 +37,6 @@ export class PGIFFileObjectContent extends PFileObjectContent {
   }
   pause() {
     return this.animatedGIF?.stop();
-  }
-  cancelLoading(): void {
-    this._canceledLoading = true;
-    this._cancelLoading?.();
   }
   public setWidth(width: number) {
     if (this.animatedGIF === undefined) {

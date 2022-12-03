@@ -282,7 +282,6 @@ export class PPetaPanel extends PIXI.Sprite {
   }
   public destroy() {
     this.pFileObject.destroy();
-    this.pFileObject.cancelLoading();
     super.destroy();
   }
   private absPanelWidth() {

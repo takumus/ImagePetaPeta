@@ -7,7 +7,6 @@ export abstract class PFileObjectContent extends PIXI.Sprite {
   public onUpdateRenderer = () => {
     //
   };
-  abstract cancelLoading(): void;
   public setWidth(width: number) {
     this.width = width;
   }

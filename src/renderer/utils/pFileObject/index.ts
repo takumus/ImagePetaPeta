@@ -31,10 +31,10 @@ export class PFileObject extends PIXI.Sprite {
     }
   }
   destroy() {
+    if (this.content !== undefined) {
+      this.removeChild(this.content);
+    }
     this.content?.destroy();
     super.destroy();
-  }
-  cancelLoading() {
-    this.content?.cancelLoading();
   }
 }
