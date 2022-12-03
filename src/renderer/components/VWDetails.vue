@@ -26,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -35,11 +34,9 @@ import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
-// Components
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VDetails from "@/renderer/components/details/VDetails.vue";
 
-// Others
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";

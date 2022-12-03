@@ -73,7 +73,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { throttle } from "throttle-debounce";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
@@ -25,7 +24,6 @@ import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore"
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 
-// Components
 const props = defineProps<{
   contentWidth: number;
   contentHeight: number;

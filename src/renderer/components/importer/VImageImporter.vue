@@ -3,14 +3,12 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { Buffer } from "buffer";
 import { onMounted } from "vue";
 
 import { ppa } from "@/commons/utils/pp";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
-// Others
 import { IPC } from "@/renderer/libs/ipc";
 
 const emit = defineEmits<{

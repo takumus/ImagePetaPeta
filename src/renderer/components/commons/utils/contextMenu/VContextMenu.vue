@@ -22,13 +22,11 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { v4 as uuid } from "uuid";
 import { computed, onMounted, ref } from "vue";
 
 import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
-// Others
 import { Vec2 } from "@/commons/utils/vec2";
 
 import { ContextMenuItem } from "@/renderer/components/commons/utils/contextMenu/contextMenuItem";

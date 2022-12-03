@@ -31,10 +31,8 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { onBeforeUpdate, onUnmounted, ref, watch } from "vue";
 
-// Components
 import VLayerCell from "@/renderer/components/board/layer/VLayerCell.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
@@ -45,7 +43,6 @@ import {
   SortHelperConstraint,
   initSortHelper,
 } from "@/renderer/components/browser/tags/sortHelper";
-// Others
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 

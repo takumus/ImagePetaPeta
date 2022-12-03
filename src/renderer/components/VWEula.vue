@@ -24,18 +24,15 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Components
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 
 import { EULA } from "@/commons/defines";
 
-// Others
 import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";

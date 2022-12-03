@@ -12,16 +12,13 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Components
 import VProgressBar from "@/renderer/components/commons/utils/progressBar/VProgressBar.vue";
 
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
-// Others
 import { IPC } from "@/renderer/libs/ipc";
 import * as Cursor from "@/renderer/utils/cursor";
 

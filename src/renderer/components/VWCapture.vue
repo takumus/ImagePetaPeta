@@ -18,18 +18,15 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VCapture from "@/renderer/components/capture/VCapture.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
-// Components
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 
-// Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";

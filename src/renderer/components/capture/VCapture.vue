@@ -30,7 +30,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { onMounted, ref, watch } from "vue";
 
 import VDragView from "@/renderer/components/commons/utils/dragView/VDragView.vue";

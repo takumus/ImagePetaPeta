@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { ref } from "vue";
 
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

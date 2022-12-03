@@ -57,11 +57,9 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Others
 import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
@@ -134,7 +132,7 @@ function open(position: Vec2): void {
   floating.value?.updateFloating({ ...position, width: 0, height: 0 });
   // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
   // const isMultiple = selectedPPetaPanels().length > 1;
-  // components.contextMenu.open(
+  // .contextMenu.open(
   //   [
   //     { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
   //     { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },

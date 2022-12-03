@@ -22,11 +22,9 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Components
 import VBrowser from "@/renderer/components/browser/VBrowser.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
@@ -35,7 +33,6 @@ import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 
-// Others
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";

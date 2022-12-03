@@ -24,18 +24,15 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Components
 import VPropertyThumbnail from "@/renderer/components/commons/property/VPropertyThumbnail.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { WindowType } from "@/commons/datas/windowType";
 import { MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
-// Others
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";

@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-// Others
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 

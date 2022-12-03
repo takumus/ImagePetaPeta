@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -17,8 +16,6 @@ import { useI18n } from "vue-i18n";
 import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { resizeImage } from "@/commons/utils/resizeImage";
-// Components
-// Others
 import { Vec2 } from "@/commons/utils/vec2";
 
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";

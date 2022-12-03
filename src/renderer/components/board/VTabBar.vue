@@ -49,7 +49,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onBeforeUpdate, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -57,7 +56,6 @@ import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vu
 
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
-// Others
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";

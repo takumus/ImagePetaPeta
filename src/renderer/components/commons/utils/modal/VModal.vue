@@ -31,8 +31,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
-// Others
 import { v4 as uuid } from "uuid";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 

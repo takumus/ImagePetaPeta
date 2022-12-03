@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 import VComplement from "@/renderer/components/commons/utils/complement/VComplement.vue";

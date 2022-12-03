@@ -30,13 +30,11 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import Fuse from "fuse.js";
 import { computed, onMounted, ref, watch } from "vue";
 
 import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
-// Others
 import { Keyboards, Keys } from "@/renderer/libs/keyboards";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useTextsStore } from "@/renderer/stores/textsStore/useTextsStore";

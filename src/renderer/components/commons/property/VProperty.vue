@@ -146,11 +146,9 @@
 </template>
 
 <script setup lang="ts">
-// // Vue
+//
 // import { Options, Vue } from "vue-class-component";
 // import { Prop, Ref, Watch } from "vue-property-decorator";
-// Components
-// Others
 import dateFormat from "dateformat";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

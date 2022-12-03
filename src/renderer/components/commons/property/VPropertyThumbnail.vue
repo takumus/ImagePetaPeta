@@ -14,14 +14,12 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, ref } from "vue";
 
 import { FileType } from "@/commons/datas/fileType";
 
 import { PropertyThumbnail } from "@/renderer/components/commons/property/propertyThumbnail";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-// Others
 import { getFileURL } from "@/renderer/utils/fileURL";
 
 const nsfwStore = useNSFWStore();

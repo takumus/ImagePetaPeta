@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
 import { FileType } from "@/commons/datas/fileType";
@@ -45,7 +44,6 @@ import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { getFileURL } from "@/renderer/utils/fileURL";
 
-// Others
 const emit = defineEmits<{
   (e: "startDrag", event: PointerEvent, petaPanel: RPetaPanel): void;
   (e: "update:petaPanel", cellData: RPetaPanel): void;

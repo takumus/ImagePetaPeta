@@ -39,11 +39,9 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Components
 import VBoard from "@/renderer/components/board/VBoard.vue";
 import VBoardProperty from "@/renderer/components/board/VBoardProperty.vue";
 import VTabBar from "@/renderer/components/board/VTabBar.vue";
@@ -66,7 +64,6 @@ import { hasPetaFiles } from "@/commons/utils/board";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { Vec2 } from "@/commons/utils/vec2";
 
-// Others
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
 import { IPC } from "@/renderer/libs/ipc";
 import { logChunk } from "@/renderer/libs/rendererLogger";

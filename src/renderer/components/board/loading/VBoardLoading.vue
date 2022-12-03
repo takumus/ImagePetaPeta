@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-// Components
 import { useI18n } from "vue-i18n";
 
 import VModal from "@/renderer/components/commons/utils/modal/VModal.vue";

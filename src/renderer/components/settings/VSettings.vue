@@ -38,7 +38,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -50,7 +49,6 @@ import VSettingsInfo from "@/renderer/components/settings/VSettingsInfo.vue";
 import VSettingsOthers from "@/renderer/components/settings/VSettingsOthers.vue";
 import VSettingsUpdate from "@/renderer/components/settings/VSettingsUpdate.vue";
 
-// Others
 import { IPC } from "@/renderer/libs/ipc";
 
 const { t } = useI18n();

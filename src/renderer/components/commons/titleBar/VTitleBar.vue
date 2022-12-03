@@ -33,13 +33,10 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed } from "vue";
 
 import { WindowType } from "@/commons/datas/windowType";
 
-// Components
-// Others
 import { IPC } from "@/renderer/libs/ipc";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";

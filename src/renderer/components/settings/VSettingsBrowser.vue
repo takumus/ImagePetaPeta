@@ -21,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-// Others
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 

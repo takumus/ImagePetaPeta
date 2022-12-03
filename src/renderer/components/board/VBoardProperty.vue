@@ -7,10 +7,8 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { computed, ref } from "vue";
 
-// Others
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 
 const props = defineProps<{

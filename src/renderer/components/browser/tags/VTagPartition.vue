@@ -17,7 +17,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { ref } from "vue";
 
 import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";

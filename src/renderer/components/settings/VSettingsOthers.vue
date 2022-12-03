@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-// Others
 import { useI18n } from "vue-i18n";
 
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
