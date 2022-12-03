@@ -195,25 +195,27 @@ export class PPetaPanel extends PIXI.Sprite {
         this.pFileObject.content.y =
           -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
       }
-      if (
-        this.pFileObject.content instanceof PVideoFileObjectContent &&
-        this.petaPanel.status.type === "video"
-      ) {
-        this.pFileObject.content.setVolume(this.petaPanel.status.volume);
-        if (this.petaPanel.status.stopped) {
-          this.pFileObject.content.pause();
-        } else {
-          this.pFileObject.content.play();
+      if (!this.loading) {
+        if (
+          this.pFileObject.content instanceof PVideoFileObjectContent &&
+          this.petaPanel.status.type === "video"
+        ) {
+          this.pFileObject.content.setVolume(this.petaPanel.status.volume);
+          if (this.petaPanel.status.stopped) {
+            this.pFileObject.content.pause();
+          } else {
+            this.pFileObject.content.play();
+          }
         }
-      }
-      if (
-        this.pFileObject.content instanceof PGIFFileObjectContent &&
-        this.petaPanel.status.type === "gif"
-      ) {
-        if (this.petaPanel.status.stopped) {
-          this.pFileObject.content.pause();
-        } else {
-          this.pFileObject.content.play();
+        if (
+          this.pFileObject.content instanceof PGIFFileObjectContent &&
+          this.petaPanel.status.type === "gif"
+        ) {
+          if (this.petaPanel.status.stopped) {
+            this.pFileObject.content.pause();
+          } else {
+            this.pFileObject.content.play();
+          }
         }
       }
       if (this.imageWrapper.mask) {
