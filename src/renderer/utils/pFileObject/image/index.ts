@@ -1,6 +1,6 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import { getImage } from "@/renderer/utils/pFileObject/loaders/imageLoader";
+import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 
 export class PImageFileObjectContent extends PFileObjectContent {

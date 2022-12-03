@@ -1,7 +1,7 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
-import { getImage } from "@/renderer/utils/pFileObject/loaders/imageLoader";
+import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 
 export class PGIFFileObjectContent extends PFileObjectContent {
