@@ -83,7 +83,7 @@ export class PPetaPanel extends PIXI.Sprite {
       if (petaFile !== undefined) {
         await this.pFileObject.load(petaFile);
         if (this.pFileObject.content !== undefined) {
-          this.pFileObject.content.onUpdateRenderer = this.onUpdateRenderer;
+          this.pFileObject.content.event.on("updateRenderer", () => this.onUpdateRenderer());
         }
         this.noImage = false;
         this.loading = false;

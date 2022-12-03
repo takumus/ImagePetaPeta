@@ -9,12 +9,20 @@
       @construct="construct"
       @lose-context="loseContext"
       @resize="resize" />
+    <t-playback-controller-wrapper>
+      <t-playback-controller>
+        <VPlaybackController
+          v-if="pFileObjectContent"
+          :p-file-object-content="pFileObjectContent" />
+      </t-playback-controller>
+    </t-playback-controller-wrapper>
   </t-details-root>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 
+import VPlaybackController from "@/renderer/components/commons/playbackController/VPlaybackController.vue";
 import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
@@ -29,6 +37,7 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsSto
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 import { PFileObject } from "@/renderer/utils/pFileObject";
 import { PGIFFileObjectContent } from "@/renderer/utils/pFileObject/gif";
+import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 const props = defineProps<{
@@ -37,6 +46,7 @@ const props = defineProps<{
 }>();
 // const nsfwStore = useNSFWStore();
 const vPixi = ref<InstanceType<typeof VPIXI>>();
+const pFileObjectContent = ref<PFileObjectContent<unknown>>();
 const pFileObject = new PFileObject();
 const mouseOffset = new Vec2();
 const stageRect = ref(new Vec2());
@@ -63,14 +73,15 @@ async function construct() {
 }
 async function load() {
   await pFileObject.load(props.petaFile);
+  pFileObjectContent.value = pFileObject.content;
   if (
     pFileObject.content instanceof PVideoFileObjectContent ||
     pFileObject.content instanceof PGIFFileObjectContent
   ) {
     pFileObject.content.play();
-    pFileObject.content.onUpdateRenderer = () => {
+    pFileObject.content.event.on("updateRenderer", () => {
       vPixi.value?.orderPIXIRender();
-    };
+    });
   }
   vPixi.value?.orderPIXIRender();
 }
@@ -231,30 +242,17 @@ t-details-root {
   display: block;
   background-image: url("~@/@assets/transparentBackground.png");
   overflow: hidden;
-
-  img,
-  t-nsfw {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-  }
-  t-nsfw {
-    background-size: 32px;
-    background-position: center;
-    background-repeat: repeat;
-    background-image: url("~@/@assets/nsfwBackground.png");
-  }
   // 1pxだけ右下から出す。
-  > t-smooth {
-    display: block;
+  > t-playback-controller-wrapper {
     position: absolute;
-    top: calc(100% - 1px);
-    left: calc(100% - 1px);
-    width: 1px;
-    height: 1px;
-    opacity: 0.1%;
+    display: block;
+    width: 100%;
+    padding: var(--px-3) var(--px-3);
+    bottom: 0px;
+    > t-playback-controller {
+      display: block;
+      width: 100%;
+    }
   }
 }
 </style>

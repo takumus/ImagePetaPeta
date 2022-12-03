@@ -4,13 +4,10 @@ import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 
-export class PGIFFileObjectContent extends PFileObjectContent {
+export class PGIFFileObjectContent extends PFileObjectContent<void> {
   animatedGIF?: AnimatedGIF;
   private _cancelLoading?: () => void;
   private _canceledLoading = false;
-  public onUpdateRenderer = () => {
-    //
-  };
   async load(petaFile: RPetaFile) {
     const result = getImage(petaFile);
     this._cancelLoading = result.cancel;
@@ -21,7 +18,7 @@ export class PGIFFileObjectContent extends PFileObjectContent {
     if (image.animatedGIF) {
       this.animatedGIF = image.animatedGIF;
       this.animatedGIF.onFrameChange = () => {
-        this.onUpdateRenderer();
+        this.event.emit("updateRenderer");
       };
       this.addChild(this.animatedGIF);
     }

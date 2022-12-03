@@ -3,7 +3,7 @@ import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 
-export class PImageFileObjectContent extends PFileObjectContent {
+export class PImageFileObjectContent extends PFileObjectContent<void> {
   private _cancelLoading?: () => void;
   private _canceledLoading = false;
   async load(petaFile: RPetaFile) {
