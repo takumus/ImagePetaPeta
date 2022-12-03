@@ -7,22 +7,17 @@ import { Vec2 } from "@/commons/utils/vec2";
 import LOADINGImage from "@/@assets/loadingBackground.png";
 import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import NSFWImage from "@/@assets/nsfwBackground.png";
-// import { AnimatedGIF } from "@/renderer/libs/pixi-gif";
-import { getImage } from "@/renderer/components/board/pPetaPanels/ImageLoader";
 import {
-  VideoLoaderResult,
-  videoLoader,
-} from "@/renderer/components/board/pPetaPanels/videoLoader";
-import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
+  PFileObject,
+  PGIFFileObjectContent,
+  PVideoFileObjectContent,
+} from "@/renderer/components/board/pPetaPanels/pFileObject";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 
 export class PPetaPanel extends PIXI.Sprite {
-  // public selected = false;
   public unselected = false;
   public dragging = false;
   public draggingOffset = new Vec2();
-  public image = new PIXI.Sprite();
-  public gif: AnimatedGIF | undefined;
   public imageWrapper = new PIXI.Sprite();
   public noImage = true;
   public loading = true;
@@ -36,10 +31,7 @@ export class PPetaPanel extends PIXI.Sprite {
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
   private zoomScale = 1;
-  private video: VideoLoaderResult | undefined;
-  private _cancelLoading? = () => {
-    return;
-  };
+  private pFileObject: PFileObject;
   public showNSFW = false;
   private static nsfwTexture?: PIXI.Texture;
   private static noImageTexture?: PIXI.Texture;
@@ -50,9 +42,10 @@ export class PPetaPanel extends PIXI.Sprite {
     public onUpdateRenderer: () => void,
   ) {
     super();
+    this.pFileObject = new PFileObject();
     this.anchor.set(0.5, 0.5);
     this.imageWrapper.mask = this.masker;
-    this.imageWrapper.addChild(this.image);
+    this.imageWrapper.addChild(this.pFileObject);
     this.addChild(this.imageWrapper, this.masker, this.cover, this.selection);
     this.interactive = true;
     this.cover.visible = false;
@@ -89,42 +82,13 @@ export class PPetaPanel extends PIXI.Sprite {
       this.noImage = true;
       this.loading = true;
       const petaFile = this.petaFilesStore.getPetaFile(this.petaPanel.petaFileId);
-      if (this.video !== undefined) {
-        this.video.destroy();
-      }
-      if (petaFile?.metadata.type === "video") {
-        this.video = videoLoader(
-          petaFile,
-          this.petaPanel.status.type === "video" && !this.petaPanel.status.stopped,
-          this.onUpdateRenderer,
-        );
-        this.image.texture = await this.video.load();
+      if (petaFile !== undefined) {
+        await this.pFileObject.load(petaFile);
+        if (this.pFileObject.content !== undefined) {
+          this.pFileObject.content.onUpdateRenderer = this.onUpdateRenderer;
+        }
         this.noImage = false;
         this.loading = false;
-      } else if (petaFile?.metadata.type === "image") {
-        const result = getImage(petaFile);
-        this._cancelLoading = result.cancel;
-        const image = await result.promise;
-        this.loading = false;
-        if (this.gif) {
-          this.imageWrapper.removeChild(this.gif);
-          this.gif.onFrameChange = undefined;
-          this.gif.destroy();
-          this.gif = undefined;
-        }
-        if (image.animatedGIF) {
-          this.gif = image.animatedGIF;
-          this.gif.onFrameChange = this.onUpdateRenderer;
-          this.imageWrapper.addChild(this.gif);
-          if (this.petaPanel.status.type === "gif" && this.petaPanel.status.stopped) {
-            this.gif.stop();
-            // this.gif.tim = this.petaPanel.status.frame;
-          }
-          this.noImage = false;
-        } else if (image.texture) {
-          this.image.texture = image.texture;
-          this.noImage = false;
-        }
       }
     } catch (error) {
       this.loading = false;
@@ -182,6 +146,8 @@ export class PPetaPanel extends PIXI.Sprite {
           this.petaPanel.locked,
           "petaPanel.status",
           Object.values(this.petaPanel.status).join("-"),
+          "pFileObject.content",
+          this.pFileObject.content,
           "unselected",
           this.unselected,
           "petaPanel.renderer.selected",
@@ -222,29 +188,32 @@ export class PPetaPanel extends PIXI.Sprite {
       const tempImageWidth = petaFile ? petaFile.metadata.width : this.defaultHeight;
       const imageHeight =
         panelWidth * (tempImageHeight / tempImageWidth) * (1 / this.petaPanel.crop.width);
-      this.image.width = imageWidth;
-      this.image.height = imageHeight;
-      this.image.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
-      this.image.y = -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
-      if (this.gif && !this.loading) {
-        this.gif.width = this.image.width;
-        this.gif.height = this.image.height;
-        this.gif.x = this.image.x;
-        this.gif.y = this.image.y;
-        if (this.petaPanel.status.type === "gif") {
-          if (this.petaPanel.status.stopped) {
-            this.gif.stop();
-          } else {
-            this.gif.play();
-          }
+      if (this.pFileObject.content !== undefined) {
+        this.pFileObject.content.setWidth(imageWidth);
+        this.pFileObject.content.setHeight(imageHeight);
+        this.pFileObject.content.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
+        this.pFileObject.content.y =
+          -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
+      }
+      if (
+        this.pFileObject.content instanceof PVideoFileObjectContent &&
+        this.petaPanel.status.type === "video"
+      ) {
+        this.pFileObject.content.setVolume(this.petaPanel.status.volume);
+        if (this.petaPanel.status.stopped) {
+          this.pFileObject.content.pause();
+        } else {
+          this.pFileObject.content.play();
         }
       }
-      if (this.petaPanel.status.type === "video" && !this.loading && this.video !== undefined) {
-        this.video.videoElement.volume = this.petaPanel.status.volume;
+      if (
+        this.pFileObject.content instanceof PGIFFileObjectContent &&
+        this.petaPanel.status.type === "gif"
+      ) {
         if (this.petaPanel.status.stopped) {
-          this.video.pause();
+          this.pFileObject.content.pause();
         } else {
-          this.video.play();
+          this.pFileObject.content.play();
         }
       }
       if (this.imageWrapper.mask) {
@@ -311,24 +280,10 @@ export class PPetaPanel extends PIXI.Sprite {
       leftBottom: corners[3],
     };
   }
-  public cancelLoading() {
-    this._cancelLoading?.();
-    this._cancelLoading = undefined;
-  }
   public destroy() {
-    [
-      this.image.destroy,
-      this.gif?.destroy,
-      this.video?.destroy,
-      this.cancelLoading,
-      super.destroy,
-    ].forEach((destroy) => {
-      try {
-        destroy?.();
-      } catch {
-        //
-      }
-    });
+    this.pFileObject.destroy();
+    this.pFileObject.cancelLoading();
+    super.destroy();
   }
   private absPanelWidth() {
     return Math.abs(this.petaPanel.width);

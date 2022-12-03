@@ -76,7 +76,7 @@ export function initBoardLoader(
     loadingStatus.value.extractProgress = 0;
     if (cancelExtract !== undefined) {
       log("vBoard", `canceling loading`);
-      pPanelsArray().forEach((pPanel) => pPanel.cancelLoading());
+      pPanelsArray().forEach((pPanel) => pPanel.destroy());
       await cancelExtract();
       log("vBoard", `canceled loading`);
       return load(params);
