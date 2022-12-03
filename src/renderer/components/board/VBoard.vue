@@ -62,6 +62,7 @@ import { PBackground } from "@/renderer/components/board/pBackground";
 import { PBoardGrid } from "@/renderer/components/board/pGrid";
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
 import { PTransformer } from "@/renderer/components/board/pPetaPanels/pTransformer";
+import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
@@ -162,8 +163,8 @@ function loseContext() {
   logChunk().error("WEBGL_lose_context");
   IPC.send("reloadWindow");
 }
-function resize(rect: DOMRectReadOnly) {
-  stageRect.set(rect.width, rect.height);
+function resize(rect: PIXIRect) {
+  stageRect.set(rect.domRect.width, rect.domRect.height);
   mouseOffset.set(vPixi.value?.canvasWrapper().getBoundingClientRect());
   stageRect.clone().div(2).setTo(centerWrapper);
   updateRect();

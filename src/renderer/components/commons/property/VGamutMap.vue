@@ -25,6 +25,7 @@ import { RPetaFile } from "@/commons/datas/rPetaFile";
 import hsvCircleImage from "@/@assets/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
+import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { IPC } from "@/renderer/libs/ipc";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
@@ -104,19 +105,19 @@ function animate() {
 function loseContext() {
   IPC.send("reloadWindow");
 }
-function resize(r: DOMRect) {
+function resize(rect: PIXIRect) {
   backgroundRawSprite.width =
     backgroundNormalizedSprite.width =
     resultNormalizedSprite.width =
     resultRawSprite.width =
-      r.width / 2;
+      rect.domRect.width / 2;
   backgroundRawSprite.height =
     backgroundNormalizedSprite.height =
     resultNormalizedSprite.height =
     resultRawSprite.height =
-      r.width / 2;
-  backgroundNormalizedSprite.x = r.width / 2;
-  resultNormalizedSprite.x = r.width / 2;
+      rect.domRect.width / 2;
+  backgroundNormalizedSprite.x = rect.domRect.width / 2;
+  resultNormalizedSprite.x = rect.domRect.width / 2;
 }
 function setPixel(pixels: Uint8Array, x: number, y: number, r: number, g: number, b: number) {
   if (x < 0 || x > size.width || y < 0 || y > size.height) {

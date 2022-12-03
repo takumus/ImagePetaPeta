@@ -6,6 +6,7 @@
 import * as PIXI from "pixi.js";
 import { onMounted, onUnmounted, ref } from "vue";
 
+import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 
 const canvasWrapper = ref<HTMLElement>();
@@ -22,7 +23,7 @@ const emit = defineEmits<{
   (e: "construct"): void;
   (e: "destruct"): void;
   (e: "tick"): void;
-  (e: "resize", rect: DOMRect | DOMRectReadOnly): void;
+  (e: "resize", rect: PIXIRect): void;
 }>();
 const props = defineProps<{
   antialias?: boolean;
@@ -90,7 +91,13 @@ function resize(rect: DOMRect) {
   app.renderer.resize(rect.width, rect.height);
   canvas.style.width = rect.width + "px";
   canvas.style.height = rect.height + "px";
-  emit("resize", rect);
+  emit("resize", {
+    domRect: rect,
+    pixiRect: {
+      width: app.renderer.view.width,
+      height: app.renderer.view.height,
+    },
+  });
   renderPIXI(true);
 }
 defineExpose({
