@@ -17,7 +17,7 @@ export interface PetaFileVideoMetadata extends _PetaFileMetadata {
   type: "video";
   width: number;
   height: number;
-  lengthMS: number;
+  duration: number;
   palette: PetaColor[];
 }
 export type PetaFileMetadata = PetaFileImageMetadata | PetaFileVideoMetadata;

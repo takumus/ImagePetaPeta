@@ -44,12 +44,13 @@ export async function generateVideoMetadata(
       nodeId: input.nodeId,
       files: [path],
     });
-    const size = await new Promise<{ width: number; height: number }>((res, rej) => {
-      let result = { width: 0, height: 0 };
-      let retryCount = 0;
-      const handler = setInterval(async () => {
-        try {
-          await window.webContents.executeJavaScript(`
+    const info = await new Promise<{ size: { width: number; height: number }; duration: number }>(
+      (res, rej) => {
+        let result = { size: { width: 0, height: 0 }, duration: 0 };
+        let retryCount = 0;
+        const handler = setInterval(async () => {
+          try {
+            await window.webContents.executeJavaScript(`
             var videoElement = document.querySelector('video');
             videoElement.autoplay = false;
             videoElement.controls = false;
@@ -57,29 +58,33 @@ export async function generateVideoMetadata(
             videoElement.cuttentTime = 0;
             videoElement.pause();
           `);
-          result = JSON.parse(
-            await window.webContents.executeJavaScript(`
+            result = JSON.parse(
+              await window.webContents.executeJavaScript(`
               JSON.stringify({
-                width: videoElement.videoWidth,
-                height: videoElement.videoHeight
+                size: {
+                  width: videoElement.videoWidth,
+                  height: videoElement.videoHeight
+                },
+                duration: videoElement.duration
               })
             `),
-          );
-          if (result.width > 0 && result.height > 0) {
-            clearInterval(handler);
-            res(result);
+            );
+            if (result.size.width > 0 && result.size.height > 0 && result.duration > 0) {
+              clearInterval(handler);
+              res(result);
+            }
+          } catch {
+            //
           }
-        } catch {
-          //
-        }
-        retryCount++;
-        if (retryCount >= 5) {
-          clearInterval(handler);
-          rej("could not get size");
-        }
-      }, 500);
-    });
-    const height = (size.height / size.width) * BROWSER_THUMBNAIL_SIZE;
+          retryCount++;
+          if (retryCount >= 5) {
+            clearInterval(handler);
+            rej("could not get size");
+          }
+        }, 500);
+      },
+    );
+    const height = (info.size.height / info.size.width) * BROWSER_THUMBNAIL_SIZE;
     window.setSize(Math.floor(BROWSER_THUMBNAIL_SIZE), Math.floor(height));
     const buffer = (await window.capturePage()).toPNG();
     const thumbnailsBuffer = await sharp(buffer, { limitInputPixels: false })
@@ -108,11 +113,11 @@ export async function generateVideoMetadata(
       },
       metadata: {
         type: "video",
-        width: size.width,
-        height: size.height,
+        width: info.size.width,
+        height: info.size.height,
         palette,
         version: PETAIMAGE_METADATA_VERSION,
-        lengthMS: 0,
+        duration: info.duration,
       },
     };
   } catch (error) {

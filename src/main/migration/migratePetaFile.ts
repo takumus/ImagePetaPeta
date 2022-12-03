@@ -29,5 +29,9 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
     data.mimeType = "unknown/unknown";
     update();
   }
+  if (data.metadata.type === "video" && data.metadata.duration === undefined) {
+    data.metadata.duration = 0;
+    update();
+  }
   return data;
 });

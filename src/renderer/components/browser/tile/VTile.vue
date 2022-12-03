@@ -56,6 +56,13 @@
           {{ t("browser.untagged") }}
         </t-tag>
       </t-tags>
+      <t-video-duration
+        v-if="props.tile.petaFile?.metadata.type === 'video'"
+        :class="{
+          selected,
+        }">
+        {{ videoDuration }}
+      </t-video-duration>
       <t-selected v-show="selected"> </t-selected>
     </t-tile-wrapper>
     <t-group v-else>
@@ -65,7 +72,6 @@
 </template>
 
 <script setup lang="ts">
-// Vue
 import { debounce } from "throttle-debounce";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -82,7 +88,7 @@ import {
   BROWSER_LOAD_THUMBNAIL_DELAY,
   BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM,
 } from "@/commons/defines";
-// Others
+import { secondsToHMS } from "@/commons/utils/secondsToHMS";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { Tile } from "@/renderer/components/browser/tile/tile";
@@ -118,6 +124,7 @@ const loadingOriginal = ref(true);
 const loadingTags = ref(true);
 const myPetaTags = ref<RPetaTag[]>([]);
 const click: ClickChecker = new ClickChecker();
+const videoDuration = ref("00:00");
 let loadOriginalTimeoutHandler = -1;
 let loadThumbnailTimeoutHandler = -1;
 let fetchTagsTimeoutHandler = -1;
@@ -129,6 +136,9 @@ const setVideoVisibleDebounce = debounce(500, (visible: boolean) => {
 onMounted(() => {
   delayedLoadImage();
   delayedFetchPetaTags();
+  if (props.tile.petaFile?.metadata.type === "video") {
+    videoDuration.value = secondsToHMS(props.tile.petaFile.metadata.duration);
+  }
 });
 onUnmounted(() => {
   window.clearTimeout(loadOriginalTimeoutHandler);
@@ -379,30 +389,43 @@ t-tile-root {
         filter: brightness(1);
       }
     }
+    > t-video-duration {
+      display: block;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      margin: var(--px-1);
+      border-radius: var(--rounded);
+      padding: var(--px-1);
+      background-color: var(--color-1);
+      font-size: var(--size-0);
+      line-height: var(--size-0);
+      &.selected {
+        margin: var(--px-2);
+      }
+    }
     > t-tags {
       width: 100%;
       position: absolute;
       bottom: 0px;
       pointer-events: none;
       outline: none;
-      padding: 2px;
-      font-size: var(--size-0);
       word-break: break-word;
       text-align: left;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap-reverse;
       justify-content: right;
+      padding: var(--px-1);
       > t-tag {
         display: inline-block;
-        margin: 1px 1px;
+        margin-left: var(--px-0);
+        margin-top: var(--px-0);
         border-radius: var(--rounded);
         padding: var(--px-1);
         background-color: var(--color-1);
         font-size: var(--size-0);
         line-height: var(--size-0);
-        font-weight: bold;
-        // border: solid 2px var(--color-font);
       }
       &.selected {
         padding: var(--px-2);
