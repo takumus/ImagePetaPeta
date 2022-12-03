@@ -139,6 +139,7 @@ export class Windows {
         ? `${process.env.WEBPACK_DEV_SERVER_URL}${type}`
         : `app://./${type}.html`;
     window.loadURL(url);
+    // window.webContents.openDevTools();
     return window;
   }
   changeMainWindow(type: WindowType) {
