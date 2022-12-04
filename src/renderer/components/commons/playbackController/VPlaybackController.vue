@@ -2,12 +2,14 @@
   <t-playback-controller-root>
     <button @click="play">play</button>
     <button @click="pause">pause</button>
+    <t-seekbar>
+      <VSeekBar
+        :duration="duration"
+        v-model:time="currentTimeModel"
+        @start-seek="startSeek"
+        @stop-seek="stopSeek" />
+    </t-seekbar>
     <input type="range" :max="1000" v-model="currentVolumeModel" />
-    <VSeekBar
-      :duration="duration"
-      v-model:time="currentTimeModel"
-      @start-seek="startSeek"
-      @stop-seek="stopSeek" />
   </t-playback-controller-root>
 </template>
 
@@ -79,8 +81,13 @@ watch(
 
 <style lang="scss" scoped>
 t-playback-controller-root {
-  display: block;
+  display: flex;
   width: 100%;
   height: 100%;
+  > t-seekbar {
+    padding: var(--px-1);
+    display: block;
+    flex: 1;
+  }
 }
 </style>

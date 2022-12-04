@@ -103,6 +103,7 @@ export class Windows {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        backgroundThrottling: false,
         preload: Path.join(__dirname, "preload.js"),
       },
       backgroundColor: isDarkMode()
