@@ -2,9 +2,9 @@ import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
-import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
+import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
-export class PGIFFileObjectContent extends PFileObjectContent<void> {
+export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
   animatedGIF?: AnimatedGIF;
   private _cancelLoading?: () => void;
   private _canceledLoading = false;
@@ -34,6 +34,24 @@ export class PGIFFileObjectContent extends PFileObjectContent<void> {
   }
   pause() {
     return this.animatedGIF?.stop();
+  }
+  getPaused() {
+    return !this.animatedGIF?.playing;
+  }
+  getDuration() {
+    return (this.animatedGIF?.totalFrames ?? 1) - 1;
+  }
+  getCurrentTime() {
+    return this.animatedGIF?.currentFrame ?? 0;
+  }
+  getSeekable() {
+    return this.animatedGIF !== undefined;
+  }
+  setCurrentTime(currentTime: number) {
+    if (this.animatedGIF === undefined) {
+      return;
+    }
+    this.animatedGIF.currentFrame = Math.floor(currentTime);
   }
   public setWidth(width: number) {
     if (this.animatedGIF === undefined) {

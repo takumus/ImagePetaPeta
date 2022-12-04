@@ -1,9 +1,9 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { VideoLoaderResult, videoLoader } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
-import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
+import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
-export class PVideoFileObjectContent extends PFileObjectContent<void> {
+export class PVideoFileObjectContent extends PPlayableFileObjectContent<void> {
   private video?: VideoLoaderResult;
   private _canceledLoading = false;
   private setCurrentTimeHandler = -1;
@@ -64,7 +64,7 @@ export class PVideoFileObjectContent extends PFileObjectContent<void> {
     if (this.video === undefined) {
       return false;
     }
-    return !this.video.videoElement.seeking && this.video.videoElement.seekable;
+    return !this.video.videoElement.seeking;
   }
   setCurrentTime(currentTime: number) {
     if (this.video === undefined) {
