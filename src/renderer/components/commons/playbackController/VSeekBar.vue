@@ -46,6 +46,11 @@ function pointerMove(event: PointerEvent) {
   }
   const x = event.clientX - rect.x;
   draggingTime.value = (x / rect.width) * props.duration;
+  if (draggingTime.value < 0) {
+    draggingTime.value = 0;
+  } else if (draggingTime.value > props.duration) {
+    draggingTime.value = props.duration;
+  }
   emit("update:time", draggingTime.value);
 }
 const cursorPosition = computed(() => {
@@ -66,7 +71,7 @@ t-seekbar-root {
   position: relative;
   width: 100%;
   height: 32px;
-  background-color: var(--color-1);
+  background-color: var(--color-0);
   border-radius: var(--rounded);
   overflow: hidden;
   padding: var(--px-2) calc(var(--px-2) + calc(var(--seekbar-size) / 2));
@@ -81,7 +86,7 @@ t-seekbar-root {
       width: var(--seekbar-size);
       transform: translateX(-50%);
       height: 100%;
-      background-color: var(--color-border);
+      background-color: var(--color-font);
       border-radius: var(--rounded);
     }
   }
