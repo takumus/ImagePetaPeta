@@ -1,5 +1,5 @@
 <template>
-  <t-playback-controller-root>
+  <t-playback-controller-root v-if="pFileObjectContent instanceof PVideoFileObjectContent">
     <button @click="play">play</button>
     <button @click="pause">pause</button>
     <input type="range" :max="1000" v-model="currentVolumeModel" />
