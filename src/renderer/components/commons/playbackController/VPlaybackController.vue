@@ -1,5 +1,5 @@
 <template>
-  <t-playback-controller-root v-if="pFileObjectContent instanceof PVideoFileObjectContent">
+  <t-playback-controller-root v-if="isVideo">
     <button @click="play">play</button>
     <button @click="pause">pause</button>
     <input type="range" :max="1000" v-model="currentVolumeModel" />
@@ -49,6 +49,7 @@ function stopSeek() {
     }
   }
 }
+const isVideo = computed(() => props.pFileObjectContent instanceof PVideoFileObjectContent);
 const currentTimeModel = computed<number>({
   get() {
     return currentTime.value;
