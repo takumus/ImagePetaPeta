@@ -2,18 +2,19 @@
   <t-playback-controller-root>
     <button @click="play">play</button>
     <button @click="pause">pause</button>
-    <input
-      type="range"
-      :max="duration"
-      v-model="currentTimeModel"
-      @pointerdown="seeking = true"
-      @change="seeking = false" />
     <input type="range" :max="1000" v-model="currentVolumeModel" />
+    <VSeekBar
+      :duration="duration"
+      v-model:time="currentTimeModel"
+      @start-seek="startSeek"
+      @stop-seek="stopSeek" />
   </t-playback-controller-root>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+
+import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
 
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
@@ -24,7 +25,7 @@ const props = defineProps<{
 const duration = ref(0);
 const currentTime = ref(0);
 const currentVolumeTime = ref(0);
-const seeking = ref(false);
+const paused = ref(false);
 function play() {
   if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
     props.pFileObjectContent.play();
@@ -33,6 +34,19 @@ function play() {
 function pause() {
   if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
     props.pFileObjectContent.pause();
+  }
+}
+function startSeek() {
+  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
+    paused.value = props.pFileObjectContent.getPaused();
+    props.pFileObjectContent.pause();
+  }
+}
+function stopSeek() {
+  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
+    if (!paused.value) {
+      props.pFileObjectContent.play();
+    }
   }
 }
 const currentTimeModel = computed<number>({
@@ -60,14 +74,10 @@ const currentVolumeModel = computed<number>({
 watch(
   () => props.pFileObjectContent,
   () => {
-    console.log("ok");
     if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
       const video = props.pFileObjectContent;
       duration.value = video.getDuration() * 1000;
       video.event.on("updateRenderer", () => {
-        if (seeking.value) {
-          return;
-        }
         currentTime.value = video.getCurrentTime() * 1000;
         currentVolumeTime.value = video.getVolume() * 1000;
       });
@@ -82,8 +92,5 @@ t-playback-controller-root {
   display: block;
   width: 100%;
   height: 100%;
-  > input {
-    width: 100%;
-  }
 }
 </style>

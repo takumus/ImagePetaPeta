@@ -32,11 +32,6 @@ export class PVideoFileObjectContent extends PFileObjectContent<void> {
       this.orderedCurrentTime >= 0
     ) {
       this.video.videoElement.currentTime = this.orderedCurrentTime;
-      const paused = this.video.videoElement.paused;
-      await this.play();
-      if (paused) {
-        this.pause();
-      }
       this.orderedCurrentTime = -1;
       this.setCurrentTimeHandler = window.setTimeout(
         this.setCurrentTimeFromOrdered.bind(this),
@@ -51,10 +46,13 @@ export class PVideoFileObjectContent extends PFileObjectContent<void> {
     super.destroy();
   }
   play() {
-    return this.video?.play();
+    return this.video?.videoElement.play();
   }
   pause() {
-    return this.video?.pause();
+    return this.video?.videoElement.pause();
+  }
+  getPaused() {
+    return this.video?.videoElement.paused ?? false;
   }
   getDuration() {
     return this.video?.videoElement.duration ?? 0;

@@ -11,6 +11,13 @@ export function videoLoader(
   onUpdate: () => void,
 ): VideoLoaderResult {
   const videoElement = document.createElement("video");
+  document.body.appendChild(videoElement);
+  videoElement.style.zIndex = "100";
+  videoElement.style.bottom = "0px";
+  videoElement.style.width = "1px";
+  videoElement.style.height = "1px";
+  videoElement.style.position = "fixed";
+
   let updateVideoHandler = -1;
   let texture: PIXI.Texture | undefined;
   let destroyed = false;
@@ -19,6 +26,9 @@ export function videoLoader(
     videoElement.loop = true;
     videoElement.autoplay = false;
     videoElement.volume = 0;
+    videoElement.addEventListener("seeked", () => {
+      forceUpdate();
+    });
     await videoElement.play();
     if (destroyed) {
       throw new Error("video is destroyed");
@@ -26,7 +36,7 @@ export function videoLoader(
     if (!play) {
       videoElement.pause();
     }
-    const texture = new PIXI.Texture(
+    texture = new PIXI.Texture(
       new PIXI.BaseTexture(
         new PIXI.VideoResource(videoElement, {
           autoPlay: false,
@@ -39,8 +49,14 @@ export function videoLoader(
   }
   function updateVideo() {
     window.cancelAnimationFrame(updateVideoHandler);
-    onUpdate();
+    if (!videoElement.paused) {
+      onUpdate();
+    }
     updateVideoHandler = window.requestAnimationFrame(updateVideo);
+  }
+  function forceUpdate() {
+    texture?.update();
+    onUpdate();
   }
   function destroy() {
     destroyed = true;
@@ -53,25 +69,13 @@ export function videoLoader(
   return {
     load,
     destroy,
-    async play() {
-      if (!videoElement.paused) {
-        return;
-      }
-      return videoElement.play();
-    },
-    pause() {
-      if (videoElement.paused) {
-        return;
-      }
-      return videoElement.pause();
-    },
+    forceUpdate,
     videoElement,
   };
 }
 export type VideoLoaderResult = {
   load: () => Promise<PIXI.Texture>;
   destroy: () => void;
-  play: () => Promise<void>;
-  pause: () => void;
+  forceUpdate: () => void;
   videoElement: HTMLVideoElement;
 };
