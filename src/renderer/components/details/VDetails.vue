@@ -12,8 +12,8 @@
     <t-playback-controller-wrapper>
       <t-playback-controller>
         <VPlaybackController
-          v-if="pFileObjectContent"
-          :p-file-object-content="pFileObjectContent" />
+          v-if="pPlayableFileObjectContent"
+          :p-file-object-content="pPlayableFileObjectContent" />
       </t-playback-controller>
     </t-playback-controller-wrapper>
   </t-details-root>
@@ -36,9 +36,8 @@ import { IPC } from "@/renderer/libs/ipc";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 import { PFileObject } from "@/renderer/utils/pFileObject";
-import { PGIFFileObjectContent } from "@/renderer/utils/pFileObject/gif";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
-import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
+import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
 const props = defineProps<{
   petaFile: RPetaFile;
@@ -74,10 +73,7 @@ async function construct() {
 async function load() {
   await pFileObject.load(props.petaFile);
   pFileObjectContent.value = pFileObject.content;
-  if (
-    pFileObject.content instanceof PVideoFileObjectContent ||
-    pFileObject.content instanceof PGIFFileObjectContent
-  ) {
+  if (pFileObject.content instanceof PPlayableFileObjectContent) {
     pFileObject.content.play();
     pFileObject.content.event.on("updateRenderer", () => {
       vPixi.value?.orderPIXIRender();
@@ -196,6 +192,12 @@ function wheel(event: WheelEvent) {
   update();
   vPixi.value?.orderPIXIRender();
 }
+const pPlayableFileObjectContent = computed(() => {
+  if (pFileObjectContent.value instanceof PPlayableFileObjectContent) {
+    return pFileObjectContent.value;
+  }
+  return undefined;
+});
 const defaultScale = computed(() => {
   let width = 0;
   let height = 0;

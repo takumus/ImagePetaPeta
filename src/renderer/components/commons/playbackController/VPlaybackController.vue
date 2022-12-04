@@ -1,5 +1,5 @@
 <template>
-  <t-playback-controller-root v-if="isVideo">
+  <t-playback-controller-root>
     <button @click="play">play</button>
     <button @click="pause">pause</button>
     <input type="range" :max="1000" v-model="currentVolumeModel" />
@@ -16,49 +16,38 @@ import { computed, ref, watch } from "vue";
 
 import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
 
-import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
+import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 const props = defineProps<{
-  pFileObjectContent: PFileObjectContent<unknown>;
+  pFileObjectContent: PPlayableFileObjectContent<void>;
 }>();
 const duration = ref(0);
 const currentTime = ref(0);
 const currentVolumeTime = ref(0);
 const paused = ref(false);
 function play() {
-  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
+  props.pFileObjectContent.play();
+}
+function pause() {
+  props.pFileObjectContent.pause();
+}
+function startSeek() {
+  paused.value = props.pFileObjectContent.getPaused();
+  props.pFileObjectContent.pause();
+}
+function stopSeek() {
+  if (!paused.value) {
     props.pFileObjectContent.play();
   }
 }
-function pause() {
-  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
-    props.pFileObjectContent.pause();
-  }
-}
-function startSeek() {
-  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
-    paused.value = props.pFileObjectContent.getPaused();
-    props.pFileObjectContent.pause();
-  }
-}
-function stopSeek() {
-  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
-    if (!paused.value) {
-      props.pFileObjectContent.play();
-    }
-  }
-}
-const isVideo = computed(() => props.pFileObjectContent instanceof PVideoFileObjectContent);
 const currentTimeModel = computed<number>({
   get() {
     return currentTime.value;
   },
   set(value) {
-    if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
-      const video = props.pFileObjectContent;
-      video.setCurrentTime(value / 1000);
-    }
+    const video = props.pFileObjectContent;
+    video.setCurrentTime(value / 1000);
   },
 });
 const currentVolumeModel = computed<number>({
@@ -75,14 +64,14 @@ const currentVolumeModel = computed<number>({
 watch(
   () => props.pFileObjectContent,
   () => {
-    if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
-      const video = props.pFileObjectContent;
-      duration.value = video.getDuration() * 1000;
-      video.event.on("updateRenderer", () => {
-        currentTime.value = video.getCurrentTime() * 1000;
-        currentVolumeTime.value = video.getVolume() * 1000;
-      });
-    }
+    const playable = props.pFileObjectContent;
+    duration.value = playable.getDuration() * 1000;
+    playable.event.on("updateRenderer", () => {
+      currentTime.value = playable.getCurrentTime() * 1000;
+      if (playable instanceof PVideoFileObjectContent) {
+        currentVolumeTime.value = playable.getVolume() * 1000;
+      }
+    });
   },
   { immediate: true },
 );
