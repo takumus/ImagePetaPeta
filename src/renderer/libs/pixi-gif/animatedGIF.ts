@@ -69,7 +69,7 @@ export class AnimatedGIF extends Sprite {
     }
     this._playing = false;
     if (this._autoUpdate && this._isConnectedToTicker) {
-      Ticker.shared.remove(this.update, this);
+      Ticker.shared.remove(this.update);
       this._isConnectedToTicker = false;
     }
   }
@@ -79,7 +79,7 @@ export class AnimatedGIF extends Sprite {
     }
     this._playing = true;
     if (this._autoUpdate && !this._isConnectedToTicker) {
-      Ticker.shared.add(this.update, this, UPDATE_PRIORITY.HIGH);
+      Ticker.shared.add(this.update);
       this._isConnectedToTicker = true;
     }
     if (!this.loop && this.currentFrame === this._frames.length - 1) {
@@ -92,7 +92,7 @@ export class AnimatedGIF extends Sprite {
   public get playing(): boolean {
     return this._playing;
   }
-  update(deltaTime: number): void {
+  update = (deltaTime: number) => {
     if (!this._playing) {
       return;
     }
@@ -117,7 +117,7 @@ export class AnimatedGIF extends Sprite {
       this._currentTime = localTime;
       this.updateFrameIndex(localFrame);
     }
-  }
+  };
   private updateFrame(force = false): void {
     if (!this.dirty && !force) {
       return;
@@ -165,6 +165,9 @@ export class AnimatedGIF extends Sprite {
   set currentFrame(value: number) {
     this.updateFrameIndex(value);
     this._currentTime = this._frames[value]!.start;
+  }
+  set currentTime(value: number) {
+    this._currentTime = value;
   }
   private updateFrameIndex(value: number): void {
     if (value < 0 || value >= this._frames.length) {
