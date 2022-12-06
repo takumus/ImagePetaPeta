@@ -32,14 +32,15 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
   }
   play() {
     if (this.animatedGIF?.playing === false) {
-      this.event.emit("play");
       this.animatedGIF.play();
+      this.event.emit("play");
     }
   }
   pause() {
     if (this.animatedGIF?.playing === true) {
+      this.animatedGIF?.stop();
       this.event.emit("pause");
-      return this.animatedGIF?.stop();
+      return;
     }
   }
   getPaused() {

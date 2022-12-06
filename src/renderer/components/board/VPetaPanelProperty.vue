@@ -80,7 +80,7 @@ function pausePlayback() {
     return;
   }
   if (
-    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
     pPetaPanel.petaPanel.status.stopped = true;
@@ -94,7 +94,7 @@ function playPlayback() {
     return;
   }
   if (
-    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
     pPetaPanel.petaPanel.status.stopped = false;
@@ -106,8 +106,9 @@ function seekPlayback() {
   if (pPetaPanel === undefined) {
     return;
   }
+  console.log(pPetaPanel.petaPanel.status.type);
   if (
-    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
     pPetaPanel.petaPanel.status.time = pPetaPanel.pFileObject.content.getCurrentTime();

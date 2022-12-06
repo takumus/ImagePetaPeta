@@ -10,7 +10,7 @@
         @start-seek="startSeek"
         @stop-seek="stopSeek" />
     </t-seekbar>
-    <input type="range" :max="1000" v-model="currentVolumeModel" />
+    <input v-if="hasAudio" type="range" :max="1000" v-model="currentVolumeModel" />
   </t-playback-controller-root>
 </template>
 
@@ -114,6 +114,9 @@ function unobserve(content?: PPlayableFileObjectContent<void>) {
     content.event.off("volume", onVolume);
   }
 }
+const hasAudio = computed(() => {
+  return props.pFileObjectContent instanceof PVideoFileObjectContent;
+});
 watch(
   () => props.pFileObjectContent,
   (newContent, oldContent) => {
@@ -136,6 +139,9 @@ t-playback-controller-root {
     padding: var(--px-1);
     display: block;
     flex: 1;
+  }
+  > input {
+    max-width: 64px;
   }
 }
 </style>

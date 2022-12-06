@@ -12,8 +12,8 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   private orderedCurrentTime = -1;
   async load(petaFile: RPetaFile) {
     this.video = videoLoader(petaFile, false, () => {
-      this.event.emit("updateRenderer");
       this.event.emit("time");
+      this.event.emit("updateRenderer");
     });
     const texture = await this.video.load();
     if (this._canceledLoading) {
