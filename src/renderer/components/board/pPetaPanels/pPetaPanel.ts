@@ -88,7 +88,6 @@ export class PPetaPanel extends PIXI.Sprite {
         if (this.petaPanel.status.type === "gif" || this.petaPanel.status.type === "video") {
           if (this.pFileObject.content instanceof PPlayableFileObjectContent) {
             this.pFileObject.content.setCurrentTime(this.petaPanel.status.time);
-            console.log(this.petaPanel.status.time);
             if (!this.petaPanel.status.stopped) {
               this.pFileObject.content.play();
             }
