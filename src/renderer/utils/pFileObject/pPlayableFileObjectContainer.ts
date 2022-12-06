@@ -4,7 +4,13 @@ import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectCont
 
 export abstract class PPlayableFileObjectContent<
   T extends EventMap | unknown,
-> extends PFileObjectContent<T> {
+> extends PFileObjectContent<
+  T & {
+    play: () => void;
+    pause: () => void;
+    time: () => void;
+  }
+> {
   abstract play(): void;
   abstract pause(): void;
   abstract getPaused(): boolean;

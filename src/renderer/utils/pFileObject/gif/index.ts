@@ -18,6 +18,7 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
     if (image.animatedGIF) {
       this.animatedGIF = image.animatedGIF;
       this.animatedGIF.onFrameChange = () => {
+        this.event.emit("time");
         this.event.emit("updateRenderer");
       };
       this.addChild(this.animatedGIF);
@@ -30,10 +31,16 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
     super.destroy();
   }
   play() {
-    return this.animatedGIF?.play();
+    if (this.animatedGIF?.playing === false) {
+      this.event.emit("play");
+      this.animatedGIF.play();
+    }
   }
   pause() {
-    return this.animatedGIF?.stop();
+    if (this.animatedGIF?.playing === true) {
+      this.event.emit("pause");
+      return this.animatedGIF?.stop();
+    }
   }
   getPaused() {
     return !this.animatedGIF?.playing;

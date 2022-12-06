@@ -9,6 +9,10 @@ const ja = {
     capture: "キャプチャ",
     eula: "はじめにお読みください",
   },
+  playbackController: {
+    play: "再生",
+    pause: "停止",
+  },
   commons: {
     yes: "はい",
     no: "いいえ",

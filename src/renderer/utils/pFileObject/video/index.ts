@@ -3,7 +3,9 @@ import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { VideoLoaderResult, videoLoader } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
-export class PVideoFileObjectContent extends PPlayableFileObjectContent<void> {
+export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
+  volume: () => void;
+}> {
   private video?: VideoLoaderResult;
   private _canceledLoading = false;
   private setCurrentTimeHandler = -1;
@@ -11,6 +13,7 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<void> {
   async load(petaFile: RPetaFile) {
     this.video = videoLoader(petaFile, false, () => {
       this.event.emit("updateRenderer");
+      this.event.emit("time");
     });
     const texture = await this.video.load();
     if (this._canceledLoading) {
@@ -45,11 +48,19 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<void> {
     window.clearTimeout(this.setCurrentTimeHandler);
     super.destroy();
   }
-  play() {
-    return this.video?.videoElement.play();
+  async play() {
+    if (this.video?.videoElement.paused === true) {
+      await this.video.videoElement.play();
+      this.event.emit("play");
+      return;
+    }
   }
   pause() {
-    return this.video?.videoElement.pause();
+    if (this.video?.videoElement.paused === false) {
+      this.video.videoElement.pause();
+      this.event.emit("pause");
+      return;
+    }
   }
   getPaused() {
     return this.video?.videoElement.paused ?? false;
@@ -79,6 +90,7 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<void> {
   setVolume(volume: number) {
     if (this.video !== undefined) {
       this.video.videoElement.volume = volume;
+      this.event.emit("volume");
     }
   }
 }

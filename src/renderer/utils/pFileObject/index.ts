@@ -9,6 +9,7 @@ import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 export class PFileObject extends PIXI.Sprite {
   public content?: PFileObjectContent<unknown>;
+  private _loaded = false;
   constructor() {
     super();
   }
@@ -29,6 +30,10 @@ export class PFileObject extends PIXI.Sprite {
         this.addChild(this.content);
       }
     }
+    this._loaded = true;
+  }
+  get loaded() {
+    return this._loaded;
   }
   destroy() {
     if (this.content !== undefined) {
