@@ -10,6 +10,7 @@ import NSFWImage from "@/@assets/nsfwBackground.png";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { PFileObject } from "@/renderer/utils/pFileObject";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
+import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 export class PPetaPanel extends PIXI.Sprite {
   public unselected = false;
@@ -86,8 +87,15 @@ export class PPetaPanel extends PIXI.Sprite {
         }
         if (this.petaPanel.status.type === "gif" || this.petaPanel.status.type === "video") {
           if (this.pFileObject.content instanceof PPlayableFileObjectContent) {
+            this.pFileObject.content.setCurrentTime(this.petaPanel.status.time);
+            console.log(this.petaPanel.status.time);
             if (!this.petaPanel.status.stopped) {
               this.pFileObject.content.play();
+            }
+            if (this.pFileObject.content instanceof PVideoFileObjectContent) {
+              if (this.petaPanel.status.type === "video") {
+                this.pFileObject.content.setVolume(this.petaPanel.status.volume);
+              }
             }
           }
         }

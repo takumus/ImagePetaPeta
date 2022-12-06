@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
@@ -27,16 +27,27 @@ const { t } = useI18n();
 const props = defineProps<{
   pFileObjectContent: PPlayableFileObjectContent<void>;
 }>();
+const emit = defineEmits<{
+  (e: "pause"): void;
+  (e: "play"): void;
+  (e: "volume"): void;
+  (e: "seek"): void;
+}>();
 const duration = ref(0);
 const currentTime = ref(0);
 const currentVolumeTime = ref(0);
 const isPlayingBeforeSeek = ref(false);
 const playing = ref(false);
+onUnmounted(() => {
+  unobserve(props.pFileObjectContent);
+});
 function play() {
   props.pFileObjectContent.play();
+  emit("play");
 }
 function pause() {
   props.pFileObjectContent.pause();
+  emit("pause");
 }
 function startSeek() {
   isPlayingBeforeSeek.value = playing.value;
@@ -46,6 +57,7 @@ function stopSeek() {
   if (isPlayingBeforeSeek.value) {
     props.pFileObjectContent.play();
   }
+  emit("seek");
 }
 const currentTimeModel = computed<number>({
   get() {
@@ -64,31 +76,49 @@ const currentVolumeModel = computed<number>({
     if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
       const video = props.pFileObjectContent;
       video.setVolume(value / 1000);
+      emit("volume");
     }
   },
 });
+function onPlay() {
+  playing.value = !props.pFileObjectContent.getPaused();
+}
+function onPause() {
+  playing.value = !props.pFileObjectContent.getPaused();
+}
+function onTime() {
+  currentTime.value = props.pFileObjectContent.getCurrentTime() * 1000;
+}
+function onVolume() {
+  if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
+    currentVolumeTime.value = props.pFileObjectContent.getVolume() * 1000;
+  }
+}
+function observe(content: PPlayableFileObjectContent<void>) {
+  duration.value = content.getDuration() * 1000;
+  playing.value = !content.getPaused();
+  currentTime.value = content.getCurrentTime() * 1000;
+  content.event.on("play", onPlay);
+  content.event.on("pause", onPause);
+  content.event.on("time", onTime);
+  if (content instanceof PVideoFileObjectContent) {
+    content.event.on("volume", onVolume);
+    currentVolumeTime.value = content.getVolume() * 1000;
+  }
+}
+function unobserve(content?: PPlayableFileObjectContent<void>) {
+  content?.event.off("play", onPlay);
+  content?.event.off("pause", onPause);
+  content?.event.off("time", onTime);
+  if (content instanceof PVideoFileObjectContent) {
+    content.event.off("volume", onVolume);
+  }
+}
 watch(
   () => props.pFileObjectContent,
-  () => {
-    const playable = props.pFileObjectContent;
-    duration.value = playable.getDuration() * 1000;
-    playing.value = !playable.getPaused();
-    playable.event.on("play", () => {
-      playing.value = !playable.getPaused();
-      console.log(playing.value);
-    });
-    playable.event.on("pause", () => {
-      playing.value = !playable.getPaused();
-      console.log(playing.value);
-    });
-    playable.event.on("time", () => {
-      currentTime.value = playable.getCurrentTime() * 1000;
-    });
-    if (playable instanceof PVideoFileObjectContent) {
-      playable.event.on("volume", () => {
-        currentVolumeTime.value = playable.getVolume() * 1000;
-      });
-    }
+  (newContent, oldContent) => {
+    unobserve(oldContent);
+    observe(newContent);
   },
   { immediate: true },
 );

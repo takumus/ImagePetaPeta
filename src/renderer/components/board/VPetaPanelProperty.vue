@@ -20,24 +20,13 @@
         @click="singleSelectedPetaPanel ? openDetails(singleSelectedPetaPanel) : false">
         {{ t("boards.panelMenu.details") }}
       </button>
-      <button
-        v-if="
-          singleSelectedPetaPanel?.status.type === 'video' ||
-          singleSelectedPetaPanel?.status.type === 'gif'
-        "
-        @click="play">
-        {{
-          t(
-            `boards.panelMenu.${
-              (singleSelectedPetaPanel.status.type === "video" ||
-                singleSelectedPetaPanel.status.type === "gif") &&
-              singleSelectedPetaPanel.status.stopped
-                ? "playVideo"
-                : "stopVideo"
-            }`,
-          )
-        }}
-      </button>
+      <VPlaybackController
+        v-if="singleSelectedPlayableContent"
+        :p-file-object-content="singleSelectedPlayableContent"
+        @pause="pausePlayback"
+        @play="playPlayback"
+        @seek="seekPlayback"
+        @volume="volumeVideo" />
     </t-content>
   </VFloating>
 </template>
@@ -46,6 +35,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+import VPlaybackController from "@/renderer/components/commons/playbackController/VPlaybackController.vue";
 import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
@@ -54,11 +44,10 @@ import { Vec2 } from "@/commons/utils/vec2";
 
 import { initBoardLoader } from "@/renderer/components/board/boardLoader";
 import { IPC } from "@/renderer/libs/ipc";
-import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
+import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 import { searchParentElement } from "@/renderer/utils/searchParentElement";
 
-const petaFilesStore = usePetaFilesStore();
 const props = defineProps<{
   zIndex: number;
   selectedPetaPanels: RPetaPanel[];
@@ -85,27 +74,57 @@ onMounted(() => {
     }
   });
 });
-function play(): void {
-  if (singleSelectedPetaPanel.value === undefined) {
-    return;
-  }
-  const pPetaPanel = props.boardLoader.getPPanelFromId(singleSelectedPetaPanel.value.id);
+function pausePlayback() {
+  const pPetaPanel = singleSelectedPPetaPanel.value;
   if (pPetaPanel === undefined) {
     return;
   }
   if (
     pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
-    (singleSelectedPetaPanel.value.status.type === "video" ||
-      singleSelectedPetaPanel.value.status.type === "gif")
+    (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
-    if (pPetaPanel.pFileObject.content.getPaused()) {
-      pPetaPanel.pFileObject.content.play();
-      singleSelectedPetaPanel.value.status.stopped = false;
-    } else {
-      pPetaPanel.pFileObject.content.pause();
-      singleSelectedPetaPanel.value.status.stopped = true;
-    }
-    emit("update:petaPanels", [singleSelectedPetaPanel.value]);
+    pPetaPanel.petaPanel.status.stopped = true;
+    pPetaPanel.petaPanel.status.time = pPetaPanel.pFileObject.content.getCurrentTime();
+    emit("update:petaPanels", [pPetaPanel.petaPanel]);
+  }
+}
+function playPlayback() {
+  const pPetaPanel = singleSelectedPPetaPanel.value;
+  if (pPetaPanel === undefined) {
+    return;
+  }
+  if (
+    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
+  ) {
+    pPetaPanel.petaPanel.status.stopped = false;
+    emit("update:petaPanels", [pPetaPanel.petaPanel]);
+  }
+}
+function seekPlayback() {
+  const pPetaPanel = singleSelectedPPetaPanel.value;
+  if (pPetaPanel === undefined) {
+    return;
+  }
+  if (
+    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
+  ) {
+    pPetaPanel.petaPanel.status.time = pPetaPanel.pFileObject.content.getCurrentTime();
+    emit("update:petaPanels", [pPetaPanel.petaPanel]);
+  }
+}
+function volumeVideo() {
+  const pPetaPanel = singleSelectedPPetaPanel.value;
+  if (pPetaPanel === undefined) {
+    return;
+  }
+  if (
+    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    pPetaPanel.petaPanel.status.type === "video"
+  ) {
+    pPetaPanel.petaPanel.status.volume = pPetaPanel.pFileObject.content.getVolume();
+    emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }
 function open(position: Vec2): void {
@@ -198,11 +217,16 @@ function close(): void {
 const singleSelectedPetaPanel = computed(() =>
   props.selectedPetaPanels.length === 1 ? props.selectedPetaPanels[0] : undefined,
 );
-const singleSelectedPetaFile = computed(() =>
-  singleSelectedPetaPanel.value !== undefined
-    ? petaFilesStore.getPetaFile(singleSelectedPetaPanel.value.petaFileId)
+const singleSelectedPPetaPanel = computed(() =>
+  singleSelectedPetaPanel.value
+    ? props.boardLoader.getPPanelFromId(singleSelectedPetaPanel.value.id)
     : undefined,
 );
+const singleSelectedPlayableContent = computed(() => {
+  return singleSelectedPPetaPanel.value?.pFileObject.content instanceof PPlayableFileObjectContent
+    ? singleSelectedPPetaPanel.value.pFileObject.content
+    : undefined;
+});
 defineExpose({
   open,
   close,
@@ -213,6 +237,6 @@ defineExpose({
 t-content {
   display: block;
   padding: var(--px-2);
-  max-width: 256px;
+  max-width: 512px;
 }
 </style>
