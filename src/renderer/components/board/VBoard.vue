@@ -30,6 +30,7 @@
     <VPetaPanelProperty
       :selected-peta-panels="selectedPetaPanelsArray"
       :peta-panels="petaPanelsArray"
+      :board-loader="boardLoader"
       @update:peta-panels="boardLoader.updatePetaPanelsFromLayer"
       @sort-index="boardLoader.sortIndex"
       @remove-selected-panels="boardLoader.removeSelectedPanels"

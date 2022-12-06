@@ -9,8 +9,7 @@ import NOIMAGEImage from "@/@assets/noImageBackground.png";
 import NSFWImage from "@/@assets/nsfwBackground.png";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { PFileObject } from "@/renderer/utils/pFileObject";
-import { PGIFFileObjectContent } from "@/renderer/utils/pFileObject/gif";
-import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
+import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
 export class PPetaPanel extends PIXI.Sprite {
   public unselected = false;
@@ -29,7 +28,7 @@ export class PPetaPanel extends PIXI.Sprite {
   private needToScaling = valueChecker().isSameAll;
   private defaultHeight = 0;
   private zoomScale = 1;
-  private pFileObject: PFileObject;
+  public pFileObject: PFileObject;
   public showNSFW = false;
   private static nsfwTexture?: PIXI.Texture;
   private static noImageTexture?: PIXI.Texture;
@@ -84,6 +83,13 @@ export class PPetaPanel extends PIXI.Sprite {
         await this.pFileObject.load(petaFile);
         if (this.pFileObject.content !== undefined) {
           this.pFileObject.content.event.on("updateRenderer", () => this.onUpdateRenderer());
+        }
+        if (this.petaPanel.status.type === "gif" || this.petaPanel.status.type === "video") {
+          if (this.pFileObject.content instanceof PPlayableFileObjectContent) {
+            if (!this.petaPanel.status.stopped) {
+              this.pFileObject.content.play();
+            }
+          }
         }
         this.noImage = false;
         this.loading = false;
@@ -192,29 +198,6 @@ export class PPetaPanel extends PIXI.Sprite {
         this.pFileObject.content.x = -panelWidth / 2 - this.petaPanel.crop.position.x * imageWidth;
         this.pFileObject.content.y =
           -panelHeight / 2 - this.petaPanel.crop.position.y * imageHeight;
-      }
-      if (!this.loading) {
-        if (
-          this.pFileObject.content instanceof PVideoFileObjectContent &&
-          this.petaPanel.status.type === "video"
-        ) {
-          this.pFileObject.content.setVolume(this.petaPanel.status.volume);
-          if (this.petaPanel.status.stopped) {
-            this.pFileObject.content.pause();
-          } else {
-            this.pFileObject.content.play();
-          }
-        }
-        if (
-          this.pFileObject.content instanceof PGIFFileObjectContent &&
-          this.petaPanel.status.type === "gif"
-        ) {
-          if (this.petaPanel.status.stopped) {
-            this.pFileObject.content.pause();
-          } else {
-            this.pFileObject.content.play();
-          }
-        }
       }
       if (this.imageWrapper.mask) {
         this.masker.clear();

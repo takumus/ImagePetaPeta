@@ -22,29 +22,15 @@
       </button>
       <button
         v-if="
-          singleSelectedPetaPanel &&
-          singleSelectedPetaFile?.metadata.type === 'image' &&
-          singleSelectedPetaFile.metadata.gif
+          singleSelectedPetaPanel?.status.type === 'video' ||
+          singleSelectedPetaPanel?.status.type === 'gif'
         "
-        @click="playGIF">
+        @click="play">
         {{
           t(
             `boards.panelMenu.${
-              singleSelectedPetaPanel.status.type === "gif" &&
-              singleSelectedPetaPanel.status.stopped
-                ? "playGIF"
-                : "stopGIF"
-            }`,
-          )
-        }}
-      </button>
-      <button
-        v-if="singleSelectedPetaPanel && singleSelectedPetaFile?.metadata.type === 'video'"
-        @click="playVideo">
-        {{
-          t(
-            `boards.panelMenu.${
-              singleSelectedPetaPanel.status.type === "video" &&
+              (singleSelectedPetaPanel.status.type === "video" ||
+                singleSelectedPetaPanel.status.type === "gif") &&
               singleSelectedPetaPanel.status.stopped
                 ? "playVideo"
                 : "stopVideo"
@@ -66,8 +52,10 @@ import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { WindowType } from "@/commons/datas/windowType";
 import { Vec2 } from "@/commons/utils/vec2";
 
+import { initBoardLoader } from "@/renderer/components/board/boardLoader";
 import { IPC } from "@/renderer/libs/ipc";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
+import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 import { searchParentElement } from "@/renderer/utils/searchParentElement";
 
 const petaFilesStore = usePetaFilesStore();
@@ -75,6 +63,7 @@ const props = defineProps<{
   zIndex: number;
   selectedPetaPanels: RPetaPanel[];
   petaPanels: RPetaPanel[];
+  boardLoader: ReturnType<typeof initBoardLoader>;
 }>();
 const emit = defineEmits<{
   (e: "update:petaPanels", updates: RPetaPanel[]): void;
@@ -96,34 +85,26 @@ onMounted(() => {
     }
   });
 });
-function playGIF(): void {
-  if (singleSelectedPetaPanel.value !== undefined) {
-    const isGIF = singleSelectedPetaPanel.value.status.type === "gif";
-    const stopped =
-      singleSelectedPetaPanel.value.status.type === "gif"
-        ? singleSelectedPetaPanel.value.status.stopped
-        : true;
-    singleSelectedPetaPanel.value.status = {
-      type: "gif",
-      time: 0,
-      stopped: !isGIF ? false : !stopped,
-    };
-    emit("update:petaPanels", [singleSelectedPetaPanel.value]);
+function play(): void {
+  if (singleSelectedPetaPanel.value === undefined) {
+    return;
   }
-}
-function playVideo(): void {
-  if (singleSelectedPetaPanel.value !== undefined) {
-    const isGIF = singleSelectedPetaPanel.value.status.type === "video";
-    const stopped =
-      singleSelectedPetaPanel.value.status.type === "video"
-        ? singleSelectedPetaPanel.value.status.stopped
-        : true;
-    singleSelectedPetaPanel.value.status = {
-      type: "video",
-      time: 0,
-      volume: 0,
-      stopped: !isGIF ? false : !stopped,
-    };
+  const pPetaPanel = props.boardLoader.getPPanelFromId(singleSelectedPetaPanel.value.id);
+  if (pPetaPanel === undefined) {
+    return;
+  }
+  if (
+    pPetaPanel.pFileObject.content instanceof PVideoFileObjectContent &&
+    (singleSelectedPetaPanel.value.status.type === "video" ||
+      singleSelectedPetaPanel.value.status.type === "gif")
+  ) {
+    if (pPetaPanel.pFileObject.content.getPaused()) {
+      pPetaPanel.pFileObject.content.play();
+      singleSelectedPetaPanel.value.status.stopped = false;
+    } else {
+      pPetaPanel.pFileObject.content.pause();
+      singleSelectedPetaPanel.value.status.stopped = true;
+    }
     emit("update:petaPanels", [singleSelectedPetaPanel.value]);
   }
 }
