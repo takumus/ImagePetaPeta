@@ -1,17 +1,18 @@
 import { Vec2 } from "@/commons/utils/vec2";
 
+export type PetaPanelPlayableStatus = {
+  paused: boolean;
+  time: number;
+  speed: number;
+};
 export type PetaPanelStatus =
-  | {
+  | ({
       type: "gif";
-      stopped: boolean;
-      time: number;
-    }
-  | {
+    } & PetaPanelPlayableStatus)
+  | ({
       type: "video";
-      stopped: boolean;
-      time: number;
       volume: number;
-    }
+    } & PetaPanelPlayableStatus)
   | {
       type: "none";
     };

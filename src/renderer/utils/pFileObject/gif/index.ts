@@ -30,21 +30,17 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
     this._cancelLoading?.();
     super.destroy();
   }
-  play() {
-    if (this.animatedGIF?.playing === false) {
-      this.animatedGIF.play();
-      this.event.emit("play");
-    }
-  }
-  pause() {
-    if (this.animatedGIF?.playing === true) {
-      this.animatedGIF?.stop();
-      this.event.emit("pause");
-      return;
-    }
-  }
   getPaused() {
     return !this.animatedGIF?.playing;
+  }
+  async setPaused(paused: boolean) {
+    if (this.animatedGIF?.playing === false && !paused) {
+      this.animatedGIF.play();
+      this.event.emit("play");
+    } else if (this.animatedGIF?.playing === true && paused) {
+      this.animatedGIF?.stop();
+      this.event.emit("pause");
+    }
   }
   getDuration() {
     return (this.animatedGIF?.totalFrames ?? 1) - 1;
@@ -84,5 +80,13 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
       return 0;
     }
     return this.animatedGIF.height;
+  }
+  getSpeed() {
+    return this.animatedGIF?.animationSpeed ?? 1;
+  }
+  setSpeed(speed: number) {
+    if (this.animatedGIF !== undefined) {
+      this.animatedGIF.animationSpeed = speed;
+    }
   }
 }

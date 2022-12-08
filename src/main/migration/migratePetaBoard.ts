@@ -46,5 +46,19 @@ export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) =
     data.status.volume = 0;
     update();
   }
+  if (
+    (data.status.type === "video" || data.status.type === "gif") &&
+    data.status.speed === undefined
+  ) {
+    data.status.speed = 1;
+    update();
+  }
+  if (
+    (data.status.type === "video" || data.status.type === "gif") &&
+    data.status.paused === undefined
+  ) {
+    data.status.paused = true;
+    update();
+  }
   return data;
 });

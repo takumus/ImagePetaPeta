@@ -83,7 +83,7 @@ function pausePlayback() {
     pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
-    pPetaPanel.petaPanel.status.stopped = true;
+    pPetaPanel.petaPanel.status.paused = true;
     pPetaPanel.petaPanel.status.time = pPetaPanel.pFileObject.content.getCurrentTime();
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
@@ -97,7 +97,7 @@ function playPlayback() {
     pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
-    pPetaPanel.petaPanel.status.stopped = false;
+    pPetaPanel.petaPanel.status.paused = false;
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }

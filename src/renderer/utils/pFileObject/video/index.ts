@@ -48,22 +48,19 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
     window.clearTimeout(this.setCurrentTimeHandler);
     super.destroy();
   }
-  async play() {
-    if (this.video?.videoElement.paused === true) {
+  getPaused() {
+    return this.video?.videoElement.paused ?? false;
+  }
+  async setPaused(paused: boolean) {
+    if (this.video?.videoElement.paused === true && !paused) {
       await this.video.videoElement.play();
       this.event.emit("play");
       return;
-    }
-  }
-  pause() {
-    if (this.video?.videoElement.paused === false) {
+    } else if (this.video?.videoElement.paused === false && paused) {
       this.video.videoElement.pause();
       this.event.emit("pause");
       return;
     }
-  }
-  getPaused() {
-    return this.video?.videoElement.paused ?? false;
   }
   getDuration() {
     return this.video?.videoElement.duration ?? 0;
@@ -91,6 +88,14 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
     if (this.video !== undefined) {
       this.video.videoElement.volume = volume;
       this.event.emit("volume");
+    }
+  }
+  getSpeed() {
+    return this.video?.videoElement.playbackRate ?? 1;
+  }
+  setSpeed(speed: number) {
+    if (this.video !== undefined) {
+      this.video.videoElement.playbackRate = speed;
     }
   }
 }

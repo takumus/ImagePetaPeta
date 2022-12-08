@@ -42,20 +42,20 @@ onUnmounted(() => {
   unobserve(props.pFileObjectContent);
 });
 function play() {
-  props.pFileObjectContent.play();
+  props.pFileObjectContent.setPaused(false);
   emit("play");
 }
 function pause() {
-  props.pFileObjectContent.pause();
+  props.pFileObjectContent.setPaused(true);
   emit("pause");
 }
 function startSeek() {
   isPlayingBeforeSeek.value = playing.value;
-  props.pFileObjectContent.pause();
+  props.pFileObjectContent.setPaused(true);
 }
 function stopSeek() {
   if (isPlayingBeforeSeek.value) {
-    props.pFileObjectContent.play();
+    props.pFileObjectContent.setPaused(false);
   }
   emit("seek");
 }

@@ -11,11 +11,14 @@ export abstract class PPlayableFileObjectContent<
     time: () => void;
   }
 > {
-  abstract play(): void;
-  abstract pause(): void;
   abstract getPaused(): boolean;
+  abstract setPaused(paused: boolean): Promise<void>;
   abstract getDuration(): number;
-  abstract getCurrentTime(): number;
   abstract getSeekable(): boolean;
+
+  abstract getCurrentTime(): number;
   abstract setCurrentTime(currentTime: number): void;
+
+  abstract getSpeed(): number;
+  abstract setSpeed(speed: number): void;
 }

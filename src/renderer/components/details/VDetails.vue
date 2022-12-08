@@ -74,7 +74,7 @@ async function load() {
   await pFileObject.load(props.petaFile);
   pFileObjectContent.value = pFileObject.content;
   if (pFileObject.content instanceof PPlayableFileObjectContent) {
-    pFileObject.content.play();
+    pFileObject.content.setPaused(false);
     pFileObject.content.event.on("updateRenderer", () => {
       vPixi.value?.orderPIXIRender();
     });
