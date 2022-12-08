@@ -75,3 +75,5 @@ export const FILENAME_DB_INFO = "dbInfo.json";
 export const FILENAME_WINDOW_STATES = "windowStates.json";
 export const DIRNAME_IMAGES = "images";
 export const DIRNAME_THUMBNAILS = "thumbnails";
+
+export const VIDEO_LOADER_MAX_FPS = 60;

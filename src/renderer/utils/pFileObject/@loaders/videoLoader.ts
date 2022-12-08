@@ -2,9 +2,20 @@ import * as PIXI from "pixi.js";
 
 import { FileType } from "@/commons/datas/fileType";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
+import { VIDEO_LOADER_MAX_FPS } from "@/commons/defines";
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
 import { getFileURL } from "@/renderer/utils/fileURL";
 
+const intervals = (() => {
+  const events = new TypedEventEmitter<{
+    update: () => void;
+  }>();
+  window.setInterval(() => {
+    events.emit("update");
+  }, 1000 / VIDEO_LOADER_MAX_FPS);
+  return events;
+})();
 export function videoLoader(
   petaFile: RPetaFile,
   play: boolean,
@@ -18,7 +29,6 @@ export function videoLoader(
   videoElement.style.height = "1px";
   videoElement.style.position = "fixed";
 
-  let updateVideoHandler = -1;
   let texture: PIXI.Texture | undefined;
   let destroyed = false;
   async function load() {
@@ -45,14 +55,13 @@ export function videoLoader(
       ),
     );
     updateVideo();
+    intervals.on("update", updateVideo);
     return texture;
   }
   function updateVideo() {
-    window.cancelAnimationFrame(updateVideoHandler);
     if (!videoElement.paused) {
       onUpdate();
     }
-    updateVideoHandler = window.requestAnimationFrame(updateVideo);
   }
   function forceUpdate() {
     texture?.update();
@@ -63,8 +72,8 @@ export function videoLoader(
     videoElement.removeAttribute("src");
     videoElement.load();
     videoElement.remove();
-    window.cancelAnimationFrame(updateVideoHandler);
     texture?.destroy(true);
+    intervals.off("update", updateVideo);
   }
   return {
     load,
