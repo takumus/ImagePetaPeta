@@ -1,6 +1,6 @@
 <template>
   <t-playback-controller-root>
-    <button @click="playing ? pause() : play()">
+    <button @click="paused(playing)">
       {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
     </button>
     <t-seekbar>
@@ -11,6 +11,10 @@
         @stop-seek="stopSeek" />
     </t-seekbar>
     <input v-if="hasAudio" type="range" :max="1000" v-model="currentVolumeModel" />
+    <input type="range" :min="100" :max="4000" v-model="currentSpeedModel" /><button
+      @click="currentSpeedModel = 1000">
+      reset
+    </button>
   </t-playback-controller-root>
 </template>
 
@@ -28,26 +32,23 @@ const props = defineProps<{
   pFileObjectContent: PPlayableFileObjectContent<void>;
 }>();
 const emit = defineEmits<{
-  (e: "pause"): void;
-  (e: "play"): void;
+  (e: "paused", paused: boolean): void;
   (e: "volume"): void;
   (e: "seek"): void;
+  (e: "speed"): void;
 }>();
 const duration = ref(0);
 const currentTime = ref(0);
-const currentVolumeTime = ref(0);
+const currentVolume = ref(0);
+const currentSpeed = ref(1);
 const isPlayingBeforeSeek = ref(false);
 const playing = ref(false);
 onUnmounted(() => {
   unobserve(props.pFileObjectContent);
 });
-function play() {
-  props.pFileObjectContent.setPaused(false);
-  emit("play");
-}
-function pause() {
-  props.pFileObjectContent.setPaused(true);
-  emit("pause");
+function paused(paused: boolean) {
+  props.pFileObjectContent.setPaused(paused);
+  emit("paused", paused);
 }
 function startSeek() {
   isPlayingBeforeSeek.value = playing.value;
@@ -70,7 +71,7 @@ const currentTimeModel = computed<number>({
 });
 const currentVolumeModel = computed<number>({
   get() {
-    return currentVolumeTime.value;
+    return currentVolume.value;
   },
   set(value) {
     if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
@@ -80,9 +81,15 @@ const currentVolumeModel = computed<number>({
     }
   },
 });
-function onPlay() {
-  playing.value = !props.pFileObjectContent.getPaused();
-}
+const currentSpeedModel = computed<number>({
+  get() {
+    return currentSpeed.value;
+  },
+  set(value) {
+    props.pFileObjectContent.setSpeed(value / 1000);
+    emit("speed");
+  },
+});
 function onPause() {
   playing.value = !props.pFileObjectContent.getPaused();
 }
@@ -91,25 +98,30 @@ function onTime() {
 }
 function onVolume() {
   if (props.pFileObjectContent instanceof PVideoFileObjectContent) {
-    currentVolumeTime.value = props.pFileObjectContent.getVolume() * 1000;
+    currentVolume.value = props.pFileObjectContent.getVolume() * 1000;
   }
+}
+function onSpeed() {
+  currentSpeed.value = props.pFileObjectContent.getSpeed() * 1000;
+  console.log(currentSpeed.value);
 }
 function observe(content: PPlayableFileObjectContent<void>) {
   duration.value = content.getDuration() * 1000;
   playing.value = !content.getPaused();
   currentTime.value = content.getCurrentTime() * 1000;
-  content.event.on("play", onPlay);
-  content.event.on("pause", onPause);
+  currentSpeed.value = content.getSpeed() * 1000;
+  content.event.on("paused", onPause);
   content.event.on("time", onTime);
+  content.event.on("speed", onSpeed);
   if (content instanceof PVideoFileObjectContent) {
     content.event.on("volume", onVolume);
-    currentVolumeTime.value = content.getVolume() * 1000;
+    currentVolume.value = content.getVolume() * 1000;
   }
 }
 function unobserve(content?: PPlayableFileObjectContent<void>) {
-  content?.event.off("play", onPlay);
-  content?.event.off("pause", onPause);
+  content?.event.off("paused", onPause);
   content?.event.off("time", onTime);
+  content?.event.off("speed", onSpeed);
   if (content instanceof PVideoFileObjectContent) {
     content.event.off("volume", onVolume);
   }

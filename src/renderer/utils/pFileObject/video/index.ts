@@ -54,11 +54,11 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   async setPaused(paused: boolean) {
     if (this.video?.videoElement.paused === true && !paused) {
       await this.video.videoElement.play();
-      this.event.emit("play");
+      this.event.emit("paused", false);
       return;
     } else if (this.video?.videoElement.paused === false && paused) {
       this.video.videoElement.pause();
-      this.event.emit("pause");
+      this.event.emit("paused", true);
       return;
     }
   }
@@ -96,6 +96,7 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   setSpeed(speed: number) {
     if (this.video !== undefined) {
       this.video.videoElement.playbackRate = speed;
+      this.event.emit("speed");
     }
   }
 }

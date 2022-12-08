@@ -6,9 +6,9 @@ export abstract class PPlayableFileObjectContent<
   T extends EventMap | unknown,
 > extends PFileObjectContent<
   T & {
-    play: () => void;
-    pause: () => void;
+    paused: (paused: boolean) => void;
     time: () => void;
+    speed: () => void;
   }
 > {
   abstract getPaused(): boolean;

@@ -36,10 +36,10 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
   async setPaused(paused: boolean) {
     if (this.animatedGIF?.playing === false && !paused) {
       this.animatedGIF.play();
-      this.event.emit("play");
+      this.event.emit("paused", false);
     } else if (this.animatedGIF?.playing === true && paused) {
       this.animatedGIF?.stop();
-      this.event.emit("pause");
+      this.event.emit("paused", true);
     }
   }
   getDuration() {
@@ -87,6 +87,7 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
   setSpeed(speed: number) {
     if (this.animatedGIF !== undefined) {
       this.animatedGIF.animationSpeed = speed;
+      this.event.emit("speed");
     }
   }
 }

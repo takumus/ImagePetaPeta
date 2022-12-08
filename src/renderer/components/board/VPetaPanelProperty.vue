@@ -23,10 +23,10 @@
       <VPlaybackController
         v-if="singleSelectedPlayableContent"
         :p-file-object-content="singleSelectedPlayableContent"
-        @pause="pausePlayback"
-        @play="playPlayback"
+        @paused="pausePlayback"
         @seek="seekPlayback"
-        @volume="volumeVideo" />
+        @volume="volumeVideo"
+        @speed="speedPlayback" />
     </t-content>
   </VFloating>
 </template>
@@ -70,11 +70,10 @@ onMounted(() => {
       show.value
     ) {
       close();
-      console.log("close");
     }
   });
 });
-function pausePlayback() {
+function pausePlayback(paused: boolean) {
   const pPetaPanel = singleSelectedPPetaPanel.value;
   if (pPetaPanel === undefined) {
     return;
@@ -83,21 +82,8 @@ function pausePlayback() {
     pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
-    pPetaPanel.petaPanel.status.paused = true;
+    pPetaPanel.petaPanel.status.paused = paused;
     pPetaPanel.petaPanel.status.time = pPetaPanel.pFileObject.content.getCurrentTime();
-    emit("update:petaPanels", [pPetaPanel.petaPanel]);
-  }
-}
-function playPlayback() {
-  const pPetaPanel = singleSelectedPPetaPanel.value;
-  if (pPetaPanel === undefined) {
-    return;
-  }
-  if (
-    pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
-    (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
-  ) {
-    pPetaPanel.petaPanel.status.paused = false;
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }
@@ -106,12 +92,24 @@ function seekPlayback() {
   if (pPetaPanel === undefined) {
     return;
   }
-  console.log(pPetaPanel.petaPanel.status.type);
   if (
     pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
     pPetaPanel.petaPanel.status.time = pPetaPanel.pFileObject.content.getCurrentTime();
+    emit("update:petaPanels", [pPetaPanel.petaPanel]);
+  }
+}
+function speedPlayback() {
+  const pPetaPanel = singleSelectedPPetaPanel.value;
+  if (pPetaPanel === undefined) {
+    return;
+  }
+  if (
+    pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
+    (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
+  ) {
+    pPetaPanel.petaPanel.status.speed = pPetaPanel.pFileObject.content.getSpeed();
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }
