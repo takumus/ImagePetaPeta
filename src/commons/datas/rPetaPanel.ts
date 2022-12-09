@@ -38,6 +38,7 @@ export function createRPetaPanel(
     id: uuid(),
     index: 0,
     status,
+    filters: {},
     visible: true,
     locked: false,
     renderer: {

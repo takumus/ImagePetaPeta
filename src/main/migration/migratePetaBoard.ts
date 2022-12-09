@@ -60,5 +60,9 @@ export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) =
     data.status.paused = true;
     update();
   }
+  if (data.filters === undefined) {
+    data.filters = {};
+    update();
+  }
   return data;
 });

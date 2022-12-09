@@ -5,6 +5,15 @@ export type PetaPanelPlayableStatus = {
   time: number;
   speed: number;
 };
+export type PetaPanelFilters = {
+  grayscale?: {
+    mode: "luminance" | "brightness";
+    value: number;
+  };
+  alpha?: {
+    value: number;
+  };
+};
 export type PetaPanelStatus =
   | ({
       type: "gif";
@@ -27,10 +36,10 @@ export interface PetaPanel {
     width: number;
     height: number;
   };
+  filters: PetaPanelFilters;
   id: string;
   index: number;
   status: PetaPanelStatus;
-
   visible: boolean;
   locked: boolean;
 }
