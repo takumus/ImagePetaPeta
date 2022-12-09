@@ -14,8 +14,8 @@ export class PBoardGrid extends PIXI.Container {
   grid: PIXI.Graphics;
   center: PIXI.Graphics;
   _scale = 1;
-  private ignoreRenderGrids = valueChecker().isSameAll;
-  private ignoreRenderCenter = valueChecker().isSameAll;
+  private ignoreRenderGrids = valueChecker();
+  private ignoreRenderCenter = valueChecker();
   constructor() {
     super();
     this.grid = new PIXI.Graphics();
@@ -34,18 +34,7 @@ export class PBoardGrid extends PIXI.Container {
       DIVISION,
       SUB_GRID_SIZE,
     );
-    if (
-      !this.ignoreRenderGrids(
-        "width",
-        width,
-        "height",
-        height,
-        "color",
-        numColor,
-        "scale",
-        this._scale,
-      )
-    ) {
+    if (!this.ignoreRenderGrids(width, height, numColor, this._scale)) {
       this.grid.clear();
       const maximumZoomAlpha = Math.max(
         (this._scale - (BOARD_ZOOM_MAX - MAXIMUM_ZOOM_BEGIN_SCALE)) / MAXIMUM_ZOOM_BEGIN_SCALE,
@@ -80,22 +69,7 @@ export class PBoardGrid extends PIXI.Container {
         this.renderGrid(maxGridSize / (DIVISION * DIVISION), width, height);
       }
     }
-    if (
-      !this.ignoreRenderCenter(
-        "width",
-        width,
-        "height",
-        height,
-        "scale",
-        this._scale,
-        "color",
-        numColor,
-        "position.x",
-        position.x,
-        "position.y",
-        position.y,
-      )
-    ) {
+    if (!this.ignoreRenderCenter(width, height, this._scale, numColor, position.x, position.y)) {
       this.center.clear();
       //------------------------------------------------------
       // 中心線
