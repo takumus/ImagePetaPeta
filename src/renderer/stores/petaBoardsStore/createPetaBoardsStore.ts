@@ -97,6 +97,7 @@ function petaBoardToRPetaBoard(petaBoard: PetaBoard): RPetaBoard {
             ...petaPanel.crop,
             position: new Vec2(petaPanel.crop.position),
           },
+          position: new Vec2(petaPanel.position),
           renderer: {
             selected: false,
           },
