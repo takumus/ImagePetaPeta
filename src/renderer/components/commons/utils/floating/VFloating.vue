@@ -28,7 +28,10 @@ const position = ref(new Vec2(0, 0));
 const height = ref(props.maxHeight);
 const width = ref(props.maxWidth);
 const rootElement = ref<HTMLElement>();
-function updateFloating(targetRect: { x: number; y: number; width: number; height: number }) {
+function updateFloating(
+  targetRect: { x: number; y: number; width: number; height: number },
+  fit = false,
+) {
   position.value.x = targetRect.x;
   position.value.y = targetRect.y + targetRect.height;
   height.value = props.maxHeight;
@@ -38,19 +41,25 @@ function updateFloating(targetRect: { x: number; y: number; width: number; heigh
     if (rect === undefined) {
       return;
     }
-    if (rect.right > document.body.clientWidth) {
-      if (targetRect.x - rect.width - targetRect.width < 0) {
-        width.value = `${document.body.clientWidth - position.value.x}px`;
-      } else {
+    if (position.value.x + rect.width > document.body.clientWidth) {
+      if (targetRect.x - rect.width > 0 && !fit) {
         position.value.x = targetRect.x - rect.width;
+      } else {
+        position.value.x = document.body.clientWidth - rect.width;
       }
     }
-    if (rect.bottom > document.body.clientHeight) {
-      if (targetRect.y - rect.height - targetRect.height < 0) {
-        height.value = `${document.body.clientHeight - position.value.y}px`;
-      } else {
+    if (position.value.y + rect.height > document.body.clientHeight) {
+      if (targetRect.y - rect.height - targetRect.height > 0 && !fit) {
         position.value.y = targetRect.y - rect.height - targetRect.height;
+      } else {
+        position.value.y = document.body.clientHeight - rect.height;
       }
+    }
+    if (position.value.x < 0) {
+      position.value.x = 0;
+    }
+    if (position.value.y < 0) {
+      position.value.y = 0;
     }
   });
 }
@@ -70,5 +79,6 @@ t-floating-root {
   top: 0px;
   left: 0px;
   max-width: 256px;
+  // overflow: hidden;
 }
 </style>

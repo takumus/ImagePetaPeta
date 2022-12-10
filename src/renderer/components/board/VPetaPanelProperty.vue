@@ -89,7 +89,7 @@ function pointerMove(event: PointerEvent) {
     return;
   }
   const position = vec2FromPointerEvent(event).sub(startDragOffset.value);
-  floating.value?.updateFloating({ ...position, width: 0, height: 0 });
+  floating.value?.updateFloating({ ...position, width: 0, height: 0 }, true);
 }
 function pointerUp() {
   startDragOffset.value = undefined;
