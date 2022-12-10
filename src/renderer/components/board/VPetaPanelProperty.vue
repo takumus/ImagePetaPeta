@@ -6,6 +6,7 @@
     :max-height="'unset'"
     ref="floating">
     <t-content>
+      <t-draggable @pointerdown="startDrag"></t-draggable>
       <p v-for="p in selectedPetaPanels" :key="p.id">{{ p.id }}</p>
       <button @click="changeOrder('front')">{{ t("boards.panelMenu.toFront") }}</button>
       <button @click="changeOrder('back')">{{ t("boards.panelMenu.toBack") }}</button>
@@ -40,7 +41,7 @@ import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vu
 
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { WindowType } from "@/commons/datas/windowType";
-import { Vec2 } from "@/commons/utils/vec2";
+import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { initBoardLoader } from "@/renderer/components/board/boardLoader";
 import { IPC } from "@/renderer/libs/ipc";
@@ -62,6 +63,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const show = ref(false);
 const floating = ref<InstanceType<typeof VFloating>>();
+const startDragOffset = ref<Vec2>();
 onMounted(() => {
   window.addEventListener("pointerdown", (event) => {
     if (
@@ -73,6 +75,25 @@ onMounted(() => {
     }
   });
 });
+function startDrag(event: PointerEvent) {
+  const rect = (floating.value?.$el as HTMLElement | undefined)?.getBoundingClientRect();
+  if (rect === undefined) {
+    return;
+  }
+  startDragOffset.value = vec2FromPointerEvent(event).sub(rect);
+  window.addEventListener("pointermove", pointerMove);
+  window.addEventListener("pointerup", pointerUp);
+}
+function pointerMove(event: PointerEvent) {
+  if (startDragOffset.value === undefined) {
+    return;
+  }
+  const position = vec2FromPointerEvent(event).sub(startDragOffset.value);
+  floating.value?.updateFloating({ ...position, width: 0, height: 0 });
+}
+function pointerUp() {
+  startDragOffset.value = undefined;
+}
 function pausePlayback(paused: boolean) {
   const pPetaPanel = singleSelectedPPetaPanel.value;
   if (pPetaPanel === undefined) {
@@ -236,6 +257,17 @@ defineExpose({
 t-content {
   display: block;
   padding: var(--px-2);
+  padding-top: calc(var(--px-4));
   max-width: 512px;
+  > t-draggable {
+    display: block;
+    width: 100%;
+    height: var(--px-4);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    cursor: grab;
+    // background-color: #ff0000;
+  }
 }
 </style>
