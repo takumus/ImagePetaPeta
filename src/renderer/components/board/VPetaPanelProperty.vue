@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VPlaybackController from "@/renderer/components/commons/playbackController/VPlaybackController.vue";
@@ -47,7 +47,6 @@ import { initBoardLoader } from "@/renderer/components/board/boardLoader";
 import { IPC } from "@/renderer/libs/ipc";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
-import { searchParentElement } from "@/renderer/utils/searchParentElement";
 
 const props = defineProps<{
   zIndex: number;
@@ -65,15 +64,7 @@ const show = ref(false);
 const floating = ref<InstanceType<typeof VFloating>>();
 const startDragOffset = ref<Vec2>();
 onMounted(() => {
-  window.addEventListener("pointerdown", (event) => {
-    if (
-      event.target instanceof HTMLElement &&
-      !searchParentElement(event.target, floating.value?.rootElement) &&
-      show.value
-    ) {
-      close();
-    }
-  });
+  //
 });
 function startDrag(event: PointerEvent) {
   const rect = (floating.value?.$el as HTMLElement | undefined)?.getBoundingClientRect();
@@ -147,9 +138,9 @@ function volumeVideo() {
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }
-function open(position: Vec2): void {
+function open(position: Vec2, height = 0): void {
   show.value = true;
-  floating.value?.updateFloating({ ...position, width: 0, height: 0 });
+  floating.value?.updateFloating({ ...position, width: 0, height: height });
   // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
   // const isMultiple = selectedPPetaPanels().length > 1;
   // .contextMenu.open(
@@ -247,6 +238,16 @@ const singleSelectedPlayableContent = computed(() => {
     ? singleSelectedPPetaPanel.value.pFileObject.content
     : undefined;
 });
+watch(
+  () => props.selectedPetaPanels.length,
+  (length) => {
+    if (length === 0) {
+      if (show.value) {
+        close();
+      }
+    }
+  },
+);
 defineExpose({
   open,
   close,

@@ -1,20 +1,24 @@
 <template>
   <t-playback-controller-root>
-    <button @click="paused(playing)">
-      {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
-    </button>
-    <t-seekbar>
-      <VSeekBar
-        :duration="duration"
-        v-model:time="currentTimeModel"
-        @start-seek="startSeek"
-        @stop-seek="stopSeek" />
-    </t-seekbar>
-    <input v-if="hasAudio" type="range" :max="1000" v-model="currentVolumeModel" />
-    <input type="range" :min="100" :max="4000" v-model="currentSpeedModel" /><button
-      @click="currentSpeedModel = 1000">
-      reset
-    </button>
+    <t-advanced>
+      <button @click="paused(playing)">
+        {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
+      </button>
+      <input v-if="hasAudio" type="range" :max="1000" v-model="currentVolumeModel" />
+      <input type="range" :min="100" :max="4000" v-model="currentSpeedModel" /><button
+        @click="currentSpeedModel = 1000">
+        reset
+      </button>
+    </t-advanced>
+    <t-general>
+      <t-seekbar>
+        <VSeekBar
+          :duration="duration"
+          v-model:time="currentTimeModel"
+          @start-seek="startSeek"
+          @stop-seek="stopSeek" />
+      </t-seekbar>
+    </t-general>
   </t-playback-controller-root>
 </template>
 
@@ -144,16 +148,20 @@ t-playback-controller-root {
   display: flex;
   width: 100%;
   height: 100%;
-  > button {
-    min-width: 64px;
+  flex-direction: column;
+  > t-general {
+    display: flex;
+    > button {
+      min-width: 64px;
+    }
+    > t-seekbar {
+      padding: var(--px-1);
+      display: block;
+      flex: 1;
+    }
   }
-  > t-seekbar {
-    padding: var(--px-1);
-    display: block;
-    flex: 1;
-  }
-  > input {
-    max-width: 64px;
+  > t-advanced {
+    display: flex;
   }
 }
 </style>
