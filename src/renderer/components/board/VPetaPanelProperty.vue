@@ -7,7 +7,7 @@
     ref="floating">
     <t-content>
       <t-draggable @pointerdown="startDrag"></t-draggable>
-      <p v-for="p in selectedPetaPanels" :key="p.id">{{ p.id }}</p>
+      <!-- <p v-for="p in selectedPetaPanels" :key="p.id">{{ p.id }}</p> -->
       <button @click="changeOrder('front')">{{ t("boards.panelMenu.toFront") }}</button>
       <button @click="changeOrder('back')">{{ t("boards.panelMenu.toBack") }}</button>
       <button @click="flipPetaPanel('horizontal')">

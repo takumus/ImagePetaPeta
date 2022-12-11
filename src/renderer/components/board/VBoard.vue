@@ -91,6 +91,7 @@ const petaFilesStore = usePetaFilesStore();
 const keyboards = useKeyboardsStore(true);
 const { t } = useI18n();
 const layer = ref<typeof VLayer>();
+const boardRoot = ref<HTMLElement>();
 const croppingPetaPanel = ref<RPetaPanel>();
 const cropping = ref(false);
 const dragging = ref(false);
@@ -329,7 +330,12 @@ function petaPanelMenu(petaPanel: RPetaPanel, position: Vec2) {
   if (!pPanel) {
     return;
   }
-  petaPanelsProperty.value?.open(position);
+  if (selectedPetaPanelsArray.value.length === 1) {
+    const offset = boardRoot.value?.getBoundingClientRect() ?? new Vec2();
+    petaPanelsProperty.value?.open(new Vec2(pPanel.toGlobal(pPanel.getCorners(0)[3])).add(offset));
+  } else if (selectedPetaPanelsArray.value.length > 1) {
+    petaPanelsProperty.value?.open(position);
+  }
 }
 // function beginCrop(petaPanel: RPetaPanel) {
 //   croppingPetaPanel.value = petaPanel;
