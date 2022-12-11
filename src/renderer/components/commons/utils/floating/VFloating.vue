@@ -36,30 +36,49 @@ function updateFloating(
   position.value.y = targetRect.y + targetRect.height;
   height.value = props.maxHeight;
   width.value = props.maxWidth;
+  const margin = 10;
   nextTick(() => {
     const rect = rootElement.value?.getBoundingClientRect();
     if (rect === undefined) {
       return;
     }
-    if (position.value.x + rect.width > document.body.clientWidth) {
-      if (targetRect.x - rect.width > 0 && !fit) {
-        position.value.x = targetRect.x - rect.width;
+    const rightSpace = document.body.clientWidth - margin - (targetRect.x + rect.width);
+    const leftSpace = targetRect.x - rect.width - margin;
+    const bottomSpace = document.body.clientHeight - margin - (targetRect.y + rect.height);
+    const topSpace = targetRect.y - rect.height - targetRect.height - margin;
+    if (rightSpace < 0) {
+      if (leftSpace < 0) {
+        position.value.x = document.body.clientWidth - margin - rect.width;
+        if (rect.width > document.body.clientWidth - margin) {
+          position.value.x = margin;
+          width.value = document.body.clientWidth - margin * 2 + "px";
+        }
       } else {
-        position.value.x = document.body.clientWidth - rect.width;
+        if (fit) {
+          position.value.x = document.body.clientWidth - margin - rect.width;
+        } else {
+          position.value.x = targetRect.x - rect.width;
+        }
       }
     }
-    if (position.value.y + rect.height > document.body.clientHeight) {
-      if (targetRect.y - rect.height - targetRect.height > 0 && !fit) {
-        position.value.y = targetRect.y - rect.height - targetRect.height;
+    if (bottomSpace < 0) {
+      if (topSpace < 0) {
+        if (position.value.y + rect.height > document.body.clientHeight - margin) {
+          height.value = document.body.clientHeight - margin - position.value.y + "px";
+        }
       } else {
-        position.value.y = document.body.clientHeight - rect.height;
+        if (fit) {
+          position.value.y = document.body.clientHeight - margin - rect.height;
+        } else {
+          position.value.y = targetRect.y - rect.height - targetRect.height;
+        }
       }
     }
-    if (position.value.x < 0) {
-      position.value.x = 0;
+    if (position.value.x < margin) {
+      position.value.x = margin;
     }
-    if (position.value.y < 0) {
-      position.value.y = 0;
+    if (position.value.y < margin) {
+      position.value.y = margin;
     }
   });
 }
@@ -79,6 +98,6 @@ t-floating-root {
   top: 0px;
   left: 0px;
   max-width: 256px;
-  // overflow: hidden;
+  overflow: hidden;
 }
 </style>
