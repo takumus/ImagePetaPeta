@@ -332,7 +332,20 @@ function petaPanelMenu(petaPanel: RPetaPanel, position: Vec2) {
   }
   if (selectedPetaPanelsArray.value.length === 1) {
     const offset = boardRoot.value?.getBoundingClientRect() ?? new Vec2();
-    petaPanelsProperty.value?.open(new Vec2(pPanel.toGlobal(pPanel.getCorners(0)[3])).add(offset));
+    const corners = pPanel.getCorners(0).map((corner) => new Vec2(pPanel.toGlobal(corner)));
+    const min = new Vec2(Infinity, Infinity);
+    const max = new Vec2(-Infinity, -Infinity);
+    corners.forEach((corner) => {
+      min.x = Math.min(min.x, corner.x);
+      min.y = Math.min(min.y, corner.y);
+      max.x = Math.max(max.x, corner.x);
+      max.y = Math.max(max.y, corner.y);
+    });
+    min.add(offset);
+    max.add(offset);
+    const position = min;
+    // const width
+    petaPanelsProperty.value?.open(position, max.x - min.x, max.y - min.y);
   } else if (selectedPetaPanelsArray.value.length > 1) {
     petaPanelsProperty.value?.open(position);
   }

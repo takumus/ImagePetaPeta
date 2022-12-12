@@ -138,9 +138,9 @@ function volumeVideo() {
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }
-function open(position: Vec2, height = 0): void {
+function open(position: Vec2, width = 0, height = 0): void {
   show.value = true;
-  floating.value?.updateFloating({ ...position, width: 0, height: height });
+  floating.value?.updateFloating({ ...position, width: width, height: height });
   // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
   // const isMultiple = selectedPPetaPanels().length > 1;
   // .contextMenu.open(

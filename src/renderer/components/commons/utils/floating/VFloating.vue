@@ -44,8 +44,10 @@ function updateFloating(
     }
     const rightSpace = document.body.clientWidth - margin - (targetRect.x + rect.width);
     const leftSpace = targetRect.x - rect.width - margin;
-    const bottomSpace = document.body.clientHeight - margin - (targetRect.y + rect.height);
-    const topSpace = targetRect.y - rect.height - targetRect.height - margin;
+    const bottomSpace =
+      document.body.clientHeight - margin - (targetRect.y + targetRect.y + rect.height);
+    const topSpace = targetRect.y - rect.height - margin;
+    console.log(bottomSpace, topSpace);
     if (rightSpace < 0) {
       if (leftSpace < 0) {
         position.value.x = document.body.clientWidth - margin - rect.width;
@@ -70,7 +72,7 @@ function updateFloating(
         if (fit) {
           position.value.y = document.body.clientHeight - margin - rect.height;
         } else {
-          position.value.y = targetRect.y - rect.height - targetRect.height;
+          position.value.y = targetRect.y - rect.height;
         }
       }
     }
