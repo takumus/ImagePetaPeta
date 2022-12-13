@@ -82,7 +82,7 @@ function pointerMove(event: PointerEvent) {
   const position = vec2FromPointerEvent(event).sub(startDragOffset.value);
   floating.value?.updateFloating(
     { ...position, width: 0, height: 0 },
-    { shrinkHeight: false, shrinkWidth: false },
+    { shrinkHeight: false, shrinkWidth: false, insideParentElement: true },
   );
 }
 function pointerUp() {
@@ -145,7 +145,7 @@ function open(position: Vec2, width = 0, height = 0): void {
   show.value = true;
   floating.value?.updateFloating(
     { ...position, width: width, height: height },
-    { shrinkHeight: false, shrinkWidth: false },
+    { shrinkHeight: false, shrinkWidth: false, insideParentElement: true },
   );
   // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
   // const isMultiple = selectedPPetaPanels().length > 1;
