@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import deepcopy from "deepcopy";
 import { nextTick, ref } from "vue";
 
 import { Vec2 } from "@/commons/utils/vec2";
@@ -30,57 +31,66 @@ const width = ref(props.maxWidth);
 const rootElement = ref<HTMLElement>();
 function updateFloating(
   targetRect: { x: number; y: number; width: number; height: number },
-  fit = false,
+  contitions = {
+    shrinkWidth: false,
+    shrinkHeight: true,
+  },
 ) {
-  position.value.x = targetRect.x;
-  position.value.y = targetRect.y + targetRect.height;
+  const margin = 10;
+  const rightLimit = document.body.clientWidth - margin;
+  const leftLimit = margin;
+  const widthLimit = rightLimit - leftLimit;
+  const bottomLimit = document.body.clientHeight - margin;
+  const topLimit = margin;
+  const targetCorners = {
+    top: Math.max(topLimit, Math.min(targetRect.y, bottomLimit)),
+    bottom: Math.max(topLimit, Math.min(targetRect.y + targetRect.height, bottomLimit)),
+    left: Math.max(leftLimit, Math.min(targetRect.x, rightLimit)),
+    right: Math.max(leftLimit, Math.min(targetRect.x + targetRect.width, rightLimit)),
+  };
+  position.value.x = targetCorners.left;
+  position.value.y = targetCorners.bottom;
   height.value = props.maxHeight;
   width.value = props.maxWidth;
-  const margin = 10;
   nextTick(() => {
     const rect = rootElement.value?.getBoundingClientRect();
     if (rect === undefined) {
       return;
     }
-    const rightSpace = document.body.clientWidth - margin - (targetRect.x + rect.width);
-    const leftSpace = targetRect.x - rect.width - margin;
-    const bottomSpace =
-      document.body.clientHeight - margin - (targetRect.y + targetRect.y + rect.height);
-    const topSpace = targetRect.y - rect.height - margin;
-    console.log(bottomSpace, topSpace);
+    const rightSpace = rightLimit - (targetCorners.left + rect.width);
+    const leftSpace = targetCorners.left - rect.width - leftLimit;
+    const bottomSpace = bottomLimit - (targetCorners.bottom + rect.height);
+    const topSpace = targetCorners.top - rect.height - topLimit;
     if (rightSpace < 0) {
       if (leftSpace < 0) {
-        position.value.x = document.body.clientWidth - margin - rect.width;
-        if (rect.width > document.body.clientWidth - margin) {
-          position.value.x = margin;
-          width.value = document.body.clientWidth - margin * 2 + "px";
+        position.value.x = rightLimit - rect.width;
+        if (rect.width > widthLimit) {
+          position.value.x = leftLimit;
+          width.value = widthLimit + "px";
         }
       } else {
-        if (fit) {
-          position.value.x = document.body.clientWidth - margin - rect.width;
-        } else {
-          position.value.x = targetRect.x - rect.width;
-        }
+        position.value.x = targetCorners.left - rect.width;
       }
     }
     if (bottomSpace < 0) {
       if (topSpace < 0) {
-        if (position.value.y + rect.height > document.body.clientHeight - margin) {
-          height.value = document.body.clientHeight - margin - position.value.y + "px";
+        if (contitions.shrinkHeight) {
+          if (bottomSpace > topSpace) {
+            height.value = bottomLimit - position.value.y + "px";
+          } else {
+            position.value.y = topLimit;
+            height.value = targetCorners.top - topLimit + "px";
+          }
+        } else {
+          if (bottomSpace > topSpace) {
+            position.value.y = bottomLimit - rect.height;
+          } else {
+            position.value.y = topLimit;
+          }
         }
       } else {
-        if (fit) {
-          position.value.y = document.body.clientHeight - margin - rect.height;
-        } else {
-          position.value.y = targetRect.y - rect.height;
-        }
+        position.value.y = targetCorners.top - rect.height;
       }
-    }
-    if (position.value.x < margin) {
-      position.value.x = margin;
-    }
-    if (position.value.y < margin) {
-      position.value.y = margin;
     }
   });
 }

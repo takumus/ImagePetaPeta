@@ -80,7 +80,10 @@ function pointerMove(event: PointerEvent) {
     return;
   }
   const position = vec2FromPointerEvent(event).sub(startDragOffset.value);
-  floating.value?.updateFloating({ ...position, width: 0, height: 0 }, true);
+  floating.value?.updateFloating(
+    { ...position, width: 0, height: 0 },
+    { shrinkHeight: false, shrinkWidth: false },
+  );
 }
 function pointerUp() {
   startDragOffset.value = undefined;
@@ -140,7 +143,10 @@ function volumeVideo() {
 }
 function open(position: Vec2, width = 0, height = 0): void {
   show.value = true;
-  floating.value?.updateFloating({ ...position, width: width, height: height });
+  floating.value?.updateFloating(
+    { ...position, width: width, height: height },
+    { shrinkHeight: false, shrinkWidth: false },
+  );
   // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
   // const isMultiple = selectedPPetaPanels().length > 1;
   // .contextMenu.open(
