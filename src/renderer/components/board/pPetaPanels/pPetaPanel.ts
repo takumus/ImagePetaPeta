@@ -125,6 +125,8 @@ export class PPetaPanel extends PIXI.Sprite {
           this.petaPanel.crop.position.y,
           this.petaPanel.position.x,
           this.petaPanel.position.y,
+          this.petaPanel.flipHorizontal,
+          this.petaPanel.flipVertical,
           this.petaPanel.rotation,
           this.petaPanel.visible,
           this.petaPanel.locked,
@@ -146,10 +148,14 @@ export class PPetaPanel extends PIXI.Sprite {
       this.interactive = this.petaPanel.visible && !this.petaPanel.locked;
       const panelWidth = this.absPanelWidth();
       const panelHeight = this.absPanelHeight();
-      const flippedX = this.petaPanel.width < 0;
-      const flippedY = this.petaPanel.height < 0;
-      this.imageWrapper.scale.set(flippedX ? -1 : 1, flippedY ? -1 : 1);
-      this.imageWrapper.anchor.set(flippedX ? 1 : 0, flippedY ? 1 : 0);
+      this.imageWrapper.scale.set(
+        this.petaPanel.flipHorizontal ? -1 : 1,
+        this.petaPanel.flipVertical ? -1 : 1,
+      );
+      this.imageWrapper.anchor.set(
+        this.petaPanel.flipHorizontal ? 1 : 0,
+        this.petaPanel.flipVertical ? 1 : 0,
+      );
       if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
         this.imageWrapper.mask = this.masker;
         this.masker.visible = true;

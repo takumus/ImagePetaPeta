@@ -14,9 +14,6 @@
         @lose-context="loseContext"
         @resize="resize"
     /></t-pixi-container>
-    <t-crop v-if="cropping">
-      <VCrop :peta-panel="croppingPetaPanel" @update="updateCrop" />
-    </t-crop>
     <VBoardLoading :z-index="2" :data="boardLoader.loadingStatus.value"></VBoardLoading>
     <VLayer
       ref="layer"
@@ -44,7 +41,6 @@ import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VCrop from "@/renderer/components/board/VCrop.vue";
 import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import VLayer from "@/renderer/components/board/layer/VLayer.vue";
 import VBoardLoading from "@/renderer/components/board/loading/VBoardLoading.vue";
@@ -71,7 +67,6 @@ import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
-import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
 import { hitTest } from "@/renderer/utils/hitTest";
@@ -87,13 +82,10 @@ const { systemInfo } = useSystemInfoStore();
 const nsfwStore = useNSFWStore();
 const settingsStore = useSettingsStore();
 const components = useComponentsStore();
-const petaFilesStore = usePetaFilesStore();
 const keyboards = useKeyboardsStore(true);
 const { t } = useI18n();
 const layer = ref<typeof VLayer>();
 const boardRoot = ref<HTMLElement>();
-const croppingPetaPanel = ref<RPetaPanel>();
-const cropping = ref(false);
 const dragging = ref(false);
 const petaPanelsProperty = ref<InstanceType<typeof VPetaPanelProperty>>();
 const currentBoard = ref<RPetaBoard>();
@@ -128,6 +120,9 @@ onMounted(() => {
   keyboards.keys("Backspace").down(boardLoader.removeSelectedPanels);
   keyboards.keys("ShiftLeft", "ShiftRight").change((pressed) => {
     pTransformer.fit = pressed;
+  });
+  keyboards.keys("AltLeft", "AltRight").change((pressed) => {
+    pTransformer.crop = pressed;
   });
   vPixi.value?.canvasWrapper().addEventListener("dblclick", boardLoader.resetTransform);
   vPixi.value?.canvasWrapper().addEventListener("pointerdown", preventWheelClick);
@@ -349,43 +344,6 @@ function petaPanelMenu(petaPanel: RPetaPanel, position: Vec2) {
   } else if (selectedPetaPanelsArray.value.length > 1) {
     petaPanelsProperty.value?.open(position);
   }
-}
-// function beginCrop(petaPanel: RPetaPanel) {
-//   croppingPetaPanel.value = petaPanel;
-//   cropping.value = true;
-//   if (keyboards) {
-//     keyboards.enabled = false;
-//   }
-// }
-// function endCrop() {
-//   croppingPetaPanel.value = undefined;
-//   cropping.value = false;
-//   if (keyboards) {
-//     keyboards.enabled = true;
-//   }
-// }
-function updateCrop(petaPanel?: RPetaPanel) {
-  // endCrop();
-  const petaFile = petaFilesStore.getPetaFile(petaPanel?.petaFileId);
-  if (petaFile === undefined || currentBoard.value === undefined || petaPanel === undefined) {
-    return;
-  }
-  const sign = petaPanel.height < 0 ? -1 : 1;
-  petaPanel.height =
-    Math.abs(
-      petaPanel.width *
-        ((petaPanel.crop.height * petaFile.metadata.height) /
-          (petaPanel.crop.width * petaFile.metadata.width)),
-    ) * sign;
-  currentBoard.value.petaPanels[petaPanel.id] = petaPanel;
-  boardLoader.load({
-    reload: {
-      additions: [],
-      deletions: [],
-    },
-  });
-  updatePetaBoard();
-  orderPIXIRender();
 }
 function onUpdateGif() {
   if (boardLoader.loadingStatus.value.extracting) {

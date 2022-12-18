@@ -41,6 +41,7 @@ import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vu
 
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { WindowType } from "@/commons/datas/windowType";
+import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { initBoardLoader } from "@/renderer/components/board/boardLoader";
@@ -200,19 +201,38 @@ function openDetails(petaPanel: RPetaPanel) {
 function resetPetaPanel() {
   emit(
     "update:petaPanels",
-    props.selectedPetaPanels.map((pp) => ({
-      ...pp,
-      height: Math.abs(pp.height),
-      width: Math.abs(pp.width),
-      // pPanel.petaPanel.crop.position.set(0, 0);
-      crop: {
-        ...pp.crop,
-        position: new Vec2(0, 0),
-        width: 1,
-        height: 1,
-      },
-      rotation: 0,
-    })),
+    props.selectedPetaPanels.map((pp) => {
+      const pP = props.boardLoader.getPPanelFromId(pp.id);
+      let width = 0;
+      let height = 0;
+      const baseWidth = pP?.pFileObject.content?.width ?? 0;
+      const baseHeight = pP?.pFileObject.content?.height ?? 0;
+      const maxWidth = pp.width;
+      const maxHeight = pp.height;
+      if (maxWidth > maxHeight) {
+        const size = resizeImage(baseWidth, baseHeight, maxWidth, "width");
+        width = size.width;
+        height = size.height;
+      } else {
+        const size = resizeImage(baseWidth, baseHeight, maxHeight, "height");
+        height = size.height;
+        width = size.width;
+      }
+      return {
+        ...pp,
+        height: height,
+        width: width,
+        flipHorizontal: false,
+        flipVertical: false,
+        crop: {
+          ...pp.crop,
+          position: new Vec2(0, 0),
+          width: 1,
+          height: 1,
+        },
+        rotation: 0,
+      };
+    }),
   );
 }
 function removeSelectedPanels() {
@@ -223,8 +243,8 @@ function flipPetaPanel(direction: "vertical" | "horizontal") {
     "update:petaPanels",
     props.selectedPetaPanels.map((pp) => ({
       ...pp,
-      width: direction === "horizontal" ? -pp.width : pp.width,
-      height: direction === "vertical" ? -pp.height : pp.height,
+      flipVertical: direction === "vertical" ? !pp.flipVertical : pp.flipVertical,
+      flipHorizontal: direction === "horizontal" ? !pp.flipHorizontal : pp.flipHorizontal,
     })),
   );
 }

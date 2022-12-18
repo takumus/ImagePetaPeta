@@ -14,6 +14,7 @@ enum ControlStatus {
   PANEL_DRAG = "p_drag",
   PANEL_ROTATE = "p_rotate",
   PANEL_SIZE = "p_size",
+  PANEL_CROP = "p_crop",
   BACKGROUND_DRAG = "bg_drag",
   NONE = "none",
 }
@@ -45,6 +46,8 @@ export class PTransformer extends PIXI.Container {
   private mousePosition = new Vec2();
   _scale = 0;
   fit = false;
+  crop = false;
+  beginSize = new Vec2();
   updatePetaPanels?: () => void;
   constructor(public pPanels: { [key: string]: PPetaPanel }) {
     super();
@@ -93,6 +96,9 @@ export class PTransformer extends PIXI.Container {
     const sizingCorner = this.corners[this.sizingCornerIndex];
     if (sizingCorner) {
       this.beginSizingDistance = this.pairCorner.getDistance(sizingCorner);
+    }
+    if (this.crop) {
+      this.controlStatus = ControlStatus.PANEL_CROP;
     }
   }
   beginRotating(index: number, e: PIXI.FederatedPointerEvent) {
@@ -143,7 +149,7 @@ export class PTransformer extends PIXI.Container {
       pPanel.dragging = true;
     });
   }
-  pointerup(e: PIXI.FederatedPointerEvent) {
+  pointerup() {
     if (this.controlStatus === ControlStatus.PANEL_DRAG) {
       this.selectedPPetaPanels.forEach((pPanel) => {
         pPanel.dragging = false;
@@ -189,6 +195,120 @@ export class PTransformer extends PIXI.Container {
           ),
         );
       });
+    } else if (this.controlStatus === ControlStatus.PANEL_CROP) {
+      const beginPetaPanel = this.beginSizingPetaPanels[0];
+      const pPetaPanel = this.selectedPPetaPanels[0];
+      const petaPanel = pPetaPanel?.petaPanel;
+      if (
+        pPetaPanel === undefined ||
+        petaPanel === undefined ||
+        beginPetaPanel === undefined ||
+        this.selectedPPetaPanels.length !== 1
+      ) {
+        return;
+      }
+      const changeWidth =
+        this.sizingCornerIndex === 0 ||
+        this.sizingCornerIndex === 2 ||
+        this.sizingCornerIndex === 3 ||
+        this.sizingCornerIndex === 4 ||
+        this.sizingCornerIndex === 6 ||
+        this.sizingCornerIndex === 7;
+      const changeHeight =
+        this.sizingCornerIndex === 0 ||
+        this.sizingCornerIndex === 1 ||
+        this.sizingCornerIndex === 2 ||
+        this.sizingCornerIndex === 4 ||
+        this.sizingCornerIndex === 5 ||
+        this.sizingCornerIndex === 6;
+      const negativeWidth =
+        this.sizingCornerIndex === 0 ||
+        this.sizingCornerIndex === 6 ||
+        this.sizingCornerIndex === 7;
+      const negativeHeight =
+        this.sizingCornerIndex === 0 ||
+        this.sizingCornerIndex === 1 ||
+        this.sizingCornerIndex === 2;
+      if (changeWidth) {
+        if (negativeWidth) {
+          const mw = 1 - beginPetaPanel.crop.position.x + beginPetaPanel.crop.width;
+          const wr = (-pPetaPanel.toLocal(e.global).x + petaPanel.width / 2) / beginPetaPanel.width;
+          petaPanel.crop.position.x =
+            (1 - wr) * beginPetaPanel.crop.width + beginPetaPanel.crop.position.x;
+          petaPanel.crop.width = wr * beginPetaPanel.crop.width;
+          if (
+            petaPanel.crop.position.x >
+            beginPetaPanel.crop.position.x + beginPetaPanel.crop.width
+          ) {
+            petaPanel.crop.position.x = mw;
+            petaPanel.crop.width = 0;
+          } else if (petaPanel.crop.position.x < 0) {
+            petaPanel.crop.position.x = 0;
+            petaPanel.crop.width = beginPetaPanel.crop.position.x + beginPetaPanel.crop.width;
+          }
+          petaPanel.width =
+            (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
+        } else {
+          const mw = 1 - beginPetaPanel.crop.position.x;
+          const wr = (pPetaPanel.toLocal(e.global).x + petaPanel.width / 2) / beginPetaPanel.width;
+          petaPanel.crop.width = wr * beginPetaPanel.crop.width;
+          if (petaPanel.crop.width > mw) {
+            petaPanel.crop.width = mw;
+          } else if (petaPanel.crop.width < 0) {
+            petaPanel.crop.width = 0;
+          }
+          petaPanel.width =
+            (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
+        }
+      }
+      if (changeHeight) {
+        if (negativeHeight) {
+          const mw = 1 - beginPetaPanel.crop.position.y + beginPetaPanel.crop.height;
+          const wr =
+            (-pPetaPanel.toLocal(e.global).y + petaPanel.height / 2) / beginPetaPanel.height;
+          petaPanel.crop.position.y =
+            (1 - wr) * beginPetaPanel.crop.height + beginPetaPanel.crop.position.y;
+          petaPanel.crop.height = wr * beginPetaPanel.crop.height;
+          if (
+            petaPanel.crop.position.y >
+            beginPetaPanel.crop.position.y + beginPetaPanel.crop.height
+          ) {
+            petaPanel.crop.position.y = mw;
+            petaPanel.crop.height = 0;
+          } else if (petaPanel.crop.position.y < 0) {
+            petaPanel.crop.position.y = 0;
+            petaPanel.crop.height = beginPetaPanel.crop.position.y + beginPetaPanel.crop.height;
+          }
+          petaPanel.height =
+            (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
+        } else {
+          const mw = 1 - beginPetaPanel.crop.position.y;
+          const wr =
+            (pPetaPanel.toLocal(e.global).y + petaPanel.height / 2) / beginPetaPanel.height;
+          petaPanel.crop.height = wr * beginPetaPanel.crop.height;
+          if (petaPanel.crop.height > mw) {
+            petaPanel.crop.height = mw;
+          } else if (petaPanel.crop.height < 0) {
+            petaPanel.crop.height = 0;
+          }
+          petaPanel.height =
+            (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
+        }
+      }
+      const pairLocal = new Vec2(pPetaPanel.toLocal(this.toGlobal(this.pairCorner)));
+      const dragLocal = pPetaPanel.toLocal(e.global);
+      dragLocal.x = Math.min(petaPanel.width / 2, Math.max(-petaPanel.width / 2, dragLocal.x));
+      dragLocal.y = Math.min(petaPanel.height / 2, Math.max(-petaPanel.height / 2, dragLocal.y));
+      petaPanel.position.set(
+        pPetaPanel.parent.toLocal(
+          pPetaPanel.toGlobal(
+            pairLocal
+              .add(new Vec2(changeWidth ? dragLocal.x : 0, changeHeight ? dragLocal.y : 0))
+              .div(2),
+          ),
+        ),
+      );
+      pPetaPanel.orderRender();
     } else if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
       this.rotatingRotation = center.getDiff(this.toLocal(e.data.global)).atan2();

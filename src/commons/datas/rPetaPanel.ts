@@ -30,6 +30,8 @@ export function createRPetaPanel(
     rotation: 0,
     width: width,
     height: height || (petaFile.metadata.height / petaFile.metadata.width) * width,
+    flipVertical: false,
+    flipHorizontal: false,
     crop: {
       position: new Vec2(0, 0),
       width: 1,

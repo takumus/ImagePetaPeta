@@ -31,6 +31,8 @@ export interface PetaPanel {
   rotation: number;
   width: number;
   height: number;
+  flipVertical: boolean;
+  flipHorizontal: boolean;
   crop: {
     position: Vec2;
     width: number;
