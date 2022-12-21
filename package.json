@@ -30,6 +30,11 @@
     "format": "yarn prettier ./src --write"
   },
   "dependencies": {
+    "//": "fixed",
+    "sharp": "0.31.3",
+    "pixi.js": "7.0.5",
+
+    "//": "",
     "@araki-packages/promise-serial": "^2.0.2",
     "@seald-io/nedb": "^3.1.0",
     "@xmldom/xmldom": "^0.8.5",
@@ -47,15 +52,18 @@
     "fuse.js": "^6.6.2",
     "gifuct-js": "^2.1.2",
     "p-limit": "^4.0.0",
-    "pixi.js": "^7.0.5",
     "quantize": "^1.0.2",
-    "sharp": "0.31.3",
     "throttle-debounce": "^5.0.0",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
     "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
+    "//": "fixed",
+    "electron": "20.3.8",
+    "chalk": "4.1.2",
+
+    "//": "",
     "@shockpkg/icon-encoder": "^2.1.1",
     "@trivago/prettier-plugin-sort-imports": "^3.4.0",
     "@types/color-convert": "^2.0.0",
@@ -82,9 +90,7 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-typescript": "^11.0.2",
     "adm-zip": "^0.5.9",
-    "chalk": "4.1.2",
     "core-js": "^3.24.1",
-    "electron": "20.3.8",
     "electron-devtools-installer": "^3.2.0",
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
