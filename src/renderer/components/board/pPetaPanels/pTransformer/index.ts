@@ -229,12 +229,26 @@ export class PTransformer extends PIXI.Container {
         this.sizingCornerIndex === 0 ||
         this.sizingCornerIndex === 1 ||
         this.sizingCornerIndex === 2;
+      const minX =
+        -(
+          ((beginPetaPanel.crop.position.x + beginPetaPanel.crop.width) /
+            beginPetaPanel.crop.width) *
+          beginPetaPanel.width
+        ) / 2;
+      const maxX =
+        (((1 - beginPetaPanel.crop.position.x) / beginPetaPanel.crop.width) *
+          beginPetaPanel.width) /
+        2;
       if (changeWidth) {
         if (negativeWidth) {
+          let x = pPetaPanel.toLocal(e.global).x;
+          x = Math.max(minX, x);
+          console.log(x, minX);
           const mw = 1 - beginPetaPanel.crop.position.x + beginPetaPanel.crop.width;
-          const wr = (-pPetaPanel.toLocal(e.global).x + petaPanel.width / 2) / beginPetaPanel.width;
+          const wr = (-x + petaPanel.width / 2) / beginPetaPanel.width;
           petaPanel.crop.position.x =
             (1 - wr) * beginPetaPanel.crop.width + beginPetaPanel.crop.position.x;
+
           petaPanel.crop.width = wr * beginPetaPanel.crop.width;
           if (
             petaPanel.crop.position.x >
@@ -249,8 +263,12 @@ export class PTransformer extends PIXI.Container {
           petaPanel.width =
             (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
         } else {
+          let x = pPetaPanel.toLocal(e.global).x;
+          x = Math.min(maxX, x);
+          console.log(x, maxX);
+
           const mw = 1 - beginPetaPanel.crop.position.x;
-          const wr = (pPetaPanel.toLocal(e.global).x + petaPanel.width / 2) / beginPetaPanel.width;
+          const wr = (x + petaPanel.width / 2) / beginPetaPanel.width;
           petaPanel.crop.width = wr * beginPetaPanel.crop.width;
           if (petaPanel.crop.width > mw) {
             petaPanel.crop.width = mw;
@@ -297,8 +315,8 @@ export class PTransformer extends PIXI.Container {
       }
       const pairLocal = new Vec2(pPetaPanel.toLocal(this.toGlobal(this.pairCorner)));
       const dragLocal = pPetaPanel.toLocal(e.global);
-      dragLocal.x = Math.min(petaPanel.width / 2, Math.max(-petaPanel.width / 2, dragLocal.x));
-      dragLocal.y = Math.min(petaPanel.height / 2, Math.max(-petaPanel.height / 2, dragLocal.y));
+      dragLocal.x = Math.min(maxX, Math.max(minX, dragLocal.x));
+      // dragLocal.y = Math.min(petaPanel.height / 2, Math.max(-petaPanel.height / 2, dragLocal.y));
       petaPanel.position.set(
         pPetaPanel.parent.toLocal(
           pPetaPanel.toGlobal(
