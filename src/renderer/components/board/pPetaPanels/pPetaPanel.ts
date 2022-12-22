@@ -42,7 +42,7 @@ export class PPetaPanel extends PIXI.Sprite {
     super();
     this.pFileObject = new PFileObject();
     this.anchor.set(0.5, 0.5);
-    // this.imageWrapper.mask = this.masker;
+    this.imageWrapper.mask = this.masker;
     this.imageWrapper.addChild(this.pFileObject);
     this.addChild(this.imageWrapper, this.masker, this.cover, this.selection);
     this.interactive = true;
@@ -157,11 +157,11 @@ export class PPetaPanel extends PIXI.Sprite {
         this.petaPanel.flipVertical ? 1 : 0,
       );
       if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
-        // this.imageWrapper.mask = this.masker;
-        // this.masker.visible = true;
+        this.imageWrapper.mask = this.masker;
+        this.masker.visible = true;
       } else {
-        // this.imageWrapper.mask = null;
-        // this.masker.visible = false;
+        this.imageWrapper.mask = null;
+        this.masker.visible = false;
       }
       const imageWidth = panelWidth * (1 / this.petaPanel.crop.width);
       const tempImageHeight = petaFile ? petaFile.metadata.height : this.defaultHeight;
