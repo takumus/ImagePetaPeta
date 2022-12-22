@@ -257,9 +257,11 @@ export class PPetaPanel extends PIXI.Sprite {
   ): P {
     if (
       this.position.x !== this.petaPanel.position.x ||
-      this.position.y !== this.petaPanel.position.y
+      this.position.y !== this.petaPanel.position.y ||
+      this.rotation !== this.petaPanel.rotation
     ) {
       this.position.set(this.petaPanel.position.x, this.petaPanel.position.y);
+      this.rotation = this.petaPanel.rotation;
     }
     return super.toLocal(position, from, point, skipUpdate);
   }
@@ -270,9 +272,11 @@ export class PPetaPanel extends PIXI.Sprite {
   ): P {
     if (
       this.position.x !== this.petaPanel.position.x ||
-      this.position.y !== this.petaPanel.position.y
+      this.position.y !== this.petaPanel.position.y ||
+      this.rotation !== this.petaPanel.rotation
     ) {
       this.position.set(this.petaPanel.position.x, this.petaPanel.position.y);
+      this.rotation = this.petaPanel.rotation;
     }
     return super.toGlobal(position, point, skipUpdate);
   }
