@@ -229,81 +229,71 @@ export class PTransformer extends PIXI.Container {
         this.sizingCornerIndex === 0 ||
         this.sizingCornerIndex === 1 ||
         this.sizingCornerIndex === 2;
+      let x = pPetaPanel.toLocal(e.global).x;
+      let y = pPetaPanel.toLocal(e.global).y;
       if (changeWidth) {
         if (negativeWidth) {
-          const mw = 1 - beginPetaPanel.crop.position.x + beginPetaPanel.crop.width;
-          const wr = (-pPetaPanel.toLocal(e.global).x + petaPanel.width / 2) / beginPetaPanel.width;
+          const minX =
+            -(
+              ((beginPetaPanel.crop.position.x + beginPetaPanel.crop.width) /
+                beginPetaPanel.crop.width) *
+              beginPetaPanel.width
+            ) / 2;
+          const maxX = -1;
+          x = Math.max(minX, Math.min(maxX, x));
+          const wr = (-x + petaPanel.width / 2) / beginPetaPanel.width;
           petaPanel.crop.position.x =
             (1 - wr) * beginPetaPanel.crop.width + beginPetaPanel.crop.position.x;
           petaPanel.crop.width = wr * beginPetaPanel.crop.width;
-          if (
-            petaPanel.crop.position.x >
-            beginPetaPanel.crop.position.x + beginPetaPanel.crop.width
-          ) {
-            petaPanel.crop.position.x = mw;
-            petaPanel.crop.width = 0;
-          } else if (petaPanel.crop.position.x < 0) {
-            petaPanel.crop.position.x = 0;
-            petaPanel.crop.width = beginPetaPanel.crop.position.x + beginPetaPanel.crop.width;
-          }
           petaPanel.width =
             (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
         } else {
-          const mw = 1 - beginPetaPanel.crop.position.x;
-          const wr = (pPetaPanel.toLocal(e.global).x + petaPanel.width / 2) / beginPetaPanel.width;
+          const maxX =
+            (((1 - beginPetaPanel.crop.position.x) / beginPetaPanel.crop.width) *
+              beginPetaPanel.width) /
+            2;
+          const minX = 1;
+          x = Math.max(minX, Math.min(maxX, x));
+          const wr = (x + petaPanel.width / 2) / beginPetaPanel.width;
           petaPanel.crop.width = wr * beginPetaPanel.crop.width;
-          if (petaPanel.crop.width > mw) {
-            petaPanel.crop.width = mw;
-          } else if (petaPanel.crop.width < 0) {
-            petaPanel.crop.width = 0;
-          }
           petaPanel.width =
             (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
         }
       }
       if (changeHeight) {
         if (negativeHeight) {
-          const mw = 1 - beginPetaPanel.crop.position.y + beginPetaPanel.crop.height;
-          const wr =
-            (-pPetaPanel.toLocal(e.global).y + petaPanel.height / 2) / beginPetaPanel.height;
+          const minY =
+            -(
+              ((beginPetaPanel.crop.position.y + beginPetaPanel.crop.height) /
+                beginPetaPanel.crop.height) *
+              beginPetaPanel.height
+            ) / 2;
+          const maxY = -1;
+          y = Math.max(minY, Math.min(maxY, y));
+          const wr = (-y + petaPanel.height / 2) / beginPetaPanel.height;
           petaPanel.crop.position.y =
             (1 - wr) * beginPetaPanel.crop.height + beginPetaPanel.crop.position.y;
           petaPanel.crop.height = wr * beginPetaPanel.crop.height;
-          if (
-            petaPanel.crop.position.y >
-            beginPetaPanel.crop.position.y + beginPetaPanel.crop.height
-          ) {
-            petaPanel.crop.position.y = mw;
-            petaPanel.crop.height = 0;
-          } else if (petaPanel.crop.position.y < 0) {
-            petaPanel.crop.position.y = 0;
-            petaPanel.crop.height = beginPetaPanel.crop.position.y + beginPetaPanel.crop.height;
-          }
           petaPanel.height =
             (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
         } else {
-          const mw = 1 - beginPetaPanel.crop.position.y;
-          const wr =
-            (pPetaPanel.toLocal(e.global).y + petaPanel.height / 2) / beginPetaPanel.height;
+          const maxY =
+            (((1 - beginPetaPanel.crop.position.y) / beginPetaPanel.crop.height) *
+              beginPetaPanel.height) /
+            2;
+          const minY = 1;
+          y = Math.max(minY, Math.min(maxY, y));
+          const wr = (y + petaPanel.height / 2) / beginPetaPanel.height;
           petaPanel.crop.height = wr * beginPetaPanel.crop.height;
-          if (petaPanel.crop.height > mw) {
-            petaPanel.crop.height = mw;
-          } else if (petaPanel.crop.height < 0) {
-            petaPanel.crop.height = 0;
-          }
           petaPanel.height =
             (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
         }
       }
-      const pairLocal = new Vec2(pPetaPanel.toLocal(this.toGlobal(this.pairCorner)));
-      const dragLocal = pPetaPanel.toLocal(e.global);
-      dragLocal.x = Math.min(petaPanel.width / 2, Math.max(-petaPanel.width / 2, dragLocal.x));
-      dragLocal.y = Math.min(petaPanel.height / 2, Math.max(-petaPanel.height / 2, dragLocal.y));
       petaPanel.position.set(
         pPetaPanel.parent.toLocal(
           pPetaPanel.toGlobal(
-            pairLocal
-              .add(new Vec2(changeWidth ? dragLocal.x : 0, changeHeight ? dragLocal.y : 0))
+            new Vec2(changeWidth ? x : 0, changeHeight ? y : 0)
+              .add(pPetaPanel.toLocal(this.toGlobal(this.pairCorner)))
               .div(2),
           ),
         ),
@@ -311,7 +301,7 @@ export class PTransformer extends PIXI.Container {
       pPetaPanel.orderRender();
     } else if (this.controlStatus === ControlStatus.PANEL_ROTATE) {
       const center = this.getRotatingCenter();
-      this.rotatingRotation = center.getDiff(this.toLocal(e.data.global)).atan2();
+      this.rotatingRotation = center.getDiff(this.toLocal(e.global)).atan2();
       if (this.fit) {
         const corner = this.beginTransformCorners[3];
         if (corner === undefined) {

@@ -249,4 +249,31 @@ export class PPetaPanel extends PIXI.Sprite {
   private absPanelHeight() {
     return Math.abs(this.petaPanel.height);
   }
+  public toLocal<P extends PIXI.IPointData = PIXI.Point>(
+    position: PIXI.IPointData,
+    from?: PIXI.DisplayObject | undefined,
+    point?: P | undefined,
+    skipUpdate?: boolean | undefined,
+  ): P {
+    if (
+      this.position.x !== this.petaPanel.position.x ||
+      this.position.y !== this.petaPanel.position.y
+    ) {
+      this.position.set(this.petaPanel.position.x, this.petaPanel.position.y);
+    }
+    return super.toLocal(position, from, point, skipUpdate);
+  }
+  public toGlobal<P extends PIXI.IPointData = PIXI.Point>(
+    position: PIXI.IPointData,
+    point?: P | undefined,
+    skipUpdate?: boolean | undefined,
+  ): P {
+    if (
+      this.position.x !== this.petaPanel.position.x ||
+      this.position.y !== this.petaPanel.position.y
+    ) {
+      this.position.set(this.petaPanel.position.x, this.petaPanel.position.y);
+    }
+    return super.toGlobal(position, point, skipUpdate);
+  }
 }
