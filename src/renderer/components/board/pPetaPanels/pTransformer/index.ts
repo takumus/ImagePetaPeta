@@ -232,62 +232,47 @@ export class PTransformer extends PIXI.Container {
       let x = pPetaPanel.toLocal(e.global).x;
       let y = pPetaPanel.toLocal(e.global).y;
       if (changeWidth) {
-        if (negativeWidth) {
-          const minX =
-            -(
-              ((beginPetaPanel.crop.position.x + beginPetaPanel.crop.width) /
-                beginPetaPanel.crop.width) *
-              beginPetaPanel.width
-            ) / 2;
-          const maxX = -1;
-          x = Math.max(minX, Math.min(maxX, x));
-          const wr = (-x + petaPanel.width / 2) / beginPetaPanel.width;
+        const v1 =
+          (((1 - beginPetaPanel.crop.position.x) / beginPetaPanel.crop.width) *
+            beginPetaPanel.width) /
+          2;
+        const v2 =
+          (((beginPetaPanel.crop.position.x + beginPetaPanel.crop.width) /
+            beginPetaPanel.crop.width) *
+            beginPetaPanel.width) /
+          2;
+        const min = negativeWidth ? -(petaPanel.flipHorizontal ? v1 : v2) : 1;
+        const max = !negativeWidth ? (petaPanel.flipHorizontal ? v2 : v1) : -1;
+        x = Math.max(min, Math.min(max, x));
+        const r = ((negativeWidth ? -1 : 1) * x + petaPanel.width / 2) / beginPetaPanel.width;
+        if (negativeWidth != petaPanel.flipHorizontal) {
           petaPanel.crop.position.x =
-            (1 - wr) * beginPetaPanel.crop.width + beginPetaPanel.crop.position.x;
-          petaPanel.crop.width = wr * beginPetaPanel.crop.width;
-          petaPanel.width =
-            (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
-        } else {
-          const maxX =
-            (((1 - beginPetaPanel.crop.position.x) / beginPetaPanel.crop.width) *
-              beginPetaPanel.width) /
-            2;
-          const minX = 1;
-          x = Math.max(minX, Math.min(maxX, x));
-          const wr = (x + petaPanel.width / 2) / beginPetaPanel.width;
-          petaPanel.crop.width = wr * beginPetaPanel.crop.width;
-          petaPanel.width =
-            (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
+            (1 - r) * beginPetaPanel.crop.width + beginPetaPanel.crop.position.x;
         }
+        petaPanel.crop.width = r * beginPetaPanel.crop.width;
+        petaPanel.width = (petaPanel.crop.width / beginPetaPanel.crop.width) * beginPetaPanel.width;
       }
       if (changeHeight) {
-        if (negativeHeight) {
-          const minY =
-            -(
-              ((beginPetaPanel.crop.position.y + beginPetaPanel.crop.height) /
-                beginPetaPanel.crop.height) *
-              beginPetaPanel.height
-            ) / 2;
-          const maxY = -1;
-          y = Math.max(minY, Math.min(maxY, y));
-          const wr = (-y + petaPanel.height / 2) / beginPetaPanel.height;
+        const v1 =
+          (((1 - beginPetaPanel.crop.position.y) / beginPetaPanel.crop.height) *
+            beginPetaPanel.height) /
+          2;
+        const v2 =
+          (((beginPetaPanel.crop.position.y + beginPetaPanel.crop.height) /
+            beginPetaPanel.crop.height) *
+            beginPetaPanel.height) /
+          2;
+        const min = negativeHeight ? -(petaPanel.flipVertical ? v1 : v2) : 1;
+        const max = !negativeHeight ? (petaPanel.flipVertical ? v2 : v1) : -1;
+        y = Math.max(min, Math.min(max, y));
+        const r = ((negativeHeight ? -1 : 1) * y + petaPanel.height / 2) / beginPetaPanel.height;
+        if (negativeHeight != petaPanel.flipVertical) {
           petaPanel.crop.position.y =
-            (1 - wr) * beginPetaPanel.crop.height + beginPetaPanel.crop.position.y;
-          petaPanel.crop.height = wr * beginPetaPanel.crop.height;
-          petaPanel.height =
-            (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
-        } else {
-          const maxY =
-            (((1 - beginPetaPanel.crop.position.y) / beginPetaPanel.crop.height) *
-              beginPetaPanel.height) /
-            2;
-          const minY = 1;
-          y = Math.max(minY, Math.min(maxY, y));
-          const wr = (y + petaPanel.height / 2) / beginPetaPanel.height;
-          petaPanel.crop.height = wr * beginPetaPanel.crop.height;
-          petaPanel.height =
-            (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
+            (1 - r) * beginPetaPanel.crop.height + beginPetaPanel.crop.position.y;
         }
+        petaPanel.crop.height = r * beginPetaPanel.crop.height;
+        petaPanel.height =
+          (petaPanel.crop.height / beginPetaPanel.crop.height) * beginPetaPanel.height;
       }
       petaPanel.position.set(
         pPetaPanel.parent.toLocal(
