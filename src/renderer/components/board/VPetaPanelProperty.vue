@@ -148,41 +148,6 @@ function open(position: Vec2, width = 0, height = 0): void {
     { ...position, width: width, height: height },
     { shrinkHeight: false, shrinkWidth: false, insideParentElement: true },
   );
-  // const petaFile = petaFilesStore.getPetaFile(petaPanel.petaFileId);
-  // const isMultiple = selectedPPetaPanels().length > 1;
-  // .contextMenu.open(
-  //   [
-  //     { label: t("boards.panelMenu.toFront"), click: () => changeOrder("front") },
-  //     { label: t("boards.panelMenu.toBack"), click: () => changeOrder("back") },
-  //     { separate: true },
-  //     { label: t("boards.panelMenu.details"), click: () => openDetails(petaFile) },
-  //     { separate: true },
-  //     {
-  //       skip: isMultiple || !pPanel.isGIF,
-  //       label: pPanel.isPlayingGIF ? t("boards.panelMenu.stopGIF") : t("boards.panelMenu.playGIF"),
-  //       click: () => {
-  //         pPanel.toggleGIF();
-  //         updatePetaBoard();
-  //       },
-  //     },
-  //     { skip: isMultiple || !pPanel?.isGIF, separate: true },
-  //     {
-  //       skip: isMultiple,
-  //       label: t("boards.panelMenu.crop"),
-  //       click: () => {
-  //         beginCrop(petaPanel);
-  //       },
-  //     },
-  //     { skip: isMultiple, separate: true },
-  //     { label: t("boards.panelMenu.flipHorizontal"), click: () => flipPetaPanel("horizontal") },
-  //     { label: t("boards.panelMenu.flipVertical"), click: () => flipPetaPanel("vertical") },
-  //     { separate: true },
-  //     { label: t("boards.panelMenu.reset"), click: resetPetaPanel },
-  //     { separate: true },
-  //     { label: t("boards.panelMenu.remove"), click: removeSelectedPanels },
-  //   ],
-  //   position,
-  // );
 }
 function changeOrder(to: "front" | "back") {
   emit(
@@ -205,8 +170,8 @@ function resetPetaPanel() {
       const pP = props.boardLoader.getPPanelFromId(pp.id);
       let width = 0;
       let height = 0;
-      const baseWidth = pP?.pFileObject.content?.width ?? 0;
-      const baseHeight = pP?.pFileObject.content?.height ?? 0;
+      const baseWidth = pP?.pFileObject.content?.getWidth() ?? 0;
+      const baseHeight = pP?.pFileObject.content?.getHeight() ?? 0;
       const maxWidth = pp.width;
       const maxHeight = pp.height;
       if (maxWidth > maxHeight) {
