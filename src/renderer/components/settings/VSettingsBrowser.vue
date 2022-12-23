@@ -8,12 +8,12 @@
     </label>
     <p>{{ t("settings.regenerateMetadatasDescriptions") }}</p>
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.loadTilesInOriginal" />
+      <VCheckbox v-model:value="settingsStore.state.value.loadTilesInOriginal" />
       {{ t("settings.loadTilesInOriginal") }}
     </label>
     <p>{{ t("settings.loadTilesInOriginalDescriptions") }}</p>
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.showTagsOnTile" />
+      <VCheckbox v-model:value="settingsStore.state.value.showTagsOnTile" />
       {{ t("settings.showTagsOnTile") }}
     </label>
     <p>{{ t("settings.showTagsOnTileDescriptions") }}</p>
@@ -23,6 +23,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
+import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";

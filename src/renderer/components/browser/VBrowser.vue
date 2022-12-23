@@ -16,14 +16,9 @@
           </t-search>
           <t-buttons>
             <label>
-              <input
-                type="checkbox"
-                :checked="statesStore.state.value.groupingByDate"
-                @change="
-                  statesStore.state.value.groupingByDate = Boolean(
-                    ($event.target as HTMLInputElement).checked,
-                  )
-                " />
+              <VCheckbox
+                :value="statesStore.state.value.groupingByDate"
+                @update:value="(value) => (statesStore.state.value.groupingByDate = value)" />
               <span>{{ t("browser.grouping") }}</span>
             </label>
             <select v-model="sortMode">
@@ -82,6 +77,7 @@ import VTags from "@/renderer/components/browser/tags/VTags.vue";
 import VTile from "@/renderer/components/browser/tile/VTile.vue";
 import VPreview from "@/renderer/components/commons/property/VPreview.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
+import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";

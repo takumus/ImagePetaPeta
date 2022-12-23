@@ -1,20 +1,19 @@
 <template>
   <t-settings-content-root>
     <label>
-      <input
-        type="checkbox"
-        v-model="settingsStore.state.value.darkMode"
+      <VCheckbox
+        v-model:value="settingsStore.state.value.darkMode"
         :disabled="settingsStore.state.value.autoDarkMode" />
       {{ t("settings.darkMode") }}
     </label>
     <br />
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.autoDarkMode" />
+      <VCheckbox v-model:value="settingsStore.state.value.autoDarkMode" />
       {{ t("settings.autoDarkMode") }}
     </label>
     <p>{{ t("settings.autoDarkModeDescriptions") }}</p>
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.alwaysOnTop" />
+      <VCheckbox v-model:value="settingsStore.state.value.alwaysOnTop" />
       {{ t("settings.alwaysOnTop") }}
     </label>
     <p>{{ t("settings.alwaysOnTopDescriptions") }}</p>
@@ -32,6 +31,8 @@
 
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+
+import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 

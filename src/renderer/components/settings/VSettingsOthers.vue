@@ -1,12 +1,12 @@
 <template>
   <t-settings-content-root>
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.alwaysShowNSFW" />
+      <VCheckbox v-model:value="settingsStore.state.value.alwaysShowNSFW" />
       {{ t("settings.alwaysShowNSFW") }}
     </label>
     <p>{{ t("settings.alwaysShowNSFWDescriptions") }}</p>
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.showFPS" />
+      <VCheckbox v-model:value="settingsStore.state.value.showFPS" />
       {{ t("settings.showFPS") }}
     </label>
     <p>{{ t("settings.showFPSDescriptions") }}</p>
@@ -19,7 +19,7 @@
     </label>
     <p>{{ t("settings.gamutMapSamplingDescriptions") }}</p>
     <label>
-      <input type="checkbox" v-model="settingsStore.state.value.developerMode" />
+      <VCheckbox v-model:value="settingsStore.state.value.developerMode" />
       {{ t("settings.developerMode") }}
     </label>
     <p>{{ t("settings.developerModeDescriptions") }}</p>
@@ -28,6 +28,8 @@
 
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+
+import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 

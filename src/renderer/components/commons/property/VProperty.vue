@@ -135,11 +135,7 @@
     <t-nsfw v-show="!noImage" class="content">
       <p>{{ t("browser.property.nsfw.label") }}</p>
       <label>
-        <input
-          type="checkbox"
-          tabindex="-1"
-          :checked="nsfw"
-          @change="changeNSFW(Boolean(($event.target as HTMLInputElement).checked))" />
+        <VCheckbox :value="nsfw ?? false" @update:value="changeNSFW" />
       </label>
     </t-nsfw>
   </t-property-root>
@@ -154,6 +150,7 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VGamutMap from "@/renderer/components/commons/property/VGamutMap.vue";
+import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
 import { PetaColor } from "@/commons/datas/petaColor";
