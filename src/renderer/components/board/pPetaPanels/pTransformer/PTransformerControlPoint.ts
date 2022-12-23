@@ -7,8 +7,6 @@ export class PTransformerControlPoint extends PIXI.Container {
   public rotate = new PIXI.Graphics();
   public currentRotation = 0;
   public currentParentRotation = 0;
-  public xPosition: -1 | 0 | 1 = 0;
-  public yPosition: -1 | 0 | 1 = 0;
   resizeCursors = [
     "ns-resize",
     "nesw-resize",
