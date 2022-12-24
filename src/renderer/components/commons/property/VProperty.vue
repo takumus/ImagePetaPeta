@@ -1,143 +1,147 @@
 <template>
   <t-property-root>
-    <t-infos v-if="singlePetaFileInfo" class="content">
-      <p>{{ t("browser.property.infos.label") }}</p>
-      <t-datas>
-        <t-data>
-          <t-name>{{ t("browser.property.infos.name") }}:</t-name>
-          <t-value>
-            <VTextarea
-              :type="'single'"
-              :click-to-edit="true"
-              :allow-empty="true"
-              :text-area-style="{ width: '100%' }"
-              :outer-style="{ width: '100%' }"
-              :value="singlePetaFileInfo.petaFile.name"
-              :look="singlePetaFileInfo.petaFile.name"
-              @update:value="changeName" />
-          </t-value>
-        </t-data>
-        <t-data>
-          <t-name>{{ t("browser.property.infos.note") }}:</t-name>
-          <t-value>
-            <VTextarea
-              :type="'multi'"
-              :click-to-edit="true"
-              :allow-empty="true"
-              :text-area-style="{ width: '100%', overflowY: 'auto', maxHeight: '64px' }"
-              :outer-style="{ width: '100%' }"
-              :value="note"
-              @update:value="changeNote" />
-          </t-value>
-        </t-data>
-        <t-data>
-          <t-name>{{ t("browser.property.infos.size") }}:</t-name>
-          <t-value
-            >{{ singlePetaFileInfo.petaFile.metadata.width }}px,
-            {{ singlePetaFileInfo.petaFile.metadata.height }}px</t-value
-          >
-        </t-data>
-        <t-data>
-          <t-name>{{ t("browser.property.infos.mimeType") }}:</t-name>
-          <t-value>{{ singlePetaFileInfo.petaFile.mimeType }}</t-value>
-        </t-data>
-        <!-- <t-data>
+    <t-shrinks class="content">
+      <t-infos v-if="singlePetaFileInfo" class="content-child">
+        <p>{{ t("browser.property.infos.label") }}</p>
+        <t-datas>
+          <t-data>
+            <t-name>{{ t("browser.property.infos.name") }}:</t-name>
+            <t-value>
+              <VTextarea
+                :type="'single'"
+                :click-to-edit="true"
+                :allow-empty="true"
+                :text-area-style="{ width: '100%' }"
+                :outer-style="{ width: '100%' }"
+                :value="singlePetaFileInfo.petaFile.name"
+                :look="singlePetaFileInfo.petaFile.name"
+                @update:value="changeName" />
+            </t-value>
+          </t-data>
+          <t-data>
+            <t-name>{{ t("browser.property.infos.note") }}:</t-name>
+            <t-value>
+              <VTextarea
+                :type="'multi'"
+                :click-to-edit="true"
+                :allow-empty="true"
+                :text-area-style="{ width: '100%', overflowY: 'auto', maxHeight: '64px' }"
+                :outer-style="{ width: '100%' }"
+                :value="note"
+                @update:value="changeNote" />
+            </t-value>
+          </t-data>
+          <t-data>
+            <t-name>{{ t("browser.property.infos.size") }}:</t-name>
+            <t-value
+              >{{ singlePetaFileInfo.petaFile.metadata.width }}px,
+              {{ singlePetaFileInfo.petaFile.metadata.height }}px</t-value
+            >
+          </t-data>
+          <t-data>
+            <t-name>{{ t("browser.property.infos.mimeType") }}:</t-name>
+            <t-value>{{ singlePetaFileInfo.petaFile.mimeType }}</t-value>
+          </t-data>
+          <!-- <t-data>
           <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
           <t-value>{{ singlePetaFileInfo.fileDate }}</t-value>
         </t-data> -->
-        <t-data>
-          <t-name>{{ t("browser.property.infos.addDate") }}:</t-name>
-          <t-value>{{ singlePetaFileInfo.addDate }}</t-value>
-        </t-data>
-      </t-datas>
-    </t-infos>
-    <t-colors v-if="singlePetaFileInfo" class="content">
-      <p>{{ t("browser.property.colors.label") }}</p>
-      <t-palette>
-        <t-color-wrapper>
-          <t-color
-            v-for="color in singlePetaFileInfo.palette"
-            :key="color.id"
-            :style="{
-              backgroundColor: `rgb(${color.color.r}, ${color.color.g}, ${color.color.b})`,
-              flex: Math.floor(color.population * 90 + 10),
-            }"
-            @click="changeCurrentColor(color.color)">
-          </t-color>
-        </t-color-wrapper>
-        <t-current-color v-if="currentColor">
-          <t-color-label
-            ><t-name>RGB:</t-name> <t-value> {{ toRGB(currentColor) }}</t-value></t-color-label
-          >
-          <t-color-label
-            ><t-name>HEX:</t-name> <t-value> #{{ toHEX(currentColor) }}</t-value></t-color-label
-          >
-          <t-color-label
-            ><t-name>HSL:</t-name> <t-value> {{ toHSL(currentColor) }}</t-value></t-color-label
-          >
-          <t-color-wrapper
-            ><t-color
+          <t-data>
+            <t-name>{{ t("browser.property.infos.addDate") }}:</t-name>
+            <t-value>{{ singlePetaFileInfo.addDate }}</t-value>
+          </t-data>
+        </t-datas>
+      </t-infos>
+      <t-colors v-if="singlePetaFileInfo" class="content-child">
+        <p>{{ t("browser.property.colors.label") }}</p>
+        <t-palette>
+          <t-color-wrapper>
+            <t-color
+              v-for="color in singlePetaFileInfo.palette"
+              :key="color.id"
               :style="{
-                backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
-                flex: 1,
-              }"></t-color
-          ></t-color-wrapper>
-        </t-current-color>
-      </t-palette>
-    </t-colors>
-    <t-color-circle v-if="singlePetaFileInfo">
-      <VGamutMap :peta-file="singlePetaFileInfo.petaFile" />
-    </t-color-circle>
-    <t-tags v-show="!noImage" class="content">
-      <p>
-        {{
-          singlePetaFileInfo !== undefined
-            ? t("browser.property.tags")
-            : t("browser.property.mutualTags")
-        }}
-      </p>
-      <t-search-box v-if="!fetchingTags">
-        <t-tag v-for="tag in mutualPetaTags" :key="tag.id">
-          <VTextarea
-            :type="'single'"
-            :trim="true"
-            :click-to-edit="true"
-            :allow-empty="true"
-            :readonly="true"
-            :blur-to-reset="true"
-            :complements="complements"
-            :value="tag.name"
-            :look="tag.name"
-            @click="selectTag(tag)"
-            @contextmenu="tagMenu($event, tag)" />
-        </t-tag>
-        <t-tag class="last">
-          <VTextarea
-            ref="tagInput"
-            :type="'single'"
-            :trim="true"
-            :look="textsStore.state.value.plus + '       '"
-            :click-to-edit="true"
-            :blur-to-reset="true"
-            :complements="complements"
-            :text-area-style="{ width: '100%' }"
-            :outer-style="{ width: '100%' }"
-            :no-outline="true"
-            @update:value="addTag" />
-        </t-tag>
-      </t-search-box>
-      <ul v-else>
-        <li>
-          {{ t("browser.property.fetchingTags") }}
-        </li>
-      </ul>
-    </t-tags>
-    <t-nsfw v-show="!noImage" class="content">
-      <p>{{ t("browser.property.nsfw.label") }}</p>
-      <label>
-        <VCheckbox :value="nsfw ?? false" @update:value="changeNSFW" />
-      </label>
-    </t-nsfw>
+                backgroundColor: `rgb(${color.color.r}, ${color.color.g}, ${color.color.b})`,
+                flex: Math.floor(color.population * 90 + 10),
+              }"
+              @click="changeCurrentColor(color.color)">
+            </t-color>
+          </t-color-wrapper>
+          <t-current-color v-if="currentColor">
+            <t-color-label
+              ><t-name>RGB:</t-name> <t-value> {{ toRGB(currentColor) }}</t-value></t-color-label
+            >
+            <t-color-label
+              ><t-name>HEX:</t-name> <t-value> #{{ toHEX(currentColor) }}</t-value></t-color-label
+            >
+            <t-color-label
+              ><t-name>HSL:</t-name> <t-value> {{ toHSL(currentColor) }}</t-value></t-color-label
+            >
+            <t-color-wrapper
+              ><t-color
+                :style="{
+                  backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
+                  flex: 1,
+                }"></t-color
+            ></t-color-wrapper>
+          </t-current-color>
+        </t-palette>
+      </t-colors>
+      <t-color-circle v-if="singlePetaFileInfo" class="content-child">
+        <VGamutMap :peta-file="singlePetaFileInfo.petaFile" />
+      </t-color-circle>
+    </t-shrinks>
+    <t-fixed class="content">
+      <t-tags v-show="!noImage" class="content-child">
+        <p>
+          {{
+            singlePetaFileInfo !== undefined
+              ? t("browser.property.tags")
+              : t("browser.property.mutualTags")
+          }}
+        </p>
+        <t-search-box v-if="!fetchingTags">
+          <t-tag v-for="tag in mutualPetaTags" :key="tag.id">
+            <VTextarea
+              :type="'single'"
+              :trim="true"
+              :click-to-edit="true"
+              :allow-empty="true"
+              :readonly="true"
+              :blur-to-reset="true"
+              :complements="complements"
+              :value="tag.name"
+              :look="tag.name"
+              @click="selectTag(tag)"
+              @contextmenu="tagMenu($event, tag)" />
+          </t-tag>
+          <t-tag class="last">
+            <VTextarea
+              ref="tagInput"
+              :type="'single'"
+              :trim="true"
+              :look="textsStore.state.value.plus + '       '"
+              :click-to-edit="true"
+              :blur-to-reset="true"
+              :complements="complements"
+              :text-area-style="{ width: '100%' }"
+              :outer-style="{ width: '100%' }"
+              :no-outline="true"
+              @update:value="addTag" />
+          </t-tag>
+        </t-search-box>
+        <ul v-else>
+          <li>
+            {{ t("browser.property.fetchingTags") }}
+          </li>
+        </ul>
+      </t-tags>
+      <t-nsfw v-show="!noImage" class="content-child">
+        <p>{{ t("browser.property.nsfw.label") }}</p>
+        <label>
+          <VCheckbox :value="nsfw ?? false" @update:value="changeNSFW" />
+        </label>
+      </t-nsfw>
+    </t-fixed>
   </t-property-root>
 </template>
 
@@ -363,69 +367,30 @@ t-property-root {
   flex-direction: column;
   overflow: hidden;
   > .content {
-    > p {
-      text-decoration: underline;
-      font-weight: bold;
+    > .content-child {
+      > p {
+        text-decoration: underline;
+        font-weight: bold;
+        margin: var(--px-2);
+      }
     }
-  }
-  > t-infos {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    > t-datas {
+  }
+  > t-shrinks {
+    overflow-y: auto;
+    > t-infos {
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      > t-data {
-        display: flex;
-        margin: var(--px-1) 0px;
-        > t-name {
-          display: block;
-          width: 35%;
-          position: relative;
-          text-align: right;
-          padding: 0px var(--px-1);
-        }
-        > t-value {
-          padding: 0px var(--px-1);
-          display: block;
-          width: 65%;
-          word-break: break-word;
-        }
-      }
-    }
-  }
-  > t-colors {
-    > t-palette {
-      padding: var(--px-2);
-      display: block;
-      width: 100%;
-      t-color-wrapper {
-        display: flex;
-        border-radius: var(--rounded);
-        height: var(--px-2);
-        width: 100%;
-        overflow: hidden;
-        margin: var(--px-0) 0px;
-        box-shadow: 0px 0px 0px var(--px-0) var(--color-border);
-        > t-color {
-          height: 100%;
-          display: block;
-          &:hover {
-            cursor: pointer;
-            transform: scaleX(1.5) scaleY(2);
-          }
-        }
-      }
-      > t-current-color {
+      > t-datas {
         display: flex;
         flex-direction: column;
-        > t-color-label {
+        > t-data {
           display: flex;
           margin: var(--px-1) 0px;
           > t-name {
             display: block;
-            width: 30%;
+            width: 35%;
             position: relative;
             text-align: right;
             padding: 0px var(--px-1);
@@ -433,51 +398,99 @@ t-property-root {
           > t-value {
             padding: 0px var(--px-1);
             display: block;
-            width: 70%;
+            width: 65%;
             word-break: break-word;
-            user-select: text;
           }
         }
       }
     }
-  }
-  > t-color-circle {
-    display: block;
-    width: 100%;
-  }
-  > t-tags {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 128px;
-    > t-search-box {
-      outline: none;
-      padding: var(--px-1) var(--px-1) 0px 0px;
-      width: 100%;
-      word-break: break-word;
-      text-align: left;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      overflow-y: auto;
-      > t-tag {
-        display: inline-block;
-        margin: 0px 0px var(--px-1) var(--px-1);
-        border-radius: var(--rounded);
-        padding: var(--px-1);
-        background-color: var(--color-1);
-        box-shadow: var(--shadow-small);
-        &.last {
+    > t-colors {
+      > t-palette {
+        padding: var(--px-2);
+        display: block;
+        width: 100%;
+        t-color-wrapper {
+          display: flex;
+          border-radius: var(--rounded);
+          height: var(--px-2);
           width: 100%;
-          background-color: unset;
-          flex: 1 1 64px;
-          box-shadow: unset;
+          overflow: hidden;
+          margin: var(--px-0) 0px;
+          box-shadow: 0px 0px 0px var(--px-0) var(--color-border);
+          > t-color {
+            height: 100%;
+            display: block;
+            &:hover {
+              cursor: pointer;
+              transform: scaleX(1.5) scaleY(2);
+            }
+          }
+        }
+        > t-current-color {
+          display: flex;
+          flex-direction: column;
+          > t-color-label {
+            display: flex;
+            margin: var(--px-1) 0px;
+            > t-name {
+              display: block;
+              width: 30%;
+              position: relative;
+              text-align: right;
+              padding: 0px var(--px-1);
+            }
+            > t-value {
+              padding: 0px var(--px-1);
+              display: block;
+              width: 70%;
+              word-break: break-word;
+              user-select: text;
+            }
+          }
         }
       }
     }
-    > t-nsfw {
+    > t-color-circle {
       display: block;
+      width: 100%;
+    }
+  }
+  > t-fixed {
+    flex: 1;
+    > t-tags {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 128px;
+      > t-search-box {
+        outline: none;
+        padding: var(--px-1) var(--px-1) 0px 0px;
+        width: 100%;
+        word-break: break-word;
+        text-align: left;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        overflow-y: auto;
+        > t-tag {
+          display: inline-block;
+          margin: 0px 0px var(--px-1) var(--px-1);
+          border-radius: var(--rounded);
+          padding: var(--px-1);
+          background-color: var(--color-1);
+          box-shadow: var(--shadow-small);
+          &.last {
+            width: 100%;
+            background-color: unset;
+            flex: 1 1 64px;
+            box-shadow: unset;
+          }
+        }
+      }
+      > t-nsfw {
+        display: block;
+      }
     }
   }
   p {
