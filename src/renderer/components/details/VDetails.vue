@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import * as PIXI from "pixi.js";
 import { computed, ref, watch } from "vue";
 
 import VPlaybackController from "@/renderer/components/commons/playbackController/VPlaybackController.vue";
@@ -32,6 +33,8 @@ import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { IPC } from "@/renderer/libs/ipc";
+import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
+import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 // import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
@@ -43,7 +46,7 @@ const props = defineProps<{
   petaFile: RPetaFile;
   zIndex: number;
 }>();
-// const nsfwStore = useNSFWStore();
+const nsfwStore = useNSFWStore();
 const vPixi = ref<InstanceType<typeof VPIXI>>();
 const pFileObjectContent = ref<PFileObjectContent<unknown>>();
 const pFileObject = new PFileObject();
@@ -54,6 +57,7 @@ let scale = 1;
 const position = new Vec2();
 const settingsStore = useSettingsStore();
 const pointerPosition = new Vec2();
+const nsfwMask = new PIXI.TilingSprite(useCommonTextureStore().NSFW, 100, 100);
 const dragging = ref(false);
 let fitToOutside = true;
 async function construct() {
@@ -62,12 +66,14 @@ async function construct() {
     return;
   }
   pixiApp.stage.addChild(pFileObject);
+  pixiApp.stage.addChild(nsfwMask);
   pixiApp.stage.interactive = true;
   pixiApp.stage.on("pointerdown", pointerdown);
   window.addEventListener("pointerup", pointerup);
   vPixi.value?.canvasWrapper().addEventListener("wheel", wheel);
   vPixi.value?.canvasWrapper().addEventListener("dblclick", reset);
   pixiApp.stage.on("pointermove", pointermove);
+  nsfwMask.tileScale.set(0.5);
   load();
 }
 async function load() {
@@ -91,6 +97,8 @@ function loseContext() {
 function resize(rect: PIXIRect) {
   mouseOffset.set(0, 0);
   stageRect.value.set(rect.domRect.width, rect.domRect.height);
+  nsfwMask.width = stageRect.value.x;
+  nsfwMask.height = stageRect.value.y;
   if (fitToOutside) {
     reset();
   }
@@ -233,6 +241,14 @@ watch(
   () => {
     load();
   },
+);
+watch(
+  () => nsfwStore.state.value || !props.petaFile.nsfw,
+  (value) => {
+    nsfwMask.visible = !value;
+    vPixi.value?.orderPIXIRender();
+  },
+  { immediate: true },
 );
 </script>
 

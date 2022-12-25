@@ -2,6 +2,10 @@ import DetailsIndex from "@/renderer/components/VWDetails.vue";
 
 import { WindowType } from "@/commons/datas/windowType";
 
+import {
+  commonTextureStoreKey,
+  createCommonTextureStore,
+} from "@/renderer/stores/commonTextureStore/createCommonTextureStore";
 import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
 import {
   createPetaFilesStore,
@@ -16,4 +20,5 @@ import { create } from "@/renderer/windows/@base";
 create(DetailsIndex, WindowType.DETAILS, [
   keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),
+  keyStoreCreatorPair(commonTextureStoreKey, createCommonTextureStore),
 ]);
