@@ -4,9 +4,7 @@ import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { valueChecker } from "@/commons/utils/valueChecker";
 import { Vec2 } from "@/commons/utils/vec2";
 
-import LOADINGImage from "@/@assets/loadingBackground.png";
-import NOIMAGEImage from "@/@assets/noImageBackground.png";
-import NSFWImage from "@/@assets/nsfwBackground.png";
+import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { PFileObject } from "@/renderer/utils/pFileObject";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
@@ -31,12 +29,10 @@ export class PPetaPanel extends PIXI.Sprite {
   private zoomScale = 1;
   public pFileObject: PFileObject;
   public showNSFW = false;
-  private static nsfwTexture?: PIXI.Texture;
-  private static noImageTexture?: PIXI.Texture;
-  private static loadingTexture?: PIXI.Texture;
   constructor(
     public petaPanel: RPetaPanel,
     private petaFilesStore: ReturnType<typeof usePetaFilesStore>,
+    private commonTextureStore: ReturnType<typeof useCommonTextureStore>,
     public onUpdateRenderer: () => void,
   ) {
     super();
@@ -47,25 +43,14 @@ export class PPetaPanel extends PIXI.Sprite {
     this.addChild(this.imageWrapper, this.masker, this.cover, this.selection);
     this.interactive = true;
     this.cover.visible = false;
-    this.setPetaPanel(this.petaPanel);
-    this.orderRender();
-  }
-  async init() {
-    if (!PPetaPanel.nsfwTexture) {
-      PPetaPanel.nsfwTexture = await PIXI.Texture.fromURL(NSFWImage);
-    }
-    if (!PPetaPanel.noImageTexture) {
-      PPetaPanel.noImageTexture = await PIXI.Texture.fromURL(NOIMAGEImage);
-    }
-    if (!PPetaPanel.loadingTexture) {
-      PPetaPanel.loadingTexture = await PIXI.Texture.fromURL(LOADINGImage);
-    }
-    this.nsfwTile = new PIXI.TilingSprite(PPetaPanel.nsfwTexture, 100, 100);
+    this.nsfwTile = new PIXI.TilingSprite(this.commonTextureStore.NSFW, 100, 100);
     this.nsfwTile.visible = false;
-    this.noImageTile = new PIXI.TilingSprite(PPetaPanel.noImageTexture, 100, 100);
-    this.loadingTile = new PIXI.TilingSprite(PPetaPanel.loadingTexture, 100, 100);
+    this.noImageTile = new PIXI.TilingSprite(this.commonTextureStore.NO, 100, 100);
+    this.loadingTile = new PIXI.TilingSprite(this.commonTextureStore.LOADING, 100, 100);
     this.setZoomScale(this.zoomScale);
     this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
+    this.setPetaPanel(this.petaPanel);
+    this.orderRender();
   }
   public setPetaPanel(petaPanel: RPetaPanel) {
     this.petaPanel = petaPanel;

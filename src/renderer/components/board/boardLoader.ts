@@ -12,6 +12,7 @@ import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
 import { PTransformer } from "@/renderer/components/board/pPetaPanels/pTransformer";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { logChunk } from "@/renderer/libs/rendererLogger";
+import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
@@ -28,6 +29,7 @@ export function initBoardLoader(
 ) {
   const statesStore = useStateStore();
   const petaFilesStore = usePetaFilesStore();
+  const commonTextureStore = useCommonTextureStore();
   const nsfwStore = useNSFWStore();
   const loadingStatus = ref<VBoardLoadingStatus>({
     loading: false,
@@ -121,9 +123,13 @@ export function initBoardLoader(
         let pPanel = pPanels[petaPanel.id];
         if (pPanel === undefined) {
           // pPanelが無ければ作成。
-          pPanel = pPanels[petaPanel.id] = new PPetaPanel(petaPanel, petaFilesStore, onUpdateGif);
+          pPanel = pPanels[petaPanel.id] = new PPetaPanel(
+            petaPanel,
+            petaFilesStore,
+            commonTextureStore,
+            onUpdateGif,
+          );
           pPanel.setZoomScale(currentBoard.value?.transform.scale || 1);
-          await pPanel.init();
           pPanel.showNSFW = nsfwStore.state.value;
           pPanelsContainer.addChild(pPanel);
           pPanel.orderRender();
