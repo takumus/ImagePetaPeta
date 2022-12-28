@@ -74,5 +74,13 @@ export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) =
     data.flipVertical = true;
     update();
   }
+  if (data.flipHorizontal === undefined) {
+    data.flipHorizontal = false;
+    update();
+  }
+  if (data.flipVertical === undefined) {
+    data.flipVertical = false;
+    update();
+  }
   return data;
 });
