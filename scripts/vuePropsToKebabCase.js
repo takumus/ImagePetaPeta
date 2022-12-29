@@ -14,7 +14,7 @@ script.run("linecount", () => {
       } else {
         if (config.types.indexOf(Path.extname(value).toLocaleLowerCase().replace(/\./g, "")) >= 0) {
           for (let i = 0; i < config.exclude.length; i++) {
-            if (Path.resolve(config.exclude[i]) == cpath) {
+            if (Path.resolve(config.exclude[i]) === cpath) {
               return;
             }
           }
