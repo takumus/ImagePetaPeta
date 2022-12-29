@@ -307,7 +307,7 @@ export class PTransformer extends PIXI.Container {
     const max = !negative ? (flipped ? tmpMax : tmpMin) : -1;
     position = Math.max(min, Math.min(max, position));
     const r = ((negative ? -1 : 1) * position + petaPanel[wh] / 2) / beginPetaPanel[wh];
-    if (negative != flipped) {
+    if (negative !== flipped) {
       petaPanel.crop.position[xy] =
         (1 - r) * beginPetaPanel.crop[wh] + beginPetaPanel.crop.position[xy];
     }
@@ -331,7 +331,7 @@ export class PTransformer extends PIXI.Container {
         c.currentRotation = r;
       });
     }
-    if (this.controlStatus != ControlStatus.PANEL_ROTATE) {
+    if (this.controlStatus !== ControlStatus.PANEL_ROTATE) {
       const singlePPetaPanel = this.selectedPPetaPanels[0];
       if (this.selectedPPetaPanels.length === 1 && singlePPetaPanel !== undefined) {
         singlePPetaPanel.getCorners().forEach((c, i) => {

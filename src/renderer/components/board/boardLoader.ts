@@ -115,7 +115,7 @@ export function initBoardLoader(
             loadingStatus.value.log =
               `load complete   (${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
               loadingStatus.value.log;
-            if (loaded == petaPanels.length) {
+            if (loaded === petaPanels.length) {
               loadingStatus.value.loading = false;
             }
           }

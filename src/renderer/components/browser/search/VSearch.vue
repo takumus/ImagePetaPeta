@@ -69,7 +69,7 @@ function editSearchTag(tag: RPetaTag, value: string) {
   const index = props.selectedPetaTagIds.findIndex((id) => id === tag.id);
   const _selectedPetaTagIds = [...props.selectedPetaTagIds];
   _selectedPetaTagIds.splice(index, 1);
-  if (value != "") {
+  if (value !== "") {
     const petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === value);
     if (petaTag && !_selectedPetaTagIds.includes(petaTag.id)) {
       _selectedPetaTagIds.splice(index, 0, petaTag.id);

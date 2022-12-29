@@ -90,7 +90,7 @@ export class SortHelper<T extends { data: any; id: number }, C extends { $el: HT
         return b.y - a.y;
       })
       .forEach((v, index) => {
-        if (this.dataToIndex(v.layerCellData) != index) {
+        if (this.dataToIndex(v.layerCellData) !== index) {
           change.push({
             data: v.layerCellData,
             index,

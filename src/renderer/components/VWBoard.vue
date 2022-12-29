@@ -119,7 +119,7 @@ onMounted(async () => {
 async function restoreBoard() {
   const states = await IPC.send("getStates");
   errorPetaBoardId.value =
-    states.selectedPetaBoardId != states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
+    states.selectedPetaBoardId !== states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
   const lastBoard = petaBoardsStore.state.value[states.selectedPetaBoardId];
   selectPetaBoard(lastBoard);
   if (!lastBoard) {
@@ -171,7 +171,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
       (await components.dialog.show(t("boards.selectErrorBoardDialog", [board.name]), [
         t("commons.yes"),
         t("commons.no"),
-      ])) != 0
+      ])) !== 0
     ) {
       return;
     } else {
@@ -185,7 +185,7 @@ async function removePetaBoard(board: RPetaBoard) {
     (await components.dialog.show(t("boards.removeDialog", [board.name]), [
       t("commons.yes"),
       t("commons.no"),
-    ])) != 0
+    ])) !== 0
   ) {
     return;
   }

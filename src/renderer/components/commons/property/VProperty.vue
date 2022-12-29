@@ -316,7 +316,7 @@ const nsfw = computed(() => {
       nsfw = pi.nsfw;
       return;
     }
-    if (nsfw != pi.nsfw) {
+    if (nsfw !== pi.nsfw) {
       same = false;
     }
   });

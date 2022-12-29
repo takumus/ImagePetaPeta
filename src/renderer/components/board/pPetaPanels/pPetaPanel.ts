@@ -141,7 +141,7 @@ export class PPetaPanel extends PIXI.Sprite {
         this.petaPanel.flipHorizontal ? 1 : 0,
         this.petaPanel.flipVertical ? 1 : 0,
       );
-      if (this.petaPanel.crop.width != 1 || this.petaPanel.crop.height != 1) {
+      if (this.petaPanel.crop.width !== 1 || this.petaPanel.crop.height !== 1) {
         this.imageWrapper.mask = this.masker;
         this.masker.visible = true;
       } else {

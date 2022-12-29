@@ -146,7 +146,7 @@ function setData(data: generateGamutMapWorkerOutputData) {
       const py = y + yi;
       const aIndex = Math.floor(py) * size.width + Math.floor(px);
       resultAlphas[aIndex] += 1;
-      if (px == x && py == y) {
+      if (px === x && py === y) {
         resultAlphas[aIndex] += 1;
       }
       setPixel(resultRawPixels, px, py, data[4], data[5], data[6]);

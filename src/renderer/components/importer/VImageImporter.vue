@@ -122,7 +122,7 @@ async function getDataFromFileList(fileList?: FileList): Promise<{
         },
         [...items],
       ).promise
-    ).filter((buffer) => buffer != undefined) as Buffer[];
+    ).filter((buffer) => buffer !== undefined) as Buffer[];
     return { buffers };
   }
 }

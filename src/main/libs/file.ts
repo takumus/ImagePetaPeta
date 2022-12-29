@@ -68,7 +68,7 @@ export function mkdirSync(path: string, recursive = false) {
     fs.mkdirSync(path, { recursive });
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   } catch (err: any) {
-    if (err && err.code != "EEXIST") {
+    if (err && err.code !== "EEXIST") {
       throw err;
     }
   }
@@ -120,7 +120,7 @@ export function writable(path: string, isDirectory: boolean) {
     return;
   }
   // 存在する場合はファイルの種類の確認
-  if (stat.isDirectory() != isDirectory) {
+  if (stat.isDirectory() !== isDirectory) {
     throw new Error(
       `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
     );

@@ -16,7 +16,7 @@ export async function checkAndNotifySoftwareUpdate() {
   }
   const log = logger.logMainChunk();
   log.log("$Check Update");
-  if (process.platform != "win32") {
+  if (process.platform !== "win32") {
     log.log("mac os is not available");
     return;
   }

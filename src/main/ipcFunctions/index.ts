@@ -515,7 +515,7 @@ export function getIpcFunctions(): {
           return undefined;
         }
         let path = Path.resolve(filePath);
-        // if (Path.basename(path) != "PetaFile") {
+        // if (Path.basename(path) !== "PetaFile") {
         //   path = Path.resolve(path, "PetaFile");
         // }
         try {

@@ -23,13 +23,13 @@ export class PTransformerDashedLine extends PIXI.Container {
     this.addChild(this.graphics);
   }
   setCorners(corners: Vec2[]) {
-    if (this.corners.join(",") != corners.join(",")) {
+    if (this.corners.join(",") !== corners.join(",")) {
       this.dirty = true;
     }
     this.corners = corners as typeof this.corners;
   }
   setScale(scale: number) {
-    if (this.renderScale != scale) {
+    if (this.renderScale !== scale) {
       this.dirty = true;
     }
     this.renderScale = scale;

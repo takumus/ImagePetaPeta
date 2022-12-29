@@ -39,7 +39,7 @@ onUnmounted(() => {
   window.clearInterval(changeResolutionIntervalHandler);
 });
 function constructIfResolutionChanged() {
-  if (resolution != window.devicePixelRatio) {
+  if (resolution !== window.devicePixelRatio) {
     resolution = window.devicePixelRatio;
     destruct();
     construct(resolution);

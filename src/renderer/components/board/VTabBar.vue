@@ -93,7 +93,7 @@ onUnmounted(() => {
 });
 function pointerdown(event: PointerEvent, board: RPetaBoard, index: number) {
   if (isKeyboardLocked()) return;
-  if (event.button != MouseButton.LEFT) return;
+  if (event.button !== MouseButton.LEFT) return;
   selectPetaBoard(board);
   pressing.value = true;
   draggingPetaBoardId.value = board.id;

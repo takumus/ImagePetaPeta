@@ -104,7 +104,7 @@ watch(
       return;
     }
     // 自分のidを除外
-    components.modal.modalIds = components.modal.modalIds.filter((id) => id != modalId);
+    components.modal.modalIds = components.modal.modalIds.filter((id) => id !== modalId);
     if (props.visible) {
       // 自分のidを追加
       components.modal.modalIds.push(modalId);

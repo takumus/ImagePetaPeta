@@ -186,7 +186,7 @@ function pointerdown(e: PIXI.FederatedPointerEvent) {
     const pPanel = boardLoader.getPPetaPanelFromObject(e.target);
     if (pPanel) {
       pointerdownPPetaPanel(pPanel, e);
-    } else if (e.target instanceof PIXI.Container && e.target.name != "transformer") {
+    } else if (e.target instanceof PIXI.Container && e.target.name !== "transformer") {
       boardLoader.clearSelectionAll();
       selecting = true;
       pSelection.topLeft.set(rootContainer.toLocal(mouse));

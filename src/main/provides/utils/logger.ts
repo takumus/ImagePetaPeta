@@ -31,7 +31,7 @@ export class Logger {
   open() {
     try {
       const date = dateFormat(new Date(), "yyyy-mm-dd");
-      if (this.date != date) {
+      if (this.date !== date) {
         this.close();
         this.logFile = createWriteStream(Path.resolve(this.path, date + ".log"), { flags: "a" });
         this.logFile.on("error", (error) => {

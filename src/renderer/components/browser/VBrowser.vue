@@ -516,7 +516,7 @@ const tiles = computed((): Tile[] => {
     const date = new Date(p.addDate);
     const currentDateString =
       date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-    if (prevDateString != currentDateString && statesStore.state.value.groupingByDate) {
+    if (prevDateString !== currentDateString && statesStore.state.value.groupingByDate) {
       prevDateString = currentDateString;
       mvi = 0;
       minY = maxY;

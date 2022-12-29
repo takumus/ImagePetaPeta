@@ -42,7 +42,7 @@ const show = ref(false);
 const floating = ref<InstanceType<typeof VFloating>>();
 onMounted(() => {
   window.addEventListener("pointerdown", (event) => {
-    if ((event.target as HTMLElement).parentElement != contextMenu.value) {
+    if ((event.target as HTMLElement).parentElement !== contextMenu.value) {
       select();
       return;
     }
@@ -67,7 +67,7 @@ function select(item?: ContextMenuItem) {
   }
 }
 const filteredItems = computed(() => {
-  return items.value.filter((item) => item.skip != true);
+  return items.value.filter((item) => item.skip !== true);
 });
 useComponentsStore().contextMenu = {
   open,

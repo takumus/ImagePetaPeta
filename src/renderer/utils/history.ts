@@ -9,7 +9,7 @@
 //       override = true;
 //     }
 //     const latest = this.getCurrent();
-//     if (!latest || (latest && JSON.stringify(latest) != JSON.stringify(datas))) {
+//     if (!latest || (latest && JSON.stringify(latest) !== JSON.stringify(datas))) {
 //       if (override) this.nextIndex--;
 //       this.history.splice(this.nextIndex, this.history.length);
 //       this.history[this.nextIndex] = datas.map(v => v.clone());

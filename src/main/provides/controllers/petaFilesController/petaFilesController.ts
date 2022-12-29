@@ -247,7 +247,7 @@ export class PetaFilesController {
   ) {
     const logger = useLogger();
     const paths = usePaths();
-    if (params.fileInfos.length == 0) {
+    if (params.fileInfos.length === 0) {
       return [];
     }
     return Tasks.spawn(
