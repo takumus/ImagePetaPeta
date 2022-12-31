@@ -208,6 +208,9 @@ const ja = {
     updateButton: "アップデートする",
     checkUpdateButton: "アップデート確認",
     releaseNoteButton: "リリースノートを確認",
+    disableAcceleratedVideoDecode: "動画再生のGPUアクセラレーションを無効にする",
+    disableAcceleratedVideoDecodeDescriptions:
+      "動画が乱れたりカクついたりする場合は無効にしてみてください。動画再生時の全体的な動作は重くなりますが、動作の安定感は増します。変更後は再起動が必要です。",
     developerMode: "開発者モード",
     gamutMapSampling: "ガマットマップのサンプリング数",
     gamutMapSamplingDescriptions:

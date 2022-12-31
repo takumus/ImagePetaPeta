@@ -37,5 +37,9 @@ export const migrateSettings = createMigrater<Settings>(async (data, update) => 
     delete anyData.petaImageDirectory;
     update();
   }
+  if (data.disableAcceleratedVideoDecode === undefined) {
+    data.disableAcceleratedVideoDecode = defaultSettings.disableAcceleratedVideoDecode;
+    update();
+  }
   return data;
 });

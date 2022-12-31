@@ -33,6 +33,10 @@ import { initWebhook } from "@/main/webhook";
   const windows = useWindows();
   const configSettings = useConfigSettings();
   const dbStatus = useDBStatus();
+  // コマンドライン引数
+  if (configSettings.data.disableAcceleratedVideoDecode) {
+    app.commandLine.appendSwitch("disable-accelerated-video-decode");
+  }
   // プロトコル準備
   protocol.registerSchemesAsPrivileged([
     {

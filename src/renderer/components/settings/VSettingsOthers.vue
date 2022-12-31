@@ -19,6 +19,11 @@
     </label>
     <p>{{ t("settings.gamutMapSamplingDescriptions") }}</p>
     <label>
+      <VCheckbox v-model:value="settingsStore.state.value.disableAcceleratedVideoDecode" />
+      {{ t("settings.disableAcceleratedVideoDecode") }}
+    </label>
+    <p>{{ t("settings.disableAcceleratedVideoDecodeDescriptions") }}</p>
+    <label>
       <VCheckbox v-model:value="settingsStore.state.value.developerMode" />
       {{ t("settings.developerMode") }}
     </label>
