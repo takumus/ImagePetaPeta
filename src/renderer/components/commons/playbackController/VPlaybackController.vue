@@ -4,8 +4,8 @@
       <button @click="paused(playing)">
         {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
       </button>
-      <input v-if="hasAudio" type="range" :max="1000" v-model="currentVolumeModel" />
-      <input type="range" :min="100" :max="4000" v-model="currentSpeedModel" /><button
+      <VSlider v-if="hasAudio" :min="0" :max="1000" v-model:value="currentVolumeModel" />
+      <VSlider :min="100" :max="4000" v-model:value="currentSpeedModel" /><button
         @click="currentSpeedModel = 1000">
         reset
       </button>
@@ -27,6 +27,7 @@ import { computed, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
+import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
@@ -162,6 +163,7 @@ t-playback-controller-root {
   }
   > t-advanced {
     display: flex;
+    align-items: center;
   }
 }
 </style>

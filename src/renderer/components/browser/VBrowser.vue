@@ -25,14 +25,11 @@
               :items="sortModes.map((sm) => ({ value: sm, label: sm }))"
               v-model:value="sortMode" />
             <input type="color" v-model="currentColor" />
-            <input
-              type="range"
-              v-model="thumbnailsSize"
-              tabindex="-1"
-              @change="updateTileSize(Number(($event.target as HTMLInputElement).value))"
+            <VSlider
+              v-model:value="thumbnailsSize"
+              @change="updateTileSize"
               :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
-              :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX"
-              :step="defines.BROWSER_THUMBNAIL_ZOOM_STEP" />
+              :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX" />
           </t-buttons>
         </t-top>
         <t-tiles ref="thumbnails">
@@ -79,6 +76,7 @@ import VPreview from "@/renderer/components/commons/property/VPreview.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
+import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";

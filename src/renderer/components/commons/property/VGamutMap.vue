@@ -10,7 +10,7 @@
         @lose-context="loseContext"
         @resize="resize" />
     </t-circle>
-    <input type="range" min="0" max="100" v-model="amountFilterValue" />
+    <VSlider :min="0" :max="100" v-model:value="amountFilterValue" />
   </t-gamut-map-root>
 </template>
 
@@ -19,6 +19,7 @@ import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
+import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
