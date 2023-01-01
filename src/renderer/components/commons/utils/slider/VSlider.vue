@@ -25,7 +25,7 @@ const dragging = ref(false);
 const positionX = computed(() => {
   return ((props.value - props.min) / (props.max - props.min)) * 100;
 });
-const emitThrottle = throttle(20, (value: number) => {
+const emitThrottle = throttle(1000 / 60, (value: number) => {
   if (dragging.value) {
     emit("update:value", value);
   }
