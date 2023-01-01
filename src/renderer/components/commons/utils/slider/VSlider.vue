@@ -1,7 +1,10 @@
 <template>
-  <t-slider-root @click="click">
-    <t-content :class="{ checked: value }" @pointerdown.left="startDrag" ref="bar">
+  <t-slider-root @click="click" :style="{ width: width ?? '128px' }">
+    <t-content @pointerdown.left="startDrag" ref="bar">
       <t-circle :style="{ left: positionX + '%' }"> </t-circle>
+      <t-bar>
+        <t-bar-inner :style="{ width: positionX + '%' }"></t-bar-inner>
+      </t-bar>
     </t-content>
   </t-slider-root>
 </template>
@@ -15,6 +18,7 @@ const props = defineProps<{
   max: number;
   min: number;
   float?: boolean;
+  width?: string;
 }>();
 const emit = defineEmits<{
   (e: "update:value", value: number): void;
@@ -50,6 +54,9 @@ function emitValue(event: PointerEvent, change = false) {
     Math.min(Math.max((event.clientX - rect.x) / rect.width, 0), 1) * (props.max - props.min) +
       props.min,
   );
+  if (isNaN(value) || value < props.min || value > props.max) {
+    return;
+  }
   emitThrottle(value);
   if (change) {
     emit("change", value);
@@ -77,22 +84,35 @@ function pointerUp(event: PointerEvent) {
 t-slider-root {
   display: inline-block;
   height: var(--px-3);
-  width: 128px;
   padding: var(--px-1);
-  margin: var(--px-2);
+  margin: var(--px-1);
   cursor: pointer;
   > t-content {
     display: block;
     height: 100%;
     width: 100%;
-    border-radius: 999px;
     position: relative;
-    background-color: var(--color-checkbox-false-background);
-    // overflow: hidden;
+    > t-bar {
+      display: block;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      background-color: var(--color-checkbox-false-background);
+      border-radius: 999px;
+      overflow: hidden;
+      > t-bar-inner {
+        display: block;
+        height: 100%;
+        background-color: var(--color-checkbox-true-background);
+      }
+    }
     > t-circle {
+      z-index: 2;
       display: block;
       border-radius: 999px;
-      background-color: var(--color-checkbox-false-circle);
+      background-color: var(--color-checkbox-true-circle);
       height: 100%;
       aspect-ratio: 1;
       transform: translateX(-50%) scale(1.9);
@@ -100,12 +120,6 @@ t-slider-root {
       transform-origin: center;
       position: relative;
       box-shadow: 0px 0.5px 2px rgba(0, 0, 0, 0.3);
-    }
-    &.checked {
-      background-color: var(--color-checkbox-true-background);
-      > t-circle {
-        background-color: var(--color-checkbox-true-circle);
-      }
     }
   }
 }
