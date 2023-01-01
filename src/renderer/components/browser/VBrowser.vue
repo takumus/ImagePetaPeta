@@ -602,8 +602,15 @@ t-browser-root {
   > t-left {
     padding: var(--px-2);
     width: 250px;
-    min-width: 250px;
+    min-width: 128px;
     display: block;
+  }
+  > t-right {
+    width: 250px;
+    min-width: 128px;
+    padding: var(--px-2);
+    display: flex;
+    flex-direction: column;
   }
   > t-center {
     display: flex;
@@ -623,14 +630,20 @@ t-browser-root {
         width: 100%;
         display: flex;
         padding: 0px 0px var(--px-2) 0px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
         > t-search {
           display: block;
           flex: 1;
           padding: 0px var(--px-2);
+          min-width: 200px;
         }
         > t-buttons {
           display: flex;
+          flex-wrap: wrap;
           align-items: center;
+          justify-content: center;
           > label {
             display: flex;
             align-items: center;
@@ -649,13 +662,6 @@ t-browser-root {
         }
       }
     }
-  }
-  > t-right {
-    width: 250px;
-    min-width: 250px;
-    padding: var(--px-2);
-    display: flex;
-    flex-direction: column;
   }
 }
 </style>
