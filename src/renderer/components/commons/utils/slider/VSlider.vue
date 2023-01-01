@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { throttle } from "throttle-debounce";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const props = defineProps<{
@@ -23,6 +24,11 @@ const bar = ref<HTMLElement>();
 const dragging = ref(false);
 const positionX = computed(() => {
   return ((props.value - props.min) / (props.max - props.min)) * 100;
+});
+const emitThrottle = throttle(20, (value: number) => {
+  if (dragging.value) {
+    emit("update:value", value);
+  }
 });
 onMounted(() => {
   window.addEventListener("pointermove", pointerMove);
@@ -44,7 +50,7 @@ function emitValue(event: PointerEvent, change = false) {
     Math.min(Math.max((event.clientX - rect.x) / rect.width, 0), 1) * (props.max - props.min) +
       props.min,
   );
-  emit("update:value", value);
+  emitThrottle(value);
   if (change) {
     emit("change", value);
   }
