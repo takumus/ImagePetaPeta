@@ -18,11 +18,16 @@
     </label>
     <p>{{ t("settings.alwaysOnTopDescriptions") }}</p>
     <label>
-      <select v-model="settingsStore.state.value.show">
-        <option value="board">{{ t("settings.showBoard") }}</option>
+      <VSelect
+        v-model:value="settingsStore.state.value.show"
+        :items="[
+          { value: 'board', label: t('settings.showBoard') },
+          { value: 'browser', label: t('settings.showBrowser') },
+          { value: 'both', label: t('settings.showBoth') },
+        ]" />
+      <!-- <option value="board">{{ t("settings.showBoard") }}</option>
         <option value="browser">{{ t("settings.showBrowser") }}</option>
-        <option value="both">{{ t("settings.showBoth") }}</option>
-      </select>
+        <option value="both">{{ t("settings.showBoth") }}</option> -->
       {{ t("settings.show") }}
     </label>
     <p>{{ t("settings.showDescriptions") }}</p>
@@ -33,6 +38,7 @@
 import { useI18n } from "vue-i18n";
 
 import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
+import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
 
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 

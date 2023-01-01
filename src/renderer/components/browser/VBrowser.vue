@@ -21,9 +21,9 @@
                 @update:value="(value) => (statesStore.state.value.groupingByDate = value)" />
               <span>{{ t("browser.grouping") }}</span>
             </label>
-            <select v-model="sortMode">
-              <option v-for="sm in sortModes" :key="sm" :value="sm">{{ sm }}</option>
-            </select>
+            <VSelect
+              :items="sortModes.map((sm) => ({ value: sm, label: sm }))"
+              v-model:value="sortMode" />
             <input type="color" v-model="currentColor" />
             <input
               type="range"
@@ -78,6 +78,7 @@ import VTile from "@/renderer/components/browser/tile/VTile.vue";
 import VPreview from "@/renderer/components/commons/property/VPreview.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
+import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
