@@ -17,7 +17,7 @@
       {{ t("settings.alwaysOnTop") }}
     </label>
     <p>{{ t("settings.alwaysOnTopDescriptions") }}</p>
-    <label>
+    <t-label class="label">
       <VSelect
         v-model:value="settingsStore.state.value.show"
         :items="[
@@ -29,7 +29,7 @@
         <option value="browser">{{ t("settings.showBrowser") }}</option>
         <option value="both">{{ t("settings.showBoth") }}</option> -->
       {{ t("settings.show") }}
-    </label>
+    </t-label>
     <p>{{ t("settings.showDescriptions") }}</p>
   </t-settings-content-root>
 </template>
