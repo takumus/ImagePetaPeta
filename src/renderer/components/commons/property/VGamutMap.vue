@@ -10,7 +10,7 @@
         @lose-context="loseContext"
         @resize="resize" />
     </t-circle>
-    <VSlider :min="0" :max="100" v-model:value="amountFilterValue" />
+    <VSlider :min="0" :max="100" :width="'50%'" v-model:value="amountFilterValue" />
   </t-gamut-map-root>
 </template>
 
