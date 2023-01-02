@@ -35,6 +35,10 @@ function updateFloating(
     shrinkHeight: true,
     insideParentElement: false,
   },
+  flip = {
+    x: true,
+    y: true,
+  },
 ) {
   const margin = 10;
   const limits = (() => {
@@ -85,7 +89,11 @@ function updateFloating(
           width.value = limits.width + "px";
         }
       } else {
-        position.value.x = targetCorners.left - floatingRect.width;
+        if (flip.x) {
+          position.value.x = targetCorners.left - floatingRect.width;
+        } else {
+          position.value.x = limits.right - floatingRect.width;
+        }
       }
     }
     if (bottomSpace < 0) {
@@ -105,7 +113,11 @@ function updateFloating(
           }
         }
       } else {
-        position.value.y = targetCorners.top - floatingRect.height;
+        if (flip.y) {
+          position.value.y = targetCorners.top - floatingRect.height;
+        } else {
+          position.value.y = limits.bottom - floatingRect.height;
+        }
       }
     }
   });

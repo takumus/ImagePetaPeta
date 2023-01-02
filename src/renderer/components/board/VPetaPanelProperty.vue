@@ -84,6 +84,7 @@ function pointerMove(event: PointerEvent) {
   floating.value?.updateFloating(
     { ...position, width: 0, height: 0 },
     { shrinkHeight: false, shrinkWidth: false, insideParentElement: true },
+    { x: false, y: false },
   );
 }
 function pointerUp() {
@@ -146,7 +147,7 @@ function open(position: Vec2, width = 0, height = 0): void {
   show.value = true;
   floating.value?.updateFloating(
     { ...position, width: width, height: height },
-    { shrinkHeight: false, shrinkWidth: false, insideParentElement: true },
+    { shrinkHeight: true, shrinkWidth: true, insideParentElement: true },
   );
 }
 function changeOrder(to: "front" | "back") {
