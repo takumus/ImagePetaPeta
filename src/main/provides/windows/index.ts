@@ -135,7 +135,7 @@ export class Windows {
       }
       window.moveTop();
     });
-    window.webContents.addListener("crashed", (e) => {
+    window.webContents.addListener("crashed", () => {
       logger.error("Window Crashed:", type);
       this.reloadWindow(type);
     });

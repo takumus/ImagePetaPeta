@@ -18,6 +18,7 @@ export function getWindowCustomOptions(type: WindowType): Electron.BrowserWindow
           y: 13,
         },
         alwaysOnTop: configSettings.data.alwaysOnTop,
+        // transparent: true,
       };
     case WindowType.BROWSER:
       return {
