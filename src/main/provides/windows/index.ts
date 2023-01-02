@@ -93,7 +93,7 @@ export class Windows {
   }
   createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
-    const logger = useLogger();
+    const logger = useLogger().logMainChunk();
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -119,7 +119,7 @@ export class Windows {
     });
     this.activeWindows[type] = true;
     const state = configWindowStates.data[type];
-    logger.logMainChunk().log("$Create Window:", type);
+    logger.log("$Create Window:", type);
     window.setMenuBarVisibility(false);
     if (state?.maximized) {
       window.maximize();
@@ -134,6 +134,10 @@ export class Windows {
         this.changeMainWindow(type);
       }
       window.moveTop();
+    });
+    window.webContents.addListener("crashed", (e) => {
+      logger.error("Window Crashed:", type);
+      this.reloadWindow(type);
     });
     const url =
       process.env.WEBPACK_DEV_SERVER_URL !== undefined
