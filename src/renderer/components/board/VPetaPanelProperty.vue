@@ -147,7 +147,7 @@ function open(position: Vec2, width = 0, height = 0): void {
   show.value = true;
   floating.value?.updateFloating(
     { ...position, width: width, height: height },
-    { shrinkHeight: true, shrinkWidth: true, insideParentElement: true },
+    { shrinkHeight: false, shrinkWidth: false, insideParentElement: true },
   );
 }
 function changeOrder(to: "front" | "back") {
