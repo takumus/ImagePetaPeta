@@ -23,6 +23,7 @@
             </label>
             <VSelect
               :items="sortModes.map((sm) => ({ value: sm, label: sm }))"
+              :min-width="'120px'"
               v-model:value="sortMode" />
             <input type="color" v-model="currentColor" />
             <VSlider

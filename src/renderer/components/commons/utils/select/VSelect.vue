@@ -1,7 +1,13 @@
 <template>
   <t-select-root>
-    <button @click="open" ref="button">
-      {{ items.find((v) => v.value === value)?.label ?? "" }}
+    <button
+      @click="open"
+      ref="button"
+      :style="{
+        minWidth: minWidth ?? 'unset',
+      }">
+      <t-label>{{ items.find((v) => v.value === value)?.label ?? "" }}</t-label>
+      <t-icon></t-icon>
     </button>
     <VFloating
       :visible="show"
@@ -28,6 +34,7 @@ import { SelectItem } from "@/renderer/components/commons/utils/select/selectIte
 defineProps<{
   value: string | number;
   items: SelectItem[];
+  minWidth?: string;
 }>();
 const emit = defineEmits<{
   (e: "update:value", value: string | number): void;
@@ -65,8 +72,28 @@ function select(item: SelectItem) {
 </script>
 
 <style lang="scss" scoped>
-> t-select-root {
+t-select-root {
   display: inline-block;
+  > button {
+    display: flex;
+    align-items: center;
+    padding-left: var(--px-2);
+    padding-right: var(--px-1);
+    > t-label {
+      display: block;
+      flex: 1;
+      flex-grow: 1;
+      text-align: left;
+    }
+    > t-icon {
+      display: block;
+      margin: var(--px-0);
+      margin-left: var(--px-2);
+      border-top: var(--px-1) solid var(--color-font);
+      border-right: var(--px-1) solid transparent;
+      border-left: var(--px-1) solid transparent;
+    }
+  }
 }
 .select-root {
   padding: 0px;
