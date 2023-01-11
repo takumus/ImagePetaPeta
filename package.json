@@ -22,9 +22,10 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "postbuild": "node ./scripts/compressForWindows.js",
-    "prebuild": "yarn audit --groups dependencies && yarn generate-assets && yarn tsc",
+    "prebuild": "yarn generate-assets && yarn tsc",
     "prepare": "husky install && yarn generate-assets",
     "preserve": "yarn generate-assets",
+    "aud": "yarn audit --groups dependencies",
     "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
     "tsc": "tsc -p ./tsconfig.json --noEmit && vue-tsc --noEmit",
     "format": "yarn prettier ./src --write"
@@ -33,13 +34,11 @@
     "//": "fixed",
     "sharp": "0.31.3",
     "pixi.js": "7.0.5",
-
     "//": "",
     "@araki-packages/promise-serial": "^2.0.2",
     "@seald-io/nedb": "^3.1.0",
     "@xmldom/xmldom": "^0.8.5",
     "axios": "^1.1.2",
-    "body-parser": "^1.20.1",
     "color-convert": "^2.0.1",
     "color-diff": "^1.2.0",
     "cors": "^2.8.5",
@@ -62,7 +61,6 @@
     "//": "fixed",
     "electron": "22.0.1",
     "chalk": "4.1.2",
-
     "//": "",
     "@shockpkg/icon-encoder": "^2.1.1",
     "@trivago/prettier-plugin-sort-imports": "^3.4.0",

@@ -1,4 +1,3 @@
-import bodyParser from "body-parser";
 import cors from "cors";
 import { IpcMainInvokeEvent } from "electron";
 import express from "express";
@@ -26,8 +25,7 @@ export function initWebhook(ipcFunctions: {
   try {
     initLog.log(`$Webhook: init`);
     const http = express();
-    http.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }));
-    http.use(bodyParser.json({ limit: "100mb" }));
+    http.use(express.json({ limit: "100mb" }));
     http.use(cors());
     http.use(IpFilter(WEBHOOK_WHITELIST_IP_LIST, { mode: "allow" }));
     const server = http.listen(WEBHOOK_PORT, () => {
