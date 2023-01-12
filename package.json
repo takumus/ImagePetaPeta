@@ -22,10 +22,9 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "postbuild": "node ./scripts/compressForWindows.js",
-    "prebuild": "yarn generate-assets && yarn tsc",
+    "prebuild": "yarn audit --groups dependencies && yarn generate-assets && yarn tsc",
     "prepare": "husky install && yarn generate-assets",
     "preserve": "yarn generate-assets",
-    "aud": "yarn audit --groups dependencies",
     "test": "node --loader ts-node/esm -r tsconfig-paths/register ./src/test/__test",
     "tsc": "tsc -p ./tsconfig.json --noEmit && vue-tsc --noEmit",
     "format": "yarn prettier ./src --write"
