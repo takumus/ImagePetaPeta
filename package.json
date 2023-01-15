@@ -1,6 +1,6 @@
 {
   "name": "imagepetapeta-beta",
-  "version": "2.2023.4-beta",
+  "version": "2.2023.5-beta",
   "private": true,
   "description": "image viewer",
   "author": "takumus",
@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "//": "fixed",
-    "electron": "22.0.1",
+    "electron": "22.0.2",
     "chalk": "4.1.2",
     "//": "",
     "@shockpkg/icon-encoder": "^2.1.1",
