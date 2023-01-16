@@ -32,7 +32,7 @@
   "dependencies": {
     "//": "fixed",
     "sharp": "0.31.3",
-    "pixi.js": "7.0.5",
+    "pixi.js": "7.1.0",
     "//": "",
     "@araki-packages/promise-serial": "^2.0.2",
     "@seald-io/nedb": "^3.1.0",
