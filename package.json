@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "//": "fixed",
-    "electron": "22.0.2",
+    "electron": "22.0.3",
     "chalk": "4.1.2",
     "//": "",
     "@shockpkg/icon-encoder": "^2.1.1",
