@@ -39,7 +39,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
       const tasks = ppa(
         async (petaFile, index) => {
           const inputFile = petaFilesController.getFilePath(petaFile, FileType.ORIGINAL);
-          const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.webp`;
+          const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.png`;
           const parameters = [
             "-i",
             inputFile,
