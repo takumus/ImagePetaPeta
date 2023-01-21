@@ -15,7 +15,7 @@ import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
-import { DEFAULT_BOARD_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
+import { BOARD_DEFAULT_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { ppa } from "@/commons/utils/pp";
 
@@ -133,7 +133,7 @@ export function getIpcFunctions(): {
         const length = Object.keys(petaBoards).length;
         if (length === 0) {
           log.log("no boards! create empty board");
-          const board = createPetaBoard(DEFAULT_BOARD_NAME, 0, isDarkMode());
+          const board = createPetaBoard(BOARD_DEFAULT_NAME, 0, isDarkMode());
           await petaBoardsController.updateMultiple([board], UpdateMode.INSERT);
           petaBoards[board.id] = board;
         }

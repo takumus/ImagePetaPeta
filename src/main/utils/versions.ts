@@ -3,7 +3,7 @@ import { app } from "electron";
 import { v4 as uuid } from "uuid";
 
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
-import { PACKAGE_JSON_URL } from "@/commons/defines";
+import { URL_PACKAGE_JSON } from "@/commons/defines";
 
 export function isLatest(meVersion: string, remoteVersion: string) {
   if (meVersion === remoteVersion) {
@@ -29,7 +29,7 @@ export function isLatest(meVersion: string, remoteVersion: string) {
 }
 export async function getLatestVersion(): Promise<RemoteBinaryInfo> {
   try {
-    const url = `${PACKAGE_JSON_URL}?hash=${uuid()}`;
+    const url = `${URL_PACKAGE_JSON}?hash=${uuid()}`;
     const packageJSON = (await axios.get(url, { responseType: "json" })).data;
     // packageJSON.version = "4.0.0";
     return {

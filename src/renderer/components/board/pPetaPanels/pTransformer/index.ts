@@ -2,7 +2,7 @@ import deepcopy from "deepcopy";
 import * as PIXI from "pixi.js";
 
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import { ROTATION_BLOCK_INCREMENT } from "@/commons/defines";
+import { BOARD_ROTATION_BLOCK_INCREMENT } from "@/commons/defines";
 import { Vec2 } from "@/commons/utils/vec2";
 
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
@@ -251,10 +251,10 @@ export class PTransformer extends PIXI.Container {
         }
         const diff = center.getDiff(corner);
         const r = diff.atan2() + this.rotatingRotation - this.beginRotatingRotation;
-        const rot = Math.floor((r / Math.PI) * 180 + ROTATION_BLOCK_INCREMENT / 2) % 360;
+        const rot = Math.floor((r / Math.PI) * 180 + BOARD_ROTATION_BLOCK_INCREMENT / 2) % 360;
         this.rotatingRotation =
-          Math.floor((rot + (rot < 0 ? 360 : 0)) / ROTATION_BLOCK_INCREMENT) *
-            ((ROTATION_BLOCK_INCREMENT / 180) * Math.PI) -
+          Math.floor((rot + (rot < 0 ? 360 : 0)) / BOARD_ROTATION_BLOCK_INCREMENT) *
+            ((BOARD_ROTATION_BLOCK_INCREMENT / 180) * Math.PI) -
           diff.atan2() +
           this.beginRotatingRotation;
       }

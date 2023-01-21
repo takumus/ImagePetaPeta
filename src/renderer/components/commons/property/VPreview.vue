@@ -31,7 +31,7 @@ import VPropertyThumbnail from "@/renderer/components/commons/property/VProperty
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { WindowType } from "@/commons/datas/windowType";
-import { MAX_PREVIEW_COUNT } from "@/commons/defines";
+import { BROWSER_MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
@@ -85,7 +85,7 @@ const propertyThumbnails = computed<PropertyThumbnail[]>(() => {
   const maxWidth = props.petaFiles.length === 1 ? previewWidth.value : previewWidth.value * 0.7;
   const petaFiles = [...props.petaFiles];
   // プレビュー数の最大を抑える。
-  petaFiles.splice(0, petaFiles.length - MAX_PREVIEW_COUNT);
+  petaFiles.splice(0, petaFiles.length - BROWSER_MAX_PREVIEW_COUNT);
   const thumbnails = petaFiles.map((p): PropertyThumbnail => {
     let width = 0;
     let height = 0;

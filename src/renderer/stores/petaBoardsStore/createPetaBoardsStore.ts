@@ -5,7 +5,7 @@ import { PetaPanel } from "@/commons/datas/petaPanel";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { DEFAULT_BOARD_NAME, SAVE_DELAY } from "@/commons/defines";
+import { BOARD_DEFAULT_NAME, BOARD_SAVE_DELAY } from "@/commons/defines";
 import { Vec2 } from "@/commons/utils/vec2";
 
 import { DelayUpdater } from "@/renderer/libs/delayUpdater";
@@ -30,7 +30,7 @@ export async function createPetaBoardsStore() {
       if (updater) {
         updater.destroy();
       }
-      updater = boardUpdaters.value[board.id] = new DelayUpdater<RPetaBoard>(SAVE_DELAY);
+      updater = boardUpdaters.value[board.id] = new DelayUpdater<RPetaBoard>(BOARD_SAVE_DELAY);
       updater.initData(board);
       updater.onUpdate((board) => {
         IPC.send("updatePetaBoards", [rPetaBoardToPetaBoard(board)], UpdateMode.UPDATE);
@@ -55,7 +55,7 @@ export async function createPetaBoardsStore() {
   }
   async function addPetaBoard(dark = false) {
     const name = getNameAvoidDuplication(
-      DEFAULT_BOARD_NAME,
+      BOARD_DEFAULT_NAME,
       Object.values(states.value).map((b) => b.name),
     );
     const board = createPetaBoard(

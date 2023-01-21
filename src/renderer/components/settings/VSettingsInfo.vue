@@ -32,7 +32,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { WindowType } from "@/commons/datas/windowType";
-import { SUPPORT_URL } from "@/commons/defines";
+import { URL_SUPPORT } from "@/commons/defines";
 
 import { DEBUGGERS } from "@/@assets/debuggers";
 import { LICENSES } from "@/@assets/licenses";
@@ -53,7 +53,7 @@ function gotoGithub() {
 function gotoIssues() {
   IPC.send(
     "openURL",
-    `${SUPPORT_URL}?usp=pp_url&entry.1709939184=${encodeURIComponent(
+    `${URL_SUPPORT}?usp=pp_url&entry.1709939184=${encodeURIComponent(
       appInfoStore.state.value.version,
     )}`,
   );

@@ -85,11 +85,11 @@ import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 import {
+  BROWSER_THUMBNAILS_SELECTION_PERCENT,
   BROWSER_THUMBNAIL_MARGIN,
   BROWSER_THUMBNAIL_SIZE,
   BROWSER_THUMBNAIL_ZOOM_MAX,
   BROWSER_THUMBNAIL_ZOOM_MIN,
-  THUMBNAILS_SELECTION_PERCENT,
 } from "@/commons/defines";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -138,6 +138,7 @@ const defines = useDefinesStore().defines;
 const filteredPetaFiles = ref<RPetaFile[]>([]);
 const ignoreScrollEvent = ref(false);
 const currentColor = ref("#ffffff");
+const fetchFilteredPetaFilesThrottle = throttle(100, () => fetchFilteredPetaFiles(false));
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -304,7 +305,11 @@ function selectTile(thumb: Tile, force = false) {
       );
       const hitArea = widthDiff * heightDiff;
       const ptArea = pt.width * pt.height;
-      if (widthDiff > 0 && heightDiff > 0 && hitArea / ptArea > THUMBNAILS_SELECTION_PERCENT) {
+      if (
+        widthDiff > 0 &&
+        heightDiff > 0 &&
+        hitArea / ptArea > BROWSER_THUMBNAILS_SELECTION_PERCENT
+      ) {
         pt.petaFile.renderer.selected = true;
       }
     });
@@ -410,17 +415,21 @@ function calcCiedeFromPalette(petaFile: RPetaFile, rgb: { r: number; g: number; 
 }
 const fetchFilteredPetaFiles = (() => {
   let fetchId = 0;
-  return async () => {
+  let results: string[] = [];
+  return async (reload = true) => {
     const currentFetchId = ++fetchId;
     console.time("fetch" + currentFetchId);
-    const results = await IPC.send(
-      "getPetaFileIds",
-      selectedFilterType.value === FilterType.UNTAGGED
-        ? { type: "untagged" }
-        : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0
-        ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
-        : { type: "all" },
-    );
+    if (reload) {
+      const newResults = await IPC.send(
+        "getPetaFileIds",
+        selectedFilterType.value === FilterType.UNTAGGED
+          ? { type: "untagged" }
+          : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0
+          ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
+          : { type: "all" },
+      );
+      results = newResults;
+    }
     console.timeEnd("fetch" + currentFetchId);
     if (currentFetchId !== fetchId) {
       return;
@@ -431,7 +440,7 @@ const fetchFilteredPetaFiles = (() => {
         new Set(
           results
             .map((id) => {
-              return petaFiles.value[id];
+              return petaFilesStore.state.value[id];
             })
             .filter((petaFile) => {
               return petaFile;
@@ -469,8 +478,7 @@ function keyA() {
     });
   }
 }
-const petaFiles = computed(() => petaFilesStore.state.value);
-const petaFilesArray = computed(() => Object.values(petaFiles.value));
+const petaFilesArray = computed(() => Object.values(petaFilesStore.state.value));
 const selectedPetaFiles = computed(() => petaFilesArray.value.filter((pi) => pi.renderer.selected));
 const thumbnailsRowCount = computed(() => {
   const c = Math.floor(thumbnailsWidth.value / thumbnailsSize.value);
@@ -576,19 +584,18 @@ watch([selectedPetaTagIds, selectedFilterType, sortMode], () => {
   });
   fetchFilteredPetaFiles();
 });
-watch(petaFilesArray, fetchFilteredPetaFiles);
-watch(petaTagsStore.state.petaTags, fetchFilteredPetaFiles);
-watch(sortMode, fetchFilteredPetaFiles);
-const f = throttle(100, fetchFilteredPetaFiles);
+watch(petaFilesArray, () => fetchFilteredPetaFiles());
+watch(petaTagsStore.state.petaTags, () => fetchFilteredPetaFiles());
+watch(sortMode, () => fetchFilteredPetaFiles());
 watch(currentColor, () => {
-  currentScrollTileId.value = "";
-  nextTick(() => {
-    if (thumbnails.value) {
-      thumbnails.value.scrollTo(0, 0);
-    }
-  });
   if (sortMode.value === "SIMILAR") {
-    f();
+    currentScrollTileId.value = "";
+    nextTick(() => {
+      if (thumbnails.value) {
+        thumbnails.value.scrollTo(0, 0);
+      }
+    });
+    fetchFilteredPetaFilesThrottle();
   }
 });
 watch(thumbnailsSize, restoreScrollPosition);

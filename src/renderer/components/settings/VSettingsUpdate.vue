@@ -19,7 +19,7 @@
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { DOWNLOAD_URL } from "@/commons/defines";
+import { URL_DOWNLOAD } from "@/commons/defines";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
@@ -37,10 +37,10 @@ async function checkUpdate() {
   updateAvailable.value = !remoteBinaryInfo.isLatest;
 }
 function downloadUpdate() {
-  IPC.send("openURL", `${DOWNLOAD_URL}${latestVersion.value}`);
+  IPC.send("openURL", `${URL_DOWNLOAD}${latestVersion.value}`);
 }
 function releaseNote() {
-  IPC.send("openURL", `${DOWNLOAD_URL}${appInfoStore.state.value.version}`);
+  IPC.send("openURL", `${URL_DOWNLOAD}${appInfoStore.state.value.version}`);
 }
 </script>
 

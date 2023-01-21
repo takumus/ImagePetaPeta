@@ -58,7 +58,7 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BOARD_ADD_MULTIPLE_OFFSET_X,
   BOARD_ADD_MULTIPLE_OFFSET_Y,
-  DEFAULT_IMAGE_SIZE,
+  BOARD_DEFAULT_IMAGE_SIZE,
 } from "@/commons/defines";
 import { hasPetaFiles } from "@/commons/utils/board";
 import { minimizeID } from "@/commons/utils/minimizeID";
@@ -141,8 +141,8 @@ function addOrderedPetaPanels() {
       orderedAddPanelDragEvent.value
         .clone()
         .add(new Vec2(BOARD_ADD_MULTIPLE_OFFSET_X, BOARD_ADD_MULTIPLE_OFFSET_Y).mult(i)),
-      DEFAULT_IMAGE_SIZE,
-      (petaFile.metadata.height / petaFile.metadata.width) * DEFAULT_IMAGE_SIZE,
+      BOARD_DEFAULT_IMAGE_SIZE,
+      (petaFile.metadata.height / petaFile.metadata.width) * BOARD_DEFAULT_IMAGE_SIZE,
     );
     vPetaBoard.value?.addPanel(panel, offsetIndex++);
   });

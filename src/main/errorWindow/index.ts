@@ -1,6 +1,6 @@
 import { BrowserWindow, app } from "electron";
 
-import { SUPPORT_URL } from "@/commons/defines";
+import { URL_SUPPORT } from "@/commons/defines";
 
 import { useWindows } from "@/main/provides/windows";
 
@@ -37,7 +37,7 @@ export function showErrorWindow(error: ErrorWindowParameters, quit = true) {
       )}</h1>
       <pre>Verison: ${app.getVersion()}</pre>
       <pre>Message: ${noHtml(error.message)}</pre>
-      <h2><a href="javascript:require('electron').shell.openExternal('${SUPPORT_URL}?usp=pp_url&entry.1300869761=%E3%83%90%E3%82%B0&entry.1709939184=${encodeURIComponent(
+      <h2><a href="javascript:require('electron').shell.openExternal('${URL_SUPPORT}?usp=pp_url&entry.1300869761=%E3%83%90%E3%82%B0&entry.1709939184=${encodeURIComponent(
         app.getVersion(),
       )}');">SUPPORT</a></h2>
       </body>`,
