@@ -1,4 +1,3 @@
-import deepcopy from "deepcopy";
 import { IpcRendererEvent } from "electron/main";
 
 import { IPC_GLOBAL_NAME } from "@/commons/defines";
@@ -14,7 +13,9 @@ export const IPC = {
   ): ReturnType<IpcFunctions[U]> => {
     return WINDOW[IPC_GLOBAL_NAME].send(
       e,
-      ...args.map((arg) => (arg === undefined ? undefined : arg === null ? null : deepcopy(arg))),
+      ...args.map((arg) =>
+        arg === undefined ? undefined : arg === null ? null : structuredClone(arg),
+      ),
     );
   },
   on: <U extends keyof IpcEvents>(
