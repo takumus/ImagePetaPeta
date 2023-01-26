@@ -20,11 +20,11 @@ import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
-import { fileSHA256 } from "@/main/provides/utils/fileSHA256";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
