@@ -24,19 +24,19 @@ export async function initDB() {
   const dbPetaTagPartitions = useDBPetaTagPartitions();
   const configDBInfo = useConfigDBInfo();
   const dbStatus = useDBStatus();
+  const dbs = [
+    dbPetaBoard,
+    dbPetaFiles,
+    dbPetaTags,
+    dbPetaTagPartitions,
+    dbPetaFilesPetaTags,
+  ] as const;
   function emitInitialization(log: string) {
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
     logger.logMainChunk().log("$Init DB:", log);
   }
   try {
     // ロード
-    const dbs = [
-      dbPetaBoard,
-      dbPetaFiles,
-      dbPetaTags,
-      dbPetaTagPartitions,
-      dbPetaFilesPetaTags,
-    ] as const;
     await Promise.all(
       dbs.map((db) => {
         return (async () => {
@@ -87,9 +87,7 @@ export async function initDB() {
     return;
   }
   // 自動圧縮登録
-  (
-    [dbPetaFiles, dbPetaBoard, dbPetaTags, dbPetaTagPartitions, dbPetaFilesPetaTags] as const
-  ).forEach((db) => {
+  dbs.forEach((db) => {
     db.on("beginCompaction", () => {
       logger.logMainChunk().log(`begin compaction(${db.name})`);
     });
@@ -100,7 +98,7 @@ export async function initDB() {
       logger.logMainChunk().error(`compaction error(${db.name})`, error);
     });
   });
-  // データ初期化完了通知
+  // DB初期化完了通知
   dbStatus.initialized = true;
   emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
 }
