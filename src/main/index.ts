@@ -5,7 +5,6 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { PROTOCOLS } from "@/commons/defines";
 import { getLastSegmentFromURL } from "@/commons/utils/getLastSegmentFromURL";
 
-import { showError } from "@/main/errorWindow";
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
@@ -23,7 +22,7 @@ import { initWebhook } from "@/main/webhook";
     return;
   }
   // DI準備
-  if (!initDI(showError)) {
+  if (!initDI()) {
     return;
   }
   const logger = useLogger();

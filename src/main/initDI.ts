@@ -26,7 +26,7 @@ import {
 } from "@/commons/defines";
 import languages from "@/commons/languages";
 
-import { ErrorWindowParameters } from "@/main/errorWindow";
+import { showError } from "@/main/errorWindow";
 import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";
@@ -71,7 +71,7 @@ import { Windows, windowsKey } from "@/main/provides/windows";
 import isValidFilePath from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/main/utils/versions";
 
-export function initDI(showError: (error: ErrorWindowParameters, quit?: boolean) => void) {
+export function initDI() {
   try {
     const i18n = createI18n({
       locale: "ja",
