@@ -3,10 +3,6 @@ export const PROTOCOLS = {
     IMAGE_ORIGINAL: "file-image-original",
     IMAGE_THUMBNAIL: "file-image-thumbnail",
   },
-  BUFFER: {
-    IMAGE_ORIGINAL: "buffer-image-original",
-    IMAGE_THUMBNAIL: "buffer-image-thumbnail",
-  },
 } as const;
 export const BOARD_DEFAULT_NAME = "noname";
 export const BOARD_DEFAULT_BACKGROUND_FILL_COLOR = "#e9e9e9";
