@@ -1,12 +1,4 @@
-import {
-  IpcMainInvokeEvent,
-  app,
-  desktopCapturer,
-  dialog,
-  nativeImage,
-  screen,
-  shell,
-} from "electron";
+import { app, desktopCapturer, dialog, nativeImage, screen, shell } from "electron";
 import * as Path from "path";
 
 import { FileType } from "@/commons/datas/fileType";
@@ -16,7 +8,7 @@ import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowType } from "@/commons/datas/windowType";
 import { BOARD_DEFAULT_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
-import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
+import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { ppa } from "@/commons/utils/pp";
 
 import Transparent from "@/@assets/transparent.png";
@@ -41,12 +33,7 @@ import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
 
 let temporaryShowNSFW = false;
 let detailsPetaFile: PetaFile | undefined;
-export function getIpcFunctions(): {
-  [P in keyof IpcFunctions]: (
-    event: IpcMainInvokeEvent,
-    ...args: Parameters<IpcFunctions[P]>
-  ) => ReturnType<IpcFunctions[P]>;
-} {
+export function getIpcFunctions(): IpcFunctionsType {
   return {
     async browseAndImportFiles(event, type) {
       const logger = useLogger();
@@ -331,7 +318,7 @@ export function getIpcFunctions(): {
       }
       return -1;
     },
-    async log(event, id: string, ...args: unknown[]) {
+    async log(event, id, ...args) {
       const dataLogger = useLogger();
       dataLogger.log(LogFrom.RENDERER, id, ...args);
       return true;

@@ -1,5 +1,4 @@
 import cors from "cors";
-import { IpcMainInvokeEvent } from "electron";
 import express from "express";
 import { IpFilter } from "express-ipfilter";
 
@@ -9,17 +8,13 @@ import {
   WEBHOOK_WHITELIST_ORIGIN_LIST,
 } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
+import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 
 import { useLogger } from "@/main/provides/utils/logger";
 
 type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = ["importFiles"];
-export function initWebhook(ipcFunctions: {
-  [P in keyof IpcFunctions]: (
-    event: IpcMainInvokeEvent,
-    ...args: Parameters<IpcFunctions[P]>
-  ) => ReturnType<IpcFunctions[P]>;
-}) {
+export function initWebhook(ipcFunctions: IpcFunctionsType) {
   const logger = useLogger();
   const initLog = logger.logMainChunk();
   try {
