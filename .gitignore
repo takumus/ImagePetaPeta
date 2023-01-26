@@ -2,7 +2,6 @@
 desktop.ini
 /node_modules
 /dist
-/build
 /.temp
 electron.config.appx.js
 src/@assets/licenses.ts
