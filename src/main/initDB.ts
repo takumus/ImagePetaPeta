@@ -9,6 +9,7 @@ import {
   useDBPetaFilesPetaTags,
   useDBPetaTagPartitions,
   useDBPetaTags,
+  useDBStatus,
 } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
@@ -22,6 +23,7 @@ export async function initDB() {
   const dbPetaTags = useDBPetaTags();
   const dbPetaTagPartitions = useDBPetaTagPartitions();
   const configDBInfo = useConfigDBInfo();
+  const dbStatus = useDBStatus();
   function emitInitialization(log: string) {
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
     logger.logMainChunk().log("$Init DB:", log);
@@ -98,4 +100,7 @@ export async function initDB() {
       logger.logMainChunk().error(`compaction error(${db.name})`, error);
     });
   });
+  // データ初期化完了通知
+  dbStatus.initialized = true;
+  emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
 }

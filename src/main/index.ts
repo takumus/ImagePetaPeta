@@ -1,4 +1,4 @@
-import { app, ipcMain, protocol } from "electron";
+import { app, protocol } from "electron";
 import * as Path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
@@ -8,14 +8,12 @@ import { getLastSegmentFromURL } from "@/commons/utils/getLastSegmentFromURL";
 import { showError } from "@/main/errorWindow";
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
-import { getIpcFunctions } from "@/main/ipcFunctions";
+import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
-import { useDBStatus } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { initWebhook } from "@/main/webhook";
 
@@ -32,7 +30,6 @@ import { initWebhook } from "@/main/webhook";
   const paths = usePaths();
   const windows = useWindows();
   const configSettings = useConfigSettings();
-  const dbStatus = useDBStatus();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -108,10 +105,8 @@ import { initWebhook } from "@/main/webhook";
       });
     });
     // ipcの関数登録
-    const ipcFunctions = getIpcFunctions();
-    Object.keys(ipcFunctions).forEach((key) => {
-      ipcMain.handle(key, ipcFunctions[key as keyof typeof ipcFunctions]);
-    });
+    registerIpcFunctions();
+    // protocol作成
     createProtocol("app");
     // 初期ウインドウ表示
     windows.showWindows();
@@ -121,9 +116,6 @@ import { initWebhook } from "@/main/webhook";
     checkAndNotifySoftwareUpdate();
     // dbの初期化
     await initDB();
-    // データ初期化完了通知
-    dbStatus.initialized = true;
-    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
     // webhook有効化
     if (configSettings.data.developerMode) {
       initWebhook(ipcFunctions);
