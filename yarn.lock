@@ -4363,10 +4363,10 @@ electron-to-chromium@^1.4.251:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.283.tgz#d4f263f5df402fd799c0a06255d580dcf8aa9a8e"
   integrity sha512-g6RQ9zCOV+U5QVHW9OpFR7rdk/V7xfopNXnyAamdpFgCHgZ1sjI8VuR1+zG2YG/TZk+tQ8mpNkug4P8FU0fuOA==
 
-electron@23.0.0-beta.4:
-  version "23.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-23.0.0-beta.4.tgz#1be2b9f28afe692c7434ea742c4f4f50d073493f"
-  integrity sha512-km7DAmz6W2fOxRgu+s8+8LG2jkVczMFX/6XV61MvOYr7hDFBAfOq9YiU+9os2XB1JXnfOjwTlUjTzRN+oVmG8A==
+electron@23.0.0-beta.8:
+  version "23.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-23.0.0-beta.8.tgz#231d3c24e2d3f08502c8f172b8ae607c81969217"
+  integrity sha512-Xi2bMKc37IrHZnD5jDJxiJNk3qez7mAnGmRKdg2yQGXYzNwDEUQjQfR2pCk6Qdde7VxQPJTx4dkWQDzE79wehA==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^16.11.26"
