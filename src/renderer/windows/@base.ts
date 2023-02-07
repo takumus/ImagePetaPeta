@@ -67,12 +67,9 @@ export async function create(
     initialized = true;
     logChunk().log(`$Window "${windowType}" init`);
     const app = createApp(component);
-    async function appUse(plugin: Plugin) {
-      return await plugin.install?.(app);
-    }
     const platform = await IPC.send("getPlatform");
-    await appUse(
-      createI18n({
+    app.use(
+      createI18n<[typeof languages.ja], "ja">({
         legacy: false,
         locale: "ja",
         messages: languages,
