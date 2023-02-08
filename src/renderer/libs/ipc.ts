@@ -21,10 +21,7 @@ export const IPC = {
   on: <U extends keyof IpcEvents>(
     e: U,
     cb: (event: IpcRendererEvent, ...args: Parameters<IpcEvents[U]>) => void,
-  ): string => {
+  ): { off: () => void } => {
     return WINDOW[IPC_GLOBAL_NAME].on(e, cb);
-  },
-  off: (id: string): void => {
-    return WINDOW[IPC_GLOBAL_NAME].off(id);
   },
 };
