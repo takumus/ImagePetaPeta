@@ -184,7 +184,7 @@ export class PetaFilesController {
     }
     return true;
   }
-  async createFileInfoFromURL(url: string) {
+  async createFileInfoFromURL(url: string): Promise<ImportFileInfo | undefined> {
     const logger = useLogger();
     const paths = usePaths();
     const log = logger.logMainChunk();
@@ -202,12 +202,15 @@ export class PetaFilesController {
       }
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
       await file.writeFile(dist, data);
+      if (!(await isSupportedFile(dist))) {
+        throw new Error("unsupported file");
+      }
       log.log("return:", true);
       return {
         path: dist,
         note: remoteURL,
         name: "downloaded",
-      } as ImportFileInfo;
+      };
     } catch (error) {
       if (error instanceof AxiosError) {
         log.error(error.message, error.code);
@@ -218,7 +221,9 @@ export class PetaFilesController {
     log.log("return:", false);
     return undefined;
   }
-  async createFileInfoFromBuffer(buffer: ArrayBuffer | Buffer) {
+  async createFileInfoFromBuffer(
+    buffer: ArrayBuffer | Buffer,
+  ): Promise<ImportFileInfo | undefined> {
     const logger = useLogger();
     const paths = usePaths();
     const log = logger.logMainChunk();
@@ -226,12 +231,15 @@ export class PetaFilesController {
       log.log("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
       await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
+      if (!(await isSupportedFile(dist))) {
+        throw new Error("unsupported file");
+      }
       log.log("return:", true);
       return {
         path: dist,
         note: "",
         name: "noname",
-      } as ImportFileInfo;
+      };
     } catch (error) {
       log.error(error);
     }
