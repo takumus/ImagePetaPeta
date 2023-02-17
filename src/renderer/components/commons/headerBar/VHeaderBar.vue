@@ -22,9 +22,9 @@
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
         <t-icon class="import-folder"></t-icon>
       </button>
-      <button v-if="windowType !== 'capture'" tabindex="-1" @click="openCapture()">
+      <!-- <button v-if="windowType !== 'capture'" tabindex="-1" @click="openCapture()">
         <t-icon class="import-folder"></t-icon>
-      </button>
+      </button> -->
     </t-commons>
     <t-commons class="right" v-if="visible">
       <button tabindex="-1" @click="toggleNSFW">
