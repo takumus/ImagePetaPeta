@@ -10,7 +10,11 @@
           {{ label }}
         </p>
         <t-buttons>
-          <button v-for="(item, index) in items" :key="item" @click="select(index)" tabindex="-1">
+          <button
+            v-for="(item, index) in items"
+            :key="item"
+            @click="select(index)"
+            :ref="(element) => buttonsRef(element as HTMLButtonElement)">
             {{ item }}
           </button>
         </t-buttons>
@@ -20,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 
@@ -31,21 +35,29 @@ defineProps<{
 const items = ref<string[]>([]);
 const label = ref("");
 const visible = ref(false);
+const buttons = ref<HTMLButtonElement[]>();
 let resolve: (index: number) => void = (index: number) => index;
 function select(index: number) {
   resolve(index);
   visible.value = false;
 }
-function show(_label: string, _items: string[]) {
+function show(_label: string, _items: string[], _defaultItemIndex = 0) {
   if (visible.value) {
     resolve(-1);
   }
+  buttons.value = [];
   visible.value = true;
   label.value = _label;
   items.value = _items;
+  nextTick(() => {
+    buttons.value?.[_defaultItemIndex ?? -1]?.focus();
+  });
   return new Promise<number>((res) => {
     resolve = res;
   });
+}
+function buttonsRef(button: HTMLButtonElement) {
+  buttons.value?.push(button);
 }
 useComponentsStore().dialog = {
   show,
