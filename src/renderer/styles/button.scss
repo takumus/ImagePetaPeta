@@ -20,5 +20,8 @@ t-root {
     &:active {
       background-color: var(--color-2);
     }
+    &:focus {
+      border: solid 1.2px var(--color-accent-1);
+    }
   }
 }
