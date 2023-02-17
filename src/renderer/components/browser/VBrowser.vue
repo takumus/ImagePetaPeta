@@ -25,7 +25,7 @@
               :items="sortModes.map((sm) => ({ value: sm, label: sm }))"
               :min-width="'120px'"
               v-model:value="sortMode" />
-            <input type="color" v-model="currentColor" />
+            <input type="color" tabindex="-1" v-model="currentColor" />
             <VSlider
               v-model:value="thumbnailsSize"
               @change="updateTileSize"

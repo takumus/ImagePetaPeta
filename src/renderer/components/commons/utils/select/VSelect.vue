@@ -5,7 +5,8 @@
       ref="button"
       :style="{
         minWidth: minWidth ?? 'unset',
-      }">
+      }"
+      tabindex="-1">
       <t-label>{{ items.find((v) => v.value === value)?.label ?? "" }}</t-label>
       <t-icon></t-icon>
     </button>
