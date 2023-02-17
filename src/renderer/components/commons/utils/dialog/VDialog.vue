@@ -1,6 +1,6 @@
 <template>
   <t-dialog-root
-    v-show="visible"
+    v-if="visible"
     :style="{
       zIndex: zIndex,
     }">
