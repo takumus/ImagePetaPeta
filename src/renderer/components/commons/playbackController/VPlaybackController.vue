@@ -1,9 +1,6 @@
 <template>
   <t-playback-controller-root>
     <t-advanced>
-      <button @click="paused(playing)">
-        {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
-      </button>
       <VSlider v-if="hasAudio" :min="0" :max="1000" v-model:value="currentVolumeModel" />
       <VSlider :min="100" :max="4000" v-model:value="currentSpeedModel" /><button
         @click="currentSpeedModel = 1000">
@@ -11,6 +8,9 @@
       </button>
     </t-advanced>
     <t-general>
+      <button @click="paused(playing)">
+        {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
+      </button>
       <t-seekbar>
         <VSeekBar
           :duration="duration"
@@ -18,6 +18,7 @@
           @start-seek="startSeek"
           @stop-seek="stopSeek" />
       </t-seekbar>
+      <t-current-time>{{ currentTimeHMS }}</t-current-time>
     </t-general>
   </t-playback-controller-root>
 </template>
@@ -28,6 +29,8 @@ import { useI18n } from "vue-i18n";
 
 import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
+
+import { secondsToHMS } from "@/commons/utils/secondsToHMS";
 
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
@@ -73,6 +76,9 @@ const currentTimeModel = computed<number>({
     const video = props.pFileObjectContent;
     video.setCurrentTime(value / 1000);
   },
+});
+const currentTimeHMS = computed(() => {
+  return secondsToHMS(currentTime.value / 1000);
 });
 const currentVolumeModel = computed<number>({
   get() {
@@ -152,6 +158,7 @@ t-playback-controller-root {
   flex-direction: column;
   > t-general {
     display: flex;
+    align-items: center;
     > button {
       min-width: 64px;
     }
@@ -159,6 +166,10 @@ t-playback-controller-root {
       padding: var(--px-1);
       display: block;
       flex: 1;
+    }
+    > t-current-time {
+      display: block;
+      padding: 0px var(--px-1);
     }
   }
   > t-advanced {
