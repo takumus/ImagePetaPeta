@@ -3,12 +3,14 @@
     :style="{
       zIndex: zIndex,
     }">
-    <VPIXI
-      ref="vPixi"
-      :antialias="false"
-      @construct="construct"
-      @lose-context="loseContext"
-      @resize="resize" />
+    <t-pixi-wrapper>
+      <VPIXI
+        ref="vPixi"
+        :antialias="false"
+        @construct="construct"
+        @lose-context="loseContext"
+        @resize="resize" />
+    </t-pixi-wrapper>
     <t-playback-controller-wrapper>
       <t-playback-controller>
         <VPlaybackController
@@ -257,19 +259,21 @@ t-details-root {
   position: relative;
   width: 100%;
   height: 100%;
-  display: block;
+  display: flex;
+  flex-direction: column;
   background-image: url("~@/@assets/transparentBackground.png");
   overflow: hidden;
-  // 1pxだけ右下から出す。
-  > t-playback-controller-wrapper {
-    position: absolute;
+  > t-pixi-wrapper {
     display: block;
-    width: 100%;
-    padding: var(--px-3) var(--px-3);
-    bottom: 0px;
+    overflow: hidden;
+    flex: 1;
+  }
+  > t-playback-controller-wrapper {
+    display: block;
+    background-color: var(--color-1);
+    padding: var(--px-2) var(--px-2);
     > t-playback-controller {
       display: block;
-      width: 100%;
     }
   }
 }
