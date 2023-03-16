@@ -1,5 +1,5 @@
 <template>
-  <t-tag-cell-root @click="select()" :class="{ selected: selected }">
+  <e-tag-cell-root @click="select()" :class="{ selected: selected }">
     <VTextarea
       ref="vTextarea"
       :type="'single'"
@@ -9,7 +9,7 @@
       :look="look"
       :click-to-edit="clickToEdit"
       @update:value="(name) => updateName(name)" />
-  </t-tag-cell-root>
+  </e-tag-cell-root>
 </template>
 
 <script setup lang="ts">
@@ -40,7 +40,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-tag-cell-root {
+e-tag-cell-root {
   display: block;
   width: fit-content;
   // margin: 0px 0px var(--px-1) var(--px-1);

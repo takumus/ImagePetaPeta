@@ -1,13 +1,13 @@
 <template>
   <VModal :visible="visible" :center="true" :visible-close-button="false">
-    <t-tasks-root>
-      <t-tasks>
+    <e-tasks-root>
+      <e-tasks>
         <VTask v-for="t in taskStatusArray" :key="t.id" :task-id="t.id" :task-status="t.status" />
-      </t-tasks>
+      </e-tasks>
       <button tabindex="-1" @click="close" v-if="closable">
         {{ t("commons.closeButton") }}
       </button>
-    </t-tasks-root>
+    </e-tasks-root>
   </VModal>
 </template>
 
@@ -68,10 +68,10 @@ function close() {
 </script>
 
 <style lang="scss" scoped>
-t-tasks-root {
+e-tasks-root {
   text-align: center;
   display: block;
-  > t-tasks {
+  > e-tasks {
     width: 100%;
     max-height: 512px;
     overflow-x: hidden;

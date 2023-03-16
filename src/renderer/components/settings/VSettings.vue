@@ -1,5 +1,5 @@
 <template>
-  <t-settings-root>
+  <e-settings-root>
     <ul>
       <li
         v-for="tab in tabs"
@@ -11,30 +11,30 @@
         {{ t("settings." + tab) }}
       </li>
     </ul>
-    <t-contents>
-      <t-content v-if="currentTab === 'general'">
+    <e-contents>
+      <e-content v-if="currentTab === 'general'">
         <VSettingsGeneral />
-      </t-content>
-      <t-content v-if="currentTab === 'control'">
+      </e-content>
+      <e-content v-if="currentTab === 'control'">
         <VSettingsControl />
-      </t-content>
-      <t-content v-if="currentTab === 'browser'">
+      </e-content>
+      <e-content v-if="currentTab === 'browser'">
         <VSettingsBrowser />
-      </t-content>
-      <t-content v-if="currentTab === 'datas'">
+      </e-content>
+      <e-content v-if="currentTab === 'datas'">
         <VSettingsDatas />
-      </t-content>
-      <t-content v-if="currentTab === 'others'">
+      </e-content>
+      <e-content v-if="currentTab === 'others'">
         <VSettingsOthers />
-      </t-content>
-      <t-content v-if="currentTab === 'update'">
+      </e-content>
+      <e-content v-if="currentTab === 'update'">
         <VSettingsUpdate />
-      </t-content>
-      <t-content v-if="currentTab === 'info'">
+      </e-content>
+      <e-content v-if="currentTab === 'info'">
         <VSettingsInfo />
-      </t-content>
-    </t-contents>
-  </t-settings-root>
+      </e-content>
+    </e-contents>
+  </e-settings-root>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +67,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-t-settings-root {
+e-settings-root {
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -85,12 +85,12 @@ t-settings-root {
       }
     }
   }
-  > t-contents {
+  > e-contents {
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     display: block;
-    > t-content {
+    > e-content {
       display: block;
     }
   }

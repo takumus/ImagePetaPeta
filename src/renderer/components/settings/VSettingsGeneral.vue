@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root>
+  <e-settings-content-root>
     <label>
       <VCheckbox
         v-model:value="settingsStore.state.value.darkMode"
@@ -17,7 +17,7 @@
       {{ t("settings.alwaysOnTop") }}
     </label>
     <p>{{ t("settings.alwaysOnTopDescriptions") }}</p>
-    <t-label class="label">
+    <e-label class="label">
       <VSelect
         v-model:value="settingsStore.state.value.show"
         :items="[
@@ -29,9 +29,9 @@
         <option value="browser">{{ t("settings.showBrowser") }}</option>
         <option value="both">{{ t("settings.showBoth") }}</option> -->
       {{ t("settings.show") }}
-    </t-label>
+    </e-label>
     <p>{{ t("settings.showDescriptions") }}</p>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">

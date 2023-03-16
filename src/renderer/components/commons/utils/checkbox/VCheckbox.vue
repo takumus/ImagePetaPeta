@@ -1,9 +1,9 @@
 <template>
-  <t-checkbox-root @click="click">
-    <t-content :class="{ checked: value }">
-      <t-circle> </t-circle>
-    </t-content>
-  </t-checkbox-root>
+  <e-checkbox-root @click="click">
+    <e-content :class="{ checked: value }">
+      <e-circle> </e-circle>
+    </e-content>
+  </e-checkbox-root>
 </template>
 
 <script setup lang="ts">
@@ -19,12 +19,12 @@ function click() {
 </script>
 
 <style lang="scss" scoped>
-t-checkbox-root {
+e-checkbox-root {
   display: inline-block;
   height: 26px;
   padding: var(--px-1);
   cursor: pointer;
-  > t-content {
+  > e-content {
     display: block;
     height: 100%;
     aspect-ratio: 2;
@@ -32,7 +32,7 @@ t-checkbox-root {
     position: relative;
     background-color: var(--color-checkbox-false-background);
     overflow: hidden;
-    > t-circle {
+    > e-circle {
       display: block;
       border-radius: 999px;
       background-color: var(--color-checkbox-false-circle);
@@ -47,7 +47,7 @@ t-checkbox-root {
     }
     &.checked {
       background-color: var(--color-checkbox-true-background);
-      > t-circle {
+      > e-circle {
         left: 50%;
         background-color: var(--color-checkbox-true-circle);
       }

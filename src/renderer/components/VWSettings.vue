@@ -1,19 +1,19 @@
 <template>
-  <t-root
+  <e-root
     :class="{
       dark: darkModeStore.state.value,
     }">
-    <t-content>
-      <t-top>
+    <e-content>
+      <e-top>
         <VTitleBar :title="t('titles.settings')"> </VTitleBar>
-      </t-top>
-      <t-browser>
+      </e-top>
+      <e-browser>
         <VSettings />
-      </t-browser>
-    </t-content>
+      </e-browser>
+    </e-content>
     <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
-  </t-root>
+  </e-root>
 </template>
 
 <script setup lang="ts">
@@ -54,10 +54,10 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-root {
+e-root {
   background-color: var(--color-0);
   color: var(--color-font);
-  > t-content {
+  > e-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -65,12 +65,12 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    > t-top {
+    > e-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    > t-browser {
+    > e-browser {
       display: block;
       overflow: hidden;
       padding: var(--px-3);
@@ -78,7 +78,7 @@ t-root {
       flex: 1;
       z-index: 1;
     }
-    > t-modals {
+    > e-modals {
       position: absolute;
       width: 100%;
       height: 100%;

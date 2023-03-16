@@ -1,5 +1,5 @@
 <template>
-  <t-select-root>
+  <e-select-root>
     <button
       @click="open"
       ref="button"
@@ -7,8 +7,8 @@
         minWidth: minWidth ?? 'unset',
       }"
       tabindex="-1">
-      <t-label>{{ items.find((v) => v.value === value)?.label ?? "" }}</t-label>
-      <t-icon></t-icon>
+      <e-label>{{ items.find((v) => v.value === value)?.label ?? "" }}</e-label>
+      <e-icon></e-icon>
     </button>
     <VFloating
       :visible="show"
@@ -22,7 +22,7 @@
         </li>
       </ul>
     </VFloating>
-  </t-select-root>
+  </e-select-root>
 </template>
 
 <script setup lang="ts">
@@ -73,20 +73,20 @@ function select(item: SelectItem) {
 </script>
 
 <style lang="scss" scoped>
-t-select-root {
+e-select-root {
   display: inline-block;
   > button {
     display: flex;
     align-items: center;
     padding-left: var(--px-2);
     padding-right: var(--px-1);
-    > t-label {
+    > e-label {
       display: block;
       flex: 1;
       flex-grow: 1;
       text-align: left;
     }
-    > t-icon {
+    > e-icon {
       display: block;
       margin: var(--px-0);
       margin-left: var(--px-2);

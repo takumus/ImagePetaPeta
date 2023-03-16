@@ -5,8 +5,8 @@
     :max-width="'512px'"
     :max-height="'unset'"
     ref="floating">
-    <t-content>
-      <t-draggable @pointerdown="startDrag"></t-draggable>
+    <e-content>
+      <e-draggable @pointerdown="startDrag"></e-draggable>
       <!-- <p v-for="p in selectedPetaPanels" :key="p.id">{{ p.id }}</p> -->
       <button @click="changeOrder('front')">{{ t("boards.panelMenu.toFront") }}</button>
       <button @click="changeOrder('back')">{{ t("boards.panelMenu.toBack") }}</button>
@@ -28,7 +28,7 @@
         @seek="seekPlayback"
         @volume="volumeVideo"
         @speed="speedPlayback" />
-    </t-content>
+    </e-content>
   </VFloating>
 </template>
 
@@ -247,12 +247,12 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-content {
+e-content {
   display: block;
   padding: var(--px-2);
   padding-top: calc(var(--px-4));
   max-width: 512px;
-  > t-draggable {
+  > e-draggable {
     display: block;
     width: 100%;
     height: var(--px-4);

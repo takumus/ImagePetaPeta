@@ -1,5 +1,5 @@
 <template>
-  <t-pixi-root ref="canvasWrapper"> </t-pixi-root>
+  <e-pixi-root ref="canvasWrapper"> </e-pixi-root>
 </template>
 
 <script setup lang="ts">
@@ -125,7 +125,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-pixi-root {
+e-pixi-root {
   width: 100%;
   height: 100%;
   display: block;

@@ -1,12 +1,12 @@
 <template>
-  <t-slider-root @click="click" :style="{ width: width ?? '128px' }">
-    <t-content @pointerdown.left="startDrag" ref="bar">
-      <t-circle :style="{ left: positionX + '%' }"> </t-circle>
-      <t-bar>
-        <t-bar-inner :style="{ width: positionX + '%' }"></t-bar-inner>
-      </t-bar>
-    </t-content>
-  </t-slider-root>
+  <e-slider-root @click="click" :style="{ width: width ?? '128px' }">
+    <e-content @pointerdown.left="startDrag" ref="bar">
+      <e-circle :style="{ left: positionX + '%' }"> </e-circle>
+      <e-bar>
+        <e-bar-inner :style="{ width: positionX + '%' }"></e-bar-inner>
+      </e-bar>
+    </e-content>
+  </e-slider-root>
 </template>
 
 <script setup lang="ts">
@@ -81,18 +81,18 @@ function pointerUp(event: PointerEvent) {
 </script>
 
 <style lang="scss" scoped>
-t-slider-root {
+e-slider-root {
   display: inline-block;
   height: var(--px-3);
   padding: var(--px-1);
   margin: var(--px-1);
   cursor: pointer;
-  > t-content {
+  > e-content {
     display: block;
     height: 100%;
     width: 100%;
     position: relative;
-    > t-bar {
+    > e-bar {
       display: block;
       height: 100%;
       width: 100%;
@@ -102,13 +102,13 @@ t-slider-root {
       background-color: var(--color-checkbox-false-background);
       border-radius: 999px;
       overflow: hidden;
-      > t-bar-inner {
+      > e-bar-inner {
         display: block;
         height: 100%;
         background-color: var(--color-checkbox-true-background);
       }
     }
-    > t-circle {
+    > e-circle {
       z-index: 2;
       display: block;
       border-radius: 999px;

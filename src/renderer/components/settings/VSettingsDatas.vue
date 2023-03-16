@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root>
+  <e-settings-content-root>
     <button @click="browsePetaFileDirectory">
       {{ t("settings.browsePetaFileDirectoryButton") }}</button
     ><br />
@@ -16,7 +16,7 @@
       {{ t("settings.changePetaFileDirectoryButton") }}
     </button>
     <p>{{ t("settings.changePetaFileDirectoryDescriptions") }}</p>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root>
+  <e-settings-content-root>
     <label>
       {{ t("settings.zoomSensitivity") }}:
       <input type="number" v-model="settingsStore.state.value.zoomSensitivity"
@@ -10,7 +10,7 @@
       <input type="number" v-model="settingsStore.state.value.moveSensitivity"
     /></label>
     <p>{{ t("settings.moveSensitivityDescriptions") }}</p>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">

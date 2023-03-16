@@ -1,7 +1,7 @@
 <template>
-  <t-search-root>
-    <t-search-box>
-      <t-tag v-for="tag in selectedPetaTags" :key="tag.id">
+  <e-search-root>
+    <e-search-box>
+      <e-tag v-for="tag in selectedPetaTags" :key="tag.id">
         <VTextarea
           :type="'single'"
           :trim="true"
@@ -13,14 +13,14 @@
           :look="tag.name"
           @update:value="(value) => editSearchTag(tag, value)"
           @delete-of-empty="editSearchTag(tag, '')" />
-      </t-tag>
-      <t-tag v-if="selectedFilterType === FilterType.ALL">
+      </e-tag>
+      <e-tag v-if="selectedFilterType === FilterType.ALL">
         <VTextarea :type="'single'" :trim="true" :value="t('browser.all')" :readonly="true" />
-      </t-tag>
-      <t-tag v-if="selectedFilterType === FilterType.UNTAGGED">
+      </e-tag>
+      <e-tag v-if="selectedFilterType === FilterType.UNTAGGED">
         <VTextarea :type="'single'" :trim="true" :value="t('browser.untagged')" :readonly="true" />
-      </t-tag>
-      <t-tag class="last">
+      </e-tag>
+      <e-tag class="last">
         <VTextarea
           :type="'single'"
           :trim="true"
@@ -34,9 +34,9 @@
           @update:value="addSelectedTag"
           @delete-of-empty="removeLastPetaTag()"
           ref="searchInput" />
-      </t-tag>
-    </t-search-box>
-  </t-search-root>
+      </e-tag>
+    </e-search-box>
+  </e-search-root>
 </template>
 
 <script lang="ts" setup>
@@ -129,11 +129,11 @@ const selectedPetaTags = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-t-search-root {
+e-search-root {
   display: block;
   text-align: center;
   width: 100%;
-  > t-search-box {
+  > e-search-box {
     border-radius: var(--rounded);
     border: solid 1.2px var(--color-border);
     outline: none;
@@ -148,7 +148,7 @@ t-search-root {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    > t-tag {
+    > e-tag {
       display: inline-block;
       margin: 0px 0px var(--px-1) var(--px-1);
       border-radius: var(--rounded);

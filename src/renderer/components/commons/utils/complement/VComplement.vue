@@ -5,9 +5,9 @@
     :max-width="'256px'"
     :max-height="'unset'"
     ref="floating">
-    <t-complement-root class="complement-root" ref="complement">
-      <t-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></t-close>
-      <t-tag
+    <e-complement-root class="complement-root" ref="complement">
+      <e-close v-html="textsStore.state.value.close" v-if="filteredItems.length > 0"></e-close>
+      <e-tag
         v-for="(item, i) in filteredItems"
         :key="item.value"
         @pointerdown="select(item.value)"
@@ -16,16 +16,16 @@
         :class="{
           selected: i === currentIndex,
         }">
-        <t-char
+        <e-char
           v-for="co in item.value.split('').map((c, i) => ({ c, i }))"
           :key="co.i"
           :class="{
             match: item.matches.find((range) => range[0] <= co.i && co.i <= range[1]) !== undefined,
           }">
           {{ co.c }}
-        </t-char>
-      </t-tag>
-    </t-complement-root>
+        </e-char>
+      </e-tag>
+    </e-complement-root>
   </VFloating>
 </template>
 
@@ -163,7 +163,7 @@ watch(() => props.value, input);
 </script>
 
 <style lang="scss" scoped>
-t-complement-root {
+e-complement-root {
   padding: var(--px-2) var(--px-2) var(--px-2) var(--px-1);
   word-break: break-word;
   text-align: left;
@@ -172,7 +172,7 @@ t-complement-root {
   flex-wrap: wrap;
   justify-content: center;
   overflow-y: auto;
-  > t-tag {
+  > e-tag {
     line-height: var(--size-2);
     display: inline-block;
     margin: 0px 0px var(--px-1) var(--px-1);
@@ -185,7 +185,7 @@ t-complement-root {
     &.close:hover {
       background-color: var(--color-accent-1);
     }
-    > t-char {
+    > e-char {
       display: inline;
       &.match {
         font-weight: bold;
@@ -193,7 +193,7 @@ t-complement-root {
       }
     }
   }
-  > t-close {
+  > e-close {
     cursor: pointer;
     display: inline-block;
     width: 100%;

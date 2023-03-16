@@ -1,6 +1,6 @@
 <template>
-  <t-textarea-root :style="outerStyle">
-    <t-textarea
+  <e-textarea-root :style="outerStyle">
+    <e-textarea
       lock-keyboard
       ref="textArea"
       v-text="value"
@@ -19,7 +19,7 @@
       }"
       spellcheck="false"
       :style="textAreaStyle">
-    </t-textarea>
+    </e-textarea>
     <VComplement
       v-if="complements"
       :value="rawValue"
@@ -28,7 +28,7 @@
       :z-index="10"
       :editing="editing"
       :text-area="textArea" />
-  </t-textarea-root>
+  </e-textarea-root>
 </template>
 
 <script setup lang="ts">
@@ -204,11 +204,11 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-textarea-root {
+e-textarea-root {
   display: inline-block;
   min-width: var(--px-3);
   position: relative;
-  > t-textarea {
+  > e-textarea {
     line-height: var(--size-2);
     min-height: var(--size-2);
     cursor: pointer;

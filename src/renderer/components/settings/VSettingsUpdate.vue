@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root class="update">
+  <e-settings-content-root class="update">
     <p v-if="updateAvailable">
       {{ t("settings.updateAvailable") }}<br />
       {{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
@@ -12,7 +12,7 @@
       <button @click="releaseNote">{{ t("settings.releaseNoteButton") }}</button>
     </p>
     <button @click="checkUpdate">{{ t("settings.checkUpdateButton") }}</button>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">
@@ -45,7 +45,7 @@ function releaseNote() {
 </script>
 
 <style lang="scss" scoped>
-t-settings-content-root.update {
+e-settings-content-root.update {
   text-align: center;
   display: block;
   > p {

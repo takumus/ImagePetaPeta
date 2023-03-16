@@ -1,11 +1,11 @@
 <template>
-  <t-board-root
+  <e-board-root
     ref="boardRoot"
     v-show="currentBoard"
     :style="{
       zIndex: zIndex,
     }">
-    <t-pixi-container
+    <e-pixi-container
       ><VPIXI
         ref="vPixi"
         @construct="construct"
@@ -13,7 +13,7 @@
         @tick="animate"
         @lose-context="loseContext"
         @resize="resize"
-    /></t-pixi-container>
+    /></e-pixi-container>
     <VBoardLoading :z-index="2" :data="boardLoader.loadingStatus.value"></VBoardLoading>
     <VLayer
       ref="layer"
@@ -33,7 +33,7 @@
       @remove-selected-panels="boardLoader.removeSelectedPanels"
       :z-index="3"
       ref="petaPanelsProperty" />
-  </t-board-root>
+  </e-board-root>
 </template>
 
 <script setup lang="ts">
@@ -429,12 +429,12 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-board-root {
+e-board-root {
   position: relative;
   width: 100%;
   height: 100%;
   display: block;
-  > t-pixi-container {
+  > e-pixi-container {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -443,7 +443,7 @@ t-board-root {
     z-index: 1;
     display: block;
   }
-  > t-crop {
+  > e-crop {
     position: absolute;
     z-index: 3;
     top: 0px;

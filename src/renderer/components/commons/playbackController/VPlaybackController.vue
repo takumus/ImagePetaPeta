@@ -1,26 +1,26 @@
 <template>
-  <t-playback-controller-root>
-    <t-advanced>
+  <e-playback-controller-root>
+    <e-advanced>
       <VSlider v-if="hasAudio" :min="0" :max="1000" v-model:value="currentVolumeModel" />
       <VSlider :min="100" :max="4000" v-model:value="currentSpeedModel" /><button
         @click="currentSpeedModel = 1000">
         reset
       </button>
-    </t-advanced>
-    <t-general>
+    </e-advanced>
+    <e-general>
       <button @click="paused(playing)">
         {{ playing ? t("playbackController.pause") : t("playbackController.play") }}
       </button>
-      <t-seekbar>
+      <e-seekbar>
         <VSeekBar
           :duration="duration"
           v-model:time="currentTimeModel"
           @start-seek="startSeek"
           @stop-seek="stopSeek" />
-      </t-seekbar>
-      <t-current-time>{{ currentTimeHMS }}</t-current-time>
-    </t-general>
-  </t-playback-controller-root>
+      </e-seekbar>
+      <e-current-time>{{ currentTimeHMS }}</e-current-time>
+    </e-general>
+  </e-playback-controller-root>
 </template>
 
 <script setup lang="ts">
@@ -151,28 +151,28 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-playback-controller-root {
+e-playback-controller-root {
   display: flex;
   width: 100%;
   height: 100%;
   flex-direction: column;
-  > t-general {
+  > e-general {
     display: flex;
     align-items: center;
     > button {
       min-width: 64px;
     }
-    > t-seekbar {
+    > e-seekbar {
       padding: var(--px-1);
       display: block;
       flex: 1;
     }
-    > t-current-time {
+    > e-current-time {
       display: block;
       padding: 0px var(--px-1);
     }
   }
-  > t-advanced {
+  > e-advanced {
     display: flex;
     align-items: center;
   }

@@ -1,11 +1,11 @@
 <template>
-  <t-progress-bar-root>
-    <t-bar
+  <e-progress-bar-root>
+    <e-bar
       :style="{
         width: `${progress}%`,
       }">
-    </t-bar>
-  </t-progress-bar-root>
+    </e-bar>
+  </e-progress-bar-root>
 </template>
 
 <script setup lang="ts">
@@ -15,7 +15,7 @@ defineProps<{
 </script>
 
 <style lang="scss" scoped>
-t-progress-bar-root {
+e-progress-bar-root {
   background-color: var(--color-font);
   width: 100%;
   height: var(--px-3);
@@ -23,7 +23,7 @@ t-progress-bar-root {
   border-radius: var(--rounded);
   padding: 2px;
   display: block;
-  > t-bar {
+  > e-bar {
     width: 50%;
     height: 100%;
     border-radius: var(--rounded);

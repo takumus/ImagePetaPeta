@@ -1,5 +1,5 @@
 <template>
-  <t-details-root
+  <e-details-root
     ref="detailsRoot"
     :style="{
       zIndex: zIndex,
@@ -7,15 +7,15 @@
     <!-- <select v-model="currentSource">
       <option v-for="source in sources" :key="source.id" :value="source">{{ source.name }}</option>
     </select> -->
-    <t-video>
+    <e-video>
       <VDragView
         v-if="currentSource?.size"
         :content-width="currentSource.size.width"
         :content-height="currentSource.size.height">
         <video ref="video"></video>
       </VDragView>
-    </t-video>
-    <t-thumbnails
+    </e-video>
+    <e-thumbnails
       ><img
         v-for="source in sources"
         :key="source.id"
@@ -25,8 +25,8 @@
           selected: source === currentSource,
         }"
         draggable="false" />
-    </t-thumbnails>
-  </t-details-root>
+    </e-thumbnails>
+  </e-details-root>
 </template>
 
 <script setup lang="ts">
@@ -91,7 +91,7 @@ watch(currentSource, changeSource);
 </script>
 
 <style lang="scss" scoped>
-t-details-root {
+e-details-root {
   position: relative;
   width: 100%;
   height: 100%;
@@ -102,7 +102,7 @@ t-details-root {
   > input {
     display: block;
   }
-  > t-video {
+  > e-video {
     display: block;
     flex: 1;
     overflow: hidden;
@@ -111,7 +111,7 @@ t-details-root {
     width: 100%;
     height: 100%;
   }
-  > t-thumbnails {
+  > e-thumbnails {
     background-color: var(--color-0);
     display: flex;
     justify-content: center;

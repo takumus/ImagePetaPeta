@@ -1,12 +1,12 @@
 <template>
-  <t-property-root>
-    <t-shrinks class="content">
-      <t-infos v-if="singlePetaFileInfo" class="content-child">
+  <e-property-root>
+    <e-shrinks class="content">
+      <e-infos v-if="singlePetaFileInfo" class="content-child">
         <p>{{ t("browser.property.infos.label") }}</p>
-        <t-datas>
-          <t-data>
-            <t-name>{{ t("browser.property.infos.name") }}:</t-name>
-            <t-value>
+        <e-datas>
+          <e-data>
+            <e-name>{{ t("browser.property.infos.name") }}:</e-name>
+            <e-value>
               <VTextarea
                 :type="'single'"
                 :click-to-edit="true"
@@ -16,11 +16,11 @@
                 :value="singlePetaFileInfo.petaFile.name"
                 :look="singlePetaFileInfo.petaFile.name"
                 @update:value="changeName" />
-            </t-value>
-          </t-data>
-          <t-data>
-            <t-name>{{ t("browser.property.infos.note") }}:</t-name>
-            <t-value>
+            </e-value>
+          </e-data>
+          <e-data>
+            <e-name>{{ t("browser.property.infos.note") }}:</e-name>
+            <e-value>
               <VTextarea
                 :type="'multi'"
                 :click-to-edit="true"
@@ -29,34 +29,34 @@
                 :outer-style="{ width: '100%' }"
                 :value="note"
                 @update:value="changeNote" />
-            </t-value>
-          </t-data>
-          <t-data>
-            <t-name>{{ t("browser.property.infos.size") }}:</t-name>
-            <t-value
+            </e-value>
+          </e-data>
+          <e-data>
+            <e-name>{{ t("browser.property.infos.size") }}:</e-name>
+            <e-value
               >{{ singlePetaFileInfo.petaFile.metadata.width }}px,
-              {{ singlePetaFileInfo.petaFile.metadata.height }}px</t-value
+              {{ singlePetaFileInfo.petaFile.metadata.height }}px</e-value
             >
-          </t-data>
-          <t-data>
-            <t-name>{{ t("browser.property.infos.mimeType") }}:</t-name>
-            <t-value>{{ singlePetaFileInfo.petaFile.mimeType }}</t-value>
-          </t-data>
-          <!-- <t-data>
-          <t-name>{{ t("browser.property.infos.fileDate") }}</t-name>
-          <t-value>{{ singlePetaFileInfo.fileDate }}</t-value>
-        </t-data> -->
-          <t-data>
-            <t-name>{{ t("browser.property.infos.addDate") }}:</t-name>
-            <t-value>{{ singlePetaFileInfo.addDate }}</t-value>
-          </t-data>
-        </t-datas>
-      </t-infos>
-      <t-colors v-if="singlePetaFileInfo" class="content-child">
+          </e-data>
+          <e-data>
+            <e-name>{{ t("browser.property.infos.mimeType") }}:</e-name>
+            <e-value>{{ singlePetaFileInfo.petaFile.mimeType }}</e-value>
+          </e-data>
+          <!-- <e-data>
+          <e-name>{{ t("browser.property.infos.fileDate") }}</e-name>
+          <e-value>{{ singlePetaFileInfo.fileDate }}</e-value>
+        </e-data> -->
+          <e-data>
+            <e-name>{{ t("browser.property.infos.addDate") }}:</e-name>
+            <e-value>{{ singlePetaFileInfo.addDate }}</e-value>
+          </e-data>
+        </e-datas>
+      </e-infos>
+      <e-colors v-if="singlePetaFileInfo" class="content-child">
         <p>{{ t("browser.property.colors.label") }}</p>
-        <t-palette>
-          <t-color-wrapper>
-            <t-color
+        <e-palette>
+          <e-color-wrapper>
+            <e-color
               v-for="color in singlePetaFileInfo.palette"
               :key="color.id"
               :style="{
@@ -64,34 +64,34 @@
                 flex: Math.floor(color.population * 90 + 10),
               }"
               @click="changeCurrentColor(color.color)">
-            </t-color>
-          </t-color-wrapper>
-          <t-current-color v-if="currentColor">
-            <t-color-label
-              ><t-name>RGB:</t-name> <t-value> {{ toRGB(currentColor) }}</t-value></t-color-label
+            </e-color>
+          </e-color-wrapper>
+          <e-current-color v-if="currentColor">
+            <e-color-label
+              ><e-name>RGB:</e-name> <e-value> {{ toRGB(currentColor) }}</e-value></e-color-label
             >
-            <t-color-label
-              ><t-name>HEX:</t-name> <t-value> #{{ toHEX(currentColor) }}</t-value></t-color-label
+            <e-color-label
+              ><e-name>HEX:</e-name> <e-value> #{{ toHEX(currentColor) }}</e-value></e-color-label
             >
-            <t-color-label
-              ><t-name>HSL:</t-name> <t-value> {{ toHSL(currentColor) }}</t-value></t-color-label
+            <e-color-label
+              ><e-name>HSL:</e-name> <e-value> {{ toHSL(currentColor) }}</e-value></e-color-label
             >
-            <t-color-wrapper
-              ><t-color
+            <e-color-wrapper
+              ><e-color
                 :style="{
                   backgroundColor: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
                   flex: 1,
-                }"></t-color
-            ></t-color-wrapper>
-          </t-current-color>
-        </t-palette>
-      </t-colors>
-      <t-color-circle v-if="singlePetaFileInfo" class="content-child">
+                }"></e-color
+            ></e-color-wrapper>
+          </e-current-color>
+        </e-palette>
+      </e-colors>
+      <e-color-circle v-if="singlePetaFileInfo" class="content-child">
         <VGamutMap :peta-file="singlePetaFileInfo.petaFile" />
-      </t-color-circle>
-    </t-shrinks>
-    <t-fixed class="content">
-      <t-tags v-show="!noImage" class="content-child">
+      </e-color-circle>
+    </e-shrinks>
+    <e-fixed class="content">
+      <e-tags v-show="!noImage" class="content-child">
         <p>
           {{
             singlePetaFileInfo !== undefined
@@ -99,8 +99,8 @@
               : t("browser.property.mutualTags")
           }}
         </p>
-        <t-search-box v-if="!fetchingTags">
-          <t-tag v-for="tag in mutualPetaTags" :key="tag.id">
+        <e-search-box v-if="!fetchingTags">
+          <e-tag v-for="tag in mutualPetaTags" :key="tag.id">
             <VTextarea
               :type="'single'"
               :trim="true"
@@ -113,8 +113,8 @@
               :look="tag.name"
               @click="selectTag(tag)"
               @contextmenu="tagMenu($event, tag)" />
-          </t-tag>
-          <t-tag class="last">
+          </e-tag>
+          <e-tag class="last">
             <VTextarea
               ref="tagInput"
               :type="'single'"
@@ -127,22 +127,22 @@
               :outer-style="{ width: '100%' }"
               :no-outline="true"
               @update:value="addTag" />
-          </t-tag>
-        </t-search-box>
+          </e-tag>
+        </e-search-box>
         <ul v-else>
           <li>
             {{ t("browser.property.fetchingTags") }}
           </li>
         </ul>
-      </t-tags>
-      <t-nsfw v-show="!noImage" class="content-child">
+      </e-tags>
+      <e-nsfw v-show="!noImage" class="content-child">
         <p>{{ t("browser.property.nsfw.label") }}</p>
         <label>
           <VCheckbox :value="nsfw ?? false" @update:value="changeNSFW" />
         </label>
-      </t-nsfw>
-    </t-fixed>
-  </t-property-root>
+      </e-nsfw>
+    </e-fixed>
+  </e-property-root>
 </template>
 
 <script setup lang="ts">
@@ -359,7 +359,7 @@ petaTagsStore.onUpdate((petaTagIds, petaFileIds) => {
 </script>
 
 <style lang="scss" scoped>
-t-property-root {
+e-property-root {
   width: 100%;
   height: 100%;
   position: relative;
@@ -377,25 +377,25 @@ t-property-root {
     display: flex;
     flex-direction: column;
   }
-  > t-shrinks {
+  > e-shrinks {
     overflow-y: auto;
-    > t-infos {
+    > e-infos {
       display: flex;
       flex-direction: column;
-      > t-datas {
+      > e-datas {
         display: flex;
         flex-direction: column;
-        > t-data {
+        > e-data {
           display: flex;
           margin: var(--px-1) 0px;
-          > t-name {
+          > e-name {
             display: block;
             width: 35%;
             position: relative;
             text-align: right;
             padding: 0px var(--px-1);
           }
-          > t-value {
+          > e-value {
             padding: 0px var(--px-1);
             display: block;
             width: 65%;
@@ -404,12 +404,12 @@ t-property-root {
         }
       }
     }
-    > t-colors {
-      > t-palette {
+    > e-colors {
+      > e-palette {
         padding: var(--px-2);
         display: block;
         width: 100%;
-        t-color-wrapper {
+        e-color-wrapper {
           display: flex;
           border-radius: var(--rounded);
           height: var(--px-2);
@@ -417,7 +417,7 @@ t-property-root {
           overflow: hidden;
           margin: var(--px-0) 0px;
           box-shadow: 0px 0px 0px var(--px-0) var(--color-border);
-          > t-color {
+          > e-color {
             height: 100%;
             display: block;
             &:hover {
@@ -426,20 +426,20 @@ t-property-root {
             }
           }
         }
-        > t-current-color {
+        > e-current-color {
           display: flex;
           flex-direction: column;
-          > t-color-label {
+          > e-color-label {
             display: flex;
             margin: var(--px-1) 0px;
-            > t-name {
+            > e-name {
               display: block;
               width: 30%;
               position: relative;
               text-align: right;
               padding: 0px var(--px-1);
             }
-            > t-value {
+            > e-value {
               padding: 0px var(--px-1);
               display: block;
               width: 70%;
@@ -450,19 +450,19 @@ t-property-root {
         }
       }
     }
-    > t-color-circle {
+    > e-color-circle {
       display: block;
       width: 100%;
     }
   }
-  > t-fixed {
+  > e-fixed {
     flex: 1;
-    > t-tags {
+    > e-tags {
       flex: 1;
       display: flex;
       flex-direction: column;
       min-height: 128px;
-      > t-search-box {
+      > e-search-box {
         outline: none;
         padding: var(--px-1) var(--px-1) 0px 0px;
         width: 100%;
@@ -473,7 +473,7 @@ t-property-root {
         flex-wrap: wrap;
         justify-content: center;
         overflow-y: auto;
-        > t-tag {
+        > e-tag {
           display: inline-block;
           margin: 0px 0px var(--px-1) var(--px-1);
           border-radius: var(--rounded);
@@ -488,7 +488,7 @@ t-property-root {
           }
         }
       }
-      > t-nsfw {
+      > e-nsfw {
         display: block;
       }
     }

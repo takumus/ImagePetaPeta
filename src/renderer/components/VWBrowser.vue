@@ -1,24 +1,24 @@
 <template>
-  <t-root
+  <e-root
     :class="{
       dark: darkModeStore.state.value,
     }">
-    <t-content>
-      <t-top>
+    <e-content>
+      <e-top>
         <VTitleBar :title="t('titles.browser')"> </VTitleBar>
         <VHeaderBar> </VHeaderBar>
-      </t-top>
-      <t-browser>
+      </e-top>
+      <e-browser>
         <VBrowser />
-      </t-browser>
-    </t-content>
-    <t-modals v-show="components.modal.modalIds.length > 0">
+      </e-browser>
+    </e-content>
+    <e-modals v-show="components.modal.modalIds.length > 0">
       <VImageImporter />
       <VTasks />
-    </t-modals>
+    </e-modals>
     <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
-  </t-root>
+  </e-root>
 </template>
 
 <script setup lang="ts">
@@ -55,10 +55,10 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-root {
+e-root {
   background-color: var(--color-0);
   color: var(--color-font);
-  > t-content {
+  > e-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -66,12 +66,12 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    > t-top {
+    > e-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    > t-browser {
+    > e-browser {
       display: block;
       overflow: hidden;
       padding: var(--px-2);
@@ -79,7 +79,7 @@ t-root {
       flex: 1;
       z-index: 1;
     }
-    > t-modals {
+    > e-modals {
       position: absolute;
       width: 100%;
       height: 100%;

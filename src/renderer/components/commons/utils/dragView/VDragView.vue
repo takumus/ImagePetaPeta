@@ -1,6 +1,6 @@
 <template>
-  <t-drag-view-root ref="detailsRoot">
-    <t-img
+  <e-drag-view-root ref="detailsRoot">
+    <e-img
       :style="{
         transform: `translate(${position.x + stageRect.x / 2}px, ${
           position.y + stageRect.y / 2
@@ -9,8 +9,8 @@
         height: `${contentHeight}px`,
       }">
       <slot></slot>
-    </t-img>
-  </t-drag-view-root>
+    </e-img>
+  </e-drag-view-root>
 </template>
 
 <script setup lang="ts">
@@ -179,14 +179,14 @@ watch([() => props.contentWidth, () => props.contentHeight], () => {
 </script>
 
 <style lang="scss" scoped>
-t-drag-view-root {
+e-drag-view-root {
   position: relative;
   width: 100%;
   height: 100%;
   display: block;
   background-image: url("~@/@assets/transparentBackground.png");
   overflow: hidden;
-  > t-img {
+  > e-img {
     display: block;
     position: absolute;
     transform-origin: top left;

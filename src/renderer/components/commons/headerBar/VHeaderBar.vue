@@ -1,40 +1,40 @@
 <template>
-  <t-utils-bar-root>
-    <t-property>
+  <e-utils-bar-root>
+    <e-property>
       <slot></slot>
-    </t-property>
-    <t-commons class="left" v-if="visible">
+    </e-property>
+    <e-commons class="left" v-if="visible">
       <button
         v-if="windowType === 'browser' || windowType === 'details' || windowType === 'capture'"
         tabindex="-1"
         @click="openBoard()">
-        <t-icon class="board"></t-icon>
+        <e-icon class="board"></e-icon>
       </button>
       <button
         v-if="windowType === 'board' || windowType === 'details' || windowType === 'capture'"
         tabindex="-1"
         @click="openBrowser()">
-        <t-icon class="browser"></t-icon>
+        <e-icon class="browser"></e-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="browseAndImportFiles()">
-        <t-icon class="import-file"></t-icon>
+        <e-icon class="import-file"></e-icon>
       </button>
       <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
-        <t-icon class="import-folder"></t-icon>
+        <e-icon class="import-folder"></e-icon>
       </button>
       <!-- <button v-if="windowType !== 'capture'" tabindex="-1" @click="openCapture()">
-        <t-icon class="import-folder"></t-icon>
+        <e-icon class="import-folder"></e-icon>
       </button> -->
-    </t-commons>
-    <t-commons class="right" v-if="visible">
+    </e-commons>
+    <e-commons class="right" v-if="visible">
       <button tabindex="-1" @click="toggleNSFW">
-        <t-icon :class="nsfwClass"></t-icon>
+        <e-icon :class="nsfwClass"></e-icon>
       </button>
       <button tabindex="-1" @click="openSettings">
-        <t-icon class="settings"></t-icon>
+        <e-icon class="settings"></e-icon>
       </button>
-    </t-commons>
-  </t-utils-bar-root>
+    </e-commons>
+  </e-utils-bar-root>
 </template>
 
 <script setup lang="ts">
@@ -95,7 +95,7 @@ const nsfwClass = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-t-utils-bar-root {
+e-utils-bar-root {
   --top-draggable-height: 10px;
   width: 100%;
   position: relative;
@@ -105,7 +105,7 @@ t-utils-bar-root {
   border-bottom: solid 1px var(--color-0);
   display: block;
   z-index: 2;
-  > t-commons {
+  > e-commons {
     position: absolute;
     top: 0px;
     height: 100%;
@@ -134,7 +134,7 @@ t-utils-bar-root {
         height: 100%;
         margin: 0px;
         border: none;
-        > t-icon {
+        > e-icon {
           display: block;
           width: 100%;
           height: 100%;
@@ -170,7 +170,7 @@ t-utils-bar-root {
       }
     }
   }
-  > t-property {
+  > e-property {
     display: block;
   }
 }

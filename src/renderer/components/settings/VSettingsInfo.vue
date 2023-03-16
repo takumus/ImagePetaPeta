@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root class="info">
+  <e-settings-content-root class="info">
     <p>{{ appInfoStore.state.value.name }} {{ appInfoStore.state.value.version }}</p>
     <button tabindex="-1" @click="gotoGithub">
       {{ t("info.githubButton") }}
@@ -24,7 +24,7 @@
     <pre class="debuggers">{{ debuggers }}</pre>
     <p>{{ t("info.licenses") }}</p>
     <pre class="licenses">{{ licenses }}</pre>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">
@@ -73,7 +73,7 @@ function showEULA() {
 </script>
 
 <style lang="scss" scoped>
-t-settings-content-root.info {
+e-settings-content-root.info {
   text-align: center;
   display: block;
   > pre {

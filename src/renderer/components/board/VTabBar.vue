@@ -1,6 +1,6 @@
 <template>
-  <t-tab-root>
-    <t-tab
+  <e-tab-root>
+    <e-tab
       :class="{ selected: b === board }"
       :style="{ opacity: b === board && dragging ? 0 : 1 }"
       v-for="(b, index) in boards"
@@ -8,44 +8,44 @@
       @contextmenu="menu($event, b)"
       :key="b.id"
       :ref="(element: HTMLElement) => setTabRef(element, b.id)">
-      <t-label-wrapper>
-        <t-label>
+      <e-label-wrapper>
+        <e-label>
           <VTextarea
             :type="'single'"
             :trim="true"
             :value="b.name"
             @update:value="(v) => changePetaBoardName(b, v)" />
-        </t-label>
-      </t-label-wrapper>
-    </t-tab>
-    <t-tab class="add" @click="addPetaBoard()">
-      <t-label-wrapper>
-        <t-label>
+        </e-label>
+      </e-label-wrapper>
+    </e-tab>
+    <e-tab class="add" @click="addPetaBoard()">
+      <e-label-wrapper>
+        <e-label>
           <VTextarea
             :type="'single'"
             :trim="true"
             :readonly="true"
             :value="textsStore.state.value.plus" />
-        </t-label>
-      </t-label-wrapper>
-    </t-tab>
-    <t-tab
+        </e-label>
+      </e-label-wrapper>
+    </e-tab>
+    <e-tab
       class="selected drag"
       ref="draggingTab"
       :style="{ display: dragging ? 'block' : 'none' }"
       v-show="dragging">
-      <t-label-wrapper>
-        <t-label>
+      <e-label-wrapper>
+        <e-label>
           <VTextarea
             :type="'single'"
             :trim="true"
             :readonly="true"
             :value="board.name"
             v-if="board" />
-        </t-label>
-      </t-label-wrapper>
-    </t-tab>
-  </t-tab-root>
+        </e-label>
+      </e-label-wrapper>
+    </e-tab>
+  </e-tab-root>
 </template>
 
 <script setup lang="ts">
@@ -190,7 +190,7 @@ const board = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-t-tab-root {
+e-tab-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   top: 0px;
@@ -199,7 +199,7 @@ t-tab-root {
   color: var(--color-font);
   height: var(--tab-height);
   display: flex;
-  > t-tab {
+  > e-tab {
     display: block;
     margin: 0px;
     // border-right: solid 1px var(--color-border);
@@ -220,11 +220,11 @@ t-tab-root {
       min-width: var(--px-3);
       border-right: none;
       flex-shrink: 0;
-      > t-label-wrapper t-label {
+      > e-label-wrapper e-label {
         padding: 0px var(--px-2);
       }
     }
-    &:not(.selected):not(:hover) + t-tab:not(.selected):not(:hover) {
+    &:not(.selected):not(:hover) + e-tab:not(.selected):not(:hover) {
       &::after {
         content: "";
         display: block;
@@ -291,11 +291,11 @@ t-tab-root {
         transform: scaleX(-1);
       }
     }
-    > t-label-wrapper {
+    > e-label-wrapper {
       display: flex;
       align-items: center;
       height: 100%;
-      > t-label {
+      > e-label {
         padding: 0px var(--px-2);
         flex-shrink: 1;
       }

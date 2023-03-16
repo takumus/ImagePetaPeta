@@ -1,20 +1,20 @@
 <template>
-  <t-browser-root>
-    <t-left>
+  <e-browser-root>
+    <e-left>
       <VTags
         :peta-files-array="petaFilesArray"
         v-model:selected-filter-type="selectedFilterType"
         v-model:selected-peta-tag-ids="selectedPetaTagIds" />
-    </t-left>
-    <t-center>
-      <t-content>
-        <t-top>
-          <t-search>
+    </e-left>
+    <e-center>
+      <e-content>
+        <e-top>
+          <e-search>
             <VSearch
               v-model:selected-peta-tag-ids="selectedPetaTagIds"
               v-model:selected-filter-type="selectedFilterType" />
-          </t-search>
-          <t-buttons>
+          </e-search>
+          <e-buttons>
             <label>
               <VCheckbox
                 :value="statesStore.state.value.groupingByDate"
@@ -31,10 +31,10 @@
               @change="updateTileSize"
               :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
               :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX" />
-          </t-buttons>
-        </t-top>
-        <t-tiles ref="thumbnails">
-          <t-tiles-content
+          </e-buttons>
+        </e-top>
+        <e-tiles ref="thumbnails">
+          <e-tiles-content
             ref="thumbsWrapper"
             :style="{ height: scrollHeight + defines.BROWSER_THUMBNAIL_MARGIN + 'px' }">
             <VTile
@@ -50,19 +50,19 @@
               "
               @drag="drag"
               @dblclick="openDetail" />
-          </t-tiles-content>
-        </t-tiles>
-      </t-content>
-    </t-center>
-    <t-right>
+          </e-tiles-content>
+        </e-tiles>
+      </e-content>
+    </e-center>
+    <e-right>
       <VPreview
         :peta-files="selectedPetaFiles"
         @clear-selection-all="clearSelectionAll"
         @menu="petaFileMenu"
         @drag="drag" />
       <VProperty :peta-files="selectedPetaFiles" @select-tag="selectTag" />
-    </t-right>
-  </t-browser-root>
+    </e-right>
+  </e-browser-root>
 </template>
 
 <script setup lang="ts">
@@ -602,31 +602,31 @@ watch(thumbnailsSize, restoreScrollPosition);
 </script>
 
 <style lang="scss" scoped>
-t-browser-root {
+e-browser-root {
   width: 100%;
   height: 100%;
   display: flex;
   overflow: hidden;
-  > t-left {
+  > e-left {
     padding: var(--px-2);
     width: 250px;
     min-width: 128px;
     display: block;
   }
-  > t-right {
+  > e-right {
     width: 250px;
     min-width: 128px;
     padding: var(--px-2);
     display: flex;
     flex-direction: column;
   }
-  > t-center {
+  > e-center {
     display: flex;
     flex-direction: column;
     flex: 1;
     height: 100%;
     padding: var(--px-2);
-    > t-content {
+    > e-content {
       width: 100%;
       height: 100%;
       position: relative;
@@ -634,20 +634,20 @@ t-browser-root {
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      > t-top {
+      > e-top {
         width: 100%;
         display: flex;
         padding: 0px 0px var(--px-2) 0px;
         flex-wrap: wrap;
         align-items: center;
         justify-content: center;
-        > t-search {
+        > e-search {
           display: block;
           flex: 1;
           padding: 0px var(--px-2);
           min-width: 200px;
         }
-        > t-buttons {
+        > e-buttons {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
@@ -658,14 +658,14 @@ t-browser-root {
           }
         }
       }
-      > t-tiles {
+      > e-tiles {
         width: 100%;
         position: relative;
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
         border-radius: var(--px-2);
-        > t-tiles-content {
+        > e-tiles-content {
           display: block;
         }
       }

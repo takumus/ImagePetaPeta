@@ -1,15 +1,15 @@
 <template>
-  <t-dialog-root
+  <e-dialog-root
     v-if="visible"
     :style="{
       zIndex: zIndex,
     }">
-    <t-modal>
-      <t-content>
+    <e-modal>
+      <e-content>
         <p>
           {{ label }}
         </p>
-        <t-buttons>
+        <e-buttons>
           <button
             v-for="(item, index) in items"
             :key="item"
@@ -17,10 +17,10 @@
             :ref="(element) => buttonsRef(element as HTMLButtonElement)">
             {{ item }}
           </button>
-        </t-buttons>
-      </t-content>
-    </t-modal>
-  </t-dialog-root>
+        </e-buttons>
+      </e-content>
+    </e-modal>
+  </e-dialog-root>
 </template>
 
 <script setup lang="ts">
@@ -68,7 +68,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-dialog-root {
+e-dialog-root {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -81,7 +81,7 @@ t-dialog-root {
   &.no-background {
     background-color: transparent;
   }
-  > t-modal {
+  > e-modal {
     background-color: var(--color-0);
     padding: var(--px-3);
     border-radius: var(--rounded);
@@ -92,7 +92,7 @@ t-dialog-root {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    > t-content {
+    > e-content {
       flex: 1;
       overflow: hidden;
       text-align: center;
@@ -102,7 +102,7 @@ t-dialog-root {
         word-break: break-word;
         white-space: pre-wrap;
       }
-      > t-buttons {
+      > e-buttons {
         display: block;
       }
     }

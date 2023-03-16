@@ -1,26 +1,26 @@
 <template>
-  <t-root
+  <e-root
     :class="{
       dark: darkModeStore.state.value,
     }">
-    <t-content>
-      <t-top>
+    <e-content>
+      <e-top>
         <VTitleBar :title="t('titles.eula')"> </VTitleBar>
-      </t-top>
-      <t-browser>
-        <t-body>{{ t("eula.body") }}</t-body>
-        <t-buttons v-if="needToAgree">
+      </e-top>
+      <e-browser>
+        <e-body>{{ t("eula.body") }}</e-body>
+        <e-buttons v-if="needToAgree">
           <button @click="agree">{{ t("eula.agree") }}</button>
           <button @click="disagree">{{ t("eula.disagree") }}</button>
-        </t-buttons>
-        <t-buttons v-else>
+        </e-buttons>
+        <e-buttons v-else>
           <button @click="close">{{ t("commons.closeButton") }}</button>
-        </t-buttons>
-      </t-browser>
-    </t-content>
+        </e-buttons>
+      </e-browser>
+    </e-content>
     <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
-  </t-root>
+  </e-root>
 </template>
 
 <script setup lang="ts">
@@ -68,10 +68,10 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-root {
+e-root {
   background-color: var(--color-0);
   color: var(--color-font);
-  > t-content {
+  > e-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -79,24 +79,24 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    > t-top {
+    > e-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    > t-browser {
+    > e-browser {
       display: block;
       overflow-y: auto;
       margin: var(--px-3);
       background-color: var(--color-0);
       flex: 1;
       z-index: 1;
-      > t-body {
+      > e-body {
         display: block;
         white-space: pre-wrap;
         user-select: text;
       }
-      > t-buttons {
+      > e-buttons {
         display: block;
         text-align: center;
       }

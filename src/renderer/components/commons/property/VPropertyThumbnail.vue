@@ -1,16 +1,16 @@
 <template>
-  <t-property-thumbnail-root
+  <e-property-thumbnail-root
     :style="{
       top: propertyThumbnail.position.y + 'px',
       left: propertyThumbnail.position.x + 'px',
       width: propertyThumbnail.width + 'px',
       height: propertyThumbnail.height + 'px',
     }">
-    <t-image-wrapper>
-      <t-nsfw v-if="nsfwMask"> </t-nsfw>
+    <e-image-wrapper>
+      <e-nsfw v-if="nsfwMask"> </e-nsfw>
       <img draggable="false" :src="fileURL" v-if="!nsfwMask && fileURL !== undefined" />
-    </t-image-wrapper>
-  </t-property-thumbnail-root>
+    </e-image-wrapper>
+  </e-property-thumbnail-root>
 </template>
 
 <script setup lang="ts">
@@ -36,10 +36,10 @@ const nsfwMask = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-t-property-thumbnail-root {
+e-property-thumbnail-root {
   display: block;
   position: absolute;
-  > t-image-wrapper {
+  > e-image-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -56,7 +56,7 @@ t-property-thumbnail-root {
       top: 0px;
       left: 0px;
     }
-    > t-nsfw {
+    > e-nsfw {
       position: relative;
       top: 0px;
       left: 0px;

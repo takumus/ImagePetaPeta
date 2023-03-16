@@ -8,27 +8,27 @@
     }"
     @pointerdown="pointerdown($event)"
     ref="vLayerCellRoot">
-    <t-icon
+    <e-icon
       class="visible"
       ref="visibleIcon"
       :class="{
         disabled: !visible,
       }">
-    </t-icon>
-    <t-icon
+    </e-icon>
+    <e-icon
       class="lock"
       ref="lockedIcon"
       :class="{
         disabled: !locked,
       }">
-    </t-icon>
-    <t-thumb
+    </e-icon>
+    <e-thumb
       v-if="url"
       :style="{
         backgroundImage: `url(${url})`,
       }">
-      <t-nsfw v-if="nsfwMask"></t-nsfw>
-    </t-thumb>
+      <e-nsfw v-if="nsfwMask"></e-nsfw>
+    </e-thumb>
   </li>
 </template>
 
@@ -133,7 +133,7 @@ function pointerdown(event: PointerEvent) {
     position: absolute;
     top: 0px;
   }
-  > t-icon {
+  > e-icon {
     padding: 0px var(--px-2);
     height: 100%;
     width: 24px;
@@ -154,7 +154,7 @@ function pointerdown(event: PointerEvent) {
       opacity: 0.3;
     }
   }
-  > t-thumb {
+  > e-thumb {
     min-width: 32px;
     height: 100%;
     margin: 0px var(--px-2);
@@ -163,7 +163,7 @@ function pointerdown(event: PointerEvent) {
     background-position: center center;
     background-size: contain;
     display: block;
-    > t-nsfw {
+    > e-nsfw {
       width: 100%;
       height: 100%;
       display: block;

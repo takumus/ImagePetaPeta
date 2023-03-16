@@ -1,14 +1,14 @@
 <template>
-  <t-task-root>
+  <e-task-root>
     <p v-if="name !== ''">{{ t(name) }}({{ Math.floor(progress) }}%)</p>
     <VProgressBar :progress="progress"></VProgressBar>
     <pre class="log">{{ log }}</pre>
-    <t-cancel>
+    <e-cancel>
       <button tabindex="-1" @click="cancel" v-if="cancelable">
         {{ t("fileImporter.cancel") }}
       </button>
-    </t-cancel>
-  </t-task-root>
+    </e-cancel>
+  </e-task-root>
 </template>
 
 <script setup lang="ts">
@@ -84,7 +84,7 @@ function cancel() {
 </script>
 
 <style lang="scss" scoped>
-t-task-root {
+e-task-root {
   text-align: center;
   display: block;
   > pre {

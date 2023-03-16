@@ -1,16 +1,16 @@
 <template>
-  <t-tile-root
+  <e-tile-root
     :style="{
       transform: `translate(${tile.position.x + 'px'}, ${tile.position.y + 'px'})`,
       width: tile.width + 'px',
       height: tile.height + 'px',
     }">
-    <t-tile-wrapper
+    <e-tile-wrapper
       v-if="tile.group === undefined && tile.petaFile !== undefined"
       @pointermove="seekVideo"
       @pointerenter="pointerEnter"
       @pointerleave="pointerLeave">
-      <t-images
+      <e-images
         @pointerdown="pointerdown"
         @dragstart="dragstart($event)"
         @dblclick="dblclick"
@@ -18,15 +18,15 @@
         :class="{
           selected,
         }">
-        <t-nsfw v-if="nsfwMask"> </t-nsfw>
-        <t-placeholder
+        <e-nsfw v-if="nsfwMask"> </e-nsfw>
+        <e-placeholder
           class="placeholder"
           :class="{
             loaded: !loadingThumbnail,
           }"
           :style="{
             backgroundColor: placeholderColor,
-          }"></t-placeholder>
+          }"></e-placeholder>
         <img
           draggable="false"
           :src="thumbnailURL"
@@ -42,33 +42,33 @@
           v-show="tile.petaFile.metadata.type === 'video'"
           v-if="showVideo"
           :src="getFileURL(props.tile.petaFile, FileType.ORIGINAL)"></video>
-        <t-background> </t-background>
-      </t-images>
-      <t-tags
+        <e-background> </e-background>
+      </e-images>
+      <e-tags
         v-if="settingsStore.state.value.showTagsOnTile"
         :class="{
           selected,
         }">
-        <t-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
+        <e-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
           {{ petaTag.name }}
-        </t-tag>
-        <t-tag v-if="myPetaTags.length === 0 && !loadingTags">
+        </e-tag>
+        <e-tag v-if="myPetaTags.length === 0 && !loadingTags">
           {{ t("browser.untagged") }}
-        </t-tag>
-      </t-tags>
-      <t-video-duration
+        </e-tag>
+      </e-tags>
+      <e-video-duration
         v-if="props.tile.petaFile?.metadata.type === 'video'"
         :class="{
           selected,
         }">
         {{ videoDuration }}
-      </t-video-duration>
-      <t-selected v-show="selected"> </t-selected>
-    </t-tile-wrapper>
-    <t-group v-else>
+      </e-video-duration>
+      <e-selected v-show="selected"> </e-selected>
+    </e-tile-wrapper>
+    <e-group v-else>
       {{ tile.group }}
-    </t-group>
-  </t-tile-root>
+    </e-group>
+  </e-tile-root>
 </template>
 
 <script setup lang="ts">
@@ -291,10 +291,10 @@ petaTagsStore.onUpdate((petaTagIds, petaFileIds) => {
 </script>
 
 <style lang="scss" scoped>
-t-tile-root {
+e-tile-root {
   display: block;
   position: absolute;
-  > t-group {
+  > e-group {
     position: relative;
     width: 100%;
     height: 100%;
@@ -305,14 +305,14 @@ t-tile-root {
     font-weight: bold;
     font-size: var(--size-2);
   }
-  > t-tile-wrapper {
+  > e-tile-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: var(--rounded);
     display: block;
-    > t-images {
+    > e-images {
       display: block;
       width: 100%;
       height: 100%;
@@ -343,7 +343,7 @@ t-tile-root {
         height: 100%;
         object-fit: cover;
       }
-      > t-background {
+      > e-background {
         z-index: 0;
         position: absolute;
         top: 0px;
@@ -354,7 +354,7 @@ t-tile-root {
         background-repeat: repeat;
         background-image: url("~@/@assets/transparentBackground.png");
       }
-      > t-placeholder {
+      > e-placeholder {
         position: absolute;
         z-index: 2;
         top: 0px;
@@ -369,7 +369,7 @@ t-tile-root {
           opacity: 0;
         }
       }
-      > t-nsfw {
+      > e-nsfw {
         z-index: 2;
         position: absolute;
         top: 0px;
@@ -385,11 +385,11 @@ t-tile-root {
     }
     &:hover {
       box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-      > t-images {
+      > e-images {
         filter: brightness(1);
       }
     }
-    > t-video-duration {
+    > e-video-duration {
       display: block;
       position: absolute;
       top: 0px;
@@ -404,7 +404,7 @@ t-tile-root {
         margin: var(--px-2);
       }
     }
-    > t-tags {
+    > e-tags {
       width: 100%;
       position: absolute;
       bottom: 0px;
@@ -417,7 +417,7 @@ t-tile-root {
       flex-wrap: wrap-reverse;
       justify-content: right;
       padding: var(--px-1);
-      > t-tag {
+      > e-tag {
         display: inline-block;
         margin-left: var(--px-0);
         margin-top: var(--px-0);
@@ -431,7 +431,7 @@ t-tile-root {
         padding: var(--px-2);
       }
     }
-    > t-selected {
+    > e-selected {
       position: absolute;
       bottom: 0px;
       right: 0px;

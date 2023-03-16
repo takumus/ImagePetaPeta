@@ -1,6 +1,6 @@
 <template>
-  <t-gamut-map-root
-    ><t-circle>
+  <e-gamut-map-root
+    ><e-circle>
       <VPIXI
         ref="vPixi"
         :antialias="false"
@@ -9,9 +9,9 @@
         @tick="animate"
         @lose-context="loseContext"
         @resize="resize" />
-    </t-circle>
+    </e-circle>
     <VSlider :min="0" :max="100" :width="'50%'" v-model:value="amountFilterValue" />
-  </t-gamut-map-root>
+  </e-gamut-map-root>
 </template>
 
 <script setup lang="ts">
@@ -174,7 +174,7 @@ watch(amountFilterValue, () => {
 watch(() => props.petaFile, generate, { immediate: true });
 </script>
 <style lang="scss" scoped>
-t-gamut-map-root {
+e-gamut-map-root {
   display: flex;
   height: 100%;
   width: 100%;
@@ -182,7 +182,7 @@ t-gamut-map-root {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  > t-circle {
+  > e-circle {
     display: block;
     width: 100%;
     overflow: hidden;

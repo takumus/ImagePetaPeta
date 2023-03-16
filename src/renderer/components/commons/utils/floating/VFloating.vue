@@ -1,5 +1,5 @@
 <template>
-  <t-floating-root
+  <e-floating-root
     class="complement-root"
     ref="rootElement"
     v-show="visible"
@@ -10,7 +10,7 @@
       zIndex: zIndex,
     }">
     <slot></slot>
-  </t-floating-root>
+  </e-floating-root>
 </template>
 
 <script setup lang="ts">
@@ -129,7 +129,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-t-floating-root {
+e-floating-root {
   position: fixed;
   background-color: var(--color-0-floating);
   margin: 0px;

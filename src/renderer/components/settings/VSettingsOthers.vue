@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root>
+  <e-settings-content-root>
     <label>
       <VCheckbox v-model:value="settingsStore.state.value.alwaysShowNSFW" />
       {{ t("settings.alwaysShowNSFW") }}
@@ -28,7 +28,7 @@
       {{ t("settings.developerMode") }}
     </label>
     <p>{{ t("settings.developerModeDescriptions") }}</p>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">

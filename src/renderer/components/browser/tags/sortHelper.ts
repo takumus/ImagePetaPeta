@@ -33,8 +33,8 @@ export function initSortHelper<T extends SortHelperData>(
     flexGap?: number;
   },
 ) {
-  const dragTargetLineElement = document.createElement("t-drag-target-line");
-  dragTargetLineElement.classList.add("t-drag-target-line");
+  const dragTargetLineElement = document.createElement("e-drag-target-line");
+  dragTargetLineElement.classList.add("e-drag-target-line");
   dragTargetLineElement.style.display = "none";
   const click = new ClickChecker();
   const flexGap = config?.flexGap ?? 0;

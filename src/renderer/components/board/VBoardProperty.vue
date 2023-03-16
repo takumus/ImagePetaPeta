@@ -1,9 +1,9 @@
 <template>
-  <t-board-property-root>
+  <e-board-property-root>
     <button tabindex="-1" @click="scale = 1">{{ scale.toFixed(2) }}x</button>
     <input type="color" v-model="fillColor" tabindex="-1" ref="inputFillColor" />
     <input type="color" v-model="lineColor" tabindex="-1" ref="inputLineColor" />
-  </t-board-property-root>
+  </e-board-property-root>
 </template>
 
 <script setup lang="ts">
@@ -64,7 +64,7 @@ const scale = computed({
 </script>
 
 <style lang="scss" scoped>
-t-board-property-root {
+e-board-property-root {
   position: absolute;
   top: 0px;
   left: 0px;

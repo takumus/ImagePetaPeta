@@ -1,6 +1,6 @@
 <template>
-  <t-tags-root>
-    <t-tags-top>
+  <e-tags-root>
+    <e-tags-top>
       <VTagCell
         @click="changeFilterType(FilterType.ALL)"
         :selected="selectedFilterType === FilterType.ALL"
@@ -11,8 +11,8 @@
         :selected="selectedFilterType === FilterType.UNTAGGED"
         :readonly="true"
         :look="`${t('browser.untagged')}`" />
-    </t-tags-top>
-    <t-tags ref="tagsRoot">
+    </e-tags-top>
+    <e-tags ref="tagsRoot">
       <VTagCell
         v-for="c in browserTags"
         :key="c.petaTag.id"
@@ -45,12 +45,12 @@
         :style="{
           order: orders[p.id] ?? 0,
         }" />
-      <t-drag-target-linea
-        class="t-drag-target-line"
+      <e-drag-target-line
+        class="e-drag-target-line"
         ref="dragTargetLineElement"
-        v-if="draggingData"></t-drag-target-linea>
-    </t-tags>
-    <t-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
+        v-if="draggingData"></e-drag-target-line>
+    </e-tags>
+    <e-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
       <VTagCell
         v-if="'petaTag' in draggingData"
         :key="draggingData.petaTag.id"
@@ -65,9 +65,9 @@
         :readonly="true"
         :value="draggingData.petaTagPartition.name"
         :look="`${draggingData.petaTagPartition.name}`" />
-    </t-drag-floating-tag-cell>
-    <t-tag-add>
-      <t-tag>
+    </e-drag-floating-tag-cell>
+    <e-tag-add>
+      <e-tag>
         <VTextarea
           :type="'single'"
           :trim="true"
@@ -76,9 +76,9 @@
           :outer-style="{ width: '100%' }"
           :look="textsStore.state.value.plus"
           @update:value="addTag" />
-      </t-tag>
-    </t-tag-add>
-  </t-tags-root>
+      </e-tag>
+    </e-tag-add>
+  </e-tags-root>
 </template>
 
 <script setup lang="ts">
@@ -372,18 +372,18 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-tags-root {
+e-tags-root {
   flex-direction: column;
   display: flex;
   width: 100%;
   height: 100%;
-  > t-tag-add {
+  > e-tag-add {
     padding: var(--px-1) var(--px-1) 0px 0px;
-    > t-tag {
+    > e-tag {
       padding: var(--px-1);
     }
   }
-  > t-tags-top {
+  > e-tags-top {
     outline: none;
     padding: var(--px-1);
     width: 100%;
@@ -394,7 +394,7 @@ t-tags-root {
     justify-content: center;
     gap: var(--px-1);
   }
-  > t-tags {
+  > e-tags {
     outline: none;
     padding: var(--px-1);
     width: 100%;
@@ -406,7 +406,7 @@ t-tags-root {
     justify-content: center;
     gap: var(--px-1);
   }
-  > t-drag-target-line {
+  > e-drag-target-line {
     position: fixed;
     z-index: 999;
     width: 0px;
@@ -424,7 +424,7 @@ t-tags-root {
       transform: translate(-50%, -50%);
     }
   }
-  > t-drag-floating-tag-cell {
+  > e-drag-floating-tag-cell {
     z-index: 999;
     pointer-events: none;
     top: 0px;

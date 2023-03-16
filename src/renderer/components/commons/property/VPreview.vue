@@ -1,6 +1,6 @@
 <template>
-  <t-previews-root>
-    <t-previews
+  <e-previews-root>
+    <e-previews
       ref="previews"
       v-show="!noImage"
       @contextmenu="menu"
@@ -10,17 +10,17 @@
         v-for="data in propertyThumbnails"
         :key="data.petaFile.id"
         :property-thumbnail="data" />
-    </t-previews>
+    </e-previews>
     <p>{{ t("browser.property.selectedImage", [petaFiles.length]) }}</p>
-    <t-buttons v-show="!noImage">
+    <e-buttons v-show="!noImage">
       <button tabindex="-1" @click="clearSelection">
         {{ t("browser.property.clearSelectionButton") }}
       </button>
       <button tabindex="-1" v-if="propertyThumbnails.length === 1" @click="openDetails">
         {{ t("browser.property.openDetailsButton") }}
       </button>
-    </t-buttons>
-  </t-previews-root>
+    </e-buttons>
+  </e-previews-root>
 </template>
 
 <script setup lang="ts">
@@ -125,13 +125,13 @@ const noImage = computed<boolean>(() => {
 </script>
 
 <style lang="scss" scoped>
-t-previews-root {
+e-previews-root {
   width: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   flex-shrink: 2;
-  > t-previews {
+  > e-previews {
     position: relative;
     width: 100%;
     height: 150px;
@@ -139,7 +139,7 @@ t-previews-root {
     display: block;
     cursor: pointer;
   }
-  > t-buttons {
+  > e-buttons {
     text-align: center;
     display: block;
   }

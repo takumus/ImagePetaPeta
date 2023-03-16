@@ -1,12 +1,12 @@
 <template>
-  <t-seekbar-root>
-    <t-cursor-wrapper @pointerdown="pointerMove" ref="root">
-      <t-cursor
+  <e-seekbar-root>
+    <e-cursor-wrapper @pointerdown="pointerMove" ref="root">
+      <e-cursor
         :style="{
           left: `${cursorPosition}%`,
-        }"></t-cursor>
-    </t-cursor-wrapper>
-  </t-seekbar-root>
+        }"></e-cursor>
+    </e-cursor-wrapper>
+  </e-seekbar-root>
 </template>
 
 <script setup lang="ts">
@@ -65,7 +65,7 @@ const cursorPosition = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-t-seekbar-root {
+e-seekbar-root {
   --seekbar-size: 4px;
   display: block;
   position: relative;
@@ -76,11 +76,11 @@ t-seekbar-root {
   overflow: hidden;
   padding: var(--px-2) calc(var(--px-2) + calc(var(--seekbar-size) / 2));
   cursor: pointer;
-  > t-cursor-wrapper {
+  > e-cursor-wrapper {
     display: block;
     width: 100%;
     height: 100%;
-    > t-cursor {
+    > e-cursor {
       display: block;
       position: relative;
       width: var(--seekbar-size);

@@ -1,28 +1,28 @@
 <template>
-  <t-root
+  <e-root
     :class="{
       dark: darkModeStore.state.value,
     }">
-    <t-content>
-      <t-top>
+    <e-content>
+      <e-top>
         <VTitleBar :title="t('titles.details')"> </VTitleBar>
         <VHeaderBar> </VHeaderBar>
-      </t-top>
-      <t-browser>
-        <t-board v-if="petaFile">
+      </e-top>
+      <e-browser>
+        <e-board v-if="petaFile">
           <VDetails :peta-file="petaFile" :z-index="1" />
-        </t-board>
-        <t-property>
+        </e-board>
+        <e-property>
           <VProperty :peta-files="singlePetaFiles" @select-tag="() => {}" />
-        </t-property>
-      </t-browser>
-    </t-content>
-    <t-modals v-show="components.modal.modalIds.length > 0">
+        </e-property>
+      </e-browser>
+    </e-content>
+    <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
-    </t-modals>
+    </e-modals>
     <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
-  </t-root>
+  </e-root>
 </template>
 
 <script setup lang="ts">
@@ -102,10 +102,10 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-root {
+e-root {
   background-color: var(--color-0);
   color: var(--color-font);
-  > t-content {
+  > e-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -113,18 +113,18 @@ t-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
-    > t-top {
+    > e-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
-    > t-browser {
+    > e-browser {
       display: flex;
       overflow: hidden;
       background-color: var(--color-0);
       flex: 1;
       z-index: 1;
-      > t-board {
+      > e-board {
         display: block;
         flex: 1;
         z-index: 1;
@@ -133,7 +133,7 @@ t-root {
         background-image: url("~@/@assets/transparentBackground.png");
         cursor: grab;
       }
-      > t-property {
+      > e-property {
         padding: var(--px-2);
         display: block;
         background-color: var(--color-0);
@@ -141,7 +141,7 @@ t-root {
         width: 300px;
       }
     }
-    > t-modals {
+    > e-modals {
       position: absolute;
       width: 100%;
       height: 100%;

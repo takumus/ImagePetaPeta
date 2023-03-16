@@ -1,5 +1,5 @@
 <template>
-  <t-settings-content-root>
+  <e-settings-content-root>
     <button v-show="regenerateMetadatasCompleted" @click="regenerateMetadatas">
       {{ t("settings.regenerateMetadatasButton") }}
     </button>
@@ -17,7 +17,7 @@
       {{ t("settings.showTagsOnTile") }}
     </label>
     <p>{{ t("settings.showTagsOnTileDescriptions") }}</p>
-  </t-settings-content-root>
+  </e-settings-content-root>
 </template>
 
 <script setup lang="ts">

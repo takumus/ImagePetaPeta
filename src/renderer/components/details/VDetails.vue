@@ -1,24 +1,24 @@
 <template>
-  <t-details-root
+  <e-details-root
     :style="{
       zIndex: zIndex,
     }">
-    <t-pixi-wrapper>
+    <e-pixi-wrapper>
       <VPIXI
         ref="vPixi"
         :antialias="false"
         @construct="construct"
         @lose-context="loseContext"
         @resize="resize" />
-    </t-pixi-wrapper>
-    <t-playback-controller-wrapper>
-      <t-playback-controller>
+    </e-pixi-wrapper>
+    <e-playback-controller-wrapper>
+      <e-playback-controller>
         <VPlaybackController
           v-if="pPlayableFileObjectContent"
           :p-file-object-content="pPlayableFileObjectContent" />
-      </t-playback-controller>
-    </t-playback-controller-wrapper>
-  </t-details-root>
+      </e-playback-controller>
+    </e-playback-controller-wrapper>
+  </e-details-root>
 </template>
 
 <script setup lang="ts">
@@ -255,7 +255,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-details-root {
+e-details-root {
   position: relative;
   width: 100%;
   height: 100%;
@@ -263,16 +263,16 @@ t-details-root {
   flex-direction: column;
   background-image: url("~@/@assets/transparentBackground.png");
   overflow: hidden;
-  > t-pixi-wrapper {
+  > e-pixi-wrapper {
     display: block;
     overflow: hidden;
     flex: 1;
   }
-  > t-playback-controller-wrapper {
+  > e-playback-controller-wrapper {
     display: block;
     background-color: var(--color-1);
     padding: var(--px-2) var(--px-2);
-    > t-playback-controller {
+    > e-playback-controller {
       display: block;
     }
   }

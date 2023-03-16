@@ -1,5 +1,5 @@
 <template>
-  <t-modal-root
+  <e-modal-root
     :class="{
       'no-background': noBackground,
     }"
@@ -9,7 +9,7 @@
       zIndex: zIndex,
     }"
     ref="background">
-    <t-modal
+    <e-modal
       :style="
         childStyle
           ? {
@@ -20,14 +20,14 @@
           ? centerStyle
           : {}
       ">
-      <t-buttons v-if="visibleCloseButton">
-        <t-button @click="close" v-html="textsStore.state.value.close"></t-button>
-      </t-buttons>
-      <t-content>
+      <e-buttons v-if="visibleCloseButton">
+        <e-button @click="close" v-html="textsStore.state.value.close"></e-button>
+      </e-buttons>
+      <e-content>
         <slot></slot>
-      </t-content>
-    </t-modal>
-  </t-modal-root>
+      </e-content>
+    </e-modal>
+  </e-modal-root>
 </template>
 
 <script setup lang="ts">
@@ -127,7 +127,7 @@ function pressEscape() {
 </script>
 
 <style lang="scss" scoped>
-t-modal-root {
+e-modal-root {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -140,7 +140,7 @@ t-modal-root {
   &.no-background {
     background-color: transparent;
   }
-  > t-modal {
+  > e-modal {
     width: 600px;
     background-color: var(--color-0);
     padding: var(--px-3);
@@ -148,16 +148,16 @@ t-modal-root {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    > t-buttons {
+    > e-buttons {
       text-align: right;
       display: block;
-      > t-button {
+      > e-button {
         font-family: Segoe MDL2 Assets, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
           "Hiragino Sans", Meiryo, sans-serif;
         cursor: pointer;
       }
     }
-    > t-content {
+    > e-content {
       flex: 1;
       overflow: hidden;
       display: block;

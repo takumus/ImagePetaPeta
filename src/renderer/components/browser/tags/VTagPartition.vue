@@ -1,7 +1,7 @@
 <template>
-  <t-tag-partition-root>
-    <t-content>
-      <t-border /><t-label
+  <e-tag-partition-root>
+    <e-content>
+      <e-border /><e-label
         ><VTextarea
           ref="vTextarea"
           :type="'single'"
@@ -10,10 +10,10 @@
           :value="value"
           :look="look"
           :click-to-edit="clickToEdit"
-          @update:value="(name) => updateName(name)" /></t-label
-      ><t-border
-    /></t-content>
-  </t-tag-partition-root>
+          @update:value="(name) => updateName(name)" /></e-label
+      ><e-border
+    /></e-content>
+  </e-tag-partition-root>
 </template>
 
 <script setup lang="ts">
@@ -43,7 +43,7 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-t-tag-partition-root {
+e-tag-partition-root {
   display: flex;
   height: var(--px-4);
   width: 100%;
@@ -51,17 +51,17 @@ t-tag-partition-root {
   cursor: pointer;
   background-color: var(--color-0);
   border-radius: var(--rounded);
-  > t-content {
+  > e-content {
     display: flex;
     // background-color: var(--color-border);
     // height: var(--px-1);
     align-items: center;
     width: 100%;
-    > t-label {
+    > e-label {
       text-align: center;
       padding: var(--px-2);
     }
-    > t-border {
+    > e-border {
       flex: 1;
       display: block;
       height: var(--px-0);

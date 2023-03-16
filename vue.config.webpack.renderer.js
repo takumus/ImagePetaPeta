@@ -10,7 +10,7 @@ module.exports = (config) => {
       options.hotReload = false;
       options.compilerOptions = {
         ...options.compilerOptions,
-        isCustomElement: (tag) => tag.startsWith("t-"),
+        isCustomElement: (tag) => tag.startsWith("e-"),
       };
       return options;
     })

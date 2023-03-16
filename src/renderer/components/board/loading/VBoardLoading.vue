@@ -4,13 +4,13 @@
     :center="true"
     :default-z-index="zIndex"
     :ignore="true">
-    <t-board-loading-root>
+    <e-board-loading-root>
       <p>{{ t("boards.extracting") }}{{ Math.floor(data.extractProgress) }}%</p>
       <VProgressBar :progress="data.extractProgress"></VProgressBar>
       <p>{{ t("boards.loading") }}{{ Math.floor(data.loadProgress) }}%</p>
       <VProgressBar :progress="data.loadProgress"></VProgressBar>
       <pre class="log">{{ data.log }}</pre>
-    </t-board-loading-root>
+    </e-board-loading-root>
   </VModal>
 </template>
 
@@ -31,7 +31,7 @@ defineProps<{
 </script>
 
 <style lang="scss" scoped>
-t-board-loading-root {
+e-board-loading-root {
   text-align: center;
   > .log {
     text-align: left;

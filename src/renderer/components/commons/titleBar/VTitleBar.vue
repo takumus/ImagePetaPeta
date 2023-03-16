@@ -1,35 +1,35 @@
 <template>
-  <t-titlebar-root>
-    <t-title>
-      <t-icon>{{ title }}</t-icon>
-    </t-title>
-    <t-content>
-      <t-top>
+  <e-titlebar-root>
+    <e-title>
+      <e-icon>{{ title }}</e-icon>
+    </e-title>
+    <e-content>
+      <e-top>
         <!-- -->
-      </t-top>
-      <t-bottom>
-        <t-draggable
+      </e-top>
+      <e-bottom>
+        <e-draggable
           class="left"
           :class="{
             mac: systemInfo.platform === 'darwin',
           }">
-        </t-draggable>
+        </e-draggable>
         <slot></slot>
-        <t-draggable class="right"> </t-draggable>
-      </t-bottom>
-    </t-content>
-    <t-window-buttons v-if="!isMac">
-      <t-window-button v-if="resizable" @click="minimizeWindow">
-        <t-icon>&#xe921;</t-icon>
-      </t-window-button>
-      <t-window-button v-if="resizable" @click="maximizeWindow">
-        <t-icon>&#xe922;</t-icon>
-      </t-window-button>
-      <t-window-button class="close" @click="closeWindow">
-        <t-icon>&#xe8bb;</t-icon>
-      </t-window-button>
-    </t-window-buttons>
-  </t-titlebar-root>
+        <e-draggable class="right"> </e-draggable>
+      </e-bottom>
+    </e-content>
+    <e-window-buttons v-if="!isMac">
+      <e-window-button v-if="resizable" @click="minimizeWindow">
+        <e-icon>&#xe921;</e-icon>
+      </e-window-button>
+      <e-window-button v-if="resizable" @click="maximizeWindow">
+        <e-icon>&#xe922;</e-icon>
+      </e-window-button>
+      <e-window-button class="close" @click="closeWindow">
+        <e-icon>&#xe8bb;</e-icon>
+      </e-window-button>
+    </e-window-buttons>
+  </e-titlebar-root>
 </template>
 
 <script setup lang="ts">
@@ -65,33 +65,33 @@ const isMac = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-t-titlebar-root {
+e-titlebar-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
   background-color: var(--color-1);
   min-height: var(--tab-height);
   display: flex;
   position: relative;
-  > t-title {
+  > e-title {
     position: absolute;
     height: 100%;
     width: 100%;
     display: flex;
     align-items: center;
     pointer-events: none;
-    > t-icon {
+    > e-icon {
       width: 100%;
       text-align: center;
       display: inline-block;
       font-size: var(--size-0);
     }
   }
-  > t-content {
+  > e-content {
     flex-grow: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    > t-top {
+    > e-top {
       margin-top: var(--window-resize-margin);
       margin-left: var(--window-resize-margin);
       flex-grow: 1;
@@ -99,10 +99,10 @@ t-titlebar-root {
       display: block;
       height: var(--top-draggable-height);
     }
-    > t-bottom {
+    > e-bottom {
       display: flex;
       flex-direction: row;
-      > t-draggable {
+      > e-draggable {
         -webkit-app-region: drag;
         display: block;
         &.left {
@@ -120,13 +120,13 @@ t-titlebar-root {
       }
     }
   }
-  > t-window-buttons {
+  > e-window-buttons {
     display: flex;
-    > t-window-button {
+    > e-window-button {
       display: flex;
       padding: 0px 16px;
       align-items: center;
-      > t-icon {
+      > e-icon {
         display: inline-block;
         font-size: 6px;
         font-family: Segoe MDL2 Assets;

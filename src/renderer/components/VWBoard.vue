@@ -1,10 +1,10 @@
 <template>
-  <t-root
+  <e-root
     :class="{
       dark: darkModeStore.state.value,
     }">
-    <t-content>
-      <t-top>
+    <e-content>
+      <e-top>
         <VTitleBar>
           <VTabBar
             :boards="sortedPetaBoards"
@@ -20,22 +20,22 @@
             :board="currentPetaBoard"
             @update="updatePetaBoard" />
         </VHeaderBar>
-      </t-top>
-      <t-browser>
+      </e-top>
+      <e-browser>
         <VBoard
           :z-index="1"
           :board="currentPetaBoard"
           ref="vPetaBoard"
           @update:board="updatePetaBoard" />
-      </t-browser>
-    </t-content>
-    <t-modals v-show="components.modal.modalIds.length > 0">
+      </e-browser>
+    </e-content>
+    <e-modals v-show="components.modal.modalIds.length > 0">
       <VImageImporter @add-panel-by-drag-and-drop="addPanelByDragAndDrop" />
       <VTasks />
-    </t-modals>
+    </e-modals>
     <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
-  </t-root>
+  </e-root>
 </template>
 
 <script setup lang="ts">
@@ -235,11 +235,11 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-t-root {
+e-root {
   background-color: var(--color-0);
   color: var(--color-font);
 
-  > t-content {
+  > e-content {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -249,13 +249,13 @@ t-root {
     flex-direction: column;
     z-index: 3;
 
-    > t-top {
+    > e-top {
       display: block;
       width: 100%;
       z-index: 2;
     }
 
-    > t-browser {
+    > e-browser {
       display: block;
       overflow: hidden;
       background-color: var(--color-0);
@@ -264,7 +264,7 @@ t-root {
     }
   }
 
-  > t-modals {
+  > e-modals {
     position: absolute;
     width: 100%;
     height: 100%;
