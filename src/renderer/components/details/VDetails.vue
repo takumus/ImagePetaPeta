@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import * as PIXI from "pixi.js";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import VPlaybackController from "@/renderer/components/commons/playbackController/VPlaybackController.vue";
 import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
@@ -62,7 +62,15 @@ const pointerPosition = new Vec2();
 const nsfwMask = new PIXI.TilingSprite(useCommonTextureStore().NSFW, 100, 100);
 const dragging = ref(false);
 let fitToOutside = true;
-async function construct() {
+onMounted(() => {
+  window.addEventListener("pointerup", pointerup);
+  window.addEventListener("pointermove", pointermove);
+});
+onUnmounted(() => {
+  window.removeEventListener("pointerup", pointerup);
+  window.removeEventListener("pointermove", pointermove);
+});
+function construct() {
   const pixiApp = vPixi.value?.app();
   if (pixiApp === undefined) {
     return;
@@ -71,10 +79,8 @@ async function construct() {
   pixiApp.stage.addChild(nsfwMask);
   pixiApp.stage.eventMode = "static";
   pixiApp.stage.on("pointerdown", pointerdown);
-  window.addEventListener("pointerup", pointerup);
   vPixi.value?.canvasWrapper().addEventListener("wheel", wheel);
   vPixi.value?.canvasWrapper().addEventListener("dblclick", reset);
-  pixiApp.stage.on("pointermove", pointermove);
   nsfwMask.tileScale.set(0.5);
   load();
 }
