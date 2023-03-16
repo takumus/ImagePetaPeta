@@ -19,8 +19,8 @@ export class PTransformerControlPoint extends PIXI.Container {
   ];
   constructor(public index: number) {
     super();
-    this.size.interactive = true;
-    this.rotate.interactive = true;
+    this.size.eventMode = "static";
+    this.rotate.eventMode = "static";
     this.size.name = "transformer";
     this.rotate.name = "transformer";
     this.addChild(this.rotate, this.size);

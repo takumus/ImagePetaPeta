@@ -41,7 +41,7 @@ export class PPetaPanel extends PIXI.Sprite {
     this.imageWrapper.mask = this.masker;
     this.imageWrapper.addChild(this.pFileObject);
     this.addChild(this.imageWrapper, this.masker, this.cover, this.selection);
-    this.interactive = true;
+    this.eventMode = "static";
     this.cover.visible = false;
     this.nsfwTile = new PIXI.TilingSprite(this.commonTextureStore.NSFW, 100, 100);
     this.nsfwTile.visible = false;
@@ -130,7 +130,7 @@ export class PPetaPanel extends PIXI.Sprite {
         return;
       }
       this.visible = this.petaPanel.visible;
-      this.interactive = this.petaPanel.visible && !this.petaPanel.locked;
+      this.eventMode = this.petaPanel.visible && !this.petaPanel.locked ? "static" : "none";
       const panelWidth = this.absPanelWidth();
       const panelHeight = this.absPanelHeight();
       this.imageWrapper.scale.set(

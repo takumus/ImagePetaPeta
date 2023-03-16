@@ -69,7 +69,7 @@ async function construct() {
   }
   pixiApp.stage.addChild(pFileObject);
   pixiApp.stage.addChild(nsfwMask);
-  pixiApp.stage.interactive = true;
+  pixiApp.stage.eventMode = "static";
   pixiApp.stage.on("pointerdown", pointerdown);
   window.addEventListener("pointerup", pointerup);
   vPixi.value?.canvasWrapper().addEventListener("wheel", wheel);

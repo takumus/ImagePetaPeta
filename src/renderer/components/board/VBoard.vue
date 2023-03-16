@@ -151,7 +151,7 @@ function construct() {
   pixiApp.stage.addChild(pBackground, pBoardGrid, centerWrapper);
   centerWrapper.addChild(rootContainer);
   rootContainer.addChild(pPanelsContainer, pTransformer, pSelection);
-  pixiApp.stage.interactive = true;
+  pixiApp.stage.eventMode = "static";
 }
 function destruct() {
   //
