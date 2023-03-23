@@ -126,12 +126,9 @@ onMounted(() => {
   });
   vPixi.value?.canvasWrapper().addEventListener("dblclick", boardLoader.resetTransform);
   vPixi.value?.canvasWrapper().addEventListener("pointerdown", preventWheelClick);
-  vPixi.value?.canvasWrapper().addEventListener("mousewheel", wheel as (e: Event) => void);
-});
-onUnmounted(() => {
-  vPixi.value?.canvasWrapper().removeEventListener("dblclick", boardLoader.resetTransform);
-  vPixi.value?.canvasWrapper().removeEventListener("pointerdown", preventWheelClick);
-  vPixi.value?.canvasWrapper().removeEventListener("mousewheel", wheel as (e: Event) => void);
+  vPixi.value
+    ?.canvasWrapper()
+    .addEventListener("mousewheel", wheel as (e: Event) => void, { passive: true });
 });
 function construct() {
   logChunk().log("construct PIXI");
