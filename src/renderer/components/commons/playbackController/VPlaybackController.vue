@@ -1,11 +1,19 @@
 <template>
   <e-playback-controller-root>
     <e-advanced>
-      <VSlider v-if="hasAudio" :min="0" :max="1000" v-model:value="currentVolumeModel" />
-      <VSlider :min="100" :max="4000" v-model:value="currentSpeedModel" /><button
-        @click="currentSpeedModel = 1000">
-        reset
-      </button>
+      <!-- volume -->
+      <e-property v-if="hasAudio">
+        <e-label> {{ t("playbackController.volume") }} </e-label>
+        <VSlider :min="0" :max="1000" v-model:value="currentVolumeModel" />
+      </e-property>
+      <!-- playback speed -->
+      <e-property>
+        <e-label> {{ t("playbackController.speed") }} </e-label>
+        <VSlider :min="100" :max="4000" v-model:value="currentSpeedModel" />
+        <button v-for="speed in speeds" :key="speed.label" @click="currentSpeedModel = speed.value">
+          {{ speed.label }}x
+        </button>
+      </e-property>
     </e-advanced>
     <e-general>
       <button @click="paused(playing)">
@@ -36,6 +44,14 @@ import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayab
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 const { t } = useI18n();
+const speeds: {
+  value: number;
+  label: string;
+}[] = [
+  { value: 500, label: "0.5" },
+  { value: 1000, label: "1.0" },
+  { value: 2000, label: "2.0" },
+];
 const props = defineProps<{
   pFileObjectContent: PPlayableFileObjectContent<void>;
 }>();
@@ -174,7 +190,12 @@ e-playback-controller-root {
   }
   > e-advanced {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    padding: var(--px-1);
+    > e-property {
+      display: flex;
+      align-items: center;
+    }
   }
 }
 </style>

@@ -12,6 +12,8 @@ const ja = {
   playbackController: {
     play: "再生",
     pause: "停止",
+    volume: "音量",
+    speed: "速度",
   },
   commons: {
     yes: "はい",
