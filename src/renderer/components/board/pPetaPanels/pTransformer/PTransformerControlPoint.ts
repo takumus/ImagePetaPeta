@@ -94,10 +94,10 @@ export class PTransformerControlPoint extends PIXI.Container {
     this.size.pivot.y = (10 * scale) / 2;
 
     const hitArea = 16;
-    this.rotate.hitArea = new PIXI.Circle(0, 0, hitArea * scale);
-    // this.rotate.clear();
-    // this.rotate.beginFill(0x00ff00);
-    // this.rotate.drawCircle(0, 0, hitArea * scale);
+    // this.rotate.hitArea = new PIXI.Circle(0, 0, hitArea * scale);
+    this.rotate.clear();
+    this.rotate.beginFill(0xffffff, 0.001);
+    this.rotate.drawCircle(0, 0, hitArea * scale);
     const r = this.currentRotation + Math.PI;
     const radius = (30 * scale) / 2;
 
