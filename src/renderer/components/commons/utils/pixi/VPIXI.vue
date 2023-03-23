@@ -46,7 +46,7 @@ function constructIfResolutionChanged() {
   }
 }
 function construct(resolution: number) {
-  PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.OFF;
+  PIXI.BaseTexture.defaultOptions.mipmap = PIXI.MIPMAP_MODES.OFF;
   app = new PIXI.Application({
     resolution,
     antialias: props.antialias,
