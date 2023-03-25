@@ -1,5 +1,5 @@
 import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
-import { Component, Plugin, createApp } from "vue";
+import { Component, createApp } from "vue";
 import { createI18n } from "vue-i18n";
 
 import { WindowType } from "@/commons/datas/windowType";

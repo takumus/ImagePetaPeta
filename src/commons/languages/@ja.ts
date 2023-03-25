@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const ja = {
+import { I18NBase } from "@/commons/languages/@base";
+
+export const ja: I18NBase = {
   hello: "こんにちは",
   titles: {
     details: "詳細",
@@ -21,7 +22,7 @@ const ja = {
     closeButton: "閉じる",
   },
   utils: {
-    downloadUpdateDialog: (ctx: any) => {
+    downloadUpdateDialog: (ctx) => {
       return `新しいアップデートを発見しました!!!\n現在のバージョン: ${ctx.list(
         0,
       )}\n最新のバージョン: ${ctx.list(1)}\n手動でダウンロードしますか?`;
@@ -38,10 +39,10 @@ const ja = {
     openBrowserButton: "ブラウザ",
   },
   boards: {
-    removeDialog: (ctx: any) => {
+    removeDialog: (ctx) => {
       return `ボード"${ctx.list(0)}"を削除しますか?`;
     },
-    selectErrorBoardDialog: (ctx: any) => {
+    selectErrorBoardDialog: (ctx) => {
       return `前回、ボード"${ctx.list(
         0,
       )}"をロード中にアプリが終了されました。\nもう一度読み込みますか?`;
@@ -64,7 +65,7 @@ const ja = {
       reset: "リセット",
       remove: "削除",
     },
-    addManyImageDialog: (ctx: any) => {
+    addManyImageDialog: (ctx) => {
       return `${ctx.list(0)}枚の画像をボードに追加しますか?`;
     },
     crop: {
@@ -77,45 +78,45 @@ const ja = {
   },
   browser: {
     tagMenu: {
-      remove: (ctx: any) => {
+      remove: (ctx) => {
         return `タグ "${ctx.list(0)}" を削除`;
       },
     },
     tagPartitionMenu: {
-      remove: (ctx: any) => {
+      remove: (ctx) => {
         return `区切り "${ctx.list(0)}" を削除`;
       },
     },
     addTagPartition: `区切りを追加`,
     petaFileMenu: {
-      remove: (ctx: any) => {
+      remove: (ctx) => {
         return `${ctx.list(0)}枚の画像を削除`;
       },
       openFile: "画像ファイルの場所を開く",
       realESRGAN: "Real-ESRGANで変換する",
       searchImageByGoogle: "Googleで類似画像を検索",
     },
-    removeImageDialog: (ctx: any) => {
+    removeImageDialog: (ctx) => {
       return `${ctx.list(0)}枚の画像を削除しますか?`;
     },
-    removeTagDialog: (ctx: any) => {
+    removeTagDialog: (ctx) => {
       return `タグ "${ctx.list(0)}" を削除しますか?\n画像は削除されません。`;
     },
-    removeTagPartitionDialog: (ctx: any) => {
+    removeTagPartitionDialog: (ctx) => {
       return `区切り "${ctx.list(0)}" を削除しますか?`;
     },
-    tagAlreadyExistsDialog: (ctx: any) => {
+    tagAlreadyExistsDialog: (ctx) => {
       return `タグ" ${ctx.list(0)}" はすでに存在します`;
     },
     property: {
       clickToAddTag: "タグ追加",
       tagName: "タグ名",
       fetchingTags: "タグ取得中...",
-      selectedImage: (ctx: any) => {
+      selectedImage: (ctx) => {
         return `${ctx.list(0)}枚の画像を選択中`;
       },
       tagMenu: {
-        remove: (ctx: any) => {
+        remove: (ctx) => {
           return `タグ"${ctx.list(0)}"を削除`;
         },
       },
@@ -146,7 +147,7 @@ const ja = {
   },
   tab: {
     menu: {
-      remove: (ctx: any) => {
+      remove: (ctx) => {
         return `ボード "${ctx.list(0)}" を削除`;
       },
     },
@@ -219,10 +220,10 @@ const ja = {
       "ガマットマップを作る際に読み込むピクセルの量です。最大は65536です。多くすればするほど重くなります。",
     developerModeDescriptions:
       "開発者モードを有効にすると51915ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。",
-    changePetaFileDirectoryDialog: (ctx: any) => {
+    changePetaFileDirectoryDialog: (ctx) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;
     },
-    changePetaFileDirectoryErrorDialog: (ctx: any) => {
+    changePetaFileDirectoryErrorDialog: (ctx) => {
       return `データの保存先を\n"${ctx.list(
         0,
       )}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`;
@@ -238,7 +239,7 @@ const ja = {
         begin: "",
         progress: "",
         complete: "",
-        failed: (ctx: any) => {
+        failed: (ctx) => {
           return `エラー: ${ctx.list(0)}`;
         },
       },
@@ -265,15 +266,15 @@ const ja = {
       name: "ファイルをインポートしています。",
       logs: {
         begin: "開始",
-        progress: (ctx: any) => {
+        progress: (ctx) => {
           return `${
             ctx.list(0) === "error" ? "エラー" : ctx.list(0) === "exists" ? "重複" : "追加"
           }:${ctx.list(1)}`;
         },
-        complete: (ctx: any) => {
+        complete: (ctx) => {
           return `${ctx.list(1)}件中${ctx.list(0)}件のインポートに成功しました。`;
         },
-        failed: (ctx: any) => {
+        failed: (ctx) => {
           return `${ctx.list(1)}件中${ctx.list(0)}件のインポートに成功しました。`;
         },
       },
@@ -281,10 +282,10 @@ const ja = {
     upconverting: {
       name: "Real-ESRGANで変換しています。",
       logs: {
-        begin: (ctx: any) => {
+        begin: (ctx) => {
           return `${ctx.list(0)}枚の画像を変換します。`;
         },
-        progress: (ctx: any) => {
+        progress: (ctx) => {
           return `Real-ESRGAN: ${ctx.list(0)}`;
         },
         complete: "完了",
@@ -296,24 +297,14 @@ const ja = {
       logs: {
         begin: "開始",
         complete: "完了",
-        failed: (ctx: any) => {
+        failed: (ctx) => {
           return `失敗: ${ctx.list(0)}`;
         },
-        progress: (ctx: any) => {
+        progress: (ctx) => {
           return `${ctx.list(0)}`;
         },
       },
     },
-  } as {
-    [key: string]: {
-      name: string;
-      logs: {
-        begin: string | ((ctx: any) => void);
-        progress: string | ((ctx: any) => void);
-        complete: string | ((ctx: any) => void);
-        failed: string | ((ctx: any) => void);
-      };
-    };
   },
   eula: {
     body: `下記の(壱), (弐), (参), (肆), (伍), (陸)の内容ついて、\n全て分かった方は「分かった」を押してください。\n「分かった」方のみ本アプリを利用できます。\n\n(壱). バグとかで、突然データが消えたりすることが絶対に無いとは言えません。データ管理については結構慎重に開発したつもりですけど！もし問題が起きても、怒らないでください。\n\n(弐). あと、もしバグを見つけた時や、機能追加・改善等の要望がある場合は、設定画面の情報タブより報告してくれると、嬉しいです☺\n\n(参). 本アプリは、オープンソースです。プログラムの内容がすべて公開されていて、誰でも開発に参加できます。興味がある人は下記リポジトリを見てください。https://github.com/takumus/ImagePetaPeta\n\n(肆). NSFW機能は上手に使ってください。恥ずかしい思いをしないように。\n\n(伍). 本アプリを起動中の間、アップデートの確認のため、定期的にインターネットに接続します。\n\n(陸). ダウンロードしていただきありがとうございます！嬉しいです。`,
@@ -321,4 +312,3 @@ const ja = {
     disagree: "分からない",
   },
 };
-export default ja;
