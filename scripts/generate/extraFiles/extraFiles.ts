@@ -1,7 +1,7 @@
+import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
 import { mkdirSync, readdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { generateLicenses } from "scripts/generate/licenses";
 
 interface ExtraFile {
   name: string;

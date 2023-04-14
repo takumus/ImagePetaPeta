@@ -1,6 +1,5 @@
-import { readFileSync, readdirSync, writeFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import checker from "license-checker-rseidelsohn";
-import { v4 } from "uuid";
 
 interface Module {
   name: string;
