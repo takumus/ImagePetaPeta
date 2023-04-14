@@ -13,7 +13,7 @@
   },
   "scripts": {
     "generate-assets": "run-s generate-assets:*",
-    "generate-assets:extraFiles": "tsx ./scripts/generate/extraFiles/extraFiles.ts",
+    "generate-assets:extraFiles": "tsx ./scripts/generate/extraFiles/index.ts",
     "generate-assets:image": "tsx ./scripts/generate/images.ts",
     "generate-assets:debuggers": "tsx ./scripts/generate/debuggers.ts",
     "create-release": "tsx ./scripts/createRelease.ts",
