@@ -21,7 +21,7 @@
     "build": "vite build && electron-builder",
     "preview": "vite preview",
     "tsc": "vue-tsc --noEmit ",
-    "format": "npm run prettier ./src --write",
+    "format": "prettier ./src --write",
     "asar": "asar list",
     "tsx": "tsx",
     "prebuild": "npm run generate-assets",
