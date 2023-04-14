@@ -1,7 +1,7 @@
 import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
 import { mkdirSync, readdirSync, writeFileSync } from "fs";
-import { resolve } from "path";
+import { join, resolve } from "path";
 
 interface ExtraFile {
   name: string;
@@ -78,8 +78,8 @@ async function createExtra(params: {
   prepare?: (extra: ExtraFile) => Promise<unknown>;
 }) {
   const platformPath = params.platform === "universal" ? "universal/" : params.platform + "/";
-  const developmentPath = "./resources/electron/extraFiles/" + platformPath + params.name;
-  const productionPath = "./extraFiles/" + platformPath + params.name;
+  const developmentPath = join("./resources/electron/extraFiles/", platformPath, params.name);
+  const productionPath = join("./extraFiles/", platformPath, params.name);
   const extra: ExtraFile = {
     name: params.name,
     platform: params.platform,
