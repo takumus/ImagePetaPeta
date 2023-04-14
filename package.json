@@ -14,7 +14,7 @@
   "scripts": {
     "generate-assets": "run-s generate-assets:*",
     "generate-assets:extraFiles": "tsx ./scripts/generate/extraFiles.ts",
-    "generate-assets:image": "tsx ./scripts/generate/imageAssets.ts",
+    "generate-assets:image": "tsx ./scripts/generate/images.ts",
     "generate-assets:debuggers": "tsx ./scripts/generate/debuggers.ts",
     "create-release": "tsx ./scripts/createRelease.ts",
     "dev": "vite",
