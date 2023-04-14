@@ -10,8 +10,7 @@ import { resolve } from "path";
       throw new Error(exeFile + " is not found");
     }
     zip.addLocalFile(resolve("./release", exeFile));
-    const out = resolve("./release", exeFile.replace(/win32-x64/g, "windows") + ".zip");
-    zip.writeZip(out);
+    zip.writeZip(resolve("./release", exeFile.replace(/win32-x64/g, "windows") + ".zip"));
   } else if (process.platform === "darwin") {
     const dmgFile = readdirSync(resolve("./release")).find((name) => name.endsWith(".dmg"));
     if (dmgFile === undefined) {
