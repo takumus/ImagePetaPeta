@@ -267,7 +267,7 @@ e-details-root {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-image: url("~@/@assets/transparentBackground.png");
+  background-image: url("/images/imageBackgrounds/transparent.png");
   overflow: hidden;
   > e-pixi-wrapper {
     display: block;

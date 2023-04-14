@@ -1,1 +1,0 @@
-ManifestDPIAware true

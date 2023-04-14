@@ -1,3 +1,4 @@
+import deepcopy from "deepcopy";
 import * as PIXI from "pixi.js";
 
 import { PetaPanel } from "@/commons/datas/petaPanel";
@@ -86,7 +87,7 @@ export class PTransformer extends PIXI.Container {
     this.sizingCornerIndex = index;
     this.beginSizingPosition = new Vec2(e.data.global);
     this.beginSizingPetaPanels = this.selectedPPetaPanels.map((pPanel) => {
-      const p = structuredClone(pPanel.petaPanel);
+      const p = deepcopy(pPanel.petaPanel);
       return p;
     });
     this.pairCorner = new Vec2(
@@ -104,7 +105,7 @@ export class PTransformer extends PIXI.Container {
     this.mousePosition.set(e.data.global);
     this.click.down();
     this.beginSizingPetaPanels = this.selectedPPetaPanels.map((pPanel) => {
-      const p = structuredClone(pPanel.petaPanel);
+      const p = deepcopy(pPanel.petaPanel);
       return p;
     });
     this.beginTransformCorners = this.corners.map(

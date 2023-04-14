@@ -1,3 +1,5 @@
+import deepcopy from "deepcopy";
+
 const defaultSettings = {
   darkMode: true,
   autoDarkMode: false,
@@ -20,7 +22,7 @@ const defaultSettings = {
   gamutMapSampling: 5000,
 };
 export function getDefaultSettings() {
-  const settings = structuredClone(defaultSettings);
+  const settings = deepcopy(defaultSettings);
   if (process.platform === "darwin") {
     settings.moveSensitivity = 75;
     settings.zoomSensitivity = 750;

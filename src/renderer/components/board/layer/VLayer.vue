@@ -198,7 +198,7 @@ e-layer-root {
     background: no-repeat;
     background-position: center center;
     background-size: 14px;
-    background-image: url("~@/@assets/layer.png");
+    background-image: url("/images/icons/layer.png");
     height: 14px;
     min-width: 14px;
     flex-shrink: 0;

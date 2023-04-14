@@ -1,5 +1,5 @@
-import RotateCursor1x from "@/@assets/rotateCursor1x.png";
-import RotateCursor2x from "@/@assets/rotateCursor2x.png";
+import RotateCursor1x from "@/@assets/images/cursors/rotate1x.png";
+import RotateCursor2x from "@/@assets/images/cursors/rotate2x.png";
 
 let locked = false;
 export function lock() {

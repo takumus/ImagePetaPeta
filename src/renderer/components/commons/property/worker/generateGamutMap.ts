@@ -1,7 +1,7 @@
 import { FileType } from "@/commons/datas/fileType";
 import { PetaFile } from "@/commons/datas/petaFile";
 
-import Worker from "@/renderer/components/commons/property/worker/generateGamutMapWorker.worker";
+import Worker from "@/renderer/components/commons/property/worker/generateGamutMapWorker.!ww";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { createWebWorkerGroup } from "@/renderer/libs/workerGroup";
 import { getFileURL } from "@/renderer/utils/fileURL";

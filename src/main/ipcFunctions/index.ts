@@ -11,7 +11,8 @@ import { BOARD_DEFAULT_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { ppa } from "@/commons/utils/pp";
 
-import Transparent from "@/@assets/transparent.png";
+import { extraFiles } from "@/@assets/extraFiles";
+import Transparent from "@/@assets/images/others/transparent.png";
 import { showError } from "@/main/errorWindow";
 import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
@@ -27,6 +28,7 @@ import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { realESRGAN } from "@/main/utils/realESRGAN";
+import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { getLatestVersion } from "@/main/utils/versions";
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
@@ -773,6 +775,10 @@ export const ipcFunctions: IpcFunctionsType = {
       thumbnailDataURL: source.thumbnail.toDataURL(),
       size: displaySizes[source.display_id],
     }));
+  },
+  async getLicenses() {
+    const execFilePath = resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]);
+    return JSON.parse((await file.readFile(execFilePath)).toString());
   },
 };
 export function registerIpcFunctions() {

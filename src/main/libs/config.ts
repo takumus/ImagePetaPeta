@@ -1,3 +1,4 @@
+import deepcopy from "deepcopy";
 import fs from "fs";
 
 import { Migrater } from "@/main/libs/createMigrater";
@@ -5,7 +6,7 @@ import { Migrater } from "@/main/libs/createMigrater";
 export default class Config<T> {
   data: T;
   constructor(private path: string, private defaultData: T, migrater?: Migrater<T>) {
-    this.data = structuredClone(defaultData);
+    this.data = deepcopy(defaultData);
     this.load();
     if (migrater) {
       const result = migrater(this.data);
@@ -20,7 +21,7 @@ export default class Config<T> {
       const buffer = fs.readFileSync(this.path);
       this.data = JSON.parse(buffer.toString());
     } catch (e) {
-      this.data = structuredClone(this.defaultData);
+      this.data = deepcopy(this.defaultData);
     }
   }
   save() {

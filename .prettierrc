@@ -7,7 +7,12 @@
   "semi": true,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "importOrder": ["<THIRD_PARTY_MODULES>", "^(.*).vue$", "^@/commons/(.*)$", "^@/(.*)$"],
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^(.*).vue$",
+    "^@/commons/(.*)$",
+    "^@/(.*)$"
+  ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
   "bracketSameLine": true

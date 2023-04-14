@@ -1,11 +1,3 @@
-import EventEmitter from "events";
-import TypedEmitter, { EventMap } from "typed-emitter";
+import EventEmitter from "eventemitter3";
 
-export class TypedEventEmitter<T extends EventMap> extends (EventEmitter as {
-  new <T extends EventMap>(): TypedEmitter<T>;
-})<T> {
-  constructor() {
-    super();
-    this.setMaxListeners(0);
-  }
-}
+export { EventEmitter as TypedEventEmitter };

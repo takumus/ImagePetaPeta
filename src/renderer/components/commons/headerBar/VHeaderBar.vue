@@ -143,28 +143,28 @@ e-utils-bar-root {
           background-position: center center;
           filter: var(--filter-icon);
           &.board {
-            background-image: url("~@/@assets/board.png");
+            background-image: url("/images/icons/board.png");
           }
           &.browser {
-            background-image: url("~@/@assets/browser.png");
+            background-image: url("/images/icons/browser.png");
           }
           &.import-file {
-            background-image: url("~@/@assets/importFile.png");
+            background-image: url("/images/icons/importFile.png");
           }
           &.import-folder {
-            background-image: url("~@/@assets/importFolder.png");
+            background-image: url("/images/icons/importFolder.png");
           }
           &.settings {
-            background-image: url("~@/@assets/settings.png");
+            background-image: url("/images/icons/settings.png");
           }
           &.nsfw {
-            background-image: url("~@/@assets/nsfw.png");
+            background-image: url("/images/icons/nsfw.png");
           }
           &.sfw {
-            background-image: url("~@/@assets/sfw.png");
+            background-image: url("/images/icons/sfw.png");
           }
           &.info {
-            background-image: url("~@/@assets/info.png");
+            background-image: url("/images/icons/info.png");
           }
         }
       }

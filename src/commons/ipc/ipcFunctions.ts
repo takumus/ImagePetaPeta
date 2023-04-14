@@ -79,4 +79,5 @@ export interface IpcFunctions {
   getLatestVersion: () => Promise<RemoteBinaryInfo>;
   getMediaSources: () => Promise<MediaSourceInfo[]>;
   eula: (agree: boolean) => Promise<void>;
+  getLicenses: () => Promise<{ name: string; licenses: string; text: string }[]>;
 }

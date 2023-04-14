@@ -27,6 +27,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
     async (handler) => {
       const log = logger.logMainChunk();
       const { execFilePath, modelFilePath } = getFilePath();
+      log.log("execFilePath:", execFilePath);
       setPermisionTo755(execFilePath);
       let success = true;
       handler.emitStatus({
@@ -35,7 +36,6 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
         status: TaskStatusCode.BEGIN,
         cancelable: true,
       });
-      log.log("execFilePath:", execFilePath);
       const tasks = ppa(
         async (petaFile, index) => {
           const inputFile = petaFilesController.getFilePath(petaFile, FileType.ORIGINAL);

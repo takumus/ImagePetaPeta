@@ -1,34 +1,38 @@
-.DS_Store
-desktop.ini
-/node_modules
-/dist
-/.temp
-electron.config.appx.js
-src/@assets/licenses.ts
-src/@assets/extraFiles.ts
-
-# local env files
-.env.local
-.env.*.local
-
-# Log files
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+release
+*.local
 
 # Editor directories and files
+.vscode/.debug.env
 .idea
-.vscode
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-src/test/sample_images/*
-!1.png
-!2.png
-!3.png
-!4.png
-!5.png
+# lockfile
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# htmls
+src/renderer/htmls/*
+!$*.html
+
+# extras
+resources/electron/extraFiles
+# src
+src/@assets/*
+!.keep

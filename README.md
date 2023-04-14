@@ -1,59 +1,53 @@
-# ImagePetaPeta-beta
+# 起動
 
-<img src="./.readme_assets/app.png" width="100%">
+`yarn dev`  
+一瞬エラーダイアログ出るかもしれない。これは速さの問題。
 
-写真やイラスト資料を閲覧、管理するソフトです。
+# 階層
 
-## インストール
+## メインプロセス
 
-### Windows
+`src/main`
 
-下記より zip ファイル **(ImagePetaPeta-beta-X.X.X-beta-win32-x64.exe.zip)** をダウンロードしてインストールしてください。  
-<https://github.com/takumus/ImagePetaPeta/releases/>  
-下図ような警告が出ますが、赤い枠のボタンを押せばインストールできます。  
-<img src="./.readme_assets/install-win-01.png" width="49%"><img src="./.readme_assets/install-win-02.png" width="49%">
+## preload
 
-### Mac
+`src/main/preload.ts`
 
-下記より dmg ファイル **(ImagePetaPeta-beta-X.X.X-beta-darwin-YYY.dmg)** をダウンロードして Applications にドラッグしてください。  
-**`YYY` は、M1 や M2 等をお使いの場合は arm64 を、それ以外の方は Intel を選んでください。**  
-<https://github.com/takumus/ImagePetaPeta/releases/>
+## レンダラプロセス
 
-#### 1. `Temrminal.app` を起動します。
-  
-<img src="./.readme_assets/install-mac-01.png" width="33%"><img src="./.readme_assets/install-mac-02.png" width="33%"><img src="./.readme_assets/install-mac-03.png" width="33%">
+`src/renderer`
 
-#### 2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。  
-<img src="./.readme_assets/install-mac-04.png" width="100%">
+## レンダラメイン共通
 
-その後は通常通りに起動できます。
+`src/commons`
 
-## ご協力
+# メインプロセスで ESModules のみ対応ライブラリに対応。
 
-まだ開発段階のアプリなので、多くのユーザーに最新版を使っていただき、新鮮なフィードバックを貰いたいと思っております。  
-そのため、アップデートの通知はオフにできないようになっています。  
-よろしくお願いします。
+## vite-plugin-esmodule
 
-## バグ発見！質問！または要望！
+これをつかって対応しつつ  
+`devDependencies`を除外したものを対象にしたり、  
+`rollupOptions.external`から除外したり、いろいろしている。
 
-<https://docs.google.com/forms/d/e/1FAIpQLSfMVEzYwdC09SrM6ipTtHyk_wTC1n08pB2eeZIVZifIRW7ojQ/viewform>  
-こちらのフォームからお願いします。  
-github アカウントをお持ちの方は、Issues でも OK です。
+# 完全型安全の WebWorker, node:worker_threads に対応。
 
-# 開発者向け
+## 仕組み
 
-## node とかのバージョン
+`vitePlugins`に変換マシン。それが頑張ってる。  
+`node:worker_threads` のみ、`vite.config.ts` への追記が必要。  
+いずれプラグインを頑張って自動化する。
 
-`./package.json`の最後の`volta`を御覧ください。
+# マルチウインドウに対応。
 
-## デバッグ
+## Window の追加
 
-```
-yarn serve
-```
+各々編集してください。  
+`src/commons/windows.ts`にウインドウ名を追記。  
+`src/renderer/windows/`にウインドウ名と同名の ts ファイルを作成。
 
-## ビルド
+## 仕組み
 
-```
-yarn build
-```
+`src/renderer/htmls/$template.html`はすべてのウインドウのテンプレート。  
+ビルド時に、それをウインドウ名分`src/renderer/htmls`へ`.html`を作成してくれる。  
+`vitePlugins/electronWindows`というプラグインを作った。  
+`vite`はエントリーになる`html`の実態がないとだめっぽいので、将来的に、バーチャルでエントリーを指定できるようになれば嬉しい！

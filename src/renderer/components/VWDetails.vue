@@ -130,7 +130,7 @@ e-root {
         z-index: 1;
         overflow: hidden;
         background-repeat: repeat;
-        background-image: url("~@/@assets/transparentBackground.png");
+        background-image: url("/images/imageBackgrounds/transparent.png");
         cursor: grab;
       }
       > e-property {

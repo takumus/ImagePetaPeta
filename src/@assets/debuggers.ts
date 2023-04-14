@@ -5,5 +5,5 @@ export const DEBUGGERS = [
   "namekuji",
   "Aran",
   "tanizaki",
-  "hinako",
+  "hinako"
 ];

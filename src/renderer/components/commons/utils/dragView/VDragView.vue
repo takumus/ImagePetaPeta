@@ -184,7 +184,7 @@ e-drag-view-root {
   width: 100%;
   height: 100%;
   display: block;
-  background-image: url("~@/@assets/transparentBackground.png");
+  background-image: url("/images/imageBackgrounds/transparent.png");
   overflow: hidden;
   > e-img {
     display: block;

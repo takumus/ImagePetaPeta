@@ -3,7 +3,7 @@ import {
   AnimatedGIFFrame,
   AnimatedGIFOptions,
 } from "@/renderer/libs/pixi-gif/animatedGIF";
-import DecompressWorker from "@/renderer/libs/pixi-gif/decoder/decompress.worker";
+import DecompressWorker from "@/renderer/libs/pixi-gif/decoder/decompress.!ww";
 import { createWebWorkerGroup } from "@/renderer/libs/workerGroup";
 
 const wtGroup = createWebWorkerGroup(DecompressWorker);

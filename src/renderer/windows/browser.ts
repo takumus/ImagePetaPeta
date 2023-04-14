@@ -2,6 +2,7 @@ import BrowserIndex from "@/renderer/components/VWBrowser.vue";
 
 import { WindowType } from "@/commons/datas/windowType";
 
+import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
 import {
   createPetaBoardsStore,
@@ -21,6 +22,7 @@ import {
 } from "@/renderer/stores/petaTagsStore/createPetaTagsStore";
 import { create } from "@/renderer/windows/@base";
 
+injectAnimatedGIFAsset();
 create(BrowserIndex, WindowType.BROWSER, [
   keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),

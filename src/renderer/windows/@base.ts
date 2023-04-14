@@ -8,7 +8,6 @@ import languages from "@/commons/languages";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
-import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import { logChunk } from "@/renderer/libs/rendererLogger";
 import {
   appInfoStoreKey,
@@ -90,7 +89,6 @@ export async function create(
       (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
       ...(stores?.map(async (store) => app.provide(store.key, await store.creator())) || []),
     ]);
-    injectAnimatedGIFAsset();
     ClickChecker.init();
     app.mount("#app");
   };

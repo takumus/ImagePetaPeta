@@ -1,6 +1,5 @@
 import { app, protocol } from "electron";
 import * as Path from "path";
-import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 
 import { PROTOCOLS } from "@/commons/defines";
 import { getLastSegmentFromURL } from "@/commons/utils/getLastSegmentFromURL";
@@ -35,13 +34,6 @@ import { initWebhook } from "@/main/webhook";
   }
   // プロトコル準備
   protocol.registerSchemesAsPrivileged([
-    {
-      scheme: "app",
-      privileges: {
-        secure: true,
-        standard: true,
-      },
-    },
     {
       scheme: PROTOCOLS.FILE.IMAGE_THUMBNAIL,
       privileges: {
@@ -105,8 +97,6 @@ import { initWebhook } from "@/main/webhook";
     });
     // ipcの関数登録
     registerIpcFunctions();
-    // protocol作成
-    createProtocol("app");
     // 初期ウインドウ表示
     windows.showWindows();
     // ダークモード監視開始

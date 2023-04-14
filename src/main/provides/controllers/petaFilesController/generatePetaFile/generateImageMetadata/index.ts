@@ -1,6 +1,6 @@
 import { WorkerThreadsInputType, WorkerThreadsOutputType } from "@/main/libs/initWorkerThreads";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
-import WorkerThreads from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generateImageMetadata.worker-threads";
+import WorkerThreads from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generateImageMetadata.!wt";
 
 const wtGroup = createWorkerThreadsGroup(WorkerThreads);
 export async function generateImageMetadataByWorker(

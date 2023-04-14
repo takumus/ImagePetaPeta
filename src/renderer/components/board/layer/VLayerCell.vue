@@ -144,11 +144,11 @@ function pointerdown(event: PointerEvent) {
     filter: var(--filter-icon);
     &.visible {
       background-size: 14px;
-      background-image: url("~@/@assets/visible.png");
+      background-image: url("/images/icons/visible.png");
     }
     &.lock {
       background-size: 11px;
-      background-image: url("~@/@assets/locked.png");
+      background-image: url("/images/icons/locked.png");
     }
     &.disabled {
       opacity: 0.3;
@@ -170,7 +170,7 @@ function pointerdown(event: PointerEvent) {
       background-size: 24px;
       background-position: center;
       background-repeat: repeat;
-      background-image: url("~@/@assets/nsfwBackground.png");
+      background-image: url("/images/imageBackgrounds/nsfw.png");
     }
   }
   > .name {

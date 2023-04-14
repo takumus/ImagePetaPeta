@@ -23,29 +23,31 @@
     <p>{{ t("info.debuggers") }}</p>
     <pre class="debuggers">{{ debuggers }}</pre>
     <p>{{ t("info.licenses") }}</p>
-    <pre class="licenses">{{ licenses }}</pre>
+    <pre class="licenses">{{
+      licenses.map((lib) => `${lib.name}\n${lib.licenses}\n${lib.text}`).join("\n")
+    }}</pre>
   </e-settings-content-root>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { WindowType } from "@/commons/datas/windowType";
 import { URL_SUPPORT } from "@/commons/defines";
 
 import { DEBUGGERS } from "@/@assets/debuggers";
-import { LICENSES } from "@/@assets/licenses";
 import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
-const licenses = computed(() => {
-  return LICENSES.map((lib) => `${lib.name}\n${lib.licenses}\n`).join("\n");
-});
+const licenses = ref<{ name: string; text: string; licenses: string }[]>([]);
 const debuggers = computed(() => {
   return DEBUGGERS.join(", ");
+});
+onMounted(async () => {
+  licenses.value = await IPC.send("getLicenses");
 });
 function gotoGithub() {
   IPC.send("openURL", "https://github.com/takumus/ImagePetaPeta");
