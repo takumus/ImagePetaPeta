@@ -77,9 +77,8 @@ async function createExtra(params: {
   files: string[];
   prepare?: (extra: ExtraFile) => Promise<unknown>;
 }) {
-  const platformPath = params.platform === "universal" ? "universal/" : params.platform + "/";
-  const developmentPath = join("./resources/electron/extraFiles/", platformPath, params.name);
-  const productionPath = join("./extraFiles/", platformPath, params.name);
+  const developmentPath = join("./resources/electron/extraFiles", params.platform, params.name);
+  const productionPath = join("./extraFiles", params.platform, params.name);
   const extra: ExtraFile = {
     name: params.name,
     platform: params.platform,
