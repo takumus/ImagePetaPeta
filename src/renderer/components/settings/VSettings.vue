@@ -53,8 +53,8 @@ import { IPC } from "@/renderer/libs/ipc";
 
 const { t } = useI18n();
 const tabNames = ["general", "control", "browser", "datas", "others", "update", "info"] as const;
-const tabs = ref<typeof tabNames[number][]>([...tabNames]);
-const currentTab = ref<typeof tabNames[number]>("general");
+const tabs = ref<(typeof tabNames)[number][]>([...tabNames]);
+const currentTab = ref<(typeof tabNames)[number]>("general");
 onMounted(async () => {
   IPC.on("foundLatestVersion", async () => {
     currentTab.value = "update";
