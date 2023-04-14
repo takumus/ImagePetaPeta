@@ -9,7 +9,7 @@ import { resolve } from "path";
     if (exeFile === undefined) {
       throw new Error(exeFile + " is not found");
     }
-    zip.addLocalFile("./release/" + exeFile);
+    zip.addLocalFile(resolve("./release", exeFile));
     const out = resolve("./release", exeFile.replace(/win32-x64/g, "windows") + ".zip");
     zip.writeZip(out);
   } else if (process.platform === "darwin") {
