@@ -92,7 +92,6 @@
   "productName": "ImagePetaPeta-beta",
   "volta": {
     "node": "19.9.0",
-    "yarn": "1.22.19",
     "npm": "9.6.3"
   }
 }

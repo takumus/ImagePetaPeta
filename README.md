@@ -20,10 +20,11 @@
 <https://github.com/takumus/ImagePetaPeta/releases/>
 
 #### 1. `Temrminal.app` を起動します。
-  
+
 <img src="./.readme_assets/install-mac-01.png" width="33%"><img src="./.readme_assets/install-mac-02.png" width="33%"><img src="./.readme_assets/install-mac-03.png" width="33%">
 
-#### 2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。  
+#### 2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。
+
 <img src="./.readme_assets/install-mac-04.png" width="100%">
 
 その後は通常通りに起動できます。
@@ -49,11 +50,15 @@ github アカウントをお持ちの方は、Issues でも OK です。
 ## デバッグ
 
 ```
-yarn serve
+npm run dev
 ```
 
 ## ビルド
 
 ```
-yarn build
+npm run build
+```
+
+```
+npm run build --electron-target=mac:arm64
 ```

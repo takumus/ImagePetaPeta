@@ -15,14 +15,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: yarn
-          cache-dependency-path: yarn.lock
-      - name: yarn install
-        run: yarn install --network-timeout 600000
+      - name: npm install
+        run: npm install --network-timeout 600000
       - name: npm rebuild
         run: npm rebuild --platform=darwin --arch=arm64
-      - name: yarn build
-        run: yarn build --electron-target=mac:arm64
+      - name: npm run build
+        run: npm run build --electron-target=mac:arm64
       - name: Release
         uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -41,12 +39,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: yarn
-          cache-dependency-path: yarn.lock
-      - name: yarn install
-        run: yarn install --network-timeout 600000
-      - name: yarn build
-        run: yarn build --electron-target=mac:x64
+      - name: npm install
+        run: npm install --network-timeout 600000
+      - name: npm run build
+        run: npm run build --electron-target=mac:x64
       - name: Release
         uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -65,12 +61,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: yarn
-          cache-dependency-path: yarn.lock
-      - name: yarn install
-        run: yarn install --network-timeout 600000
-      - name: yarn build
-        run: yarn build --electron-target=win:x64
+      - name: npm install
+        run: npm install --network-timeout 600000
+      - name: npm run build
+        run: npm run build --electron-target=win:x64
       - name: Release
         uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
