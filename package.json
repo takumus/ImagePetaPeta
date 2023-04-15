@@ -1,6 +1,6 @@
 {
   "name": "imagepetapeta-beta",
-  "version": "2.2023.600-beta",
+  "version": "2.2023.700-beta",
   "private": true,
   "description": "image viewer",
   "author": "takumus",
@@ -19,6 +19,9 @@
     "create-release": "tsx ./scripts/createRelease.ts",
     "dev": "vite",
     "build": "vite build && tsx ./scripts/buildElectron.ts",
+    "build:mac-arm64": "vite build && tsx ./scripts/buildElectron.ts --electron-target=mac:arm64",
+    "build:mac-x64": "vite build && tsx ./scripts/buildElectron.ts --electron-target=mac:x64",
+    "build:win": "vite build && tsx ./scripts/buildElectron.ts --electron-target=win:x64",
     "preview": "vite preview",
     "tsc": "vue-tsc --noEmit ",
     "format": "prettier ./src --write",
