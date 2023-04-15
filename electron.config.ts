@@ -8,6 +8,7 @@ export const electronConfiguration: Configuration = {
     output: "release",
   },
   files: ["dist"],
+  artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
   extraFiles: [
     {
       from: "resources/electron/extraFiles",
@@ -16,19 +17,20 @@ export const electronConfiguration: Configuration = {
     },
   ],
   mac: {
-    artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
-    target: ["dmg"],
+    target: [
+      {
+        target: "dmg",
+      },
+    ],
     icon: "resources/electron/app_icon_mac.png",
   },
   win: {
     target: [
       {
         target: "nsis",
-        arch: ["x64"],
       },
     ],
     icon: "resources/electron/app_icon_win.ico",
-    artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
   },
   nsis: {
     oneClick: false,
