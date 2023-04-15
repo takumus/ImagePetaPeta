@@ -18,7 +18,7 @@
     "generate-assets:debuggers": "tsx ./scripts/generate/debuggers.ts",
     "create-release": "tsx ./scripts/createRelease.ts",
     "dev": "vite",
-    "build": "vite build && electron-builder",
+    "build": "vite build && tsx ./scripts/buildElectron.ts",
     "preview": "vite preview",
     "tsc": "vue-tsc --noEmit ",
     "format": "prettier ./src --write",

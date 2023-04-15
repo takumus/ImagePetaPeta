@@ -1,7 +1,6 @@
-/**
- * @see https://www.electron.build/configuration/configuration
- */
-{
+import { Configuration } from "electron-builder";
+
+export const electronConfiguration: Configuration = {
   appId: "io.takumus.imagepetapeta-beta",
   productName: "ImagePetaPeta-beta",
   asar: true,
@@ -37,4 +36,4 @@
     allowToChangeInstallationDirectory: true,
     deleteAppDataOnUninstall: true,
   },
-}
+};
