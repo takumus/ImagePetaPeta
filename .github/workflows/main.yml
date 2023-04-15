@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 18
       - name: npm install
-        run: npm install --network-timeout 600000
+        run: npm install
       - name: npm rebuild
         run: npm rebuild --platform=darwin --arch=arm64
       - name: npm run build
@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 18
       - name: npm install
-        run: npm install --network-timeout 600000
+        run: npm install
       - name: npm run build
         run: npm run build --electron-target=mac:x64
       - name: Release
@@ -62,7 +62,7 @@ jobs:
         with:
           node-version: 18
       - name: npm install
-        run: npm install --network-timeout 600000
+        run: npm install
       - name: npm run build
         run: npm run build --electron-target=win:x64
       - name: Release
