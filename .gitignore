@@ -25,7 +25,7 @@ src/renderer/htmls/*
 !$*.html
 
 # extras
-resources/electron/extraFiles
+resources/electron
 # src
 src/@assets/*
 !.keep
