@@ -2,7 +2,7 @@ import AdmZip from "adm-zip";
 import { readdirSync, renameSync } from "fs";
 import { resolve } from "path";
 
-(async () => {
+export const createRelease = async () => {
   if (process.platform === "win32") {
     const zip = new AdmZip();
     const exeFile = readdirSync(resolve("./release")).find((name) => name.endsWith(".exe"));
@@ -27,4 +27,4 @@ import { resolve } from "path";
       ),
     );
   }
-})();
+};

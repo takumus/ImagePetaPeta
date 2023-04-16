@@ -1,6 +1,7 @@
 import { electronConfiguration } from "../electron.config";
 import { Arch, Platform, build } from "electron-builder";
 import { exit } from "process";
+import { createRelease } from "scripts/createRelease";
 
 const target = (() => {
   const [os, archString] = process.argv
@@ -37,9 +38,16 @@ build({
   targets: target,
 })
   .then(() => {
-    exit(0);
+    createRelease()
+      .then(() => {
+        exit(0);
+      })
+      .catch((e) => {
+        console.error(e);
+        exit(-1);
+      });
   })
   .catch((e) => {
-    console.log(e);
+    console.error(e);
     exit(-1);
   });
