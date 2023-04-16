@@ -4,7 +4,6 @@
   "private": true,
   "description": "image viewer",
   "author": "takumus",
-  "main": "dist/main/index.js",
   "license": "MIT",
   "debug": {
     "env": {

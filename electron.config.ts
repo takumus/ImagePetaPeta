@@ -7,13 +7,21 @@ export const electronConfiguration: Configuration = {
   directories: {
     output: "release",
   },
-  files: ["dist"],
+  files: [
+    {
+      from: "electronTemp/dist",
+      to: "./",
+    },
+    "package.json",
+  ],
   artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
+  extraMetadata: {
+    main: "main/index.js",
+  },
   extraFiles: [
     {
       from: "electronTemp/extraFiles",
       to: "extraFiles",
-      filter: ["**/*"],
     },
   ],
   mac: {

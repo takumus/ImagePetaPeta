@@ -39,6 +39,7 @@ build({
   .then(() => {
     exit(0);
   })
-  .catch(() => {
+  .catch((e) => {
+    console.log(e);
     exit(-1);
   });

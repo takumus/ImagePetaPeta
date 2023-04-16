@@ -13,7 +13,7 @@ import esmodule from "vite-plugin-esmodule";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(async ({ command }) => {
-  rmSync("dist", { recursive: true, force: true });
+  rmSync("electronTemp/dist", { recursive: true, force: true });
   const isServe = command === "serve";
   const isBuild = command === "build";
   if (isBuild) {
@@ -33,7 +33,7 @@ export default defineConfig(async ({ command }) => {
       plugins: [esmodules.plugin],
       build: {
         minify: isBuild,
-        outDir: resolve("./dist/main"),
+        outDir: resolve("./electronTemp/dist/main"),
         rollupOptions: {
           external: [
             ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(
@@ -102,7 +102,7 @@ export default defineConfig(async ({ command }) => {
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/@assets"),
     build: {
-      outDir: resolve("./dist/renderer"),
+      outDir: resolve("./electronTemp/dist/renderer"),
       rollupOptions: {},
       minify: false,
     },
