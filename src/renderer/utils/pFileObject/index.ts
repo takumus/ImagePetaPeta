@@ -8,7 +8,7 @@ import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectCont
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 export class PFileObject extends PIXI.Sprite {
-  public content?: PFileObjectContent<unknown>;
+  public content?: PFileObjectContent<any>;
   private _loaded = false;
   constructor() {
     super();

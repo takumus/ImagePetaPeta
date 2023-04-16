@@ -100,7 +100,7 @@ async function getDataFromFileList(fileList?: FileList): Promise<{
   buffers?: Buffer[];
   filePaths?: string[];
 }> {
-  const items = [...(fileList ?? [])];
+  const items = Array.from(fileList ?? []);
   if (items.length === 0) {
     return {};
   }

@@ -61,6 +61,7 @@
     "recursive-readdir": "^2.2.3",
     "sass": "^1.61.0",
     "tsx": "^3.12.6",
+    "typed-emitter": "^2.1.0",
     "typescript": "^5.0.2",
     "vite": "^4.2.1",
     "vite-plugin-electron": "^0.11.1",
