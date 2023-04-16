@@ -11,7 +11,7 @@ export const electronConfiguration: Configuration = {
   artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
   extraFiles: [
     {
-      from: "resources/electron/extraFiles",
+      from: "electronTemp/extraFiles",
       to: "extraFiles",
       filter: ["**/*"],
     },
@@ -22,7 +22,7 @@ export const electronConfiguration: Configuration = {
         target: "dmg",
       },
     ],
-    icon: "resources/electron/app_icon_mac.png",
+    icon: "electronTemp/app_icon_mac.png",
   },
   win: {
     target: [
@@ -30,7 +30,7 @@ export const electronConfiguration: Configuration = {
         target: "nsis",
       },
     ],
-    icon: "resources/electron/app_icon_win.ico",
+    icon: "electronTemp/app_icon_win.ico",
   },
   nsis: {
     oneClick: false,

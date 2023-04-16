@@ -28,15 +28,14 @@ async function exportIcon(from: string, to: string, sizes: number[]) {
   writeFileSync(to, ico.encode());
 }
 (async () => {
-  mkdirSync("./resources/electron", { recursive: true });
   await exportIcon(
     "./resources/images/appIcon/icon.png",
-    resolve("./resources/electron/app_icon_win.ico"),
+    resolve("./electronTemp/app_icon_win.ico"),
     [16, 32, 48, 64, 128, 256],
   );
   await exportImageWithMargin(
     "./resources/images/appIcon/icon.png",
-    resolve("./resources/electron/app_icon_mac.png"),
+    resolve("./electronTemp/app_icon_mac.png"),
     512,
     50,
   );

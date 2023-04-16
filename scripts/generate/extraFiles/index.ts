@@ -79,7 +79,7 @@ async function createExtra(params: {
   prepare?: (extra: ExtraFile) => Promise<unknown>;
 }) {
   const developmentPath = normalizePath(
-    join("./resources/electron/extraFiles", params.platform, params.name),
+    join("./electronTemp/extraFiles", params.platform, params.name),
   );
   const productionPath = normalizePath(join("./extraFiles", params.platform, params.name));
   const extra: ExtraFile = {
