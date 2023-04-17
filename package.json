@@ -20,7 +20,7 @@
     "build:mac-x64": "npm run build-vite && tsx ./scripts/buildElectron.ts --electron-target=mac:x64",
     "build:win": "npm run build-vite && tsx ./scripts/buildElectron.ts --electron-target=win:x64",
     "generate-assets": "run-s generate-assets:*",
-    "generate-assets:temp-dir": "tsx ./scripts/generate/tempDir.ts",
+    "generate-assets:dir": "tsx ./scripts/generate/dir.ts",
     "generate-assets:extraFiles": "tsx ./scripts/generate/extraFiles/index.ts",
     "generate-assets:image": "tsx ./scripts/generate/images.ts",
     "generate-assets:debuggers": "tsx ./scripts/generate/debuggers.ts",

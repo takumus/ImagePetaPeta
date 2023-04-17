@@ -26,5 +26,4 @@ src/renderer/htmls/*
 # extras
 electronTemp
 # src
-src/@assets/*
-!.keep
+src/@assets
