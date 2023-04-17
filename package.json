@@ -1,6 +1,6 @@
 {
   "name": "imagepetapeta-beta",
-  "version": "2.2023.700-beta",
+  "version": "2.2023.800-beta",
   "private": true,
   "description": "image viewer",
   "author": "takumus",
@@ -26,7 +26,8 @@
     "generate-assets:debuggers": "tsx ./scripts/generate/debuggers.ts",
     "generate-assets:app-icon": "tsx ./scripts/generate/appIcon.ts",
     "tsc": "run-s tsc:*",
-    "tsc:renderer": "vue-tsc --noEmit ",
+    "tsc:main": "tsc -p ./tsconfig.json --noEmit",
+    "tsc:renderer": "vue-tsc --noEmit",
     "format": "prettier ./src --write",
     "asar": "asar list",
     "tsx": "tsx"
@@ -86,6 +87,7 @@
     "quantize": "^1.0.2",
     "sharp": "^0.32.0",
     "throttle-debounce": "^5.0.0",
+    "typescript": "^5.0.4",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
     "vue-i18n": "v9.3.0-beta.17"
