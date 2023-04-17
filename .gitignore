@@ -1,29 +1,11 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-pnpm-debug.log*
-lerna-debug.log*
-
 node_modules
-release
-*.local
-
-# Editor directories and files
 .vscode/.debug.env
-.idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
-# htmls
+
 src/renderer/htmls/*
 !$*.html
 
-# extras
+release
 electronTemp
-# src
 src/@assets
