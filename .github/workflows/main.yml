@@ -7,7 +7,7 @@ on:
       - "v*.*.*"
 
 jobs:
-  build_on_mac_arm64:
+  build_on_mac:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v3
@@ -17,8 +17,10 @@ jobs:
           node-version: 18
       - name: npm install
         run: npm install
-      - name: npm run build
-        run: npm run build:mac-x64
+      - name: build-vite
+        run: npm run ci-build-vite
+      - name: build-electron-x64
+        run: npm run ci-build-electron:mac-x64
       - name: Release
         uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -27,10 +29,8 @@ jobs:
           allowUpdates: true
           artifacts: |
             release/*.dmg
-      - name: npm rebuild
-        run: npm rebuild --platform=darwin --arch=arm64
-      - name: npm run build
-        run: npm run build:mac-arm64
+      - name: build-electron-arm64
+        run: npm run ci-build-electron:mac-arm64
       - name: Release
         uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -51,8 +51,10 @@ jobs:
           node-version: 18
       - name: npm install
         run: npm install
-      - name: npm run build
-        run: npm run build:win
+      - name: build-vite
+        run: npm run ci-build-vite
+      - name: build-electron-x64
+        run: npm run ci-build-electron:win
       - name: Release
         uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
