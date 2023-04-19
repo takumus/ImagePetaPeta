@@ -29,13 +29,13 @@ import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const keyboards = useKeyboardsStore();
-const windowTypeStore = useWindowTypeStore();
+const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const appInfoStore = useAppInfoStore();
 onMounted(() => {
@@ -45,7 +45,7 @@ onMounted(() => {
   });
 });
 watch(
-  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {
     windowTitleStore.windowTitle.value = value;
   },

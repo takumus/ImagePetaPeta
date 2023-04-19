@@ -1,17 +1,17 @@
-import { WindowType } from "@/commons/datas/windowType";
 import {
   WINDOW_EULA_HEIGHT,
   WINDOW_EULA_WIDTH,
   WINDOW_SETTINGS_HEIGHT,
   WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
+import { WindowName } from "@/commons/windows";
 
 import { useConfigSettings } from "@/main/provides/configs";
 
-export function getWindowCustomOptions(type: WindowType): Electron.BrowserWindowConstructorOptions {
+export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindowConstructorOptions {
   const configSettings = useConfigSettings();
   switch (type) {
-    case WindowType.BOARD:
+    case "board":
       return {
         trafficLightPosition: {
           x: 13,
@@ -20,11 +20,11 @@ export function getWindowCustomOptions(type: WindowType): Electron.BrowserWindow
         alwaysOnTop: configSettings.data.alwaysOnTop,
         // transparent: true,
       };
-    case WindowType.BROWSER:
+    case "browser":
       return {
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
-    case WindowType.SETTINGS:
+    case "settings":
       return {
         width: WINDOW_SETTINGS_WIDTH,
         height: WINDOW_SETTINGS_HEIGHT,
@@ -35,15 +35,15 @@ export function getWindowCustomOptions(type: WindowType): Electron.BrowserWindow
         fullscreenable: false,
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
-    case WindowType.DETAILS:
+    case "details":
       return {
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
-    case WindowType.CAPTURE:
+    case "capture":
       return {
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
-    case WindowType.EULA:
+    case "eula":
       return {
         width: WINDOW_EULA_WIDTH,
         height: WINDOW_EULA_HEIGHT,

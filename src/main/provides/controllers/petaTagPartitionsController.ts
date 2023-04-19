@@ -1,7 +1,6 @@
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
@@ -41,7 +40,7 @@ export class PetaTagPartitionsController {
           status: TaskStatusCode.COMPLETE,
         });
         emitMainEvent(
-          { type: EmitMainEventTargetType.WINDOW_TYPES, windowTypes: [WindowType.BROWSER] },
+          { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["browser"] },
           "updatePetaTagPartitions",
           tags,
           mode,

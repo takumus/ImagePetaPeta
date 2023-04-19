@@ -83,7 +83,6 @@ import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
 import {
   BROWSER_THUMBNAILS_SELECTION_PERCENT,
   BROWSER_THUMBNAIL_MARGIN,
@@ -380,7 +379,7 @@ async function openDetail(petaFile: RPetaFile) {
     return;
   }
   await IPC.send("setDetailsPetaFile", petaFile.id);
-  await IPC.send("openWindow", WindowType.DETAILS);
+  await IPC.send("openWindow", "details");
 }
 function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;

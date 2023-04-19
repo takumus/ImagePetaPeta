@@ -3,7 +3,6 @@ import { PetaTag, createPetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
@@ -42,8 +41,8 @@ export class PetaTagsController {
         // Tileの更新対象は、PetaTagIdsのみ。
         emitMainEvent(
           {
-            type: EmitMainEventTargetType.WINDOW_TYPES,
-            windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+            type: EmitMainEventTargetType.WINDOW_NAMES,
+            windowNames: ["board", "browser", "details"],
           },
           "updatePetaTags",
           {

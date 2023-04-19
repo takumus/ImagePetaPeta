@@ -37,14 +37,14 @@ import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const darkModeStore = useDarkModeStore();
 const settings = useSettingsStore();
-const windowTypeStore = useWindowTypeStore();
+const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 function agree() {
   IPC.send("eula", true);
@@ -59,7 +59,7 @@ const needToAgree = computed(() => {
   return settings.state.value.eula !== EULA;
 });
 watch(
-  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {
     windowTitleStore.windowTitle.value = value;
   },

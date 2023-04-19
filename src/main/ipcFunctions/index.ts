@@ -6,10 +6,10 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
 import { BOARD_DEFAULT_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { ppa } from "@/commons/utils/pp";
+import { WindowName } from "@/commons/windows";
 
 import { extraFiles } from "@/@assets/extraFiles";
 import Transparent from "@/@assets/images/others/transparent.png";
@@ -383,7 +383,7 @@ export const ipcFunctions: IpcFunctionsType = {
       log.log("#Update Settings");
       configSettings.data = settings;
       Object.keys(windows.windows).forEach((key) => {
-        const window = windows.windows[key as WindowType];
+        const window = windows.windows[key as WindowName];
         if (window === undefined || window.isDestroyed()) {
           return;
         }
@@ -673,13 +673,13 @@ export const ipcFunctions: IpcFunctionsType = {
     }
     return [];
   },
-  async openWindow(event, windowType) {
+  async openWindow(event, windowName) {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
     log.log("#Open Window");
-    log.log("type:", windowType);
-    windows.openWindow(windowType, event);
+    log.log("type:", windowName);
+    windows.openWindow(windowName, event);
   },
   async reloadWindow(event) {
     const logger = useLogger();
@@ -689,9 +689,9 @@ export const ipcFunctions: IpcFunctionsType = {
     const type = windows.reloadWindowByEvent(event);
     log.log("type:", type);
   },
-  async getMainWindowType() {
+  async getMainWindowName() {
     const windows = useWindows();
-    return windows.mainWindowType;
+    return windows.mainWindowName;
   },
   async getShowNSFW() {
     return getShowNSFW();
@@ -721,7 +721,7 @@ export const ipcFunctions: IpcFunctionsType = {
       return;
     }
     emitMainEvent(
-      { type: EmitMainEventTargetType.WINDOW_TYPES, windowTypes: [WindowType.DETAILS] },
+      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["details"] },
       "detailsPetaFile",
       detailsPetaFile,
     );

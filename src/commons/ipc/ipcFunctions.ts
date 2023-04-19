@@ -11,7 +11,7 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
+import { WindowName } from "@/commons/windows";
 
 export interface IpcFunctions {
   browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
@@ -55,7 +55,7 @@ export interface IpcFunctions {
   updateSettings: (settings: Settings) => Promise<boolean>;
   getSettings: () => Promise<Settings>;
   getWindowIsFocused: () => Promise<boolean>;
-  getMainWindowType: () => Promise<WindowType | undefined>;
+  getMainWindowName: () => Promise<WindowName | undefined>;
   windowMaximize: () => Promise<void>;
   windowMinimize: () => Promise<void>;
   windowClose: () => Promise<void>;
@@ -66,7 +66,7 @@ export interface IpcFunctions {
   changePetaFileDirectory: (path: string) => Promise<boolean>;
   realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<boolean>;
   startDrag: (petaFiles: PetaFile[], iconSize: number, iconData: string) => Promise<void>;
-  openWindow: (windowType: WindowType) => Promise<void>;
+  openWindow: (windowName: WindowName) => Promise<void>;
   reloadWindow: () => Promise<void>;
   setDetailsPetaFile: (petaFileId: string) => Promise<void>;
   getDetailsPetaFile: () => Promise<PetaFile | undefined>;

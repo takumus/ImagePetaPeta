@@ -1,7 +1,7 @@
-import { WindowType } from "@/commons/datas/windowType";
+import { WindowName } from "@/commons/windows";
 
 export type WindowStates = {
-  [key in WindowType]?: {
+  [key in WindowName]?: {
     width: number;
     height: number;
     maximized: boolean;

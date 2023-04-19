@@ -10,7 +10,6 @@ import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
@@ -54,8 +53,8 @@ export class PetaFilesController {
           // Tileの更新対象なし
           emitMainEvent(
             {
-              type: EmitMainEventTargetType.WINDOW_TYPES,
-              windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+              type: EmitMainEventTargetType.WINDOW_NAMES,
+              windowNames: ["board", "browser", "details"],
             },
             "updatePetaTags",
             {
@@ -66,8 +65,8 @@ export class PetaFilesController {
         }
         emitMainEvent(
           {
-            type: EmitMainEventTargetType.WINDOW_TYPES,
-            windowTypes: [WindowType.BOARD, WindowType.BROWSER, WindowType.DETAILS],
+            type: EmitMainEventTargetType.WINDOW_NAMES,
+            windowNames: ["board", "browser", "details"],
           },
           "updatePetaFiles",
           datas,

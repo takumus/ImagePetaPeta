@@ -5,24 +5,24 @@
     </e-property>
     <e-commons class="left" v-if="visible">
       <button
-        v-if="windowType === 'browser' || windowType === 'details' || windowType === 'capture'"
+        v-if="windowName === 'browser' || windowName === 'details' || windowName === 'capture'"
         tabindex="-1"
         @click="openBoard()">
         <e-icon class="board"></e-icon>
       </button>
       <button
-        v-if="windowType === 'board' || windowType === 'details' || windowType === 'capture'"
+        v-if="windowName === 'board' || windowName === 'details' || windowName === 'capture'"
         tabindex="-1"
         @click="openBrowser()">
         <e-icon class="browser"></e-icon>
       </button>
-      <button v-if="windowType !== 'details'" tabindex="-1" @click="browseAndImportFiles()">
+      <button v-if="windowName !== 'details'" tabindex="-1" @click="browseAndImportFiles()">
         <e-icon class="import-file"></e-icon>
       </button>
-      <button v-if="windowType !== 'details'" tabindex="-1" @click="importImageDirectories()">
+      <button v-if="windowName !== 'details'" tabindex="-1" @click="importImageDirectories()">
         <e-icon class="import-folder"></e-icon>
       </button>
-      <!-- <button v-if="windowType !== 'capture'" tabindex="-1" @click="openCapture()">
+      <!-- <button v-if="windowName !== 'capture'" tabindex="-1" @click="openCapture()">
         <e-icon class="import-folder"></e-icon>
       </button> -->
     </e-commons>
@@ -41,30 +41,28 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { WindowType } from "@/commons/datas/windowType";
-
 import { IPC } from "@/renderer/libs/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 
 const nsfwStore = useNSFWStore();
 const components = useComponentsStore();
 const { t } = useI18n();
-const { windowType } = useWindowTypeStore();
+const { windowName } = useWindowNameStore();
 const windowStatusStore = useWindowStatusStore();
 function openBoard() {
-  IPC.send("openWindow", WindowType.BOARD);
+  IPC.send("openWindow", "board");
 }
 function openBrowser() {
-  IPC.send("openWindow", WindowType.BROWSER);
+  IPC.send("openWindow", "browser");
 }
 function openSettings() {
-  IPC.send("openWindow", WindowType.SETTINGS);
+  IPC.send("openWindow", "settings");
 }
 function openCapture() {
-  IPC.send("openWindow", WindowType.CAPTURE);
+  IPC.send("openWindow", "capture");
 }
 function browseAndImportFiles() {
   IPC.send("browseAndImportFiles", "files");

@@ -33,7 +33,6 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { WindowType } from "@/commons/datas/windowType";
 import { URL_SUPPORT } from "@/commons/defines";
 
 import { DEBUGGERS } from "@/@assets/debuggers";
@@ -70,7 +69,7 @@ function showConfigFolder() {
   IPC.send("showConfigFolder");
 }
 function showEULA() {
-  IPC.send("openWindow", WindowType.EULA);
+  IPC.send("openWindow", "eula");
 }
 </script>
 

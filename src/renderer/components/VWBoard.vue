@@ -73,9 +73,9 @@ import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeSto
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 
 const statesStore = useStateStore();
 const components = useComponentsStore();
@@ -83,7 +83,7 @@ const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
-const windowTypeStore = useWindowTypeStore();
+const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const petaFilesStore = usePetaFilesStore();
 const petaBoardsStore = usePetaBoardsStore();
@@ -226,7 +226,7 @@ watch(
   },
 );
 watch(
-  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {
     windowTitleStore.windowTitle.value = value;
   },

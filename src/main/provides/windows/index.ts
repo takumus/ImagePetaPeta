@@ -1,7 +1,6 @@
 import { BrowserWindow, IpcMainInvokeEvent, app, screen } from "electron";
 import * as Path from "path";
 
-import { WindowType } from "@/commons/datas/windowType";
 import {
   BOARD_DARK_BACKGROUND_FILL_COLOR,
   BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
@@ -13,30 +12,31 @@ import {
 } from "@/commons/defines";
 import { IpcEvents } from "@/commons/ipc/ipcEvents";
 import { Vec2 } from "@/commons/utils/vec2";
+import { WindowName } from "@/commons/windows";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
-import { keepAliveWindowTypes } from "@/main/provides/windows/keepAliveWindowTypes";
+import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
 import { getWindowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { isDarkMode } from "@/main/utils/darkMode";
 
 export class Windows {
-  windows: { [key in WindowType]?: BrowserWindow | undefined } = {};
-  activeWindows: { [key in WindowType]?: boolean } = {};
-  mainWindowType: WindowType | undefined;
-  onCloseWindow(type: WindowType) {
+  windows: { [key in WindowName]?: BrowserWindow | undefined } = {};
+  activeWindows: { [key in WindowName]?: boolean } = {};
+  mainWindowName: WindowName | undefined;
+  onCloseWindow(type: WindowName) {
     const logger = useLogger();
     logger.logMainChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
-    const activeMainWindowType = keepAliveWindowTypes.reduce<WindowType | undefined>(
-      (activeMainWindowType, windowType) =>
-        this.activeWindows[windowType] ? windowType : activeMainWindowType,
+    const activeMainWindowName = keepAliveWindowNames.reduce<WindowName | undefined>(
+      (activeMainWindowName, windowName) =>
+        this.activeWindows[windowName] ? windowName : activeMainWindowName,
       undefined,
     );
-    if (activeMainWindowType !== undefined) {
-      this.changeMainWindow(activeMainWindowType);
+    if (activeMainWindowName !== undefined) {
+      this.changeMainWindow(activeMainWindowName);
     } else if (process.platform !== "darwin") {
       app.quit();
     }
@@ -45,24 +45,24 @@ export class Windows {
     const configSettings = useConfigSettings();
     if (configSettings.data.eula < EULA) {
       if (this.windows.eula === undefined || this.windows.eula.isDestroyed()) {
-        this.openWindow(WindowType.EULA);
+        this.openWindow("eula");
       } else {
         this.windows.eula.moveTop();
       }
       return;
     }
     if (configSettings.data.show === "both") {
-      this.openWindow(WindowType.BOARD);
-      this.openWindow(WindowType.BROWSER);
+      this.openWindow("board");
+      this.openWindow("browser");
     } else if (configSettings.data.show === "browser") {
-      this.openWindow(WindowType.BROWSER);
+      this.openWindow("browser");
     } else {
-      this.openWindow(WindowType.BOARD);
+      this.openWindow("board");
     }
   }
-  openWindow(windowType: WindowType, event?: IpcMainInvokeEvent) {
+  openWindow(windowName: WindowName, event?: IpcMainInvokeEvent) {
     const logger = useLogger();
-    logger.logMainChunk().log("$Open Window:", windowType);
+    logger.logMainChunk().log("$Open Window:", windowName);
     const position = new Vec2();
     try {
       const parentWindowBounds = event
@@ -78,20 +78,20 @@ export class Windows {
     } catch (error) {
       //
     }
-    if (this.windows[windowType] === undefined || this.windows[windowType]?.isDestroyed()) {
-      this.windows[windowType] = this.createWindow(windowType, {
-        ...getWindowCustomOptions(windowType),
+    if (this.windows[windowName] === undefined || this.windows[windowName]?.isDestroyed()) {
+      this.windows[windowName] = this.createWindow(windowName, {
+        ...getWindowCustomOptions(windowName),
         x: position.x,
         y: position.y,
       });
-      this.windows[windowType]?.center();
+      this.windows[windowName]?.center();
     } else {
-      this.windows[windowType]?.moveTop();
-      this.windows[windowType]?.focus();
+      this.windows[windowName]?.moveTop();
+      this.windows[windowName]?.focus();
     }
-    return this.windows[windowType] as BrowserWindow;
+    return this.windows[windowName] as BrowserWindow;
   }
-  createWindow(type: WindowType, options: Electron.BrowserWindowConstructorOptions) {
+  createWindow(type: WindowName, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
     const logger = useLogger().logMainChunk();
     const window = new BrowserWindow({
@@ -130,7 +130,7 @@ export class Windows {
     );
     window.addListener("focus", () => {
       this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", true, type);
-      if (keepAliveWindowTypes.includes(type)) {
+      if (keepAliveWindowNames.includes(type)) {
         this.changeMainWindow(type);
       }
       window.moveTop();
@@ -156,23 +156,23 @@ export class Windows {
     // window.webContents.openDevTools();
     return window;
   }
-  changeMainWindow(type: WindowType) {
-    this.mainWindowType = type;
-    this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "mainWindowType", type);
+  changeMainWindow(type: WindowName) {
+    this.mainWindowName = type;
+    this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "mainWindowName", type);
   }
-  saveWindowSize(windowType: WindowType) {
+  saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
     const logger = useLogger();
-    logger.logMainChunk().log("$Save Window States:", windowType);
-    let state = configWindowStates.data[windowType];
+    logger.logMainChunk().log("$Save Window States:", windowName);
+    let state = configWindowStates.data[windowName];
     if (state === undefined) {
-      state = configWindowStates.data[windowType] = {
+      state = configWindowStates.data[windowName] = {
         width: WINDOW_DEFAULT_WIDTH,
         height: WINDOW_DEFAULT_HEIGHT,
         maximized: false,
       };
     }
-    const window = this.windows[windowType];
+    const window = this.windows[windowName];
     if (window === undefined || window.isDestroyed()) {
       return;
     }
@@ -187,8 +187,8 @@ export class Windows {
     const windowSet = Object.keys(this.windows)
       .map((key) => {
         return {
-          type: key as WindowType,
-          window: this.windows[key as WindowType],
+          type: key as WindowName,
+          window: this.windows[key as WindowName],
         };
       })
       .find((windowInfo) => {
@@ -200,13 +200,13 @@ export class Windows {
       });
     if (windowSet && windowSet.window !== undefined) {
       return windowSet as {
-        type: WindowType;
+        type: WindowName;
         window: BrowserWindow;
       };
     }
     return undefined;
   }
-  reloadWindow(type: WindowType) {
+  reloadWindow(type: WindowName) {
     if (!this.windows[type]?.isDestroyed()) {
       this.windows[type]?.reload();
     }
@@ -236,8 +236,8 @@ export class Windows {
           window.webContents.send(key, ...args);
         }
       });
-    } else if (target.type === EmitMainEventTargetType.WINDOW_TYPES) {
-      target.windowTypes.forEach((type) => {
+    } else if (target.type === EmitMainEventTargetType.WINDOW_NAMES) {
+      target.windowNames.forEach((type) => {
         const window = this.windows[type];
         if (window !== undefined && !window.isDestroyed()) {
           window.webContents.send(key, ...args);
@@ -249,11 +249,11 @@ export class Windows {
 export enum EmitMainEventTargetType {
   ALL = "all",
   WINDOWS = "windows",
-  WINDOW_TYPES = "windowTypes",
+  WINDOW_NAMES = "windowNames",
 }
 export type EmitMainEventTarget =
   | { type: EmitMainEventTargetType.ALL }
   | { type: EmitMainEventTargetType.WINDOWS; windows: BrowserWindow[] }
-  | { type: EmitMainEventTargetType.WINDOW_TYPES; windowTypes: WindowType[] };
+  | { type: EmitMainEventTargetType.WINDOW_NAMES; windowNames: WindowName[] };
 export const windowsKey = createKey<Windows>("windows");
 export const useWindows = createUseFunction(windowsKey);

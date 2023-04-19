@@ -40,7 +40,6 @@ import VPlaybackController from "@/renderer/components/commons/playbackControlle
 import VFloating from "@/renderer/components/commons/utils/floating/VFloating.vue";
 
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
-import { WindowType } from "@/commons/datas/windowType";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
@@ -162,7 +161,7 @@ function changeOrder(to: "front" | "back") {
 }
 function openDetails(petaPanel: RPetaPanel) {
   IPC.send("setDetailsPetaFile", petaPanel.petaFileId);
-  IPC.send("openWindow", WindowType.DETAILS);
+  IPC.send("openWindow", "details");
 }
 function resetPetaPanel() {
   emit(

@@ -5,7 +5,7 @@ import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { TaskStatus } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { WindowType } from "@/commons/datas/windowType";
+import { WindowName } from "@/commons/windows";
 
 export interface IpcEvents {
   updatePetaFiles: (petaFiles: PetaFile[], mode: UpdateMode) => void;
@@ -13,8 +13,8 @@ export interface IpcEvents {
   updatePetaTagPartitions: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
   taskStatus: (id: string, task: TaskStatus) => void;
   foundLatestVersion: (remote: RemoteBinaryInfo) => void;
-  windowFocused: (focused: boolean, windowType: WindowType) => void;
-  mainWindowType: (type: WindowType | undefined) => void;
+  windowFocused: (focused: boolean, windowName: WindowName) => void;
+  mainWindowName: (type: WindowName | undefined) => void;
   regenerateMetadatasProgress: (done: number, count: number) => void;
   regenerateMetadatasBegin: () => void;
   regenerateMetadatasComplete: () => void;

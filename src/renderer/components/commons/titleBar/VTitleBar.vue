@@ -35,13 +35,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { WindowType } from "@/commons/datas/windowType";
-
 import { IPC } from "@/renderer/libs/ipc";
 import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemInfoStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 
-const { windowType } = useWindowTypeStore();
+const { windowName } = useWindowNameStore();
 const { systemInfo } = useSystemInfoStore();
 defineProps<{
   title?: string;
@@ -57,7 +55,7 @@ function closeWindow() {
   IPC.send("windowClose");
 }
 const resizable = computed(() => {
-  return windowType.value !== WindowType.SETTINGS;
+  return windowName.value !== "settings";
 });
 const isMac = computed(() => {
   return systemInfo.value.platform === "darwin";

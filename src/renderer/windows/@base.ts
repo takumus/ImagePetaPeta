@@ -2,8 +2,8 @@ import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
 import { Component, createApp } from "vue";
 import { createI18n } from "vue-i18n";
 
-import { WindowType } from "@/commons/datas/windowType";
 import languages from "@/commons/languages";
+import { WindowName } from "@/commons/windows";
 
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { IPC } from "@/renderer/libs/ipc";
@@ -37,6 +37,10 @@ import {
 } from "@/renderer/stores/systemInfoStore/createSystemInfoStore";
 import { createTextsStore, textsStoreKey } from "@/renderer/stores/textsStore/createTextsStore";
 import {
+  createWindowNameStore,
+  windowNameStoreKey,
+} from "@/renderer/stores/windowNameStore/createWindowNameStore";
+import {
   createWindowStatusStore,
   windowStatusStoreKey,
 } from "@/renderer/stores/windowStatusStore/createWindowStatusStore";
@@ -44,15 +48,11 @@ import {
   createWindowTitleStore,
   windowTitleStoreKey,
 } from "@/renderer/stores/windowTitleStore/createWindowTitleStore";
-import {
-  createWindowTypeStore,
-  windowTypeStoreKey,
-} from "@/renderer/stores/windowTypeStore/createWindowTypeStore";
 import { createInitialization } from "@/renderer/utils/createInitialization";
 
 export async function create(
   component: Component,
-  windowType: WindowType,
+  windowName: WindowName,
   stores?: KeyStoreCreatorPair<unknown>[],
 ) {
   const initialization = createInitialization();
@@ -64,7 +64,7 @@ export async function create(
     }
     initialization.destroy();
     initialized = true;
-    logChunk().log(`$Window "${windowType}" init`);
+    logChunk().log(`$Window "${windowName}" init`);
     const app = createApp(component);
     const platform = await IPC.send("getPlatform");
     app.use(
@@ -77,10 +77,10 @@ export async function create(
     await Promise.all([
       (async () => app.provide(darkModeStoreKey, await createDarkModeStore()))(),
       (async () => app.provide(nsfwStoreKey, await createNSFWStore()))(),
-      (async () => app.provide(windowTypeStoreKey, await createWindowTypeStore(windowType)))(),
+      (async () => app.provide(windowNameStoreKey, await createWindowNameStore(windowName)))(),
       (async () => app.provide(definesStoreKey, await createDefinesStore()))(),
       (async () => app.provide(systemInfoStoreKey, await createSystemInfoStore(platform)))(),
-      (async () => app.provide(windowStatusStoreKey, await createWindowStatusStore(windowType)))(),
+      (async () => app.provide(windowStatusStoreKey, await createWindowStatusStore(windowName)))(),
       (async () => app.provide(statesStoreKey, await createStatesStore()))(),
       (async () => app.provide(settingsStoreKey, await createSettingsStore()))(),
       (async () => app.provide(appInfoStoreKey, await createAppInfoStore()))(),
@@ -116,6 +116,6 @@ export async function create(
   });
   keyboards.enabled = true;
   window.onerror = (e) => {
-    logChunk().log(`window "${windowType}" error:`, e);
+    logChunk().log(`window "${windowName}" error:`, e);
   };
 }

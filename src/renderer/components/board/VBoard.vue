@@ -49,7 +49,6 @@ import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
 import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
-import { WindowType } from "@/commons/datas/windowType";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
@@ -206,7 +205,7 @@ function pointerup(e: PIXI.FederatedPointerEvent) {
           [
             {
               label: t("boards.menu.openBrowser"),
-              click: () => IPC.send("openWindow", WindowType.BROWSER),
+              click: () => IPC.send("openWindow", "browser"),
             },
             { separate: true },
             { label: t("boards.menu.resetPosition"), click: boardLoader.resetTransform },

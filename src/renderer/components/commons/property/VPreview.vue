@@ -30,7 +30,6 @@ import { useI18n } from "vue-i18n";
 import VPropertyThumbnail from "@/renderer/components/commons/property/VPropertyThumbnail.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
-import { WindowType } from "@/commons/datas/windowType";
 import { BROWSER_MAX_PREVIEW_COUNT } from "@/commons/defines";
 import { resizeImage } from "@/commons/utils/resizeImage";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
@@ -78,7 +77,7 @@ function openDetails() {
   const petaFile = props.petaFiles[0];
   if (petaFile) {
     IPC.send("setDetailsPetaFile", petaFile.id);
-    IPC.send("openWindow", WindowType.DETAILS);
+    IPC.send("openWindow", "details");
   }
 }
 const propertyThumbnails = computed<PropertyThumbnail[]>(() => {

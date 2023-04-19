@@ -1,5 +1,4 @@
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
-import { WindowType } from "@/commons/datas/windowType";
 import { UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 
 import { useLogger } from "@/main/provides/utils/logger";
@@ -20,7 +19,7 @@ export async function checkAndNotifySoftwareUpdate() {
   log.log(remote);
   if (!remote.isLatest) {
     log.log("this version is old");
-    windows.openWindow(WindowType.SETTINGS);
+    windows.openWindow("settings");
     emitMainEvent({ type: EmitMainEventTargetType.ALL }, "foundLatestVersion", remote);
   } else {
     log.log("this version is latest");

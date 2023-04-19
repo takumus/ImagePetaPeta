@@ -1,21 +1,21 @@
 import { InjectionKey, readonly, ref } from "vue";
 
-import { WindowType } from "@/commons/datas/windowType";
+import { WindowName } from "@/commons/windows";
 
 import { IPC } from "@/renderer/libs/ipc";
 
-export async function createWindowStatusStore(myWindowType: WindowType) {
+export async function createWindowStatusStore(myWindowName: WindowName) {
   const state = ref({
     focused: await IPC.send("getWindowIsFocused"),
-    isMainWindow: (await IPC.send("getMainWindowType")) === myWindowType,
+    isMainWindow: (await IPC.send("getMainWindowName")) === myWindowName,
   });
-  IPC.on("windowFocused", (event, focused, windowType) => {
-    if (myWindowType === windowType) {
+  IPC.on("windowFocused", (event, focused, windowName) => {
+    if (myWindowName === windowName) {
       state.value.focused = focused;
     }
   });
-  IPC.on("mainWindowType", (event, type) => {
-    state.value.isMainWindow = type === myWindowType;
+  IPC.on("mainWindowName", (event, type) => {
+    state.value.isMainWindow = type === myWindowName;
   });
   return {
     state: readonly(state),

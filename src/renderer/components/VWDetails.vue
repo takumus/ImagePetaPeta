@@ -44,15 +44,15 @@ import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore"
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
-import { useWindowTypeStore } from "@/renderer/stores/windowTypeStore/useWindowTypeStore";
 
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
 const petaFilesStore = usePetaFilesStore();
-const windowTypeStore = useWindowTypeStore();
+const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const petaFileId = ref<string>();
 const keyboards = new Keyboards();
@@ -93,7 +93,7 @@ const singlePetaFiles = computed(() => {
   return [petaFile.value];
 });
 watch(
-  () => `${t(`titles.${windowTypeStore.windowType.value}`)} - ${appInfoStore.state.value.name}`,
+  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {
     windowTitleStore.windowTitle.value = value;
   },
