@@ -40,7 +40,7 @@ export class Windows {
     if (activeMainWindowName !== undefined) {
       this.changeMainWindow(activeMainWindowName);
     } else if (process.platform !== "darwin") {
-      quit.request();
+      quit.quit();
     }
   }
   showWindows() {

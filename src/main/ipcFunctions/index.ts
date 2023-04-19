@@ -537,7 +537,7 @@ export const ipcFunctions: IpcFunctionsType = {
       configSettings.data.petaFileDirectory.default = false;
       configSettings.data.petaFileDirectory.path = path;
       configSettings.save();
-      relaunch();
+      useQuit().relaunch();
       return true;
     } catch (error) {
       log.error(error);
@@ -754,9 +754,9 @@ export const ipcFunctions: IpcFunctionsType = {
     if (agree) {
       configSettings.data.eula = EULA;
       configSettings.save();
-      relaunch();
+      quit.relaunch();
     } else {
-      quit.force();
+      quit.quit(true);
     }
   },
   async getMediaSources() {
@@ -791,8 +791,4 @@ export function registerIpcFunctions() {
 function getShowNSFW() {
   const configSettings = useConfigSettings();
   return temporaryShowNSFW || configSettings.data.alwaysShowNSFW;
-}
-function relaunch() {
-  app.relaunch();
-  app.exit();
 }

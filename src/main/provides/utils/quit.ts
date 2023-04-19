@@ -3,11 +3,18 @@ import { app } from "electron";
 import { createKey, createUseFunction } from "@/main/libs/di";
 
 export class Quit {
-  force() {
-    app.quit();
+  quit(force = false) {
+    if (force) {
+      app.exit();
+      return;
+    }
+    setTimeout(() => {
+      this.quit(true);
+    }, 1000);
   }
-  request() {
-    app.quit();
+  relaunch(force = false) {
+    app.relaunch();
+    this.quit(force);
   }
 }
 export const quitKey = createKey<Quit>("quit");

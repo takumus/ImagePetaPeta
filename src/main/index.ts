@@ -10,6 +10,7 @@ import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
+import { useQuit } from "@/main/provides/utils/quit";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
@@ -17,7 +18,7 @@ import { initWebhook } from "@/main/webhook";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
-    app.quit();
+    app.exit();
     return;
   }
   // DI準備
@@ -76,6 +77,10 @@ import { initWebhook } from "@/main/webhook";
   });
   // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
+  app.on("will-quit", (e) => {
+    e.preventDefault();
+    useQuit().quit();
+  });
   // electron準備OK
   async function appReady() {
     logger
