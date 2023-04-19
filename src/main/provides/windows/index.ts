@@ -17,6 +17,7 @@ import { WindowName } from "@/commons/windows";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
+import { useQuit } from "@/main/provides/utils/quit";
 import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
 import { getWindowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { isDarkMode } from "@/main/utils/darkMode";
@@ -27,6 +28,7 @@ export class Windows {
   mainWindowName: WindowName | undefined;
   onCloseWindow(type: WindowName) {
     const logger = useLogger();
+    const quit = useQuit();
     logger.logMainChunk().log("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
@@ -38,7 +40,7 @@ export class Windows {
     if (activeMainWindowName !== undefined) {
       this.changeMainWindow(activeMainWindowName);
     } else if (process.platform !== "darwin") {
-      app.quit();
+      quit.request();
     }
   }
   showWindows() {

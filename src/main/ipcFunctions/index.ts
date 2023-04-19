@@ -24,6 +24,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBStatus } from "@/main/provides/databases";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
+import { useQuit } from "@/main/provides/utils/quit";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
@@ -744,6 +745,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const logger = useLogger();
     const configSettings = useConfigSettings();
     const log = logger.logMainChunk();
+    const quit = useQuit();
     log.log("#EULA");
     log.log(agree ? "agree" : "disagree", EULA);
     if (configSettings.data.eula === EULA) {
@@ -754,7 +756,7 @@ export const ipcFunctions: IpcFunctionsType = {
       configSettings.save();
       relaunch();
     } else {
-      app.quit();
+      quit.force();
     }
   },
   async getMediaSources() {
