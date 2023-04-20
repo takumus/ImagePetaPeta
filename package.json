@@ -93,6 +93,6 @@
   "productName": "ImagePetaPeta-beta",
   "volta": {
     "node": "19.9.0",
-    "npm": "9.6.3"
+    "npm": "9.6.5"
   }
 }
