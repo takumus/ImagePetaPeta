@@ -42,12 +42,12 @@ jobs:
         run: npm run ci-build-vite
       - name: build-electron-${{ matrix.target }}
         run: npm run ci-build-electron:${{ matrix.target }}
-      - name: Release
-        uses: ncipollo/release-action@v1
-        with:
-          draft: true
-          allowUpdates: true
-          artifacts: |
-            release/*.dmg,release/*.exe.zip
+        # - name: Release
+        #   uses: ncipollo/release-action@v1
+        #   with:
+        #     draft: true
+        #     allowUpdates: true
+        #     artifacts: |
+        #       release/*.dmg,release/*.exe.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
