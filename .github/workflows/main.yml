@@ -10,8 +10,14 @@ jobs:
   build_on_mac:
     strategy:
       matrix:
-        target: [mac-x64, mac-arm64]
-    runs-on: macos-11
+        include:
+          - os: windows-latest
+            target: win
+          - os: macos-11
+            target: mac-arm64
+          - os: macos-11
+            target: mac-x64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 18
@@ -31,30 +37,6 @@ jobs:
           draft: true
           allowUpdates: true
           artifacts: |
-            release/*.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  build_on_win:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: npm install
-        run: npm install
-      - name: build-vite
-        run: npm run ci-build-vite
-      - name: build-electron-x64
-        run: npm run ci-build-electron:win
-      - name: Release
-        uses: ncipollo/release-action@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          draft: true
-          allowUpdates: true
-          artifacts: |
-            release/*.exe.zip
+            release/*.dmg,release/*.exe.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
