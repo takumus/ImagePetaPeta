@@ -1,4 +1,4 @@
-name: CI
+name: Release
 
 on:
   push:
@@ -7,15 +7,15 @@ on:
       - "v*.*.*"
 
 jobs:
-  build_on_mac:
+  release:
     strategy:
       matrix:
         include:
           - os: windows-latest
             target: win
-          - os: macos-11
+          - os: macos-12
             target: mac-arm64
-          - os: macos-11
+          - os: macos-12
             target: mac-x64
     runs-on: ${{ matrix.os }}
     steps:
