@@ -2,10 +2,7 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
     tags:
-      # "vXX.XX.XX" で始まる Tag 名
       - "v*.*.*"
 
 jobs:
@@ -15,10 +12,13 @@ jobs:
         include:
           - os: windows-latest
             target: win
+            artifact: release/*.dmg
           - os: macos-12
             target: mac-arm64
+            artifact: release/*.dmg
           - os: macos-12
             target: mac-x64
+            artifact: release/*.exe.zip
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -26,16 +26,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - uses: actions/cache@v3
-        id: build-cache_id
-        env:
-          cache-name: build-cache
-        with:
-          ref: ${{ github.ref_name }}
-          path: |
-            node_modules
-            .electron-builder-cache
-          key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+      # - uses: actions/cache@v3
+      #   id: build-cache_id
+      #   env:
+      #     cache-name: build-cache
+      #   with:
+      #     path: |
+      #       node_modules
+      #       .electron-builder-cache
+      #     key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
       - name: npm install
         run: npm install
       - name: build-vite
@@ -45,10 +44,9 @@ jobs:
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-          tag: "test-test"
           draft: true
           allowUpdates: true
           artifacts: |
-            release/*.dmg,release/*.exe.zip
+            release/${{ matrix.artifact }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
