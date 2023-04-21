@@ -58,7 +58,3 @@ npm run dev
 ```
 npm run build
 ```
-
-```
-npm run build --electron-target=mac:arm64
-```
