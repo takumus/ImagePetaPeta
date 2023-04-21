@@ -12,13 +12,13 @@ jobs:
         include:
           - os: windows-latest
             target: win
-            artifact: release/*.dmg
+            artifact: release/*.exe.zip
           - os: macos-12
             target: mac-arm64
             artifact: release/*.dmg
           - os: macos-12
             target: mac-x64
-            artifact: release/*.exe.zip
+            artifact: release/*.dmg
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -47,6 +47,6 @@ jobs:
           draft: true
           allowUpdates: true
           artifacts: |
-            release/${{ matrix.artifact }}
+            ${{ matrix.artifact }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
