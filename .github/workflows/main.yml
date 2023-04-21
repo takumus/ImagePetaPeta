@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       # "vXX.XX.XX" で始まる Tag 名
       - "v*.*.*"
