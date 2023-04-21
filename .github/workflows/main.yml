@@ -35,19 +35,19 @@ jobs:
             node_modules
             .electron-builder-cache
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
-      - run: echo '${{ toJSON(steps.build-cache_id.outputs) }}'
       - name: npm install
         run: npm install
       - name: build-vite
         run: npm run ci-build-vite
       - name: build-electron-${{ matrix.target }}
         run: npm run ci-build-electron:${{ matrix.target }}
-        # - name: Release
-        #   uses: ncipollo/release-action@v1
-        #   with:
-        #     draft: true
-        #     allowUpdates: true
-        #     artifacts: |
-        #       release/*.dmg,release/*.exe.zip
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "test-test"
+          draft: true
+          allowUpdates: true
+          artifacts: |
+            release/*.dmg,release/*.exe.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
