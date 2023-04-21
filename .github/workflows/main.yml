@@ -25,13 +25,15 @@ jobs:
         with:
           node-version: 18
       - uses: actions/cache@v3
-        id: node_modules_cache_id
+        id: build-cache_id
         env:
-          cache-name: cache-node-modules
+          cache-name: build-cache
         with:
-          path: "node_modules"
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
-      - run: echo '${{ toJSON(steps.node_modules_cache_id.outputs) }}'
+          path: |
+            node_modules
+            .electron-builder-cache
+          key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+      - run: echo '${{ toJSON(steps.build-cache_id.outputs) }}'
       - name: npm install
         run: npm install
       - name: build-vite

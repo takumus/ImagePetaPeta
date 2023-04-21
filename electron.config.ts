@@ -7,6 +7,9 @@ export const electronConfiguration: Configuration = {
   directories: {
     output: "release",
   },
+  electronDownload: {
+    cache: "./.electron-builder-cache",
+  },
   files: [
     {
       from: "electronTemp/dist",
