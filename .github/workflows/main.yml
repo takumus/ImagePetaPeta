@@ -2,10 +2,8 @@ name: Release
 
 on:
   push:
-    # tags:
-    #   - "v*.*.*"
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 
 jobs:
   release:
@@ -46,7 +44,6 @@ jobs:
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-          tag: v30.30.30
           draft: true
           allowUpdates: true
           artifacts: |
