@@ -1,10 +1,10 @@
 {
   "name": "imagepetapeta-beta",
-  "version": "2.2023.801-beta",
+  "version": "2.2023.900-beta",
   "private": true,
   "description": "image viewer",
   "author": "takumus",
-  "license": "MIT",
+  "license": "BSD 2-Clause License",
   "main": "electronTemp/dist/main/index.js",
   "debug": {
     "env": {
