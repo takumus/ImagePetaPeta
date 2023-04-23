@@ -9,8 +9,13 @@ export const migrateStates = createMigrater<States>(async (data, update) => {
     update();
   }
   // 3.0.0
-  if (data.groupingByDate === undefined) {
-    data.groupingByDate = defaultStates.groupingByDate;
+  // if (data.groupingByDate === undefined) {
+  //   data.groupingByDate = defaultStates.groupingByDate;
+  //   update();
+  // }
+  // 3.0.0
+  if (data.browserTileViewMode === undefined) {
+    data.browserTileViewMode = defaultStates.browserTileViewMode;
     update();
   }
   return data;

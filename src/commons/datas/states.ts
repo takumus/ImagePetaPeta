@@ -3,12 +3,13 @@ export type States = {
   browserTileSize: number;
   visibleLayerPanel: boolean;
   loadedPetaBoardId: string;
-  groupingByDate: boolean;
+  browserTileViewMode: (typeof browserTileViewMode)[number];
 };
 export const defaultStates: States = {
   selectedPetaBoardId: "",
   browserTileSize: 128,
   visibleLayerPanel: true,
   loadedPetaBoardId: "",
-  groupingByDate: false,
+  browserTileViewMode: "fill1",
 };
+export const browserTileViewMode = ["fill1", "fill2", "date"] as const;

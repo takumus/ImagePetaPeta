@@ -15,12 +15,10 @@
               v-model:selected-filter-type="selectedFilterType" />
           </e-search>
           <e-buttons>
-            <label>
-              <VCheckbox
-                :value="statesStore.state.value.groupingByDate"
-                @update:value="(value) => (statesStore.state.value.groupingByDate = value)" />
-              <span>{{ t("browser.grouping") }}</span>
-            </label>
+            <VSelect
+              :items="browserTileViewMode.map((sm) => ({ value: sm, label: sm }))"
+              :min-width="'120px'"
+              v-model:value="statesStore.state.value.browserTileViewMode" />
             <VSelect
               :items="sortModes.map((sm) => ({ value: sm, label: sm }))"
               :min-width="'120px'"
@@ -82,6 +80,7 @@ import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
+import { browserTileViewMode } from "@/commons/datas/states";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BROWSER_THUMBNAILS_SELECTION_PERCENT,
@@ -506,7 +505,7 @@ const tiles = computed((): Tile[] => {
   }
   let prevDateString = "";
   const tiles: Tile[] = [];
-  filteredPetaFiles.value.map((p) => {
+  filteredPetaFiles.value.map((p, i) => {
     let minY = Number.MAX_VALUE;
     let maxY = Number.MIN_VALUE;
     let mvi = 0;
@@ -523,7 +522,10 @@ const tiles = computed((): Tile[] => {
     const date = new Date(p.addDate);
     const currentDateString =
       date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-    if (prevDateString !== currentDateString && statesStore.state.value.groupingByDate) {
+    if (
+      prevDateString !== currentDateString &&
+      statesStore.state.value.browserTileViewMode === "date"
+    ) {
       prevDateString = currentDateString;
       mvi = 0;
       minY = maxY;
@@ -545,6 +547,13 @@ const tiles = computed((): Tile[] => {
       };
       updateVisibility(tile);
       tiles.push(tile);
+    }
+    if (
+      i % thumbnailsRowCount.value === 0 &&
+      statesStore.state.value.browserTileViewMode === "fill2"
+    ) {
+      yList.fill(maxY);
+      mvi = 0;
     }
     const position = new Vec2(
       mvi * actualTileSize.value + BROWSER_THUMBNAIL_MARGIN,
