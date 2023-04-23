@@ -104,7 +104,7 @@ export default defineConfig(async ({ command }) => {
     build: {
       outDir: resolve("./electronTemp/dist/renderer"),
       rollupOptions: {},
-      minify: false,
+      minify: isBuild,
     },
     resolve: {
       alias: [{ find: "@", replacement: resolve("./src/") }],
