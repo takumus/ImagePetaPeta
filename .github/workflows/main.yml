@@ -13,10 +13,10 @@ jobs:
           - os: windows-latest
             target: win
             artifact: release/*.exe.zip
-          - os: macos-12
+          - os: self-hosted
             target: mac-arm64
             artifact: release/*.dmg
-          - os: macos-12
+          - os: self-hosted
             target: mac-x64
             artifact: release/*.dmg
     runs-on: ${{ matrix.os }}
