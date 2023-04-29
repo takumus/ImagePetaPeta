@@ -34,6 +34,7 @@ export const electronConfiguration: Configuration = {
       },
     ],
     icon: "electronTemp/app_icon_mac.png",
+    cscInstallerLink: "takumus",
   },
   win: {
     target: [
