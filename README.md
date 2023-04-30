@@ -19,15 +19,21 @@
 **`YYY` は、M1 や M2 等をお使いの場合は arm64 を、それ以外の方は Intel を選んでください。**  
 <https://github.com/takumus/ImagePetaPeta/releases/>
 
-#### 1. `Temrminal.app` を起動します。
+#### 1. ダウンロードしたファイルを開きアプリケーションへドラッグします。
 
-<img src="./.readme_assets/install-mac-01.png" width="33%"><img src="./.readme_assets/install-mac-02.png" width="33%"><img src="./.readme_assets/install-mac-03.png" width="33%">
+<img src="./.readme_assets/install-mac-01.jpg" width="50%">
 
-#### 2. `xattr -rc /Applications/ImagePetaPeta-beta.app` と入力し、エンターキーを押します。
+#### 2. ランチャー等からアプリを起動します。しかし開けないので、左のボタンを押しファインダーで開きます。
 
-<img src="./.readme_assets/install-mac-04.png" width="100%">
+<img src="./.readme_assets/install-mac-02.jpg" width="50%">
 
-その後は通常通りに起動できます。
+#### 3. アプリをダブルクリックではなく、右クリックで開きます。
+
+<img src="./.readme_assets/install-mac-03.jpg" width="50%">
+
+#### 4. 開くを押せば起動できます。
+
+<img src="./.readme_assets/install-mac-04.jpg" width="50%">
 
 ## ご協力
 
