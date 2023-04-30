@@ -4,16 +4,10 @@
       <slot></slot>
     </e-property>
     <e-commons class="left" v-if="visible">
-      <button
-        v-if="windowName === 'browser' || windowName === 'details' || windowName === 'capture'"
-        tabindex="-1"
-        @click="openBoard()">
+      <button v-if="windowName !== 'board'" tabindex="-1" @click="openBoard()">
         <e-icon class="board"></e-icon>
       </button>
-      <button
-        v-if="windowName === 'board' || windowName === 'details' || windowName === 'capture'"
-        tabindex="-1"
-        @click="openBrowser()">
+      <button v-if="windowName !== 'browser'" tabindex="-1" @click="openBrowser()">
         <e-icon class="browser"></e-icon>
       </button>
       <button v-if="windowName !== 'details'" tabindex="-1" @click="browseAndImportFiles()">
@@ -85,7 +79,12 @@ async function toggleNSFW() {
   }
 }
 const visible = computed(() => {
-  return windowStatusStore.state.value.isMainWindow || windowStatusStore.state.value.focused;
+  return (
+    windowName.value === "board" ||
+    windowName.value === "details" ||
+    windowName.value === "browser" ||
+    windowName.value === "capture"
+  );
 });
 const nsfwClass = computed(() => {
   return nsfwStore.state.value ? "nsfw" : "sfw";
