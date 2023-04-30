@@ -12,7 +12,7 @@ export const createRelease = async () => {
     zip.addLocalFile(resolve("./release", exeFile));
     zip.writeZip(resolve("./release", exeFile.replace(/win32-x64/g, "windows") + ".zip"));
   } else if (process.platform === "darwin") {
-    const dmgFile = readdirSync(resolve("./release")).find((name) => name.endsWith(".dmg"));
+    const dmgFile = readdirSync(resolve("./release")).find((name) => name.endsWith(".pkg"));
     if (dmgFile === undefined) {
       return;
     }
