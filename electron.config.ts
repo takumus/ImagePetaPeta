@@ -28,11 +28,7 @@ export const electronConfiguration: Configuration = {
     },
   ],
   mac: {
-    target: [
-      {
-        target: "pkg",
-      },
-    ],
+    target: ["pkg", "dmg"],
     icon: "electronTemp/app_icon_mac.png",
     cscInstallerLink: "takumus",
   },
@@ -43,11 +39,7 @@ export const electronConfiguration: Configuration = {
     mustClose: ["io.takumus.imagepetapeta-beta"],
   },
   win: {
-    target: [
-      {
-        target: "nsis",
-      },
-    ],
+    target: ["nsis"],
     icon: "electronTemp/app_icon_win.ico",
   },
   nsis: {
