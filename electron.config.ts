@@ -37,6 +37,7 @@ export const electronConfiguration: Configuration = {
     cscInstallerLink: "takumus",
   },
   pkg: {
+    isRelocatable: false,
     overwriteAction: "upgrade",
     mustClose: ["io.takumus.imagepetapeta-beta"],
   },
