@@ -30,7 +30,7 @@ export const electronConfiguration: Configuration = {
   mac: {
     target: [
       {
-        target: "dmg",
+        target: "pkg",
       },
     ],
     icon: "electronTemp/app_icon_mac.png",
