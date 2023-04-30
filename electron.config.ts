@@ -39,6 +39,7 @@ export const electronConfiguration: Configuration = {
   pkg: {
     isRelocatable: false,
     overwriteAction: "upgrade",
+    allowAnywhere: false,
     mustClose: ["io.takumus.imagepetapeta-beta"],
   },
   win: {
