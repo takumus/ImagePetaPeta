@@ -12,19 +12,19 @@ export const createRelease = async () => {
     zip.addLocalFile(resolve("./release", exeFile));
     zip.writeZip(resolve("./release", exeFile.replace(/win32-x64/g, "windows") + ".zip"));
   } else if (process.platform === "darwin") {
-    const dmgFile = readdirSync(resolve("./release")).find((name) => name.endsWith(".pkg"));
-    if (dmgFile === undefined) {
-      return;
-    }
-    renameSync(
-      resolve("./release", dmgFile),
-      resolve(
-        "./release",
-        dmgFile
-          .replace(/darwin/g, "mac")
-          .replace(/x64/g, "intel")
-          .replace(/arm64/g, "m1"),
-      ),
-    );
+    readdirSync(resolve("./release"))
+      .filter((name) => name.endsWith(".pkg") || name.endsWith(".dmg"))
+      .forEach((name) => {
+        renameSync(
+          resolve("./release", name),
+          resolve(
+            "./release",
+            name
+              .replace(/darwin/g, "mac")
+              .replace(/x64/g, "intel")
+              .replace(/arm64/g, "m1"),
+          ),
+        );
+      });
   }
 };
