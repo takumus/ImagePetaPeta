@@ -3,7 +3,7 @@ e-settings-content-root {
   display: block;
   > p {
     font-size: var(--size-0);
-    margin-left: 16px;
+    margin: var(--size-1);
     word-break: break-word;
   }
 }

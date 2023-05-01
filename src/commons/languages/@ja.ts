@@ -160,7 +160,7 @@ export const ja: I18NBase = {
     showEULAButton: "はじめにお読みください",
     licenses: "使用しているライブラリ情報",
     assets: "使用しているアセット情報",
-    debuggers: "デバッグ協力",
+    supporters: "サポーター",
   },
   settings: {
     settings: "設定",

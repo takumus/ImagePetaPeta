@@ -1,16 +1,24 @@
 <template>
   <e-settings-content-root class="update">
-    <p v-if="updateAvailable">
-      {{ t("settings.updateAvailable") }}<br />
-      {{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
-      {{ t("settings.latestVersion") }}: {{ latestVersion }}<br />
-      <button @click="downloadUpdate">{{ t("settings.updateButton") }}</button>
-    </p>
-    <p v-else>
-      {{ t("settings.thisIsLatest") }}<br />
-      {{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}<br />
-      <button @click="releaseNote">{{ t("settings.releaseNoteButton") }}</button>
-    </p>
+    <e-info v-if="updateAvailable">
+      <p>
+        {{ t("settings.updateAvailable") }}
+      </p>
+      <p>{{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}</p>
+      <p>{{ t("settings.latestVersion") }}: {{ latestVersion }}</p>
+      <p>
+        <button @click="downloadUpdate">{{ t("settings.updateButton") }}</button>
+      </p>
+    </e-info>
+    <e-info v-else>
+      <p>
+        {{ t("settings.thisIsLatest") }}
+      </p>
+      <p>{{ t("settings.currentVersion") }}: {{ appInfoStore.state.value.version }}</p>
+      <p>
+        <button @click="releaseNote">{{ t("settings.releaseNoteButton") }}</button>
+      </p>
+    </e-info>
     <button @click="checkUpdate">{{ t("settings.checkUpdateButton") }}</button>
   </e-settings-content-root>
 </template>
@@ -48,10 +56,13 @@ function releaseNote() {
 e-settings-content-root.update {
   text-align: center;
   display: block;
-  > p {
-    font-size: var(--size-1);
-    margin: 0px 16px;
-    word-break: break-word;
+  > e-info {
+    display: block;
+    overflow: hidden;
+    > p {
+      font-size: var(--size-1);
+      word-break: break-word;
+    }
   }
 }
 </style>

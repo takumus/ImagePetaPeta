@@ -23,7 +23,7 @@ import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import hsvCircleImage from "@/@assets/images/others/hsvCircle.png";
+import hsvCircleImage from "@/_public/images/others/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";

@@ -36,7 +36,7 @@ const defaultPlugin: Plugin = async (filePath, destFilePath) => {
 
 (async () => {
   const imagesRoot = "./resources/images";
-  const destImagesRoot = "./src/@assets/images";
+  const destImagesRoot = "./src/_public/images";
   const extetions = ["png"];
   const plugins: Plugin[] = [cursorSizePlugin, ignoreAppIconPlugin, defaultPlugin];
   rmSync(resolve(destImagesRoot), { recursive: true, force: true });

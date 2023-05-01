@@ -1,6 +1,6 @@
 import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
-import { mkdirSync, readdirSync, writeFileSync } from "fs";
+import { copyFileSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
 import { normalizePath } from "vite";
 
@@ -29,6 +29,20 @@ interface ExtraFile {
   );
   extras.push(
     await createExtra({
+      platform: "universal",
+      name: "supporters",
+      files: ["supporters.json"],
+      prepare: async (extraFile) => {
+        mkdirSync(extraFile.developmentPath, { recursive: true });
+        copyFileSync(
+          "./resources/supporters/supporters.json",
+          resolve(extraFile.developmentPath, "supporters.json"),
+        );
+      },
+    }),
+  );
+  extras.push(
+    await createExtra({
       platform: "win32",
       name: "realesrgan",
       files: ["models/", "realesrgan-ncnn-vulkan.exe", "vcomp140.dll", "vcomp140d.dll"],
@@ -51,7 +65,7 @@ interface ExtraFile {
 })();
 function writeExtraFilesTS(extras: ExtraFile[]) {
   writeFileSync(
-    "./src/@assets/extraFiles.ts",
+    "./src/_public/extraFiles.ts",
     Buffer.from(
       `const development = process.env.NODE_ENV === "development";\nexport const extraFiles = {\n` +
         extras

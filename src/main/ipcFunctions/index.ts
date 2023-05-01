@@ -11,8 +11,8 @@ import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { ppa } from "@/commons/utils/pp";
 import { WindowName } from "@/commons/windows";
 
-import { extraFiles } from "@/@assets/extraFiles";
-import Transparent from "@/@assets/images/others/transparent.png";
+import { extraFiles } from "@/_public/extraFiles";
+import Transparent from "@/_public/images/others/transparent.png";
 import { showError } from "@/main/errorWindow";
 import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
@@ -779,8 +779,22 @@ export const ipcFunctions: IpcFunctionsType = {
     }));
   },
   async getLicenses() {
-    const execFilePath = resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]);
-    return JSON.parse((await file.readFile(execFilePath)).toString());
+    return JSON.parse(
+      (
+        await file.readFile(
+          resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]),
+        )
+      ).toString(),
+    );
+  },
+  async getSupporters() {
+    return JSON.parse(
+      (
+        await file.readFile(
+          resolveExtraFilesPath(extraFiles["supporters.universal"]["supporters.json"]),
+        )
+      ).toString(),
+    );
   },
 };
 export function registerIpcFunctions() {

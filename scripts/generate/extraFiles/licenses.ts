@@ -74,7 +74,7 @@ export async function generateLicenses() {
       .replace(/\n$/, ""); // 最後の改行削除
   });
   // writeFileSync(
-  //   "./src/@assets/licenses.ts",
+  //   "./src/_public/licenses.ts",
   //   `export const LICENSES = ${JSON.stringify(modules, null, 2)}`,
   //   {
   //     encoding: "utf-8",

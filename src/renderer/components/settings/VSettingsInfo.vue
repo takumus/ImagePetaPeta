@@ -20,8 +20,14 @@
     </button>
     <p>{{ t("info.assets") }}</p>
     <button tabindex="-1" @click="gotoIcons8">Icons8.com</button>
-    <p>{{ t("info.debuggers") }}</p>
-    <pre class="debuggers">{{ debuggers }}</pre>
+    <p>{{ t("info.supporters") }}</p>
+    <pre class="licenses">{{
+      supporters
+        .map((data) => {
+          return `--${data.type}--\n` + `${data.names.join("\n")}`;
+        })
+        .join("\n\n")
+    }}</pre>
     <p>{{ t("info.licenses") }}</p>
     <pre class="licenses">{{
       licenses.map((lib) => `${lib.name}\n${lib.licenses}\n${lib.text}`).join("\n")
@@ -35,18 +41,25 @@ import { useI18n } from "vue-i18n";
 
 import { URL_SUPPORT } from "@/commons/defines";
 
-import { DEBUGGERS } from "@/@assets/debuggers";
 import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const licenses = ref<{ name: string; text: string; licenses: string }[]>([]);
-const debuggers = computed(() => {
-  return DEBUGGERS.join(", ");
-});
+const supporters = ref<{ type: string; names: string[] }[]>([]);
 onMounted(async () => {
-  licenses.value = await IPC.send("getLicenses");
+  const [_licenses, _supporters] = await Promise.all([
+    IPC.send("getLicenses"),
+    IPC.send("getSupporters"),
+  ]);
+  licenses.value = _licenses;
+  Object.keys(_supporters).forEach((type) => {
+    supporters.value.push({
+      type,
+      names: _supporters[type],
+    });
+  });
 });
 function gotoGithub() {
   IPC.send("openURL", "https://github.com/takumus/ImagePetaPeta");
@@ -81,7 +94,7 @@ e-settings-content-root.info {
     &.licenses {
       text-align: left;
     }
-    &.debuggers {
+    &.supporters {
       text-align: center;
     }
     overflow: hidden;

@@ -148,7 +148,7 @@ export interface I18NBase extends I18N {
     showEULAButton: I18NProp;
     licenses: I18NProp;
     assets: I18NProp;
-    debuggers: I18NProp;
+    supporters: I18NProp;
   };
   settings: {
     settings: I18NProp;

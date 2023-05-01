@@ -8,4 +8,4 @@ src/renderer/htmls/*
 
 release
 electronTemp
-src/@assets
+src/_public

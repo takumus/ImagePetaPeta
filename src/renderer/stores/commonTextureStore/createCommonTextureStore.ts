@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js";
 import { InjectionKey } from "vue";
 
-import LOADINGImage from "@/@assets/images/imageBackgrounds/loading.png";
-import NOIMAGEImage from "@/@assets/images/imageBackgrounds/noImage.png";
-import NSFWImage from "@/@assets/images/imageBackgrounds/nsfw.png";
+import LOADINGImage from "@/_public/images/imageBackgrounds/loading.png";
+import NOIMAGEImage from "@/_public/images/imageBackgrounds/noImage.png";
+import NSFWImage from "@/_public/images/imageBackgrounds/nsfw.png";
 
 export async function createCommonTextureStore() {
   return {

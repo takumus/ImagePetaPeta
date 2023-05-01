@@ -8,7 +8,7 @@ import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
-import { extraFiles } from "@/@assets/extraFiles";
+import { extraFiles } from "@/_public/extraFiles";
 import * as Tasks from "@/main/libs/task";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";

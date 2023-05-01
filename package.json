@@ -23,7 +23,6 @@
     "generate-assets:dir": "tsx ./scripts/generate/dir.ts",
     "generate-assets:extraFiles": "tsx ./scripts/generate/extraFiles/index.ts",
     "generate-assets:image": "tsx ./scripts/generate/images.ts",
-    "generate-assets:debuggers": "tsx ./scripts/generate/debuggers.ts",
     "generate-assets:app-icon": "tsx ./scripts/generate/appIcon.ts",
     "tsc": "run-s tsc:*",
     "tsc:main": "tsc -p ./tsconfig.json --noEmit",

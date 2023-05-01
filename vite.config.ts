@@ -100,7 +100,7 @@ export default defineConfig(async ({ command }) => {
   ];
   return {
     root: resolve("./src/renderer"),
-    publicDir: resolve("./src/@assets"),
+    publicDir: resolve("./src/_public"),
     build: {
       outDir: resolve("./electronTemp/dist/renderer"),
       rollupOptions: {},
