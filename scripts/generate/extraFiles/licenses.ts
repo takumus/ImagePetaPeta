@@ -7,21 +7,7 @@ interface Module {
   text: string;
 }
 export async function generateLicenses() {
-  const modules = readdirSync("resources/licenses")
-    .filter((fileName) => fileName.endsWith(".txt"))
-    .reduce<Module[]>((licenses, fileName) => {
-      const text = readFileSync("resources/licenses/" + fileName)
-        .toString()
-        .split(/\r\n|\n|\r/g);
-      return [
-        ...licenses,
-        {
-          name: text.shift() ?? "",
-          licenses: text.shift() ?? "",
-          text: text.join("\n"),
-        },
-      ];
-    }, []);
+  const modules: Module[] = [];
   modules.push(
     ...(await new Promise<Module[]>((res) => {
       checker.init(
@@ -29,6 +15,7 @@ export async function generateLicenses() {
           start: ".",
           production: true,
           excludePrivatePackages: true,
+          unknown: true,
         },
         (_, packages) => {
           res(
@@ -59,12 +46,35 @@ export async function generateLicenses() {
       );
     })),
   );
+  readdirSync("resources/licenses")
+    .filter((fileName) => fileName.endsWith(".txt"))
+    .map((fileName) => {
+      const text = readFileSync("resources/licenses/" + fileName)
+        .toString()
+        .split(/\r\n|\n|\r/g);
+      const module: Module = {
+        name: text.shift() ?? "",
+        licenses: text.shift() ?? "",
+        text: text.join("\n"),
+      };
+      const sameNameModule = modules.find((m) => m.name === module.name);
+      if (sameNameModule) {
+        sameNameModule.licenses = module.licenses;
+        sameNameModule.text = module.text;
+        return;
+      }
+      modules.push(module);
+    });
+
   const licensesCounts: { [key: string]: number } = {};
   modules.forEach((module) => {
     if (licensesCounts[module.licenses] !== undefined) {
       licensesCounts[module.licenses]++;
     } else {
       licensesCounts[module.licenses] = 1;
+    }
+    if (module.licenses.toLocaleLowerCase().match(/(unknown|gpl)/)) {
+      throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
     }
     module.text = module.text
       .replace(/^\s+/g, "") //先頭のスペース削除
@@ -73,17 +83,10 @@ export async function generateLicenses() {
       .replace(/\n\s+/g, "\n") // 行頭のスペース削除
       .replace(/\n$/, ""); // 最後の改行削除
   });
-  // writeFileSync(
-  //   "./src/_public/licenses.ts",
-  //   `export const LICENSES = ${JSON.stringify(modules, null, 2)}`,
-  //   {
-  //     encoding: "utf-8",
-  //   },
-  // ),
-  //   console.log(
-  //     Object.keys(licensesCounts)
-  //       .map((key) => `${key}: ${licensesCounts[key]}`)
-  //       .join("\n"),
-  //   );
+  console.log(
+    Object.keys(licensesCounts)
+      .map((key) => `-${key}: ${licensesCounts[key]}`)
+      .join("\n"),
+  );
   return JSON.stringify(modules, null, 2);
 }
