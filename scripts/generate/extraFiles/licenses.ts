@@ -1,6 +1,8 @@
 import { readFileSync, readdirSync } from "fs";
 import checker from "license-checker-rseidelsohn";
 
+const DANGER_LICENSES = /(unknown|gpl)/;
+
 interface Module {
   name: string;
   licenses: string;
@@ -73,7 +75,7 @@ export async function generateLicenses() {
     } else {
       licensesCounts[module.licenses] = 1;
     }
-    if (module.licenses.toLocaleLowerCase().match(/(unknown|gpl)/)) {
+    if (module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)) {
       throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
     }
     module.text = module.text
