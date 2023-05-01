@@ -352,7 +352,7 @@ e-tile-root {
         width: 100%;
         height: 100%;
         background-repeat: repeat;
-        background-image: url("/images/imageBackgrounds/transparent.png");
+        background-image: url("/images/textures/transparent.png");
       }
       > e-placeholder {
         position: absolute;
@@ -380,7 +380,7 @@ e-tile-root {
         background-size: 32px;
         background-position: center;
         background-repeat: repeat;
-        background-image: url("/images/imageBackgrounds/nsfw.png");
+        background-image: url("/images/textures/nsfw.png");
       }
     }
     &:hover {

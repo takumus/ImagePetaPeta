@@ -170,7 +170,7 @@ function pointerdown(event: PointerEvent) {
       background-size: 24px;
       background-position: center;
       background-repeat: repeat;
-      background-image: url("/images/imageBackgrounds/nsfw.png");
+      background-image: url("/images/textures/nsfw.png");
     }
   }
   > .name {

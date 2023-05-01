@@ -46,7 +46,7 @@ e-property-thumbnail-root {
     overflow: hidden;
     border-radius: var(--rounded);
     background-repeat: repeat;
-    background-image: url("/images/imageBackgrounds/transparent.png");
+    background-image: url("/images/textures/transparent.png");
     display: block;
     > img {
       display: block;
@@ -66,7 +66,7 @@ e-property-thumbnail-root {
       background-size: 32px;
       background-position: center;
       background-repeat: repeat;
-      background-image: url("/images/imageBackgrounds/nsfw.png");
+      background-image: url("/images/textures/nsfw.png");
     }
   }
 }

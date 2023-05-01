@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readdirSync, rmSync } from "fs";
+import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync } from "fs";
 import { dirname, extname, join, resolve } from "path";
 import sharp from "sharp";
 
@@ -22,7 +22,7 @@ const cursorSizePlugin: Plugin = async (filePath, destFilePath) => {
 };
 
 const ignoreAppIconPlugin: Plugin = async (filePath) => {
-  if (dirname(resolve(filePath)) === resolve("./resources/images/appIcon")) {
+  if (resolve(filePath) === resolve("./resources/images/app/icon.png")) {
     return true;
   }
   return false;
@@ -42,6 +42,9 @@ const defaultPlugin: Plugin = async (filePath, destFilePath) => {
   rmSync(resolve(destImagesRoot), { recursive: true, force: true });
   await ppa(async (dirName) => {
     const dirPath = join(imagesRoot, dirName);
+    if (!statSync(dirPath).isDirectory()) {
+      return;
+    }
     const destDirPath = join(destImagesRoot, dirName);
     await ppa(async (fileName) => {
       if (!extetions.includes(extname(fileName).replace(/\./, "").toLowerCase())) {
