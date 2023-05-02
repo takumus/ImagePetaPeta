@@ -148,12 +148,12 @@ export class Windows {
     // window.loadURL(url);
     if (process.env.VITE_DEV_SERVER_URL) {
       // electron-vite-vue#298
-      console.log(process.env.VITE_DEV_SERVER_URL + "htmls/" + type + ".html");
-      window.loadURL(process.env.VITE_DEV_SERVER_URL + "htmls/" + type + ".html");
+      console.log(process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html");
+      window.loadURL(process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html");
       // Open devTool if the app is not packaged
       window.webContents.openDevTools();
     } else {
-      window.loadFile(Path.resolve(__dirname, "../renderer/htmls/" + type + ".html"));
+      window.loadFile(Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html"));
     }
     // window.webContents.openDevTools();
     return window;

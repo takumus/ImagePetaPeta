@@ -11,7 +11,7 @@ import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { ppa } from "@/commons/utils/pp";
 import { WindowName } from "@/commons/windows";
 
-import { extraFiles } from "@/_public/extraFiles";
+import { extraFiles } from "@/_defines/extraFiles";
 import Transparent from "@/_public/images/utils/transparent.png";
 import { showError } from "@/main/errorWindow";
 import * as file from "@/main/libs/file";

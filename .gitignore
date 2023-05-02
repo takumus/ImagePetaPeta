@@ -3,9 +3,9 @@ node_modules
 .DS_Store
 .electron-builder-cache
 
-src/renderer/htmls/*
-!$*.html
+src/renderer/htmls/_*.html
 
 release
 electronTemp
 src/_public
+src/_defines

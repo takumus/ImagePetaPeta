@@ -17,7 +17,7 @@ export default (pluginOptions: {
           resolve(pluginOptions.htmlDir, pluginOptions.entryTSDirFromHTMLDir, `${window.name}.ts`),
         );
         writeFileSync(
-          resolve(pluginOptions.htmlDir, `${window.name}.html`),
+          resolve(pluginOptions.htmlDir, `_${window.name}.html`),
           readFileSync(resolve(window.templateHTMLFile))
             .toString()
             .replace(
@@ -32,7 +32,7 @@ export default (pluginOptions: {
         config.build.rollupOptions.input = pluginOptions.windows.reduce<{ [key: string]: string }>(
           (obj, window) => ({
             ...obj,
-            [window.name]: resolve(pluginOptions.htmlDir, `${window.name}.html`),
+            [window.name]: resolve(pluginOptions.htmlDir, `_${window.name}.html`),
           }),
           {},
         );

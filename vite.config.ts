@@ -6,11 +6,13 @@ import workerThreads from "./vitePlugins/workerThreads";
 import { rmSync } from "node:fs";
 import { resolve } from "path";
 import readdirr from "recursive-readdir";
-import { defineConfig } from "vite";
+import { AliasOptions, defineConfig } from "vite";
 import electron, { Configuration as ElectronConfig } from "vite-plugin-electron";
 import esmodule from "vite-plugin-esmodule";
 
 import vue from "@vitejs/plugin-vue";
+
+const alias: AliasOptions = [{ find: "@", replacement: resolve("./src/") }];
 
 export default defineConfig(async ({ command }) => {
   rmSync("electronTemp/dist", { recursive: true, force: true });
@@ -43,7 +45,7 @@ export default defineConfig(async ({ command }) => {
         },
       },
       resolve: {
-        alias: [{ find: "@", replacement: resolve("./src/") }],
+        alias,
       },
     },
   };
@@ -107,7 +109,7 @@ export default defineConfig(async ({ command }) => {
       minify: isBuild,
     },
     resolve: {
-      alias: [{ find: "@", replacement: resolve("./src/") }],
+      alias,
     },
     plugins: [
       webWorker(),
@@ -117,7 +119,7 @@ export default defineConfig(async ({ command }) => {
         entryTSDirFromHTMLDir: "../windows",
         windows: windowNames.map((name) => ({
           name,
-          templateHTMLFile: "./src/renderer/htmls/$template.html",
+          templateHTMLFile: "./src/renderer/htmls/template.html",
         })),
       }),
       vue({

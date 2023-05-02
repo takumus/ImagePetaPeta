@@ -65,7 +65,7 @@ interface ExtraFile {
 })();
 function writeExtraFilesTS(extras: ExtraFile[]) {
   writeFileSync(
-    "./src/_public/extraFiles.ts",
+    "./src/_defines/extraFiles.ts",
     Buffer.from(
       `const development = process.env.NODE_ENV === "development";\nexport const extraFiles = {\n` +
         extras
