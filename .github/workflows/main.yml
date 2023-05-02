@@ -34,7 +34,7 @@ jobs:
       #   with:
       #     path: |
       #       node_modules
-      #       .electron-builder-cache
+      #       .electronBuilderCache
       #     key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
       - name: npm install
         run: npm install

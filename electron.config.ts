@@ -8,7 +8,7 @@ export const electronConfiguration: Configuration = {
     output: "release",
   },
   electronDownload: {
-    cache: "./.electron-builder-cache",
+    cache: "./.electronBuilderCache",
   },
   files: [
     {

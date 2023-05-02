@@ -1,7 +1,7 @@
 node_modules
 .vscode/.debug.env
 .DS_Store
-.electron-builder-cache
+.electronBuilderCache
 
 src/renderer/htmls/_*.html
 
