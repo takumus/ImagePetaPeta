@@ -3,7 +3,7 @@ import { Configuration } from "electron-builder";
 export const electronConfiguration: Configuration = {
   appId: "io.takumus.imagepetapeta-beta",
   productName: "ImagePetaPeta-beta",
-  asar: false,
+  asar: true,
   directories: {
     output: "_release",
   },
