@@ -17,7 +17,6 @@ export interface IpcFunctions {
   browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
   importFiles: (
     datas: (
-      | { type: "html"; html: string }
       | { type: "url"; url: string }
       | { type: "buffer"; buffer: ArrayBuffer }
       | { type: "filePath"; filePath: string }

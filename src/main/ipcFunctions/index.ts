@@ -32,7 +32,6 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { getLatestVersion } from "@/main/utils/versions";
-import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
 
 let temporaryShowNSFW = false;
 let detailsPetaFile: PetaFile | undefined;
@@ -640,15 +639,6 @@ export const ipcFunctions: IpcFunctionsType = {
               const result = await petaFilesController.createFileInfoFromURL(d.url);
               if (result !== undefined) {
                 return result;
-              }
-            }
-            if (d?.type === "html") {
-              const url = getURLFromHTML(d.html);
-              if (url !== undefined) {
-                const result = await petaFilesController.createFileInfoFromURL(url);
-                if (result !== undefined) {
-                  return result;
-                }
               }
             }
             if (d?.type === "buffer") {

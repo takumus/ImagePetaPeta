@@ -10,6 +10,7 @@ import { ppa } from "@/commons/utils/pp";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { IPC } from "@/renderer/libs/ipc";
+import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";
 
 const emit = defineEmits<{
   (e: "addPanelByDragAndDrop", ids: string[], position: Vec2, fromBrowser: boolean): void;
@@ -22,23 +23,29 @@ onMounted(() => {
     event.stopPropagation();
     if (event.dataTransfer) {
       IPC.send("windowActivate");
-      const html = event.dataTransfer.getData("text/html");
+      const url = getURLFromHTML(event.dataTransfer.getData("text/html"));
       const { buffers, filePaths } = await getDataFromFileList(event.dataTransfer.files);
       let ids: string[] = [];
-      if (html !== "") {
+      if (url !== undefined) {
         ids = await IPC.send("importFiles", [
           [
-            {
-              type: "html",
-              html,
-            },
-            ...(buffers?.[0]
+            ...(url !== undefined
               ? [
                   {
-                    type: "buffer",
-                    buffer: buffers[0],
+                    type: "url",
+                    url,
                   } as const,
                 ]
+              : []),
+            ...(buffers !== undefined
+              ? buffers.map(
+                  (buffer) =>
+                    ({
+                      type: "buffer",
+                      buffer,
+                    } as const),
+                  [],
+                )
               : []),
           ],
         ]);
