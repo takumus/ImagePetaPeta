@@ -1,11 +1,11 @@
 node_modules
 .vscode/.debug.env
 .DS_Store
-.electronBuilderCache
+_electronBuilderCache
 
 src/renderer/htmls/_*.html
 
-release
-electronTemp
+_release
+_electronTemp
 src/_public
 src/_defines

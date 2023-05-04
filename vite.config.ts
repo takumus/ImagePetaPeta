@@ -15,11 +15,11 @@ import vue from "@vitejs/plugin-vue";
 const alias: AliasOptions = [{ find: "@", replacement: resolve("./src/") }];
 
 export default defineConfig(async ({ command }) => {
-  rmSync("electronTemp/dist", { recursive: true, force: true });
+  rmSync("_electronTemp/dist", { recursive: true, force: true });
   const isServe = command === "serve";
   const isBuild = command === "build";
   if (isBuild) {
-    rmSync("release", { recursive: true, force: true });
+    rmSync("_release", { recursive: true, force: true });
   }
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
   const esmodules = (() => {
@@ -35,7 +35,7 @@ export default defineConfig(async ({ command }) => {
       plugins: [esmodules.plugin],
       build: {
         minify: isBuild,
-        outDir: resolve("./electronTemp/dist/main"),
+        outDir: resolve("./_electronTemp/dist/main"),
         rollupOptions: {
           external: [
             ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(
@@ -104,7 +104,7 @@ export default defineConfig(async ({ command }) => {
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
     build: {
-      outDir: resolve("./electronTemp/dist/renderer"),
+      outDir: resolve("./_electronTemp/dist/renderer"),
       rollupOptions: {},
       minify: isBuild,
     },

@@ -11,15 +11,15 @@ jobs:
           # windows x64
           - os: windows-latest
             target: win
-            artifacts: release/*.exe.zip
+            artifacts: _release/*.exe.zip
           # mac arm64
           - os: [self-hosted, runner-01]
             target: mac-arm64
-            artifacts: release/*.dmg,release/*.pkg
+            artifacts: _release/*.dmg,_release/*.pkg
           # mac x64
           - os: [self-hosted, runner-02]
             target: mac-x64
-            artifacts: release/*.dmg,release/*.pkg
+            artifacts: _release/*.dmg,_release/*.pkg
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -34,7 +34,7 @@ jobs:
       #   with:
       #     path: |
       #       node_modules
-      #       .electronBuilderCache
+      #       _electronBuilderCache
       #     key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
       - name: npm install
         run: npm install

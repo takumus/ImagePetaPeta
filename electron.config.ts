@@ -5,14 +5,14 @@ export const electronConfiguration: Configuration = {
   productName: "ImagePetaPeta-beta",
   asar: false,
   directories: {
-    output: "release",
+    output: "_release",
   },
   electronDownload: {
-    cache: "./.electronBuilderCache",
+    cache: "./_electronBuilderCache",
   },
   files: [
     {
-      from: "electronTemp/dist",
+      from: "_electronTemp/dist",
       to: "./",
     },
     "package.json",
@@ -23,13 +23,13 @@ export const electronConfiguration: Configuration = {
   },
   extraFiles: [
     {
-      from: "electronTemp/extraFiles",
+      from: "_electronTemp/extraFiles",
       to: "extraFiles",
     },
   ],
   mac: {
     target: ["pkg", "dmg"],
-    icon: "electronTemp/app_icon_mac.png",
+    icon: "_electronTemp/app_icon_mac.png",
     cscInstallerLink: "takumus",
   },
   pkg: {
@@ -40,7 +40,7 @@ export const electronConfiguration: Configuration = {
   },
   win: {
     target: ["nsis"],
-    icon: "electronTemp/app_icon_win.ico",
+    icon: "_electronTemp/app_icon_win.ico",
   },
   nsis: {
     oneClick: false,
