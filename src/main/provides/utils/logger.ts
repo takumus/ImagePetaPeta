@@ -23,11 +23,7 @@ export class Logger {
           },
         );
       }
-      if (from === LogFrom.MAIN) {
-        console.log(`\x1b[35m${date}`, ...args);
-      } else {
-        console.log(`\x1b[32m${date}`, ...args);
-      }
+      console.log(`${from === LogFrom.MAIN ? "\x1b[35m" : "\x1b[32m"}${date}`, ...args);
     } catch (error) {
       console.log("Could not write logfile", error);
     }
