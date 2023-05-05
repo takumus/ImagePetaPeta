@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import * as Path from "path";
 
 import { FileType } from "@/commons/datas/fileType";
@@ -20,7 +20,6 @@ import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
 export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANModelName) {
-  const petaFilesController = usePetaFilesController();
   const paths = usePaths();
   const logger = useLogger();
   return Tasks.spawn(
@@ -29,7 +28,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
       const log = logger.logMainChunk();
       const { execFilePath, modelFilePath } = getFilePath();
       log.log("execFilePath:", execFilePath);
-      setPermisionTo755(execFilePath);
+      await setPermisionTo755(execFilePath);
       let success = true;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
@@ -120,12 +119,12 @@ function getFilePath() {
   return { execFilePath, modelFilePath };
 }
 
-function setPermisionTo755(execFilePath: string) {
+async function setPermisionTo755(execFilePath: string) {
   if (process.platform === "darwin") {
     try {
-      fs.accessSync(execFilePath, fs.constants.X_OK);
+      await fs.access(execFilePath, fs.constants.X_OK);
     } catch {
-      fs.chmodSync(execFilePath, "755");
+      await fs.chmod(execFilePath, "755");
     }
   }
 }

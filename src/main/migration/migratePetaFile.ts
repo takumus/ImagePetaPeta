@@ -1,10 +1,11 @@
+import { rename } from "fs/promises";
 import Path from "path";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 import { PETAIMAGE_METADATA_VERSION } from "@/commons/defines";
 
 import { createMigrater } from "@/main/libs/createMigrater";
-import { mkdirSync, moveFile } from "@/main/libs/file";
+import { mkdirIfNotIxists } from "@/main/libs/file";
 import { usePaths } from "@/main/provides/utils/paths";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
@@ -44,10 +45,12 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
       const paths = usePaths();
       const directory = getPetaFileDirectoryPath(data);
       const path = getPetaFilePath(data);
-      mkdirSync(directory.original, true);
-      mkdirSync(directory.thumbnail, true);
-      await moveFile(Path.resolve(paths.DIR_IMAGES, data.file.original), path.original);
-      await moveFile(Path.resolve(paths.DIR_THUMBNAILS, data.file.thumbnail), path.thumbnail);
+      await Promise.all([
+        mkdirIfNotIxists(directory.original, { recursive: true }),
+        mkdirIfNotIxists(directory.thumbnail, { recursive: true }),
+        rename(Path.resolve(paths.DIR_IMAGES, data.file.original), path.original),
+        rename(Path.resolve(paths.DIR_THUMBNAILS, data.file.thumbnail), path.thumbnail),
+      ]);
     } catch {
       //
     }

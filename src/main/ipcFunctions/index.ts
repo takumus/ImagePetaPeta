@@ -1,4 +1,5 @@
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
+import { readFile } from "fs/promises";
 import * as Path from "path";
 
 import { FileType } from "@/commons/datas/fileType";
@@ -508,7 +509,7 @@ export const ipcFunctions: IpcFunctionsType = {
       //   path = Path.resolve(path, "PetaFile");
       // }
       try {
-        await file.readFile(Path.resolve(filePath, FILENAME_DB_INFO));
+        await readFile(Path.resolve(filePath, FILENAME_DB_INFO));
       } catch {
         path = Path.resolve(path, "PetaFile");
       }
@@ -533,7 +534,7 @@ export const ipcFunctions: IpcFunctionsType = {
         log.error("Invalid file path:", path);
         return false;
       }
-      path = file.initDirectory(true, path);
+      path = await file.initDirectory(true, path);
       configSettings.data.petaFileDirectory.default = false;
       configSettings.data.petaFileDirectory.path = path;
       configSettings.save();
@@ -770,18 +771,14 @@ export const ipcFunctions: IpcFunctionsType = {
   async getLicenses() {
     return JSON.parse(
       (
-        await file.readFile(
-          resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]),
-        )
+        await readFile(resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]))
       ).toString(),
     );
   },
   async getSupporters() {
     return JSON.parse(
       (
-        await file.readFile(
-          resolveExtraFilesPath(extraFiles["supporters.universal"]["supporters.json"]),
-        )
+        await readFile(resolveExtraFilesPath(extraFiles["supporters.universal"]["supporters.json"]))
       ).toString(),
     );
   },

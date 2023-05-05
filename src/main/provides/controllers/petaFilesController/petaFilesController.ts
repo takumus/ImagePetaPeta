@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import dataUriToBuffer from "data-uri-to-buffer";
+import { rm, stat, writeFile } from "fs/promises";
 import * as Path from "path";
 import { v4 as uuid } from "uuid";
 
@@ -167,10 +168,10 @@ export class PetaFilesController {
       await dbPetaFilesPetaTags.remove({ petaFileId: petaFile.id });
       await dbPetaFiles.remove({ id: petaFile.id });
       const path = getPetaFilePath(petaFile);
-      await file.rm(path.original).catch(() => {
+      await rm(path.original).catch(() => {
         //
       });
-      await file.rm(path.thumbnail).catch(() => {
+      await rm(path.thumbnail).catch(() => {
         //
       });
     } else if (mode === UpdateMode.UPDATE) {
@@ -197,7 +198,7 @@ export class PetaFilesController {
         remoteURL = url;
       }
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      await file.writeFile(dist, data);
+      await writeFile(dist, data);
       if (!(await isSupportedFile(dist))) {
         throw new Error("unsupported file");
       }
@@ -226,7 +227,7 @@ export class PetaFilesController {
     try {
       log.log("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
+      await writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
       if (!(await isSupportedFile(dist))) {
         throw new Error("unsupported file");
       }
@@ -305,7 +306,7 @@ export class PetaFilesController {
           let errorReason = "";
           try {
             const name = Path.basename(fileInfo.path);
-            const fileDate = (await file.stat(fileInfo.path)).mtime;
+            const fileDate = (await stat(fileInfo.path)).mtime;
             if (!(await isSupportedFile(fileInfo.path))) {
               throw new Error("unsupported file");
             }

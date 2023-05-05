@@ -1,115 +1,77 @@
 import * as fs from "fs";
+import * as fsp from "fs/promises";
 import * as Path from "path";
 
-export function writeFile(filePath: string, buffer: NodeJS.ArrayBufferView): Promise<boolean> {
-  return new Promise((res, rej) => {
-    fs.writeFile(filePath, buffer, (err) => {
-      if (err) {
-        rej(err.message);
-        return;
-      }
-      res(true);
-    });
-  });
-}
-export function readFile(path: string): Promise<Buffer> {
-  return new Promise((res, rej) => {
-    fs.readFile(path, (err, data) => {
-      if (err) {
-        rej(err.message);
-        return;
-      }
-      res(data);
-    });
-  });
-}
-export function copyFile(from: string, to: string) {
-  return new Promise<boolean>((res, rej) => {
-    fs.copyFile(from, to, (err) => {
-      if (err) {
-        rej(err.message);
-        return;
-      }
-      res(true);
-    });
-  });
-}
-export function moveFile(from: string, to: string) {
-  return new Promise<boolean>((res, rej) => {
-    fs.rename(from, to, (err) => {
-      if (err) {
-        rej(err.message);
-        return;
-      }
-      res(true);
-    });
-  });
-}
-export function readStream(path: string) {
-  return fs.createReadStream(path);
-}
-export function mkdir(path: string, recursive = false): Promise<string> {
-  return new Promise((res, rej) => {
-    fs.mkdir(path, { recursive }, (err) => {
-      if (err) {
-        if (err.code === "EEXIST") {
-          res(path);
-        } else {
-          rej(err);
-        }
-        return;
-      }
-      res(path);
-    });
-  });
-}
-export function mkdirSync(path: string, recursive = false) {
+export async function mkdirIfNotIxists(path: string, options: fs.MakeDirectoryOptions) {
   try {
-    fs.mkdirSync(path, { recursive });
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  } catch (err: any) {
-    if (err && err.code !== "EEXIST") {
-      throw err;
+    await fsp.mkdir(path, options);
+  } catch (error: any) {
+    if (error.code !== "EEXIST") {
+      return path;
+    } else {
+      throw error;
     }
   }
   return path;
 }
-export function rm(path: string): Promise<boolean> {
-  return new Promise((res, rej) => {
-    fs.rm(path, (err) => {
-      if (err) {
-        rej(err);
-        return;
-      }
-      res(true);
-    });
-  });
+export async function mkdirIfNotIxistsSync(path: string, options: fs.MakeDirectoryOptions) {
+  try {
+    fs.mkdirSync(path, options);
+  } catch (error: any) {
+    if (error.code !== "EEXIST") {
+      return path;
+    } else {
+      throw error;
+    }
+  }
+  return path;
 }
-export function stat(path: string): Promise<fs.Stats> {
-  return new Promise((res, rej) => {
-    fs.stat(path, (err, stats) => {
-      if (err) {
-        rej(err);
-        return;
-      }
-      res(stats);
-    });
-  });
-}
-export function initFile(...paths: string[]) {
+export async function initFile(...paths: string[]) {
   const res = Path.resolve(...paths);
-  writable(res, false);
+  await writable(res, false);
   return res;
 }
-export function initDirectory(create: boolean, ...paths: string[]) {
+export function initFileSync(...paths: string[]) {
   const res = Path.resolve(...paths);
-  writable(res, true);
+  writableSync(res, false);
+  return res;
+}
+export async function initDirectory(create: boolean, ...paths: string[]) {
+  const res = Path.resolve(...paths);
+  await writable(res, true);
   if (create) {
-    mkdirSync(res);
+    await mkdirIfNotIxists(res, { recursive: true });
   }
   return res;
 }
-export function writable(path: string, isDirectory: boolean) {
+export function initDirectorySync(create: boolean, ...paths: string[]) {
+  const res = Path.resolve(...paths);
+  writableSync(res, true);
+  if (create) {
+    mkdirIfNotIxists(res, { recursive: true });
+  }
+  return res;
+}
+export async function writable(path: string, isDirectory: boolean) {
+  let stat: fs.Stats;
+  try {
+    // 存在確認
+    stat = await fsp.stat(path);
+  } catch (err) {
+    // 存在しない場合は親ディレクトリのアクセス権確認
+    await fsp.access(Path.resolve(path, "../"), fs.constants.W_OK | fs.constants.R_OK);
+    return;
+  }
+  // 存在する場合はファイルの種類の確認
+  if (stat.isDirectory() !== isDirectory) {
+    throw new Error(
+      `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
+    );
+  }
+  // 存在する場合はパスのアクセス権確認
+  await fsp.access(path, fs.constants.W_OK | fs.constants.R_OK);
+}
+export function writableSync(path: string, isDirectory: boolean) {
   let stat: fs.Stats;
   try {
     // 存在確認
@@ -127,17 +89,6 @@ export function writable(path: string, isDirectory: boolean) {
   }
   // 存在する場合はパスのアクセス権確認
   fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
-}
-export function readdir(path: string) {
-  return new Promise((res: (files: string[]) => void, rej) => {
-    fs.readdir(path, {}, (err, files) => {
-      if (err) {
-        rej(err);
-        return;
-      }
-      res(files as string[]);
-    });
-  });
 }
 export function readDirRecursive(
   path: string,
@@ -173,7 +124,7 @@ async function _readDirRecursive(
   path = Path.resolve(path);
   const _files: string[] = [];
   try {
-    const files = await readdir(path);
+    const files = await fsp.readdir(path);
     for (let i = 0; i < files.length; i++) {
       try {
         const fileName = files[i];
