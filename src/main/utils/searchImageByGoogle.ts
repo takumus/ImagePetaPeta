@@ -57,10 +57,10 @@ async function steps(
     progress(step);
   }, steps).promise;
 }
-export async function searchImageByGoogle(petaFile: PetaFile, dirThumbnails: string) {
+export async function searchImageByGoogle(path: string) {
   return Tasks.spawn(
     "Search Image By Google",
-    async (handler, petaFile: PetaFile) => {
+    async (handler, path: string) => {
       const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
       let taskCount = 0;
       handler.emitStatus({
@@ -115,7 +115,7 @@ export async function searchImageByGoogle(petaFile: PetaFile, dirThumbnails: str
         // ファイル選択
         await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
           nodeId: input.nodeId,
-          files: [Path.resolve(dirThumbnails, petaFile.file.thumbnail)],
+          files: [path],
         });
         // 後処理
         await steps(window.webContents, task.afterSteps, (step) => {
@@ -183,7 +183,7 @@ export async function searchImageByGoogle(petaFile: PetaFile, dirThumbnails: str
       window.destroy();
       return true;
     },
-    petaFile,
+    path,
     false,
   );
 }

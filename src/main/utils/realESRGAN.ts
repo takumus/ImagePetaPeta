@@ -15,6 +15,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
@@ -38,7 +39,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
       });
       const tasks = ppa(
         async (petaFile, index) => {
-          const inputFile = petaFilesController.getFilePath(petaFile, FileType.ORIGINAL);
+          const inputFile = getPetaFilePath(petaFile).original;
           const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.png`;
           const parameters = [
             "-i",

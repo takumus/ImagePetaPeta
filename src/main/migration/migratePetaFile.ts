@@ -1,6 +1,12 @@
+import Path from "path";
+
 import { PetaFile } from "@/commons/datas/petaFile";
+import { PETAIMAGE_METADATA_VERSION } from "@/commons/defines";
 
 import { createMigrater } from "@/main/libs/createMigrater";
+import { mkdirSync, moveFile } from "@/main/libs/file";
+import { usePaths } from "@/main/provides/utils/paths";
+import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
 export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -31,6 +37,21 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
   }
   if (data.metadata.type === "video" && data.metadata.duration === undefined) {
     data.metadata.duration = 0;
+    update();
+  }
+  if (data.metadata.version < 1.8) {
+    try {
+      const paths = usePaths();
+      const directory = getPetaFileDirectoryPath(data);
+      const path = getPetaFilePath(data);
+      mkdirSync(directory.original, true);
+      mkdirSync(directory.thumbnail, true);
+      await moveFile(Path.resolve(paths.DIR_IMAGES, data.file.original), path.original);
+      await moveFile(Path.resolve(paths.DIR_THUMBNAILS, data.file.thumbnail), path.thumbnail);
+    } catch {
+      //
+    }
+    data.metadata.version = PETAIMAGE_METADATA_VERSION;
     update();
   }
   return data;

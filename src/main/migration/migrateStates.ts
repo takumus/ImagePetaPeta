@@ -1,8 +1,8 @@
 import { States, defaultStates } from "@/commons/datas/states";
 
-import { createMigrater } from "@/main/libs/createMigrater";
+import { createSyncMigrater } from "@/main/libs/createMigrater";
 
-export const migrateStates = createMigrater<States>(async (data, update) => {
+export const migrateStates = createSyncMigrater<States>((data, update) => {
   // 2.7.0
   if (data.browserTileSize === undefined) {
     data.browserTileSize = defaultStates.browserTileSize;

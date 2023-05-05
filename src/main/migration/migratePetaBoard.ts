@@ -1,5 +1,6 @@
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaPanel } from "@/commons/datas/petaPanel";
+import { ppa } from "@/commons/utils/pp";
 
 import { createMigrater } from "@/main/libs/createMigrater";
 
@@ -14,13 +15,13 @@ export const migratePetaBoard = createMigrater<PetaBoard>(async (data, update) =
     data.petaPanels = newPetaPanels;
     update();
   }
-  Object.values(data.petaPanels).forEach((petaPanel) => {
-    const result = migratePetaPanel(petaPanel);
+  await ppa(async (petaPanel) => {
+    const result = await migratePetaPanel(petaPanel);
     if (result.updated) {
       data.petaPanels[result.data.id] = result.data;
       update();
     }
-  });
+  }, Object.values(data.petaPanels)).promise;
   return data;
 });
 export const migratePetaPanel = createMigrater<PetaPanel>(async (data, update) => {

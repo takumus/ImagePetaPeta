@@ -25,6 +25,8 @@ export async function generatePetaFile(param: {
   }
   const originalFileName = `${param.extends.id}.${fileInfo.original.extention}`; // xxxxxxxx.png
   const thumbnailFileName = `${param.extends.id}.${fileInfo.original.extention}.${fileInfo.thumbnail.extention}`; // xxxxxxxx.png.webp
+  file.mkdirSync(param.dirOriginals, true);
+  file.mkdirSync(param.dirThumbnails, true);
   const petaFile: PetaFile = {
     id: param.extends.id,
     file: {

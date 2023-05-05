@@ -28,6 +28,7 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
@@ -337,7 +338,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.log("#Open Image File");
-    shell.showItemInFolder(petaFilesController.getFilePath(petaFile, FileType.ORIGINAL));
+    shell.showItemInFolder(getPetaFilePath(petaFile).original);
   },
   async getAppInfo() {
     const logger = useLogger();
@@ -371,7 +372,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.log("#Show Image In Folder");
-    shell.showItemInFolder(petaFilesController.getFilePath(petaFile, FileType.ORIGINAL));
+    shell.showItemInFolder(getPetaFilePath(petaFile).original);
     return true;
   },
   async updateSettings(event, settings) {
@@ -570,10 +571,8 @@ export const ipcFunctions: IpcFunctionsType = {
     if (!first) {
       return;
     }
-    const firstPath = Path.resolve(paths.DIR_IMAGES, first.file.original);
-    const files = petaFiles.map((petaFile) =>
-      Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
-    );
+    const firstPath = getPetaFilePath(first).original;
+    const files = petaFiles.map((petaFile) => getPetaFilePath(petaFile).original);
     if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
       windows.windows.board.moveTop();
     }
@@ -697,7 +696,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const log = logger.logMainChunk();
     log.log("#Search Image By Google");
     try {
-      await searchImageByGoogle(petaFile, paths.DIR_THUMBNAILS);
+      await searchImageByGoogle(getPetaFilePath(petaFile).thumbnail);
       log.log("return:", true);
       return true;
     } catch (error) {
