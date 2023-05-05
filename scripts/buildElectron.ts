@@ -34,16 +34,13 @@ import yargs from "yargs/yargs";
     }
   })();
   const windowsCSC: typeof electronConfiguration.win = (() => {
-    if (
-      os !== "win" ||
-      process.env.WINDOWS_PFX_PASSWORD == undefined ||
-      process.env.WINDOWS_PFX == undefined
-    ) {
+    const pfx = process.env.WINDOWS_PFX?.split("\n");
+    if (os !== "win" || pfx == undefined) {
       return undefined;
     }
-    writeFileSync("./windowsPFX.pfx", process.env.WINDOWS_PFX, { encoding: "base64" });
+    writeFileSync("./windowsPFX.pfx", pfx[0], { encoding: "base64" });
     return {
-      cscKeyPassword: process.env.WINDOWS_PFX_PASSWORD,
+      cscKeyPassword: pfx[1],
       cscLink: "./windowsPFX.pfx",
     };
   })();

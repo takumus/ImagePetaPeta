@@ -44,7 +44,6 @@ jobs:
         run: npm run ci-build-electron:${{ matrix.target }}
         env:
           WINDOWS_PFX: ${{ secrets.WINDOWS_PFX }}
-          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
       - name: release
         uses: ncipollo/release-action@v1
         with:
