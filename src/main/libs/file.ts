@@ -48,7 +48,7 @@ export function initDirectorySync(create: boolean, ...paths: string[]) {
   const res = Path.resolve(...paths);
   writableSync(res, true);
   if (create) {
-    mkdirIfNotIxists(res, { recursive: true });
+    mkdirIfNotIxistsSync(res, { recursive: true });
   }
   return res;
 }
