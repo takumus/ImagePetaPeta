@@ -25,13 +25,13 @@ const task: SearchImageByGoogleTask = {
   url: "https://images.google.com/",
   beforeSteps: [
     {
-      wait: 1000,
+      wait: 2000,
     },
     {
       js: `document.querySelector("div[data-is-images-mode='true']").click();`,
     },
     {
-      wait: 1000,
+      wait: 2000,
     },
   ],
   afterSteps: [],
