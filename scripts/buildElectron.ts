@@ -33,7 +33,7 @@ import yargs from "yargs/yargs";
       return Platform.WINDOWS.createTarget(undefined, arch);
     }
   })();
-  const win: typeof electronConfiguration.win = (() => {
+  const windowsCSC: typeof electronConfiguration.win = (() => {
     if (
       os !== "win" ||
       process.env.WINDOWS_PFX_PASSWORD == undefined ||
@@ -47,15 +47,15 @@ import yargs from "yargs/yargs";
       cscLink: "./windowsPFX.pfx",
     };
   })();
-  if (win !== undefined) {
-    console.log("csc:", win);
+  if (windowsCSC !== undefined) {
+    console.log("add csc configuration");
   }
   build({
     config: {
       ...electronConfiguration,
       win: {
         ...electronConfiguration.win,
-        ...win,
+        ...windowsCSC,
       },
     },
     publish: "never",
