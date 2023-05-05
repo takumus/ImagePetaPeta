@@ -1,7 +1,7 @@
 <template>
   <e-settings-root>
-    <ul>
-      <li
+    <e-categories>
+      <e-category
         v-for="tab in tabs"
         :key="tab"
         :class="{
@@ -9,8 +9,8 @@
         }"
         @click="currentTab = tab">
         {{ t("settings." + tab) }}
-      </li>
-    </ul>
+      </e-category>
+    </e-categories>
     <e-contents>
       <e-content v-if="currentTab === 'general'">
         <VSettingsGeneral />
@@ -68,17 +68,15 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 e-settings-root {
-  text-align: center;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100%;
   overflow: hidden;
-  > ul {
-    list-style-type: none;
+  > e-categories {
     padding: 0px;
-    > li {
-      margin: 0px var(--px-2);
-      display: inline-block;
+    > e-category {
+      margin: var(--px-2);
+      display: block;
       cursor: pointer;
       &.selected {
         text-decoration: underline;
@@ -90,6 +88,7 @@ e-settings-root {
     overflow-y: auto;
     overflow-x: hidden;
     display: block;
+    flex: 1;
     > e-content {
       display: block;
     }
