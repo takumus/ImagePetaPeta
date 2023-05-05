@@ -42,6 +42,9 @@ jobs:
         run: npm run ci-build-vite
       - name: build electron (${{ matrix.target }})
         run: npm run ci-build-electron:${{ matrix.target }}
+        env:
+          WINDOWS_PFX: ${{ secrets.WINDOWS_PFX }}
+          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
       - name: release
         uses: ncipollo/release-action@v1
         with:
@@ -50,5 +53,3 @@ jobs:
           artifacts: ${{ matrix.artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WINDOWS_PFX: ${{ secrets.WINDOWS_PFX }}
-          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
