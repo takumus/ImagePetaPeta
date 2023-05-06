@@ -18,28 +18,28 @@ export async function migrate(onProgress: (log: string) => void) {
   const dbPetaTags = useDBPetaTags();
   const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
   await ppa(async (pi) => {
-    const result = migratePetaFile(pi);
+    const result = await migratePetaFile(pi);
     if (result.updated) {
       onProgress(`PetaFile(${minimizeID(result.data.id)})`);
       await dbPetaFiles.update({ id: result.data.id }, result.data);
     }
   }, dbPetaFiles.getAll()).promise;
   await ppa(async (pt) => {
-    const result = migratePetaTag(pt);
+    const result = await migratePetaTag(pt);
     if (result.updated) {
       onProgress(`PetaTag(${minimizeID(result.data.id)})`);
       await dbPetaTags.update({ id: result.data.id }, result.data);
     }
   }, dbPetaTags.getAll()).promise;
   await ppa(async (pfpt) => {
-    const result = migratePetaFilesPetaTags(pfpt);
+    const result = await migratePetaFilesPetaTags(pfpt);
     if (result.updated) {
       onProgress(`PetaFilesPetaTags(${minimizeID(result.data.id)})`);
       await dbPetaFilesPetaTags.update({ id: result.data.id }, result.data);
     }
   }, dbPetaFilesPetaTags.getAll()).promise;
   await ppa(async (pb) => {
-    const result = migratePetaBoard(pb);
+    const result = await migratePetaBoard(pb);
     if (result.updated) {
       onProgress(`PetaBoard(${minimizeID(result.data.id)})`);
       await dbPetaBoard.update({ id: result.data.id }, result.data);

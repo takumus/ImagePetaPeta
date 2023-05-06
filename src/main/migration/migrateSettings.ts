@@ -1,9 +1,9 @@
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 
-import { createMigrater } from "@/main/libs/createMigrater";
+import { createSyncMigrater } from "@/main/libs/createMigrater";
 
 const defaultSettings = getDefaultSettings();
-export const migrateSettings = createMigrater<Settings>(async (data, update) => {
+export const migrateSettings = createSyncMigrater<Settings>((data, update) => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const anyData = data as any;
   // v2.8.0

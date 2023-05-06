@@ -1,7 +1,7 @@
 import { WindowStates } from "@/commons/datas/windowStates";
 
-import { createMigrater } from "@/main/libs/createMigrater";
+import { createSyncMigrater } from "@/main/libs/createMigrater";
 
-export const migrateWindowStates = createMigrater<WindowStates>(async (data) => {
+export const migrateWindowStates = createSyncMigrater<WindowStates>((data) => {
   return data;
 });

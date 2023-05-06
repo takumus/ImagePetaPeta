@@ -1,11 +1,11 @@
 import deepcopy from "deepcopy";
 import fs from "fs";
 
-import { Migrater } from "@/main/libs/createMigrater";
+import { SyncMigrater } from "@/main/libs/createMigrater";
 
 export default class Config<T> {
   data: T;
-  constructor(private path: string, private defaultData: T, migrater?: Migrater<T>) {
+  constructor(private path: string, private defaultData: T, migrater?: SyncMigrater<T>) {
     this.data = deepcopy(defaultData);
     this.load();
     if (migrater) {

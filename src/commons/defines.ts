@@ -68,5 +68,5 @@ export const FILENAME_WINDOW_STATES = "windowStates.json";
 export const DIRNAME_IMAGES = "images";
 export const DIRNAME_THUMBNAILS = "thumbnails";
 
-export const PETAIMAGE_METADATA_VERSION = 1.7;
+export const PETAIMAGE_METADATA_VERSION = 1.8;
 export const EULA = 2;

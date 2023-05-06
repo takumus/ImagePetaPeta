@@ -30,7 +30,7 @@ import { showError } from "@/main/errorWindow";
 import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";
-import * as file from "@/main/libs/file";
+import { initDirectorySync, initFileSync } from "@/main/libs/file";
 import { migrateSettings } from "@/main/migration/migrateSettings";
 import { migrateStates } from "@/main/migration/migrateStates";
 import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
@@ -79,12 +79,12 @@ export function initDI() {
       messages: languages,
     });
     // ログは最優先で初期化
-    const DIR_LOG = file.initDirectory(false, app.getPath("logs"));
+    const DIR_LOG = initDirectorySync(false, app.getPath("logs"));
     const dataLogger = new Logger(DIR_LOG);
     // その他パス初期化
-    const DIR_APP = file.initDirectory(false, app.getPath("userData"));
-    const DIR_TEMP = file.initDirectory(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
-    const FILE_SETTINGS = file.initFile(DIR_APP, FILENAME_SETTINGS);
+    const DIR_APP = initDirectorySync(false, app.getPath("userData"));
+    const DIR_TEMP = initDirectorySync(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
+    const FILE_SETTINGS = initFileSync(DIR_APP, FILENAME_SETTINGS);
     // 設定ロード
     const configSettings = new Config<Settings>(
       FILE_SETTINGS,
@@ -95,7 +95,7 @@ export function initDI() {
     const DIR_ROOT = (() => {
       // デフォルトならピクチャーズ
       if (configSettings.data.petaFileDirectory.default) {
-        return (configSettings.data.petaFileDirectory.path = file.initDirectory(
+        return (configSettings.data.petaFileDirectory.path = initDirectorySync(
           true,
           app.getPath("pictures"),
           "imagePetaPeta",
@@ -106,7 +106,7 @@ export function initDI() {
           if (!isValidFilePath(configSettings.data.petaFileDirectory.path)) {
             throw new Error();
           }
-          return file.initDirectory(true, configSettings.data.petaFileDirectory.path);
+          return initDirectorySync(true, configSettings.data.petaFileDirectory.path);
         } catch (error) {
           configSettings.data.petaFileDirectory.default = true;
           configSettings.save();
@@ -116,16 +116,16 @@ export function initDI() {
         }
       }
     })();
-    const DIR_IMAGES = file.initDirectory(true, DIR_ROOT, DIRNAME_IMAGES);
-    const DIR_THUMBNAILS = file.initDirectory(true, DIR_ROOT, DIRNAME_THUMBNAILS);
-    const FILE_IMAGES_DB = file.initFile(DIR_ROOT, FILENAME_IMAGES_DB);
-    const FILE_BOARDS_DB = file.initFile(DIR_ROOT, FILENAME_BOARDS_DB);
-    const FILE_TAGS_DB = file.initFile(DIR_ROOT, FILENAME_TAGS_DB);
-    const FILE_TAG_PARTITIONS_DB = file.initFile(DIR_ROOT, FILENAME_TAG_PARTITIONS_DB);
-    const FILE_IMAGES_TAGS_DB = file.initFile(DIR_ROOT, FILENAME_IMAGES_TAGS_DB);
-    const FILE_STATES = file.initFile(DIR_APP, FILENAME_STATES);
-    const FILE_DBINFO = file.initFile(DIR_ROOT, FILENAME_DB_INFO);
-    const FILE_WINDOW_STATES = file.initFile(DIR_APP, FILENAME_WINDOW_STATES);
+    const DIR_IMAGES = initDirectorySync(true, DIR_ROOT, DIRNAME_IMAGES);
+    const DIR_THUMBNAILS = initDirectorySync(true, DIR_ROOT, DIRNAME_THUMBNAILS);
+    const FILE_IMAGES_DB = initFileSync(DIR_ROOT, FILENAME_IMAGES_DB);
+    const FILE_BOARDS_DB = initFileSync(DIR_ROOT, FILENAME_BOARDS_DB);
+    const FILE_TAGS_DB = initFileSync(DIR_ROOT, FILENAME_TAGS_DB);
+    const FILE_TAG_PARTITIONS_DB = initFileSync(DIR_ROOT, FILENAME_TAG_PARTITIONS_DB);
+    const FILE_IMAGES_TAGS_DB = initFileSync(DIR_ROOT, FILENAME_IMAGES_TAGS_DB);
+    const FILE_STATES = initFileSync(DIR_APP, FILENAME_STATES);
+    const FILE_DBINFO = initFileSync(DIR_ROOT, FILENAME_DB_INFO);
+    const FILE_WINDOW_STATES = initFileSync(DIR_APP, FILENAME_WINDOW_STATES);
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, getDefaultDBInfo());
     // デフォルト値だったらバージョン付与。
     if (configDBInfo.data.version === getDefaultDBInfo().version) {

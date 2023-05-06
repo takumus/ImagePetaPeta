@@ -1,10 +1,11 @@
 import { fileTypeFromFile } from "file-type";
+import { copyFile, readFile, rename, writeFile } from "fs/promises";
 import * as Path from "path";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
 import { PetaFile } from "@/commons/datas/petaFile";
 
-import * as file from "@/main/libs/file";
+import { mkdirIfNotIxists } from "@/main/libs/file";
 import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata";
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -25,6 +26,8 @@ export async function generatePetaFile(param: {
   }
   const originalFileName = `${param.extends.id}.${fileInfo.original.extention}`; // xxxxxxxx.png
   const thumbnailFileName = `${param.extends.id}.${fileInfo.original.extention}.${fileInfo.thumbnail.extention}`; // xxxxxxxx.png.webp
+  await mkdirIfNotIxists(param.dirOriginals, { recursive: true });
+  await mkdirIfNotIxists(param.dirThumbnails, { recursive: true });
   const petaFile: PetaFile = {
     id: param.extends.id,
     file: {
@@ -40,19 +43,16 @@ export async function generatePetaFile(param: {
     metadata: fileInfo.metadata,
   };
   if (param.type === "add") {
-    await file.copyFile(param.path, Path.resolve(param.dirOriginals, originalFileName));
+    await copyFile(param.path, Path.resolve(param.dirOriginals, originalFileName));
   }
   if (param.type === "update") {
     const to = Path.resolve(param.dirOriginals, originalFileName);
     if (param.path !== to) {
       console.log("move:", param.path, to);
-      await file.moveFile(param.path, Path.resolve(param.dirOriginals, originalFileName));
+      await rename(param.path, Path.resolve(param.dirOriginals, originalFileName));
     }
   }
-  await file.writeFile(
-    Path.resolve(param.dirThumbnails, thumbnailFileName),
-    fileInfo.thumbnail.buffer,
-  );
+  await writeFile(Path.resolve(param.dirThumbnails, thumbnailFileName), fileInfo.thumbnail.buffer);
   return petaFile;
 }
 export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {
@@ -62,7 +62,7 @@ export async function generateMetadata(path: string): Promise<GeneratedFileInfo 
   if (fileType !== undefined) {
     if (supportedFileConditions.image(fileType)) {
       return generateImageMetadataByWorker({
-        buffer: await file.readFile(path),
+        buffer: await readFile(path),
         fileType: fileType,
       });
     }

@@ -1,9 +1,9 @@
 import axios, { AxiosError } from "axios";
 import dataUriToBuffer from "data-uri-to-buffer";
+import { rm, stat, writeFile } from "fs/promises";
 import * as Path from "path";
 import { v4 as uuid } from "uuid";
 
-import { FileType } from "@/commons/datas/fileType";
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
@@ -24,6 +24,11 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
+import {
+  getPetaFileDirectoryPath,
+  getPetaFileDirectoryPathFromID,
+  getPetaFilePath,
+} from "@/main/utils/getPetaFileDirectory";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
@@ -81,14 +86,6 @@ export class PetaFilesController {
       {},
       silent,
     );
-  }
-  getFilePath(petaFile: PetaFile, thumbnail: FileType) {
-    const paths = usePaths();
-    if (thumbnail === FileType.ORIGINAL) {
-      return Path.resolve(paths.DIR_IMAGES, petaFile.file.original);
-    } else {
-      return Path.resolve(paths.DIR_THUMBNAILS, petaFile.file.thumbnail);
-    }
   }
   async getPetaFile(id: string) {
     const dbPetaFiles = useDBPetaFiles();
@@ -170,10 +167,11 @@ export class PetaFilesController {
     if (mode === UpdateMode.REMOVE) {
       await dbPetaFilesPetaTags.remove({ petaFileId: petaFile.id });
       await dbPetaFiles.remove({ id: petaFile.id });
-      await file.rm(this.getFilePath(petaFile, FileType.ORIGINAL)).catch(() => {
+      const path = getPetaFilePath(petaFile);
+      await rm(path.original).catch(() => {
         //
       });
-      await file.rm(this.getFilePath(petaFile, FileType.THUMBNAIL)).catch(() => {
+      await rm(path.thumbnail).catch(() => {
         //
       });
     } else if (mode === UpdateMode.UPDATE) {
@@ -200,7 +198,7 @@ export class PetaFilesController {
         remoteURL = url;
       }
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      await file.writeFile(dist, data);
+      await writeFile(dist, data);
       if (!(await isSupportedFile(dist))) {
         throw new Error("unsupported file");
       }
@@ -229,7 +227,7 @@ export class PetaFilesController {
     try {
       log.log("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      await file.writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
+      await writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
       if (!(await isSupportedFile(dist))) {
         throw new Error("unsupported file");
       }
@@ -308,7 +306,7 @@ export class PetaFilesController {
           let errorReason = "";
           try {
             const name = Path.basename(fileInfo.path);
-            const fileDate = (await file.stat(fileInfo.path)).mtime;
+            const fileDate = (await stat(fileInfo.path)).mtime;
             if (!(await isSupportedFile(fileInfo.path))) {
               throw new Error("unsupported file");
             }
@@ -318,10 +316,11 @@ export class PetaFilesController {
               result = ImportImageResult.EXISTS;
               petaFiles.push(exists);
             } else {
+              const directory = getPetaFileDirectoryPathFromID(id);
               const petaFile = await generatePetaFile({
                 path: fileInfo.path,
-                dirOriginals: paths.DIR_IMAGES,
-                dirThumbnails: paths.DIR_THUMBNAILS,
+                dirOriginals: directory.original,
+                dirThumbnails: directory.thumbnail,
                 extends: {
                   name: fileInfo.name ?? name,
                   fileDate: fileDate.getTime(),
@@ -383,11 +382,12 @@ export class PetaFilesController {
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
+      const directory = getPetaFileDirectoryPath(petaFile);
       const newPetaFile = await generatePetaFile({
-        path: Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
+        path: getPetaFilePath(petaFile).original,
         type: "update",
-        dirOriginals: paths.DIR_IMAGES,
-        dirThumbnails: paths.DIR_THUMBNAILS,
+        dirOriginals: directory.original,
+        dirThumbnails: directory.thumbnail,
         extends: petaFile,
       });
       if (newPetaFile === undefined) {

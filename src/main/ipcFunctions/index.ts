@@ -1,4 +1,5 @@
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
+import { readFile } from "fs/promises";
 import * as Path from "path";
 
 import { FileType } from "@/commons/datas/fileType";
@@ -28,6 +29,7 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
@@ -337,7 +339,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.log("#Open Image File");
-    shell.showItemInFolder(petaFilesController.getFilePath(petaFile, FileType.ORIGINAL));
+    shell.showItemInFolder(getPetaFilePath(petaFile).original);
   },
   async getAppInfo() {
     const logger = useLogger();
@@ -371,7 +373,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.log("#Show Image In Folder");
-    shell.showItemInFolder(petaFilesController.getFilePath(petaFile, FileType.ORIGINAL));
+    shell.showItemInFolder(getPetaFilePath(petaFile).original);
     return true;
   },
   async updateSettings(event, settings) {
@@ -507,7 +509,7 @@ export const ipcFunctions: IpcFunctionsType = {
       //   path = Path.resolve(path, "PetaFile");
       // }
       try {
-        await file.readFile(Path.resolve(filePath, FILENAME_DB_INFO));
+        await readFile(Path.resolve(filePath, FILENAME_DB_INFO));
       } catch {
         path = Path.resolve(path, "PetaFile");
       }
@@ -532,7 +534,7 @@ export const ipcFunctions: IpcFunctionsType = {
         log.error("Invalid file path:", path);
         return false;
       }
-      path = file.initDirectory(true, path);
+      path = await file.initDirectory(true, path);
       configSettings.data.petaFileDirectory.default = false;
       configSettings.data.petaFileDirectory.path = path;
       configSettings.save();
@@ -570,10 +572,8 @@ export const ipcFunctions: IpcFunctionsType = {
     if (!first) {
       return;
     }
-    const firstPath = Path.resolve(paths.DIR_IMAGES, first.file.original);
-    const files = petaFiles.map((petaFile) =>
-      Path.resolve(paths.DIR_IMAGES, petaFile.file.original),
-    );
+    const firstPath = getPetaFilePath(first).original;
+    const files = petaFiles.map((petaFile) => getPetaFilePath(petaFile).original);
     if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
       windows.windows.board.moveTop();
     }
@@ -697,7 +697,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const log = logger.logMainChunk();
     log.log("#Search Image By Google");
     try {
-      await searchImageByGoogle(petaFile, paths.DIR_THUMBNAILS);
+      await searchImageByGoogle(getPetaFilePath(petaFile).thumbnail);
       log.log("return:", true);
       return true;
     } catch (error) {
@@ -771,18 +771,14 @@ export const ipcFunctions: IpcFunctionsType = {
   async getLicenses() {
     return JSON.parse(
       (
-        await file.readFile(
-          resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]),
-        )
+        await readFile(resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]))
       ).toString(),
     );
   },
   async getSupporters() {
     return JSON.parse(
       (
-        await file.readFile(
-          resolveExtraFilesPath(extraFiles["supporters.universal"]["supporters.json"]),
-        )
+        await readFile(resolveExtraFilesPath(extraFiles["supporters.universal"]["supporters.json"]))
       ).toString(),
     );
   },
