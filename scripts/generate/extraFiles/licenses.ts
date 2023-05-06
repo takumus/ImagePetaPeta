@@ -48,6 +48,11 @@ export async function generateLicenses() {
       );
     })),
   );
+  modules.forEach((module) => {
+    if (module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)) {
+      throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
+    }
+  });
   readdirSync("resources/licenses")
     .filter((fileName) => fileName.endsWith(".txt"))
     .map((fileName) => {
@@ -74,6 +79,9 @@ export async function generateLicenses() {
       licensesCounts[module.licenses]++;
     } else {
       licensesCounts[module.licenses] = 1;
+    }
+    if (module.licenses.toLocaleLowerCase().match(/unknown/)) {
+      throw `UNKNOWN LICENSE!!!!!!!: ${module.name}`;
     }
     if (module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)) {
       throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
