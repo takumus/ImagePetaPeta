@@ -1,8 +1,8 @@
-// import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser as XMLDOMParser } from "@xmldom/xmldom";
 
 export function getURLFromHTML(html: string) {
   try {
-    const dom = new DOMParser().parseFromString(`<wrapper>${html}</wrapper>`, "text/html");
+    const dom = new XMLDOMParser().parseFromString(`<wrapper>${html}</wrapper>`, "text/html");
     const imgDom = dom.getElementsByTagName("img")[0];
     const aDom = dom.getElementsByTagName("a")[0];
     const videoDom = dom.getElementsByTagName("video")[0];
