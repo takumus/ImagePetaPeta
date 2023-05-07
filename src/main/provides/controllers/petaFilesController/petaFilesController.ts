@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios";
 import dataUriToBuffer from "data-uri-to-buffer";
 import { rm, stat, writeFile } from "fs/promises";
 import * as Path from "path";
@@ -181,7 +180,7 @@ export class PetaFilesController {
     }
     return true;
   }
-  async createFileInfoFromURL(url: string): Promise<ImportFileInfo | undefined> {
+  async createFileInfoFromURL(url: string, referrer?: string): Promise<ImportFileInfo | undefined> {
     const logger = useLogger();
     const paths = usePaths();
     const log = logger.logMainChunk();
@@ -194,7 +193,19 @@ export class PetaFilesController {
         data = dataUriToBuffer(url);
       } else {
         // 普通のurlだったら
-        data = (await axios.get(url, { responseType: "arraybuffer" })).data;
+        data = Buffer.from(
+          await (
+            await fetch(url, {
+              headers:
+                referrer !== undefined
+                  ? {
+                      Referer: referrer,
+                    }
+                  : undefined,
+              method: "GET",
+            })
+          ).arrayBuffer(),
+        );
         remoteURL = url;
       }
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
@@ -209,11 +220,7 @@ export class PetaFilesController {
         name: "downloaded",
       };
     } catch (error) {
-      if (error instanceof AxiosError) {
-        log.error(error.message, error.code);
-      } else {
-        log.error(error);
-      }
+      log.error(error);
     }
     log.log("return:", false);
     return undefined;

@@ -636,7 +636,7 @@ export const ipcFunctions: IpcFunctionsType = {
               };
             }
             if (d?.type === "url") {
-              const result = await petaFilesController.createFileInfoFromURL(d.url);
+              const result = await petaFilesController.createFileInfoFromURL(d.url, d.referrer);
               if (result !== undefined) {
                 return result;
               }
