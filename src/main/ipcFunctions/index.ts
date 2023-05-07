@@ -612,7 +612,7 @@ export const ipcFunctions: IpcFunctionsType = {
         .filter(
           (data) =>
             data[0]?.type === "filePath" &&
-            Path.resolve(Path.dirname(data[0].filePath)) === Path.resolve(paths.DIR_IMAGES),
+            Path.resolve(Path.dirname(data[0].filePath)).startsWith(Path.resolve(paths.DIR_IMAGES)),
         )
         .map(
           (data) =>
