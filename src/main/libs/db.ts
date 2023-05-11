@@ -12,6 +12,8 @@ export default class DB<T> extends TypedEventEmitter<{
   nedb: Nedb<T> | null = null;
   loaded = false;
   execCompationIntervalId!: NodeJS.Timeout;
+  saveCompleted = true;
+  orderCompleted = true;
   constructor(public name: string, private path: string) {
     super();
   }
@@ -36,13 +38,17 @@ export default class DB<T> extends TypedEventEmitter<{
   orderCompaction() {
     clearTimeout(this.execCompationIntervalId);
     this.execCompationIntervalId = setTimeout(this.compaction, DB_COMPACTION_DELAY);
+    this.orderCompleted = false;
   }
   compaction = () => {
     if (this.nedb && this.loaded) {
+      this.saveCompleted = false;
+      this.orderCompleted = true;
       this.emit("beginCompaction");
       this.nedb
         .compactDatafileAsync()
         .then(() => {
+          this.saveCompleted = true;
           this.emit("doneCompaction");
         })
         .catch((error) => {
@@ -111,5 +117,8 @@ export default class DB<T> extends TypedEventEmitter<{
       }
       this.nedb.ensureIndex(ensureIndexOptions, res);
     });
+  }
+  get isKillable() {
+    return this.orderCompleted && this.saveCompleted;
   }
 }

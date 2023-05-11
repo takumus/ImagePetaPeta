@@ -63,6 +63,7 @@ import {
   dbPetaTagPartitionsKey,
   dbPetaTagsKey,
   dbStatusKey,
+  dbsKey,
 } from "@/main/provides/databases";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
@@ -196,6 +197,13 @@ export function initDI() {
     provide(dbPetaFilesPetaTagsKey, dbPetaFilesPetaTags);
     provide(dbPetaTagsKey, dbPetaTags);
     provide(dbPetaTagPartitionsKey, dbPetaTagPartitions);
+    provide(dbsKey, [
+      dbPetaBoard,
+      dbPetaFiles,
+      dbPetaFilesPetaTags,
+      dbPetaTags,
+      dbPetaTagPartitions,
+    ]);
   } catch (err) {
     // どこかで失敗したら強制終了
     showError({

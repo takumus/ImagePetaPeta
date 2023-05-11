@@ -1,6 +1,8 @@
 import {
   WINDOW_EULA_HEIGHT,
   WINDOW_EULA_WIDTH,
+  WINDOW_QUIT_HEIGHT,
+  WINDOW_QUIT_WIDTH,
   WINDOW_SETTINGS_HEIGHT,
   WINDOW_SETTINGS_WIDTH,
 } from "@/commons/defines";
@@ -49,6 +51,15 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         height: WINDOW_EULA_HEIGHT,
         minWidth: WINDOW_EULA_WIDTH,
         minHeight: WINDOW_EULA_HEIGHT,
+        alwaysOnTop: configSettings.data.alwaysOnTop,
+      };
+    case "quit":
+      return {
+        width: WINDOW_QUIT_WIDTH,
+        height: WINDOW_QUIT_HEIGHT,
+        minWidth: WINDOW_QUIT_WIDTH,
+        minHeight: WINDOW_QUIT_HEIGHT,
+        resizable: false,
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
   }

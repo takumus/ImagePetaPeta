@@ -13,6 +13,7 @@ export const dbPetaBoardsKey = createKey<DB<PetaBoard>>("dbPetaBoards");
 export const dbPetaTagPartitionsKey = createKey<DB<PetaTagPartition>>("dbPetaTagPartitions");
 export const dbPetaFilesPetaTagsKey = createKey<DB<PetaFilePetaTag>>("dbPetaFilesPetaTags");
 export const dbStatusKey = createKey<{ initialized: boolean }>("dbStatus");
+export const dbsKey = createKey<DB<any>[]>("dbs");
 
 export const useDBPetaFiles = createUseFunction(dbPetaFilesKey);
 export const useDBPetaTags = createUseFunction(dbPetaTagsKey);
@@ -20,3 +21,4 @@ export const useDBPetaBoards = createUseFunction(dbPetaBoardsKey);
 export const useDBPetaTagPartitions = createUseFunction(dbPetaTagPartitionsKey);
 export const useDBPetaFilesPetaTags = createUseFunction(dbPetaFilesPetaTagsKey);
 export const useDBStatus = createUseFunction(dbStatusKey);
+export const useDBS = createUseFunction(dbsKey);

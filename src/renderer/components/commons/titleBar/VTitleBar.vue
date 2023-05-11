@@ -18,7 +18,7 @@
         <e-draggable class="right"> </e-draggable>
       </e-bottom>
     </e-content>
-    <e-window-buttons v-if="!isMac">
+    <e-window-buttons v-if="!isMac && !hideControls">
       <e-window-button v-if="resizable" @click="minimizeWindow">
         <e-icon>&#xe921;</e-icon>
       </e-window-button>
@@ -43,6 +43,7 @@ const { windowName } = useWindowNameStore();
 const { systemInfo } = useSystemInfoStore();
 defineProps<{
   title?: string;
+  hideControls?: boolean;
 }>();
 
 function minimizeWindow() {
