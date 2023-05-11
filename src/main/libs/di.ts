@@ -24,8 +24,8 @@ export function inject<T>(key: Key<T>): T {
 }
 export function createUseFunction<T>(key: Key<T>) {
   let instance: T | undefined = undefined;
-  return (cache = true) => {
-    if (instance === undefined || !cache) {
+  return () => {
+    if (instance === undefined) {
       instance = inject(key);
     }
     return instance;
