@@ -1,5 +1,6 @@
 import { AppInfo } from "@/commons/datas/appInfo";
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
+import { ImportFileGroup } from "@/commons/datas/importFileGroup";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
@@ -15,13 +16,7 @@ import { WindowName } from "@/commons/windows";
 
 export interface IpcFunctions {
   browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
-  importFiles: (
-    datas: (
-      | { type: "url"; url: string; referrer?: string }
-      | { type: "buffer"; buffer: ArrayBuffer }
-      | { type: "filePath"; filePath: string }
-    )[][],
-  ) => Promise<string[]>;
+  importFiles: (datas: ImportFileGroup[]) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
   getPetaFiles: () => Promise<PetaFiles>;
   updatePetaFiles: (datas: PetaFile[], mode: UpdateMode) => Promise<boolean>;

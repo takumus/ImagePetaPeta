@@ -2,13 +2,13 @@ import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } fro
 import { readFile } from "fs/promises";
 import * as Path from "path";
 
-import { FileType } from "@/commons/datas/fileType";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { BOARD_DEFAULT_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
+import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
 import { ppa } from "@/commons/utils/pp";
 import { WindowName } from "@/commons/windows";
 
@@ -601,24 +601,13 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async importFiles(event, datas) {
     const logger = useLogger();
-    const paths = usePaths();
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     try {
       log.log("#importFiles");
       log.log(datas.length);
       const logFromBrowser = logger.logMainChunk();
-      const ids = datas
-        .filter(
-          (data) =>
-            data[0]?.type === "filePath" &&
-            Path.resolve(Path.dirname(data[0].filePath)).startsWith(Path.resolve(paths.DIR_IMAGES)),
-        )
-        .map(
-          (data) =>
-            Path.basename(data[0]?.type === "filePath" ? data[0].filePath : "?").split(".")[0] ??
-            "?",
-        );
+      const ids = getIdsFromFilePaths(datas);
       logFromBrowser.log("## From Browser");
       if (ids.length > 0 && ids.length === datas.length) {
         logFromBrowser.log("return:", ids.length);
