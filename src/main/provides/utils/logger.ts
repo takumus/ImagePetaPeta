@@ -23,7 +23,7 @@ export class Logger {
           },
         );
       }
-      console.log(`${from === LogFrom.MAIN ? "\x1b[35m" : "\x1b[32m"}${date}`, ...args);
+      console.log(`${from === LogFrom.MAIN ? "\x1b[35m" : "\x1b[32m"}${date}\x1b[0m`, ...args);
     } catch (error) {
       console.log("Could not write logfile", error);
     }
