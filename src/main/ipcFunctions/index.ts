@@ -16,7 +16,6 @@ import { extraFiles } from "@/_defines/extraFiles";
 import Transparent from "@/_public/images/utils/transparent.png";
 import { showError } from "@/main/errorWindow";
 import * as file from "@/main/libs/file";
-import * as Tasks from "@/main/libs/task";
 import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
@@ -24,6 +23,7 @@ import { usePetaFilesController } from "@/main/provides/controllers/petaFilesCon
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
+import { useTasks } from "@/main/provides/tasks";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
@@ -61,12 +61,13 @@ export const ipcFunctions: IpcFunctionsType = {
   async cancelTasks(event, ids) {
     const logger = useLogger();
     const log = logger.logMainChunk();
+    const tasks = useTasks();
     try {
       log.log("#Cancel Tasks");
       ids.forEach((id) => {
-        const name = Tasks.getTask(id)?.name;
+        const name = tasks.getTask(id)?.name;
         log.log(`task: ${name}-${id}`);
-        Tasks.cancel(id);
+        tasks.cancel(id);
       });
       return;
     } catch (error) {

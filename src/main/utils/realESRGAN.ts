@@ -9,10 +9,10 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
 import { extraFiles } from "@/_defines/extraFiles";
-import * as Tasks from "@/main/libs/task";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFilesPetaTags } from "@/main/provides/databases";
+import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
@@ -22,7 +22,8 @@ import { runExternalApplication } from "@/main/utils/runExternalApplication";
 export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANModelName) {
   const paths = usePaths();
   const logger = useLogger();
-  return Tasks.spawn(
+  const tasks = useTasks();
+  return tasks.spawn(
     "realESRGAN",
     async (handler) => {
       const log = logger.logMainChunk();

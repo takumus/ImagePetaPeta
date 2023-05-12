@@ -13,9 +13,9 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
-import * as Tasks from "@/main/libs/task";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
+import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
@@ -26,7 +26,8 @@ import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
-    return Tasks.spawn(
+    const tasks = useTasks();
+    return tasks.spawn(
       "UpdatePetaFiles",
       async (handler) => {
         handler.emitStatus({
@@ -182,11 +183,11 @@ export class PetaFilesController {
     silent = false,
   ) {
     const logger = useLogger();
-    const paths = usePaths();
+    const tasks = useTasks();
     if (params.fileInfos.length === 0) {
       return [];
     }
-    return Tasks.spawn(
+    return tasks.spawn(
       "importFilesFromFilePaths",
       async (handler) => {
         const log = logger.logMainChunk();

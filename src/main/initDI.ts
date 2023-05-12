@@ -65,6 +65,7 @@ import {
   dbStatusKey,
   dbsKey,
 } from "@/main/provides/databases";
+import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
@@ -157,6 +158,7 @@ export function initDI() {
       FILE_TAG_PARTITIONS_DB,
     );
     const dbPetaFilesPetaTags = new DB<PetaFilePetaTag>("petaFilePetaTag", FILE_IMAGES_TAGS_DB);
+    const tasks = new Tasks();
     // 画面初期化
     const windows = new Windows();
     // パスまとめ
@@ -204,6 +206,7 @@ export function initDI() {
       dbPetaTags,
       dbPetaTagPartitions,
     ]);
+    provide(tasksKey, tasks);
   } catch (err) {
     // どこかで失敗したら強制終了
     showError({

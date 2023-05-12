@@ -7,15 +7,16 @@ import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import * as Tasks from "@/main/libs/task";
 import { useDBPetaFilesPetaTags, useDBPetaTags } from "@/main/provides/databases";
+import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 
 export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
-    return Tasks.spawn(
+    const tasks = useTasks();
+    return tasks.spawn(
       "UpdatePetaTags",
       async (handler) => {
         handler.emitStatus({
@@ -63,7 +64,8 @@ export class PetaTagsController {
     silent = false,
   ) {
     const dbPetaTags = useDBPetaTags();
-    return Tasks.spawn(
+    const tasks = useTasks();
+    return tasks.spawn(
       "UpdatePetaFilesPetaTags",
       async (handler) => {
         handler.emitStatus({

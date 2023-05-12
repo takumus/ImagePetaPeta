@@ -6,7 +6,7 @@ import { TaskStatusCode } from "@/commons/datas/task";
 import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
 
-import * as Tasks from "@/main/libs/task";
+import { useTasks } from "@/main/provides/tasks";
 
 type SearchImageByGoogleTaskStep = { js: string } | { wait: number };
 export interface SearchImageByGoogleTask {
@@ -58,7 +58,8 @@ async function steps(
   }, steps).promise;
 }
 export async function searchImageByGoogle(path: string) {
-  return Tasks.spawn(
+  const tasks = useTasks();
+  return tasks.spawn(
     "Search Image By Google",
     async (handler, path: string) => {
       const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;

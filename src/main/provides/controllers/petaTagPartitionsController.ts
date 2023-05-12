@@ -5,8 +5,8 @@ import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import * as Tasks from "@/main/libs/task";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
+import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
@@ -17,7 +17,8 @@ export class PetaTagPartitionsController {
     return dbPetaTagPartitions.getAll();
   }
   async updateMultiple(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
-    return Tasks.spawn(
+    const tasks = useTasks();
+    return tasks.spawn(
       "UpdatePetaTagPartitions",
       async (handler) => {
         handler.emitStatus({
