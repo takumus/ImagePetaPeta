@@ -2,7 +2,7 @@ import { app, protocol } from "electron";
 import * as Path from "path";
 
 import { PROTOCOLS } from "@/commons/defines";
-import { getLastSegmentFromURL } from "@/commons/utils/getLastSegmentFromURL";
+import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
 
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
@@ -92,17 +92,15 @@ import { initWebhook } from "@/main/webhook";
     logger.logMainChunk().log(`verison: ${app.getVersion()}`);
     // プロトコル登録
     protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, (req, res) => {
-      const filename = getLastSegmentFromURL(req.url);
-      const id = filename.split(".")[0];
+      const info = getPetaFileInfoFromURL(req.url);
       res({
-        path: getPetaFilePath.fromIDAndFilename(id, filename, "original"),
+        path: getPetaFilePath.fromIDAndFilename(info.id, info.filename, "original"),
       });
     });
     protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, (req, res) => {
-      const filename = getLastSegmentFromURL(req.url);
-      const id = filename.split(".")[0];
+      const info = getPetaFileInfoFromURL(req.url);
       res({
-        path: getPetaFilePath.fromIDAndFilename(id, filename, "thumbnail"),
+        path: getPetaFilePath.fromIDAndFilename(info.id, info.filename, "thumbnail"),
       });
     });
     // ipcの関数登録
