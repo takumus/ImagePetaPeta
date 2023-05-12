@@ -7,7 +7,7 @@
       <e-top>
         <VTitleBar :title="t('titles.quit')" :hide-controls="true"> </VTitleBar>
       </e-top>
-      <e-browser> quitting... </e-browser>
+      <e-browser> {{ t("quit.quitting") }} </e-browser>
     </e-content>
   </e-root>
 </template>

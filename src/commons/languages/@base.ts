@@ -29,6 +29,7 @@ export interface I18NBase extends I18N {
     settings: I18NProp;
     capture: I18NProp;
     eula: I18NProp;
+    quit: I18NProp;
   };
   playbackController: {
     play: I18NProp;
@@ -213,5 +214,8 @@ export interface I18NBase extends I18N {
     body: I18NProp;
     agree: I18NProp;
     disagree: I18NProp;
+  };
+  quit: {
+    quitting: I18NProp;
   };
 }
