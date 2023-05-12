@@ -60,7 +60,8 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         minWidth: WINDOW_QUIT_WIDTH,
         minHeight: WINDOW_QUIT_HEIGHT,
         resizable: false,
-        alwaysOnTop: configSettings.data.alwaysOnTop,
+        alwaysOnTop: true,
+        titleBarStyle: undefined,
       };
   }
 }
