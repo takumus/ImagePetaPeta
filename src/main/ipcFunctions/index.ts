@@ -19,6 +19,7 @@ import * as file from "@/main/libs/file";
 import * as Tasks from "@/main/libs/task";
 import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
+import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
@@ -625,13 +626,13 @@ export const ipcFunctions: IpcFunctionsType = {
               };
             }
             if (d?.type === "url") {
-              const result = await petaFilesController.createFileInfoFromURL(d.url, d.referrer);
+              const result = await createFileInfo.fromURL(d.url, d.referrer);
               if (result !== undefined) {
                 return result;
               }
             }
             if (d?.type === "buffer") {
-              const result = await petaFilesController.createFileInfoFromBuffer(d.buffer);
+              const result = await createFileInfo.fromBuffer(d.buffer);
               if (result !== undefined) {
                 return result;
               }

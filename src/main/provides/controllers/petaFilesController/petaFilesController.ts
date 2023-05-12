@@ -1,7 +1,5 @@
-import dataUriToBuffer from "data-uri-to-buffer";
-import { rm, stat, writeFile } from "fs/promises";
+import { rm, stat } from "fs/promises";
 import * as Path from "path";
-import { v4 as uuid } from "uuid";
 
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
@@ -179,76 +177,6 @@ export class PetaFilesController {
       await dbPetaFiles.insert(petaFile);
     }
     return true;
-  }
-  async createFileInfoFromURL(url: string, referrer?: string): Promise<ImportFileInfo | undefined> {
-    const logger = useLogger();
-    const paths = usePaths();
-    const log = logger.logMainChunk();
-    try {
-      log.log("## Create File Info URL");
-      let data: Buffer;
-      let remoteURL = "";
-      if (url.trim().startsWith("data:")) {
-        // dataURIだったら
-        data = dataUriToBuffer(url);
-      } else {
-        // 普通のurlだったら
-        data = Buffer.from(
-          await (
-            await fetch(url, {
-              headers:
-                referrer !== undefined
-                  ? {
-                      Referer: referrer,
-                    }
-                  : undefined,
-              method: "GET",
-            })
-          ).arrayBuffer(),
-        );
-        remoteURL = url;
-      }
-      const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      await writeFile(dist, data);
-      if (!(await isSupportedFile(dist))) {
-        throw new Error("unsupported file");
-      }
-      log.log("return:", true);
-      return {
-        path: dist,
-        note: remoteURL,
-        name: "downloaded",
-      };
-    } catch (error) {
-      log.error(error);
-    }
-    log.log("return:", false);
-    return undefined;
-  }
-  async createFileInfoFromBuffer(
-    buffer: ArrayBuffer | Buffer,
-  ): Promise<ImportFileInfo | undefined> {
-    const logger = useLogger();
-    const paths = usePaths();
-    const log = logger.logMainChunk();
-    try {
-      log.log("## Create File Info From ArrayBuffer");
-      const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      await writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
-      if (!(await isSupportedFile(dist))) {
-        throw new Error("unsupported file");
-      }
-      log.log("return:", true);
-      return {
-        path: dist,
-        note: "",
-        name: "noname",
-      };
-    } catch (error) {
-      log.error(error);
-    }
-    log.log("return:", false);
-    return undefined;
   }
   async importFilesFromFileInfos(
     params: {
