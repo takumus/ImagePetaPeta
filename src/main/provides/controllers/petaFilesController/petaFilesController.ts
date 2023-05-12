@@ -21,11 +21,7 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType } from "@/main/provides/windows";
 import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
-import {
-  getPetaFileDirectoryPath,
-  getPetaFileDirectoryPathFromID,
-  getPetaFilePath,
-} from "@/main/utils/getPetaFileDirectory";
+import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
@@ -164,7 +160,7 @@ export class PetaFilesController {
     if (mode === UpdateMode.REMOVE) {
       await dbPetaFilesPetaTags.remove({ petaFileId: petaFile.id });
       await dbPetaFiles.remove({ id: petaFile.id });
-      const path = getPetaFilePath(petaFile);
+      const path = getPetaFilePath.fromPetaFile(petaFile);
       await rm(path.original).catch(() => {
         //
       });
@@ -251,7 +247,7 @@ export class PetaFilesController {
               result = ImportImageResult.EXISTS;
               petaFiles.push(exists);
             } else {
-              const directory = getPetaFileDirectoryPathFromID(id);
+              const directory = getPetaFileDirectoryPath.fromID(id);
               const petaFile = await generatePetaFile({
                 path: fileInfo.path,
                 dirOriginals: directory.original,
@@ -317,9 +313,9 @@ export class PetaFilesController {
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
-      const directory = getPetaFileDirectoryPath(petaFile);
+      const directory = getPetaFileDirectoryPath.fromPetaFile(petaFile);
       const newPetaFile = await generatePetaFile({
-        path: getPetaFilePath(petaFile).original,
+        path: getPetaFilePath.fromPetaFile(petaFile).original,
         type: "update",
         dirOriginals: directory.original,
         dirThumbnails: directory.thumbnail,

@@ -43,8 +43,8 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
   if (data.metadata.version < 1.8) {
     try {
       const paths = usePaths();
-      const directory = getPetaFileDirectoryPath(data);
-      const path = getPetaFilePath(data);
+      const directory = getPetaFileDirectoryPath.fromPetaFile(data);
+      const path = getPetaFilePath.fromPetaFile(data);
       await Promise.all([
         mkdirIfNotIxists(directory.original, { recursive: true }),
         mkdirIfNotIxists(directory.thumbnail, { recursive: true }),

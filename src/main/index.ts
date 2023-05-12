@@ -13,7 +13,7 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
-import { getPetaFilePathFromIDAndFilename } from "@/main/utils/getPetaFileDirectory";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { initWebhook } from "@/main/webhook";
 
@@ -95,14 +95,14 @@ import { initWebhook } from "@/main/webhook";
       const filename = getLastSegmentFromURL(req.url);
       const id = filename.split(".")[0];
       res({
-        path: getPetaFilePathFromIDAndFilename(id, filename, "original"),
+        path: getPetaFilePath.fromIDAndFilename(id, filename, "original"),
       });
     });
     protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, (req, res) => {
       const filename = getLastSegmentFromURL(req.url);
       const id = filename.split(".")[0];
       res({
-        path: getPetaFilePathFromIDAndFilename(id, filename, "thumbnail"),
+        path: getPetaFilePath.fromIDAndFilename(id, filename, "thumbnail"),
       });
     });
     // ipcの関数登録

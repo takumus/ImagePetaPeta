@@ -340,7 +340,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.log("#Open Image File");
-    shell.showItemInFolder(getPetaFilePath(petaFile).original);
+    shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
   },
   async getAppInfo() {
     const logger = useLogger();
@@ -374,7 +374,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.log("#Show Image In Folder");
-    shell.showItemInFolder(getPetaFilePath(petaFile).original);
+    shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
     return true;
   },
   async updateSettings(event, settings) {
@@ -573,8 +573,8 @@ export const ipcFunctions: IpcFunctionsType = {
     if (!first) {
       return;
     }
-    const firstPath = getPetaFilePath(first).original;
-    const files = petaFiles.map((petaFile) => getPetaFilePath(petaFile).original);
+    const firstPath = getPetaFilePath.fromPetaFile(first).original;
+    const files = petaFiles.map((petaFile) => getPetaFilePath.fromPetaFile(petaFile).original);
     if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
       windows.windows.board.moveTop();
     }
@@ -687,7 +687,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const log = logger.logMainChunk();
     log.log("#Search Image By Google");
     try {
-      await searchImageByGoogle(getPetaFilePath(petaFile).thumbnail);
+      await searchImageByGoogle(getPetaFilePath.fromPetaFile(petaFile).thumbnail);
       log.log("return:", true);
       return true;
     } catch (error) {

@@ -73,7 +73,6 @@ import VTags from "@/renderer/components/browser/tags/VTags.vue";
 import VTile from "@/renderer/components/browser/tile/VTile.vue";
 import VPreview from "@/renderer/components/commons/property/VPreview.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
-import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
