@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import Config from "@/main/libs/config";
 import { createSyncMigrater } from "@/main/libs/createMigrater";
 
-const ROOT = "./_test/config";
+const ROOT = "./_test/unit/config";
 const CONFIG_FILE_PATH = resolve(ROOT, "config.json");
 describe("config", () => {
   beforeEach(() => {

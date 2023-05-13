@@ -12,7 +12,7 @@ import {
 } from "@/main/libs/file";
 
 describe("file", () => {
-  const ROOT = "./_test/file";
+  const ROOT = "./_test/unit/file";
   beforeEach(() => {
     rmSync(ROOT, { recursive: true, force: true });
     mkdirSync(ROOT, { recursive: true });

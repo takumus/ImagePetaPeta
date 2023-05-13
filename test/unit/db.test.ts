@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import DB from "@/main/libs/db";
 
 describe("file", () => {
-  const ROOT = "./_test/db";
+  const ROOT = "./_test/unit/db";
   beforeEach(() => {
     rmSync(ROOT, { recursive: true, force: true });
     mkdirSync(ROOT, { recursive: true });

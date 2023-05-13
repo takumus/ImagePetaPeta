@@ -20,13 +20,14 @@ export default (pluginOptions?: {}): Plugin => {
             file,
           });
         }
+        const root = process.env.TEST === "true" ? `"./_test/app/wt"` : "__dirname";
         const newCode =
           `import { Worker as __WT__ } from "worker_threads";\n` +
           `import { resolve as __RESOLVE__ } from "path";\n` +
           workers
             .map(
               (worker) =>
-                `class ${worker.name} extends __WT__ { constructor() { super(__RESOLVE__(__dirname, "${worker.file}.js")); } }\n`,
+                `class ${worker.name} extends __WT__ { constructor() { super(__RESOLVE__(${root}, "${worker.file}.js")); } }\n`,
             )
             .join() +
           code.replace(/(import.*?from.*?.*?\.!wt["'])/g, "//$1");
