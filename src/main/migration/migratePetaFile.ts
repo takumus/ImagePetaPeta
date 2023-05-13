@@ -20,7 +20,7 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
       height: anyPetaFile.height,
       gif: false,
       palette: anyPetaFile.palette ?? [],
-      version: anyPetaFile.metadataVersion ?? 0,
+      version: 0,
     };
     delete anyPetaFile.width;
     delete anyPetaFile.height;
@@ -45,12 +45,10 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
       const paths = usePaths();
       const directory = getPetaFileDirectoryPath.fromPetaFile(data);
       const path = getPetaFilePath.fromPetaFile(data);
-      await Promise.all([
-        mkdirIfNotIxists(directory.original, { recursive: true }),
-        mkdirIfNotIxists(directory.thumbnail, { recursive: true }),
-        rename(Path.resolve(paths.DIR_IMAGES, data.file.original), path.original),
-        rename(Path.resolve(paths.DIR_THUMBNAILS, data.file.thumbnail), path.thumbnail),
-      ]);
+      await mkdirIfNotIxists(directory.original, { recursive: true });
+      await mkdirIfNotIxists(directory.thumbnail, { recursive: true });
+      await rename(Path.resolve(paths.DIR_IMAGES, data.file.original), path.original);
+      await rename(Path.resolve(paths.DIR_THUMBNAILS, data.file.thumbnail), path.thumbnail);
     } catch {
       //
     }
