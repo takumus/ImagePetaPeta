@@ -56,6 +56,7 @@ export default defineConfig(async ({ command }) => {
   return {
     test: {
       dir: "test",
+      testTimeout: 30 * 1000,
     },
     plugins: [
       {
