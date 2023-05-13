@@ -36,7 +36,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
         status: TaskStatusCode.BEGIN,
         cancelable: true,
       });
-      const tasks = ppa(
+      const processes = ppa(
         async (petaFile, index) => {
           const inputFile = getPetaFilePath.fromPetaFile(petaFile).original;
           const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.png`;
@@ -68,7 +68,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
           });
           handler.onCancel = () => {
             childProcess.kill();
-            tasks.cancel();
+            processes.cancel();
           };
           handler.emitStatus({
             i18nKey: "tasks.upconverting",
@@ -94,7 +94,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
         petaFiles,
         1,
       );
-      await tasks.promise;
+      await processes.promise;
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
         log: [],

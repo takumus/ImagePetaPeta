@@ -7,7 +7,7 @@ import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class Tasks {
   tasks: { [id: string]: TaskHandler } = {};
-  async spawn<T, K>(name: string, exec: (handler: TaskHandler) => Promise<K>, silent: boolean) {
+  async spawn<K>(name: string, exec: (handler: TaskHandler) => Promise<K>, silent: boolean) {
     const id = uuid();
     let done = false;
     const handler: TaskHandler = {
