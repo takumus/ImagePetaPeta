@@ -7,5 +7,6 @@ src/renderer/htmls/_*.html
 
 _release
 _electronTemp
+_test
 src/_public
 src/_defines

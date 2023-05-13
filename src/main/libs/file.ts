@@ -6,7 +6,7 @@ export async function mkdirIfNotIxists(path: string, options: fs.MakeDirectoryOp
   try {
     await fsp.mkdir(path, options);
   } catch (error: any) {
-    if (error.code !== "EEXIST") {
+    if (error.code === "EEXIST") {
       return path;
     } else {
       throw error;
@@ -14,11 +14,11 @@ export async function mkdirIfNotIxists(path: string, options: fs.MakeDirectoryOp
   }
   return path;
 }
-export async function mkdirIfNotIxistsSync(path: string, options: fs.MakeDirectoryOptions) {
+export function mkdirIfNotIxistsSync(path: string, options: fs.MakeDirectoryOptions) {
   try {
     fs.mkdirSync(path, options);
   } catch (error: any) {
-    if (error.code !== "EEXIST") {
+    if (error.code === "EEXIST") {
       return path;
     } else {
       throw error;
@@ -28,17 +28,17 @@ export async function mkdirIfNotIxistsSync(path: string, options: fs.MakeDirecto
 }
 export async function initFile(...paths: string[]) {
   const res = Path.resolve(...paths);
-  await writable(res, false);
+  // await writable(res, false);
   return res;
 }
 export function initFileSync(...paths: string[]) {
   const res = Path.resolve(...paths);
-  writableSync(res, false);
+  // writableSync(res, false);
   return res;
 }
 export async function initDirectory(create: boolean, ...paths: string[]) {
   const res = Path.resolve(...paths);
-  await writable(res, true);
+  // await writable(res, true);
   if (create) {
     await mkdirIfNotIxists(res, { recursive: true });
   }
@@ -46,50 +46,50 @@ export async function initDirectory(create: boolean, ...paths: string[]) {
 }
 export function initDirectorySync(create: boolean, ...paths: string[]) {
   const res = Path.resolve(...paths);
-  writableSync(res, true);
+  // writableSync(res, true);
   if (create) {
     mkdirIfNotIxistsSync(res, { recursive: true });
   }
   return res;
 }
-export async function writable(path: string, isDirectory: boolean) {
-  let stat: fs.Stats;
-  try {
-    // 存在確認
-    stat = await fsp.stat(path);
-  } catch (err) {
-    // 存在しない場合は親ディレクトリのアクセス権確認
-    await fsp.access(Path.resolve(path, "../"), fs.constants.W_OK | fs.constants.R_OK);
-    return;
-  }
-  // 存在する場合はファイルの種類の確認
-  if (stat.isDirectory() !== isDirectory) {
-    throw new Error(
-      `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
-    );
-  }
-  // 存在する場合はパスのアクセス権確認
-  await fsp.access(path, fs.constants.W_OK | fs.constants.R_OK);
-}
-export function writableSync(path: string, isDirectory: boolean) {
-  let stat: fs.Stats;
-  try {
-    // 存在確認
-    stat = fs.statSync(path);
-  } catch (err) {
-    // 存在しない場合は親ディレクトリのアクセス権確認
-    fs.accessSync(Path.resolve(path, "../"), fs.constants.W_OK | fs.constants.R_OK);
-    return;
-  }
-  // 存在する場合はファイルの種類の確認
-  if (stat.isDirectory() !== isDirectory) {
-    throw new Error(
-      `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
-    );
-  }
-  // 存在する場合はパスのアクセス権確認
-  fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
-}
+// export async function writable(path: string, isDirectory: boolean) {
+//   let stat: fs.Stats;
+//   try {
+//     // 存在確認
+//     stat = await fsp.stat(path);
+//   } catch (err) {
+//     // 存在しない場合は親ディレクトリのアクセス権確認
+//     await fsp.access(Path.resolve(path, "../"), fs.constants.W_OK | fs.constants.R_OK);
+//     return;
+//   }
+//   // 存在する場合はファイルの種類の確認
+//   if (stat.isDirectory() !== isDirectory) {
+//     throw new Error(
+//       `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
+//     );
+//   }
+//   // 存在する場合はパスのアクセス権確認
+//   await fsp.access(path, fs.constants.W_OK | fs.constants.R_OK);
+// }
+// export function writableSync(path: string, isDirectory: boolean) {
+//   let stat: fs.Stats;
+//   try {
+//     // 存在確認
+//     stat = fs.statSync(path);
+//   } catch (err) {
+//     // 存在しない場合は親ディレクトリのアクセス権確認
+//     fs.accessSync(Path.resolve(path, "../"), fs.constants.W_OK | fs.constants.R_OK);
+//     return;
+//   }
+//   // 存在する場合はファイルの種類の確認
+//   if (stat.isDirectory() !== isDirectory) {
+//     throw new Error(
+//       `File type is incorrect. "${path}" is not ${isDirectory ? "directory" : "file"}.`,
+//     );
+//   }
+//   // 存在する場合はパスのアクセス権確認
+//   fs.accessSync(path, fs.constants.W_OK | fs.constants.R_OK);
+// }
 export function readDirRecursive(
   path: string,
   onFile?: (filePaths: string[], count: number) => void,
