@@ -1,4 +1,4 @@
-const map: { [key: string]: unknown } = {};
+let map: { [key: string]: unknown } = {};
 
 interface Key<T> {
   key: string;
@@ -30,4 +30,7 @@ export function createUseFunction<T>(key: Key<T>) {
     }
     return instance;
   };
+}
+export function clearProvides() {
+  map = {};
 }

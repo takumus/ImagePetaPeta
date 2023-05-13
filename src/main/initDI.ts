@@ -74,18 +74,25 @@ import { Windows, windowsKey } from "@/main/provides/windows";
 import isValidFilePath from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/main/utils/versions";
 
-export function initDI() {
+export function initDI(
+  dirs = {
+    logs: app.getPath("logs"),
+    app: app.getPath("userData"),
+    temp: app.getPath("temp"),
+    default: app.getPath("pictures"),
+  },
+) {
   try {
     const i18n = createI18n({
       locale: "ja",
       messages: languages,
     });
     // ログは最優先で初期化
-    const DIR_LOG = initDirectorySync(false, app.getPath("logs"));
+    const DIR_LOG = initDirectorySync(true, dirs.logs);
     const dataLogger = new Logger(DIR_LOG);
     // その他パス初期化
-    const DIR_APP = initDirectorySync(false, app.getPath("userData"));
-    const DIR_TEMP = initDirectorySync(true, app.getPath("temp"), `imagePetaPeta-beta${uuid()}`);
+    const DIR_APP = initDirectorySync(true, dirs.app);
+    const DIR_TEMP = initDirectorySync(true, dirs.temp, `imagePetaPeta-beta${uuid()}`);
     const FILE_SETTINGS = initFileSync(DIR_APP, FILENAME_SETTINGS);
     // 設定ロード
     const configSettings = new Config<Settings>(
@@ -99,7 +106,7 @@ export function initDI() {
       if (configSettings.data.petaFileDirectory.default) {
         return (configSettings.data.petaFileDirectory.path = initDirectorySync(
           true,
-          app.getPath("pictures"),
+          dirs.default,
           "imagePetaPeta",
         ));
       } else {
@@ -209,6 +216,7 @@ export function initDI() {
     provide(tasksKey, tasks);
   } catch (err) {
     // どこかで失敗したら強制終了
+    console.log(err, app);
     showError({
       category: "M",
       code: 1,
