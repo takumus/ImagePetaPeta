@@ -17,7 +17,6 @@ import { generatePetaFile } from "@/main/provides/controllers/petaFilesControlle
 import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
@@ -77,7 +76,6 @@ export class PetaFilesController {
           status: TaskStatusCode.COMPLETE,
         });
       },
-      {},
       silent,
     );
   }
@@ -302,7 +300,6 @@ export class PetaFilesController {
         });
         return petaFiles;
       },
-      {},
       silent,
     );
   }

@@ -7,12 +7,7 @@ import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class Tasks {
   tasks: { [id: string]: TaskHandler } = {};
-  async spawn<T, K>(
-    name: string,
-    exec: (handler: TaskHandler, params: T) => Promise<K>,
-    params: T,
-    silent: boolean,
-  ) {
+  async spawn<T, K>(name: string, exec: (handler: TaskHandler) => Promise<K>, silent: boolean) {
     const id = uuid();
     let done = false;
     const handler: TaskHandler = {
@@ -34,7 +29,7 @@ export class Tasks {
     };
     this.addTask(handler);
     try {
-      const result = await exec(handler, params);
+      const result = await exec(handler);
       this.removeTask(handler);
       return result;
     } catch (error) {

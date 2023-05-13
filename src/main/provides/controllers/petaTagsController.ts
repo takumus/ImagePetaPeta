@@ -53,7 +53,6 @@ export class PetaTagsController {
         );
         return true;
       },
-      {},
       silent,
     );
   }
@@ -114,7 +113,6 @@ export class PetaTagsController {
           petaFileIds,
         });
       },
-      {},
       silent,
     );
   }

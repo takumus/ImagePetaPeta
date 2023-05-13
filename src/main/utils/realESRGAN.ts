@@ -102,7 +102,6 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
       });
       return success;
     },
-    {},
     false,
   );
 }

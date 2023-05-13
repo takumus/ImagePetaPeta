@@ -61,7 +61,7 @@ export async function searchImageByGoogle(path: string) {
   const tasks = useTasks();
   return tasks.spawn(
     "Search Image By Google",
-    async (handler, path: string) => {
+    async (handler) => {
       const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
       let taskCount = 0;
       handler.emitStatus({
@@ -184,7 +184,6 @@ export async function searchImageByGoogle(path: string) {
       window.destroy();
       return true;
     },
-    path,
     false,
   );
 }

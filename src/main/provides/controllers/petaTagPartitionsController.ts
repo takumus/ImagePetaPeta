@@ -48,7 +48,6 @@ export class PetaTagPartitionsController {
         );
         return true;
       },
-      {},
       silent,
     );
   }
