@@ -10,12 +10,12 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaFilesPetaTags, useDBPetaTags } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType } from "@/main/provides/windows";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
     const tasks = useTasks();
+    const windows = useWindows();
     return tasks.spawn(
       "UpdatePetaTags",
       async (handler) => {
@@ -40,7 +40,7 @@ export class PetaTagsController {
           status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象は、PetaTagIdsのみ。
-        emitMainEvent(
+        windows.emitMainEvent(
           {
             type: EmitMainEventTargetType.WINDOW_NAMES,
             windowNames: ["board", "browser", "details"],
@@ -65,6 +65,7 @@ export class PetaTagsController {
   ) {
     const dbPetaTags = useDBPetaTags();
     const tasks = useTasks();
+    const windows = useWindows();
     return tasks.spawn(
       "UpdatePetaFilesPetaTags",
       async (handler) => {
@@ -108,7 +109,7 @@ export class PetaTagsController {
           status: TaskStatusCode.COMPLETE,
         });
         // Tileの更新対象はPetaFileIdsのみ。
-        emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
+        windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
           petaTagIds: [],
           petaFileIds,
         });

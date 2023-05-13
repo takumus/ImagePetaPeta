@@ -18,8 +18,7 @@ import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/database
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { EmitMainEventTargetType } from "@/main/provides/windows";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
@@ -27,6 +26,7 @@ import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
     const tasks = useTasks();
+    const windows = useWindows();
     return tasks.spawn(
       "UpdatePetaFiles",
       async (handler) => {
@@ -50,7 +50,7 @@ export class PetaFilesController {
         await ppa(update, datas).promise;
         if (mode === UpdateMode.REMOVE) {
           // Tileの更新対象なし
-          emitMainEvent(
+          windows.emitMainEvent(
             {
               type: EmitMainEventTargetType.WINDOW_NAMES,
               windowNames: ["board", "browser", "details"],
@@ -62,7 +62,7 @@ export class PetaFilesController {
             },
           );
         }
-        emitMainEvent(
+        windows.emitMainEvent(
           {
             type: EmitMainEventTargetType.WINDOW_NAMES,
             windowNames: ["board", "browser", "details"],
@@ -308,9 +308,9 @@ export class PetaFilesController {
   }
   async regenerateMetadatas() {
     const logger = useLogger();
-    const paths = usePaths();
+    const windows = useWindows();
     const log = logger.logMainChunk();
-    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasBegin");
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasBegin");
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
@@ -327,7 +327,7 @@ export class PetaFilesController {
       }
       await this.update(newPetaFile, UpdateMode.UPDATE);
       log.log(`thumbnail (${++completed} / ${petaFiles.length})`);
-      emitMainEvent(
+      windows.emitMainEvent(
         { type: EmitMainEventTargetType.ALL },
         "regenerateMetadatasProgress",
         completed,
@@ -335,7 +335,7 @@ export class PetaFilesController {
       );
     };
     await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
-    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
   }
 }
 export const petaFilesControllerKey = createKey<PetaFilesController>("petaFilesController");

@@ -1,5 +1,4 @@
 import { app, protocol } from "electron";
-import * as Path from "path";
 
 import { PROTOCOLS } from "@/commons/defines";
 import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
@@ -9,7 +8,6 @@ import { initDI } from "@/main/initDI";
 import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
@@ -27,7 +25,6 @@ import { initWebhook } from "@/main/webhook";
     return;
   }
   const logger = useLogger();
-  const paths = usePaths();
   const windows = useWindows();
   const configSettings = useConfigSettings();
   // コマンドライン引数

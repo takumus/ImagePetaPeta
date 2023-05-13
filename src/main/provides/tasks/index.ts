@@ -3,8 +3,7 @@ import { v4 as uuid } from "uuid";
 import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { EmitMainEventTargetType } from "@/main/provides/windows";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class Tasks {
   tasks: { [id: string]: TaskHandler } = {};
@@ -21,11 +20,12 @@ export class Tasks {
       isCanceled: false,
       id,
       emitStatus: (status) => {
+        const windows = useWindows();
         if (done) {
           return;
         }
         if (!silent) {
-          emitMainEvent({ type: EmitMainEventTargetType.ALL }, "taskStatus", id, status);
+          windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "taskStatus", id, status);
         }
         if (status.status === TaskStatusCode.FAILED || status.status === TaskStatusCode.COMPLETE) {
           done = true;

@@ -29,7 +29,6 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
@@ -394,9 +393,9 @@ export const ipcFunctions: IpcFunctionsType = {
         window.setAlwaysOnTop(configSettings.data.alwaysOnTop);
       });
       configSettings.save();
-      emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateSettings", settings);
-      emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
-      emitMainEvent({ type: EmitMainEventTargetType.ALL }, "darkMode", isDarkMode());
+      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateSettings", settings);
+      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
+      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "darkMode", isDarkMode());
       log.log("return:", configSettings.data);
       return true;
     } catch (e) {
@@ -589,11 +588,12 @@ export const ipcFunctions: IpcFunctionsType = {
     const logger = useLogger();
     const configStates = useConfigStates();
     const log = logger.logMainChunk();
+    const windows = useWindows();
     try {
       log.log("#Update States");
       configStates.data = states;
       configStates.save();
-      emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateStates", states);
+      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateStates", states);
       log.log("return:", configStates.data);
       return true;
     } catch (e) {
@@ -679,8 +679,9 @@ export const ipcFunctions: IpcFunctionsType = {
     return getShowNSFW();
   },
   async setShowNSFW(event, value) {
+    const windows = useWindows();
     temporaryShowNSFW = value;
-    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
   },
   async searchImageByGoogle(event, petaFile) {
     const logger = useLogger();
@@ -698,11 +699,12 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async setDetailsPetaFile(event, petaFileId: string) {
     const petaFilesController = usePetaFilesController();
+    const windows = useWindows();
     detailsPetaFile = await petaFilesController.getPetaFile(petaFileId);
     if (detailsPetaFile === undefined) {
       return;
     }
-    emitMainEvent(
+    windows.emitMainEvent(
       { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["details"] },
       "detailsPetaFile",
       detailsPetaFile,

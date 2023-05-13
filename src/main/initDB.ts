@@ -12,8 +12,7 @@ import {
   useDBStatus,
 } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType } from "@/main/provides/windows";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export async function initDB() {
   const logger = useLogger();
@@ -24,6 +23,7 @@ export async function initDB() {
   const dbPetaTagPartitions = useDBPetaTagPartitions();
   const configDBInfo = useConfigDBInfo();
   const dbStatus = useDBStatus();
+  const windows = useWindows();
   const dbs = [
     dbPetaBoard,
     dbPetaFiles,
@@ -32,7 +32,7 @@ export async function initDB() {
     dbPetaFilesPetaTags,
   ] as const;
   function emitInitialization(log: string) {
-    emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
     logger.logMainChunk().log("$Init DB:", log);
   }
   try {
@@ -100,5 +100,5 @@ export async function initDB() {
   });
   // DB初期化完了通知
   dbStatus.initialized = true;
-  emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
+  windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
 }

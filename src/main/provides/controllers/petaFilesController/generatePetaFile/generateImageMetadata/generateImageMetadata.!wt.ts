@@ -10,7 +10,7 @@ import {
 } from "@/commons/defines";
 
 import { initWorkerThreads } from "@/main/libs/initWorkerThreads";
-import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
+import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generatePalette";
 
 export default initWorkerThreads<
   Parameters<typeof generateImageMetaData>[0],

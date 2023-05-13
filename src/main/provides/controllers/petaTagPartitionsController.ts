@@ -8,8 +8,7 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType } from "@/main/provides/windows";
-import { emitMainEvent } from "@/main/utils/emitMainEvent";
+import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class PetaTagPartitionsController {
   async getAll() {
@@ -18,6 +17,7 @@ export class PetaTagPartitionsController {
   }
   async updateMultiple(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
     const tasks = useTasks();
+    const windows = useWindows();
     return tasks.spawn(
       "UpdatePetaTagPartitions",
       async (handler) => {
@@ -40,7 +40,7 @@ export class PetaTagPartitionsController {
           i18nKey: "tasks.updateDatas",
           status: TaskStatusCode.COMPLETE,
         });
-        emitMainEvent(
+        windows.emitMainEvent(
           { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["browser"] },
           "updatePetaTagPartitions",
           tags,

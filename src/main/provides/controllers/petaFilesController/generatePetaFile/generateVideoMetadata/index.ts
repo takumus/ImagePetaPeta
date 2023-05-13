@@ -9,7 +9,7 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 
-import { getSimplePalette } from "@/main/utils/generateMetadata/generatePalette";
+import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generatePalette";
 
 export async function generateVideoMetadata(
   path: string,
