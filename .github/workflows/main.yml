@@ -17,7 +17,7 @@ jobs:
             target: mac-arm64
             artifacts: _release/*.dmg,_release/*.pkg
           # mac x64
-          - os: [self-hosted, runner-01]
+          - os: [self-hosted, runner-02]
             target: mac-x64
             artifacts: _release/*.dmg,_release/*.pkg
     runs-on: ${{ matrix.os }}
