@@ -64,3 +64,13 @@ npm run dev
 ```
 npm run build
 ```
+
+## テスト
+
+```
+npm run test
+```
+
+```
+npm run test-ui
+```
