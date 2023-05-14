@@ -41,7 +41,7 @@ export async function initDummyElectron(root: string) {
     };
   });
   vi.mock("@/commons/defines", async () => {
-    const defines = await import("@/commons/defines");
+    const defines = await vi.importActual<typeof import("@/commons/defines")>("@/commons/defines");
     return {
       ...defines,
       DB_COMPACTION_DELAY: 100,
