@@ -5,7 +5,6 @@ export default (pluginOptions?: {}): Plugin => {
     name: "worker-threads",
     transform(code, id, options) {
       if (/import.*?from.*?.*?\.!wt["']/g.exec(code)) {
-        console.log("WorkerThreads:", id);
         const regexp = /import(.*?)from.*?(.*?\.!wt)["']/g;
         let result: RegExpExecArray | null;
         const workers: { name: string; file: string }[] = [];

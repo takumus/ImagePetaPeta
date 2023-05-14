@@ -1,7 +1,7 @@
 import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, readFileSync, rmSync } from "fs";
 import { resolve } from "path";
-import { beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 
@@ -11,9 +11,11 @@ import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 const ROOT = "./_test/app/petaFilesController";
 describe("petaFilesController", () => {
   beforeEach(async () => {
-    rmSync(ROOT, { recursive: true, force: true });
     mkdirSync(ROOT, { recursive: true });
     await initDummyElectron(ROOT);
+  });
+  afterEach(() => {
+    rmSync(ROOT, { recursive: true, force: true });
   });
   test("importFilesFromFileInfos(file)", async () => {
     const pfc = usePetaFilesController();
@@ -34,7 +36,7 @@ describe("petaFilesController", () => {
       fileInfos: [{ name: "test", note: "", path: resolve("./test/app/sampleDatas") }],
       extract: true,
     });
-    expect(petaFiles.length, "petaFiles.length").toBe(2);
+    expect(petaFiles.length, "petaFiles.length").toBe(4);
   });
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
@@ -51,7 +53,7 @@ describe("petaFilesController", () => {
       }),
       UpdateMode.UPDATE,
     );
-    expect(petaFiles.length, "petaFiles.length").toBe(2);
+    expect(petaFiles.length, "petaFiles.length").toBe(4);
     Object.values(await pfc.getAll()).forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });

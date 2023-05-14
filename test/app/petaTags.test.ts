@@ -1,7 +1,7 @@
 import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 
@@ -11,9 +11,11 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 const ROOT = "./_test/app/petaTags";
 describe("petaTags", () => {
   beforeEach(async () => {
-    rmSync(ROOT, { recursive: true, force: true });
     mkdirSync(ROOT, { recursive: true });
     await initDummyElectron(ROOT);
+  });
+  afterEach(() => {
+    rmSync(ROOT, { recursive: true, force: true });
   });
   test("addPetaTag", async () => {
     const petaTagsController = usePetaTagsController();
