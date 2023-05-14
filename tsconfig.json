@@ -19,6 +19,6 @@
       ],
     },
   },
-  "include": ["vite.config.ts", "package.json", "src", "vitePlugins", "scripts", "test"],
+  "include": ["vite.config.ts", "vitest.config.ts", "vite.alias.ts", "package.json", "src", "vitePlugins", "scripts", "test"],
   "references": []
 }

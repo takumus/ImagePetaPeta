@@ -1,18 +1,17 @@
 import pkg from "./package.json";
 import { windowNames } from "./src/commons/windows";
+import { viteAlias } from "./vite.alias";
 import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import { rmSync } from "node:fs";
 import { resolve } from "path";
 import readdirr from "recursive-readdir";
-import { AliasOptions, defineConfig } from "vite";
+import { defineConfig } from "vite";
 import electron, { Configuration as ElectronConfig } from "vite-plugin-electron";
 import esmodule from "vite-plugin-esmodule";
 
 import vue from "@vitejs/plugin-vue";
-
-const alias: AliasOptions = [{ find: "@", replacement: resolve("./src/") }];
 
 export default defineConfig(async ({ command }) => {
   rmSync("_electronTemp/dist", { recursive: true, force: true });
@@ -45,11 +44,11 @@ export default defineConfig(async ({ command }) => {
         },
       },
       resolve: {
-        alias,
+        alias: viteAlias,
       },
     },
   };
-  const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith("!wt.ts"));
+  const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
   console.log("WorkerThreadsFiles:", wtFiles);
   const electronConfig: ElectronConfig[] = [
     ...wtFiles.map((file) => ({
@@ -109,7 +108,7 @@ export default defineConfig(async ({ command }) => {
       minify: isBuild,
     },
     resolve: {
-      alias,
+      alias: viteAlias,
     },
     plugins: [
       webWorker(),

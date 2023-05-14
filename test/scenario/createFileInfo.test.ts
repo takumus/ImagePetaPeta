@@ -7,7 +7,7 @@ import { createFileInfo } from "@/main/provides/controllers/petaFilesController/
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 
 const ROOT = "./_test/scenario/createFileInfo";
-const DOG_FILE = resolve("./test/scenario/sampleDatas/dogLowRes.jpg");
+const DOG_FILE = resolve("./test/sampleDatas/dogLowRes.jpg");
 describe("createFileInfo", () => {
   beforeAll(async () => {
     rmSync(resolve(ROOT), { recursive: true, force: true });

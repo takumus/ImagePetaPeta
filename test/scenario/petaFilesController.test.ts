@@ -24,7 +24,7 @@ describe("petaFilesController", () => {
   test("importFilesFromFileInfos(file)", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
-      fileInfos: [{ name: "test", note: "", path: resolve("./test/scenario/sampleDatas/bee.jpg") }],
+      fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas/bee.jpg") }],
     });
     expect(petaFiles.length, "petaFiles.length").toBe(1);
     const petaFile = petaFiles[0];
@@ -38,7 +38,7 @@ describe("petaFilesController", () => {
   test("importFilesFromFileInfos(directory)", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
-      fileInfos: [{ name: "test", note: "", path: resolve("./test/scenario/sampleDatas") }],
+      fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
     expect(petaFiles.length, "petaFiles.length").toBe(6);
@@ -47,7 +47,7 @@ describe("petaFilesController", () => {
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
-      fileInfos: [{ name: "image", note: "", path: resolve("./test/scenario/sampleDatas") }],
+      fileInfos: [{ name: "image", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
     await pfc.updateMultiple(
@@ -69,7 +69,7 @@ describe("petaFilesController", () => {
   //   const pfc = usePetaFilesController();
   //   const petaFiles = await pfc.importFilesFromFileInfos({
   //     fileInfos: [
-  //       { name: "image", note: "", path: resolve("./test/scenario/sampleDatas/lowResDog.jpg") },
+  //       { name: "image", note: "", path: resolve("./test/sampleDatas/lowResDog.jpg") },
   //     ],
   //   });
   //   const newPetaFile = (await realESRGAN(petaFiles, "realesrgan-x4plus"))[0];

@@ -39,8 +39,8 @@ describe("petaTags", () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
       fileInfos: [
-        { name: "bee", note: "", path: resolve("./test/scenario/sampleDatas/bee.jpg") },
-        { name: "flower", note: "", path: resolve("./test/scenario/sampleDatas/flower.jpg") },
+        { name: "bee", note: "", path: resolve("./test/sampleDatas/bee.jpg") },
+        { name: "flower", note: "", path: resolve("./test/sampleDatas/flower.jpg") },
       ],
     });
     const taggedPetaFile = petaFiles[0];
