@@ -28,7 +28,7 @@ export default defineConfig(async ({ command }) => {
     vite: {
       plugins: [esmodules.plugin],
       build: {
-        outDir: resolve("./_test/app/wt"),
+        outDir: resolve("./_test/scenario/wt"),
         rollupOptions: {
           external: [
             ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(

@@ -19,7 +19,7 @@ export default (pluginOptions?: {}): Plugin => {
             file,
           });
         }
-        const root = process.env.TEST === "true" ? `"./_test/app/wt"` : "__dirname";
+        const root = process.env.TEST === "true" ? `"./_test/scenario/wt"` : "__dirname";
         const newCode =
           `import { Worker as __WT__ } from "worker_threads";\n` +
           `import { resolve as __RESOLVE__ } from "path";\n` +

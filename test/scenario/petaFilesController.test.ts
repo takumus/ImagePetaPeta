@@ -9,7 +9,7 @@ import { usePetaFilesController } from "@/main/provides/controllers/petaFilesCon
 import { useDBS } from "@/main/provides/databases";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
-const ROOT = "./_test/app/petaFilesController";
+const ROOT = "./_test/scenario/petaFilesController";
 describe("petaFilesController", () => {
   beforeAll(async () => {
     rmSync(resolve(ROOT), { recursive: true, force: true });
@@ -23,7 +23,7 @@ describe("petaFilesController", () => {
   test("importFilesFromFileInfos(file)", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
-      fileInfos: [{ name: "test", note: "", path: resolve("./test/app/sampleDatas/bee.jpg") }],
+      fileInfos: [{ name: "test", note: "", path: resolve("./test/scenario/sampleDatas/bee.jpg") }],
     });
     expect(petaFiles.length, "petaFiles.length").toBe(1);
     const petaFile = petaFiles[0];
@@ -37,7 +37,7 @@ describe("petaFilesController", () => {
   test("importFilesFromFileInfos(directory)", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
-      fileInfos: [{ name: "test", note: "", path: resolve("./test/app/sampleDatas") }],
+      fileInfos: [{ name: "test", note: "", path: resolve("./test/scenario/sampleDatas") }],
       extract: true,
     });
     expect(petaFiles.length, "petaFiles.length").toBe(4);
@@ -46,7 +46,7 @@ describe("petaFilesController", () => {
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
-      fileInfos: [{ name: "image", note: "", path: resolve("./test/app/sampleDatas") }],
+      fileInfos: [{ name: "image", note: "", path: resolve("./test/scenario/sampleDatas") }],
       extract: true,
     });
     await pfc.updateMultiple(

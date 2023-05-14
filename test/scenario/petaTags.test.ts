@@ -9,7 +9,7 @@ import { usePetaFilesController } from "@/main/provides/controllers/petaFilesCon
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBS } from "@/main/provides/databases";
 
-const ROOT = "./_test/app/petaTags";
+const ROOT = "./_test/scenario/petaTags";
 describe("petaTags", () => {
   beforeAll(async () => {
     rmSync(resolve(ROOT), { recursive: true, force: true });
@@ -39,8 +39,8 @@ describe("petaTags", () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
       fileInfos: [
-        { name: "bee", note: "", path: resolve("./test/app/sampleDatas/bee.jpg") },
-        { name: "flower", note: "", path: resolve("./test/app/sampleDatas/flower.jpg") },
+        { name: "bee", note: "", path: resolve("./test/scenario/sampleDatas/bee.jpg") },
+        { name: "flower", note: "", path: resolve("./test/scenario/sampleDatas/flower.jpg") },
       ],
     });
     const taggedPetaFile = petaFiles[0];
