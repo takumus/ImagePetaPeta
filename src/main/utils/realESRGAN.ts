@@ -30,6 +30,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
       log.log("execFilePath:", execFilePath);
       await setPermisionTo755(execFilePath);
       let success = true;
+      const newPetaFiles: PetaFile[] = [];
       handler.emitStatus({
         i18nKey: "tasks.upconverting",
         log: [petaFiles.length.toString()],
@@ -82,11 +83,15 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
           });
           const result = await childProcess.promise;
           if (result) {
-            success = await importImage(
+            const newPetaFile = await importImage(
               outputFile,
               petaFile,
               `${petaFile.name}(RealESRGAN-${modelName})`,
             );
+            if (newPetaFile !== undefined) {
+              success = true;
+              newPetaFiles.push(newPetaFile);
+            }
           } else {
             success = false;
           }
@@ -100,7 +105,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
         log: [],
         status: success ? TaskStatusCode.COMPLETE : TaskStatusCode.FAILED,
       });
-      return success;
+      return newPetaFiles;
     },
     false,
   );
@@ -136,11 +141,11 @@ async function importImage(outputFile: string, petaFile: PetaFile, newName: stri
     fileInfos: [{ path: outputFile }],
   });
   if (newPetaFiles.length < 1) {
-    return false;
+    return undefined;
   }
   const newPetaFile = newPetaFiles[0];
   if (!newPetaFile) {
-    return false;
+    return undefined;
   }
   newPetaFile.addDate = petaFile.addDate + 1;
   newPetaFile.fileDate = petaFile.fileDate;
@@ -159,5 +164,5 @@ async function importImage(outputFile: string, petaFile: PetaFile, newName: stri
     })),
     UpdateMode.INSERT,
   );
-  return true;
+  return newPetaFile;
 }

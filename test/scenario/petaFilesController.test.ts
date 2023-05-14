@@ -8,6 +8,7 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { realESRGAN } from "@/main/utils/realESRGAN";
 
 const ROOT = "./_test/scenario/petaFilesController";
 describe("petaFilesController", () => {
@@ -40,7 +41,7 @@ describe("petaFilesController", () => {
       fileInfos: [{ name: "test", note: "", path: resolve("./test/scenario/sampleDatas") }],
       extract: true,
     });
-    expect(petaFiles.length, "petaFiles.length").toBe(4);
+    expect(petaFiles.length, "petaFiles.length").toBe(6);
     await useDBS().waitUntilKillable();
   });
   test("updatePetaFiles", async () => {
@@ -58,10 +59,21 @@ describe("petaFilesController", () => {
       }),
       UpdateMode.UPDATE,
     );
-    expect(petaFiles.length, "petaFiles.length").toBe(4);
+    expect(petaFiles.length, "petaFiles.length").toBe(6);
     Object.values(await pfc.getAll()).forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });
     await useDBS().waitUntilKillable();
   });
+  // test("realESRGAN", async () => {
+  //   const pfc = usePetaFilesController();
+  //   const petaFiles = await pfc.importFilesFromFileInfos({
+  //     fileInfos: [
+  //       { name: "image", note: "", path: resolve("./test/scenario/sampleDatas/lowResDog.jpg") },
+  //     ],
+  //   });
+  //   const newPetaFile = (await realESRGAN(petaFiles, "realesrgan-x4plus"))[0];
+  //   expect(newPetaFile.metadata.width, "upconverted width").toBe(128);
+  //   await useDBS().waitUntilKillable();
+  // });
 });

@@ -23,12 +23,8 @@ export function inject<T>(key: Key<T>): T {
   return instance;
 }
 export function createUseFunction<T>(key: Key<T>) {
-  let instance: T | undefined = undefined;
   return () => {
-    if (instance === undefined) {
-      instance = inject(key);
-    }
-    return instance;
+    return inject(key);
   };
 }
 export function clearProvides() {

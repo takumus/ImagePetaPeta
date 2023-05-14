@@ -47,6 +47,13 @@ export async function initDummyElectron(root: string) {
       DB_COMPACTION_DELAY: 100,
     } as typeof defines;
   });
+  vi.mock("@/main/utils/resolveExtraFilesPath", () => {
+    return {
+      resolveExtraFilesPath: (...path: string[]) => {
+        return resolve("_electronTemp", ...path);
+      },
+    };
+  });
   vi.mock("@/main/provides/utils/logger", () => {
     return {
       loggerKey: { key: "logger" },
