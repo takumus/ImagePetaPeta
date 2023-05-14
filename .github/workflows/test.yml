@@ -1,0 +1,35 @@
+name: Release
+on:
+  push:
+    branches:
+      - "main"
+    tags-ignore:
+      - "v*.*.*"
+jobs:
+  release:
+    strategy:
+      matrix:
+        include:
+          # windows x64
+          - os: windows-latest
+            target: win
+            artifacts: _release/*.exe.zip
+          # mac arm64
+          - os: [self-hosted, runner-01]
+            target: mac-arm64
+            artifacts: _release/*.dmg,_release/*.pkg
+          # mac x64
+          - os: [self-hosted, runner-02]
+            target: mac-x64
+            artifacts: _release/*.dmg,_release/*.pkg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: npm install
+        run: npm install
+      - name: test
+        run: npm run test
