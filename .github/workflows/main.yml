@@ -47,10 +47,9 @@ jobs:
         env:
           WINDOWS_PFX: ${{ secrets.WINDOWS_PFX }}
       - name: release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v1
         with:
           draft: true
-          allowUpdates: true
-          artifacts: ${{ matrix.artifacts }}
+          files: ${{ matrix.artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
