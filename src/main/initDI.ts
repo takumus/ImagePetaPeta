@@ -12,6 +12,7 @@ import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { States, defaultStates } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import {
+  DB_COMPACTION_RETRY_COUNT,
   DIRNAME_IMAGES,
   DIRNAME_THUMBNAILS,
   FILENAME_BOARDS_DB,
@@ -186,6 +187,7 @@ export function initDI(
       FILE_WINDOW_STATES,
       FILE_DBINFO,
     };
+    const dbs = [dbPetaBoard, dbPetaFiles, dbPetaFilesPetaTags, dbPetaTags, dbPetaTagPartitions];
     // 注入
     provide(pathsKey, paths);
     provide(loggerKey, dataLogger);
@@ -206,13 +208,28 @@ export function initDI(
     provide(dbPetaFilesPetaTagsKey, dbPetaFilesPetaTags);
     provide(dbPetaTagsKey, dbPetaTags);
     provide(dbPetaTagPartitionsKey, dbPetaTagPartitions);
-    provide(dbsKey, [
-      dbPetaBoard,
-      dbPetaFiles,
-      dbPetaFilesPetaTags,
-      dbPetaTags,
-      dbPetaTagPartitions,
-    ]);
+    provide(dbsKey, {
+      dbs,
+      waitUntilKillable: () => {
+        return new Promise<void>((res) => {
+          let retryCount = 0;
+          const quitIfDBsKillable = () => {
+            const killable = dbs.reduce((killable, db) => db.isKillable && killable, true);
+            if (killable) {
+              res();
+              return;
+            } else {
+              if (retryCount > DB_COMPACTION_RETRY_COUNT) {
+                throw new Error("cannot compact dbs");
+              }
+              setTimeout(quitIfDBsKillable, 500);
+              retryCount++;
+            }
+          };
+          quitIfDBsKillable();
+        });
+      },
+    });
     provide(tasksKey, tasks);
   } catch (err) {
     // どこかで失敗したら強制終了

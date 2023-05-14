@@ -40,6 +40,13 @@ export async function initDummyElectron(root: string) {
       },
     };
   });
+  vi.mock("@/commons/defines", async () => {
+    const defines = await import("@/commons/defines");
+    return {
+      ...defines,
+      DB_COMPACTION_DELAY: 100,
+    } as typeof defines;
+  });
   vi.mock("@/main/provides/utils/logger", () => {
     return {
       loggerKey: { key: "logger" },

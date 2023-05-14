@@ -1,21 +1,24 @@
 import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, readFileSync, rmSync } from "fs";
 import { resolve } from "path";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { useDBS } from "@/main/provides/databases";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
 const ROOT = "./_test/app/petaFilesController";
 describe("petaFilesController", () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
+    rmSync(resolve(ROOT), { recursive: true, force: true });
     mkdirSync(ROOT, { recursive: true });
-    await initDummyElectron(ROOT);
   });
-  afterEach(() => {
-    rmSync(ROOT, { recursive: true, force: true });
+  beforeEach(async (h) => {
+    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    await initDummyElectron(resolve(ROOT, h.meta.name));
   });
   test("importFilesFromFileInfos(file)", async () => {
     const pfc = usePetaFilesController();
@@ -29,6 +32,7 @@ describe("petaFilesController", () => {
     const thumbnail = readFileSync(filePaths.thumbnail);
     expect(original.byteLength, "original.byteLength").toBeGreaterThan(600000);
     expect(thumbnail.length, "thumbnail.byteLength").toBeGreaterThan(20000);
+    await useDBS().waitUntilKillable();
   });
   test("importFilesFromFileInfos(directory)", async () => {
     const pfc = usePetaFilesController();
@@ -37,6 +41,7 @@ describe("petaFilesController", () => {
       extract: true,
     });
     expect(petaFiles.length, "petaFiles.length").toBe(4);
+    await useDBS().waitUntilKillable();
   });
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
@@ -57,5 +62,6 @@ describe("petaFilesController", () => {
     Object.values(await pfc.getAll()).forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });
+    await useDBS().waitUntilKillable();
   });
 });

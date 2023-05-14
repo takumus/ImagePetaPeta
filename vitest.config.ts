@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import pkg from "./package.json";
 import workerThreads from "./vitePlugins/workerThreads";
+import { mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 import readdirr from "recursive-readdir";
 import { AliasOptions, defineConfig } from "vite";
@@ -9,6 +10,8 @@ import esmodule from "vite-plugin-esmodule";
 
 const alias: AliasOptions = [{ find: "@", replacement: resolve("./src/") }];
 export default defineConfig(async ({ command }) => {
+  rmSync("./_test", { recursive: true, force: true });
+  mkdirSync("./_test", { recursive: true });
   const esmodules = (() => {
     let packages: string[] = [];
     const plugin = esmodule((esms) => {
@@ -57,7 +60,7 @@ export default defineConfig(async ({ command }) => {
     test: {
       dir: "test",
       testTimeout: 30 * 1000,
-      threads: false
+      threads: false,
     },
     plugins: [
       {

@@ -1,21 +1,24 @@
 import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
+import { useDBS } from "@/main/provides/databases";
 
 const ROOT = "./_test/app/petaTags";
 describe("petaTags", () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
+    rmSync(resolve(ROOT), { recursive: true, force: true });
     mkdirSync(ROOT, { recursive: true });
-    await initDummyElectron(ROOT);
   });
-  afterEach(() => {
-    rmSync(ROOT, { recursive: true, force: true });
+  beforeEach(async (h) => {
+    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    await initDummyElectron(resolve(ROOT, h.meta.name));
   });
   test("addPetaTag", async () => {
     const petaTagsController = usePetaTagsController();
@@ -30,8 +33,9 @@ describe("petaTags", () => {
     );
     const petaTags = await petaTagsController.getPetaTags();
     expect(petaTags[0].name, "addPetaTag").toBe("A");
+    await useDBS().waitUntilKillable();
   });
-  test("modifyPetaTagToPetaFileAndFind", async () => {
+  test("modifyPetaTagToPetaFileAndFind", async (f) => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
       fileInfos: [
@@ -90,5 +94,6 @@ describe("petaTags", () => {
       type: "untagged",
     });
     expect(untaggedPetaFileIDs2.length, "all untagged.length").toBe(2);
+    await useDBS().waitUntilKillable();
   });
 });

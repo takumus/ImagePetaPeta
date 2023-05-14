@@ -13,7 +13,10 @@ export const dbPetaBoardsKey = createKey<DB<PetaBoard>>("dbPetaBoards");
 export const dbPetaTagPartitionsKey = createKey<DB<PetaTagPartition>>("dbPetaTagPartitions");
 export const dbPetaFilesPetaTagsKey = createKey<DB<PetaFilePetaTag>>("dbPetaFilesPetaTags");
 export const dbStatusKey = createKey<{ initialized: boolean }>("dbStatus");
-export const dbsKey = createKey<DB<any>[]>("dbs");
+export const dbsKey = createKey<{
+  dbs: DB<any>[];
+  waitUntilKillable: () => Promise<void>;
+}>("dbs");
 
 export const useDBPetaFiles = createUseFunction(dbPetaFilesKey);
 export const useDBPetaTags = createUseFunction(dbPetaTagsKey);
