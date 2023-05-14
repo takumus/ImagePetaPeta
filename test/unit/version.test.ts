@@ -11,6 +11,7 @@ describe("version", () => {
     expect(isLatest("1.0.0", "1.0.1")).toBe(false);
     expect(isLatest("1.0.0", "1.0.0.1")).toBe(false);
     expect(isLatest("2", "1.0.1")).toBe(true);
+    expect(isLatest("1.0.0", "2")).toBe(false);
     expect(isLatest("1.0.0", "1.0.0")).toBe(true);
   });
   test("isLatest", async () => {
