@@ -1,4 +1,3 @@
-import axios from "axios";
 import { app } from "electron";
 import { v4 as uuid } from "uuid";
 
@@ -30,7 +29,7 @@ export function isLatest(meVersion: string, remoteVersion: string) {
 export async function getLatestVersion(): Promise<RemoteBinaryInfo> {
   try {
     const url = `${URL_PACKAGE_JSON}?hash=${uuid()}`;
-    const packageJSON = (await axios.get(url, { responseType: "json" })).data;
+    const packageJSON = await (await fetch(url)).json();
     // packageJSON.version = "4.0.0";
     return {
       isLatest: isLatest(app.getVersion(), packageJSON.version),

@@ -24,22 +24,13 @@ describe("version", () => {
         },
       };
     });
-    vi.mock("axios", () => {
-      return {
-        default: {
-          async get() {
-            await new Promise((res) => {
-              setTimeout(res, 1000);
-            });
-            return {
-              data: {
-                version: "2.0.0",
-              },
-            };
-          },
-        },
-      };
-    });
+    (global.fetch = vi.fn()).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          version: "2.0.0",
+        }),
+      ),
+    );
     const result = await getLatestVersion();
     expect(result).property("isLatest", false);
     expect(result).property("version", "2.0.0");
