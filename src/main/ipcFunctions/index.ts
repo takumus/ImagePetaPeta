@@ -558,13 +558,13 @@ export const ipcFunctions: IpcFunctionsType = {
     const log = logger.logMainChunk();
     try {
       log.log("#Real-ESRGAN Convert");
-      const result = await realESRGAN(petaFiles, modelName);
+      const result = (await realESRGAN(petaFiles, modelName)).map((petaFile) => petaFile.id);
       log.log("return:", result);
       return result;
     } catch (error) {
       log.error(error);
     }
-    return false;
+    return [];
   },
   async startDrag(event, petaFiles) {
     const paths = usePaths();

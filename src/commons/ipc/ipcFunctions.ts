@@ -58,7 +58,7 @@ export interface IpcFunctions {
   regenerateMetadatas: () => Promise<void>;
   browsePetaFileDirectory: () => Promise<string | undefined>;
   changePetaFileDirectory: (path: string) => Promise<boolean>;
-  realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<boolean>;
+  realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<string[]>;
   startDrag: (petaFiles: PetaFile[], iconSize: number, iconData: string) => Promise<void>;
   openWindow: (windowName: WindowName) => Promise<void>;
   reloadWindow: () => Promise<void>;
