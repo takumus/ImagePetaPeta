@@ -13,6 +13,7 @@ import { States, defaultStates } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import {
   DB_COMPACTION_RETRY_COUNT,
+  DB_KILLABLE_CHECK_INTERVAL,
   DIRNAME_IMAGES,
   DIRNAME_THUMBNAILS,
   FILENAME_BOARDS_DB,
@@ -222,7 +223,7 @@ export function initDI(
               if (retryCount > DB_COMPACTION_RETRY_COUNT) {
                 throw new Error("cannot compact dbs");
               }
-              setTimeout(quitIfDBsKillable, 500);
+              setTimeout(quitIfDBsKillable, DB_KILLABLE_CHECK_INTERVAL);
               retryCount++;
             }
           };

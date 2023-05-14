@@ -47,6 +47,7 @@ export const UPDATE_CHECK_INTERVAL: number = 1000 * 60 * 60 * 3; // 3時間
 export const IPC_GLOBAL_NAME: string = "main-process-ipc";
 export const DB_COMPACTION_DELAY: number = 1000;
 export const DB_COMPACTION_RETRY_COUNT: number = 10;
+export const DB_KILLABLE_CHECK_INTERVAL: number = 50;
 export const TASK_CLOSE_DELAY: number = 200;
 export const WEBHOOK_PORT: number = 51915;
 export const WEBHOOK_WHITELIST_IP_LIST: string[] = ["127.0.0.1", "::ffff:127.0.0.1", "::1"];
