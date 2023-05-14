@@ -30,6 +30,7 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
@@ -527,11 +528,7 @@ export const ipcFunctions: IpcFunctionsType = {
     try {
       log.log("#Change PetaFile Directory");
       path = Path.resolve(path);
-      if (Path.resolve() === path) {
-        log.error("Invalid file path:", path);
-        return false;
-      }
-      if (paths.DIR_APP === path) {
+      if (!isValidPetaFilePath(path)) {
         log.error("Invalid file path:", path);
         return false;
       }

@@ -1,7 +1,7 @@
 import * as Path from "path";
 
-export default function (path: string) {
-  if (Path.resolve(path) === Path.resolve()) {
+export function isValidPetaFilePath(path: string) {
+  if (Path.resolve(path).startsWith(Path.resolve())) {
     return false;
   }
   return true;

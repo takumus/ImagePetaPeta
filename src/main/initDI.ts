@@ -73,7 +73,7 @@ import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
 import { Quit, quitKey } from "@/main/provides/utils/quit";
 import { Windows, windowsKey } from "@/main/provides/windows";
-import isValidFilePath from "@/main/utils/isValidFilePath";
+import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/main/utils/versions";
 
 export function initDI(
@@ -114,7 +114,7 @@ export function initDI(
       } else {
         // ちがうなら設定ファイルパス
         try {
-          if (!isValidFilePath(configSettings.data.petaFileDirectory.path)) {
+          if (!isValidPetaFilePath(configSettings.data.petaFileDirectory.path)) {
             throw new Error();
           }
           return initDirectorySync(true, configSettings.data.petaFileDirectory.path);
