@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 
-describe("ileSHA256", () => {
+describe("fileSHA256", () => {
   test("images", async () => {
     expect(await fileSHA256(resolve("./test/sampleDatas/bee.jpg"))).toBe(
       "da9c463318e720334478f9564c900e6d0432f599ee48d5279a26ac5b21ef81ea",
