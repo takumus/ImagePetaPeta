@@ -8,18 +8,10 @@ jobs:
     strategy:
       matrix:
         include:
-          # windows x64
+          # windows
           - os: windows-latest
-            target: win
-            artifacts: _release/*.exe.zip
-          # mac arm64
-          - os: [self-hosted, runner-01]
-            target: mac-arm64
-            artifacts: _release/*.dmg,_release/*.pkg
-          # mac x64
-          - os: [self-hosted, runner-02]
-            target: mac-x64
-            artifacts: _release/*.dmg,_release/*.pkg
+          # mac
+          - os: macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
