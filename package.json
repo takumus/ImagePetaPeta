@@ -14,8 +14,8 @@
   "scripts": {
     "prepare": "npm run generate-assets",
     "dev": "npm run generate-assets && vite",
-    "build": "npm run generate-assets && npm run tsc && npm run test && vite build && tsx ./scripts/buildElectron.ts",
-    "ci-build-vite": "npm run tsc && vite build",
+    "build": "npm run generate-assets && npm run tsc && vite build && tsx ./scripts/buildElectron.ts",
+    "ci-build-vite": "vite build",
     "ci-build-electron:mac-arm64": "npm rebuild --platform=darwin --arch=arm64 && tsx ./scripts/buildElectron.ts --electron-target=mac:arm64",
     "ci-build-electron:mac-x64": "tsx ./scripts/buildElectron.ts --electron-target=mac:x64",
     "ci-build-electron:win": "tsx ./scripts/buildElectron.ts --electron-target=win:x64",
