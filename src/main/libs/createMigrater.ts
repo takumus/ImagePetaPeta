@@ -1,5 +1,7 @@
 export type Migrater<T> = (data: T) => Promise<{ data: T; updated: boolean }>;
-export type SyncMigrater<T> = (data: T) => { data: T; updated: boolean };
+export type SyncMigrater<T> = (
+  ...args: Parameters<Migrater<T>>
+) => Awaited<ReturnType<Migrater<T>>>;
 export function createSyncMigrater<T>(
   migrater: (data: T, update: () => void) => T,
 ): SyncMigrater<T> {
