@@ -1,7 +1,7 @@
 import { initDummyElectron } from "./initDummyElectron";
-import { mkdirSync, rmSync } from "fs";
+import { mkdirSync, rmdirSync } from "fs";
 import { resolve } from "path";
-import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 
@@ -10,14 +10,22 @@ import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/peta
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBS } from "@/main/provides/databases";
 
-const ROOT = "./_test/scenario/petaTags";
+const ROOT = "./_test/scenario/petaFilesPetaTags";
 describe("petaFilesPetaTags", () => {
   beforeAll(async () => {
-    rmSync(resolve(ROOT), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   beforeEach(async (h) => {
-    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });

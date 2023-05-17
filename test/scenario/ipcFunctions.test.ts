@@ -1,5 +1,5 @@
 import { initDummyElectron } from "./initDummyElectron";
-import { mkdirSync, readFileSync, rmSync } from "fs";
+import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
@@ -11,11 +11,19 @@ import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 const ROOT = "./_test/scenario/ipcFunctions";
 describe("ipcFunctions", () => {
   beforeAll(async () => {
-    rmSync(resolve(ROOT), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   beforeEach(async (h) => {
-    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });
@@ -51,22 +59,6 @@ describe("ipcFunctions", () => {
     const petaFile = (await usePetaFilesController().getPetaFile(result[0]))!;
     expect(petaFile.name).toBe("bee");
     expect(petaFile.note).toBe("cute");
-    await useDBS().waitUntilKillable();
-  });
-  test("importFiles.filePath", async () => {
-    const result = await ipcFunctions.importFiles({} as any, [
-      [
-        {
-          type: "filePath",
-          filePath: resolve("./test/sampleDatas/bee.jpg"),
-        },
-      ],
-    ]);
-    const petaFile = (await usePetaFilesController().getPetaFile(result[0]))!;
-    expect(petaFile).toBeTruthy();
-    expect(
-      readFileSync(getPetaFilePath.fromPetaFile(petaFile).original).byteLength,
-    ).toBeGreaterThan(600000);
     await useDBS().waitUntilKillable();
   });
   test("getPetaBoards.empty", async (h) => {

@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync } from "fs";
+import { mkdirSync, rmdirSync } from "fs";
 import { resolve } from "path";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -9,7 +9,11 @@ const ROOT = "./_test/unit/config";
 const CONFIG_FILE_PATH = resolve(ROOT, "config.json");
 describe("config", () => {
   beforeEach(() => {
-    rmSync(ROOT, { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   test("default data", () => {

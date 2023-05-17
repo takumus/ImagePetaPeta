@@ -1,5 +1,5 @@
 import { initDummyElectron } from "./initDummyElectron";
-import { mkdirSync, readFileSync, rmSync } from "fs";
+import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -10,11 +10,19 @@ const ROOT = "./_test/scenario/createFileInfo";
 const DOG_FILE = resolve("./test/sampleDatas/dogLowRes.jpg");
 describe("createFileInfo", () => {
   beforeAll(async () => {
-    rmSync(resolve(ROOT), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   beforeEach(async (h) => {
-    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });
