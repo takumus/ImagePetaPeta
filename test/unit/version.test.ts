@@ -1,5 +1,4 @@
-import { resolve } from "path";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { getLatestVersion, isLatest } from "@/main/utils/versions";
 

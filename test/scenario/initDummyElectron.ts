@@ -54,37 +54,37 @@ export async function initDummyElectron(root: string) {
       },
     };
   });
-  vi.mock("@/main/provides/utils/logger", () => {
-    return {
-      loggerKey: { key: "logger" },
-      Logger: class {
-        logMainChunk() {
-          return {
-            log() {
-              //
-            },
-            error() {
-              //
-            },
-          };
-        }
-      },
-      useLogger() {
-        return {
-          logMainChunk() {
-            return {
-              log() {
-                //
-              },
-              error() {
-                //
-              },
-            };
-          },
-        };
-      },
-    };
-  });
+  // vi.mock("@/main/provides/utils/logger", () => {
+  //   return {
+  //     loggerKey: { key: "logger" },
+  //     Logger: class {
+  //       logMainChunk() {
+  //         return {
+  //           log() {
+  //             //
+  //           },
+  //           error() {
+  //             //
+  //           },
+  //         };
+  //       }
+  //     },
+  //     useLogger() {
+  //       return {
+  //         logMainChunk() {
+  //           return {
+  //             log() {
+  //               //
+  //             },
+  //             error() {
+  //               //
+  //             },
+  //           };
+  //         },
+  //       };
+  //     },
+  //   };
+  // });
   const { initDI } = await import("@/main/initDI");
   clearProvides();
   initDI({

@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from "fs";
+import { mkdirSync, rmdirSync } from "fs";
 import { resolve } from "path";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -7,7 +7,11 @@ import DB from "@/main/libs/db";
 describe("file", () => {
   const ROOT = "./_test/unit/db";
   beforeEach(() => {
-    rmSync(ROOT, { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
     vi.spyOn(global, "fetch").mockImplementation(
       async () => new Response('{ "key": "value" }', { status: 200 }),

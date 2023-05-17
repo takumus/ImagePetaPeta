@@ -51,6 +51,10 @@ import {
   petaFilesControllerKey,
 } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import {
+  PetaFilesPetaTagsController,
+  petaFilesPetaTagsControllerKey,
+} from "@/main/provides/controllers/petaFilesPetaTagsController";
+import {
   PetaTagPartitionsController,
   petaTagPartitionsControllerKey,
 } from "@/main/provides/controllers/petaTagPartitionsController";
@@ -203,6 +207,7 @@ export function initDI(
     provide(petaBoardsControllerKey, new PetaBoardsController());
     provide(petaFilesControllerKey, new PetaFilesController());
     provide(petaTagsControllerKey, new PetaTagsController());
+    provide(petaFilesPetaTagsControllerKey, new PetaFilesPetaTagsController());
     provide(petaTagPartitionsControllerKey, new PetaTagPartitionsController());
     provide(dbPetaBoardsKey, dbPetaBoard);
     provide(dbPetaFilesKey, dbPetaFiles);

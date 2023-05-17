@@ -36,10 +36,14 @@ jobs:
       #       node_modules
       #       _electronBuilderCache
       #     key: ${{ matrix.os }}-${{ matrix.target }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
-      - name: npm install
-        run: npm install
+      - name: npm ci
+        run: npm ci
+      - name: audit
+        run: npm audit
       - name: test
         run: npm run test
+      - name: tsc
+        run: npm run tsc
       - name: build vite
         run: npm run ci-build-vite
       - name: build electron (${{ matrix.target }})

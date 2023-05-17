@@ -20,6 +20,7 @@ import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
@@ -184,11 +185,11 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async updatePetaFilesPetaTags(event, petaFileIds, petaTagLikes, mode) {
     const logger = useLogger();
-    const petaTagsController = usePetaTagsController();
+    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const log = logger.logMainChunk();
     try {
       log.log("#Update PetaFilesPetaTags");
-      await petaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
+      await petaFilesPetaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
       log.log("return:", true);
       return true;
     } catch (error) {
@@ -244,12 +245,12 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getPetaFileIds(event, params) {
     const logger = useLogger();
-    const petaFilesController = usePetaFilesController();
+    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const log = logger.logMainChunk();
     try {
       log.log("#Get PetaFileIds");
       log.log("type:", params.type);
-      const ids = await petaFilesController.getPetaFileIds(params);
+      const ids = await petaFilesPetaTagsController.getPetaFileIds(params);
       log.log("return:", ids.length);
       return ids;
     } catch (error) {
@@ -265,11 +266,11 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getPetaTagIdsByPetaFileIds(event, petaFileIds) {
     const logger = useLogger();
-    const petaTagsController = usePetaTagsController();
+    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const log = logger.logMainChunk();
     try {
       // log.log("#Get PetaTagIds By PetaFileIds");
-      const petaTagIds = await petaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
+      const petaTagIds = await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
       // log.log("return:", petaTagIds.length);
       return petaTagIds;
     } catch (error) {
@@ -305,11 +306,11 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getPetaTagCount(event, petaTag) {
     const logger = useLogger();
-    const petaTagsController = usePetaTagsController();
+    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const log = logger.logMainChunk();
     try {
       log.log("#Get PetaTagCount");
-      const petaTagCount = await petaTagsController.getPetaTagCount(petaTag);
+      const petaTagCount = await petaFilesPetaTagsController.getPetaTagCount(petaTag);
       log.log("return:", petaTagCount);
       return petaTagCount;
     } catch (error) {
@@ -621,17 +622,26 @@ export const ipcFunctions: IpcFunctionsType = {
             if (d?.type === "filePath") {
               return {
                 path: d.filePath,
+                ...d.additionalData,
               };
             }
             if (d?.type === "url") {
               const result = await createFileInfo.fromURL(d.url, d.referrer);
               if (result !== undefined) {
+                if (d.additionalData) {
+                  result.name = d.additionalData.name ?? result.name;
+                  result.note = d.additionalData.note ?? result.note;
+                }
                 return result;
               }
             }
             if (d?.type === "buffer") {
               const result = await createFileInfo.fromBuffer(d.buffer);
               if (result !== undefined) {
+                if (d.additionalData) {
+                  result.name = d.additionalData.name ?? result.name;
+                  result.note = d.additionalData.note ?? result.note;
+                }
                 return result;
               }
             }

@@ -1,6 +1,6 @@
 {
   "name": "imagepetapeta-beta",
-  "version": "2.2023.8000-beta",
+  "version": "2.2023.10000-beta",
   "private": true,
   "description": "image viewer",
   "author": "takumus",
@@ -14,8 +14,8 @@
   "scripts": {
     "prepare": "npm run generate-assets",
     "dev": "npm run generate-assets && vite",
-    "build": "npm run generate-assets && npm run tsc && npm run test && vite build && tsx ./scripts/buildElectron.ts",
-    "ci-build-vite": "npm run tsc && vite build",
+    "build": "npm run generate-assets && npm run tsc && vite build && tsx ./scripts/buildElectron.ts",
+    "ci-build-vite": "vite build",
     "ci-build-electron:mac-arm64": "npm rebuild --platform=darwin --arch=arm64 && tsx ./scripts/buildElectron.ts --electron-target=mac:arm64",
     "ci-build-electron:mac-x64": "tsx ./scripts/buildElectron.ts --electron-target=mac:x64",
     "ci-build-electron:win": "tsx ./scripts/buildElectron.ts --electron-target=win:x64",
@@ -53,7 +53,7 @@
     "@vitejs/plugin-vue": "^4.1.0",
     "@vitest/ui": "^0.31.0",
     "adm-zip": "^0.5.10",
-    "electron": "25.0.0-beta.5",
+    "electron": "25.0.0-beta.6",
     "electron-builder": "^24.3.0",
     "license-checker-rseidelsohn": "^4.2.0",
     "npm-run-all": "^4.1.5",

@@ -1,5 +1,9 @@
+export type ImportFileAdditionalData = {
+  name?: string;
+  note?: string;
+};
 export type ImportFileGroup = (
-  | { type: "url"; url: string; referrer?: string }
-  | { type: "buffer"; buffer: ArrayBuffer }
-  | { type: "filePath"; filePath: string }
+  | { type: "url"; url: string; referrer?: string; additionalData?: ImportFileAdditionalData }
+  | { type: "buffer"; buffer: ArrayBuffer; additionalData?: ImportFileAdditionalData }
+  | { type: "filePath"; filePath: string; additionalData?: ImportFileAdditionalData }
 )[];

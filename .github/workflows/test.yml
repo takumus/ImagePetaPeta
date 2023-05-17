@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  release:
+  test:
     strategy:
       matrix:
         include:
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: npm install
-        run: npm install
+      - name: npm ci
+        run: npm ci
       - name: test
         run: npm run test
