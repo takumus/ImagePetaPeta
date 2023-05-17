@@ -9,7 +9,7 @@ import { ppa } from "@/commons/utils/pp";
 
 import { extraFiles } from "@/_defines/extraFiles";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
-import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
+import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -135,7 +135,7 @@ async function setPermisionTo755(execFilePath: string) {
 
 async function importImage(outputFile: string, petaFile: PetaFile, newName: string) {
   const petaFilesController = usePetaFilesController();
-  const petaTagsController = usePetaTagsController();
+  const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
   const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
   const newPetaFiles = await petaFilesController.importFilesFromFileInfos({
     fileInfos: [{ path: outputFile }],
@@ -156,7 +156,7 @@ async function importImage(outputFile: string, petaFile: PetaFile, newName: stri
   const pipts = await dbPetaFilesPetaTags.find({
     petaFileId: petaFile.id,
   });
-  await petaTagsController.updatePetaFilesPetaTags(
+  await petaFilesPetaTagsController.updatePetaFilesPetaTags(
     [newPetaFile.id],
     pipts.map((pipt) => ({
       type: "id",
