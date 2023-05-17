@@ -621,17 +621,26 @@ export const ipcFunctions: IpcFunctionsType = {
             if (d?.type === "filePath") {
               return {
                 path: d.filePath,
+                ...d.additionalData,
               };
             }
             if (d?.type === "url") {
               const result = await createFileInfo.fromURL(d.url, d.referrer);
               if (result !== undefined) {
+                if (d.additionalData) {
+                  result.name = d.additionalData.name ?? result.name;
+                  result.note = d.additionalData.note ?? result.note;
+                }
                 return result;
               }
             }
             if (d?.type === "buffer") {
               const result = await createFileInfo.fromBuffer(d.buffer);
               if (result !== undefined) {
+                if (d.additionalData) {
+                  result.name = d.additionalData.name ?? result.name;
+                  result.note = d.additionalData.note ?? result.note;
+                }
                 return result;
               }
             }
