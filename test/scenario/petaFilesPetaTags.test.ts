@@ -21,7 +21,7 @@ describe("petaFilesPetaTags", () => {
     mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });
-  test("modifyPetaTagToPetaFileAndFind", async (f) => {
+  async function addPetaTag() {
     const pfc = usePetaFilesController();
     const pfptc = usePetaFilesPetaTagsController();
     const petaFiles = await pfc.importFilesFromFileInfos({
@@ -33,7 +33,6 @@ describe("petaFilesPetaTags", () => {
     const taggedPetaFile = petaFiles[0];
     const untaggedPetaFile = petaFiles[1];
     const petaTagsController = usePetaTagsController();
-    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     await petaTagsController.updateMultiple(
       [
         {
@@ -44,7 +43,7 @@ describe("petaFilesPetaTags", () => {
       UpdateMode.INSERT,
     );
     const petaTag = (await petaTagsController.getPetaTags())[0];
-    await petaFilesPetaTagsController.updatePetaFilesPetaTags(
+    await pfptc.updatePetaFilesPetaTags(
       [taggedPetaFile.id],
       [
         {
@@ -65,16 +64,75 @@ describe("petaFilesPetaTags", () => {
     });
     expect(untaggedPetaFileIDs.length, "untagged.length").toBe(1);
     expect(untaggedPetaFileIDs[0], "untagged").toBe(untaggedPetaFile.id);
-    const taggedPetaTagIDs = await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(
-      taggedPetaFileIDs,
+    return {
+      taggedPetaFile,
+      petaTag,
+    };
+  }
+  test("addPetaTagToPetaFileAndFind", async (f) => {
+    await addPetaTag();
+    await useDBS().waitUntilKillable();
+  });
+  test("removePetaFilesPetaTags.byRemovePetaFile", async (f) => {
+    const result = await addPetaTag();
+    const pfc = usePetaFilesController();
+    const pfptc = usePetaFilesPetaTagsController();
+    await pfc.updateMultiple([result.taggedPetaFile], UpdateMode.REMOVE);
+    expect(
+      (
+        await pfptc.getPetaFileIds({
+          type: "petaTag",
+          petaTagIds: [result.petaTag.id],
+        })
+      ).length,
+    ).toBe(0);
+    await useDBS().waitUntilKillable();
+  });
+  test("removePetaFilesPetaTags.byRemovePetaTag", async (f) => {
+    const result = await addPetaTag();
+    const ptc = usePetaTagsController();
+    const pfptc = usePetaFilesPetaTagsController();
+    await ptc.updateMultiple(
+      [
+        {
+          type: "petaTag",
+          petaTag: result.petaTag,
+        },
+      ],
+      UpdateMode.REMOVE,
     );
-    expect(taggedPetaTagIDs.length).toBe(1);
-    expect(taggedPetaTagIDs[0]).toBe(petaTag.id);
-    await petaFilesPetaTagsController.remove(taggedPetaFile.id, "petaFileId");
-    const untaggedPetaFileIDs2 = await pfptc.getPetaFileIds({
-      type: "untagged",
-    });
-    expect(untaggedPetaFileIDs2.length, "all untagged.length").toBe(2);
+    expect(
+      (
+        await pfptc.getPetaFileIds({
+          type: "petaTag",
+          petaTagIds: [result.petaTag.id],
+        })
+      ).length,
+    ).toBe(0);
+    await useDBS().waitUntilKillable();
+  });
+  test("removePetaFilesPetaTags.byPetaFilesPetaTags", async (f) => {
+    const result = await addPetaTag();
+    const ptc = usePetaTagsController();
+    const pfptc = usePetaFilesPetaTagsController();
+    await pfptc.updatePetaFilesPetaTags(
+      [result.taggedPetaFile.id],
+      [
+        {
+          type: "petaTag",
+          petaTag: result.petaTag,
+        },
+      ],
+      UpdateMode.REMOVE,
+    );
+    expect(
+      (
+        await pfptc.getPetaFileIds({
+          type: "petaTag",
+          petaTagIds: [result.petaTag.id],
+        })
+      ).length,
+    ).toBe(0);
     await useDBS().waitUntilKillable();
   });
 });
