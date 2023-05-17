@@ -14,7 +14,8 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
-import { useDBPetaFiles, useDBPetaFilesPetaTags } from "@/main/provides/databases";
+import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
+import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
@@ -96,68 +97,16 @@ export class PetaFilesController {
     });
     return petaFiles;
   }
-  async getPetaFileIds(params: GetPetaFileIdsParams) {
-    const dbPetaFiles = useDBPetaFiles();
-    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
-    // all
-    if (params.type === "all") {
-      const ids = dbPetaFiles.getAll().map((pi) => pi.id);
-      return ids;
-    }
-    // untagged
-    if (params.type === "untagged") {
-      const taggedIds = Array.from(
-        new Set(
-          dbPetaFilesPetaTags.getAll().map((pipt) => {
-            return pipt.petaFileId;
-          }),
-        ),
-      );
-      const ids = (
-        await dbPetaFiles.find({
-          id: {
-            $nin: taggedIds,
-          },
-        })
-      ).map((pi) => pi.id);
-      return ids;
-    }
-    // filter by ids
-    if (params.type === "petaTag") {
-      const pipts = await dbPetaFilesPetaTags.find({
-        $or: params.petaTagIds.map((id) => {
-          return {
-            petaTagId: id,
-          };
-        }),
-      });
-      const ids = Array.from(
-        new Set(
-          pipts.map((pipt) => {
-            return pipt.petaFileId;
-          }),
-        ),
-      ).filter((id) => {
-        return (
-          pipts.filter((pipt) => {
-            return pipt.petaFileId === id;
-          }).length === params.petaTagIds.length
-        );
-      });
-      return ids;
-    }
-    return [];
-  }
   private async update(petaFile: PetaFile, mode: UpdateMode) {
     const dbPetaFiles = useDBPetaFiles();
-    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
+    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const logger = useLogger();
     const log = logger.logMainChunk();
     log.log("##Update PetaFile");
     log.log("mode:", mode);
     log.log("image:", minimizeID(petaFile.id));
     if (mode === UpdateMode.REMOVE) {
-      await dbPetaFilesPetaTags.remove({ petaFileId: petaFile.id });
+      await petaFilesPetaTagsController.remove(petaFile.id, "petaFileId");
       await dbPetaFiles.remove({ id: petaFile.id });
       const path = getPetaFilePath.fromPetaFile(petaFile);
       await rm(path.original).catch(() => {
