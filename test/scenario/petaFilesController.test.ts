@@ -1,5 +1,5 @@
 import { initDummyElectron } from "./initDummyElectron";
-import { mkdirSync, readFileSync, rmSync } from "fs";
+import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
@@ -13,11 +13,19 @@ import { realESRGAN } from "@/main/utils/realESRGAN";
 const ROOT = "./_test/scenario/petaFilesController";
 describe("petaFilesController", () => {
   beforeAll(async () => {
-    rmSync(resolve(ROOT), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   beforeEach(async (h) => {
-    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });

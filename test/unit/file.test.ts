@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from "fs";
+import { mkdirSync, rmdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -14,7 +14,11 @@ import {
 describe("file", () => {
   const ROOT = "./_test/unit/file";
   beforeEach(() => {
-    rmSync(ROOT, { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   test("initFile", async () => {

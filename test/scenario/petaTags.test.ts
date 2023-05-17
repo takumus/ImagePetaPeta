@@ -1,5 +1,5 @@
 import { initDummyElectron } from "./initDummyElectron";
-import { mkdirSync, rmSync } from "fs";
+import { mkdirSync, rmdirSync } from "fs";
 import { resolve } from "path";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -12,11 +12,19 @@ import { useDBS } from "@/main/provides/databases";
 const ROOT = "./_test/scenario/petaTags";
 describe("petaTags", () => {
   beforeAll(async () => {
-    rmSync(resolve(ROOT), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(ROOT, { recursive: true });
   });
   beforeEach(async (h) => {
-    rmSync(resolve(ROOT, h.meta.name), { recursive: true, force: true });
+    try {
+      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+    } catch {
+      //
+    }
     mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });
