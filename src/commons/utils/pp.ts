@@ -5,18 +5,12 @@ export class PPCancelError extends Error {
     super("PPCancelError");
   }
 }
-export function ppa<T, K>(
-  fn: (data: T, index: number) => Promise<K>,
-  array: T[],
-  concurrency = 1,
-  resolveCancelationOnNextTick = true,
-) {
+export function ppa<T, K>(fn: (data: T, index: number) => Promise<K>, array: T[], concurrency = 1) {
   const result = pp(
     array.map((value: T, index: number) => () => {
       return fn(value, index);
     }),
     concurrency,
-    resolveCancelationOnNextTick,
   );
   return {
     promise: result.promise,
@@ -26,7 +20,6 @@ export function ppa<T, K>(
 export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
   functions: T,
   concurrency = 1,
-  resolveCancelationOnNextTick = true,
 ) {
   if (concurrency < 1) {
     throw new Error(`concurrency must be larger than 1`);
@@ -57,14 +50,7 @@ export function pp<T extends readonly (() => Promise<unknown>)[] | []>(
                   cancels.map((cancel) => {
                     cancel(error);
                   });
-                  // nextTickで呼ぶか分ける。
-                  if (resolveCancelationOnNextTick) {
-                    setImmediate(() => {
-                      resolveCancels.map((rc) => rc());
-                    });
-                  } else {
-                    resolveCancels.map((rc) => rc());
-                  }
+                  resolveCancels.map((rc) => rc());
                 }
                 allCompleted = true;
               }
