@@ -21,6 +21,7 @@ const allowedEvents: EventNames[] = [
   "updatePetaTags",
   "updatePetaFilesPetaTags",
   "updatePetaBoards",
+  "getAppInfo",
 ];
 export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin = false) {
   const logger = useLogger();
