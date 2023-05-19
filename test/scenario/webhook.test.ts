@@ -68,7 +68,7 @@ describe("webhook", () => {
   });
   test("whitelist", async () => {
     const webhook = await initWebhook(ipcFunctions, true);
-    const appInfo = (await post("getAppInfo")) as any;
+    const appInfo = (await post("getSettings")) as any;
     expect(appInfo).property("error");
     await webhook?.close();
   });
