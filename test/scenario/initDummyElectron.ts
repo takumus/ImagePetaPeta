@@ -45,6 +45,7 @@ export async function initDummyElectron(root: string) {
     return {
       ...defines,
       DB_COMPACTION_DELAY: 100,
+      WEBHOOK_PORT: 51920,
     } as typeof defines;
   });
   vi.mock("@/main/utils/resolveExtraFilesPath", () => {
