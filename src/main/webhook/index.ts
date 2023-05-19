@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { IpFilter } from "express-ipfilter";
+import { Server } from "http";
 
 import {
   WEBHOOK_PORT,
@@ -13,8 +14,15 @@ import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { useLogger } from "@/main/provides/utils/logger";
 
 type EventNames = keyof IpcFunctions;
-const allowedEvents: EventNames[] = ["importFiles"];
-export function initWebhook(ipcFunctions: IpcFunctionsType) {
+const allowedEvents: EventNames[] = [
+  "importFiles",
+  "getPetaFiles",
+  "updatePetaFiles",
+  "updatePetaTags",
+  "updatePetaFilesPetaTags",
+  "updatePetaBoards",
+];
+export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin = false) {
   const logger = useLogger();
   const initLog = logger.logMainChunk();
   try {
@@ -23,13 +31,11 @@ export function initWebhook(ipcFunctions: IpcFunctionsType) {
     http.use(express.json({ limit: "100mb" }));
     http.use(cors());
     http.use(IpFilter(WEBHOOK_WHITELIST_IP_LIST, { mode: "allow" }));
-    const server = http.listen(WEBHOOK_PORT, () => {
-      initLog.log(`$Webhook: opened`, WEBHOOK_PORT);
-    });
     http.post("/", async (req, res) => {
       if (
         WEBHOOK_WHITELIST_ORIGIN_LIST.find((origin) => req.headers.origin?.startsWith(origin)) ===
-        undefined
+          undefined &&
+        !allowAllOrigin
       ) {
         res.status(403).json({ error: `invalid origin: ${req.headers.origin}` });
         return;
@@ -57,6 +63,12 @@ export function initWebhook(ipcFunctions: IpcFunctionsType) {
         res.status(500).json({ error: `event error: ${JSON.stringify(error)}` });
         executeLog.error(`$Webhook: event error`, error);
       }
+    });
+    const server = await new Promise<Server>((res) => {
+      const s = http.listen(WEBHOOK_PORT, () => {
+        initLog.log(`$Webhook: opened`, WEBHOOK_PORT);
+        res(s);
+      });
     });
     return {
       close: () => {
