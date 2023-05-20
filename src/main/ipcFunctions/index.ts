@@ -2,11 +2,17 @@ import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } fro
 import { readFile } from "fs/promises";
 import * as Path from "path";
 
+import { AppInfo } from "@/commons/datas/appInfo";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
-import { BOARD_DEFAULT_NAME, EULA, FILENAME_DB_INFO } from "@/commons/defines";
+import {
+  BOARD_DEFAULT_NAME,
+  CHROME_EXTENSION_VERSION,
+  EULA,
+  FILENAME_DB_INFO,
+} from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
 import { ppa } from "@/commons/utils/pp";
@@ -348,9 +354,11 @@ export const ipcFunctions: IpcFunctionsType = {
     const logger = useLogger();
     const log = logger.logMainChunk();
     log.log("#Get App Info");
-    const info = {
+    const info: AppInfo = {
       name: app.getName(),
       version: app.getVersion(),
+      chromeExtensionVersion: CHROME_EXTENSION_VERSION,
+      electronVersion: process.versions.electron ?? "1.0.0",
     };
     log.log("return:", info);
     return info;
