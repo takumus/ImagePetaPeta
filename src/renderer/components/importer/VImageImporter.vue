@@ -23,19 +23,20 @@ onMounted(() => {
     event.stopPropagation();
     if (event.dataTransfer) {
       IPC.send("windowActivate");
-      const url = getURLFromHTML(event.dataTransfer.getData("text/html"));
+      const urls = getURLFromHTML(event.dataTransfer.getData("text/html"));
       const { buffers, filePaths } = await getDataFromFileList(event.dataTransfer.files);
       let ids: string[] = [];
-      if (url !== undefined) {
+      if (urls !== undefined) {
         ids = await IPC.send("importFiles", [
           [
-            ...(url !== undefined
-              ? [
-                  {
-                    type: "url",
-                    url,
-                  } as const,
-                ]
+            ...(urls !== undefined
+              ? urls.map(
+                  (url) =>
+                    ({
+                      type: "url",
+                      url: url,
+                    } as const),
+                )
               : []),
             ...(buffers !== undefined
               ? buffers.map(
