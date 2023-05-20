@@ -143,9 +143,10 @@ export async function searchImageByGoogle(path: string) {
         await new Promise((res, rej) => {
           // タイムアウト
           const timeoutHandler = setTimeout(() => {
+            clearInterval(waitForUploadHandler);
             rej("timeout");
           }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
-          window.webContents.addListener("did-finish-load", () => {
+          const waitForUploadHandler = setInterval(() => {
             // アップロード完了
             if (
               !window.webContents
@@ -154,6 +155,7 @@ export async function searchImageByGoogle(path: string) {
             ) {
               return;
             }
+            clearInterval(waitForUploadHandler);
             // ブラウザ起動
             shell.openExternal(window.webContents.getURL());
             clearTimeout(timeoutHandler);
@@ -167,7 +169,7 @@ export async function searchImageByGoogle(path: string) {
               status: TaskStatusCode.COMPLETE,
             });
             res(true);
-          });
+          }, 100);
         });
       } catch (error) {
         window.destroy();
@@ -177,6 +179,7 @@ export async function searchImageByGoogle(path: string) {
             all: taskAllCount,
             current: taskCount++,
           },
+          log: [String(error)],
           status: TaskStatusCode.FAILED,
         });
         throw error;
