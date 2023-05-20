@@ -25,7 +25,6 @@ describe("getURLFromHTML", () => {
       ./test-400.png 400w
       ./test-300.png 300w">
     `);
-    console.log(result);
     expect(result).toMatchObject(["./test-400.png"]);
   });
   test("both", async () => {
@@ -36,7 +35,12 @@ describe("getURLFromHTML", () => {
       ./test-300.png 300w"
       src="./test.png">
     `);
-    console.log(result);
     expect(result).toMatchObject(["./test-400.png", "./test.png"]);
+  });
+  test("nourl", async () => {
+    const result = getURLFromHTML(`
+    <img>
+    `);
+    expect(result).toBeUndefined();
   });
 });
