@@ -7,19 +7,19 @@ export function getURLFromHTML(html: string) {
     const aDom = dom.getElementsByTagName("a")[0];
     const videoDom = dom.getElementsByTagName("video")[0];
     if (imgDom !== undefined) {
-      const url = fromImg(imgDom);
-      if (url !== undefined) {
-        return url;
+      const urls = fromImg(imgDom);
+      if (urls !== undefined) {
+        return urls;
       }
     } else if (aDom !== undefined) {
       const url = fromA(aDom);
       if (url !== undefined) {
-        return url;
+        return [url];
       }
     } else if (videoDom !== undefined) {
       const url = fromVideo(videoDom);
       if (url !== undefined) {
-        return url;
+        return [url];
       }
     }
   } catch {
@@ -60,7 +60,10 @@ function fromImg(dom: HTMLImageElement) {
       { size: 0, src: undefined as string | undefined },
     );
   const src = getValueFromAttrs("src", attrs);
-  return max?.src ?? src;
+  if (src === undefined && max?.src === undefined) {
+    return undefined;
+  }
+  return [...(max?.src ? [max.src] : []), ...(src ? [src] : [])];
 }
 function fromVideo(dom: HTMLVideoElement) {
   const attrs = Array.from(dom.attributes);
