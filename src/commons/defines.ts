@@ -73,4 +73,5 @@ export const DIRNAME_IMAGES: string = "images";
 export const DIRNAME_THUMBNAILS: string = "thumbnails";
 
 export const PETAIMAGE_METADATA_VERSION: number = 1.8;
+export const CHROME_EXTENSION_VERSION: number = 1;
 export const EULA: number = 2;
