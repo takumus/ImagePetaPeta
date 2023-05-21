@@ -2,8 +2,6 @@ import { BrowserWindow, IpcMainInvokeEvent, app, screen } from "electron";
 import * as Path from "path";
 
 import {
-  BOARD_DARK_BACKGROUND_FILL_COLOR,
-  BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
   EULA,
   WINDOW_DEFAULT_HEIGHT,
   WINDOW_DEFAULT_WIDTH,
@@ -21,6 +19,7 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
 import { getWindowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { isDarkMode } from "@/main/utils/darkMode";
+import { defaultStyles } from "@/renderer/styles/styles";
 
 export class Windows {
   windows: { [key in WindowName]?: BrowserWindow | undefined } = {};
@@ -109,8 +108,8 @@ export class Windows {
         preload: Path.join(__dirname, "preload.js"),
       },
       backgroundColor: isDarkMode()
-        ? BOARD_DARK_BACKGROUND_FILL_COLOR
-        : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
+        ? defaultStyles.dark["--color-0"]
+        : defaultStyles.light["--color-0"],
       trafficLightPosition: {
         x: 8,
         y: 8,

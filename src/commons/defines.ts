@@ -5,10 +5,6 @@ export const PROTOCOLS = {
   },
 } as const;
 export const BOARD_DEFAULT_NAME: string = "noname";
-export const BOARD_DEFAULT_BACKGROUND_FILL_COLOR: string = "#e9e9e9";
-export const BOARD_DEFAULT_BACKGROUND_LINE_COLOR: string = "#666666";
-export const BOARD_DARK_BACKGROUND_FILL_COLOR: string = "#141414";
-export const BOARD_DARK_BACKGROUND_LINE_COLOR: string = "#444444";
 export const BOARD_ADD_MULTIPLE_OFFSET_X: number = 20;
 export const BOARD_ADD_MULTIPLE_OFFSET_Y: number = 20;
 export const BOARD_ZOOM_MIN: number = 1 / 100; // 1%

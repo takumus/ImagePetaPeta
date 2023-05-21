@@ -1,13 +1,9 @@
 import { v4 as uuid } from "uuid";
 
 import { PetaPanel } from "@/commons/datas/petaPanel";
-import {
-  BOARD_DARK_BACKGROUND_FILL_COLOR,
-  BOARD_DARK_BACKGROUND_LINE_COLOR,
-  BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-  BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
-} from "@/commons/defines";
 import { Vec2 } from "@/commons/utils/vec2";
+
+import { defaultStyles } from "@/renderer/styles/styles";
 
 export interface PetaBoard {
   petaPanels: { [petaPanelId: string]: PetaPanel };
@@ -34,8 +30,8 @@ export function createPetaBoard(name: string, index = 0, dark: boolean) {
       position: new Vec2(0, 0),
     },
     background: {
-      fillColor: dark ? BOARD_DARK_BACKGROUND_FILL_COLOR : BOARD_DEFAULT_BACKGROUND_FILL_COLOR,
-      lineColor: dark ? BOARD_DARK_BACKGROUND_LINE_COLOR : BOARD_DEFAULT_BACKGROUND_LINE_COLOR,
+      fillColor: dark ? defaultStyles.dark["--color-0"] : defaultStyles.light["--color-0"],
+      lineColor: dark ? defaultStyles.dark["--color-2"] : defaultStyles.light["--color-2"],
     },
     index: index,
   };
