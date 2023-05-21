@@ -1,8 +1,5 @@
 <template>
-  <e-root
-    :class="{
-      dark: darkModeStore.state.value,
-    }">
+  <e-root>
     <e-content>
       <e-top>
         <VTitleBar :title="t('titles.quit')" :hide-controls="true"> </VTitleBar>
@@ -18,15 +15,12 @@ import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 
-import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
 const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
-const darkModeStore = useDarkModeStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 watch(

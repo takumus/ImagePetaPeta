@@ -1,8 +1,5 @@
 <template>
-  <e-root
-    :class="{
-      dark: darkModeStore.state.value,
-    }">
+  <e-root>
     <e-content>
       <e-top>
         <VTitleBar :title="t('titles.browser')"> </VTitleBar>
@@ -35,7 +32,6 @@ import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
@@ -44,7 +40,6 @@ const components = useComponentsStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const { t } = useI18n();
-const darkModeStore = useDarkModeStore();
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {

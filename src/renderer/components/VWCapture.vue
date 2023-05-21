@@ -1,8 +1,5 @@
 <template>
-  <e-root
-    :class="{
-      dark: darkModeStore.state.value,
-    }">
+  <e-root>
     <e-content>
       <e-top>
         <VTitleBar :title="t('titles.capture')"> </VTitleBar>
@@ -28,12 +25,10 @@ import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VConte
 import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
 const { t } = useI18n();
-const darkModeStore = useDarkModeStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const appInfoStore = useAppInfoStore();
