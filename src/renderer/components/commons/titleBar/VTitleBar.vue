@@ -91,8 +91,6 @@ e-titlebar-root {
     display: flex;
     flex-direction: column;
     > e-top {
-      margin-top: var(--window-resize-margin);
-      margin-left: var(--window-resize-margin);
       flex-grow: 1;
       -webkit-app-region: drag;
       display: block;
@@ -106,7 +104,6 @@ e-titlebar-root {
         display: block;
         &.left {
           flex-grow: 0;
-          margin-left: var(--window-resize-margin);
           width: calc(var(--tab-height) + var(--top-draggable-height));
           &.mac {
             width: calc(var(--tab-height) + var(--top-draggable-height) + 32px);

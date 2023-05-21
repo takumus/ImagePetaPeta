@@ -10,7 +10,7 @@ export type Style = {
   "--color-font": string;
   "--filter-icon": string;
   "--shadow": string;
-  "--floating-shadow": string;
+  "--shadow-floating": string;
   "--shadow-small": string;
   "--color-checkbox-false-background": string;
   "--color-checkbox-false-circle": string;
@@ -30,7 +30,7 @@ export const defaultStyles = {
     "--color-font": "#d3d3d3",
     "--filter-icon": "unset",
     "--shadow": "0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.5)",
-    "--floating-shadow": "1px 1px 5px rgba(0, 0, 0, 0.7)",
+    "--shadow-floating": "1px 1px 5px rgba(0, 0, 0, 0.7)",
     "--shadow-small": "0px 1px 2px 0px rgba(0, 0, 0, 0.5)",
     "--color-checkbox-false-background": "var(--color-2)",
     "--color-checkbox-false-circle": "var(--color-font)",
@@ -49,13 +49,13 @@ export const defaultStyles = {
     "--color-font": "#1a1a1a",
     "--filter-icon": "brightness(0.7) invert(100%)",
     "--shadow": "0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3)",
-    "--floating-shadow": "1px 1px 5px rgba(0, 0, 0, 0.3)",
+    "--shadow-floating": "1px 1px 5px rgba(0, 0, 0, 0.3)",
     "--shadow-small": "0px 1px 2px 0px rgba(0, 0, 0, 0.3)",
     "--color-checkbox-false-background": "var(--color-2)",
     "--color-checkbox-false-circle": "var(--color-0)",
     "--color-checkbox-true-background": "var(--color-accent-2)",
     "--color-checkbox-true-circle": "var(--color-0)",
-  },
+  } as Style,
 };
 export function applyStyle(style: Style) {
   const root = document.body;

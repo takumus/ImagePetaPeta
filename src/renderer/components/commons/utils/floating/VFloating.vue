@@ -133,7 +133,7 @@ e-floating-root {
   position: fixed;
   background-color: var(--color-0-floating);
   margin: 0px;
-  box-shadow: var(--floating-shadow);
+  box-shadow: var(--shadow-floating);
   border-radius: var(--rounded);
   top: 0px;
   left: 0px;
