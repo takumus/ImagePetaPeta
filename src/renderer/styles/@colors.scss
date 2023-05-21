@@ -13,71 +13,71 @@ e-root {
   --window-resize-margin: 0px;
   --color-window-button: #ffffff;
 
-  --light-color-0: #ffffff;
-  --light-color-0-floating: #ffffff;
-  --light-color-1: #f4f4f4;
-  --light-color-2: #dedede;
-  --light-color-accent-1: #bcdcff;
-  --light-color-accent-2: #afd7ff;
-  --light-color-border: #999999;
-  --light-color-overlay: #00000070;
-  --light-color-font: #1a1a1a;
-  --light-filter-icon: brightness(0.7) invert(100%);
-  --light-shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3);
-  --light-floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-  --light-shadow-small: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  // --light-color-0: #ffffff;
+  // --light-color-0-floating: #ffffff;
+  // --light-color-1: #f4f4f4;
+  // --light-color-2: #dedede;
+  // --light-color-accent-1: #bcdcff;
+  // --light-color-accent-2: #afd7ff;
+  // --light-color-border: #999999;
+  // --light-color-overlay: #00000070;
+  // --light-color-font: #1a1a1a;
+  // --light-filter-icon: brightness(0.7) invert(100%);
+  // --light-shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3);
+  // --light-floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+  // --light-shadow-small: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
 
-  --dark-color-0: #141414;
-  --dark-color-0-floating: #1b1b1b;
-  --dark-color-1: #272727;
-  --dark-color-2: #343434;
-  --dark-color-accent-1: rgb(41, 85, 112);
-  --dark-color-accent-2: #9cdcfe;
-  --dark-color-border: #5c5c5c;
-  --dark-color-overlay: #ffffff30;
-  --dark-color-font: #d3d3d3;
-  --dark-filter-icon: unset;
-  --dark-shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.5);
-  --dark-floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
-  --dark-shadow-small: 0px 1px 2px 0px rgba(0, 0, 0, 0.5);
+  // --dark-color-0: #141414;
+  // --dark-color-0-floating: #1b1b1b;
+  // --dark-color-1: #272727;
+  // --dark-color-2: #343434;
+  // --dark-color-accent-1: rgb(41, 85, 112);
+  // --dark-color-accent-2: #9cdcfe;
+  // --dark-color-border: #5c5c5c;
+  // --dark-color-overlay: #ffffff30;
+  // --dark-color-font: #d3d3d3;
+  // --dark-filter-icon: unset;
+  // --dark-shadow: 0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.5);
+  // --dark-floating-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+  // --dark-shadow-small: 0px 1px 2px 0px rgba(0, 0, 0, 0.5);
 
-  // 明るいモード
-  & {
-    --color-0: var(--light-color-0);
-    --color-0-floating: var(--light-color-0-floating);
-    --color-1: var(--light-color-1);
-    --color-2: var(--light-color-2);
-    --color-accent-1: var(--light-color-accent-1);
-    --color-accent-2: var(--light-color-accent-2);
-    --color-border: var(--light-color-border);
-    --color-overlay: var(--light-color-overlay);
-    --color-font: var(--light-color-font);
-    --filter-icon: var(--light-filter-icon);
-    --shadow: var(--light-shadow);
-    --floating-shadow: var(--light-floating-shadow);
-    --shadow-small: var(--light-shadow-small);
-    --color-checkbox-false-background: var(--light-color-2);
-    --color-checkbox-false-circle: var(--light-color-0);
-    --color-checkbox-true-background: var(--light-color-accent-2);
-    --color-checkbox-true-circle: var(--light-color-0);
-  }
-  &.dark {
-    --color-0: var(--dark-color-0);
-    --color-0-floating: var(--dark-color-0-floating);
-    --color-1: var(--dark-color-1);
-    --color-2: var(--dark-color-2);
-    --color-accent-1: var(--dark-color-accent-1);
-    --color-accent-2: var(--dark-color-accent-2);
-    --color-border: var(--dark-color-border);
-    --color-overlay: var(--dark-color-overlay);
-    --color-font: var(--dark-color-font);
-    --filter-icon: var(--dark-filter-icon);
-    --shadow: var(--dark-shadow);
-    --floating-shadow: var(--dark-floating-shadow);
-    --shadow-small: var(--dark-shadow-small);
-    --color-checkbox-false-background: var(--dark-color-2);
-    --color-checkbox-false-circle: var(--dark-color-font);
-    --color-checkbox-true-background: var(--dark-color-accent-1);
-    --color-checkbox-true-circle: var(--dark-color-font);
-  }
+  // // 明るいモード
+  // & {
+  //   --color-0: var(--light-color-0);
+  //   --color-0-floating: var(--light-color-0-floating);
+  //   --color-1: var(--light-color-1);
+  //   --color-2: var(--light-color-2);
+  //   --color-accent-1: var(--light-color-accent-1);
+  //   --color-accent-2: var(--light-color-accent-2);
+  //   --color-border: var(--light-color-border);
+  //   --color-overlay: var(--light-color-overlay);
+  //   --color-font: var(--light-color-font);
+  //   --filter-icon: var(--light-filter-icon);
+  //   --shadow: var(--light-shadow);
+  //   --floating-shadow: var(--light-floating-shadow);
+  //   --shadow-small: var(--light-shadow-small);
+  //   --color-checkbox-false-background: var(--light-color-2);
+  //   --color-checkbox-false-circle: var(--light-color-0);
+  //   --color-checkbox-true-background: var(--light-color-accent-2);
+  //   --color-checkbox-true-circle: var(--light-color-0);
+  // }
+  // &.dark {
+  //   --color-0: var(--dark-color-0);
+  //   --color-0-floating: var(--dark-color-0-floating);
+  //   --color-1: var(--dark-color-1);
+  //   --color-2: var(--dark-color-2);
+  //   --color-accent-1: var(--dark-color-accent-1);
+  //   --color-accent-2: var(--dark-color-accent-2);
+  //   --color-border: var(--dark-color-border);
+  //   --color-overlay: var(--dark-color-overlay);
+  //   --color-font: var(--dark-color-font);
+  //   --filter-icon: var(--dark-filter-icon);
+  //   --shadow: var(--dark-shadow);
+  //   --floating-shadow: var(--dark-floating-shadow);
+  //   --shadow-small: var(--dark-shadow-small);
+  //   --color-checkbox-false-background: var(--dark-color-2);
+  //   --color-checkbox-false-circle: var(--dark-color-font);
+  //   --color-checkbox-true-background: var(--dark-color-accent-1);
+  //   --color-checkbox-true-circle: var(--dark-color-font);
+  // }
 }
