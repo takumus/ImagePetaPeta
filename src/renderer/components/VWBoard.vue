@@ -1,8 +1,5 @@
 <template>
-  <e-root
-    :class="{
-      dark: darkModeStore.state.value,
-    }">
+  <e-root>
     <e-content>
       <e-top>
         <VTitleBar>

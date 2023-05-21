@@ -1,8 +1,5 @@
 <template>
-  <e-root
-    :class="{
-      dark: darkModeStore.state.value,
-    }">
+  <e-root>
     <e-content>
       <e-top>
         <VTitleBar :title="t('titles.details')"> </VTitleBar>
@@ -42,7 +39,6 @@ import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
@@ -50,7 +46,6 @@ import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindo
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
-const darkModeStore = useDarkModeStore();
 const petaFilesStore = usePetaFilesStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
