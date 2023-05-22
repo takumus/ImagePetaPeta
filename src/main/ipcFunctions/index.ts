@@ -678,6 +678,18 @@ export const ipcFunctions: IpcFunctionsType = {
     log.log("type:", windowName);
     windows.openWindow(windowName, event);
   },
+  async openBrowserAndGotoPetaFile(_event, petaFile) {
+    const logger = useLogger();
+    const windows = useWindows();
+    const log = logger.logMainChunk();
+    log.log("#OpenBrowserAndGotoPetaFile");
+    windows.openWindow("browser");
+    windows.emitMainEvent(
+      { windowNames: ["browser"], type: EmitMainEventTargetType.WINDOW_NAMES },
+      "gotoPetaFile",
+      petaFile,
+    );
+  },
   async reloadWindow(event) {
     const logger = useLogger();
     const windows = useWindows();

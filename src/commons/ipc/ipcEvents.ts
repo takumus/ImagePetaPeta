@@ -25,4 +25,5 @@ export interface IpcEvents {
   darkMode: (value: boolean) => void;
   dataInitialized: () => void;
   initializationProgress: (log: string) => void;
+  gotoPetaFile: (petaFile: PetaFile) => void;
 }
