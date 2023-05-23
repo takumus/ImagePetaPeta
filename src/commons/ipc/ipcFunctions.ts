@@ -61,6 +61,7 @@ export interface IpcFunctions {
   realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<string[]>;
   startDrag: (petaFiles: PetaFile[], iconSize: number, iconData: string) => Promise<void>;
   openWindow: (windowName: WindowName) => Promise<void>;
+  openBrowserAndGotoPetaFile: (petaFile: PetaFile) => Promise<void>;
   reloadWindow: () => Promise<void>;
   setDetailsPetaFile: (petaFileId: string) => Promise<void>;
   getDetailsPetaFile: () => Promise<PetaFile | undefined>;
