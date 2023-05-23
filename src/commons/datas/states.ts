@@ -12,4 +12,4 @@ export const defaultStates: States = {
   loadedPetaBoardId: "",
   browserTileViewMode: "fill1",
 };
-export const browserTileViewMode = ["fill1", "fill2", "date"] as const;
+export const browserTileViewMode = ["fill1", "fill2"] as const;
