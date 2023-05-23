@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { throttle } from "throttle-debounce";
+import { debounce, throttle } from "throttle-debounce";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -135,7 +135,12 @@ const defines = useDefinesStore().defines;
 const filteredPetaFiles = ref<RPetaFile[]>([]);
 const ignoreScrollEvent = ref(false);
 const currentColor = ref("#ffffff");
-const fetchFilteredPetaFilesThrottle = throttle(100, () => fetchFilteredPetaFiles(false));
+const fetchFilteredPetaFilesThrottle = throttle(100, (reload: boolean) =>
+  fetchFilteredPetaFiles(reload),
+);
+const fetchFilteredPetaFilesDebounce = debounce(100, (reload: boolean) =>
+  fetchFilteredPetaFiles(reload),
+);
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -502,7 +507,6 @@ const tiles = computed((): Tile[] => {
   for (let i = 0; i < thumbnailsRowCount.value; i++) {
     yList.push(0);
   }
-  let prevDateString = "";
   const tiles: Tile[] = [];
   filteredPetaFiles.value.map((p, i) => {
     let minY = Number.MAX_VALUE;
@@ -517,36 +521,6 @@ const tiles = computed((): Tile[] => {
         maxY = y;
       }
     });
-    let newGroup = false;
-    const date = new Date(p.addDate);
-    const currentDateString =
-      date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-    if (
-      prevDateString !== currentDateString &&
-      statesStore.state.value.browserTileViewMode === "date"
-    ) {
-      prevDateString = currentDateString;
-      mvi = 0;
-      minY = maxY;
-      yList.fill(minY);
-      newGroup = true;
-    }
-    if (newGroup) {
-      const height = 32;
-      const position = new Vec2(0, (yList[mvi] || 0) + BROWSER_THUMBNAIL_MARGIN);
-      yList.fill(minY + height);
-      const tile: Tile = {
-        position: position,
-        width: thumbnailsWidth.value,
-        height: height,
-        visible: false,
-        preVisible: false,
-        group: currentDateString,
-        id: currentDateString,
-      };
-      updateVisibility(tile);
-      tiles.push(tile);
-    }
     if (
       i % thumbnailsRowCount.value === 0 &&
       statesStore.state.value.browserTileViewMode === "fill2"
@@ -589,11 +563,11 @@ watch([selectedPetaTagIds, selectedFilterType, sortMode], () => {
       thumbnails.value.scrollTo(0, 0);
     }
   });
-  fetchFilteredPetaFiles();
+  fetchFilteredPetaFilesDebounce(true);
 });
-watch(petaFilesArray, () => fetchFilteredPetaFiles());
-watch(petaTagsStore.state.petaTags, () => fetchFilteredPetaFiles());
-watch(sortMode, () => fetchFilteredPetaFiles());
+watch(petaFilesArray, () => fetchFilteredPetaFilesDebounce(true));
+watch(petaTagsStore.state.petaTags, () => fetchFilteredPetaFilesDebounce(true));
+watch(sortMode, () => fetchFilteredPetaFilesDebounce(true));
 watch(currentColor, () => {
   if (sortMode.value === "SIMILAR") {
     currentScrollTileId.value = "";
@@ -602,7 +576,7 @@ watch(currentColor, () => {
         thumbnails.value.scrollTo(0, 0);
       }
     });
-    fetchFilteredPetaFilesThrottle();
+    fetchFilteredPetaFilesThrottle(false);
   }
 });
 watch(thumbnailsSize, restoreScrollPosition);
