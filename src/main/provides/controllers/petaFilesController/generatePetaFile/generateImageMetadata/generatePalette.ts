@@ -20,7 +20,7 @@ function createPixels(buffer: Buffer, pixelCount: number) {
 export function getSimplePalette(imageData: { buffer: Buffer; width: number; height: number }) {
   const palette = getPalette({
     sample: 1000,
-    beforeMergeCIEDiff: 10,
+    beforeMergeCIEDiff: 5,
     fixColorCIEDiff: 8,
     afterMergeCIEFiff: 15,
     ...imageData,
@@ -62,11 +62,10 @@ export function getPalette(imageData: {
   );
   // 似た色を除去
   for (let i = 0; i < colors.length; i++) {
-    for (let ii = i + 1; ii < colors.length; ii++) {
+    for (let ii = colors.length - 1; ii > i; ii--) {
       const cieDiff = ciede(colors[i], colors[ii]);
       if (cieDiff < imageData.beforeMergeCIEDiff) {
         colors.splice(ii, 1);
-        ii--;
       }
     }
   }
@@ -110,12 +109,12 @@ export function getPalette(imageData: {
     });
   // 似た色を再び削除。人口を統合
   for (let i = 0; i < palette.length; i++) {
-    for (let ii = i + 1; ii < palette.length; ii++) {
+    for (let ii = colors.length - 1; ii > i; ii--) {
       const cieDiff = ciede(palette[i], palette[ii]);
       if (cieDiff < imageData.afterMergeCIEFiff) {
         palette[i]!.population += palette[ii]!.population;
+        palette[i]!.population /= 2;
         palette.splice(ii, 1);
-        ii--;
       }
     }
   }

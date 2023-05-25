@@ -49,7 +49,7 @@ describe("petaFilesController", () => {
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
-    expect(petaFiles.length, "petaFiles.length").toBe(6);
+    expect(petaFiles.length, "petaFiles.length").toBe(7);
     await useDBS().waitUntilKillable();
   });
   test("updatePetaFiles", async () => {
@@ -67,7 +67,7 @@ describe("petaFilesController", () => {
       }),
       UpdateMode.UPDATE,
     );
-    expect(petaFiles.length, "petaFiles.length").toBe(6);
+    expect(petaFiles.length, "petaFiles.length").toBe(7);
     Object.values(await pfc.getAll()).forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });
