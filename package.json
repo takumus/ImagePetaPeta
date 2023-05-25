@@ -30,7 +30,8 @@
     "format": "prettier ./src --write",
     "tsx": "tsx",
     "test": "vitest run",
-    "test-ui": "vitest --ui"
+    "test-ui": "vitest --ui",
+    "test-metadata": "vitest metadata.test.ts"
   },
   "devDependencies": {
     "@shockpkg/icon-encoder": "^2.1.3",
