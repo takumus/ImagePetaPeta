@@ -140,21 +140,16 @@ export class Windows {
       logger.error("Window Crashed:", type);
       this.reloadWindow(type);
     });
-    // const url =
-    //   process.env.WEBPACK_DEV_SERVER_URL !== undefined
-    //     ? `${process.env.WEBPACK_DEV_SERVER_URL}${type}`
-    //     : `app://./${type}.html`;
-    // window.loadURL(url);
     if (process.env.VITE_DEV_SERVER_URL) {
-      // electron-vite-vue#298
-      console.log(process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html");
-      window.loadURL(process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html");
-      // Open devTool if the app is not packaged
+      const url = process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html";
+      logger.log("url:", url);
+      window.loadURL(url);
       window.webContents.openDevTools();
     } else {
-      window.loadFile(Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html"));
+      const path = Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html");
+      logger.log("path:", path);
+      window.loadFile(path);
     }
-    // window.webContents.openDevTools();
     return window;
   }
   changeMainWindow(type: WindowName) {
