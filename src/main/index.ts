@@ -87,6 +87,15 @@ import { initWebhook } from "@/main/webhook";
         `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
       );
     logger.logMainChunk().log(`verison: ${app.getVersion()}`);
+    if (process.env.NODE_ENV === "development") {
+      const log = logger.logMainChunk();
+      try {
+        log.log("install vue devtools");
+        await require("electron-devtools-installer").default("nhdogjmejiglipccpnnnanhbledajbpd");
+      } catch (error) {
+        log.error(error);
+      }
+    }
     // プロトコル登録
     protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, (req, res) => {
       const info = getPetaFileInfoFromURL(req.url);
