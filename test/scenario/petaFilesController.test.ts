@@ -1,6 +1,8 @@
 import { initDummyElectron } from "./initDummyElectron";
+import { fileTypeFromFile } from "file-type";
 import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
+import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
@@ -49,7 +51,31 @@ describe("petaFilesController", () => {
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
-    expect(petaFiles.length, "petaFiles.length").toBe(7);
+    expect(petaFiles.length, "petaFiles.length").toBe(8);
+    await useDBS().waitUntilKillable();
+  });
+  test("importRotatedFile", async () => {
+    const rotatedFile = resolve("./test/sampleDatas/lizard-rotated.jpg");
+    expect(await sharp(rotatedFile).metadata()).toMatchObject({
+      width: 853,
+      height: 1280,
+      format: "jpeg",
+    });
+    const pfc = usePetaFilesController();
+    const petaFile = (
+      await pfc.importFilesFromFileInfos({
+        fileInfos: [{ name: "rotated", note: "", path: rotatedFile }],
+      })
+    )[0];
+    const filePaths = getPetaFilePath.fromPetaFile(petaFile);
+    expect(filePaths.original.endsWith(".png")).toBeTruthy();
+    expect(petaFile.mimeType).toBe("image/png");
+    expect((await fileTypeFromFile(filePaths.original))?.mime).toBe("image/png");
+    expect(await sharp(filePaths.original).metadata()).toMatchObject({
+      width: 1280,
+      height: 853,
+      format: "png",
+    });
     await useDBS().waitUntilKillable();
   });
   test("updatePetaFiles", async () => {
@@ -67,7 +93,7 @@ describe("petaFilesController", () => {
       }),
       UpdateMode.UPDATE,
     );
-    expect(petaFiles.length, "petaFiles.length").toBe(7);
+    expect(petaFiles.length, "petaFiles.length").toBe(8);
     Object.values(await pfc.getAll()).forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });
