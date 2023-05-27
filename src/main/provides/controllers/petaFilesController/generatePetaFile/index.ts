@@ -9,6 +9,7 @@ import { mkdirIfNotIxists } from "@/main/libs/file";
 import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata";
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
 export async function generatePetaFile(param: {
@@ -42,17 +43,19 @@ export async function generatePetaFile(param: {
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
   };
-  if (param.type === "add") {
-    await copyFile(param.path, Path.resolve(param.dirOriginals, originalFileName));
-  }
-  if (param.type === "update") {
-    const to = Path.resolve(param.dirOriginals, originalFileName);
-    if (param.path !== to) {
-      console.log("move:", param.path, to);
-      await rename(param.path, Path.resolve(param.dirOriginals, originalFileName));
+  const filePath = getPetaFilePath.fromPetaFile(petaFile);
+  if (fileInfo.original.transformedBuffer !== undefined) {
+    await writeFile(filePath.original, fileInfo.original.transformedBuffer);
+  } else {
+    if (param.type === "add") {
+      await copyFile(param.path, filePath.original);
+    } else if (param.type === "update") {
+      if (param.path !== filePath.original) {
+        await rename(param.path, filePath.original);
+      }
     }
   }
-  await writeFile(Path.resolve(param.dirThumbnails, thumbnailFileName), fileInfo.thumbnail.buffer);
+  await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   return petaFile;
 }
 export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {

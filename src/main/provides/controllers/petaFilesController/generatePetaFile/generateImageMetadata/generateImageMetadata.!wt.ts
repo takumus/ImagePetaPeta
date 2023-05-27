@@ -30,19 +30,23 @@ async function generateImageMetaData(param: {
   buffer: Buffer;
   fileType: FileTypeResult;
 }): Promise<GeneratedFileInfo> {
-  const metadata = await sharp(param.buffer, { limitInputPixels: false }).metadata();
+  let metadata = await sharp(param.buffer, { limitInputPixels: false }).metadata();
   let extention = param.fileType.ext;
   let mimeType = param.fileType.mime;
+  let buffer = param.buffer;
+  let transformed = false;
   if (metadata.orientation !== undefined) {
     // jpegの角度情報があったら回転する。pngにする。
-    param.buffer = await sharp(param.buffer, { limitInputPixels: false }).rotate().png().toBuffer();
+    transformed = true;
+    buffer = await sharp(param.buffer, { limitInputPixels: false }).rotate().png().toBuffer();
+    metadata = await sharp(buffer, { limitInputPixels: false }).metadata();
     extention = "png";
     mimeType = "image/png";
   }
   if (metadata.width === undefined || metadata.height === undefined) {
     throw new Error("unsupported image");
   }
-  const thumbnailsBuffer = await sharp(param.buffer, { limitInputPixels: false })
+  const thumbnailsBuffer = await sharp(buffer, { limitInputPixels: false })
     .resize(BROWSER_THUMBNAIL_SIZE)
     .webp({ quality: BROWSER_THUMBNAIL_QUALITY })
     .toBuffer({ resolveWithObject: true });
@@ -62,6 +66,7 @@ async function generateImageMetaData(param: {
       extention: "webp",
     },
     original: {
+      transformedBuffer: transformed ? buffer : undefined,
       extention,
       mimeType,
     },
