@@ -6,6 +6,7 @@ export type GeneratedFileInfo = {
   original: {
     extention: string;
     mimeType: MimeType;
+    transformedBuffer?: Buffer;
   };
   thumbnail: {
     buffer: Buffer;
