@@ -1,8 +1,8 @@
-import { DOMParser as XMLDOMParser } from "@xmldom/xmldom";
+import { HTMLElement, parse } from "node-html-parser";
 
 export function getURLFromHTML(html: string) {
   try {
-    const dom = new XMLDOMParser().parseFromString(`<wrapper>${html}</wrapper>`, "text/html");
+    const dom = parse(html);
     const imgDom = dom.getElementsByTagName("img")[0];
     const aDom = dom.getElementsByTagName("a")[0];
     const videoDom = dom.getElementsByTagName("video")[0];
@@ -27,14 +27,12 @@ export function getURLFromHTML(html: string) {
   }
   return undefined;
 }
-function fromA(dom: HTMLAnchorElement) {
-  const attrs = Array.from(dom.attributes);
-  const href = getValueFromAttrs("href", attrs);
+function fromA(dom: HTMLElement) {
+  const href = dom.attributes["href"];
   return href;
 }
-function fromImg(dom: HTMLImageElement) {
-  const attrs = Array.from(dom.attributes);
-  const max = getValueFromAttrs("srcset", attrs)
+function fromImg(dom: HTMLElement) {
+  const max = dom.attributes["srcset"]
     ?.split(",")
     .map((src) => {
       return src
@@ -59,18 +57,13 @@ function fromImg(dom: HTMLImageElement) {
       },
       { size: 0, src: undefined as string | undefined },
     );
-  const src = getValueFromAttrs("src", attrs);
+  const src = dom.attributes["src"];
   if (src === undefined && max?.src === undefined) {
     return undefined;
   }
   return [...(max?.src ? [max.src] : []), ...(src ? [src] : [])];
 }
-function fromVideo(dom: HTMLVideoElement) {
-  const attrs = Array.from(dom.attributes);
-  const src = getValueFromAttrs("src", attrs);
+function fromVideo(dom: HTMLElement) {
+  const src = dom.attributes["src"];
   return src;
-}
-
-function getValueFromAttrs(name: string, attrs: Attr[]) {
-  return attrs.find((attr) => attr.name.toLowerCase() === name)?.value.trim();
 }
