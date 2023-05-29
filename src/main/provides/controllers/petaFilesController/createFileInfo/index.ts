@@ -1,4 +1,4 @@
-import dataUriToBuffer from "data-uri-to-buffer";
+import { dataUriToBuffer } from "data-uri-to-buffer";
 import { writeFile } from "fs/promises";
 import Path from "path";
 import { v4 as uuid } from "uuid";
