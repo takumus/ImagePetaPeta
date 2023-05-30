@@ -6,10 +6,10 @@ import { fileSHA256 } from "@/main/utils/fileSHA256";
 describe("fileSHA256", () => {
   test("images", async () => {
     expect(await fileSHA256(resolve("./test/sampleDatas/bee.jpg"))).toBe(
-      "da9c463318e720334478f9564c900e6d0432f599ee48d5279a26ac5b21ef81ea",
+      "0416c7be28fb055fb2f973e225c0aa99e40a87c2ddcbcb21659dd5574541b1c1",
     );
     expect(await fileSHA256(resolve("./test/sampleDatas/bird.png"))).toBe(
-      "ab9c465faf5c4a6b1f88983938e8e7fcb3c34e91f7293e8a92aece4571630a55",
+      "9db358469d3cd82c32d37951d1e4a0768bfb9d2663a4b187f360e2a3ecf00e13",
     );
   });
 });
