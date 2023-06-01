@@ -1,5 +1,5 @@
 import * as convert from "color-convert";
-import colorDiff from "color-diff";
+import * as colorDiff from "color-diff";
 
 function _ciede(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number {
   return colorDiff.diff(getLab(r1, g1, b1), getLab(r2, g2, b2));
