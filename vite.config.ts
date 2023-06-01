@@ -42,6 +42,7 @@ export default defineConfig(async ({ command }) => {
             ),
           ],
         },
+        sourcemap,
       },
       resolve: {
         alias: viteAlias,
@@ -51,20 +52,13 @@ export default defineConfig(async ({ command }) => {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
   console.log("WorkerThreadsFiles:", wtFiles);
   const electronConfig: ElectronConfig[] = [
+    // worker_threads
     ...wtFiles.map((file) => ({
-      // worker_threads
       ...electronBaseConfig,
       entry: file,
-      vite: {
-        ...electronBaseConfig.vite,
-        build: {
-          ...electronBaseConfig.vite?.build,
-          sourcemap,
-        },
-      },
     })),
+    // main
     {
-      // main
       ...electronBaseConfig,
       entry: resolve("./src/main/index.ts"),
       onstart(options) {
@@ -77,14 +71,10 @@ export default defineConfig(async ({ command }) => {
       vite: {
         ...electronBaseConfig.vite,
         plugins: [workerThreads(), ...(electronBaseConfig.vite?.plugins ?? [])],
-        build: {
-          ...electronBaseConfig.vite?.build,
-          sourcemap,
-        },
       },
     },
+    // preload
     {
-      // preload
       ...electronBaseConfig,
       entry: resolve("./src/main/preload.ts"),
       onstart(options) {
@@ -112,7 +102,6 @@ export default defineConfig(async ({ command }) => {
     },
     plugins: [
       webWorker(),
-      // tsconfigPaths({ loose: true }),
       electronWindows({
         htmlDir: "./src/renderer/htmls",
         entryTSDirFromHTMLDir: "../windows",
