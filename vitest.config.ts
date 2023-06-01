@@ -15,6 +15,7 @@ export default defineConfig(async ({ command }) => {
   const electronBaseConfig: ElectronConfig = {
     vite: {
       build: {
+        minify: false,
         outDir: resolve("./_test/_wt"),
         rollupOptions: {
           external: Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
