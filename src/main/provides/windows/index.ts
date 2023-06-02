@@ -61,7 +61,7 @@ export class Windows {
       this.openWindow("board");
     }
   }
-  openWindow(windowName: WindowName, event?: IpcMainInvokeEvent) {
+  openWindow(windowName: WindowName, event?: IpcMainInvokeEvent, modal = false) {
     const logger = useLogger();
     logger.logMainChunk().log("$Open Window:", windowName);
     const position = new Vec2();
@@ -84,6 +84,8 @@ export class Windows {
         ...getWindowCustomOptions(windowName),
         x: position.x,
         y: position.y,
+        modal,
+        parent: event && modal ? this.getWindowByEvent(event)?.window : undefined,
       });
       this.windows[windowName]?.center();
     } else {
