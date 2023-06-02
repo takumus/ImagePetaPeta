@@ -26,4 +26,5 @@ export interface IpcEvents {
   dataInitialized: () => void;
   initializationProgress: (log: string) => void;
   gotoPetaFile: (petaFile: PetaFile) => void;
+  updateModalDatas: () => void;
 }

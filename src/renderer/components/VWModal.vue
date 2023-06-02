@@ -2,13 +2,14 @@
   <e-root>
     <e-content>
       <e-top>
-        <VTitleBar :title="'modal'"> </VTitleBar>
+        <VTitleBar :title="'modal'" :hide-controls="true"> </VTitleBar>
       </e-top>
-      <e-browser>
-        <e-body>MODAL</e-body>
+      <e-browser v-if="modalData">
+        <e-body>{{ modalData.label }}</e-body>
         <e-buttons>
-          <button @click="OK">OK</button>
-          <button @click="CANCEL">CANCEL</button>
+          <button v-for="(item, index) in modalData.items" @click="select(index)">
+            {{ item }}
+          </button>
         </e-buttons>
       </e-browser>
     </e-content>
@@ -18,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
@@ -35,11 +36,21 @@ const { t } = useI18n();
 const appInfoStore = useAppInfoStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
-function OK() {
-  //
-}
-function CANCEL() {
-  //
+const modalDatas = ref<{ id: string; label: string; items: string[] }[]>([]);
+onMounted(async () => {
+  modalDatas.value = await IPC.send("getModalDatas");
+  IPC.on("updateModalDatas", async () => {
+    modalDatas.value = await IPC.send("getModalDatas");
+  });
+});
+const modalData = computed(() => {
+  return modalDatas.value[0];
+});
+async function select(index: number) {
+  if (modalData.value === undefined) {
+    return;
+  }
+  await IPC.send("selectModal", modalData.value.id, index);
 }
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,

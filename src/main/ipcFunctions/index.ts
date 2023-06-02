@@ -1,6 +1,7 @@
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 import { readFile } from "fs/promises";
 import * as Path from "path";
+import { v4 as uuid } from "uuid";
 
 import { AppInfo } from "@/commons/datas/appInfo";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
@@ -45,6 +46,12 @@ import { getLatestVersion } from "@/main/utils/versions";
 
 let temporaryShowNSFW = false;
 let detailsPetaFile: PetaFile | undefined;
+let modalDatas: {
+  id: string;
+  label: string;
+  items: string[];
+  select: (index: number) => void;
+}[] = [];
 export const ipcFunctions: IpcFunctionsType = {
   async browseAndImportFiles(event, type) {
     const logger = useLogger();
@@ -802,12 +809,61 @@ export const ipcFunctions: IpcFunctionsType = {
       ).toString(),
     );
   },
-  async openModal(event) {
+  async openModal(event, label, items) {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
     log.log("#OpenModal");
-    windows.openWindow("modal", event, true);
+    return await new Promise<number>((res) => {
+      const id = uuid();
+      let selected = false;
+      const modalData = {
+        id,
+        label,
+        items,
+        select(index: number) {
+          if (selected) {
+            return;
+          }
+          selected = true;
+          log.log("return:", index);
+          modalDatas = modalDatas.filter((modalData) => modalData.id !== id);
+          windows.emitMainEvent(
+            { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
+            "updateModalDatas",
+          );
+          if (modalDatas.length === 0) {
+            if (windows.windows.modal !== undefined && !windows.windows.modal.isDestroyed()) {
+              windows.windows.modal?.close();
+            }
+          }
+          res(index);
+        },
+      };
+      modalDatas.push(modalData);
+      windows.emitMainEvent(
+        { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
+        "updateModalDatas",
+      );
+      windows.openWindow("modal", event, true);
+      windows.windows.modal?.on("closed", () => {
+        modalData.select(-1);
+      });
+    });
+  },
+  async selectModal(_, id, index) {
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    log.log("#SelectModal");
+    log.log("return:", index);
+    modalDatas.find((modal) => modal.id === id)?.select(index);
+  },
+  async getModalDatas() {
+    return modalDatas.map((modalData) => ({
+      id: modalData.id,
+      items: modalData.items,
+      label: modalData.label,
+    }));
   },
 };
 export function registerIpcFunctions() {
