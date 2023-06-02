@@ -76,4 +76,5 @@ export interface IpcFunctions {
   eula: (agree: boolean) => Promise<void>;
   getLicenses: () => Promise<{ name: string; licenses: string; text: string }[]>;
   getSupporters: () => Promise<{ [key: string]: string[] }>;
+  openModal: (param: any) => Promise<any>;
 }

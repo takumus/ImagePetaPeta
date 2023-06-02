@@ -802,6 +802,13 @@ export const ipcFunctions: IpcFunctionsType = {
       ).toString(),
     );
   },
+  async openModal(event) {
+    const logger = useLogger();
+    const windows = useWindows();
+    const log = logger.logMainChunk();
+    log.log("#OpenModal");
+    windows.openWindow("modal", event, true);
+  },
 };
 export function registerIpcFunctions() {
   Object.keys(ipcFunctions).forEach((key) => {
