@@ -335,7 +335,12 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         label: t("browser.petaFileMenu.remove", [selectedPetaFiles.value.length]),
         click: async () => {
           if (
-            (await components.dialog.show(
+            // (await components.dialog.show(
+            //   t("browser.removeImageDialog", [selectedPetaFiles.value.length]),
+            //   [t("commons.yes"), t("commons.no")],
+            // )) === 0
+            (await IPC.send(
+              "openModal",
               t("browser.removeImageDialog", [selectedPetaFiles.value.length]),
               [t("commons.yes"), t("commons.no")],
             )) === 0
