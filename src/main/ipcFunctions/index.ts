@@ -825,12 +825,9 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getSPURLs() {
     const ips = getIPs();
-    const dev = process.env.VITE_DEV_SERVER_URL;
-    const port =
-      process.env.VITE_DEV_SERVER_URL?.split(":").pop()?.replace("/", "") ?? WEBHOOK_PORT;
     Object.keys(ips).forEach((key) => {
       ips[key] = ips[key].map((ip) => {
-        return `http://${ip}:${port}/${dev ? "" : "web/"}sp/`;
+        return `http://${ip}:${WEBHOOK_PORT}/web/`;
       });
     });
     return ips;

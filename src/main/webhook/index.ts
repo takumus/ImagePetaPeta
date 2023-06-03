@@ -25,14 +25,18 @@ export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin
     http.use(express.json({ limit: "100mb" }));
     http.use(cors());
     // http.use(IpFilter(WEBHOOK_WHITELIST_IP_LIST, { mode: "allow" }));
-    if (process.env.VITE_DEV_SERVER_URL) {
-    } else {
-      http.use("/web", express.static(resolve(__dirname, "../renderer")));
-    }
+    http.use(
+      "/web",
+      express.static(
+        process.env.NODE_ENV === "development"
+          ? resolve("./_electronTemp/dist/web")
+          : resolve(__dirname, "../web"),
+      ),
+    );
     http.post("/api", async (req, res) => {
       const executeLog = logger.logMainChunk();
       try {
-        executeLog.debug(`$Webhook: receive`, req.headers.origin, req.body);
+        executeLog.debug(`$Webhook: receive`, req.headers.origin);
         const eventName = req.body.event as EventNames;
         if (!allowedEvents.includes(eventName)) {
           res.status(400).json({ error: `invalid event: ${eventName}` });

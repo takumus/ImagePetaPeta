@@ -16,9 +16,19 @@
     "paths": {
       "@/*": [
         "src/*"
-      ],
-    },
+      ]
+    }
   },
-  "include": ["vite.config.ts", "vitest.config.ts", "vite.alias.ts", "package.json", "src", "vitePlugins", "scripts", "test"],
+  "include": [
+    "vite.app.config.ts",
+    "vite.app.web.config.ts",
+    "vitest.config.ts",
+    "vite.alias.ts",
+    "package.json",
+    "src",
+    "vitePlugins",
+    "scripts",
+    "test"
+  ],
   "references": []
 }

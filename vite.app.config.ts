@@ -14,7 +14,6 @@ import esmodule from "vite-plugin-esmodule";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(async ({ command }) => {
-  rmSync("_electronTemp/dist", { recursive: true, force: true });
   const isServe = command === "serve";
   const isBuild = command === "build";
   if (isBuild) {
@@ -94,12 +93,9 @@ export default defineConfig(async ({ command }) => {
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
     build: {
+      emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/renderer"),
-      rollupOptions: {
-        input: {
-          sp: resolve("./src/renderer/sp/index.html"),
-        },
-      },
+      rollupOptions: {},
       minify: isBuild,
     },
     resolve: {
