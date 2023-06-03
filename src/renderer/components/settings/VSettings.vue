@@ -15,9 +15,6 @@
       <e-content v-if="currentTab === 'general'">
         <VSettingsGeneral />
       </e-content>
-      <e-content v-if="currentTab === 'sp'">
-        <VSettingsSP />
-      </e-content>
       <e-content v-if="currentTab === 'control'">
         <VSettingsControl />
       </e-content>
@@ -50,22 +47,12 @@ import VSettingsDatas from "@/renderer/components/settings/VSettingsDatas.vue";
 import VSettingsGeneral from "@/renderer/components/settings/VSettingsGeneral.vue";
 import VSettingsInfo from "@/renderer/components/settings/VSettingsInfo.vue";
 import VSettingsOthers from "@/renderer/components/settings/VSettingsOthers.vue";
-import VSettingsSP from "@/renderer/components/settings/VSettingsSP.vue";
 import VSettingsUpdate from "@/renderer/components/settings/VSettingsUpdate.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
 
 const { t } = useI18n();
-const tabNames = [
-  "general",
-  "sp",
-  "control",
-  "browser",
-  "datas",
-  "others",
-  "update",
-  "info",
-] as const;
+const tabNames = ["general", "control", "browser", "datas", "others", "update", "info"] as const;
 const tabs = ref<(typeof tabNames)[number][]>([...tabNames]);
 const currentTab = ref<(typeof tabNames)[number]>("general");
 onMounted(async () => {
