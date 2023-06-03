@@ -103,6 +103,8 @@ export class Windows {
       frame: false,
       titleBarStyle: "hiddenInset",
       show: true,
+      fullscreenable: false,
+      fullscreen: false,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
