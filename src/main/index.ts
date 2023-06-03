@@ -48,7 +48,7 @@ import { initWebhook } from "@/main/webhook";
   ]);
   // Macでドックアイコン押した時。
   app.on("activate", async () => {
-    logger.logMainChunk().log("$Electron event: activate");
+    logger.logMainChunk().debug("$Electron event: activate");
     if (
       (windows.windows.board === undefined || windows.windows.board.isDestroyed()) &&
       (windows.windows.browser === undefined || windows.windows.browser.isDestroyed())
@@ -83,14 +83,14 @@ import { initWebhook } from "@/main/webhook";
   async function appReady() {
     logger
       .logMainChunk()
-      .log(
+      .debug(
         `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
       );
-    logger.logMainChunk().log(`verison: ${app.getVersion()}`);
+    logger.logMainChunk().debug(`verison: ${app.getVersion()}`);
     if (process.env.NODE_ENV === "development") {
       const log = logger.logMainChunk();
       try {
-        log.log("install vue devtools");
+        log.debug("install vue devtools");
         await require("electron-devtools-installer").default("nhdogjmejiglipccpnnnanhbledajbpd");
       } catch (error) {
         log.error(error);

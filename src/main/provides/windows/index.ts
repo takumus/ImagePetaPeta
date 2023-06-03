@@ -28,7 +28,7 @@ export class Windows {
   onCloseWindow(type: WindowName) {
     const logger = useLogger();
     const quit = useQuit();
-    logger.logMainChunk().log("$Close Window:", type);
+    logger.logMainChunk().debug("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
     const activeMainWindowName = keepAliveWindowNames.reduce<WindowName | undefined>(
@@ -63,7 +63,7 @@ export class Windows {
   }
   openWindow(windowName: WindowName, event?: IpcMainInvokeEvent, modal = false) {
     const logger = useLogger();
-    logger.logMainChunk().log("$Open Window:", windowName);
+    logger.logMainChunk().debug("$Open Window:", windowName);
     const position = new Vec2();
     try {
       const parentWindowBounds = event
@@ -122,7 +122,7 @@ export class Windows {
     });
     this.activeWindows[type] = true;
     const state = configWindowStates.data[type];
-    logger.log("$Create Window:", type);
+    logger.debug("$Create Window:", type);
     window.setMenuBarVisibility(false);
     if (state?.maximized) {
       window.maximize();
@@ -144,12 +144,12 @@ export class Windows {
     });
     if (process.env.VITE_DEV_SERVER_URL) {
       const url = process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html";
-      logger.log("url:", url);
+      logger.debug("url:", url);
       window.loadURL(url);
       window.webContents.openDevTools();
     } else {
       const path = Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html");
-      logger.log("path:", path);
+      logger.debug("path:", path);
       window.loadFile(path);
     }
     return window;
@@ -161,7 +161,7 @@ export class Windows {
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
     const logger = useLogger();
-    logger.logMainChunk().log("$Save Window States:", windowName);
+    logger.logMainChunk().debug("$Save Window States:", windowName);
     let state = configWindowStates.data[windowName];
     if (state === undefined) {
       state = configWindowStates.data[windowName] = {

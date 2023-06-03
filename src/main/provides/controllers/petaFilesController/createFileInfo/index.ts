@@ -15,7 +15,7 @@ export const createFileInfo = {
     const paths = usePaths();
     const log = logger.logMainChunk();
     try {
-      log.log("## Create File Info URL");
+      log.debug("## Create File Info URL");
       let data: Buffer;
       let remoteURL = "";
       if (url.trim().startsWith("data:")) {
@@ -43,7 +43,7 @@ export const createFileInfo = {
       if (!(await isSupportedFile(dist))) {
         throw new Error("unsupported file");
       }
-      log.log("return:", true);
+      log.debug("return:", true);
       return {
         path: dist,
         note: remoteURL,
@@ -52,7 +52,7 @@ export const createFileInfo = {
     } catch (error) {
       log.error(error);
     }
-    log.log("return:", false);
+    log.debug("return:", false);
     return undefined;
   },
   fromBuffer: async (buffer: ArrayBuffer | Buffer): Promise<ImportFileInfo | undefined> => {
@@ -60,13 +60,13 @@ export const createFileInfo = {
     const paths = usePaths();
     const log = logger.logMainChunk();
     try {
-      log.log("## Create File Info From ArrayBuffer");
+      log.debug("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
       await writeFile(dist, buffer instanceof Buffer ? buffer : Buffer.from(buffer));
       if (!(await isSupportedFile(dist))) {
         throw new Error("unsupported file");
       }
-      log.log("return:", true);
+      log.debug("return:", true);
       return {
         path: dist,
         note: "",
@@ -75,7 +75,7 @@ export const createFileInfo = {
     } catch (error) {
       log.error(error);
     }
-    log.log("return:", false);
+    log.debug("return:", false);
     return undefined;
   },
 } as const;

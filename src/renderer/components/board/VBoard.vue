@@ -130,7 +130,7 @@ onMounted(() => {
     .addEventListener("mousewheel", wheel as (e: Event) => void, { passive: true });
 });
 function construct() {
-  logChunk().log("construct PIXI");
+  logChunk().debug("construct PIXI");
   const pixiApp = vPixi.value?.app();
   if (pixiApp === undefined) {
     return;

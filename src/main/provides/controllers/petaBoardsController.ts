@@ -24,9 +24,9 @@ export class PetaBoardsController {
     const dbPetaBoards = useDBPetaBoards();
     const logger = useLogger();
     const log = logger.logMainChunk();
-    log.log("##Update PetaBoard");
-    log.log("mode:", mode);
-    log.log("board:", minimizeID(board.id));
+    log.debug("##Update PetaBoard");
+    log.debug("mode:", mode);
+    log.debug("board:", minimizeID(board.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaBoards.remove({ id: board.id });
     } else if (mode === UpdateMode.UPDATE) {

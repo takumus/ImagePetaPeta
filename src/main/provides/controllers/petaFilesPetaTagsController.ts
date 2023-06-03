@@ -160,9 +160,9 @@ export class PetaFilesPetaTagsController {
     const logger = useLogger();
     const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
     const log = logger.logMainChunk();
-    log.log("##Update PetaFilePetaTag");
-    log.log("mode:", mode);
-    log.log("tag:", minimizeID(petaFilePetaTag.id));
+    log.debug("##Update PetaFilePetaTag");
+    log.debug("mode:", mode);
+    log.debug("tag:", minimizeID(petaFilePetaTag.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaFilesPetaTags.remove({ id: petaFilePetaTag.id });
     } else if (mode === UpdateMode.UPDATE) {
