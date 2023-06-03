@@ -1,7 +1,6 @@
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 import { readFile } from "fs/promises";
 import * as Path from "path";
-import { v4 as uuid } from "uuid";
 
 import { AppInfo } from "@/commons/datas/appInfo";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
@@ -31,6 +30,7 @@ import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/peta
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
+import { useModals } from "@/main/provides/modals";
 import { useTasks } from "@/main/provides/tasks";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
@@ -46,12 +46,6 @@ import { getLatestVersion } from "@/main/utils/versions";
 
 let temporaryShowNSFW = false;
 let detailsPetaFile: PetaFile | undefined;
-let modalDatas: {
-  id: string;
-  label: string;
-  items: string[];
-  select: (index: number) => void;
-}[] = [];
 export const ipcFunctions: IpcFunctionsType = {
   async browseAndImportFiles(event, type) {
     const logger = useLogger();
@@ -811,59 +805,21 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async openModal(event, label, items) {
     const logger = useLogger();
-    const windows = useWindows();
     const log = logger.logMainChunk();
     log.log("#OpenModal");
-    return await new Promise<number>((res) => {
-      const id = uuid();
-      let selected = false;
-      const modalData = {
-        id,
-        label,
-        items,
-        select(index: number) {
-          if (selected) {
-            return;
-          }
-          selected = true;
-          log.log("return:", index);
-          modalDatas = modalDatas.filter((modalData) => modalData.id !== id);
-          windows.emitMainEvent(
-            { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
-            "updateModalDatas",
-          );
-          if (modalDatas.length === 0) {
-            if (windows.windows.modal !== undefined && !windows.windows.modal.isDestroyed()) {
-              windows.windows.modal?.close();
-            }
-          }
-          res(index);
-        },
-      };
-      modalDatas.push(modalData);
-      windows.emitMainEvent(
-        { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
-        "updateModalDatas",
-      );
-      windows.openWindow("modal", event, true);
-      windows.windows.modal?.on("closed", () => {
-        modalData.select(-1);
-      });
-    });
+    const index = await useModals().open(event, label, items);
+    log.log("return:", index);
+    return index;
   },
   async selectModal(_, id, index) {
     const logger = useLogger();
     const log = logger.logMainChunk();
     log.log("#SelectModal");
+    useModals().select(id, index);
     log.log("return:", index);
-    modalDatas.find((modal) => modal.id === id)?.select(index);
   },
   async getModalDatas() {
-    return modalDatas.map((modalData) => ({
-      id: modalData.id,
-      items: modalData.items,
-      label: modalData.label,
-    }));
+    return useModals().getOrders();
   },
 };
 export function registerIpcFunctions() {
