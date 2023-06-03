@@ -33,10 +33,11 @@ export default defineConfig(async ({ command }) => {
       entry: file,
     })),
   ];
+  console.log("CI:", process.env.CI);
   return {
     test: {
       dir: "test",
-      exclude: process.env.CI ? ["test/scenario/webhook.test.ts"] : [],
+      exclude: process.env.CI ? ["**/webhook.test.ts"] : [],
       testTimeout: 30 * 1000,
       threads: false,
       singleThread: true,
