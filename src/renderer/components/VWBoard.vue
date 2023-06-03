@@ -30,7 +30,6 @@
       <VImageImporter @add-panel-by-drag-and-drop="addPanelByDragAndDrop" />
       <VTasks />
     </e-modals>
-    <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
   </e-root>
 </template>
@@ -45,7 +44,6 @@ import VTabBar from "@/renderer/components/board/VTabBar.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 
@@ -165,7 +163,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
   statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {
     if (
-      (await components.dialog.show(t("boards.selectErrorBoardDialog", [board.name]), [
+      (await IPC.send("openModal", t("boards.selectErrorBoardDialog", [board.name]), [
         t("commons.yes"),
         t("commons.no"),
       ])) !== 0
@@ -179,7 +177,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
 }
 async function removePetaBoard(board: RPetaBoard) {
   if (
-    (await components.dialog.show(t("boards.removeDialog", [board.name]), [
+    (await IPC.send("openModal", t("boards.removeDialog", [board.name]), [
       t("commons.yes"),
       t("commons.no"),
     ])) !== 0

@@ -101,6 +101,7 @@ import {
   SortHelperConstraint,
   initSortHelper,
 } from "@/renderer/components/browser/tags/sortHelper";
+import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { usePetaTagPartitionsStore } from "@/renderer/stores/petaTagPartitionsStore/usePetaTagPartitionsStore";
@@ -249,7 +250,7 @@ async function addPartition(name: string, index: number) {
 }
 async function removeTag(petaTag: RPetaTag) {
   if (
-    (await components.dialog.show(t("browser.removeTagDialog", [petaTag.name]), [
+    (await IPC.send("openModal", t("browser.removeTagDialog", [petaTag.name]), [
       t("commons.yes"),
       t("commons.no"),
     ])) === 0
@@ -266,7 +267,7 @@ async function removeTag(petaTag: RPetaTag) {
 }
 async function removeTagPartition(petaTag: PetaTagPartition) {
   if (
-    (await components.dialog.show(t("browser.removeTagPartitionDialog", [petaTag.name]), [
+    (await IPC.send("openModal", t("browser.removeTagPartitionDialog", [petaTag.name]), [
       t("commons.yes"),
       t("commons.no"),
     ])) === 0
@@ -279,7 +280,7 @@ async function changeTag(petaTag: RPetaTag, newName: string) {
     return;
   }
   if (browserTags.value.find((c) => c.petaTag.name === newName)) {
-    components.dialog.show(t("browser.tagAlreadyExistsDialog", [newName]), [t("commons.yes")]);
+    await IPC.send("openModal", t("browser.tagAlreadyExistsDialog", [newName]), [t("commons.yes")]);
     return;
   }
   petaTag.name = newName;

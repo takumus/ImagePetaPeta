@@ -6,5 +6,6 @@ export const windowNames = [
   "eula",
   "capture",
   "quit",
+  "modal",
 ] as const;
 export type WindowName = (typeof windowNames)[number];

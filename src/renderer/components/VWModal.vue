@@ -2,10 +2,15 @@
   <e-root>
     <e-content>
       <e-top>
-        <VTitleBar :title="t('titles.settings')"> </VTitleBar>
+        <VTitleBar :title="''" :hide-controls="true"> </VTitleBar>
       </e-top>
-      <e-browser>
-        <VSettings />
+      <e-browser v-if="modalData">
+        <e-body>{{ modalData.label }}</e-body>
+        <e-buttons>
+          <button v-for="(item, index) in modalData.items" @click="select(index)">
+            {{ item }}
+          </button>
+        </e-buttons>
       </e-browser>
     </e-content>
     <VContextMenu :z-index="4" />
@@ -13,37 +18,34 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VSettings from "@/renderer/components/settings/VSettings.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
-import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
 const { t } = useI18n();
-const keyboards = useKeyboardsStore();
-const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
-const appInfoStore = useAppInfoStore();
-onMounted(() => {
-  keyboards.enabled = true;
-  keyboards.keys("Escape").up(() => {
-    IPC.send("windowClose");
+const modalDatas = ref<{ id: string; label: string; items: string[] }[]>([]);
+onMounted(async () => {
+  windowTitleStore.windowTitle.value = "";
+  modalDatas.value = await IPC.send("getModalDatas");
+  IPC.on("updateModalDatas", async () => {
+    modalDatas.value = await IPC.send("getModalDatas");
   });
 });
-watch(
-  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
-  (value) => {
-    windowTitleStore.windowTitle.value = value;
-  },
-  { immediate: true },
-);
+const modalData = computed(() => {
+  return modalDatas.value[0];
+});
+async function select(index: number) {
+  if (modalData.value === undefined) {
+    return;
+  }
+  await IPC.send("selectModal", modalData.value.id, index);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -65,19 +67,20 @@ e-root {
     }
     > e-browser {
       display: block;
-      overflow: hidden;
-      padding: var(--px-3);
+      overflow-y: auto;
+      margin: var(--px-3);
       background-color: var(--color-0);
       flex: 1;
       z-index: 1;
-    }
-    > e-modals {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0px;
-      left: 0px;
-      z-index: 3;
+      > e-body {
+        display: block;
+        white-space: pre-wrap;
+        user-select: text;
+      }
+      > e-buttons {
+        display: block;
+        text-align: center;
+      }
     }
   }
 }

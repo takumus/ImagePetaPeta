@@ -30,6 +30,7 @@ import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/peta
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
+import { useModals } from "@/main/provides/modals";
 import { useTasks } from "@/main/provides/tasks";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
@@ -801,6 +802,24 @@ export const ipcFunctions: IpcFunctionsType = {
         await readFile(resolveExtraFilesPath(extraFiles["supporters.universal"]["supporters.json"]))
       ).toString(),
     );
+  },
+  async openModal(event, label, items) {
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    log.log("#OpenModal");
+    const index = await useModals().open(event, label, items);
+    log.log("return:", index);
+    return index;
+  },
+  async selectModal(_, id, index) {
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    log.log("#SelectModal");
+    useModals().select(id, index);
+    log.log("return:", index);
+  },
+  async getModalDatas() {
+    return useModals().getOrders();
   },
 };
 export function registerIpcFunctions() {

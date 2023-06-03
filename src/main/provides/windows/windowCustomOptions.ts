@@ -1,6 +1,8 @@
 import {
   WINDOW_EULA_HEIGHT,
   WINDOW_EULA_WIDTH,
+  WINDOW_MODAL_HEIGHT,
+  WINDOW_MODAL_WIDTH,
   WINDOW_QUIT_HEIGHT,
   WINDOW_QUIT_WIDTH,
   WINDOW_SETTINGS_HEIGHT,
@@ -62,6 +64,17 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         resizable: false,
         alwaysOnTop: true,
         titleBarStyle: undefined,
+      };
+    case "modal":
+      return {
+        width: WINDOW_MODAL_WIDTH,
+        height: WINDOW_MODAL_HEIGHT,
+        minWidth: WINDOW_MODAL_WIDTH,
+        minHeight: WINDOW_MODAL_HEIGHT,
+        titleBarStyle: undefined,
+        minimizable: false,
+        maximizable: false,
+        resizable: false,
       };
   }
 }

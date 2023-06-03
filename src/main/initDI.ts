@@ -71,6 +71,7 @@ import {
   dbStatusKey,
   dbsKey,
 } from "@/main/provides/databases";
+import { Modals, modalsKey } from "@/main/provides/modals";
 import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
@@ -237,6 +238,7 @@ export function initDI(
       },
     });
     provide(tasksKey, tasks);
+    provide(modalsKey, new Modals());
   } catch (err) {
     // どこかで失敗したら強制終了
     console.log(err, app);
