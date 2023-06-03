@@ -165,6 +165,7 @@ export const ja: I18NBase = {
   },
   settings: {
     settings: "設定",
+    sp: "スマホインポート",
     general: "基本",
     control: "操作",
     browser: "ブラウザ",
@@ -219,8 +220,11 @@ export const ja: I18NBase = {
     gamutMapSampling: "ガマットマップのサンプリング数",
     gamutMapSamplingDescriptions:
       "ガマットマップを作る際に読み込むピクセルの量です。最大は65536です。多くすればするほど重くなります。",
-    developerModeDescriptions:
-      "開発者モードを有効にすると51915ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。",
+    developerModeDescriptions: (ctx) => {
+      return `開発者モードを有効にすると${ctx.list(
+        0,
+      )}ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。`;
+    },
     changePetaFileDirectoryDialog: (ctx) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;
     },

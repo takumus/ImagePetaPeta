@@ -14,7 +14,6 @@ import esmodule from "vite-plugin-esmodule";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(async ({ command }) => {
-  rmSync("_electronTemp/dist", { recursive: true, force: true });
   const isServe = command === "serve";
   const isBuild = command === "build";
   if (isBuild) {
@@ -90,9 +89,11 @@ export default defineConfig(async ({ command }) => {
     },
   ];
   return {
+    base: "./",
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
     build: {
+      emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/renderer"),
       rollupOptions: {},
       minify: isBuild,
@@ -119,15 +120,9 @@ export default defineConfig(async ({ command }) => {
       }),
       electron(electronConfig),
     ],
-    server:
-      process.env.VSCODE_DEBUG &&
-      (() => {
-        const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL);
-        return {
-          host: url.hostname,
-          port: +url.port,
-        };
-      })(),
+    server: {
+      host: true,
+    },
     clearScreen: false,
   };
 });
