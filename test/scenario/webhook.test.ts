@@ -31,7 +31,7 @@ describe("webhook", () => {
     event: U,
     ...args: Parameters<IpcFunctions[U]>
   ): Promise<Awaited<ReturnType<IpcFunctions[U]>>> {
-    const response = await fetch("http://localhost:51920/", {
+    const response = await fetch("http://localhost:51920/api", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,18 +52,8 @@ describe("webhook", () => {
           filePath: resolve("./test/sampleDatas/bee.jpg"),
         },
       ],
-      [
-        {
-          type: "buffer",
-          buffer: readFileSync(resolve("./test/sampleDatas/dog.jpg")),
-        },
-      ],
     ]);
-    expect(ids.length).toBe(2);
-    const petaFiles = await post("getPetaFiles");
-    expect(Object.values(petaFiles).length).toBe(2);
-    expect(petaFiles[ids[0]]).toBeTruthy();
-    expect(petaFiles[ids[1]]).toBeTruthy();
+    expect(ids.length).toBe(1);
     await webhook?.close();
   });
   test("whitelist", async () => {

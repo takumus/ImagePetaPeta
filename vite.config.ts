@@ -90,11 +90,16 @@ export default defineConfig(async ({ command }) => {
     },
   ];
   return {
+    base: "./",
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
     build: {
       outDir: resolve("./_electronTemp/dist/renderer"),
-      rollupOptions: {},
+      rollupOptions: {
+        input: {
+          sp: resolve("./src/renderer/sp/index.html"),
+        },
+      },
       minify: isBuild,
     },
     resolve: {
@@ -119,15 +124,9 @@ export default defineConfig(async ({ command }) => {
       }),
       electron(electronConfig),
     ],
-    server:
-      process.env.VSCODE_DEBUG &&
-      (() => {
-        const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL);
-        return {
-          host: url.hostname,
-          port: +url.port,
-        };
-      })(),
+    server: {
+      host: true,
+    },
     clearScreen: false,
   };
 });
