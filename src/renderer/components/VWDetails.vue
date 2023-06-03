@@ -17,7 +17,6 @@
     <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
     </e-modals>
-    <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
   </e-root>
 </template>
@@ -30,7 +29,6 @@ import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VDetails from "@/renderer/components/details/VDetails.vue";
 

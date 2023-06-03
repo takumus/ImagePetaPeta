@@ -67,7 +67,7 @@ function importImageDirectories() {
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {
     if (
-      (await components.dialog.show(t("utilsBar.nsfwConfirm"), [
+      (await IPC.send("openModal", t("utilsBar.nsfwConfirm"), [
         t("commons.yes"),
         t("commons.no"),
       ])) === 0

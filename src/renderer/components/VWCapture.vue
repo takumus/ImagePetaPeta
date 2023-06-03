@@ -9,7 +9,6 @@
         <VCapture :z-index="1" />
       </e-browser>
     </e-content>
-    <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
   </e-root>
 </template>
@@ -22,7 +21,6 @@ import VCapture from "@/renderer/components/capture/VCapture.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";

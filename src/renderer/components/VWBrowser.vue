@@ -13,7 +13,6 @@
       <VImageImporter />
       <VTasks />
     </e-modals>
-    <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
   </e-root>
 </template>
@@ -26,7 +25,6 @@ import VBrowser from "@/renderer/components/browser/VBrowser.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 

@@ -8,7 +8,6 @@
         <VSettings />
       </e-browser>
     </e-content>
-    <VDialog :z-index="6"></VDialog>
     <VContextMenu :z-index="4" />
   </e-root>
 </template>
@@ -19,7 +18,6 @@ import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VDialog from "@/renderer/components/commons/utils/dialog/VDialog.vue";
 import VSettings from "@/renderer/components/settings/VSettings.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
