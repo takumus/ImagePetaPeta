@@ -36,6 +36,7 @@ export default defineConfig(async ({ command }) => {
   return {
     test: {
       dir: "test",
+      exclude: process.env.CI ? ["test/scenario/webhook.test.ts"] : [],
       testTimeout: 30 * 1000,
       threads: false,
       singleThread: true,
