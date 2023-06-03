@@ -2,13 +2,13 @@
   <e-root>
     <e-title>{{ t("web.title") }}</e-title>
     <input ref="fileInput" type="file" accept="image/*" @change="load" />
-    <img :src="connected ? dataURL ?? Icon : Icon" />
+    <img :src="connected ? selectedData?.dataURL ?? Icon : Icon" />
     <e-input v-if="connected">
       <e-status>
         {{ status === "ready" ? "" : t(`web.status.${status}`) }}
       </e-status>
       <button @click="select">{{ t("web.selectButton") }}</button>
-      <button @click="upload" v-if="dataURL">{{ t("web.uploadButton") }}</button>
+      <button @click="upload" v-if="selectedData">{{ t("web.uploadButton") }}</button>
     </e-input>
     <e-input v-else>
       <e-status>{{ t("web.noConnections") }} </e-status>
@@ -27,7 +27,7 @@ import Icon from "@/_public/images/app/icon.png";
 
 const { t } = useI18n();
 const fileInput = ref<HTMLInputElement>();
-const dataURL = ref<string | undefined>();
+const selectedData = ref<{ dataURL: string; filename: string } | undefined>();
 const uploading = ref(false);
 const status = ref<"successful" | "progress" | "failed" | "ready">("ready");
 const connected = ref(true);
@@ -56,9 +56,9 @@ async function load() {
   if (file === undefined) {
     return;
   }
-  dataURL.value = undefined;
+  selectedData.value = undefined;
   try {
-    dataURL.value = await new Promise<string>((res, rej) => {
+    const dataURL = await new Promise<string>((res, rej) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         res(reader.result as string);
@@ -68,12 +68,16 @@ async function load() {
       };
       reader.readAsDataURL(file);
     });
+    selectedData.value = {
+      dataURL,
+      filename: file.name,
+    };
   } catch {
     //
   }
 }
 async function upload() {
-  if (dataURL.value === undefined) {
+  if (selectedData.value === undefined) {
     return;
   }
   status.value = "progress";
@@ -83,9 +87,10 @@ async function upload() {
       [
         {
           type: "url",
-          url: dataURL.value,
+          url: selectedData.value.dataURL,
           additionalData: {
-            note: "from sp",
+            name: selectedData.value.filename,
+            note: t("web.title"),
           },
         },
       ],
