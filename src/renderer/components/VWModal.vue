@@ -2,7 +2,7 @@
   <e-root>
     <e-content>
       <e-top>
-        <VTitleBar :title="'modal'" :hide-controls="true"> </VTitleBar>
+        <VTitleBar :title="''" :hide-controls="true"> </VTitleBar>
       </e-top>
       <e-browser v-if="modalData">
         <e-body>{{ modalData.label }}</e-body>
