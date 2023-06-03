@@ -319,4 +319,15 @@ export const ja: I18NBase = {
   quit: {
     quitting: "終了しています。",
   },
+  web: {
+    title: "ImagePetaPeta-beta ウェブツール",
+    selectButton: "ファイルを選ぶ・写真を撮る",
+    uploadButton: "アプリへ送信",
+    noConnections: "アプリと接続できません。",
+    status: {
+      successful: "送信完了",
+      failed: "送信失敗",
+      progress: "送信中...",
+    },
+  },
 };

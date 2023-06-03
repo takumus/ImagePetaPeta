@@ -219,4 +219,15 @@ export interface I18NBase extends I18N {
   quit: {
     quitting: I18NProp;
   };
+  web: {
+    title: I18NProp;
+    selectButton: I18NProp;
+    uploadButton: I18NProp;
+    noConnections: I18NProp;
+    status: {
+      successful: I18NProp;
+      failed: I18NProp;
+      progress: I18NProp;
+    };
+  };
 }
