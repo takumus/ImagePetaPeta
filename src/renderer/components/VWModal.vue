@@ -18,24 +18,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
-import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
-import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
 const { t } = useI18n();
-const appInfoStore = useAppInfoStore();
-const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const modalDatas = ref<{ id: string; label: string; items: string[] }[]>([]);
 onMounted(async () => {
+  windowTitleStore.windowTitle.value = "";
   modalDatas.value = await IPC.send("getModalDatas");
   IPC.on("updateModalDatas", async () => {
     modalDatas.value = await IPC.send("getModalDatas");
@@ -50,13 +46,6 @@ async function select(index: number) {
   }
   await IPC.send("selectModal", modalData.value.id, index);
 }
-watch(
-  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
-  (value) => {
-    windowTitleStore.windowTitle.value = value;
-  },
-  { immediate: true },
-);
 </script>
 
 <style lang="scss" scoped>
