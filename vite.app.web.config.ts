@@ -6,9 +6,6 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(async ({ command }) => {
-  const isServe = command === "serve";
-  const isBuild = command === "build";
-  const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
   return {
     base: "./",
     root: resolve("./src/web"),
@@ -20,7 +17,7 @@ export default defineConfig(async ({ command }) => {
           sp: resolve("./src/web/index.html"),
         },
       },
-      minify: isBuild,
+      minify: true,
     },
     resolve: {
       alias: viteAlias,
