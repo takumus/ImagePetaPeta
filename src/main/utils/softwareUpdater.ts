@@ -13,15 +13,15 @@ export async function checkAndNotifySoftwareUpdate() {
     clearTimeout(checkUpdateTimeoutHandler);
   }
   const log = logger.logMainChunk();
-  log.log("$Check Update");
+  log.debug("$Check Update");
   const remote: RemoteBinaryInfo = await getLatestVersion();
-  log.log(remote);
+  log.debug(remote);
   if (!remote.isLatest) {
-    log.log("this version is old");
+    log.debug("this version is old");
     windows.openWindow("settings");
     windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "foundLatestVersion", remote);
   } else {
-    log.log("this version is latest");
+    log.debug("this version is latest");
   }
   checkUpdateTimeoutHandler = setTimeout(checkAndNotifySoftwareUpdate, UPDATE_CHECK_INTERVAL);
 }

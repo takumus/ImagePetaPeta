@@ -55,9 +55,9 @@ export class PetaTagPartitionsController {
     const logger = useLogger();
     const dbPetaTagPartitions = useDBPetaTagPartitions();
     const log = logger.logMainChunk();
-    log.log("##Update PetaTagPartition");
-    log.log("mode:", mode);
-    log.log("tag:", minimizeID(petaPetaTagPartition.id));
+    log.debug("##Update PetaTagPartition");
+    log.debug("mode:", mode);
+    log.debug("tag:", minimizeID(petaPetaTagPartition.id));
     if (mode === UpdateMode.REMOVE) {
       await dbPetaTagPartitions.remove({ id: petaPetaTagPartition.id });
     } else if (mode === UpdateMode.UPDATE) {

@@ -47,7 +47,7 @@ export function initBoardLoader(
       deletions: string[];
     };
   }): Promise<void> {
-    const log = logChunk().log;
+    const log = logChunk().debug;
     // endCrop();
     // リロードじゃないならクリア。
     if (params.reload === undefined) {

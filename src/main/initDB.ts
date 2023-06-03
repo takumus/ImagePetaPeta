@@ -33,7 +33,7 @@ export async function initDB() {
   ] as const;
   function emitInitialization(log: string) {
     windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
-    logger.logMainChunk().log("$Init DB:", log);
+    logger.logMainChunk().debug("$Init DB:", log);
   }
   try {
     // ロード
@@ -70,7 +70,7 @@ export async function initDB() {
     // 旧バージョンからのマイグレーション
     await migrate((log: string) => {
       emitInitialization(`migrate: ${log}`);
-      logger.logMainChunk().log(log);
+      logger.logMainChunk().debug(log);
     });
     // バージョンアップ時、バージョン情報更新
     if (configDBInfo.data.version !== app.getVersion()) {
@@ -89,10 +89,10 @@ export async function initDB() {
   // 自動圧縮登録
   dbs.forEach((db) => {
     db.on("beginCompaction", () => {
-      logger.logMainChunk().log(`begin compaction(${db.name})`);
+      logger.logMainChunk().debug(`begin compaction(${db.name})`);
     });
     db.on("doneCompaction", () => {
-      logger.logMainChunk().log(`done compaction(${db.name})`);
+      logger.logMainChunk().debug(`done compaction(${db.name})`);
     });
     db.on("compactionError", (error) => {
       logger.logMainChunk().error(`compaction error(${db.name})`, error);

@@ -27,7 +27,7 @@ export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin
   const logger = useLogger();
   const initLog = logger.logMainChunk();
   try {
-    initLog.log(`$Webhook: init`);
+    initLog.debug(`$Webhook: init`);
     const http = express();
     http.use(express.json({ limit: "100mb" }));
     http.use(cors());
@@ -43,23 +43,23 @@ export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin
       }
       const executeLog = logger.logMainChunk();
       try {
-        executeLog.log(`$Webhook: receive`, req.headers.origin, req.body);
+        executeLog.debug(`$Webhook: receive`, req.headers.origin, req.body);
         const eventName = req.body.event as EventNames;
         if (!allowedEvents.includes(eventName)) {
           res.status(400).json({ error: `invalid event: ${eventName}` });
-          executeLog.log(`$Webhook: invalid event`, eventName);
+          executeLog.debug(`$Webhook: invalid event`, eventName);
           return;
         }
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const event = ipcFunctions[eventName] as any;
         if (event) {
-          executeLog.log(`$Webhook: execute`, eventName);
+          executeLog.debug(`$Webhook: execute`, eventName);
           res.json(await event(undefined, ...(req.body.args ?? [])));
-          executeLog.log(`$Webhook: done`, eventName);
+          executeLog.debug(`$Webhook: done`, eventName);
           return;
         }
         res.status(400).json({ error: `invalid event: ${eventName}` });
-        executeLog.log(`$Webhook: invalid event`, eventName);
+        executeLog.debug(`$Webhook: invalid event`, eventName);
       } catch (error) {
         res.status(500).json({ error: `event error: ${JSON.stringify(error)}` });
         executeLog.error(`$Webhook: event error`, error);
@@ -67,7 +67,7 @@ export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin
     });
     const server = await new Promise<Server>((res) => {
       const s = http.listen(WEBHOOK_PORT, () => {
-        initLog.log(`$Webhook: opened`, WEBHOOK_PORT);
+        initLog.debug(`$Webhook: opened`, WEBHOOK_PORT);
         res(s);
       });
     });

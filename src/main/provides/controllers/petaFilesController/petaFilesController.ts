@@ -102,9 +102,9 @@ export class PetaFilesController {
     const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const logger = useLogger();
     const log = logger.logMainChunk();
-    log.log("##Update PetaFile");
-    log.log("mode:", mode);
-    log.log("image:", minimizeID(petaFile.id));
+    log.debug("##Update PetaFile");
+    log.debug("mode:", mode);
+    log.debug("image:", minimizeID(petaFile.id));
     if (mode === UpdateMode.REMOVE) {
       await petaFilesPetaTagsController.remove(petaFile.id, "petaFileId");
       await dbPetaFiles.remove({ id: petaFile.id });
@@ -138,10 +138,10 @@ export class PetaFilesController {
       "importFilesFromFilePaths",
       async (handler) => {
         const log = logger.logMainChunk();
-        log.log("## Import Images From File Paths");
+        log.debug("## Import Images From File Paths");
         const fileInfos: ImportFileInfo[] = [];
         if (params.extract) {
-          log.log("###List Files", params.fileInfos.length);
+          log.debug("###List Files", params.fileInfos.length);
           handler.emitStatus({
             i18nKey: "tasks.listingFiles",
             status: TaskStatusCode.BEGIN,
@@ -171,7 +171,7 @@ export class PetaFilesController {
             });
             return [];
           }
-          log.log("complete", fileInfos.length);
+          log.debug("complete", fileInfos.length);
         } else {
           fileInfos.push(...params.fileInfos);
         }
@@ -180,7 +180,7 @@ export class PetaFilesController {
         let error = false;
         const petaFiles: PetaFile[] = [];
         const importImage = async (fileInfo: ImportFileInfo, index: number) => {
-          log.log("import:", index + 1, "/", fileInfos.length);
+          log.debug("import:", index + 1, "/", fileInfos.length);
           let result = ImportImageResult.SUCCESS;
           let errorReason = "";
           try {
@@ -215,7 +215,7 @@ export class PetaFilesController {
               addedFileCount++;
               petaFiles.push(petaFile);
             }
-            log.log("imported", result);
+            log.debug("imported", result);
           } catch (err) {
             log.error(err);
             errorReason = String(err);
@@ -241,7 +241,7 @@ export class PetaFilesController {
         } catch (err) {
           //
         }
-        log.log("return:", addedFileCount, "/", fileInfos.length);
+        log.debug("return:", addedFileCount, "/", fileInfos.length);
         handler.emitStatus({
           i18nKey: "tasks.importingFiles",
           log: [addedFileCount.toString(), fileInfos.length.toString()],
@@ -272,7 +272,7 @@ export class PetaFilesController {
         return;
       }
       await this.update(newPetaFile, UpdateMode.UPDATE);
-      log.log(`thumbnail (${++completed} / ${petaFiles.length})`);
+      log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
       windows.emitMainEvent(
         { type: EmitMainEventTargetType.ALL },
         "regenerateMetadatasProgress",

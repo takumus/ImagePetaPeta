@@ -3,6 +3,8 @@ import { WriteStream, createWriteStream } from "fs";
 import * as Path from "path";
 import { v4 as uuid } from "uuid";
 
+import { LogChunk } from "@/commons/datas/logChunk";
+
 import { createKey, createUseFunction } from "@/main/libs/di";
 
 export class Logger {
@@ -62,15 +64,18 @@ export class Logger {
   logRendererChunk(label?: string) {
     return this.logChunk(LogFrom.RENDERER, label);
   }
-  logChunk(logFrom: LogFrom, label?: string) {
+  logChunk(logFrom: LogFrom, label?: string): LogChunk {
     const uid = uuid().substring(0, 4);
     const id = label ? `${label}(${uid})` : uid;
     return {
-      log: (...args: unknown[]) => {
+      debug: (...args: unknown[]) => {
         this.log(logFrom, id, ...args);
       },
       error: (...args: unknown[]) => {
         this.log(logFrom, id, "Error:", ...args);
+      },
+      warn: (...args: unknown[]) => {
+        this.log(logFrom, id, "Warn:", ...args);
       },
       uid,
     };

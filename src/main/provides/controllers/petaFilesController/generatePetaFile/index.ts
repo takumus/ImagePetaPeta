@@ -20,7 +20,7 @@ export async function generatePetaFile(param: {
   type: "update" | "add";
 }): Promise<PetaFile> {
   const logger = useLogger().logMainChunk();
-  logger.log("#Generate PetaFile");
+  logger.debug("#Generate PetaFile");
   const fileInfo = await generateMetadata(param.path);
   if (fileInfo === undefined) {
     throw new Error("unsupported file");
@@ -61,7 +61,7 @@ export async function generatePetaFile(param: {
 export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {
   const fileType = await fileTypeFromFile(path);
   const logger = useLogger().logMainChunk();
-  logger.log("#Generate Metadata", fileType?.mime);
+  logger.debug("#Generate Metadata", fileType?.mime);
   if (fileType !== undefined) {
     if (supportedFileConditions.image(fileType)) {
       return generateImageMetadataByWorker({
