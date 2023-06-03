@@ -1,0 +1,117 @@
+<template>
+  <e-root>
+    <e-content>
+      <e-top>
+        <VTitleBar :title="t('titles.webAccess')"> </VTitleBar>
+      </e-top>
+      <e-browser>
+        <e-accesses>
+          <e-access v-for="urlAndQR in urlAndQRs">
+            <img :src="urlAndQR.image" />
+            <e-url class="url" @click="IPC.send('openURL', urlAndQR.url)">
+              {{ urlAndQR.url }}
+            </e-url>
+          </e-access>
+        </e-accesses>
+      </e-browser>
+    </e-content>
+    <VContextMenu :z-index="4" />
+  </e-root>
+</template>
+
+<script setup lang="ts">
+import * as QR from "qrcode";
+import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
+import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
+
+import { ppa } from "@/commons/utils/pp";
+
+import { IPC } from "@/renderer/libs/ipc";
+import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
+import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
+
+const windowTitleStore = useWindowTitleStore();
+const windowNameStore = useWindowNameStore();
+const appInfoStore = useAppInfoStore();
+const { t } = useI18n();
+const urlAndQRs = ref<{ url: string; image: string }[]>([]);
+onMounted(async () => {
+  await ppa(async (urls) => {
+    urlAndQRs.value.push(
+      ...(await ppa(async (url) => {
+        const image = await QR.toDataURL(url);
+        return {
+          url,
+          image,
+        };
+      }, urls).promise),
+    );
+  }, Object.values(await IPC.send("getSPURLs"))).promise;
+  urlAndQRs.value.push(urlAndQRs.value[0]);
+  urlAndQRs.value.push(urlAndQRs.value[0]);
+});
+watch(
+  () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
+  (value) => {
+    windowTitleStore.windowTitle.value = value;
+  },
+  { immediate: true },
+);
+</script>
+
+<style lang="scss" scoped>
+e-root {
+  background-color: var(--color-0);
+  color: var(--color-font);
+  > e-content {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    > e-top {
+      display: block;
+      width: 100%;
+      z-index: 2;
+    }
+    > e-browser {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+      padding: var(--px-2);
+      > e-accesses {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        flex-direction: column;
+        overflow-y: auto;
+        gap: var(--px-3);
+        > e-access {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background-color: var(--color-0);
+          z-index: 1;
+          flex-grow: 0;
+          gap: var(--px-2);
+          > e-url {
+            display: block;
+            cursor: pointer;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
+<style lang="scss">
+@import "@/renderer/styles/index.scss";
+</style>

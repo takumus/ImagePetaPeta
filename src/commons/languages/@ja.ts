@@ -10,6 +10,7 @@ export const ja: I18NBase = {
     capture: "キャプチャ",
     eula: "はじめにお読みください",
     quit: "終了中",
+    webAccess: "Webアクセス",
   },
   playbackController: {
     play: "再生",
