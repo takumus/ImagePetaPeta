@@ -12,6 +12,7 @@ import {
   CHROME_EXTENSION_VERSION,
   EULA,
   FILENAME_DB_INFO,
+  WEBHOOK_PORT,
 } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
@@ -37,6 +38,7 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
+import { getIPs } from "@/main/utils/getIPs";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { realESRGAN } from "@/main/utils/realESRGAN";
@@ -820,6 +822,18 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getModalDatas() {
     return useModals().getOrders();
+  },
+  async getSPURLs() {
+    const ips = getIPs();
+    const dev = process.env.VITE_DEV_SERVER_URL;
+    const port =
+      process.env.VITE_DEV_SERVER_URL?.split(":").pop()?.replace("/", "") ?? WEBHOOK_PORT;
+    Object.keys(ips).forEach((key) => {
+      ips[key] = ips[key].map((ip) => {
+        return `http://${ip}:${port}/${dev ? "" : "web/"}sp/`;
+      });
+    });
+    return ips;
   },
 };
 export function registerIpcFunctions() {

@@ -1,7 +1,7 @@
 <template>
   <e-root>
     <input ref="fileInput" type="file" accept="image/*" @change="load" />
-    <img v-if="dataURL" :src="dataURL" />
+    <img :src="dataURL ?? Icon" />
     <e-log>
       {{ log }}
     </e-log>
@@ -14,13 +14,16 @@
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
+
+import Icon from "@/_public/images/app/icon.png";
 
 const { t } = useI18n();
 const fileInput = ref<HTMLInputElement>();
 const dataURL = ref<string | undefined>();
 const uploading = ref(false);
-const log = ref("(^o^)");
+const log = ref("");
 onMounted(async () => {});
 function select() {
   fileInput.value?.click();
@@ -48,7 +51,7 @@ async function upload() {
   log.value = "アップロード中...";
   uploading.value = true;
   try {
-    await send("importFiles", [
+    const result = await send("importFiles", [
       [
         {
           type: "url",
@@ -59,7 +62,11 @@ async function upload() {
         },
       ],
     ]);
-    log.value = "完了!";
+    if (result.length > 0) {
+      log.value = "完了!";
+    } else {
+      log.value = "失敗...!";
+    }
   } catch {
     log.value = "失敗...!";
   }
@@ -69,7 +76,7 @@ async function send<U extends keyof IpcFunctions>(
   event: U,
   ...args: Parameters<IpcFunctions[U]>
 ): Promise<Awaited<ReturnType<IpcFunctions[U]>>> {
-  const response = await fetch("http://" + location.host.split(":")[0] + ":51915/api", {
+  const response = await fetch("http://" + location.host.split(":")[0] + `:${WEBHOOK_PORT}/api`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

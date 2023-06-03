@@ -22,9 +22,9 @@ const cursorSizePlugin: Plugin = async (filePath, destFilePath) => {
 };
 
 const ignoreAppIconPlugin: Plugin = async (filePath) => {
-  if (resolve(filePath) === resolve("./resources/images/app/icon.png")) {
-    return true;
-  }
+  // if (resolve(filePath) === resolve("./resources/images/app/icon.png")) {
+  //   return true;
+  // }
   return false;
 };
 

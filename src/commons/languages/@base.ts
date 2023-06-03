@@ -153,6 +153,7 @@ export interface I18NBase extends I18N {
   };
   settings: {
     settings: I18NProp;
+    sp: I18NProp;
     general: I18NProp;
     control: I18NProp;
     browser: I18NProp;

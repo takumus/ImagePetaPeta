@@ -27,7 +27,7 @@
       <VCheckbox v-model:value="settingsStore.state.value.developerMode" />
       {{ t("settings.developerMode") }}
     </label>
-    <p>{{ t("settings.developerModeDescriptions") }}</p>
+    <p>{{ t("settings.developerModeDescriptions", [WEBHOOK_PORT]) }}</p>
   </e-settings-content-root>
 </template>
 
@@ -35,6 +35,8 @@
 import { useI18n } from "vue-i18n";
 
 import VCheckbox from "@/renderer/components/commons/utils/checkbox/VCheckbox.vue";
+
+import { WEBHOOK_PORT } from "@/commons/defines";
 
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
