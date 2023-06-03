@@ -31,27 +31,44 @@ import { ppa } from "@/commons/utils/pp";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
+import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
+import { defaultStyles } from "@/renderer/styles/styles";
 
 const windowTitleStore = useWindowTitleStore();
 const windowNameStore = useWindowNameStore();
 const appInfoStore = useAppInfoStore();
 const { t } = useI18n();
+const darkModeStore = useDarkModeStore();
 const urlAndQRs = ref<{ url: string; image: string }[]>([]);
 onMounted(async () => {
-  await ppa(async (urls) => {
-    urlAndQRs.value.push(
-      ...(await ppa(async (url) => {
-        const image = await QR.toDataURL(url);
-        return {
-          url,
-          image,
-        };
-      }, urls).promise),
-    );
-  }, Object.values(await IPC.send("getSPURLs"))).promise;
+  //
 });
+watch(
+  darkModeStore.state,
+  async () => {
+    urlAndQRs.value = [];
+    await ppa(async (urls) => {
+      urlAndQRs.value.push(
+        ...(await ppa(async (url) => {
+          const image = await QR.toDataURL(url, {
+            color: {
+              light: defaultStyles[darkModeStore.state.value ? "dark" : "light"]["--color-0"],
+              dark: defaultStyles[darkModeStore.state.value ? "dark" : "light"]["--color-font"],
+            },
+            scale: 20,
+          });
+          return {
+            url,
+            image,
+          };
+        }, urls).promise),
+      );
+    }, Object.values(await IPC.send("getSPURLs"))).promise;
+  },
+  { immediate: true },
+);
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {
@@ -73,6 +90,8 @@ e-root {
     height: 100%;
     width: 100%;
     flex-direction: column;
+    background-color: var(--color-0);
+    color: var(--color-font);
     > e-top {
       display: block;
       width: 100%;
@@ -99,6 +118,10 @@ e-root {
           z-index: 1;
           flex-grow: 0;
           gap: var(--px-2);
+          > img {
+            width: 200px;
+            pointer-events: none;
+          }
           > e-url {
             display: block;
             cursor: pointer;
