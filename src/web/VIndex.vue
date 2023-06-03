@@ -1,12 +1,18 @@
 <template>
   <e-root>
+    <e-title>{{ t("web.title") }}</e-title>
     <input ref="fileInput" type="file" accept="image/*" @change="load" />
-    <img :src="dataURL ?? Icon" />
-    <e-log>
-      {{ log }}
-    </e-log>
-    <button @click="select">ファイルを選ぶ</button>
-    <button @click="upload" v-if="dataURL">アップロード</button>
+    <img :src="connected ? dataURL ?? Icon : Icon" />
+    <e-input v-if="connected">
+      <e-status>
+        {{ status === "ready" ? "" : t(`web.status.${status}`) }}
+      </e-status>
+      <button @click="select">{{ t("web.selectButton") }}</button>
+      <button @click="upload" v-if="dataURL">{{ t("web.uploadButton") }}</button>
+    </e-input>
+    <e-input v-else>
+      <e-status>{{ t("web.noConnections") }} </e-status>
+    </e-input>
   </e-root>
 </template>
 
@@ -23,8 +29,25 @@ const { t } = useI18n();
 const fileInput = ref<HTMLInputElement>();
 const dataURL = ref<string | undefined>();
 const uploading = ref(false);
-const log = ref("");
-onMounted(async () => {});
+const status = ref<"successful" | "progress" | "failed" | "ready">("ready");
+const connected = ref(true);
+onMounted(async () => {
+  let alive = true;
+  setInterval(() => {
+    if (alive) {
+      alive = false;
+    } else {
+      connected.value = false;
+    }
+  }, 2000);
+  setInterval(async () => {
+    const info = await send("getAppInfo");
+    if (info.version !== undefined) {
+      alive = true;
+      connected.value = true;
+    }
+  }, 1000);
+});
 function select() {
   fileInput.value?.click();
 }
@@ -33,22 +56,27 @@ async function load() {
   if (file === undefined) {
     return;
   }
-  dataURL.value = await new Promise<string>((res, rej) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      res(reader.result as string);
-    };
-    reader.onerror = () => {
-      rej("error");
-    };
-    reader.readAsDataURL(file);
-  });
+  dataURL.value = undefined;
+  try {
+    dataURL.value = await new Promise<string>((res, rej) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        res(reader.result as string);
+      };
+      reader.onerror = () => {
+        rej("error");
+      };
+      reader.readAsDataURL(file);
+    });
+  } catch {
+    //
+  }
 }
 async function upload() {
   if (dataURL.value === undefined) {
     return;
   }
-  log.value = "アップロード中...";
+  status.value = "progress";
   uploading.value = true;
   try {
     const result = await send("importFiles", [
@@ -63,12 +91,12 @@ async function upload() {
       ],
     ]);
     if (result.length > 0) {
-      log.value = "完了!";
+      status.value = "successful";
     } else {
-      log.value = "失敗...!";
+      status.value = "failed";
     }
   } catch {
-    log.value = "失敗...!";
+    status.value = "failed";
   }
   uploading.value = false;
 }
@@ -121,13 +149,19 @@ e-root {
     display: block;
     max-width: 60%;
     max-height: 50%;
+    border-radius: var(--rounded);
   }
   > input {
     display: none;
   }
-  > e-log {
-    white-space: pre-wrap;
-    overflow: hidden;
+  > e-input {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    > e-status {
+      white-space: pre-wrap;
+      overflow: hidden;
+    }
   }
 }
 </style>
