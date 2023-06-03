@@ -38,6 +38,8 @@ export default defineConfig(async ({ command }) => {
       dir: "test",
       testTimeout: 30 * 1000,
       threads: false,
+      singleThread: true,
+      isolate: true,
       open: false,
     },
     plugins: [
