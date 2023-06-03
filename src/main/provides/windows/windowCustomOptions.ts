@@ -36,7 +36,6 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         minHeight: WINDOW_SETTINGS_HEIGHT,
         maximizable: false,
         minimizable: false,
-        fullscreenable: false,
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
     case "details":
@@ -75,6 +74,7 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         minimizable: false,
         maximizable: false,
         resizable: false,
+        alwaysOnTop: configSettings.data.alwaysOnTop,
       };
     case "webAccess":
       return {
@@ -82,6 +82,7 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         height: WINDOW_SETTINGS_HEIGHT,
         minWidth: WINDOW_SETTINGS_WIDTH,
         minHeight: WINDOW_SETTINGS_HEIGHT,
+        alwaysOnTop: configSettings.data.alwaysOnTop,
       };
   }
 }
