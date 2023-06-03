@@ -51,8 +51,6 @@ onMounted(async () => {
       }, urls).promise),
     );
   }, Object.values(await IPC.send("getSPURLs"))).promise;
-  urlAndQRs.value.push(urlAndQRs.value[0]);
-  urlAndQRs.value.push(urlAndQRs.value[0]);
 });
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
