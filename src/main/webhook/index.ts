@@ -66,8 +66,15 @@ export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin
     });
     return {
       close: () => {
-        return new Promise<Error | undefined>((res) => {
-          server.close(res);
+        return new Promise<void>((res) => {
+          server.close((err) => {
+            if (err) {
+              initLog.error(`$Webhook: could not close`, err);
+            } else {
+              initLog.debug(`$Webhook: closed`, WEBHOOK_PORT);
+              res();
+            }
+          });
         });
       },
     };
