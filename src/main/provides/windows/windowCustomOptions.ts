@@ -76,5 +76,12 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         maximizable: false,
         resizable: false,
       };
+    case "webAccess":
+      return {
+        width: WINDOW_SETTINGS_WIDTH,
+        height: WINDOW_SETTINGS_HEIGHT,
+        minWidth: WINDOW_SETTINGS_WIDTH,
+        minHeight: WINDOW_SETTINGS_HEIGHT,
+      };
   }
 }

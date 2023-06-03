@@ -146,7 +146,7 @@ export class Windows {
       const url = process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html";
       logger.debug("url:", url);
       window.loadURL(url);
-      window.webContents.openDevTools();
+      // window.webContents.openDevTools();
     } else {
       const path = Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html");
       logger.debug("path:", path);
