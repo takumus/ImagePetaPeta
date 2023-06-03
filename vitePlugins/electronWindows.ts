@@ -29,13 +29,17 @@ export default (pluginOptions: {
     },
     config(config) {
       if (config.build?.rollupOptions) {
-        config.build.rollupOptions.input = pluginOptions.windows.reduce<{ [key: string]: string }>(
-          (obj, window) => ({
-            ...obj,
-            [window.name]: resolve(pluginOptions.htmlDir, `_${window.name}.html`),
-          }),
-          {},
-        );
+        config.build.rollupOptions.input = {
+          ...(config.build.rollupOptions.input as any),
+          ...pluginOptions.windows.reduce<{ [key: string]: string }>(
+            (obj, window) => ({
+              ...obj,
+              [window.name]: resolve(pluginOptions.htmlDir, `_${window.name}.html`),
+            }),
+            {},
+          ),
+        };
+        console.log(config.build.rollupOptions.input);
       }
     },
   };
