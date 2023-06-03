@@ -321,7 +321,7 @@ export const ja: I18NBase = {
   },
   web: {
     title: "ImagePetaPeta-beta ウェブツール",
-    selectButton: "ファイルを選ぶ",
+    selectButton: "ファイルを選ぶ・写真を撮る",
     uploadButton: "アプリへ送信",
     noConnections: "アプリと接続できません。",
     status: {
