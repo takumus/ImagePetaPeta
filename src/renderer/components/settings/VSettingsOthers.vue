@@ -23,11 +23,6 @@
       {{ t("settings.disableAcceleratedVideoDecode") }}
     </label>
     <p>{{ t("settings.disableAcceleratedVideoDecodeDescriptions") }}</p>
-    <label>
-      <VCheckbox v-model:value="settingsStore.state.value.developerMode" />
-      {{ t("settings.developerMode") }}
-    </label>
-    <p>{{ t("settings.developerModeDescriptions", [WEBHOOK_PORT]) }}</p>
   </e-settings-content-root>
 </template>
 
