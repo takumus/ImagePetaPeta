@@ -165,13 +165,11 @@ export interface I18NBase extends I18N {
     darkMode: I18NProp;
     autoDarkMode: I18NProp;
     autoDarkModeDescriptions: I18NProp;
-    alwaysOnTop: I18NProp;
     show: I18NProp;
     showBoard: I18NProp;
     showBrowser: I18NProp;
     showBoth: I18NProp;
     showDescriptions: I18NProp;
-    alwaysOnTopDescriptions: I18NProp;
     showFPS: I18NProp;
     showFPSDescriptions: I18NProp;
     zoomSensitivity: I18NProp;
