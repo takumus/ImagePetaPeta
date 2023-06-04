@@ -10,7 +10,6 @@
       </e-browser>
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
-      <VImageImporter />
       <VTasks />
     </e-modals>
     <VContextMenu :z-index="4" />
@@ -26,10 +25,10 @@ import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
-import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
+import { useImageImporterStore } from "@/renderer/stores/imageImporterStore/useImageImporterStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
@@ -37,6 +36,7 @@ const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
+useImageImporterStore();
 const { t } = useI18n();
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
