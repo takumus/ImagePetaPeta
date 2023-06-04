@@ -36,6 +36,7 @@ import { useTasks } from "@/main/provides/tasks";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
+import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
@@ -408,7 +409,7 @@ export const ipcFunctions: IpcFunctionsType = {
       configSettings.data = settings;
       Object.keys(windows.windows).forEach((key) => {
         const window = windows.windows[key as WindowName];
-        if (window === undefined || window.isDestroyed()) {
+        if (windowIs.dead(window)) {
           return;
         }
       });
@@ -591,8 +592,8 @@ export const ipcFunctions: IpcFunctionsType = {
     }
     const firstPath = getPetaFilePath.fromPetaFile(first).original;
     const files = petaFiles.map((petaFile) => getPetaFilePath.fromPetaFile(petaFile).original);
-    if (windows.windows.board !== undefined && !windows.windows.board.isDestroyed()) {
-      windows.windows.board.moveTop();
+    if (windowIs.alive("board")) {
+      windows.windows.board?.moveTop();
     }
     event.sender.startDrag({
       file: firstPath,

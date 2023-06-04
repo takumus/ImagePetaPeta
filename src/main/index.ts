@@ -9,6 +9,7 @@ import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
+import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
@@ -49,21 +50,16 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
   // Macでドックアイコン押した時。
   app.on("activate", async () => {
     logger.logMainChunk().debug("$Electron event: activate");
-    if (
-      (windows.windows.board === undefined || windows.windows.board.isDestroyed()) &&
-      (windows.windows.browser === undefined || windows.windows.browser.isDestroyed())
-    ) {
+    if (windowIs.dead("board") && windowIs.dead("browser")) {
       windows.showWindows();
     }
   });
   // 既に起動してるのに起動した場合
   app.on("second-instance", () => {
     const count = Object.values(windows.windows)
-      .filter((window) => {
-        return window !== undefined && !window.isDestroyed();
-      })
+      .filter((window) => windowIs.alive(window))
       .map((window) => {
-        window?.focus();
+        window.focus();
       }).length;
     if (count < 1) {
       windows.showWindows();

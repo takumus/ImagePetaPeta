@@ -16,6 +16,7 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
+import { windowIs } from "@/main/provides/utils/windowIs";
 import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
 import { getWindowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { isDarkMode } from "@/main/utils/darkMode";
@@ -45,10 +46,10 @@ export class Windows {
   showWindows() {
     const configSettings = useConfigSettings();
     if (configSettings.data.eula < EULA) {
-      if (this.windows.eula === undefined || this.windows.eula.isDestroyed()) {
+      if (windowIs.dead("eula")) {
         this.openWindow("eula");
       } else {
-        this.windows.eula.moveTop();
+        this.windows.eula?.moveTop();
       }
       return;
     }
@@ -79,7 +80,7 @@ export class Windows {
     } catch (error) {
       //
     }
-    if (this.windows[windowName] === undefined || this.windows[windowName]?.isDestroyed()) {
+    if (windowIs.dead(windowName)) {
       this.windows[windowName] = this.createWindow(windowName, {
         ...getWindowCustomOptions(windowName),
         x: position.x,
@@ -173,12 +174,12 @@ export class Windows {
       };
     }
     const window = this.windows[windowName];
-    if (window === undefined || window.isDestroyed()) {
+    if (windowIs.dead(window)) {
       return;
     }
-    if (!window.isMaximized()) {
-      state.width = window.getSize()[0] || WINDOW_DEFAULT_WIDTH;
-      state.height = window.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
+    if (!window?.isMaximized()) {
+      state.width = window?.getSize()[0] || WINDOW_DEFAULT_WIDTH;
+      state.height = window?.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
     }
     state.maximized = false; //window.isMaximized();
     configWindowStates.save();
@@ -193,9 +194,8 @@ export class Windows {
       })
       .find((windowInfo) => {
         return (
-          windowInfo.window &&
-          !windowInfo.window.isDestroyed() &&
-          windowInfo.window.webContents.mainFrame === event.sender.mainFrame
+          windowIs.alive(windowInfo.window) &&
+          windowInfo.window?.webContents.mainFrame === event.sender.mainFrame
         );
       });
     if (windowSet && windowSet.window !== undefined) {
@@ -226,21 +226,21 @@ export class Windows {
   ): void {
     if (target.type === EmitMainEventTargetType.ALL) {
       Object.values(this.windows).forEach((window) => {
-        if (window !== undefined && !window.isDestroyed()) {
+        if (windowIs.alive(window)) {
           window.webContents.send(key, ...args);
         }
       });
     } else if (target.type === EmitMainEventTargetType.WINDOWS) {
       target.windows.forEach((window) => {
-        if (!window.isDestroyed()) {
+        if (windowIs.alive(window)) {
           window.webContents.send(key, ...args);
         }
       });
     } else if (target.type === EmitMainEventTargetType.WINDOW_NAMES) {
       target.windowNames.forEach((type) => {
         const window = this.windows[type];
-        if (window !== undefined && !window.isDestroyed()) {
-          window.webContents.send(key, ...args);
+        if (windowIs.alive(window)) {
+          window?.webContents.send(key, ...args);
         }
       });
     }

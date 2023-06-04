@@ -2,6 +2,7 @@ import { BrowserWindow, app } from "electron";
 
 import { URL_SUPPORT } from "@/commons/defines";
 
+import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWindows } from "@/main/provides/windows";
 
 export interface ErrorWindowParameters {
@@ -59,7 +60,7 @@ export function showError(error: ErrorWindowParameters, quit = true) {
   try {
     const windows = useWindows();
     Object.values(windows.windows).forEach((window) => {
-      if (window !== undefined && !window.isDestroyed()) {
+      if (windowIs.alive(window)) {
         window.loadURL("about:blank");
       }
     });
