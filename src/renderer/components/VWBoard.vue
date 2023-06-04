@@ -27,7 +27,6 @@
       </e-browser>
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
-      <VImageImporter @add-panel-by-drag-and-drop="addPanelByDragAndDrop" />
       <VTasks />
     </e-modals>
     <VContextMenu :z-index="4" />
@@ -45,7 +44,6 @@ import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
-import VImageImporter from "@/renderer/components/importer/VImageImporter.vue";
 
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
@@ -65,6 +63,7 @@ import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
+import { useImageImporterStore } from "@/renderer/stores/imageImporterStore/useImageImporterStore";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
@@ -87,6 +86,7 @@ const orderedAddPanelIds = ref<string[]>([]);
 const orderedAddPanelDragEvent = ref(new Vec2());
 const currentPetaBoardId = ref("");
 const errorPetaBoardId = ref("");
+const imageImporterStore = useImageImporterStore();
 onMounted(async () => {
   // AnimatedGIFLoader.add?.();
   petaFilesStore.onUpdate(async (newPetaFiles, mode) => {
@@ -109,6 +109,7 @@ onMounted(async () => {
       vPetaBoard.value?.orderPIXIRender();
     }
   });
+  imageImporterStore.events.on("addPanelByDragAndDrop", addPanelByDragAndDrop);
   await restoreBoard();
 });
 async function restoreBoard() {
