@@ -230,19 +230,9 @@ watch(
 
 <style lang="scss" scoped>
 e-window-root {
-  > e-top {
-    display: block;
-    width: 100%;
-    z-index: 2;
-  }
   > e-content {
-    display: block;
-    overflow: hidden;
-    background-color: var(--color-0);
-    flex: 1;
-    z-index: 1;
+    padding: 0px;
   }
-
   > e-modals {
     position: absolute;
     width: 100%;

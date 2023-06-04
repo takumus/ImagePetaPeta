@@ -1,10 +1,12 @@
 <template>
-  <e-window-root>
-    <e-top>
-      <VTitleBar :title="t('titles.quit')" :hide-controls="true"> </VTitleBar>
-    </e-top>
-    <e-content> {{ t("quit.quitting") }} </e-content>
-  </e-window-root>
+  <e-root>
+    <e-content>
+      <e-top>
+        <VTitleBar :title="t('titles.quit')" :hide-controls="true"> </VTitleBar>
+      </e-top>
+      <e-browser> {{ t("quit.quitting") }} </e-browser>
+    </e-content>
+  </e-root>
 </template>
 
 <script setup lang="ts">
@@ -31,27 +33,24 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-window-root {
-  > e-top {
-    display: block;
-    width: 100%;
-    z-index: 2;
-  }
+e-root {
   > e-content {
-    display: block;
-    overflow-y: auto;
-    margin: var(--px-3);
-    background-color: var(--color-0);
-    flex: 1;
-    z-index: 1;
-    > e-body {
+    > e-browser {
       display: block;
-      white-space: pre-wrap;
-      user-select: text;
-    }
-    > e-buttons {
-      display: block;
-      text-align: center;
+      overflow-y: auto;
+      margin: var(--px-3);
+      background-color: var(--color-0);
+      flex: 1;
+      z-index: 1;
+      > e-body {
+        display: block;
+        white-space: pre-wrap;
+        user-select: text;
+      }
+      > e-buttons {
+        display: block;
+        text-align: center;
+      }
     }
   }
 }

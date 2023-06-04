@@ -37,22 +37,7 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
-e-window-root {
-  > e-top {
-    display: block;
-    width: 100%;
-    z-index: 2;
-  }
-  > e-content {
-    display: block;
-    overflow: hidden;
-    background-color: var(--color-0);
-    flex: 1;
-    z-index: 1;
-  }
-}
-</style>
+<style lang="scss" scoped></style>
 <style lang="scss">
 @import "@/renderer/styles/index.scss";
 </style>

@@ -83,20 +83,11 @@ watch(
 
 <style lang="scss" scoped>
 e-window-root {
-  > e-top {
-    display: block;
-    width: 100%;
-    z-index: 2;
-  }
   > e-content {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    overflow: hidden;
-    padding: var(--px-2);
     > e-accesses {
       display: flex;
       width: 100%;
+      height: 100%;
       align-items: center;
       flex-direction: column;
       overflow-y: auto;
