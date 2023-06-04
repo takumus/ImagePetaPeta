@@ -2,6 +2,7 @@ import { IpcMainInvokeEvent } from "electron";
 import { v4 as uuid } from "uuid";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
+import { windowIs } from "@/main/provides/utils/windowIs";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class Modals {
@@ -50,11 +51,7 @@ export class Modals {
       { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
       "updateModalDatas",
     );
-    if (
-      this.orders.length === 0 &&
-      windows.windows.modal !== undefined &&
-      !windows.windows.modal.isDestroyed()
-    ) {
+    if (this.orders.length === 0 && windowIs.alive("modal")) {
       windows.windows.modal?.close();
     }
   }
