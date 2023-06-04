@@ -20,4 +20,15 @@ e-window-root {
   height: 100%;
   width: 100%;
   flex-direction: column;
+  > e-top {
+    display: block;
+    width: 100%;
+  }
+  > e-content {
+    display: block;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    padding: var(--px-2);
+  }
 }
