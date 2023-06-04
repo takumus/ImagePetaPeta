@@ -120,7 +120,7 @@ import { initWebhook } from "@/main/webhook";
     // dbの初期化
     await initDB();
     // webhook有効化
-    if (configSettings.data.developerMode) {
+    if (configSettings.data.web) {
       initWebhook(ipcFunctions);
     }
   }

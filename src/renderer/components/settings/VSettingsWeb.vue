@@ -1,10 +1,10 @@
 <template>
   <e-settings-content-root>
     <label>
-      <VCheckbox v-model:value="settingsStore.state.value.developerMode" />
-      {{ t("settings.developerMode") }}
+      <VCheckbox v-model:value="settingsStore.state.value.web" />
+      {{ t("settings.web") }}
     </label>
-    <p>{{ t("settings.developerModeDescriptions", [WEBHOOK_PORT]) }}</p>
+    <p>{{ t("settings.webDescriptions", [WEBHOOK_PORT]) }}</p>
   </e-settings-content-root>
 </template>
 

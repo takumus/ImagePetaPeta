@@ -17,7 +17,7 @@ const defaultSettings = {
   },
   show: "board" as "board" | "browser" | "both",
   eula: 0,
-  developerMode: false,
+  web: false,
   disableAcceleratedVideoDecode: false,
   gamutMapSampling: 5000,
 };

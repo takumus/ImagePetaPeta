@@ -154,7 +154,6 @@ export interface I18NBase extends I18N {
   };
   settings: {
     settings: I18NProp;
-    sp: I18NProp;
     general: I18NProp;
     control: I18NProp;
     browser: I18NProp;
@@ -202,10 +201,9 @@ export interface I18NBase extends I18N {
     releaseNoteButton: I18NProp;
     disableAcceleratedVideoDecode: I18NProp;
     disableAcceleratedVideoDecodeDescriptions: I18NProp;
-    developerMode: I18NProp;
     gamutMapSampling: I18NProp;
     gamutMapSamplingDescriptions: I18NProp;
-    developerModeDescriptions: I18NProp;
+    webDescriptions: I18NProp;
     changePetaFileDirectoryDialog: I18NProp;
     changePetaFileDirectoryErrorDialog: I18NProp;
   };
