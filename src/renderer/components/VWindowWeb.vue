@@ -1,25 +1,23 @@
 <template>
-  <e-root>
+  <e-window-root>
+    <e-top>
+      <VTitleBar :title="t('titles.web')"> </VTitleBar>
+    </e-top>
     <e-content>
-      <e-top>
-        <VTitleBar :title="t('titles.web')"> </VTitleBar>
-      </e-top>
-      <e-browser>
-        <e-accesses>
-          <e-access v-for="urlAndQR in webURLData">
-            <img :src="urlAndQR.image" />
-            <e-name>
-              {{ urlAndQR.name }}
-            </e-name>
-            <e-url class="url" @click="IPC.send('openURL', urlAndQR.url)">
-              {{ urlAndQR.url }}
-            </e-url>
-          </e-access>
-        </e-accesses>
-      </e-browser>
+      <e-accesses>
+        <e-access v-for="urlAndQR in webURLData">
+          <img :src="urlAndQR.image" />
+          <e-name>
+            {{ urlAndQR.name }}
+          </e-name>
+          <e-url class="url" @click="IPC.send('openURL', urlAndQR.url)">
+            {{ urlAndQR.url }}
+          </e-url>
+        </e-access>
+      </e-accesses>
     </e-content>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -84,57 +82,44 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
-  > e-content {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    height: 100%;
+e-window-root {
+  > e-top {
+    display: block;
     width: 100%;
-    flex-direction: column;
-    background-color: var(--color-0);
-    color: var(--color-font);
-    > e-top {
-      display: block;
-      width: 100%;
-      z-index: 2;
-    }
-    > e-browser {
+    z-index: 2;
+  }
+  > e-content {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    padding: var(--px-2);
+    > e-accesses {
       display: flex;
-      flex: 1;
       width: 100%;
-      overflow: hidden;
-      padding: var(--px-2);
-      > e-accesses {
+      align-items: center;
+      flex-direction: column;
+      overflow-y: auto;
+      gap: var(--px-3);
+      > e-access {
         display: flex;
-        width: 100%;
-        align-items: center;
         flex-direction: column;
-        overflow-y: auto;
-        gap: var(--px-3);
-        > e-access {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          background-color: var(--color-0);
-          z-index: 1;
-          flex-grow: 0;
-          gap: var(--px-2);
-          > img {
-            width: 200px;
-            pointer-events: none;
-          }
-          > e-name {
-            display: block;
-          }
-          > e-url {
-            display: block;
-            cursor: pointer;
-            text-decoration: underline;
-          }
+        align-items: center;
+        background-color: var(--color-0);
+        z-index: 1;
+        flex-grow: 0;
+        gap: var(--px-2);
+        > img {
+          width: 200px;
+          pointer-events: none;
+        }
+        > e-name {
+          display: block;
+        }
+        > e-url {
+          display: block;
+          cursor: pointer;
+          text-decoration: underline;
         }
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <e-root>
+  <e-window-root>
     <e-title>{{ t("web.title") }}</e-title>
     <input ref="fileInput" type="file" accept="image/*" @change="load" />
     <img :src="connected ? selectedData?.dataURL ?? Icon : Icon" />
@@ -13,7 +13,7 @@
     <e-input v-else>
       <e-status>{{ t("web.noConnections") }} </e-status>
     </e-input>
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -142,7 +142,7 @@ html,
     sans-serif;
   background-color: var(--color-0);
 }
-e-root {
+e-window-root {
   display: flex;
   height: 100%;
   flex-direction: column;

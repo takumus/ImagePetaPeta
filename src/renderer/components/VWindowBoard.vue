@@ -1,36 +1,34 @@
 <template>
-  <e-root>
-    <e-content>
-      <e-top>
-        <VTitleBar>
-          <VTabBar
-            :boards="sortedPetaBoards"
-            :current-peta-board-id="currentPetaBoardId"
-            @remove="removePetaBoard"
-            @add="addPetaBoard"
-            @select="selectPetaBoard"
-            @update:board="updatePetaBoard" />
-        </VTitleBar>
-        <VHeaderBar>
-          <VBoardProperty
-            v-if="currentPetaBoard"
-            :board="currentPetaBoard"
-            @update="updatePetaBoard" />
-        </VHeaderBar>
-      </e-top>
-      <e-browser>
-        <VBoard
-          :z-index="1"
-          :board="currentPetaBoard"
-          ref="vPetaBoard"
+  <e-window-root>
+    <e-top>
+      <VTitleBar>
+        <VTabBar
+          :boards="sortedPetaBoards"
+          :current-peta-board-id="currentPetaBoardId"
+          @remove="removePetaBoard"
+          @add="addPetaBoard"
+          @select="selectPetaBoard"
           @update:board="updatePetaBoard" />
-      </e-browser>
+      </VTitleBar>
+      <VHeaderBar>
+        <VBoardProperty
+          v-if="currentPetaBoard"
+          :board="currentPetaBoard"
+          @update="updatePetaBoard" />
+      </VHeaderBar>
+    </e-top>
+    <e-content>
+      <VBoard
+        :z-index="1"
+        :board="currentPetaBoard"
+        ref="vPetaBoard"
+        @update:board="updatePetaBoard" />
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
     </e-modals>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -231,33 +229,18 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
-
-  > e-content {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    height: 100%;
+e-window-root {
+  > e-top {
+    display: block;
     width: 100%;
-    flex-direction: column;
-    z-index: 3;
-
-    > e-top {
-      display: block;
-      width: 100%;
-      z-index: 2;
-    }
-
-    > e-browser {
-      display: block;
-      overflow: hidden;
-      background-color: var(--color-0);
-      flex: 1;
-      z-index: 1;
-    }
+    z-index: 2;
+  }
+  > e-content {
+    display: block;
+    overflow: hidden;
+    background-color: var(--color-0);
+    flex: 1;
+    z-index: 1;
   }
 
   > e-modals {

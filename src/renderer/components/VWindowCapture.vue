@@ -1,16 +1,14 @@
 <template>
-  <e-root>
+  <e-window-root>
+    <e-top>
+      <VTitleBar :title="t('titles.capture')"> </VTitleBar>
+      <VHeaderBar> </VHeaderBar>
+    </e-top>
     <e-content>
-      <e-top>
-        <VTitleBar :title="t('titles.capture')"> </VTitleBar>
-        <VHeaderBar> </VHeaderBar>
-      </e-top>
-      <e-browser>
-        <VCapture :z-index="1" />
-      </e-browser>
+      <VCapture :z-index="1" />
     </e-content>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -40,29 +38,18 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
-  > e-content {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    height: 100%;
+e-window-root {
+  > e-top {
+    display: block;
     width: 100%;
-    flex-direction: column;
-    > e-top {
-      display: block;
-      width: 100%;
-      z-index: 2;
-    }
-    > e-browser {
-      display: block;
-      overflow: hidden;
-      background-color: var(--color-0);
-      flex: 1;
-      z-index: 1;
-    }
+    z-index: 2;
+  }
+  > e-content {
+    display: block;
+    overflow: hidden;
+    background-color: var(--color-0);
+    flex: 1;
+    z-index: 1;
   }
 }
 </style>

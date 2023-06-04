@@ -1,20 +1,18 @@
 <template>
-  <e-root>
-    <e-content>
-      <e-top>
-        <VTitleBar :title="''" :hide-controls="true"> </VTitleBar>
-      </e-top>
-      <e-browser v-if="modalData">
-        <e-body>{{ modalData.label }}</e-body>
-        <e-buttons>
-          <button v-for="(item, index) in modalData.items" @click="select(index)">
-            {{ item }}
-          </button>
-        </e-buttons>
-      </e-browser>
+  <e-window-root>
+    <e-top>
+      <VTitleBar :title="''" :hide-controls="true"> </VTitleBar>
+    </e-top>
+    <e-content v-if="modalData">
+      <e-body>{{ modalData.label }}</e-body>
+      <e-buttons>
+        <button v-for="(item, index) in modalData.items" @click="select(index)">
+          {{ item }}
+        </button>
+      </e-buttons>
     </e-content>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -49,38 +47,27 @@ async function select(index: number) {
 </script>
 
 <style lang="scss" scoped>
-e-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
-  > e-content {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    height: 100%;
+e-window-root {
+  > e-top {
+    display: block;
     width: 100%;
-    flex-direction: column;
-    > e-top {
+    z-index: 2;
+  }
+  > e-content {
+    display: block;
+    overflow-y: auto;
+    margin: var(--px-3);
+    background-color: var(--color-0);
+    flex: 1;
+    z-index: 1;
+    > e-body {
       display: block;
-      width: 100%;
-      z-index: 2;
+      white-space: pre-wrap;
+      user-select: text;
     }
-    > e-browser {
+    > e-buttons {
       display: block;
-      overflow-y: auto;
-      margin: var(--px-3);
-      background-color: var(--color-0);
-      flex: 1;
-      z-index: 1;
-      > e-body {
-        display: block;
-        white-space: pre-wrap;
-        user-select: text;
-      }
-      > e-buttons {
-        display: block;
-        text-align: center;
-      }
+      text-align: center;
     }
   }
 }

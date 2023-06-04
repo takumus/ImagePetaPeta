@@ -1,15 +1,13 @@
 <template>
-  <e-root>
+  <e-window-root>
+    <e-top>
+      <VTitleBar :title="t('titles.settings')"> </VTitleBar>
+    </e-top>
     <e-content>
-      <e-top>
-        <VTitleBar :title="t('titles.settings')"> </VTitleBar>
-      </e-top>
-      <e-browser>
-        <VSettings />
-      </e-browser>
+      <VSettings />
     </e-content>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -47,38 +45,27 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
+e-window-root {
+  > e-top {
+    display: block;
+    width: 100%;
+    z-index: 2;
+  }
   > e-content {
-    position: fixed;
+    display: block;
+    overflow: hidden;
+    padding: var(--px-3);
+    background-color: var(--color-0);
+    flex: 1;
+    z-index: 1;
+  }
+  > e-modals {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     top: 0px;
     left: 0px;
-    display: flex;
-    height: 100%;
-    width: 100%;
-    flex-direction: column;
-    > e-top {
-      display: block;
-      width: 100%;
-      z-index: 2;
-    }
-    > e-browser {
-      display: block;
-      overflow: hidden;
-      padding: var(--px-3);
-      background-color: var(--color-0);
-      flex: 1;
-      z-index: 1;
-    }
-    > e-modals {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0px;
-      left: 0px;
-      z-index: 3;
-    }
+    z-index: 3;
   }
 }
 </style>
