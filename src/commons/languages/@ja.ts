@@ -174,6 +174,7 @@ export const ja: I18NBase = {
     others: "その他",
     info: "情報",
     update: "アップデート",
+    web: "ウェブ機能",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions:

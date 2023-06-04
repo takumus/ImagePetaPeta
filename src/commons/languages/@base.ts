@@ -162,6 +162,7 @@ export interface I18NBase extends I18N {
     others: I18NProp;
     info: I18NProp;
     update: I18NProp;
+    web: I18NProp;
     darkMode: I18NProp;
     autoDarkMode: I18NProp;
     autoDarkModeDescriptions: I18NProp;
