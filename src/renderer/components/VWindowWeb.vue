@@ -6,8 +6,11 @@
       </e-top>
       <e-browser>
         <e-accesses>
-          <e-access v-for="urlAndQR in urlAndQRs">
+          <e-access v-for="urlAndQR in webURLData">
             <img :src="urlAndQR.image" />
+            <e-name>
+              {{ urlAndQR.name }}
+            </e-name>
             <e-url class="url" @click="IPC.send('openURL', urlAndQR.url)">
               {{ urlAndQR.url }}
             </e-url>
@@ -41,16 +44,17 @@ const windowNameStore = useWindowNameStore();
 const appInfoStore = useAppInfoStore();
 const { t } = useI18n();
 const darkModeStore = useDarkModeStore();
-const urlAndQRs = ref<{ url: string; image: string }[]>([]);
+const webURLData = ref<{ url: string; image: string; name: string }[]>([]);
 onMounted(async () => {
   //
 });
 watch(
   darkModeStore.state,
   async () => {
-    urlAndQRs.value = [];
-    await ppa(async (urls) => {
-      urlAndQRs.value.push(
+    webURLData.value = [];
+    const webURLs = await IPC.send("getWebURL");
+    await ppa(async (name) => {
+      webURLData.value.push(
         ...(await ppa(async (url) => {
           const image = await QR.toDataURL(url, {
             color: {
@@ -61,11 +65,12 @@ watch(
           });
           return {
             url,
+            name,
             image,
           };
-        }, urls).promise),
+        }, webURLs[name]).promise),
       );
-    }, Object.values(await IPC.send("getSPURLs"))).promise;
+    }, Object.keys(webURLs)).promise;
   },
   { immediate: true },
 );
@@ -121,6 +126,9 @@ e-root {
           > img {
             width: 200px;
             pointer-events: none;
+          }
+          > e-name {
+            display: block;
           }
           > e-url {
             display: block;

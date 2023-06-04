@@ -831,7 +831,7 @@ export const ipcFunctions: IpcFunctionsType = {
   async getModalDatas() {
     return useModals().getOrders();
   },
-  async getSPURLs() {
+  async getWebURL() {
     const ips = getIPs();
     Object.keys(ips).forEach((key) => {
       ips[key] = ips[key].map((ip) => {
