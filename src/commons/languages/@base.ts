@@ -30,7 +30,7 @@ export interface I18NBase extends I18N {
     capture: I18NProp;
     eula: I18NProp;
     quit: I18NProp;
-    webAccess: I18NProp;
+    web: I18NProp;
   };
   playbackController: {
     play: I18NProp;

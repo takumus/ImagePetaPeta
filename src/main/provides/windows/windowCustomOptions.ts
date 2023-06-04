@@ -76,7 +76,7 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         resizable: false,
         alwaysOnTop: configSettings.data.alwaysOnTop,
       };
-    case "webAccess":
+    case "web":
       return {
         width: WINDOW_SETTINGS_WIDTH,
         height: WINDOW_SETTINGS_HEIGHT,

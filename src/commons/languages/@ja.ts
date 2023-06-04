@@ -10,7 +10,7 @@ export const ja: I18NBase = {
     capture: "キャプチャ",
     eula: "はじめにお読みください",
     quit: "終了中",
-    webAccess: "Webアクセス",
+    web: "Web機能",
   },
   playbackController: {
     play: "再生",
@@ -221,9 +221,9 @@ export const ja: I18NBase = {
     gamutMapSamplingDescriptions:
       "ガマットマップを作る際に読み込むピクセルの量です。最大は65536です。多くすればするほど重くなります。",
     webDescriptions: (ctx) => {
-      return `開発者モードを有効にすると${ctx.list(
+      return `ウェブ機能を有効にすると${ctx.list(
         0,
-      )}ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。`;
+      )}ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能や、スマホインポート機能に必須です。ファイアウォールの許可が問われますので許可してください。`;
     },
     changePetaFileDirectoryDialog: (ctx) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;

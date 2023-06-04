@@ -2,7 +2,7 @@
   <e-root>
     <e-content>
       <e-top>
-        <VTitleBar :title="t('titles.webAccess')"> </VTitleBar>
+        <VTitleBar :title="t('titles.web')"> </VTitleBar>
       </e-top>
       <e-browser>
         <e-accesses>
