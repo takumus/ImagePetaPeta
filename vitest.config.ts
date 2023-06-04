@@ -42,7 +42,6 @@ export default defineConfig(async ({ command }) => {
       threads: false,
       singleThread: true,
       isolate: true,
-      open: false,
     },
     plugins: [
       {
