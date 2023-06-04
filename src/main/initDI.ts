@@ -29,6 +29,7 @@ import {
 import languages from "@/commons/languages";
 
 import { showError } from "@/main/errorWindow";
+import { ipcFunctions } from "@/main/ipcFunctions";
 import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";
@@ -77,6 +78,7 @@ import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
 import { Quit, quitKey } from "@/main/provides/utils/quit";
+import { WebHook, webhookKey } from "@/main/provides/webhook";
 import { Windows, windowsKey } from "@/main/provides/windows";
 import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { isLatest } from "@/main/utils/versions";
@@ -238,6 +240,7 @@ export function initDI(
       },
     });
     provide(tasksKey, tasks);
+    provide(webhookKey, new WebHook(ipcFunctions));
     provide(modalsKey, new Modals());
   } catch (err) {
     // どこかで失敗したら強制終了

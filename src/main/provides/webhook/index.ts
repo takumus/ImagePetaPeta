@@ -13,6 +13,7 @@ import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
+import { createKey, createUseFunction } from "@/main/libs/di";
 import { useLogger } from "@/main/provides/utils/logger";
 
 type EventNames = keyof IpcFunctions;
@@ -115,16 +116,5 @@ export class WebHook extends TypedEventEmitter<{
     });
   }
 }
-export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin = false) {
-  const webhook = new WebHook(ipcFunctions);
-  try {
-    await webhook.open(WEBHOOK_PORT);
-  } catch {
-    //
-  }
-  return {
-    close: () => {
-      return webhook.close();
-    },
-  };
-}
+export const webhookKey = createKey<WebHook>("webhook");
+export const useWebHook = createUseFunction(webhookKey);
