@@ -1,4 +1,4 @@
-import DetailsIndex from "@/renderer/components/VWDetails.vue";
+import VWindow from "@/renderer/components/VWindowDetails.vue";
 
 import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import {
@@ -17,7 +17,7 @@ import {
 import { create } from "@/renderer/windows/@base";
 
 injectAnimatedGIFAsset();
-create(DetailsIndex, "details", [
+create(VWindow, "details", [
   keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),
   keyStoreCreatorPair(commonTextureStoreKey, createCommonTextureStore),

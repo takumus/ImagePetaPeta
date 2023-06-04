@@ -1,5 +1,5 @@
-import VWWebAccess from "@/renderer/components/VWWebAccess.vue";
+import VWindow from "@/renderer/components/VWindowWebAccess.vue";
 
 import { create } from "@/renderer/windows/@base";
 
-create(VWWebAccess, "webAccess");
+create(VWindow, "webAccess");

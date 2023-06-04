@@ -1,5 +1,5 @@
-import ModalIndex from "@/renderer/components/VWModal.vue";
+import VWindow from "@/renderer/components/VWindowModal.vue";
 
 import { create } from "@/renderer/windows/@base";
 
-create(ModalIndex, "modal");
+create(VWindow, "modal");

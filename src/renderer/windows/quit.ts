@@ -1,5 +1,5 @@
-import QuitIndex from "@/renderer/components/VWQuit.vue";
+import VWindow from "@/renderer/components/VWindowQuit.vue";
 
 import { create } from "@/renderer/windows/@base";
 
-create(QuitIndex, "quit");
+create(VWindow, "quit");

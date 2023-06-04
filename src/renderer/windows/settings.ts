@@ -1,5 +1,5 @@
-import SettingsIndex from "@/renderer/components/VWSettings.vue";
+import VWindow from "@/renderer/components/VWindowSettings.vue";
 
 import { create } from "@/renderer/windows/@base";
 
-create(SettingsIndex, "settings");
+create(VWindow, "settings");
