@@ -1,4 +1,4 @@
-import BoardIndex from "@/renderer/components/VWBoard.vue";
+import VWindow from "@/renderer/components/VWindowBoard.vue";
 
 import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import {
@@ -17,7 +17,7 @@ import {
 import { create } from "@/renderer/windows/@base";
 
 injectAnimatedGIFAsset();
-create(BoardIndex, "board", [
+create(VWindow, "board", [
   keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),
   keyStoreCreatorPair(commonTextureStoreKey, createCommonTextureStore),

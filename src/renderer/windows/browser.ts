@@ -1,4 +1,4 @@
-import BrowserIndex from "@/renderer/components/VWBrowser.vue";
+import VWindow from "@/renderer/components/VWindowBrowser.vue";
 
 import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
@@ -21,7 +21,7 @@ import {
 import { create } from "@/renderer/windows/@base";
 
 injectAnimatedGIFAsset();
-create(BrowserIndex, "browser", [
+create(VWindow, "browser", [
   keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),

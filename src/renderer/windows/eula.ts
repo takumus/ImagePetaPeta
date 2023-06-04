@@ -1,5 +1,5 @@
-import EULAIndex from "@/renderer/components/VWEula.vue";
+import VWindow from "@/renderer/components/VWindowEula.vue";
 
 import { create } from "@/renderer/windows/@base";
 
-create(EULAIndex, "eula");
+create(VWindow, "eula");
