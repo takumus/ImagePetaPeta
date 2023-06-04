@@ -6,7 +6,7 @@ import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 
 import { ipcFunctions } from "@/main/ipcFunctions";
-import { initWebhook } from "@/main/webhook";
+import { useWebHook } from "@/main/provides/webhook";
 
 const ROOT = "./_test/scenario/webhook";
 describe("webhook", () => {
@@ -44,7 +44,8 @@ describe("webhook", () => {
     return response.json();
   }
   test("importFiles", async () => {
-    const webhook = await initWebhook(ipcFunctions, true);
+    const webhook = useWebHook();
+    await webhook.open(51920);
     const ids = await post("importFiles", [
       [
         {
@@ -57,7 +58,8 @@ describe("webhook", () => {
     await webhook?.close();
   });
   test("whitelist", async () => {
-    const webhook = await initWebhook(ipcFunctions, true);
+    const webhook = useWebHook();
+    await webhook.open(51920);
     const appInfo = (await post("getSettings")) as any;
     expect(appInfo).property("error");
     await webhook?.close();

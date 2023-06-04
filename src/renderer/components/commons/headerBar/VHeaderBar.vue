@@ -16,8 +16,8 @@
       <button v-if="windowName !== 'details'" tabindex="-1" @click="importImageDirectories()">
         <e-icon class="import-folder"></e-icon>
       </button>
-      <button v-if="windowName !== 'details'" tabindex="-1" @click="openWebAccess()">
-        <e-icon class="web-access"></e-icon>
+      <button v-if="windowName !== 'details'" tabindex="-1" @click="openWeb()">
+        <e-icon class="web"></e-icon>
       </button>
       <!-- <button v-if="windowName !== 'capture'" tabindex="-1" @click="openCapture()">
         <e-icon class="import-folder"></e-icon>
@@ -61,8 +61,8 @@ function openSettings() {
 function openCapture() {
   IPC.send("openWindow", "capture");
 }
-function openWebAccess() {
-  IPC.send("openWindow", "webAccess");
+function openWeb() {
+  IPC.send("openWindow", "web");
 }
 function browseAndImportFiles() {
   IPC.send("browseAndImportFiles", "files");
@@ -157,8 +157,8 @@ e-utils-bar-root {
           &.import-folder {
             background-image: url("/images/icons/importFolder.png");
           }
-          &.web-access {
-            background-image: url("/images/icons/webAccess.png");
+          &.web {
+            background-image: url("/images/icons/web.png");
           }
           &.settings {
             background-image: url("/images/icons/settings.png");

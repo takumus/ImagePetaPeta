@@ -27,6 +27,9 @@
       <e-content v-if="currentTab === 'others'">
         <VSettingsOthers />
       </e-content>
+      <e-content v-if="currentTab === 'web'">
+        <VSettingsWeb />
+      </e-content>
       <e-content v-if="currentTab === 'update'">
         <VSettingsUpdate />
       </e-content>
@@ -48,11 +51,21 @@ import VSettingsGeneral from "@/renderer/components/settings/VSettingsGeneral.vu
 import VSettingsInfo from "@/renderer/components/settings/VSettingsInfo.vue";
 import VSettingsOthers from "@/renderer/components/settings/VSettingsOthers.vue";
 import VSettingsUpdate from "@/renderer/components/settings/VSettingsUpdate.vue";
+import VSettingsWeb from "@/renderer/components/settings/VSettingsWeb.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
 
 const { t } = useI18n();
-const tabNames = ["general", "control", "browser", "datas", "others", "update", "info"] as const;
+const tabNames = [
+  "general",
+  "control",
+  "browser",
+  "datas",
+  "web",
+  "others",
+  "update",
+  "info",
+] as const;
 const tabs = ref<(typeof tabNames)[number][]>([...tabNames]);
 const currentTab = ref<(typeof tabNames)[number]>("general");
 onMounted(async () => {

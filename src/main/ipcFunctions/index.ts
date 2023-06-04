@@ -36,6 +36,7 @@ import { useTasks } from "@/main/provides/tasks";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
+import { useWebHook } from "@/main/provides/webhook";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { getIPs } from "@/main/utils/getIPs";
@@ -397,6 +398,13 @@ export const ipcFunctions: IpcFunctionsType = {
     const log = logger.logMainChunk();
     try {
       log.debug("#Update Settings");
+      if (configSettings.data.web !== settings.web) {
+        if (settings.web) {
+          useWebHook().open(WEBHOOK_PORT);
+        } else {
+          useWebHook().close();
+        }
+      }
       configSettings.data = settings;
       Object.keys(windows.windows).forEach((key) => {
         const window = windows.windows[key as WindowName];

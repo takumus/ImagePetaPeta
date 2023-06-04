@@ -1,6 +1,6 @@
 import { app, protocol } from "electron";
 
-import { PROTOCOLS } from "@/commons/defines";
+import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
 
 import { initDB } from "@/main/initDB";
@@ -9,11 +9,11 @@ import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
+import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
-import { initWebhook } from "@/main/webhook";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
@@ -120,8 +120,8 @@ import { initWebhook } from "@/main/webhook";
     // dbの初期化
     await initDB();
     // webhook有効化
-    if (configSettings.data.developerMode) {
-      initWebhook(ipcFunctions);
+    if (configSettings.data.web) {
+      await useWebHook().open(WEBHOOK_PORT);
     }
   }
   app.on("ready", appReady);

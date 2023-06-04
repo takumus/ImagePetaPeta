@@ -10,7 +10,7 @@ export const ja: I18NBase = {
     capture: "キャプチャ",
     eula: "はじめにお読みください",
     quit: "終了中",
-    webAccess: "Webアクセス",
+    web: "Web機能",
   },
   playbackController: {
     play: "再生",
@@ -166,7 +166,6 @@ export const ja: I18NBase = {
   },
   settings: {
     settings: "設定",
-    sp: "スマホインポート",
     general: "基本",
     control: "操作",
     browser: "ブラウザ",
@@ -174,6 +173,7 @@ export const ja: I18NBase = {
     others: "その他",
     info: "情報",
     update: "アップデート",
+    web: "ウェブ機能",
     darkMode: "ダークモード",
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions:
@@ -217,14 +217,13 @@ export const ja: I18NBase = {
     disableAcceleratedVideoDecode: "動画再生のGPUアクセラレーションを無効にする",
     disableAcceleratedVideoDecodeDescriptions:
       "動画が乱れたりカクついたりする場合は無効にしてみてください。動画再生時の全体的な動作は重くなりますが、動作の安定感は増します。変更後は再起動が必要です。",
-    developerMode: "開発者モード",
     gamutMapSampling: "ガマットマップのサンプリング数",
     gamutMapSamplingDescriptions:
       "ガマットマップを作る際に読み込むピクセルの量です。最大は65536です。多くすればするほど重くなります。",
-    developerModeDescriptions: (ctx) => {
-      return `開発者モードを有効にすると${ctx.list(
+    webDescriptions: (ctx) => {
+      return `ウェブ機能を有効にすると${ctx.list(
         0,
-      )}ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能を使う際は必須です。変更後は再起動が必要です。再起動後、ファイアウォールの許可が問われますので許可してください。`;
+      )}ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能や、スマホインポート機能に必須です。ファイアウォールの許可が問われますので許可してください。`;
     },
     changePetaFileDirectoryDialog: (ctx) => {
       return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;

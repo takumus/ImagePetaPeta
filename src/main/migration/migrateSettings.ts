@@ -24,8 +24,8 @@ export const migrateSettings = createSyncMigrater<Settings>((data, update) => {
     data.eula = 0;
     update();
   }
-  if (data.developerMode === undefined) {
-    data.developerMode = false;
+  if (data.web === undefined) {
+    data.web = anyData.developerMode !== undefined ? anyData.developerMode : false;
     update();
   }
   if (data.gamutMapSampling === undefined) {

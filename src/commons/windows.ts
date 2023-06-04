@@ -7,6 +7,6 @@ export const windowNames = [
   "capture",
   "quit",
   "modal",
-  "webAccess",
+  "web",
 ] as const;
 export type WindowName = (typeof windowNames)[number];
