@@ -1,14 +1,9 @@
 import cors from "cors";
 import express, { Express } from "express";
-import { IpFilter } from "express-ipfilter";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { resolve } from "path";
 
-import {
-  WEBHOOK_PORT,
-  WEBHOOK_WHITELIST_IP_LIST,
-  WEBHOOK_WHITELIST_ORIGIN_LIST,
-} from "@/commons/defines";
+import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
@@ -29,7 +24,6 @@ export class WebHook extends TypedEventEmitter<{
     super();
     const logger = useLogger();
     const log = logger.logMainChunk();
-    log.debug(`$Webhook(init)`);
     this.http = express();
     this.http.use(express.json({ limit: "100mb" }));
     this.http.use(cors());
