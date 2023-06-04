@@ -12,11 +12,6 @@
       {{ t("settings.autoDarkMode") }}
     </label>
     <p>{{ t("settings.autoDarkModeDescriptions") }}</p>
-    <label>
-      <VCheckbox v-model:value="settingsStore.state.value.alwaysOnTop" />
-      {{ t("settings.alwaysOnTop") }}
-    </label>
-    <p>{{ t("settings.alwaysOnTopDescriptions") }}</p>
     <e-label class="label">
       <VSelect
         v-model:value="settingsStore.state.value.show"
@@ -25,9 +20,6 @@
           { value: 'browser', label: t('settings.showBrowser') },
           { value: 'both', label: t('settings.showBoth') },
         ]" />
-      <!-- <option value="board">{{ t("settings.showBoard") }}</option>
-        <option value="browser">{{ t("settings.showBrowser") }}</option>
-        <option value="both">{{ t("settings.showBoth") }}</option> -->
       {{ t("settings.show") }}
     </e-label>
     <p>{{ t("settings.showDescriptions") }}</p>

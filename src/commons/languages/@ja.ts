@@ -178,13 +178,11 @@ export const ja: I18NBase = {
     autoDarkMode: "ダークモードの自動検出",
     autoDarkModeDescriptions:
       "PCの設定がダークモードかどうかを判別し、本アプリのダークモードを自動で切り替えます。",
-    alwaysOnTop: "常に手前に表示",
     show: "を起動時に表示する。",
     showBoard: "ボードのみ",
     showBrowser: "ブラウザのみ",
     showBoth: "ボードとブラウザ",
     showDescriptions: "アプリ起動時に表示する画面を設定できます。",
-    alwaysOnTopDescriptions: "このアプリのウインドウを常に最前面に固定します。",
     showFPS: "フレームレートを表示",
     showFPSDescriptions: "開発者向けの機能です。",
     zoomSensitivity: "ズーム感度",

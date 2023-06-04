@@ -21,12 +21,11 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
           x: 13,
           y: 13,
         },
-        alwaysOnTop: configSettings.data.alwaysOnTop,
         // transparent: true,
       };
     case "browser":
       return {
-        alwaysOnTop: configSettings.data.alwaysOnTop,
+        //
       };
     case "settings":
       return {
@@ -36,15 +35,14 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         minHeight: WINDOW_SETTINGS_HEIGHT,
         maximizable: false,
         minimizable: false,
-        alwaysOnTop: configSettings.data.alwaysOnTop,
       };
     case "details":
       return {
-        alwaysOnTop: configSettings.data.alwaysOnTop,
+        //
       };
     case "capture":
       return {
-        alwaysOnTop: configSettings.data.alwaysOnTop,
+        //
       };
     case "eula":
       return {
@@ -52,7 +50,6 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         height: WINDOW_EULA_HEIGHT,
         minWidth: WINDOW_EULA_WIDTH,
         minHeight: WINDOW_EULA_HEIGHT,
-        alwaysOnTop: configSettings.data.alwaysOnTop,
       };
     case "quit":
       return {
@@ -61,7 +58,6 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         minWidth: WINDOW_QUIT_WIDTH,
         minHeight: WINDOW_QUIT_HEIGHT,
         resizable: false,
-        alwaysOnTop: true,
         titleBarStyle: undefined,
         closable: false,
       };
@@ -75,7 +71,6 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         minimizable: false,
         maximizable: false,
         resizable: false,
-        alwaysOnTop: configSettings.data.alwaysOnTop,
       };
     case "web":
       return {
@@ -83,7 +78,6 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         height: WINDOW_SETTINGS_HEIGHT,
         minWidth: WINDOW_SETTINGS_WIDTH,
         minHeight: WINDOW_SETTINGS_HEIGHT,
-        alwaysOnTop: configSettings.data.alwaysOnTop,
       };
   }
 }

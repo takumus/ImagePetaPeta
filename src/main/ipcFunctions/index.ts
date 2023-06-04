@@ -411,7 +411,6 @@ export const ipcFunctions: IpcFunctionsType = {
         if (window === undefined || window.isDestroyed()) {
           return;
         }
-        window.setAlwaysOnTop(configSettings.data.alwaysOnTop);
       });
       configSettings.save();
       windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateSettings", settings);
