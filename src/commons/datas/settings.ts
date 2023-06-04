@@ -7,7 +7,6 @@ const defaultSettings = {
   showFPS: false,
   zoomSensitivity: 100,
   moveSensitivity: 100,
-  autoHideUI: false,
   loadTilesInOriginal: true,
   showTagsOnTile: true,
   alwaysShowNSFW: false,

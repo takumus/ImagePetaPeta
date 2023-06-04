@@ -178,8 +178,6 @@ export interface I18NBase extends I18N {
     zoomSensitivityDescriptions: I18NProp;
     moveSensitivity: I18NProp;
     moveSensitivityDescriptions: I18NProp;
-    autoHideUI: I18NProp;
-    autoHideUIDescriptions: I18NProp;
     regenerateMetadatasButton: I18NProp;
     regenerateMetadatasConfirm: I18NProp;
     regenerateMetadatasDescriptions: I18NProp;

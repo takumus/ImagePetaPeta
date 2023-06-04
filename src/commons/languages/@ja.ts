@@ -191,8 +191,6 @@ export const ja: I18NBase = {
     zoomSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
     moveSensitivity: "移動感度(Macのみ)",
     moveSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
-    autoHideUI: "非アクティブ時にUIを隠す",
-    autoHideUIDescriptions: "別アプリを操作している時に、タブバーやボタン等のUIを自動で隠します。",
     regenerateMetadatasButton: "メタデータ再生成",
     regenerateMetadatasConfirm: "サムネイルの再生成には時間がかかりますが、よろしいですか?",
     regenerateMetadatasDescriptions:
