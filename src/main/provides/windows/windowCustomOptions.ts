@@ -63,6 +63,7 @@ export function getWindowCustomOptions(type: WindowName): Electron.BrowserWindow
         resizable: false,
         alwaysOnTop: true,
         titleBarStyle: undefined,
+        closable: false,
       };
     case "modal":
       return {

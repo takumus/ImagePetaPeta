@@ -14,6 +14,9 @@ export class Quit {
     }
     const windows = useWindows();
     windows.openWindow("quit");
+    await new Promise((res) => {
+      setTimeout(res, 500);
+    });
     await useDBS().waitUntilKillable();
     app.exit();
   }
