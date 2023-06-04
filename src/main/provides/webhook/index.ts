@@ -105,7 +105,7 @@ export class WebHook extends TypedEventEmitter<{
     return new Promise<void>((res) => {
       server.close((error) => {
         this.server = undefined;
-        if (error !== undefined) {
+        if (error === undefined) {
           log.debug(`$Webhook(close): done`);
           this.emit("closed");
         } else {
