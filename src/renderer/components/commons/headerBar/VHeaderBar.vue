@@ -16,7 +16,10 @@
       <button v-if="windowName !== 'details'" tabindex="-1" @click="importImageDirectories()">
         <e-icon class="import-folder"></e-icon>
       </button>
-      <button v-if="windowName !== 'details'" tabindex="-1" @click="openWeb()">
+      <button
+        v-if="windowName !== 'details' && settingsStore.state.value.web"
+        tabindex="-1"
+        @click="openWeb()">
         <e-icon class="web"></e-icon>
       </button>
       <!-- <button v-if="windowName !== 'capture'" tabindex="-1" @click="openCapture()">
@@ -41,6 +44,7 @@ import { useI18n } from "vue-i18n";
 import { IPC } from "@/renderer/libs/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
+import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 
@@ -49,6 +53,7 @@ const components = useComponentsStore();
 const { t } = useI18n();
 const { windowName } = useWindowNameStore();
 const windowStatusStore = useWindowStatusStore();
+const settingsStore = useSettingsStore();
 function openBoard() {
   IPC.send("openWindow", "board");
 }
