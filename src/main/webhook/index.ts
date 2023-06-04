@@ -1,7 +1,7 @@
 import cors from "cors";
-import express from "express";
+import express, { Express } from "express";
 import { IpFilter } from "express-ipfilter";
-import { Server } from "http";
+import { IncomingMessage, Server, ServerResponse } from "http";
 import { resolve } from "path";
 
 import {
@@ -11,21 +11,28 @@ import {
 } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
 import { useLogger } from "@/main/provides/utils/logger";
 
 type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = ["importFiles", "getAppInfo"];
-export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin = false) {
-  const logger = useLogger();
-  const initLog = logger.logMainChunk();
-  try {
-    initLog.debug(`$Webhook: init`);
-    const http = express();
-    http.use(express.json({ limit: "100mb" }));
-    http.use(cors());
-    // http.use(IpFilter(WEBHOOK_WHITELIST_IP_LIST, { mode: "allow" }));
-    http.use(
+export class WebHook extends TypedEventEmitter<{
+  open: () => void;
+  error: () => void;
+  closed: () => void;
+}> {
+  private http: Express;
+  private server?: Server<typeof IncomingMessage, typeof ServerResponse>;
+  constructor(private ipcFunctions: IpcFunctionsType) {
+    super();
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    log.debug(`$Webhook(init)`);
+    this.http = express();
+    this.http.use(express.json({ limit: "100mb" }));
+    this.http.use(cors());
+    this.http.use(
       "/web",
       express.static(
         process.env.NODE_ENV === "development"
@@ -33,52 +40,91 @@ export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin
           : resolve(__dirname, "../web"),
       ),
     );
-    http.post("/api", async (req, res) => {
+    this.initAPI();
+  }
+  private initAPI() {
+    const logger = useLogger();
+    this.http.post("/api", async (req, res) => {
       const executeLog = logger.logMainChunk();
       try {
-        executeLog.debug(`$Webhook: receive`, req.headers.origin);
         const eventName = req.body.event as EventNames;
         if (!allowedEvents.includes(eventName)) {
-          res.status(400).json({ error: `invalid event: ${eventName}` });
-          executeLog.debug(`$Webhook: invalid event`, eventName);
+          res.status(400).json({ error: `not allowed event: ${eventName}` });
+          executeLog.debug(`$Webhook(api): not allowed event`, eventName);
           return;
         }
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        const event = ipcFunctions[eventName] as any;
-        if (event) {
-          executeLog.debug(`$Webhook: execute`, eventName);
+        const event = this.ipcFunctions[eventName] as
+          | ((...args: any[]) => Promise<any>)
+          | undefined;
+        if (event !== undefined) {
+          executeLog.debug(`$Webhook(api): execute`, eventName);
           res.json(await event(undefined, ...(req.body.args ?? [])));
-          executeLog.debug(`$Webhook: done`, eventName);
+          executeLog.debug(`$Webhook(api): done`, eventName);
           return;
         }
         res.status(400).json({ error: `invalid event: ${eventName}` });
-        executeLog.debug(`$Webhook: invalid event`, eventName);
+        executeLog.debug(`$Webhook(api): invalid event`, eventName);
       } catch (error) {
         res.status(500).json({ error: `event error: ${JSON.stringify(error)}` });
-        executeLog.error(`$Webhook: event error`, error);
+        executeLog.error(`$Webhook(api): event error`, error);
       }
     });
-    const server = await new Promise<Server>((res) => {
-      const s = http.listen(WEBHOOK_PORT, () => {
-        initLog.debug(`$Webhook: opened`, WEBHOOK_PORT);
-        res(s);
+  }
+  public async open(port: number) {
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    log.debug(`$Webhook(open): begin`, port);
+    if (this.server !== undefined) {
+      log.debug(`$Webhook(open): already opened`);
+      await this.close();
+    }
+    return await new Promise<number>((res, rej) => {
+      this.server = this.http.listen(port, () => {
+        log.debug(`$Webhook(open): done`);
+        this.emit("open");
+        res(port);
+      });
+      this.server.on("error", (error) => {
+        log.debug(`$Webhook(open): error`, WEBHOOK_PORT, error);
+        this.close().then(() => {
+          rej(error);
+        });
       });
     });
-    return {
-      close: () => {
-        return new Promise<void>((res) => {
-          server.close((err) => {
-            if (err) {
-              initLog.error(`$Webhook: could not close`, err);
-            } else {
-              initLog.debug(`$Webhook: closed`, WEBHOOK_PORT);
-              res();
-            }
-          });
-        });
-      },
-    };
-  } catch (error) {
-    initLog.error(`$Webhook: error`, error);
   }
+  public async close() {
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    const server = this.server;
+    log.debug(`$Webhook(close): begin`);
+    if (server === undefined) {
+      log.debug(`$Webhook(close): no server`);
+      return;
+    }
+    return new Promise<void>((res) => {
+      server.close((error) => {
+        this.server = undefined;
+        if (error !== undefined) {
+          log.debug(`$Webhook(close): done`);
+          this.emit("closed");
+        } else {
+          log.debug(`$Webhook(close): done (already closed)`);
+        }
+        res();
+      });
+    });
+  }
+}
+export async function initWebhook(ipcFunctions: IpcFunctionsType, allowAllOrigin = false) {
+  const webhook = new WebHook(ipcFunctions);
+  try {
+    await webhook.open(WEBHOOK_PORT);
+  } catch {
+    //
+  }
+  return {
+    close: () => {
+      return webhook.close();
+    },
+  };
 }
