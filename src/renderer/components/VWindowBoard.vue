@@ -1,5 +1,5 @@
 <template>
-  <e-root>
+  <e-window-root>
     <e-content>
       <e-top>
         <VTitleBar>
@@ -30,7 +30,7 @@
       <VTasks />
     </e-modals>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -231,7 +231,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
+e-window-root {
   background-color: var(--color-0);
   color: var(--color-font);
 

@@ -1,10 +1,10 @@
 <template>
-  <e-root>
-    <e-content>
+  <e-window-root>
+    <e-body>
       <e-top>
         <VTitleBar :title="t('titles.web')"> </VTitleBar>
       </e-top>
-      <e-browser>
+      <e-content>
         <e-accesses>
           <e-access v-for="urlAndQR in webURLData">
             <img :src="urlAndQR.image" />
@@ -16,10 +16,10 @@
             </e-url>
           </e-access>
         </e-accesses>
-      </e-browser>
-    </e-content>
+      </e-content>
+    </e-body>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -84,10 +84,8 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
-  > e-content {
+e-window-root {
+  > e-body {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -102,7 +100,7 @@ e-root {
       width: 100%;
       z-index: 2;
     }
-    > e-browser {
+    > e-content {
       display: flex;
       flex: 1;
       width: 100%;

@@ -1,5 +1,5 @@
 <template>
-  <e-root>
+  <e-window-root>
     <e-content>
       <e-top>
         <VTitleBar :title="''" :hide-controls="true"> </VTitleBar>
@@ -14,7 +14,7 @@
       </e-browser>
     </e-content>
     <VContextMenu :z-index="4" />
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -49,7 +49,7 @@ async function select(index: number) {
 </script>
 
 <style lang="scss" scoped>
-e-root {
+e-window-root {
   background-color: var(--color-0);
   color: var(--color-font);
   > e-content {

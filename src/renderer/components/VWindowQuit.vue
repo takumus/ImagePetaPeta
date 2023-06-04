@@ -1,12 +1,12 @@
 <template>
-  <e-root>
+  <e-window-root>
     <e-content>
       <e-top>
         <VTitleBar :title="t('titles.quit')" :hide-controls="true"> </VTitleBar>
       </e-top>
       <e-browser> {{ t("quit.quitting") }} </e-browser>
     </e-content>
-  </e-root>
+  </e-window-root>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +33,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-e-root {
+e-window-root {
   background-color: var(--color-0);
   color: var(--color-font);
   > e-content {
