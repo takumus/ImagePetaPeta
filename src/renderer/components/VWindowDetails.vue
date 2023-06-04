@@ -1,18 +1,16 @@
 <template>
   <e-window-root>
+    <e-top>
+      <VTitleBar :title="t('titles.details')"> </VTitleBar>
+      <VHeaderBar> </VHeaderBar>
+    </e-top>
     <e-content>
-      <e-top>
-        <VTitleBar :title="t('titles.details')"> </VTitleBar>
-        <VHeaderBar> </VHeaderBar>
-      </e-top>
-      <e-browser>
-        <e-board v-if="petaFile">
-          <VDetails :peta-file="petaFile" :z-index="1" />
-        </e-board>
-        <e-property>
-          <VProperty :peta-files="singlePetaFiles" @select-tag="() => {}" />
-        </e-property>
-      </e-browser>
+      <e-board v-if="petaFile">
+        <VDetails :peta-file="petaFile" :z-index="1" />
+      </e-board>
+      <e-property>
+        <VProperty :peta-files="singlePetaFiles" @select-tag="() => {}" />
+      </e-property>
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
@@ -96,52 +94,41 @@ watch(
 
 <style lang="scss" scoped>
 e-window-root {
-  background-color: var(--color-0);
-  color: var(--color-font);
-  > e-content {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    height: 100%;
+  > e-top {
+    display: block;
     width: 100%;
-    flex-direction: column;
-    > e-top {
+    z-index: 2;
+  }
+  > e-content {
+    display: flex;
+    overflow: hidden;
+    background-color: var(--color-0);
+    flex: 1;
+    z-index: 1;
+    > e-board {
       display: block;
-      width: 100%;
-      z-index: 2;
-    }
-    > e-browser {
-      display: flex;
-      overflow: hidden;
-      background-color: var(--color-0);
       flex: 1;
       z-index: 1;
-      > e-board {
-        display: block;
-        flex: 1;
-        z-index: 1;
-        overflow: hidden;
-        background-repeat: repeat;
-        background-image: url("/images/textures/transparent.png");
-        cursor: grab;
-      }
-      > e-property {
-        padding: var(--px-2);
-        display: block;
-        background-color: var(--color-0);
-        z-index: 2;
-        width: 300px;
-      }
+      overflow: hidden;
+      background-repeat: repeat;
+      background-image: url("/images/textures/transparent.png");
+      cursor: grab;
     }
-    > e-modals {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0px;
-      left: 0px;
-      z-index: 3;
+    > e-property {
+      padding: var(--px-2);
+      display: block;
+      background-color: var(--color-0);
+      z-index: 2;
+      width: 300px;
     }
+  }
+  > e-modals {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 3;
   }
 }
 </style>
