@@ -110,7 +110,7 @@ e-utils-bar-root {
   background-color: var(--color-0);
   min-height: 30px;
   box-shadow: 0px 1.5px 1px 0px rgba(0, 0, 0, 0.3);
-  border-bottom: solid 1px var(--color-0);
+  border-bottom: solid var(--px-border) var(--color-0);
   display: block;
   z-index: 2;
   > e-commons {

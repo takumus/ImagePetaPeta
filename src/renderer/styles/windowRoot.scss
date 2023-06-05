@@ -1,16 +1,17 @@
 e-window-root {
   // 共有
-  --rounded: 8px;
-  --window-buttons-close-hover: #ff0000;
-  --size-0: 0.8em;
-  --size-1: 1em;
-  --size-2: 1.2em;
-  --px-0: 2px;
-  --px-1: 4px;
-  --px-2: 8px;
-  --px-3: 16px;
-  --px-4: 32px;
-  --color-window-button: #ffffff;
+  // --rounded: 8px;
+  // --window-buttons-close-hover: #ff0000;
+  // --size-0: 0.8em;
+  // --size-1: 1em;
+  // --size-2: 1.2em;
+  // --px-border: 1px;
+  // --px-0: 2px;
+  // --px-1: 4px;
+  // --px-2: 8px;
+  // --px-3: 16px;
+  // --px-4: 32px;
+  // --color-window-button: #ffffff;
   display: flex;
   position: fixed;
   background-color: var(--color-0);

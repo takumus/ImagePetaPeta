@@ -66,7 +66,6 @@ const cursorPosition = computed(() => {
 
 <style lang="scss" scoped>
 e-seekbar-root {
-  --seekbar-size: 4px;
   display: block;
   position: relative;
   width: 100%;
@@ -74,7 +73,7 @@ e-seekbar-root {
   background-color: var(--color-0);
   border-radius: var(--rounded);
   overflow: hidden;
-  padding: var(--px-2) calc(var(--px-2) + calc(var(--seekbar-size) / 2));
+  padding: var(--px-2) calc(var(--px-2) + calc(var(--px-1) / 2));
   cursor: pointer;
   > e-cursor-wrapper {
     display: block;
@@ -83,7 +82,7 @@ e-seekbar-root {
     > e-cursor {
       display: block;
       position: relative;
-      width: var(--seekbar-size);
+      width: var(--px-1);
       transform: translateX(-50%);
       height: 100%;
       background-color: var(--color-font);

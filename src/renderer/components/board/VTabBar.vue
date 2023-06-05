@@ -191,8 +191,6 @@ const board = computed(() => {
 
 <style lang="scss" scoped>
 e-tab-root {
-  --tab-height: 24px;
-  --top-draggable-height: 10px;
   top: 0px;
   left: 0px;
   background-color: var(--color-1);
@@ -214,7 +212,7 @@ e-tab-root {
     &.drag {
       position: absolute;
       pointer-events: none;
-      border-left: solid 1px var(--color-border);
+      border-left: solid var(--px-border) var(--color-border);
     }
     &.add {
       min-width: var(--px-3);
