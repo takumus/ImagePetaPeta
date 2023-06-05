@@ -34,6 +34,7 @@
     "tsc": "run-s tsc:*",
     "tsc:main": "tsc -p ./tsconfig.json --noEmit",
     "tsc:renderer": "vue-tsc --noEmit",
+    "tsc:styles": "tsx ./scripts/checkStyleVariables.ts",
     "format": "prettier ./src --write",
     "tsx": "tsx",
     "test": "vitest run",
