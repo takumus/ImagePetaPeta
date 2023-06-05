@@ -11,7 +11,7 @@ import {
 import { WindowName } from "@/commons/windows";
 
 export const windowCustomOptions: {
-  [key in WindowName]: Electron.BrowserWindowConstructorOptions;
+  [key in WindowName]: Readonly<Electron.BrowserWindowConstructorOptions>;
 } = {
   board: {
     trafficLightPosition: {
