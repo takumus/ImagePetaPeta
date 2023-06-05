@@ -127,9 +127,6 @@ export class Windows {
     const state = configWindowStates.data[type];
     logger.debug("$Create Window:", type);
     window.setMenuBarVisibility(false);
-    if (state?.maximized) {
-      window.maximize();
-    }
     window.on("close", () => this.onCloseWindow(type));
     window.addListener("blur", () =>
       this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", false, type),
@@ -170,7 +167,6 @@ export class Windows {
       state = configWindowStates.data[windowName] = {
         width: WINDOW_DEFAULT_WIDTH,
         height: WINDOW_DEFAULT_HEIGHT,
-        maximized: false,
       };
     }
     const window = this.windows[windowName];
@@ -181,7 +177,6 @@ export class Windows {
       state.width = window?.getSize()[0] || WINDOW_DEFAULT_WIDTH;
       state.height = window?.getSize()[1] || WINDOW_DEFAULT_HEIGHT;
     }
-    state.maximized = false; //window.isMaximized();
     configWindowStates.save();
   }
   getWindowByEvent(event: IpcMainInvokeEvent) {
@@ -207,7 +202,7 @@ export class Windows {
     return undefined;
   }
   reloadWindow(type: WindowName) {
-    if (!this.windows[type]?.isDestroyed()) {
+    if (windowIs.alive(this.windows[type])) {
       this.windows[type]?.reload();
     }
   }
