@@ -22,7 +22,11 @@ jobs:
           node-version: 18
       - name: npm ci
         run: npm ci
+      - name: audit
+        run: npm audit
       - name: test
         run: npm run test
         env:
           CI: true
+      - name: tsc
+        run: npm run tsc
