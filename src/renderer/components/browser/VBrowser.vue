@@ -593,7 +593,6 @@ e-browser-root {
   display: flex;
   overflow: hidden;
   > e-left {
-    padding: var(--px-2);
     width: 250px;
     min-width: 128px;
     display: block;
@@ -601,7 +600,6 @@ e-browser-root {
   > e-right {
     width: 250px;
     min-width: 128px;
-    padding: var(--px-2);
     display: flex;
     flex-direction: column;
   }
@@ -610,7 +608,6 @@ e-browser-root {
     flex-direction: column;
     flex: 1;
     height: 100%;
-    padding: var(--px-2);
     > e-content {
       width: 100%;
       height: 100%;
