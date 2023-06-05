@@ -18,7 +18,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
-import { getWindowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
+import { windowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { isDarkMode } from "@/main/utils/darkMode";
 import { defaultStyles } from "@/renderer/styles/styles";
 
@@ -82,7 +82,7 @@ export class Windows {
     }
     if (windowIs.dead(windowName)) {
       this.windows[windowName] = this.createWindow(windowName, {
-        ...getWindowCustomOptions(windowName),
+        ...windowCustomOptions[windowName],
         x: position.x,
         y: position.y,
         modal,
