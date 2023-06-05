@@ -220,8 +220,8 @@ e-textarea-root {
     &.editing {
       cursor: unset;
       &.outline {
-        outline: solid 2px var(--color-font);
-        outline-offset: 1px;
+        outline: solid var(--px-border) var(--color-font);
+        outline-offset: var(--px-1);
       }
     }
   }

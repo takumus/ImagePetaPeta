@@ -135,7 +135,7 @@ e-search-root {
   width: 100%;
   > e-search-box {
     border-radius: var(--rounded);
-    border: solid 1.2px var(--color-border);
+    border: solid var(--px-border) var(--color-border);
     outline: none;
     padding: var(--px-1) var(--px-1) 0px 0px;
     width: 100%;
@@ -155,7 +155,6 @@ e-search-root {
       padding: var(--px-1);
       background-color: var(--color-1);
       box-shadow: var(--shadow-small);
-      // border: solid 1.2px var(--color-border);
       &.last {
         width: 100%;
         background-color: unset;

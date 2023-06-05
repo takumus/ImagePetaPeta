@@ -64,9 +64,9 @@ e-tag-partition-root {
     > e-border {
       flex: 1;
       display: block;
-      height: var(--px-0);
-      border-radius: 999px;
-      background-color: var(--color-border);
+      height: 0px;
+      // border-radius: 999px;
+      border-bottom: solid var(--px-border) var(--color-border);
     }
   }
 }

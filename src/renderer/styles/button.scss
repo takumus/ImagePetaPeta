@@ -2,14 +2,13 @@ e-window-root {
   button {
     display: inline-block;
     border-radius: var(--rounded);
-    border: none;
     background-color: var(--color-0);
     color: var(--color-font);
     padding: var(--px-1) var(--px-3);
     line-height: var(--size-1);
     font-size: var(--size-1);
     cursor: pointer;
-    border: solid 1.2px var(--color-border);
+    border: solid var(--px-border) var(--color-border);
     margin: var(--px-1);
     outline: none;
     overflow: hidden;
@@ -21,7 +20,7 @@ e-window-root {
       background-color: var(--color-2);
     }
     &:focus {
-      border: solid 1.2px var(--color-accent-1);
+      border: solid var(--px-border) var(--color-accent-1);
     }
   }
 }
