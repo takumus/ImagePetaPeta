@@ -4,6 +4,5 @@ export type WindowStates = {
   [key in WindowName]?: {
     width: number;
     height: number;
-    maximized: boolean;
   };
 };
