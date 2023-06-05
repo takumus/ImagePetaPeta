@@ -310,7 +310,10 @@ function selectTile(thumb: Tile, force = false) {
       if (
         widthDiff > 0 &&
         heightDiff > 0 &&
-        hitArea / ptArea > BROWSER_THUMBNAILS_SELECTION_PERCENT
+        hitArea / ptArea >
+          (statesStore.state.value.browserTileViewMode === "fill2"
+            ? 0
+            : BROWSER_THUMBNAILS_SELECTION_PERCENT)
       ) {
         pt.petaFile.renderer.selected = true;
       }
