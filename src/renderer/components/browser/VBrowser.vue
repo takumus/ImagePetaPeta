@@ -28,11 +28,6 @@
               tabindex="-1"
               v-model="currentColor"
               v-if="sortMode === 'SIMILAR'" />
-            <VSlider
-              v-model:value="thumbnailsSize"
-              @change="updateTileSize"
-              :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
-              :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX" />
           </e-buttons>
         </e-top>
         <e-tiles ref="thumbnails">
@@ -54,6 +49,14 @@
               @dblclick="openDetail" />
           </e-tiles-content>
         </e-tiles>
+        <e-bottom>
+          <e-space></e-space>
+          <VSlider
+            v-model:value="thumbnailsSize"
+            @change="updateTileSize"
+            :min="defines.BROWSER_THUMBNAIL_ZOOM_MIN"
+            :max="defines.BROWSER_THUMBNAIL_ZOOM_MAX" />
+        </e-bottom>
       </e-content>
     </e-center>
     <e-right>
@@ -620,6 +623,7 @@ e-browser-root {
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      gap: var(--px-2);
       > e-top {
         width: 100%;
         display: flex;
@@ -641,6 +645,14 @@ e-browser-root {
             display: flex;
             align-items: center;
           }
+        }
+      }
+      > e-bottom {
+        width: 100%;
+        display: flex;
+        padding: 0px var(--px-2);
+        > e-space {
+          flex: 1;
         }
       }
       > e-tiles {
