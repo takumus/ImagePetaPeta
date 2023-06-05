@@ -388,15 +388,14 @@ e-property-root {
         > e-data {
           display: flex;
           margin: var(--px-1) 0px;
+          gap: var(--px-1);
           > e-name {
             display: block;
             width: 35%;
             position: relative;
             text-align: right;
-            padding: 0px var(--px-1);
           }
           > e-value {
-            padding: 0px var(--px-1);
             display: block;
             width: 65%;
             word-break: break-word;
