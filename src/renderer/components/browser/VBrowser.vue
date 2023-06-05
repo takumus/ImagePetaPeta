@@ -619,7 +619,6 @@ e-browser-root {
       > e-top {
         width: 100%;
         display: flex;
-        padding: 0px 0px var(--px-2) 0px;
         flex-wrap: wrap;
         align-items: center;
         justify-content: center;
