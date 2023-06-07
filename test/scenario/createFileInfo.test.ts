@@ -19,12 +19,12 @@ describe("createFileInfo", () => {
   });
   beforeEach(async (h) => {
     try {
-      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+      rmdirSync(resolve(ROOT, h.task.name), { recursive: true });
     } catch {
       //
     }
-    mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
-    await initDummyElectron(resolve(ROOT, h.meta.name));
+    mkdirSync(resolve(ROOT, h.task.name), { recursive: true });
+    await initDummyElectron(resolve(ROOT, h.task.name));
   });
   test("fromBuffer", async () => {
     const correctHash = await fileSHA256(DOG_FILE);

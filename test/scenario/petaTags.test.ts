@@ -21,12 +21,12 @@ describe("petaTags", () => {
   });
   beforeEach(async (h) => {
     try {
-      rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+      rmdirSync(resolve(ROOT, h.task.name), { recursive: true });
     } catch {
       //
     }
-    mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
-    await initDummyElectron(resolve(ROOT, h.meta.name));
+    mkdirSync(resolve(ROOT, h.task.name), { recursive: true });
+    await initDummyElectron(resolve(ROOT, h.task.name));
   });
   test("addPetaTag", async () => {
     const petaTagsController = usePetaTagsController();

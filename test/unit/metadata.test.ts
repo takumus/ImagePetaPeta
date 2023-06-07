@@ -24,12 +24,12 @@ describe("metadata", () => {
   });
   beforeEach(async (h) => {
     try {
-      // rmdirSync(resolve(ROOT, h.meta.name), { recursive: true });
+      // rmdirSync(resolve(ROOT, h.task.name), { recursive: true });
     } catch {
       //
     }
-    mkdirSync(resolve(ROOT, h.meta.name), { recursive: true });
-    provide(loggerKey, new Logger(resolve(ROOT, h.meta.name)));
+    mkdirSync(resolve(ROOT, h.task.name), { recursive: true });
+    provide(loggerKey, new Logger(resolve(ROOT, h.task.name)));
   });
   test("generate", async (h) => {
     // const files: string[] = (await readdir(resolve("./test/sampleDatas"))).map((file) =>
@@ -48,7 +48,7 @@ describe("metadata", () => {
             path: basename(file) + ".webp",
           });
           writeFile(
-            resolve(ROOT, h.meta.name, basename(file) + ".webp"),
+            resolve(ROOT, h.task.name, basename(file) + ".webp"),
             metadata.thumbnail.buffer,
           );
         }
@@ -58,7 +58,7 @@ describe("metadata", () => {
       }
     }, files).promise;
     console.timeEnd("time");
-    const htmlPath = resolve(resolve(ROOT, h.meta.name), "out.html");
+    const htmlPath = resolve(resolve(ROOT, h.task.name), "out.html");
     console.log("output:", htmlPath);
     await writeFile(
       htmlPath,
