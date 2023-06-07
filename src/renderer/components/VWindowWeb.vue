@@ -11,7 +11,7 @@
             {{ urlAndQR.name }}
           </e-name>
           <e-url class="url" @click="IPC.send('openURL', urlAndQR.url)">
-            {{ urlAndQR.url }}
+            {{ urlAndQR.url.replace(/\?.*/g, "***") }}
           </e-url>
         </e-access>
       </e-accesses>
