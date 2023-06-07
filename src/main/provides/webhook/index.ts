@@ -2,6 +2,7 @@ import cors from "cors";
 import express, { Express } from "express";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { resolve } from "path";
+import { v4 as uuid } from "uuid";
 
 import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
@@ -20,13 +21,28 @@ export class WebHook extends TypedEventEmitter<{
 }> {
   private http: Express;
   private server?: Server<typeof IncomingMessage, typeof ServerResponse>;
+  private webAPIKey = Array.from(Array(8))
+    .map(() => uuid())
+    .join("-");
   constructor(private ipcFunctions: IpcFunctionsType) {
     super();
     const logger = useLogger();
     const log = logger.logMainChunk();
     this.http = express();
-    this.http.use(express.json({ limit: "100mb" }));
     this.http.use(cors());
+    this.http.use("/api", (req, res, next) => {
+      if (req.headers.origin === "chrome-extension://chjinkjphlcagmkcnodhahagecmdlaif") {
+        next();
+        return;
+      }
+      if (req.headers["impt-web-api-key"] === this.webAPIKey) {
+        next();
+        return;
+      }
+      res.status(400);
+      res.json({ "you-are-not-image-petapeta": true });
+    });
+    this.http.use(express.json({ limit: "100mb" }));
     this.http.use(
       "/web",
       express.static(
@@ -108,6 +124,9 @@ export class WebHook extends TypedEventEmitter<{
         res();
       });
     });
+  }
+  public getAPIKEY() {
+    return this.webAPIKey;
   }
 }
 export const webhookKey = createKey<WebHook>("webhook");
