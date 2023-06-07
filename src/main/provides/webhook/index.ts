@@ -2,7 +2,6 @@ import cors from "cors";
 import express, { Express } from "express";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { resolve } from "path";
-import { v4 as uuid } from "uuid";
 
 import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
@@ -11,6 +10,7 @@ import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useLogger } from "@/main/provides/utils/logger";
+import { createWebhookAPIKey } from "@/main/provides/webhook/createWebhookAPIKey";
 
 type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = ["importFiles", "getAppInfo"];
@@ -21,9 +21,7 @@ export class WebHook extends TypedEventEmitter<{
 }> {
   private http: Express;
   private server?: Server<typeof IncomingMessage, typeof ServerResponse>;
-  private webAPIKey = Array.from(Array(8))
-    .map(() => uuid())
-    .join("-");
+  private webAPIKey = createWebhookAPIKey();
   constructor(private ipcFunctions: IpcFunctionsType) {
     super();
     const logger = useLogger();
