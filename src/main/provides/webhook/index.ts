@@ -40,7 +40,7 @@ export class WebHook extends TypedEventEmitter<{
         return;
       }
       res.status(400);
-      res.json({ "you-are-not-image-petapeta": true });
+      res.json({ error: "you are not image-petapeta" });
     });
     this.http.use(express.json({ limit: "100mb" }));
     this.http.use(
