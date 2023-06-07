@@ -31,7 +31,10 @@ const selectedData = ref<{ dataURL: string; filename: string } | undefined>();
 const uploading = ref(false);
 const status = ref<"successful" | "progress" | "failed" | "ready">("ready");
 const connected = ref(true);
+const apiKey = ref("");
 onMounted(async () => {
+  apiKey.value = location.search.split("?webAPIKey=")[1];
+  // window.history.replaceState(null, "", "/web");
   let alive = true;
   setInterval(() => {
     if (alive) {
@@ -113,6 +116,7 @@ async function send<U extends keyof IpcFunctions>(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "impt-web-api-key": apiKey.value,
     },
     body: JSON.stringify({
       event,

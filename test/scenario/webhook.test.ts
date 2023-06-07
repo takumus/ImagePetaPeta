@@ -28,6 +28,7 @@ describe("webhook", () => {
     await initDummyElectron(resolve(ROOT, h.meta.name));
   });
   async function post<U extends keyof IpcFunctions>(
+    apiKey: string,
     event: U,
     ...args: Parameters<IpcFunctions[U]>
   ): Promise<Awaited<ReturnType<IpcFunctions[U]>>> {
@@ -35,6 +36,7 @@ describe("webhook", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "impt-web-api-key": apiKey,
       },
       body: JSON.stringify({
         event,
@@ -46,7 +48,7 @@ describe("webhook", () => {
   test("importFiles", async () => {
     const webhook = useWebHook();
     await webhook.open(51920);
-    const ids = await post("importFiles", [
+    const ids = await post(webhook.getAPIKEY(), "importFiles", [
       [
         {
           type: "filePath",
@@ -60,8 +62,14 @@ describe("webhook", () => {
   test("whitelist", async () => {
     const webhook = useWebHook();
     await webhook.open(51920);
-    const appInfo = (await post("getSettings")) as any;
+    const appInfo = (await post(webhook.getAPIKEY(), "getSettings")) as any;
     expect(appInfo).property("error");
     await webhook?.close();
+  });
+  test("wrongAPIKey", async () => {
+    const webhook = useWebHook();
+    await webhook.open(51920);
+    const appInfo = (await post("wawawawawa", "getSettings")) as any;
+    expect(appInfo).property("error");
   });
 });
