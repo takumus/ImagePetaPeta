@@ -835,7 +835,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const ips = getIPs();
     Object.keys(ips).forEach((key) => {
       ips[key] = ips[key].map((ip) => {
-        return `http://${ip}:${WEBHOOK_PORT}/web/`;
+        return `http://${ip}:${WEBHOOK_PORT}/web/?webAPIKey=${useWebHook().getAPIKEY()}`;
       });
     });
     return ips;
