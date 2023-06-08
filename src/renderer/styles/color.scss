@@ -19,6 +19,6 @@ e-window-root {
 
   ::-webkit-color-swatch {
     border: solid 1.2px var(--color-border);
-    border-radius: 999px;
+    border-radius: var(--rounded-circle);
   }
 }

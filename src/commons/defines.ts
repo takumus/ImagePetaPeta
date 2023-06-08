@@ -31,7 +31,6 @@ export const BROWSER_THUMBNAIL_SIZE: number = 256;
 export const BROWSER_THUMBNAIL_ZOOM_MIN: number = 64;
 export const BROWSER_THUMBNAIL_ZOOM_MAX: number = 512;
 export const BROWSER_THUMBNAIL_ZOOM_STEP: number = 16;
-export const BROWSER_THUMBNAIL_MARGIN: number = 8;
 export const BROWSER_LOAD_ORIGINAL_DELAY: number = 500;
 export const BROWSER_LOAD_ORIGINAL_DELAY_RANDOM: number = 300;
 export const BROWSER_LOAD_THUMBNAIL_DELAY: number = 200;

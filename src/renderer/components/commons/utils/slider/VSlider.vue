@@ -100,7 +100,7 @@ e-slider-root {
       top: 0px;
       left: 0px;
       background-color: var(--color-checkbox-false-background);
-      border-radius: 999px;
+      border-radius: var(--rounded);
       overflow: hidden;
       > e-bar-inner {
         display: block;
@@ -111,7 +111,7 @@ e-slider-root {
     > e-circle {
       z-index: 2;
       display: block;
-      border-radius: 999px;
+      border-radius: var(--rounded-circle);
       background-color: var(--color-checkbox-true-circle);
       height: 100%;
       aspect-ratio: 1;

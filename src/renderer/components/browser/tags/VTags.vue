@@ -45,10 +45,6 @@
         :style="{
           order: orders[p.id] ?? 0,
         }" />
-      <e-drag-target-line
-        class="e-drag-target-line"
-        ref="dragTargetLineElement"
-        v-if="draggingData"></e-drag-target-line>
     </e-tags>
     <e-drag-floating-tag-cell v-if="draggingData !== undefined" ref="floatingCellElement">
       <VTagCell
@@ -397,7 +393,7 @@ e-tags-root {
   }
   > e-tags {
     outline: none;
-    padding: var(--px-1);
+    // padding: var(--px-1);
     width: 100%;
     text-align: left;
     overflow-y: auto;
@@ -406,24 +402,6 @@ e-tags-root {
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--px-1);
-  }
-  > e-drag-target-line {
-    position: fixed;
-    z-index: 999;
-    width: 0px;
-    height: 0px;
-    top: 0px;
-    left: 0px;
-    transform-origin: top left;
-    &::after {
-      content: "";
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: 99px;
-      background-color: var(--color-accent-2);
-      transform: translate(-50%, -50%);
-    }
   }
   > e-drag-floating-tag-cell {
     z-index: 999;

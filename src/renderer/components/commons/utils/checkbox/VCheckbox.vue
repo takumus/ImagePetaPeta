@@ -28,13 +28,13 @@ e-checkbox-root {
     display: block;
     height: 100%;
     aspect-ratio: 2;
-    border-radius: 999px;
+    border-radius: var(--rounded-circle);
     position: relative;
     background-color: var(--color-checkbox-false-background);
     overflow: hidden;
     > e-circle {
       display: block;
-      border-radius: 999px;
+      border-radius: var(--rounded-circle);
       background-color: var(--color-checkbox-false-circle);
       height: 100%;
       aspect-ratio: 1;
