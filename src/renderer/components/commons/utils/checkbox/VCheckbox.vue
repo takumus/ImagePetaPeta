@@ -21,14 +21,14 @@ function click() {
 <style lang="scss" scoped>
 e-checkbox-root {
   display: inline-block;
-  height: 26px;
+  height: 23px;
   padding: var(--px-1);
   cursor: pointer;
   > e-content {
     display: block;
     height: 100%;
     aspect-ratio: 2;
-    border-radius: var(--rounded-circle);
+    border-radius: var(--rounded);
     position: relative;
     background-color: var(--color-checkbox-false-background);
     overflow: hidden;
