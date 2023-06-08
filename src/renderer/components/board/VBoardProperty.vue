@@ -80,7 +80,7 @@ e-board-property-root {
     height: 100%;
     min-width: 50px;
     &.color {
-      border-radius: 100px;
+      border-radius: var(--rounded);
       width: auto;
       min-width: 0px;
       aspect-ratio: 1;

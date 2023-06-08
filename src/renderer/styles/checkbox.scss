@@ -23,7 +23,7 @@ e-window-root {
     line-height: var(--checkbox-height);
 
     background-color: var(--checkbox-button-color);
-    border-radius: 9999px;
+    border-radius: var(--rounded-circle);
     border: var(--checkbox-border-size) solid var(--checkbox-border-color);
     box-shadow: inset 0px 0px 0px var(--checkbox-background-color),
       inset calc(var(--checkbox-height) * -1) 0px 0px var(--checkbox-background-color);

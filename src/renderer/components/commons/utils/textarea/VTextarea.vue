@@ -216,12 +216,12 @@ e-textarea-root {
     white-space: pre-wrap;
     word-break: break-word;
     outline: none;
-    border-radius: 2px;
+    border-radius: calc(var(--rounded) / 4);
     &.editing {
       cursor: unset;
       &.outline {
         outline: solid var(--px-border) var(--color-font);
-        outline-offset: var(--px-1);
+        outline-offset: var(--px-0);
       }
     }
   }

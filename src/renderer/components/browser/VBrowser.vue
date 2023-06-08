@@ -33,7 +33,7 @@
         <e-tiles ref="thumbnails">
           <e-tiles-content
             ref="thumbsWrapper"
-            :style="{ height: scrollHeight + defines.BROWSER_THUMBNAIL_MARGIN + 'px' }">
+            :style="{ height: scrollHeight + BROWSER_THUMBNAIL_MARGIN + 'px' }">
             <VTile
               v-for="data in visibleTiles"
               :key="data.id"
@@ -90,7 +90,6 @@ import { browserTileViewMode } from "@/commons/datas/states";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BROWSER_THUMBNAILS_SELECTION_PERCENT,
-  BROWSER_THUMBNAIL_MARGIN,
   BROWSER_THUMBNAIL_SIZE,
   BROWSER_THUMBNAIL_ZOOM_MAX,
   BROWSER_THUMBNAIL_ZOOM_MIN,
@@ -148,6 +147,7 @@ const fetchFilteredPetaFilesThrottle = throttle(100, (reload: boolean) =>
 const fetchFilteredPetaFilesDebounce = debounce(100, (reload: boolean) =>
   fetchFilteredPetaFiles(reload),
 );
+const BROWSER_THUMBNAIL_MARGIN = 8;
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -599,6 +599,7 @@ e-browser-root {
   height: 100%;
   display: flex;
   overflow: hidden;
+  gap: var(--px-2);
   > e-left {
     width: 250px;
     min-width: 128px;
@@ -661,7 +662,6 @@ e-browser-root {
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
-        border-radius: var(--px-2);
         > e-tiles-content {
           display: block;
         }
