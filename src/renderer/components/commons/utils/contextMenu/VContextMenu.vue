@@ -84,12 +84,13 @@ defineExpose({
   color: var(--color-font);
   border-radius: var(--rounded);
   overflow: hidden;
+  padding: var(--px-1);
   > .item {
     word-break: break-word;
     list-style-type: none;
     min-width: 128px;
     padding: var(--px-2) 24px;
-    // padding-left: 24px;
+    border-radius: calc(var(--rounded) / 2);
     cursor: pointer;
     &:hover {
       background-color: var(--color-accent-1);
