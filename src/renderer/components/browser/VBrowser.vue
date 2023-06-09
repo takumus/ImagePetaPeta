@@ -1,6 +1,6 @@
 <template>
   <e-browser-root>
-    <e-left>
+    <e-left ref="left">
       <VTags
         :peta-files-array="petaFilesArray"
         v-model:selected-filter-type="selectedFilterType"
@@ -83,6 +83,7 @@ import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
+import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
@@ -148,6 +149,39 @@ const fetchFilteredPetaFilesDebounce = debounce(100, (reload: boolean) =>
   fetchFilteredPetaFiles(reload),
 );
 const BROWSER_THUMBNAIL_MARGIN = 8;
+const left = ref<HTMLElement>();
+function setupResizer(element: HTMLElement) {
+  const resizerStore = useResizerStore();
+  resizerStore.observe(element);
+  const resizerElement = document.createElement("e-resizer");
+  resizerElement.style.position = "fixed";
+  resizerElement.style.width = "8px";
+  resizerElement.style.backgroundColor = "#ff0000";
+  resizerElement.style.transform = "translateX(-50%)";
+  element.appendChild(resizerElement);
+  resizerStore.on("resize", () => {
+    const rect = element.getBoundingClientRect();
+    resizerElement.style.left = rect.right + "px";
+    resizerElement.style.height = rect.height + "px";
+    resizerElement.style.top = rect.y + "px";
+  });
+  resizerElement.addEventListener("pointerdown", (event) => {
+    if (event.button !== MouseButton.LEFT) {
+      return;
+    }
+    function move(event: PointerEvent) {
+      const rect = element.getBoundingClientRect();
+      element.style.setProperty("width", `${event.clientX - rect.x}px`);
+      element.style.setProperty("min-width", `${event.clientX - rect.x}px`);
+    }
+    function up() {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    }
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  });
+}
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -165,6 +199,9 @@ onMounted(() => {
       selectedFilterType.value = FilterType.ALL;
     }
   });
+  if (left.value) {
+    setupResizer(left.value);
+  }
 });
 onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
@@ -602,12 +639,12 @@ e-browser-root {
   gap: var(--px-2);
   > e-left {
     width: 250px;
-    min-width: 128px;
-    display: block;
+    min-width: 250px;
+    display: flex;
   }
   > e-right {
     width: 250px;
-    min-width: 128px;
+    min-width: 250px;
     display: flex;
     flex-direction: column;
   }
