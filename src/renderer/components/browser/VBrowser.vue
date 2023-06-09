@@ -59,7 +59,7 @@
         </e-bottom>
       </e-content>
     </e-center>
-    <e-right>
+    <e-right ref="right">
       <VPreview
         :peta-files="selectedPetaFiles"
         @clear-selection-all="clearSelectionAll"
@@ -152,19 +152,20 @@ const fetchFilteredPetaFilesDebounce = debounce(100, (reload: boolean) =>
 );
 const BROWSER_THUMBNAIL_MARGIN = 8;
 const left = ref<HTMLElement>();
-function setupResizer(element: HTMLElement) {
+const right = ref<HTMLElement>();
+function setupResizer(element: HTMLElement, position: "left" | "right") {
   const resizerStore = useResizerStore();
   resizerStore.observe(element);
   const resizerElement = document.createElement("e-resizer");
   resizerElement.style.position = "fixed";
   resizerElement.style.width = "8px";
-  resizerElement.style.backgroundColor = "#ff0000";
+  resizerElement.style.backgroundColor = "#ff000055";
   resizerElement.style.transform = "translateX(-50%)";
   resizerElement.style.cursor = "ew-resize";
   element.appendChild(resizerElement);
   resizerStore.on("resize", () => {
     const rect = element.getBoundingClientRect();
-    resizerElement.style.left = rect.right + "px";
+    resizerElement.style.left = (position === "left" ? rect.left : rect.right) + "px";
     resizerElement.style.height = rect.height + "px";
     resizerElement.style.top = rect.y + "px";
   });
@@ -175,8 +176,9 @@ function setupResizer(element: HTMLElement) {
     setCursor("ew-resize");
     function move(event: PointerEvent) {
       const rect = element.getBoundingClientRect();
-      element.style.setProperty("width", `${event.clientX - rect.x}px`);
-      element.style.setProperty("min-width", `${event.clientX - rect.x}px`);
+      const width = position === "right" ? event.clientX - rect.left : rect.right - event.clientX;
+      element.style.setProperty("width", `${width}px`);
+      element.style.setProperty("min-width", `${width}px`);
     }
     function up() {
       window.removeEventListener("pointermove", move);
@@ -205,7 +207,10 @@ onMounted(() => {
     }
   });
   if (left.value) {
-    setupResizer(left.value);
+    setupResizer(left.value, "right");
+  }
+  if (right.value) {
+    setupResizer(right.value, "left");
   }
 });
 onUnmounted(() => {
