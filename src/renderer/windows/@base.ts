@@ -18,10 +18,6 @@ import {
   createComponentsStore,
 } from "@/renderer/stores/componentsStore/createComponentsStore";
 import {
-  createDarkModeStore,
-  darkModeStoreKey,
-} from "@/renderer/stores/darkModeStore/createDarkModeStore";
-import {
   createDefinesStore,
   definesStoreKey,
 } from "@/renderer/stores/definesStore/createDefinesStore";
@@ -31,6 +27,7 @@ import {
   settingsStoreKey,
 } from "@/renderer/stores/settingsStore/createSettingsStore";
 import { createStatesStore, statesStoreKey } from "@/renderer/stores/statesStore/createStatesStore";
+import { createStyleStore, styleStoreKey } from "@/renderer/stores/styleStore/createStyleStore";
 import {
   createSystemInfoStore,
   systemInfoStoreKey,
@@ -75,7 +72,7 @@ export async function create(
       }),
     );
     await Promise.all([
-      (async () => app.provide(darkModeStoreKey, await createDarkModeStore()))(),
+      (async () => app.provide(styleStoreKey, await createStyleStore()))(),
       (async () => app.provide(nsfwStoreKey, await createNSFWStore()))(),
       (async () => app.provide(windowNameStoreKey, await createWindowNameStore(windowName)))(),
       (async () => app.provide(definesStoreKey, await createDefinesStore()))(),

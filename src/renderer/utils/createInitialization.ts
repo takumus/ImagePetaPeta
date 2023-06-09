@@ -9,7 +9,7 @@ export function createInitialization() {
   return {
     initialize: async () => {
       const appInfo = await IPC.send("getAppInfo");
-      initializationDOM.style.color = (await IPC.send("getIsDarkMode")) ? "#ffffff" : "#000000";
+      initializationDOM.style.color = (await IPC.send("getStyle"))["--color-font"];
       initializationTitleDOM.innerHTML = `${appInfo.name}-${appInfo.version}`;
       IPC.on("initializationProgress", (e, log) => {
         initializationLogDOM.innerHTML = `${log}\n${initializationLogDOM.innerHTML}`

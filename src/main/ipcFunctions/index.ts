@@ -39,7 +39,7 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
-import { isDarkMode } from "@/main/utils/darkMode";
+import { getStyle } from "@/main/utils/darkMode";
 import { getIPs } from "@/main/utils/getIPs";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
@@ -137,7 +137,13 @@ export const ipcFunctions: IpcFunctionsType = {
       const length = Object.keys(petaBoards).length;
       if (length === 0) {
         log.debug("no boards! create empty board");
-        const board = createPetaBoard(BOARD_DEFAULT_NAME, 0, isDarkMode());
+        const style = getStyle();
+        const board = createPetaBoard(
+          BOARD_DEFAULT_NAME,
+          0,
+          style["--color-0"],
+          style["--color-2"],
+        );
         await petaBoardsController.updateMultiple([board], UpdateMode.INSERT);
         petaBoards[board.id] = board;
       }
@@ -416,7 +422,7 @@ export const ipcFunctions: IpcFunctionsType = {
       configSettings.save();
       windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateSettings", settings);
       windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
-      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "darkMode", isDarkMode());
+      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "style", getStyle());
       log.debug("return:", configSettings.data);
       return true;
     } catch (e) {
@@ -752,8 +758,8 @@ export const ipcFunctions: IpcFunctionsType = {
   async getDetailsPetaFile() {
     return detailsPetaFile;
   },
-  async getIsDarkMode() {
-    return isDarkMode();
+  async getStyle() {
+    return getStyle();
   },
   async getIsDataInitialized() {
     const dbStatus = useDBStatus();

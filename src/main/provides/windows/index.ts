@@ -19,7 +19,7 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
 import { windowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
-import { isDarkMode } from "@/main/utils/darkMode";
+import { getStyle } from "@/main/utils/darkMode";
 import { defaultStyles } from "@/renderer/styles/styles";
 
 export class Windows {
@@ -112,9 +112,7 @@ export class Windows {
         backgroundThrottling: false,
         preload: Path.join(__dirname, "preload.js"),
       },
-      backgroundColor: isDarkMode()
-        ? defaultStyles.dark["--color-0"]
-        : defaultStyles.light["--color-0"],
+      backgroundColor: getStyle()["--color-0"],
       trafficLightPosition: {
         x: 8,
         y: 8,

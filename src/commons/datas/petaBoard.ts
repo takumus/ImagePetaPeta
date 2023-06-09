@@ -20,7 +20,7 @@ export interface PetaBoardTransform {
   scale: number;
   position: Vec2;
 }
-export function createPetaBoard(name: string, index = 0, dark: boolean) {
+export function createPetaBoard(name: string, index = 0, fillColor: string, lineColor: string) {
   const board: PetaBoard = {
     petaPanels: {},
     id: uuid(),
@@ -30,8 +30,8 @@ export function createPetaBoard(name: string, index = 0, dark: boolean) {
       position: new Vec2(0, 0),
     },
     background: {
-      fillColor: dark ? defaultStyles.dark["--color-0"] : defaultStyles.light["--color-0"],
-      lineColor: dark ? defaultStyles.dark["--color-2"] : defaultStyles.light["--color-2"],
+      fillColor, //dark ? defaultStyles.dark["--color-0"] : defaultStyles.light["--color-0"],
+      lineColor, //defaultStyles.dark["--color-2"] : defaultStyles.light["--color-2"],
     },
     index: index,
   };
