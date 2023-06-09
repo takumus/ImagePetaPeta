@@ -111,6 +111,8 @@ import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsSto
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { setCursor } from "@/renderer/utils/cursor";
+import { setDefaultCursor } from "@/renderer/utils/cursor";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 
 const statesStore = useStateStore();
@@ -158,6 +160,7 @@ function setupResizer(element: HTMLElement) {
   resizerElement.style.width = "8px";
   resizerElement.style.backgroundColor = "#ff0000";
   resizerElement.style.transform = "translateX(-50%)";
+  resizerElement.style.cursor = "ew-resize";
   element.appendChild(resizerElement);
   resizerStore.on("resize", () => {
     const rect = element.getBoundingClientRect();
@@ -169,6 +172,7 @@ function setupResizer(element: HTMLElement) {
     if (event.button !== MouseButton.LEFT) {
       return;
     }
+    setCursor("ew-resize");
     function move(event: PointerEvent) {
       const rect = element.getBoundingClientRect();
       element.style.setProperty("width", `${event.clientX - rect.x}px`);
@@ -177,6 +181,7 @@ function setupResizer(element: HTMLElement) {
     function up() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      setDefaultCursor();
     }
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
