@@ -4,7 +4,9 @@
       <VTitleBar :title="''" :hide-controls="true"> </VTitleBar>
     </e-top>
     <e-content v-if="modalData">
-      <e-body>{{ modalData.label }}</e-body>
+      <e-body>
+        {{ modalData.label }}
+      </e-body>
       <e-buttons>
         <button v-for="(item, index) in modalData.items" @click="select(index)">
           {{ item }}
@@ -49,14 +51,22 @@ async function select(index: number) {
 <style lang="scss" scoped>
 e-window-root {
   > e-content {
+    display: flex;
+    flex-direction: column;
     > e-body {
-      display: block;
+      display: flex;
       white-space: pre-wrap;
       user-select: text;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      text-align: center;
+      flex: 1;
     }
     > e-buttons {
       display: block;
       text-align: center;
+      padding-bottom: var(--px-2);
     }
   }
 }
