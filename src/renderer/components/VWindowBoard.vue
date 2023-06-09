@@ -60,11 +60,11 @@ import { IPC } from "@/renderer/libs/ipc";
 import { logChunk } from "@/renderer/libs/rendererLogger";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
 import { useImageImporterStore } from "@/renderer/stores/imageImporterStore/useImageImporterStore";
 import { usePetaBoardsStore } from "@/renderer/stores/petaBoardsStore/usePetaBoardsStore";
 import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFilesStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { useStyleStore } from "@/renderer/stores/styleStore/useStyleStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
@@ -72,7 +72,7 @@ import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindo
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();
-const darkModeStore = useDarkModeStore();
+const styleStore = useStyleStore();
 const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
 const windowNameStore = useWindowNameStore();
@@ -194,7 +194,12 @@ async function removePetaBoard(board: RPetaBoard) {
   );
 }
 async function addPetaBoard() {
-  selectPetaBoard(await petaBoardsStore.addPetaBoard(darkModeStore.state.value));
+  selectPetaBoard(
+    await petaBoardsStore.addPetaBoard(
+      styleStore.style.value["--color-0"],
+      styleStore.style.value["--color-2"],
+    ),
+  );
 }
 function updatePetaBoard(board: RPetaBoard) {
   petaBoardsStore.savePetaBoard(board);

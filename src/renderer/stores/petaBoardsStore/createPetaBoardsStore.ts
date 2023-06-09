@@ -53,7 +53,7 @@ export async function createPetaBoardsStore() {
     await IPC.send("updatePetaBoards", [rPetaBoardToPetaBoard(petaBoard)], UpdateMode.REMOVE);
     await getPetaBoards();
   }
-  async function addPetaBoard(dark = false) {
+  async function addPetaBoard(fillColor: string, lineColor: string) {
     const name = getNameAvoidDuplication(
       BOARD_DEFAULT_NAME,
       Object.values(states.value).map((b) => b.name),
@@ -61,7 +61,8 @@ export async function createPetaBoardsStore() {
     const board = createPetaBoard(
       name,
       Math.max(...Object.values(states.value).map((b) => b.index), 0) + 1,
-      dark,
+      fillColor,
+      lineColor,
     );
     await IPC.send("updatePetaBoards", [board], UpdateMode.INSERT);
     await getPetaBoards();

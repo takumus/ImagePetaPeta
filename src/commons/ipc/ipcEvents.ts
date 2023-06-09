@@ -7,6 +7,8 @@ import { TaskStatus } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowName } from "@/commons/windows";
 
+import { Style } from "@/renderer/styles/styles";
+
 export interface IpcEvents {
   updatePetaFiles: (petaFiles: PetaFile[], mode: UpdateMode) => void;
   updatePetaTags: (updates: { petaTagIds: string[]; petaFileIds: string[] }) => void;
@@ -22,7 +24,7 @@ export interface IpcEvents {
   updateStates: (states: States) => void;
   showNSFW: (value: boolean) => void;
   detailsPetaFile: (petaFile: PetaFile) => void;
-  darkMode: (value: boolean) => void;
+  style: (value: Style) => void;
   dataInitialized: () => void;
   initializationProgress: (log: string) => void;
   gotoPetaFile: (petaFile: PetaFile) => void;

@@ -14,6 +14,8 @@ import { States } from "@/commons/datas/states";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowName } from "@/commons/windows";
 
+import { Style } from "@/renderer/styles/styles";
+
 export interface IpcFunctions {
   browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
   importFiles: (datas: ImportFileGroup[]) => Promise<string[]>;
@@ -69,7 +71,7 @@ export interface IpcFunctions {
   getShowNSFW: () => Promise<boolean>;
   setShowNSFW: (value: boolean) => Promise<void>;
   searchImageByGoogle: (petaFile: PetaFile) => Promise<boolean>;
-  getIsDarkMode: () => Promise<boolean>;
+  getStyle: () => Promise<Style>;
   getIsDataInitialized: () => Promise<boolean>;
   getLatestVersion: () => Promise<RemoteBinaryInfo>;
   getMediaSources: () => Promise<MediaSourceInfo[]>;

@@ -32,7 +32,7 @@ import { ppa } from "@/commons/utils/pp";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
-import { useDarkModeStore } from "@/renderer/stores/darkModeStore/useDarkModeStore";
+import { useStyleStore } from "@/renderer/stores/styleStore/useStyleStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 import { defaultStyles } from "@/renderer/styles/styles";
@@ -41,13 +41,13 @@ const windowTitleStore = useWindowTitleStore();
 const windowNameStore = useWindowNameStore();
 const appInfoStore = useAppInfoStore();
 const { t } = useI18n();
-const darkModeStore = useDarkModeStore();
+const styleStore = useStyleStore();
 const webURLData = ref<{ url: string; image: string; name: string }[]>([]);
 onMounted(async () => {
   //
 });
 watch(
-  darkModeStore.state,
+  styleStore.style,
   async () => {
     webURLData.value = [];
     const webURLs = await IPC.send("getWebURL");
@@ -56,8 +56,8 @@ watch(
         ...(await ppa(async (url) => {
           const image = await QR.toDataURL(url, {
             color: {
-              light: defaultStyles[darkModeStore.state.value ? "dark" : "light"]["--color-0"],
-              dark: defaultStyles[darkModeStore.state.value ? "dark" : "light"]["--color-font"],
+              light: styleStore.style.value["--color-0"],
+              dark: styleStore.style.value["--color-font"],
             },
             scale: 20,
           });
