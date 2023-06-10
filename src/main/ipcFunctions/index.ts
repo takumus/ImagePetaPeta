@@ -651,7 +651,7 @@ export const ipcFunctions: IpcFunctionsType = {
               };
             }
             if (d?.type === "url") {
-              const result = await createFileInfo.fromURL(d.url, d.referrer);
+              const result = await createFileInfo.fromURL(d.url, d.referrer, d.ua);
               if (result !== undefined) {
                 if (d.additionalData) {
                   result.name = d.additionalData.name ?? result.name;

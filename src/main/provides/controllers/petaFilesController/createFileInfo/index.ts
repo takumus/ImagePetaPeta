@@ -10,7 +10,11 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export const createFileInfo = {
-  fromURL: async (url: string, referrer?: string): Promise<ImportFileInfo | undefined> => {
+  fromURL: async (
+    url: string,
+    referrer?: string,
+    ua?: string,
+  ): Promise<ImportFileInfo | undefined> => {
     const logger = useLogger();
     const paths = usePaths();
     const log = logger.logMainChunk();
@@ -23,19 +27,23 @@ export const createFileInfo = {
         data = dataUriToBuffer(url);
       } else {
         // 普通のurlだったら
-        data = Buffer.from(
-          await (
-            await fetch(url, {
-              headers:
-                referrer !== undefined
-                  ? {
-                      Referer: referrer,
-                    }
-                  : undefined,
-              method: "GET",
-            })
-          ).arrayBuffer(),
-        );
+        const init: RequestInit = {
+          headers: {
+            ...(ua !== undefined
+              ? {
+                  "user-agent": ua,
+                }
+              : {}),
+            ...(referrer !== undefined
+              ? {
+                  Referer: referrer,
+                }
+              : {}),
+            method: "GET",
+          },
+        };
+        log.debug("RequestInit:", init);
+        data = Buffer.from(await (await fetch(url, init)).arrayBuffer());
         remoteURL = url;
       }
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
