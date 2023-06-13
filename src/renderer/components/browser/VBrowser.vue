@@ -100,6 +100,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 
 import { FilterType } from "@/renderer/components/browser/filterType";
 import { Tile } from "@/renderer/components/browser/tile/tile";
+import { setupDragResizer } from "@/renderer/components/commons/utils/dragResizer";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
@@ -153,42 +154,7 @@ const fetchFilteredPetaFilesDebounce = debounce(100, (reload: boolean) =>
 const BROWSER_THUMBNAIL_MARGIN = 8;
 const left = ref<HTMLElement>();
 const right = ref<HTMLElement>();
-function setupResizer(element: HTMLElement, position: "left" | "right") {
-  const resizerStore = useResizerStore();
-  resizerStore.observe(element);
-  const resizerElement = document.createElement("e-resizer");
-  resizerElement.style.position = "fixed";
-  resizerElement.style.width = "8px";
-  resizerElement.style.backgroundColor = "#ff000055";
-  resizerElement.style.transform = "translateX(-50%)";
-  resizerElement.style.cursor = "ew-resize";
-  element.appendChild(resizerElement);
-  resizerStore.on("resize", () => {
-    const rect = element.getBoundingClientRect();
-    resizerElement.style.left = (position === "left" ? rect.left : rect.right) + "px";
-    resizerElement.style.height = rect.height + "px";
-    resizerElement.style.top = rect.y + "px";
-  });
-  resizerElement.addEventListener("pointerdown", (event) => {
-    if (event.button !== MouseButton.LEFT) {
-      return;
-    }
-    setCursor("ew-resize");
-    function move(event: PointerEvent) {
-      const rect = element.getBoundingClientRect();
-      const width = position === "right" ? event.clientX - rect.left : rect.right - event.clientX;
-      element.style.setProperty("width", `${width}px`);
-      element.style.setProperty("min-width", `${width}px`);
-    }
-    function up() {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-      setDefaultCursor();
-    }
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-  });
-}
+const scrollHeight = ref(0);
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -207,10 +173,10 @@ onMounted(() => {
     }
   });
   if (left.value) {
-    setupResizer(left.value, "right");
+    setupDragResizer(left.value, "right");
   }
   if (right.value) {
-    setupResizer(right.value, "left");
+    setupDragResizer(right.value, "left");
   }
 });
 onUnmounted(() => {
@@ -548,7 +514,7 @@ const thumbnailsRowCount = computed(() => {
   return c;
 });
 const actualTileSize = computed(() => thumbnailsWidth.value / thumbnailsRowCount.value);
-const scrollHeight = computed(() => {
+const _scrollHeight = computed(() => {
   return tiles.value
     .map((tile) => {
       return tile.position.y + tile.height;
@@ -638,6 +604,12 @@ watch(currentColor, () => {
   }
 });
 watch(thumbnailsSize, restoreScrollPosition);
+watch(
+  _scrollHeight,
+  throttle(100, () => {
+    scrollHeight.value = _scrollHeight.value;
+  }),
+);
 </script>
 
 <style lang="scss" scoped>
@@ -709,6 +681,7 @@ e-browser-root {
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
+        flex: 1;
         > e-tiles-content {
           display: block;
         }
