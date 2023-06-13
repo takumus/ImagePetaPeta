@@ -5,14 +5,14 @@ import { mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 import readdirr from "recursive-readdir";
 import { defineConfig } from "vite";
-import electron, { Configuration as ElectronConfig } from "vite-plugin-electron";
+import electron, { ElectronOptions } from "vite-plugin-electron";
 
 export default defineConfig(async ({ command }) => {
   rmSync("./_test", { recursive: true, force: true });
   mkdirSync("./_test", { recursive: true });
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
   console.log("WorkerThreadsFiles:", wtFiles);
-  const electronBaseConfig: ElectronConfig = {
+  const electronBaseConfig: ElectronOptions = {
     vite: {
       build: {
         minify: false,
@@ -26,7 +26,7 @@ export default defineConfig(async ({ command }) => {
       },
     },
   };
-  const electronConfig: ElectronConfig[] = [
+  const electronConfig: ElectronOptions[] = [
     ...wtFiles.map((file) => ({
       // worker_threads
       ...electronBaseConfig,
