@@ -1,6 +1,6 @@
 <template>
   <e-browser-root>
-    <e-left>
+    <e-left ref="left">
       <VTags
         :peta-files-array="petaFilesArray"
         v-model:selected-filter-type="selectedFilterType"
@@ -59,7 +59,7 @@
         </e-bottom>
       </e-content>
     </e-center>
-    <e-right>
+    <e-right ref="right">
       <VPreview
         :peta-files="selectedPetaFiles"
         @clear-selection-all="clearSelectionAll"
@@ -83,6 +83,7 @@ import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
+import { MouseButton } from "@/commons/datas/mouseButton";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
@@ -99,6 +100,7 @@ import { Vec2 } from "@/commons/utils/vec2";
 
 import { FilterType } from "@/renderer/components/browser/filterType";
 import { Tile } from "@/renderer/components/browser/tile/tile";
+import { setupDragResizer } from "@/renderer/components/commons/utils/dragResizer";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
@@ -110,6 +112,8 @@ import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsSto
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
+import { setCursor } from "@/renderer/utils/cursor";
+import { setDefaultCursor } from "@/renderer/utils/cursor";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 
 const statesStore = useStateStore();
@@ -148,6 +152,9 @@ const fetchFilteredPetaFilesDebounce = debounce(100, (reload: boolean) =>
   fetchFilteredPetaFiles(reload),
 );
 const BROWSER_THUMBNAIL_MARGIN = 8;
+const left = ref<HTMLElement>();
+const right = ref<HTMLElement>();
+const scrollHeight = ref(0);
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -165,6 +172,12 @@ onMounted(() => {
       selectedFilterType.value = FilterType.ALL;
     }
   });
+  if (left.value) {
+    setupDragResizer(left.value, "right");
+  }
+  if (right.value) {
+    setupDragResizer(right.value, "left");
+  }
 });
 onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
@@ -501,7 +514,7 @@ const thumbnailsRowCount = computed(() => {
   return c;
 });
 const actualTileSize = computed(() => thumbnailsWidth.value / thumbnailsRowCount.value);
-const scrollHeight = computed(() => {
+const _scrollHeight = computed(() => {
   return tiles.value
     .map((tile) => {
       return tile.position.y + tile.height;
@@ -591,6 +604,12 @@ watch(currentColor, () => {
   }
 });
 watch(thumbnailsSize, restoreScrollPosition);
+watch(
+  _scrollHeight,
+  throttle(100, () => {
+    scrollHeight.value = _scrollHeight.value;
+  }),
+);
 </script>
 
 <style lang="scss" scoped>
@@ -602,12 +621,12 @@ e-browser-root {
   gap: var(--px-2);
   > e-left {
     width: 250px;
-    min-width: 128px;
-    display: block;
+    min-width: 250px;
+    display: flex;
   }
   > e-right {
     width: 250px;
-    min-width: 128px;
+    min-width: 250px;
     display: flex;
     flex-direction: column;
   }
@@ -662,6 +681,7 @@ e-browser-root {
         overflow-y: scroll;
         overflow-x: hidden;
         display: block;
+        flex: 1;
         > e-tiles-content {
           display: block;
         }
