@@ -8,7 +8,7 @@ import { rmSync } from "node:fs";
 import { resolve } from "path";
 import readdirr from "recursive-readdir";
 import { defineConfig } from "vite";
-import electron, { Configuration as ElectronConfig } from "vite-plugin-electron";
+import electron, { ElectronOptions } from "vite-plugin-electron";
 import esmodule from "vite-plugin-esmodule";
 
 import vue from "@vitejs/plugin-vue";
@@ -28,7 +28,7 @@ export default defineConfig(async ({ command }) => {
     });
     return { plugin, packages };
   })();
-  const electronBaseConfig: ElectronConfig = {
+  const electronBaseConfig: ElectronOptions = {
     vite: {
       plugins: [esmodules.plugin],
       build: {
@@ -50,7 +50,7 @@ export default defineConfig(async ({ command }) => {
   };
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
   console.log("WorkerThreadsFiles:", wtFiles);
-  const electronConfig: ElectronConfig[] = [
+  const electronConfig: ElectronOptions[] = [
     // worker_threads
     ...wtFiles.map((file) => ({
       ...electronBaseConfig,
