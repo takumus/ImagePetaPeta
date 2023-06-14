@@ -1,6 +1,6 @@
 {
   "name": "imagepetapeta-beta",
-  "version": "2.2023.90000-beta",
+  "version": "2.2024.0-beta",
   "private": true,
   "description": "image viewer",
   "author": "takumus",
@@ -60,7 +60,7 @@
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitest/ui": "^0.32.0",
     "adm-zip": "^0.5.10",
-    "electron": "25.1.0",
+    "electron": "25.1.1",
     "electron-builder": "^24.3.0",
     "electron-devtools-installer": "^3.2.0",
     "license-checker-rseidelsohn": "^4.2.5",
