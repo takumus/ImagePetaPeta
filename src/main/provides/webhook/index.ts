@@ -29,7 +29,7 @@ export class WebHook extends TypedEventEmitter<{
     this.http = express();
     this.http.use(cors());
     this.http.use("/api", (req, res, next) => {
-      if (req.headers.origin === "chrome-extension://chjinkjphlcagmkcnodhahagecmdlaif") {
+      if (req.headers.origin?.startsWith("chrome-extension://")) {
         next();
         return;
       }
