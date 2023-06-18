@@ -10,6 +10,33 @@ import electron, { ElectronOptions } from "vite-plugin-electron";
 export default defineConfig(async ({ command }) => {
   rmSync("./_test", { recursive: true, force: true });
   mkdirSync("./_test", { recursive: true });
+  const electronPlugin = await createElectronPlugin();
+  return {
+    test: {
+      dir: "test",
+      exclude: process.env.CI ? ["**/webhook.test.ts"] : [],
+      testTimeout: 30 * 1000,
+      threads: false,
+      singleThread: true,
+      isolate: true,
+    },
+    plugins: [
+      {
+        name: "wt",
+        apply: "serve",
+        configureServer: () => {
+          (electronPlugin[1].closeBundle as any)();
+        },
+      },
+      workerThreads(),
+    ],
+    resolve: {
+      alias: viteAlias,
+    },
+  };
+});
+
+async function createElectronPlugin() {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
   console.log("WorkerThreadsFiles:", wtFiles);
   const electronBaseConfig: ElectronOptions = {
@@ -33,28 +60,5 @@ export default defineConfig(async ({ command }) => {
       entry: file,
     })),
   ];
-  console.log("CI:", process.env.CI);
-  return {
-    test: {
-      dir: "test",
-      exclude: process.env.CI ? ["**/webhook.test.ts"] : [],
-      testTimeout: 30 * 1000,
-      threads: false,
-      singleThread: true,
-      isolate: true,
-    },
-    plugins: [
-      {
-        name: "wt",
-        apply: "serve",
-        configureServer: () => {
-          (electron(electronConfig)[1].closeBundle as any)();
-        },
-      },
-      workerThreads(),
-    ],
-    resolve: {
-      alias: viteAlias,
-    },
-  };
-});
+  return electron(electronConfig);
+}
