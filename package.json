@@ -6,11 +6,6 @@
   "author": "takumus",
   "license": "BSD 2-Clause License",
   "main": "_electronTemp/dist/main/index.js",
-  "debug": {
-    "env": {
-      "VITE_DEV_SERVER_URL": "http://127.0.0.1:3344/"
-    }
-  },
   "scripts": {
     "prepare": "npm run generate-assets",
     "dev": "npm run generate-assets && run-p dev:*",
