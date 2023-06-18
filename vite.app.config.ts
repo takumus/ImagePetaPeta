@@ -51,9 +51,6 @@ export default defineConfig(async ({ command }) => {
       }),
       electronPlugin,
     ],
-    server: {
-      host: true,
-    },
     clearScreen: false,
   };
 });

@@ -32,10 +32,6 @@ export default defineConfig(async ({ command }) => {
         },
       }),
     ],
-    server: {
-      host: true,
-      port: 5174,
-    },
     clearScreen: false,
   };
 });
