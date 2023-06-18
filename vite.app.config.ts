@@ -14,80 +14,11 @@ import esmodule from "vite-plugin-esmodule";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(async ({ command }) => {
-  const isServe = command === "serve";
   const isBuild = command === "build";
   if (isBuild) {
     rmSync("_release", { recursive: true, force: true });
   }
-  const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
-  const esmodules = (() => {
-    let packages: string[] = [];
-    const plugin = esmodule((esms) => {
-      packages = esms.filter((esm) => !(esm in pkg.devDependencies));
-      return packages;
-    });
-    return { plugin, packages };
-  })();
-  const electronBaseConfig: ElectronOptions = {
-    vite: {
-      plugins: [esmodules.plugin],
-      build: {
-        minify: isBuild,
-        outDir: resolve("./_electronTemp/dist/main"),
-        rollupOptions: {
-          external: [
-            ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(
-              (pkg) => !esmodules.packages.includes(pkg),
-            ),
-          ],
-        },
-        sourcemap,
-      },
-      resolve: {
-        alias: viteAlias,
-      },
-    },
-  };
-  const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
-  console.log("WorkerThreadsFiles:", wtFiles);
-  const electronConfig: ElectronOptions[] = [
-    // worker_threads
-    ...wtFiles.map((file) => ({
-      ...electronBaseConfig,
-      entry: file,
-    })),
-    // main
-    {
-      ...electronBaseConfig,
-      entry: resolve("./src/main/index.ts"),
-      onstart(options) {
-        if (process.env.VSCODE_DEBUG) {
-          console.log("[startup] Electron App");
-        } else {
-          options.startup();
-        }
-      },
-      vite: {
-        ...electronBaseConfig.vite,
-        plugins: [workerThreads(), ...(electronBaseConfig.vite?.plugins ?? [])],
-      },
-    },
-    // preload
-    {
-      ...electronBaseConfig,
-      entry: resolve("./src/main/preload.ts"),
-      onstart(options) {
-        options.reload();
-      },
-      vite: {
-        ...electronBaseConfig.vite,
-        build: {
-          ...electronBaseConfig.vite?.build,
-          sourcemap: sourcemap ? "inline" : undefined, // #332
-        },
-      },
-    },
-  ];
+  const electronPlugin = await createElectronPlugin(isBuild);
   return {
     base: "./",
     root: resolve("./src/renderer"),
@@ -118,7 +49,7 @@ export default defineConfig(async ({ command }) => {
           },
         },
       }),
-      electron(electronConfig),
+      electronPlugin,
     ],
     server: {
       host: true,
@@ -126,3 +57,69 @@ export default defineConfig(async ({ command }) => {
     clearScreen: false,
   };
 });
+
+async function createElectronPlugin(isBuild: boolean) {
+  const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
+  console.log("WorkerThreadsFiles:", wtFiles);
+  const esmodules = (() => {
+    let packages: string[] = [];
+    const plugin = esmodule((esms) => {
+      packages = esms.filter((esm) => !(esm in pkg.devDependencies));
+      return packages;
+    });
+    return { plugin, packages };
+  })();
+  const baseOptions: ElectronOptions = {
+    vite: {
+      plugins: [esmodules.plugin],
+      build: {
+        minify: isBuild,
+        outDir: resolve("./_electronTemp/dist/main"),
+        rollupOptions: {
+          external: [
+            ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(
+              (pkg) => !esmodules.packages.includes(pkg),
+            ),
+          ],
+        },
+        sourcemap: !isBuild,
+      },
+      resolve: {
+        alias: viteAlias,
+      },
+    },
+  };
+  const options: ElectronOptions[] = [];
+  options.push(
+    ...wtFiles.map((file) => ({
+      ...baseOptions,
+      entry: file,
+    })),
+  );
+  options.push({
+    ...baseOptions,
+    entry: resolve("./src/main/index.ts"),
+    onstart(options) {
+      options.startup();
+    },
+    vite: {
+      ...baseOptions.vite,
+      plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
+    },
+  });
+  options.push({
+    ...baseOptions,
+    entry: resolve("./src/main/preload.ts"),
+    onstart(options) {
+      options.reload();
+    },
+    vite: {
+      ...baseOptions.vite,
+      build: {
+        ...baseOptions.vite?.build,
+        sourcemap: !isBuild ? "inline" : undefined, // #332
+      },
+    },
+  });
+  return electron(options);
+}
