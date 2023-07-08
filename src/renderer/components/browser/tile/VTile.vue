@@ -219,9 +219,9 @@ const fetchPetaTags = (() => {
     if (currentFetchId !== fetchId) {
       return;
     }
-    myPetaTags.value = petaTagsStore.state.petaTags.value.filter((petaTag) =>
-      result.find((id) => id === petaTag.id),
-    );
+    myPetaTags.value = petaTagsStore.state.petaTags.value
+      .filter((petaTag) => result.find((id) => id === petaTag.id))
+      .reverse();
     loadingTags.value = false;
   };
 })();
@@ -413,19 +413,18 @@ e-tile-root {
       word-break: break-word;
       text-align: left;
       display: flex;
-      flex-direction: row;
+      flex-direction: row-reverse;
       flex-wrap: wrap-reverse;
       justify-content: right;
       padding: var(--px-1);
       > e-tag {
-        display: inline-block;
+        display: block;
         margin-left: var(--px-0);
         margin-top: var(--px-0);
         border-radius: var(--rounded);
         padding: var(--px-1);
         background-color: var(--color-1);
         font-size: var(--size-0);
-        line-height: var(--size-0);
       }
       &.selected {
         padding: var(--px-2);
