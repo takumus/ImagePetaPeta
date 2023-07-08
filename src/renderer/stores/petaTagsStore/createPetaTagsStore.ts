@@ -10,13 +10,21 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaTagsStore() {
   const petaTags = ref(
-    (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag)),
+    (await IPC.send("getPetaTags"))
+      .map((petaTag) => petaTagToRPetaTag(petaTag))
+      .sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      }),
   );
   const eventEmitter = new TypedEventEmitter<{
     update: (petaFileIds: string[], petaTagIds: string[]) => void;
   }>();
   IPC.on("updatePetaTags", async (event, { petaTagIds, petaFileIds }) => {
-    petaTags.value = (await IPC.send("getPetaTags")).map((petaTag) => petaTagToRPetaTag(petaTag));
+    petaTags.value = (await IPC.send("getPetaTags"))
+      .map((petaTag) => petaTagToRPetaTag(petaTag))
+      .sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      });
     eventEmitter.emit("update", petaTagIds, petaFileIds);
   });
   return {
