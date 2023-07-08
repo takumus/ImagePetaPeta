@@ -39,7 +39,7 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: audit
-        run: npm audit
+        run: npm audit --audit-level high
       - name: test
         run: npm run test
         env:
