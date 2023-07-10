@@ -62,14 +62,18 @@ export class Windows {
       this.openWindow("board");
     }
   }
-  openWindow(windowName: WindowName, event?: IpcMainInvokeEvent, modal = false) {
+  openWindow(windowName: WindowName, event?: IpcMainInvokeEvent | BrowserWindow, modal = false) {
     const logger = useLogger();
     logger.logMainChunk().debug("$Open Window:", windowName);
     const position = new Vec2();
-    try {
-      const parentWindowBounds = event
-        ? this.getWindowByEvent(event)?.window.getBounds()
+    const window =
+      event !== undefined
+        ? event instanceof BrowserWindow
+          ? event
+          : this.getWindowByEvent(event)?.window
         : undefined;
+    try {
+      const parentWindowBounds = window ? window.getBounds() : undefined;
       if (parentWindowBounds) {
         const display = screen.getDisplayNearestPoint({
           x: parentWindowBounds.x + parentWindowBounds.width / 2,
@@ -86,7 +90,7 @@ export class Windows {
         x: position.x,
         y: position.y,
         modal,
-        parent: event && modal ? this.getWindowByEvent(event)?.window : undefined,
+        parent: window && modal ? window : undefined,
       });
       this.windows[windowName]?.center();
     } else {
