@@ -1,5 +1,8 @@
 <template>
-  <e-utils-bar-root>
+  <e-utils-bar-root
+    :class="{
+      shadow: windowName === 'board',
+    }">
     <e-property>
       <slot></slot>
     </e-property>
@@ -109,10 +112,11 @@ e-utils-bar-root {
   position: relative;
   background-color: var(--color-0);
   min-height: 30px;
-  box-shadow: 0px 1.5px 1px 0px rgba(0, 0, 0, 0.3);
-  border-bottom: solid var(--px-border) var(--color-0);
   display: block;
   z-index: 2;
+  &.shadow {
+    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.3);
+  }
   > e-commons {
     position: absolute;
     top: 0px;
