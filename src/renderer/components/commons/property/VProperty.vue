@@ -415,7 +415,7 @@ e-property-root {
           width: 100%;
           overflow: hidden;
           margin: var(--px-0) 0px;
-          box-shadow: 0px 0px 0px var(--px-0) var(--color-border);
+          box-shadow: 0px 0px 0px var(--px-border) var(--color-font);
           > e-color {
             height: 100%;
             display: block;
