@@ -51,7 +51,10 @@ function open(_label: string, event: PointerEvent): void {
   targetElement.addEventListener("pointerleave", leave);
   label.value = _label;
   show.value = true;
-  floating.value?.updateFloating(targetElement.getBoundingClientRect());
+  floating.value?.updateFloating(targetElement.getBoundingClientRect(), undefined, {
+    x: false,
+    y: true,
+  });
 }
 useComponentsStore().tooltip = {
   open,
