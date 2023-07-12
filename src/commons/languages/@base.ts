@@ -226,4 +226,15 @@ export interface I18NBase extends I18N {
       progress: I18NProp;
     };
   };
+  tooltip: {
+    openBoard: I18NProp;
+    openBrowser: I18NProp;
+    importFiles: I18NProp;
+    importFolders: I18NProp;
+    importFromSP: I18NProp;
+    openSettings: I18NProp;
+    showNSFW: I18NProp;
+    hideNSFW: I18NProp;
+    toggleNSFW: I18NProp;
+  };
 }
