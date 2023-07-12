@@ -1,11 +1,11 @@
 <template>
   <VFloating
-    :visible="true"
+    :visible="show"
     :z-index="zIndex"
     :max-width="'512px'"
     :max-height="'unset'"
     ref="floating">
-    <ul v-show="show" class="context-menu-root" ref="contextMenu">
+    <ul class="context-menu-root" ref="contextMenu">
       <li
         v-for="item in filteredItems"
         :key="item.id"
