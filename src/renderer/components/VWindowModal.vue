@@ -13,7 +13,6 @@
         </button>
       </e-buttons>
     </e-content>
-    <VContextMenu :z-index="4" />
   </e-window-root>
 </template>
 
@@ -22,7 +21,6 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
-import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";

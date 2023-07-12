@@ -7,22 +7,39 @@
       <slot></slot>
     </e-property>
     <e-commons class="left" v-if="visible">
-      <button v-if="windowName !== 'board'" tabindex="-1" @click="openBoard()">
+      <button
+        v-if="windowName !== 'board'"
+        tabindex="-1"
+        @click="openBoard()"
+        @pointerenter="components.tooltip.open('board', $event)">
         <e-icon class="board"></e-icon>
       </button>
-      <button v-if="windowName !== 'browser'" tabindex="-1" @click="openBrowser()">
+      <button
+        v-if="windowName !== 'browser'"
+        tabindex="-1"
+        @click="openBrowser()"
+        @pointerenter="components.tooltip.open('browser', $event)">
         <e-icon class="browser"></e-icon>
       </button>
-      <button v-if="windowName !== 'details'" tabindex="-1" @click="browseAndImportFiles()">
+      <button
+        v-if="windowName !== 'details'"
+        tabindex="-1"
+        @click="browseAndImportFiles()"
+        @pointerenter="components.tooltip.open('browse files', $event)">
         <e-icon class="import-file"></e-icon>
       </button>
-      <button v-if="windowName !== 'details'" tabindex="-1" @click="importImageDirectories()">
+      <button
+        v-if="windowName !== 'details'"
+        tabindex="-1"
+        @click="importImageDirectories()"
+        @pointerenter="components.tooltip.open('browse folders', $event)">
         <e-icon class="import-folder"></e-icon>
       </button>
       <button
         v-if="windowName !== 'details' && settingsStore.state.value.web"
         tabindex="-1"
-        @click="openWeb()">
+        @click="openWeb()"
+        @pointerenter="components.tooltip.open('web', $event)">
         <e-icon class="web"></e-icon>
       </button>
       <!-- <button v-if="windowName !== 'capture'" tabindex="-1" @click="openCapture()">
@@ -30,10 +47,16 @@
       </button> -->
     </e-commons>
     <e-commons class="right" v-if="visible">
-      <button tabindex="-1" @click="toggleNSFW">
+      <button
+        tabindex="-1"
+        @click="toggleNSFW"
+        @pointerenter="components.tooltip.open('nsfw', $event)">
         <e-icon :class="nsfwClass"></e-icon>
       </button>
-      <button tabindex="-1" @click="openSettings">
+      <button
+        tabindex="-1"
+        @click="openSettings"
+        @pointerenter="components.tooltip.open('settings', $event)">
         <e-icon class="settings"></e-icon>
       </button>
     </e-commons>
@@ -43,6 +66,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
