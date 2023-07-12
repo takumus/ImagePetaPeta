@@ -8,7 +8,7 @@
       maxHeight: height,
       maxWidth: width,
       zIndex: zIndex,
-      pointerEvents: pointerEvents === false ? 'none' : 'unset',
+      pointerEvents: disablePointerEvents ? 'none' : 'unset',
     }">
     <slot></slot>
   </e-floating-root>
@@ -24,7 +24,7 @@ const props = defineProps<{
   visible: boolean;
   maxWidth: string;
   maxHeight: string;
-  pointerEvents?: boolean;
+  disablePointerEvents?: boolean;
 }>();
 const position = ref(new Vec2(0, 0));
 const height = ref(props.maxHeight);
