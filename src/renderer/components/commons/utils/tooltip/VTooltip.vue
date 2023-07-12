@@ -4,7 +4,7 @@
     :z-index="zIndex"
     :max-width="'512px'"
     :max-height="'unset'"
-    :pointer-events="false"
+    :disable-pointer-events="true"
     ref="floating">
     <ul class="context-menu-root" ref="contextMenu">
       <li>
