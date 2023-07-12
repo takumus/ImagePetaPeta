@@ -11,35 +11,35 @@
         v-if="windowName !== 'board'"
         tabindex="-1"
         @click="openBoard()"
-        @pointerenter="components.tooltip.open('board', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.openBoard'), $event)">
         <e-icon class="board"></e-icon>
       </button>
       <button
         v-if="windowName !== 'browser'"
         tabindex="-1"
         @click="openBrowser()"
-        @pointerenter="components.tooltip.open('browser', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.openBrowser'), $event)">
         <e-icon class="browser"></e-icon>
       </button>
       <button
         v-if="windowName !== 'details'"
         tabindex="-1"
         @click="browseAndImportFiles()"
-        @pointerenter="components.tooltip.open('browse files', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.importFiles'), $event)">
         <e-icon class="import-file"></e-icon>
       </button>
       <button
         v-if="windowName !== 'details'"
         tabindex="-1"
         @click="importImageDirectories()"
-        @pointerenter="components.tooltip.open('browse folders', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.importFolders'), $event)">
         <e-icon class="import-folder"></e-icon>
       </button>
       <button
         v-if="windowName !== 'details' && settingsStore.state.value.web"
         tabindex="-1"
         @click="openWeb()"
-        @pointerenter="components.tooltip.open('web', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.importFromSP'), $event)">
         <e-icon class="web"></e-icon>
       </button>
       <!-- <button v-if="windowName !== 'capture'" tabindex="-1" @click="openCapture()">
@@ -50,13 +50,13 @@
       <button
         tabindex="-1"
         @click="toggleNSFW"
-        @pointerenter="components.tooltip.open('nsfw', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.toggleNSFW'), $event)">
         <e-icon :class="nsfwClass"></e-icon>
       </button>
       <button
         tabindex="-1"
         @click="openSettings"
-        @pointerenter="components.tooltip.open('settings', $event)">
+        @pointerenter="components.tooltip.open(t('tooltip.openSettings'), $event)">
         <e-icon class="settings"></e-icon>
       </button>
     </e-commons>

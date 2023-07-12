@@ -326,4 +326,15 @@ export const ja: I18NBase = {
       progress: "送信中...",
     },
   },
+  tooltip: {
+    openBoard: "ボードを開く",
+    openBrowser: "ブラウザを開く",
+    importFiles: "ファイルをインポート",
+    importFolders: "フォルダをインポート",
+    importFromSP: "スマホからインポート",
+    openSettings: "設定を開く",
+    showNSFW: "NSFWを表示する",
+    hideNSFW: "NSFWを隠す",
+    toggleNSFW: "NSFWを切り替え",
+  },
 };
