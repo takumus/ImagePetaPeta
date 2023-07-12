@@ -8,6 +8,7 @@ export async function createComponentsStore() {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const components: any = {
     contextMenu: {},
+    tooltip: {},
     modal: {
       modalIds: [],
       currentModalZIndex: 1,
@@ -20,6 +21,9 @@ export const componentsStoreKey: InjectionKey<ComponentsStore> = Symbol("compone
 interface Components {
   contextMenu: {
     open: (items: ContextMenuItem[], position: Vec2) => void;
+  };
+  tooltip: {
+    open: (label: string, event: PointerEvent) => void;
   };
   modal: {
     modalIds: string[];
