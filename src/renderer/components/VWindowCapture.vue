@@ -8,6 +8,7 @@
       <VCapture :z-index="1" />
     </e-content>
     <VContextMenu :z-index="4" />
+    <VTooltip :z-index="3" />
   </e-window-root>
 </template>
 
@@ -19,6 +20,7 @@ import VCapture from "@/renderer/components/capture/VCapture.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
+import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
 
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";

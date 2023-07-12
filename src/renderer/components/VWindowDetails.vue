@@ -16,6 +16,7 @@
       <VTasks />
     </e-modals>
     <VContextMenu :z-index="4" />
+    <VTooltip :z-index="3" />
   </e-window-root>
 </template>
 
@@ -28,6 +29,7 @@ import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
+import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
 import VDetails from "@/renderer/components/details/VDetails.vue";
 
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
