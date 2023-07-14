@@ -1,6 +1,6 @@
+import { parentPort } from "worker_threads";
 import { FileTypeResult } from "file-type";
 import sharp from "sharp";
-import { parentPort } from "worker_threads";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
 import {

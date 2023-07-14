@@ -85,7 +85,7 @@ import VTagCell from "@/renderer/components/browser/tags/VTagCell.vue";
 import VTagPartition from "@/renderer/components/browser/tags/VTagPartition.vue";
 import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vue";
 
-import { PetaTagPartition, createPetaTagPartition } from "@/commons/datas/petaTagPartition";
+import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { UpdateMode } from "@/commons/datas/updateMode";
@@ -94,8 +94,8 @@ import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { BrowserTag } from "@/renderer/components/browser/browserTag";
 import { FilterType } from "@/renderer/components/browser/filterType";
 import {
-  SortHelperConstraint,
   initSortHelper,
+  SortHelperConstraint,
 } from "@/renderer/components/browser/tags/sortHelper";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";

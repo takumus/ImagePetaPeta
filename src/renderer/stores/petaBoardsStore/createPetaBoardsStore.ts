@@ -1,6 +1,6 @@
 import { InjectionKey, ref } from "vue";
 
-import { PetaBoard, createPetaBoard } from "@/commons/datas/petaBoard";
+import { createPetaBoard, PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaPanel } from "@/commons/datas/petaPanel";
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
@@ -89,22 +89,25 @@ function petaBoardToRPetaBoard(petaBoard: PetaBoard): RPetaBoard {
       ...petaBoard.transform,
       position: new Vec2(petaBoard.transform.position),
     },
-    petaPanels: Object.values(petaBoard.petaPanels).reduce((petaPanels, petaPanel) => {
-      return {
-        ...petaPanels,
-        [petaPanel.id]: {
-          ...petaPanel,
-          crop: {
-            ...petaPanel.crop,
-            position: new Vec2(petaPanel.crop.position),
-          },
-          position: new Vec2(petaPanel.position),
-          renderer: {
-            selected: false,
-          },
-        } as RPetaPanel,
-      };
-    }, {} as { [petaPanelId: string]: RPetaPanel }),
+    petaPanels: Object.values(petaBoard.petaPanels).reduce(
+      (petaPanels, petaPanel) => {
+        return {
+          ...petaPanels,
+          [petaPanel.id]: {
+            ...petaPanel,
+            crop: {
+              ...petaPanel.crop,
+              position: new Vec2(petaPanel.crop.position),
+            },
+            position: new Vec2(petaPanel.position),
+            renderer: {
+              selected: false,
+            },
+          } as RPetaPanel,
+        };
+      },
+      {} as { [petaPanelId: string]: RPetaPanel },
+    ),
     renderer: {
       selected: false,
     },
@@ -113,18 +116,21 @@ function petaBoardToRPetaBoard(petaBoard: PetaBoard): RPetaBoard {
 function rPetaBoardToPetaBoard(rPetaBoard: RPetaBoard): PetaBoard {
   const petaBoard = {
     ...rPetaBoard,
-    petaPanels: Object.values(rPetaBoard.petaPanels).reduce((rPetaPanels, rPetaPanel) => {
-      const petaPanel = {
-        ...rPetaPanel,
-      } as Partial<RPetaPanel>;
-      delete petaPanel.renderer;
-      return {
-        ...rPetaPanels,
-        [rPetaPanel.id]: {
-          ...petaPanel,
-        } as PetaPanel,
-      };
-    }, {} as { [petaPanelId: string]: PetaPanel }),
+    petaPanels: Object.values(rPetaBoard.petaPanels).reduce(
+      (rPetaPanels, rPetaPanel) => {
+        const petaPanel = {
+          ...rPetaPanel,
+        } as Partial<RPetaPanel>;
+        delete petaPanel.renderer;
+        return {
+          ...rPetaPanels,
+          [rPetaPanel.id]: {
+            ...petaPanel,
+          } as PetaPanel,
+        };
+      },
+      {} as { [petaPanelId: string]: PetaPanel },
+    ),
   } as Partial<RPetaBoard>;
   delete petaBoard.renderer;
   return petaBoard as PetaBoard;

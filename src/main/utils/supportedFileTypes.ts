@@ -1,4 +1,4 @@
-import { FileTypeResult, fileTypeFromFile } from "file-type";
+import { fileTypeFromFile, FileTypeResult } from "file-type";
 
 export async function isSupportedFile(path: string) {
   const fileType = await fileTypeFromFile(path);

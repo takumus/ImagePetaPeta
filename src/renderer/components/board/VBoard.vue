@@ -41,9 +41,9 @@ import * as PIXI from "pixi.js";
 import { computed, onMounted, onUnmounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import VLayer from "@/renderer/components/board/layer/VLayer.vue";
 import VBoardLoading from "@/renderer/components/board/loading/VBoardLoading.vue";
+import VPetaPanelProperty from "@/renderer/components/board/VPetaPanelProperty.vue";
 import VPIXI from "@/renderer/components/commons/utils/pixi/VPIXI.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
@@ -52,12 +52,12 @@ import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
-import { PSelection } from "@/renderer/components/board/PSelection";
 import { initBoardLoader } from "@/renderer/components/board/boardLoader";
 import { PBackground } from "@/renderer/components/board/pBackground";
 import { PBoardGrid } from "@/renderer/components/board/pGrid";
 import { PPetaPanel } from "@/renderer/components/board/pPetaPanels/pPetaPanel";
 import { PTransformer } from "@/renderer/components/board/pPetaPanels/pTransformer";
+import { PSelection } from "@/renderer/components/board/PSelection";
 import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { IPC } from "@/renderer/libs/ipc";

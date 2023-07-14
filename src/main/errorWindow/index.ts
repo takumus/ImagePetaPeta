@@ -1,4 +1,4 @@
-import { BrowserWindow, app } from "electron";
+import { app, BrowserWindow } from "electron";
 
 import { URL_SUPPORT } from "@/commons/defines";
 

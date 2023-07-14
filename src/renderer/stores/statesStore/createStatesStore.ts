@@ -1,4 +1,4 @@
-import { InjectionKey, watch as _watch, ref } from "vue";
+import { watch as _watch, InjectionKey, ref } from "vue";
 
 import { IPC } from "@/renderer/libs/ipc";
 

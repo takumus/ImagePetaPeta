@@ -1,7 +1,7 @@
-import cors from "cors";
-import express, { Express } from "express";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { resolve } from "path";
+import cors from "cors";
+import express, { Express } from "express";
 
 import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";

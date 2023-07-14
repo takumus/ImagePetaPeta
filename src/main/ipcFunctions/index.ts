@@ -1,6 +1,6 @@
-import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 import { readFile } from "fs/promises";
 import * as Path from "path";
+import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 
 import { AppInfo } from "@/commons/datas/appInfo";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";

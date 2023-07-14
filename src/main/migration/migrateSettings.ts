@@ -1,4 +1,4 @@
-import { Settings, getDefaultSettings } from "@/commons/datas/settings";
+import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 
 import { createSyncMigrater } from "@/main/libs/createMigrater";
 

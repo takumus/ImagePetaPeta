@@ -40,8 +40,8 @@ import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import {
-  SortHelperConstraint,
   initSortHelper,
+  SortHelperConstraint,
 } from "@/renderer/components/browser/tags/sortHelper";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";

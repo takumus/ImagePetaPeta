@@ -1,6 +1,6 @@
-import { fileTypeFromFile } from "file-type";
 import { copyFile, readFile, rename, writeFile } from "fs/promises";
 import * as Path from "path";
+import { fileTypeFromFile } from "file-type";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
 import { PetaFile } from "@/commons/datas/petaFile";

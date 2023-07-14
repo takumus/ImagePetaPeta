@@ -1,7 +1,7 @@
 import { InjectionKey, readonly, ref } from "vue";
 
 import { IPC } from "@/renderer/libs/ipc";
-import { Style, applyStyle } from "@/renderer/styles/styles";
+import { applyStyle, Style } from "@/renderer/styles/styles";
 
 export async function createStyleStore() {
   const state = ref(await IPC.send("getStyle"));

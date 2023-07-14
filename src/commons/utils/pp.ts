@@ -1,7 +1,10 @@
 import pLimit from "p-limit";
 
 export class PPCancelError extends Error {
-  constructor(public readonly all: number, public readonly remaining: number) {
+  constructor(
+    public readonly all: number,
+    public readonly remaining: number,
+  ) {
     super("PPCancelError");
   }
 }
