@@ -228,44 +228,53 @@ const fetchPetaTags = (() => {
 function delayedFetchPetaTags() {
   window.clearTimeout(fetchTagsTimeoutHandler);
   fetchingPetaTags.value = true;
-  fetchTagsTimeoutHandler = window.setTimeout(() => {
-    if (props.tile.visible) {
-      fetchPetaTags();
-    }
-    fetchingPetaTags.value = false;
-  }, Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY);
+  fetchTagsTimeoutHandler = window.setTimeout(
+    () => {
+      if (props.tile.visible) {
+        fetchPetaTags();
+      }
+      fetchingPetaTags.value = false;
+    },
+    Math.random() * BROWSER_FETCH_TAGS_DELAY_RANDOM + BROWSER_FETCH_TAGS_DELAY,
+  );
 }
 function delayedLoadImage() {
   window.clearTimeout(loadOriginalTimeoutHandler);
   window.clearTimeout(loadThumbnailTimeoutHandler);
-  loadThumbnailTimeoutHandler = window.setTimeout(() => {
-    thumbnailURL.value = getFileURL(props.tile.petaFile, FileType.THUMBNAIL);
-    if (props.original) {
-      loadOriginalTimeoutHandler = window.setTimeout(() => {
-        if (props.tile.visible) {
-          if (props.tile.petaFile?.metadata.type === "image") {
-            const img = image.value;
-            const url = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
-            if (img === undefined) {
-              return;
+  loadThumbnailTimeoutHandler = window.setTimeout(
+    () => {
+      thumbnailURL.value = getFileURL(props.tile.petaFile, FileType.THUMBNAIL);
+      if (props.original) {
+        loadOriginalTimeoutHandler = window.setTimeout(
+          () => {
+            if (props.tile.visible) {
+              if (props.tile.petaFile?.metadata.type === "image") {
+                const img = image.value;
+                const url = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
+                if (img === undefined) {
+                  return;
+                }
+                if (img.src !== url) {
+                  loadingOriginal.value = true;
+                  ImageDecoder.decode(img, url, (failed) => {
+                    loadingOriginal.value = failed;
+                  });
+                }
+              } else if (props.tile.petaFile?.metadata.type === "video") {
+                const v = video.value;
+                if (v === undefined) {
+                  return;
+                }
+                // v.src = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
+              }
             }
-            if (img.src !== url) {
-              loadingOriginal.value = true;
-              ImageDecoder.decode(img, url, (failed) => {
-                loadingOriginal.value = failed;
-              });
-            }
-          } else if (props.tile.petaFile?.metadata.type === "video") {
-            const v = video.value;
-            if (v === undefined) {
-              return;
-            }
-            // v.src = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
-          }
-        }
-      }, Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY);
-    }
-  }, Math.random() * BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM + BROWSER_LOAD_THUMBNAIL_DELAY);
+          },
+          Math.random() * BROWSER_LOAD_ORIGINAL_DELAY_RANDOM + BROWSER_LOAD_ORIGINAL_DELAY,
+        );
+      }
+    },
+    Math.random() * BROWSER_LOAD_THUMBNAIL_DELAY_RANDOM + BROWSER_LOAD_THUMBNAIL_DELAY,
+  );
 }
 const selected = computed(() => {
   if (props.tile.petaFile !== undefined) {

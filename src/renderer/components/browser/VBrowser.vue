@@ -84,16 +84,16 @@ import VSelect from "@/renderer/components/commons/utils/select/VSelect.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { MouseButton } from "@/commons/datas/mouseButton";
+import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
-import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { browserTileViewMode } from "@/commons/datas/states";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import {
-  BROWSER_THUMBNAILS_SELECTION_PERCENT,
   BROWSER_THUMBNAIL_SIZE,
   BROWSER_THUMBNAIL_ZOOM_MAX,
   BROWSER_THUMBNAIL_ZOOM_MIN,
+  BROWSER_THUMBNAILS_SELECTION_PERCENT,
 } from "@/commons/defines";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -112,8 +112,7 @@ import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsSto
 import { useResizerStore } from "@/renderer/stores/resizerStore/useResizerStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
-import { setCursor } from "@/renderer/utils/cursor";
-import { setDefaultCursor } from "@/renderer/utils/cursor";
+import { setCursor, setDefaultCursor } from "@/renderer/utils/cursor";
 import { isKeyboardLocked } from "@/renderer/utils/isKeyboardLocked";
 
 const statesStore = useStateStore();

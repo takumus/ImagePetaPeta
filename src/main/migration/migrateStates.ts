@@ -1,4 +1,4 @@
-import { States, defaultStates } from "@/commons/datas/states";
+import { defaultStates, States } from "@/commons/datas/states";
 
 import { createSyncMigrater } from "@/main/libs/createMigrater";
 

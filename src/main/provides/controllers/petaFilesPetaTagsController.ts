@@ -1,6 +1,6 @@
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
-import { PetaFilePetaTag, createPetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
-import { PetaTag, createPetaTag } from "@/commons/datas/petaTag";
+import { createPetaFilePetaTag, PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
+import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";

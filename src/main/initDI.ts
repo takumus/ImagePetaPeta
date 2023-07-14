@@ -8,8 +8,8 @@ import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { Settings, getDefaultSettings } from "@/commons/datas/settings";
-import { States, defaultStates } from "@/commons/datas/states";
+import { getDefaultSettings, Settings } from "@/commons/datas/settings";
+import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
 import {
   DB_COMPACTION_RETRY_COUNT,
@@ -22,8 +22,8 @@ import {
   FILENAME_IMAGES_TAGS_DB,
   FILENAME_SETTINGS,
   FILENAME_STATES,
-  FILENAME_TAGS_DB,
   FILENAME_TAG_PARTITIONS_DB,
+  FILENAME_TAGS_DB,
   FILENAME_WINDOW_STATES,
 } from "@/commons/defines";
 import languages from "@/commons/languages";
@@ -69,8 +69,8 @@ import {
   dbPetaFilesPetaTagsKey,
   dbPetaTagPartitionsKey,
   dbPetaTagsKey,
-  dbStatusKey,
   dbsKey,
+  dbStatusKey,
 } from "@/main/provides/databases";
 import { Modals, modalsKey } from "@/main/provides/modals";
 import { Tasks, tasksKey } from "@/main/provides/tasks";

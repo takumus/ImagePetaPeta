@@ -1,4 +1,4 @@
-import { Frame, decompressFrame, parseGIF } from "gifuct-js";
+import { decompressFrame, Frame, parseGIF } from "gifuct-js";
 
 import { initWebWorker } from "@/renderer/libs/initWebWorker";
 import {

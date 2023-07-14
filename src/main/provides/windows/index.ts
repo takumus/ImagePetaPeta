@@ -1,5 +1,5 @@
-import { BrowserWindow, IpcMainInvokeEvent, app, screen } from "electron";
 import * as Path from "path";
+import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
 
 import {
   EULA,

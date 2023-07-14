@@ -1,5 +1,5 @@
-import { BrowserWindow, WebContents, shell } from "electron";
 import * as Path from "path";
+import { BrowserWindow, shell, WebContents } from "electron";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 import { TaskStatusCode } from "@/commons/datas/task";

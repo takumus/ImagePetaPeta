@@ -1,6 +1,5 @@
 import { Buffer } from "buffer";
-import { InjectionKey, onUnmounted, readonly, ref } from "vue";
-import { onMounted } from "vue";
+import { InjectionKey, onMounted, onUnmounted, readonly, ref } from "vue";
 
 import { inject } from "@/renderer/utils/vue";
 
@@ -33,7 +32,7 @@ export function useImageImporterStore() {
                     ({
                       type: "url",
                       url: url,
-                    } as const),
+                    }) as const,
                 )
               : []),
             ...(buffers !== undefined
@@ -42,7 +41,7 @@ export function useImageImporterStore() {
                     ({
                       type: "buffer",
                       buffer,
-                    } as const),
+                    }) as const,
                   [],
                 )
               : []),

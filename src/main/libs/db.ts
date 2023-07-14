@@ -14,7 +14,10 @@ export default class DB<T> extends TypedEventEmitter<{
   execCompationIntervalId!: NodeJS.Timeout;
   saveCompleted = true;
   orderCompleted = true;
-  constructor(public name: string, private path: string) {
+  constructor(
+    public name: string,
+    private path: string,
+  ) {
     super();
   }
   init() {

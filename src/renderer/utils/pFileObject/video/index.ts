@@ -1,6 +1,6 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import { VideoLoaderResult, videoLoader } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
+import { videoLoader, VideoLoaderResult } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
 export class PVideoFileObjectContent extends PPlayableFileObjectContent<{

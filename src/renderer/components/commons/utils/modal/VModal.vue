@@ -152,8 +152,14 @@ e-modal-root {
       text-align: right;
       display: block;
       > e-button {
-        font-family: Segoe MDL2 Assets, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
-          "Hiragino Sans", Meiryo, sans-serif;
+        font-family:
+          Segoe MDL2 Assets,
+          "Helvetica Neue",
+          Arial,
+          "Hiragino Kaku Gothic ProN",
+          "Hiragino Sans",
+          Meiryo,
+          sans-serif;
         cursor: pointer;
       }
     }

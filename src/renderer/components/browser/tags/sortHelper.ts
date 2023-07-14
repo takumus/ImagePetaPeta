@@ -1,4 +1,4 @@
-import { Ref, nextTick } from "vue";
+import { nextTick, Ref } from "vue";
 
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 

@@ -1,5 +1,5 @@
 import type { AssetExtension } from "@pixi/assets";
-import { ExtensionType, extensions, settings, utils } from "@pixi/core";
+import { extensions, ExtensionType, settings, utils } from "@pixi/core";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { AnimatedGIFResource } from "@/renderer/libs/pixi-gif/animatedGIFResource";

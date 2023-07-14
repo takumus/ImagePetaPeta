@@ -25,13 +25,15 @@ e-window-root {
     background-color: var(--checkbox-button-color);
     border-radius: var(--rounded-circle);
     border: var(--checkbox-border-size) solid var(--checkbox-border-color);
-    box-shadow: inset 0px 0px 0px var(--checkbox-background-color),
+    box-shadow:
+      inset 0px 0px 0px var(--checkbox-background-color),
       inset calc(var(--checkbox-height) * -1) 0px 0px var(--checkbox-background-color);
   }
   input[type="checkbox"]:checked {
     background-color: var(--checkbox-checked-button-color);
     border: var(--checkbox-border-size) solid var(--checkbox-checked-border-color);
-    box-shadow: inset var(--checkbox-height) 0px 0px var(--checkbox-checked-background-color),
+    box-shadow:
+      inset var(--checkbox-height) 0px 0px var(--checkbox-checked-background-color),
       inset 0px 0px 0px var(--checkbox-background-color);
   }
   input[type="checkbox"]:disabled {
