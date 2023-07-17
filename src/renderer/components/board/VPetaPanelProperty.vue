@@ -18,8 +18,8 @@
       <button @click="removeSelectedPanels()">{{ t("boards.panelMenu.remove") }}</button>
       <button
         v-if="singleSelectedPetaPanel"
-        @click="singleSelectedPetaPanel ? openDetails(singleSelectedPetaPanel) : false">
-        {{ t("boards.panelMenu.details") }}
+        @click="singleSelectedPetaPanel ? openInBrowser(singleSelectedPetaPanel) : false">
+        {{ t("boards.panelMenu.openInBrowser") }}
       </button>
       <VPlaybackController
         v-if="singleSelectedPlayableContent"
@@ -159,9 +159,8 @@ function changeOrder(to: "front" | "back") {
   );
   emit("sortIndex");
 }
-function openDetails(petaPanel: RPetaPanel) {
-  IPC.send("setDetailsPetaFile", petaPanel.petaFileId);
-  IPC.send("openWindow", "details");
+function openInBrowser(petaPanel: RPetaPanel) {
+  IPC.send("openInBrowser", petaPanel.petaFileId);
 }
 function resetPetaPanel() {
   emit(
