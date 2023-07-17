@@ -164,7 +164,10 @@ onMounted(() => {
   thumbnailsSize.value = statesStore.state.value.browserTileSize;
   keyboards.enabled = true;
   keyboards.keys("KeyA").down(keyA);
-  fetchFilteredPetaFiles();
+  IPC.on("openInBrowser", (_event, petaFileID) => openInBrowser(petaFileID));
+  fetchFilteredPetaFiles().then(() => {
+    IPC.send("getOpenInBrowserID").then(openInBrowser);
+  });
   petaFilesStore.onUpdate((petaFiles, mode) => {
     if (mode === UpdateMode.INSERT) {
       selectedPetaTagIds.value = [];
@@ -182,6 +185,16 @@ onUnmounted(() => {
   thumbnails.value?.removeEventListener("scroll", updateScrollArea);
   thumbnails.value?.removeEventListener("wheel", mouseWheel);
 });
+function openInBrowser(petaFileID: string | undefined) {
+  petaFilesStore.clearSelection();
+  const petaFile = petaFilesStore.getPetaFile(petaFileID);
+  if (petaFile !== undefined) {
+    petaFile.renderer.selected = true;
+    currentScrollTileId.value = petaFile.id;
+    currentScrollTileOffset.value = 0;
+    restoreScrollPosition();
+  }
+}
 function mouseWheel(e: WheelEvent) {
   if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
     thumbnailsSize.value -= e.deltaY * settingsStore.state.value.zoomSensitivity * 0.001;
