@@ -67,6 +67,7 @@ export interface I18NBase extends I18N {
       toFront: I18NProp;
       toBack: I18NProp;
       details: I18NProp;
+      openInBrowser: I18NProp;
       playGIF: I18NProp;
       stopGIF: I18NProp;
       playVideo: I18NProp;
