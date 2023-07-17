@@ -50,6 +50,7 @@ import { getLatestVersion } from "@/main/utils/versions";
 
 let temporaryShowNSFW = false;
 let detailsPetaFile: PetaFile | undefined;
+let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
   async browseAndImportFiles(event, type) {
     const logger = useLogger();
@@ -691,21 +692,26 @@ export const ipcFunctions: IpcFunctionsType = {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
+    openInBrowserTargetID = undefined;
     log.debug("#Open Window");
     log.debug("type:", windowName);
     windows.openWindow(windowName, event);
   },
-  async openBrowserAndGotoPetaFile(_event, petaFile) {
+  async openInBrowser(_event, petaFile) {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
-    log.debug("#OpenBrowserAndGotoPetaFile");
+    log.debug("#OpenBrowserAndOpenInBrowser");
+    openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
     windows.openWindow("browser");
     windows.emitMainEvent(
       { windowNames: ["browser"], type: EmitMainEventTargetType.WINDOW_NAMES },
-      "gotoPetaFile",
-      petaFile,
+      "openInBrowser",
+      openInBrowserTargetID,
     );
+  },
+  async getOpenInBrowserID() {
+    return openInBrowserTargetID;
   },
   async reloadWindow(event) {
     const logger = useLogger();
