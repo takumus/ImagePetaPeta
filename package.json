@@ -76,7 +76,7 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@seald-io/nedb": "^4.0.0",
+    "@seald-io/nedb": "^4.0.2",
     "color-convert": "^2.0.1",
     "color-diff": "^1.4.0",
     "cors": "^2.8.5",
@@ -92,7 +92,7 @@
     "pixi.js": "7.2.4",
     "qrcode": "^1.5.3",
     "quantize": "^1.0.2",
-    "sharp": "^0.32.2",
+    "sharp": "^0.32.3",
     "throttle-debounce": "^5.0.0",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
