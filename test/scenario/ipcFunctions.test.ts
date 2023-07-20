@@ -1,6 +1,6 @@
-import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
+import { initDummyElectron } from "./initDummyElectron";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { ipcFunctions } from "@/main/ipcFunctions";

@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import checker from "license-checker-rseidelsohn";
 
 const DANGER_LICENSES = /gpl/;

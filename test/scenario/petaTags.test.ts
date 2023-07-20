@@ -1,6 +1,6 @@
-import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, rmdirSync } from "fs";
 import { resolve } from "path";
+import { initDummyElectron } from "./initDummyElectron";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";

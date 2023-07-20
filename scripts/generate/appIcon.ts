@@ -1,6 +1,6 @@
-import { IconIco } from "@shockpkg/icon-encoder";
 import { mkdirSync, writeFileSync } from "fs";
 import { resolve } from "path";
+import { IconIco } from "@shockpkg/icon-encoder";
 import sharp from "sharp";
 
 async function exportImageWithMargin(from: string, to: string, size: number, margin: number) {

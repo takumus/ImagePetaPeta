@@ -1,7 +1,7 @@
-import { generateLicenses } from "./licenses";
-import AdmZip from "adm-zip";
 import { copyFileSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
+import { generateLicenses } from "./licenses";
+import AdmZip from "adm-zip";
 import { normalizePath } from "vite";
 
 interface ExtraFile {

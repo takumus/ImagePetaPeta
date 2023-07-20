@@ -1,6 +1,6 @@
+import { resolve } from "path";
 import { viteAlias } from "./vite.alias";
 import webWorker from "./vitePlugins/webWorker";
-import { resolve } from "path";
 import { defineConfig } from "vite";
 
 import vue from "@vitejs/plugin-vue";

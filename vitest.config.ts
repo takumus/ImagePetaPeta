@@ -1,8 +1,8 @@
+import { mkdirSync, rmSync } from "fs";
+import { resolve } from "path";
 import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
 import workerThreads from "./vitePlugins/workerThreads";
-import { mkdirSync, rmSync } from "fs";
-import { resolve } from "path";
 import readdirr from "recursive-readdir";
 import { defineConfig } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";

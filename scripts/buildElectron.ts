@@ -1,7 +1,7 @@
-import { electronConfiguration } from "../electron.config";
-import { Arch, Platform, build } from "electron-builder";
 import { writeFileSync } from "fs";
 import { exit } from "process";
+import { electronConfiguration } from "../electron.config";
+import { Arch, build, Platform } from "electron-builder";
 import { createRelease } from "scripts/createRelease";
 import yargs from "yargs/yargs";
 

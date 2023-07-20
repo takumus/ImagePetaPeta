@@ -1,6 +1,6 @@
-import AdmZip from "adm-zip";
 import { readdirSync, renameSync } from "fs";
 import { resolve } from "path";
+import AdmZip from "adm-zip";
 
 export const createRelease = async () => {
   if (process.platform === "win32") {

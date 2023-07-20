@@ -1,6 +1,6 @@
-import { initDummyElectron } from "./initDummyElectron";
 import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
+import { initDummyElectron } from "./initDummyElectron";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";

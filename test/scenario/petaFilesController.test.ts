@@ -1,7 +1,7 @@
-import { initDummyElectron } from "./initDummyElectron";
-import { fileTypeFromFile } from "file-type";
 import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { resolve } from "path";
+import { initDummyElectron } from "./initDummyElectron";
+import { fileTypeFromFile } from "file-type";
 import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 

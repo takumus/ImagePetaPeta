@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { PPCancelError, pp, ppa } from "@/commons/utils/pp";
+import { pp, ppa, PPCancelError } from "@/commons/utils/pp";
 
 describe("ppa", () => {
   test("data", async () => {
