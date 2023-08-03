@@ -47,5 +47,6 @@ export const electronConfiguration: Configuration = {
     perMachine: false,
     allowToChangeInstallationDirectory: true,
     deleteAppDataOnUninstall: true,
+    include: "./electron.installer.nsh",
   },
 };
