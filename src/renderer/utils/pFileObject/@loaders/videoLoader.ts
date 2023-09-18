@@ -50,6 +50,7 @@ export function videoLoader(
     if (!videoElement.paused) {
       onUpdate();
     }
+    texture?.update();
     videoElement.requestVideoFrameCallback(updateVideo);
   }
   function forceUpdate() {
