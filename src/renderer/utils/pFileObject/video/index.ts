@@ -1,17 +1,18 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import { videoLoader, VideoLoaderResult } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
+import { VideoLoader } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
 export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   volume: () => void;
 }> {
-  private video?: VideoLoaderResult;
+  private video?: VideoLoader;
   private _canceledLoading = false;
   private setCurrentTimeHandler = -1;
   private orderedCurrentTime = -1;
   async load(petaFile: RPetaFile) {
-    this.video = videoLoader(petaFile, false, () => {
+    this.video = new VideoLoader(petaFile, false);
+    this.video.on("update", () => {
       this.event.emit("time");
       this.event.emit("updateRenderer");
     });
@@ -29,12 +30,8 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
     if (this._canceledLoading) {
       return;
     }
-    if (
-      this.video !== undefined &&
-      !this.video.videoElement.seeking &&
-      this.orderedCurrentTime >= 0
-    ) {
-      this.video.videoElement.currentTime = this.orderedCurrentTime;
+    if (this.video !== undefined && !this.video.element.seeking && this.orderedCurrentTime >= 0) {
+      this.video.element.currentTime = this.orderedCurrentTime;
       this.orderedCurrentTime = -1;
       this.setCurrentTimeHandler = window.setTimeout(
         this.setCurrentTimeFromOrdered.bind(this),
@@ -49,30 +46,30 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
     super.destroy();
   }
   getPaused() {
-    return this.video?.videoElement.paused ?? false;
+    return this.video?.element.paused ?? false;
   }
   async setPaused(paused: boolean) {
-    if (this.video?.videoElement.paused === true && !paused) {
-      await this.video.videoElement.play();
+    if (this.video?.element.paused === true && !paused) {
+      await this.video.element.play();
       this.event.emit("paused", false);
       return;
-    } else if (this.video?.videoElement.paused === false && paused) {
-      this.video.videoElement.pause();
+    } else if (this.video?.element.paused === false && paused) {
+      this.video.element.pause();
       this.event.emit("paused", true);
       return;
     }
   }
   getDuration() {
-    return this.video?.videoElement.duration ?? 0;
+    return this.video?.element.duration ?? 0;
   }
   getCurrentTime() {
-    return this.video?.videoElement.currentTime ?? 0;
+    return this.video?.element.currentTime ?? 0;
   }
   getSeekable() {
     if (this.video === undefined) {
       return false;
     }
-    return !this.video.videoElement.seeking;
+    return !this.video.element.seeking;
   }
   setCurrentTime(currentTime: number) {
     if (this.video === undefined) {
@@ -82,20 +79,20 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
     this.setCurrentTimeFromOrdered();
   }
   getVolume() {
-    return this.video?.videoElement.volume ?? 0;
+    return this.video?.element.volume ?? 0;
   }
   setVolume(volume: number) {
     if (this.video !== undefined) {
-      this.video.videoElement.volume = volume;
+      this.video.element.volume = volume;
       this.event.emit("volume");
     }
   }
   getSpeed() {
-    return this.video?.videoElement.playbackRate ?? 1;
+    return this.video?.element.playbackRate ?? 1;
   }
   setSpeed(speed: number) {
     if (this.video !== undefined) {
-      this.video.videoElement.playbackRate = speed;
+      this.video.element.playbackRate = speed;
       this.event.emit("speed");
     }
   }
