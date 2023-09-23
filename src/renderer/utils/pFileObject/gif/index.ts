@@ -1,7 +1,7 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
-import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
+import { ImageLoader } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 
 export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
@@ -9,9 +9,9 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
   private _cancelLoading?: () => void;
   private _canceledLoading = false;
   async load(petaFile: RPetaFile) {
-    const result = getImage(petaFile);
-    this._cancelLoading = result.cancel;
-    const image = await result.promise;
+    const loader = new ImageLoader(petaFile);
+    this._cancelLoading = loader.cancel.bind(loader);
+    const image = await loader.load();
     if (this._canceledLoading) {
       return false;
     }

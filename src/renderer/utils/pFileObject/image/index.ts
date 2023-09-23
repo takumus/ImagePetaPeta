@@ -1,15 +1,15 @@
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import { getImage } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
+import { ImageLoader } from "@/renderer/utils/pFileObject/@loaders/imageLoader";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 
 export class PImageFileObjectContent extends PFileObjectContent<void> {
   private _cancelLoading?: () => void;
   private _canceledLoading = false;
   async load(petaFile: RPetaFile) {
-    const result = getImage(petaFile);
-    this._cancelLoading = result.cancel;
-    const image = await result.promise;
+    const loader = new ImageLoader(petaFile);
+    this._cancelLoading = loader.cancel.bind(loader);
+    const image = await loader.load();
     if (this._canceledLoading) {
       return false;
     }
