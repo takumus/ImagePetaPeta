@@ -31,7 +31,7 @@ async function exportIcon(from: string, to: string, sizes: number[]) {
   await exportIcon(
     "./resources/images/app/icon.png",
     resolve("./_electronTemp/app_icon_win.ico"),
-    [16, 32, 48, 64, 128, 256],
+    [16, 32, 48, 64, 128, 256, 512],
   );
   await exportImageWithMargin(
     "./resources/images/app/icon.png",
