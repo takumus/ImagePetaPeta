@@ -24,7 +24,7 @@ export const createFileInfo = {
       let remoteURL = "";
       if (url.trim().startsWith("data:")) {
         // dataURIだったら
-        data = dataUriToBuffer(url);
+        data = Buffer.from(dataUriToBuffer(url).buffer);
       } else {
         // 普通のurlだったら
         const init: RequestInit = {
