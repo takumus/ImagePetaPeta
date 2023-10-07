@@ -88,20 +88,20 @@ e-window-root {
   > e-content {
     > e-accesses {
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--px-3);
       width: 100%;
       height: 100%;
-      align-items: center;
-      flex-direction: column;
       overflow-y: auto;
-      gap: var(--px-3);
       > e-access {
         display: flex;
+        flex-grow: 0;
         flex-direction: column;
         align-items: center;
-        background-color: var(--color-0);
-        z-index: 1;
-        flex-grow: 0;
         gap: var(--px-2);
+        z-index: 1;
+        background-color: var(--color-0);
         > img {
           width: 200px;
           pointer-events: none;

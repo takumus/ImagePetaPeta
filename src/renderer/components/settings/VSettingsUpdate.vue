@@ -54,8 +54,8 @@ function releaseNote() {
 
 <style lang="scss" scoped>
 e-settings-content-root.update {
-  text-align: center;
   display: block;
+  text-align: center;
   > e-info {
     display: block;
     overflow: hidden;

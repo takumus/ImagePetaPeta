@@ -92,12 +92,12 @@ watch(currentSource, changeSource);
 
 <style lang="scss" scoped>
 e-details-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
   display: flex;
+  position: relative;
   flex-direction: column;
   background-image: url("/images/textures/transparent.png");
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   > input {
     display: block;
@@ -112,20 +112,20 @@ e-details-root {
     height: 100%;
   }
   > e-thumbnails {
-    background-color: var(--color-0);
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: var(--color-0);
     padding: var(--px-2);
     height: 128px;
     > img {
-      height: 100%;
       display: block;
-      margin-right: var(--px-2);
-      cursor: pointer;
-      border-radius: var(--rounded);
-      overflow: hidden;
       filter: brightness(0.5);
+      cursor: pointer;
+      margin-right: var(--px-2);
+      border-radius: var(--rounded);
+      height: 100%;
+      overflow: hidden;
       &.selected {
         filter: brightness(1);
       }

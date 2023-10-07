@@ -262,17 +262,17 @@ watch(
 
 <style lang="scss" scoped>
 e-details-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
   display: flex;
+  position: relative;
   flex-direction: column;
   background-image: url("/images/textures/transparent.png");
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   > e-pixi-wrapper {
     display: block;
-    overflow: hidden;
     flex: 1;
+    overflow: hidden;
   }
   > e-playback-controller-wrapper {
     display: block;

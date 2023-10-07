@@ -88,20 +88,20 @@ e-settings-root {
   > e-categories {
     padding: 0px;
     > e-category {
-      margin: var(--px-2);
       display: block;
       cursor: pointer;
+      margin: var(--px-2);
       &.selected {
         text-decoration: underline;
       }
     }
   }
   > e-contents {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
     display: block;
     flex: 1;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
     > e-content {
       display: block;
     }

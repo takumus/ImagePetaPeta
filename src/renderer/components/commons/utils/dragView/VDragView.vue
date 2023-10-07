@@ -180,11 +180,11 @@ watch([() => props.contentWidth, () => props.contentHeight], () => {
 
 <style lang="scss" scoped>
 e-drag-view-root {
+  display: block;
   position: relative;
+  background-image: url("/images/textures/transparent.png");
   width: 100%;
   height: 100%;
-  display: block;
-  background-image: url("/images/textures/transparent.png");
   overflow: hidden;
   > e-img {
     display: block;

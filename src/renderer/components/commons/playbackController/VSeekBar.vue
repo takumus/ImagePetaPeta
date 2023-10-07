@@ -68,13 +68,13 @@ const cursorPosition = computed(() => {
 e-seekbar-root {
   display: block;
   position: relative;
+  cursor: pointer;
+  border-radius: var(--rounded);
+  background-color: var(--color-0);
+  padding: var(--px-2) calc(var(--px-2) + calc(var(--px-1) / 2));
   width: 100%;
   height: 32px;
-  background-color: var(--color-0);
-  border-radius: var(--rounded);
   overflow: hidden;
-  padding: var(--px-2) calc(var(--px-2) + calc(var(--px-1) / 2));
-  cursor: pointer;
   > e-cursor-wrapper {
     display: block;
     width: 100%;
@@ -82,11 +82,11 @@ e-seekbar-root {
     > e-cursor {
       display: block;
       position: relative;
-      width: var(--px-1);
       transform: translateX(-50%);
-      height: 100%;
-      background-color: var(--color-font);
       border-radius: var(--rounded);
+      background-color: var(--color-font);
+      width: var(--px-1);
+      height: 100%;
     }
   }
 }

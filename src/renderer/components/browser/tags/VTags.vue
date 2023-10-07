@@ -370,8 +370,8 @@ watch(
 
 <style lang="scss" scoped>
 e-tags-root {
-  flex-direction: column;
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   > e-tag-add {
@@ -381,37 +381,37 @@ e-tags-root {
     }
   }
   > e-tags-top {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--px-1);
     outline: none;
     padding: var(--px-1);
     width: 100%;
     text-align: left;
+  }
+  > e-tags {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--px-1);
-  }
-  > e-tags {
     outline: none;
     // padding: var(--px-1);
     width: 100%;
-    text-align: left;
     overflow-y: auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--px-1);
+    text-align: left;
   }
   > e-drag-floating-tag-cell {
-    z-index: 999;
-    pointer-events: none;
+    position: fixed;
     top: 0px;
     left: 0px;
-    position: fixed;
+    transform-origin: top right;
     visibility: hidden;
     opacity: 0.9;
-    transform-origin: top right;
+    z-index: 999;
+    pointer-events: none;
   }
 }
 </style>

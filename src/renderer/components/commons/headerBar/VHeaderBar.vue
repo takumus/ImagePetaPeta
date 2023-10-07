@@ -133,24 +133,24 @@ const nsfwClass = computed(() => {
 <style lang="scss" scoped>
 e-utils-bar-root {
   --top-draggable-height: 10px;
-  width: 100%;
-  position: relative;
-  background-color: var(--color-0);
-  min-height: 30px;
   display: block;
+  position: relative;
   z-index: 2;
+  background-color: var(--color-0);
+  width: 100%;
+  min-height: 30px;
   &.shadow {
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.3);
   }
   > e-commons {
+    display: flex;
     position: absolute;
     top: 0px;
-    height: 100%;
-    padding: var(--px-1);
-    display: flex;
     flex-shrink: 1;
-    text-align: left;
     justify-content: flex-end;
+    padding: var(--px-1);
+    height: 100%;
+    text-align: left;
     &.left {
       left: 0px;
       button {
@@ -166,19 +166,19 @@ e-utils-bar-root {
     &.left,
     &.right {
       > button {
-        min-width: 24px;
-        padding: 0px;
-        height: 100%;
         margin: 0px;
         border: none;
+        padding: 0px;
+        min-width: 24px;
+        height: 100%;
         > e-icon {
           display: block;
-          width: 100%;
-          height: 100%;
+          filter: var(--filter-icon);
+          background-position: center center;
           background-size: 14px;
           background-repeat: no-repeat;
-          background-position: center center;
-          filter: var(--filter-icon);
+          width: 100%;
+          height: 100%;
           &.board {
             background-image: url("/images/icons/board.png");
           }

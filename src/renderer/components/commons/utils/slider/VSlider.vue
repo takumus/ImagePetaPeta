@@ -83,43 +83,43 @@ function pointerUp(event: PointerEvent) {
 <style lang="scss" scoped>
 e-slider-root {
   display: inline-block;
-  height: var(--px-3);
-  padding: var(--px-1);
-  margin: var(--px-1);
   cursor: pointer;
+  margin: var(--px-1);
+  padding: var(--px-1);
+  height: var(--px-3);
   > e-content {
     display: block;
-    height: 100%;
-    width: 100%;
     position: relative;
+    width: 100%;
+    height: 100%;
     > e-bar {
       display: block;
-      height: 100%;
-      width: 100%;
       position: absolute;
       top: 0px;
       left: 0px;
-      background-color: var(--color-checkbox-false-background);
       border-radius: var(--rounded);
+      background-color: var(--color-checkbox-false-background);
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       > e-bar-inner {
         display: block;
-        height: 100%;
         background-color: var(--color-checkbox-true-background);
+        height: 100%;
       }
     }
     > e-circle {
-      z-index: 2;
       display: block;
+      position: relative;
+      left: 0%;
+      transform: translateX(-50%) scale(1.9);
+      transform-origin: center;
+      z-index: 2;
+      box-shadow: 0px 0.5px 2px rgba(0, 0, 0, 0.3);
       border-radius: var(--rounded-circle);
       background-color: var(--color-checkbox-true-circle);
-      height: 100%;
       aspect-ratio: 1;
-      transform: translateX(-50%) scale(1.9);
-      left: 0%;
-      transform-origin: center;
-      position: relative;
-      box-shadow: 0px 0.5px 2px rgba(0, 0, 0, 0.3);
+      height: 100%;
     }
   }
 }

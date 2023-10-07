@@ -45,12 +45,12 @@ defineExpose({
 <style lang="scss" scoped>
 e-tag-partition-root {
   display: flex;
-  height: var(--px-4);
-  width: 100%;
   align-items: center;
   cursor: pointer;
-  background-color: var(--color-0);
   border-radius: var(--rounded);
+  background-color: var(--color-0);
+  width: 100%;
+  height: var(--px-4);
   > e-content {
     display: flex;
     // background-color: var(--color-border);
@@ -58,15 +58,15 @@ e-tag-partition-root {
     align-items: center;
     width: 100%;
     > e-label {
-      text-align: center;
       padding: var(--px-2);
+      text-align: center;
     }
     > e-border {
-      flex: 1;
       display: block;
-      height: 0px;
+      flex: 1;
       // border-radius: 999px;
       border-bottom: solid var(--px-border) var(--color-border);
+      height: 0px;
     }
   }
 }

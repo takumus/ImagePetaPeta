@@ -206,17 +206,17 @@ defineExpose({
 <style lang="scss" scoped>
 e-textarea-root {
   display: inline-block;
-  min-width: var(--px-3);
   position: relative;
+  min-width: var(--px-3);
   > e-textarea {
-    line-height: var(--size-2);
-    min-height: var(--size-2);
-    cursor: pointer;
     display: inline-block;
-    white-space: pre-wrap;
-    word-break: break-word;
+    cursor: pointer;
     outline: none;
     border-radius: calc(var(--rounded) / 4);
+    min-height: var(--size-2);
+    line-height: var(--size-2);
+    white-space: pre-wrap;
+    word-break: break-word;
     &.editing {
       cursor: unset;
       &.outline {

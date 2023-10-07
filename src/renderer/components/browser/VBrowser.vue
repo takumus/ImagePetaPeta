@@ -626,42 +626,42 @@ watch(
 
 <style lang="scss" scoped>
 e-browser-root {
+  display: flex;
+  gap: var(--px-2);
   width: 100%;
   height: 100%;
-  display: flex;
   overflow: hidden;
-  gap: var(--px-2);
   > e-left {
+    display: flex;
     width: 250px;
     min-width: 250px;
-    display: flex;
   }
   > e-right {
-    width: 250px;
-    min-width: 250px;
     display: flex;
     flex-direction: column;
+    width: 250px;
+    min-width: 250px;
   }
   > e-center {
     display: flex;
-    flex-direction: column;
     flex: 1;
+    flex-direction: column;
     height: 100%;
     > e-content {
-      width: 100%;
-      height: 100%;
+      display: flex;
       position: relative;
       flex: 1;
-      overflow: hidden;
-      display: flex;
       flex-direction: column;
       gap: var(--px-2);
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       > e-top {
-        width: 100%;
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
         justify-content: center;
+        align-items: center;
+        width: 100%;
         > e-search {
           display: block;
           flex: 1;
@@ -671,8 +671,8 @@ e-browser-root {
         > e-buttons {
           display: flex;
           flex-wrap: wrap;
-          align-items: center;
           justify-content: center;
+          align-items: center;
           > label {
             display: flex;
             align-items: center;
@@ -680,20 +680,20 @@ e-browser-root {
         }
       }
       > e-bottom {
-        width: 100%;
         display: flex;
         padding: 0px var(--px-2);
+        width: 100%;
         > e-space {
           flex: 1;
         }
       }
       > e-tiles {
-        width: 100%;
-        position: relative;
-        overflow-y: scroll;
-        overflow-x: hidden;
         display: block;
+        position: relative;
         flex: 1;
+        width: 100%;
+        overflow-x: hidden;
+        overflow-y: scroll;
         > e-tiles-content {
           display: block;
         }

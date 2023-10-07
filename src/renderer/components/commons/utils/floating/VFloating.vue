@@ -133,12 +133,12 @@ defineExpose({
 <style lang="scss" scoped>
 e-floating-root {
   position: fixed;
-  background-color: var(--color-0-floating);
+  top: 0px;
+  left: 0px;
   margin: 0px;
   box-shadow: var(--shadow-floating);
   border-radius: var(--rounded);
-  top: 0px;
-  left: 0px;
+  background-color: var(--color-0-floating);
   max-width: 256px;
   overflow: hidden;
 }

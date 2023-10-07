@@ -42,12 +42,12 @@ defineExpose({
 <style lang="scss" scoped>
 e-tag-cell-root {
   display: block;
-  width: fit-content;
+  box-shadow: var(--shadow-small);
   // margin: 0px 0px var(--px-1) var(--px-1);
   border-radius: var(--rounded);
-  padding: var(--px-1);
   background-color: var(--color-1);
-  box-shadow: var(--shadow-small);
+  padding: var(--px-1);
+  width: fit-content;
   &.selected {
     // font-weight: bold;
     // font-size: var(--size-2);

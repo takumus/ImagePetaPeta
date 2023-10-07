@@ -103,26 +103,26 @@ e-window-root {
       display: block;
       flex: 1;
       z-index: 1;
-      overflow: hidden;
-      background-repeat: repeat;
-      background-image: url("/images/textures/transparent.png");
       cursor: grab;
+      background-image: url("/images/textures/transparent.png");
+      background-repeat: repeat;
+      overflow: hidden;
     }
     > e-property {
-      padding: var(--px-2);
       display: block;
-      background-color: var(--color-0);
       z-index: 2;
+      background-color: var(--color-0);
+      padding: var(--px-2);
       width: 300px;
     }
   }
   > e-modals {
     position: absolute;
-    width: 100%;
-    height: 100%;
     top: 0px;
     left: 0px;
     z-index: 3;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

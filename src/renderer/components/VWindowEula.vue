@@ -65,8 +65,8 @@ e-window-root {
   > e-content {
     > e-body {
       display: block;
-      white-space: pre-wrap;
       user-select: text;
+      white-space: pre-wrap;
     }
     > e-buttons {
       display: block;

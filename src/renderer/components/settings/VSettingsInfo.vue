@@ -89,18 +89,18 @@ function showEULA() {
 
 <style lang="scss" scoped>
 e-settings-content-root.info {
-  text-align: center;
   display: block;
+  text-align: center;
   > pre {
+    overflow: hidden;
+    font-size: var(--size-0);
+    white-space: pre-wrap;
     &.licenses {
       text-align: left;
     }
     &.supporters {
       text-align: center;
     }
-    overflow: hidden;
-    white-space: pre-wrap;
-    font-size: var(--size-0);
   }
   > p {
     font-size: var(--size-1);

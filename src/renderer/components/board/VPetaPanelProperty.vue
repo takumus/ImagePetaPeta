@@ -252,12 +252,12 @@ e-content {
   max-width: 512px;
   > e-draggable {
     display: block;
-    width: 100%;
-    height: var(--px-4);
     position: absolute;
     top: 0px;
     left: 0px;
     cursor: grab;
+    width: 100%;
+    height: var(--px-4);
     // background-color: #ff0000;
   }
 }

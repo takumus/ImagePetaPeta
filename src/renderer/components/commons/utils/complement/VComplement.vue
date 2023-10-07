@@ -164,23 +164,23 @@ watch(() => props.value, input);
 
 <style lang="scss" scoped>
 e-complement-root {
-  padding: var(--px-2) var(--px-2) var(--px-2) var(--px-1);
-  word-break: break-word;
-  text-align: left;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  padding: var(--px-2) var(--px-2) var(--px-2) var(--px-1);
   overflow-y: auto;
+  text-align: left;
+  word-break: break-word;
   > e-tag {
-    line-height: var(--size-2);
     display: inline-block;
-    margin: 0px 0px var(--px-1) var(--px-1);
-    border-radius: var(--rounded);
-    padding: var(--px-1);
-    background-color: var(--color-1);
-    box-shadow: var(--shadow-small);
     cursor: pointer;
+    margin: 0px 0px var(--px-1) var(--px-1);
+    box-shadow: var(--shadow-small);
+    border-radius: var(--rounded);
+    background-color: var(--color-1);
+    padding: var(--px-1);
+    line-height: var(--size-2);
     &.selected,
     &.close:hover {
       background-color: var(--color-accent-1);
@@ -194,10 +194,10 @@ e-complement-root {
     }
   }
   > e-close {
-    cursor: pointer;
     display: inline-block;
-    width: 100%;
+    cursor: pointer;
     margin-bottom: var(--px-2);
+    width: 100%;
     text-align: center;
   }
 }

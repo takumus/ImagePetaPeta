@@ -125,26 +125,26 @@ const noImage = computed<boolean>(() => {
 
 <style lang="scss" scoped>
 e-previews-root {
-  width: 100%;
-  position: relative;
   display: flex;
-  flex-direction: column;
+  position: relative;
   flex-shrink: 2;
+  flex-direction: column;
+  width: 100%;
   > e-previews {
+    display: block;
     position: relative;
+    cursor: pointer;
     width: 100%;
     height: 150px;
     overflow: hidden;
-    display: block;
-    cursor: pointer;
   }
   > e-buttons {
-    text-align: center;
     display: block;
+    text-align: center;
   }
   p {
-    text-align: center;
     margin: var(--px-1) 0px;
+    text-align: center;
   }
 }
 </style>

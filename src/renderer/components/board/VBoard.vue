@@ -427,27 +427,27 @@ defineExpose({
 
 <style lang="scss" scoped>
 e-board-root {
+  display: block;
   position: relative;
   width: 100%;
   height: 100%;
-  display: block;
   > e-pixi-container {
+    display: block;
     position: absolute;
     top: 0px;
     left: 0px;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    z-index: 1;
-    display: block;
   }
   > e-crop {
+    display: block;
     position: absolute;
-    z-index: 3;
     top: 0px;
     left: 0px;
+    z-index: 3;
     width: 100%;
     height: 100%;
-    display: block;
   }
 }
 </style>

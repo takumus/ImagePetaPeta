@@ -169,9 +169,9 @@ watch(
 <style lang="scss" scoped>
 e-playback-controller-root {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  flex-direction: column;
   > e-general {
     display: flex;
     align-items: center;
@@ -179,9 +179,9 @@ e-playback-controller-root {
       min-width: 64px;
     }
     > e-seekbar {
-      padding: var(--px-1);
       display: block;
       flex: 1;
+      padding: var(--px-1);
     }
     > e-current-time {
       display: block;

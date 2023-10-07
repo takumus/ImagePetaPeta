@@ -191,101 +191,101 @@ const board = computed(() => {
 
 <style lang="scss" scoped>
 e-tab-root {
+  display: flex;
   top: 0px;
   left: 0px;
   background-color: var(--color-1);
-  color: var(--color-font);
   height: var(--tab-height);
-  display: flex;
+  color: var(--color-font);
   > e-tab {
     display: block;
+    position: relative;
+    flex-shrink: 1;
+    z-index: 1;
+    cursor: pointer;
     margin: 0px;
     // border-right: solid 1px var(--color-border);
     // border-left: solid 1px;
     margin-right: -1px;
-    flex-shrink: 1;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
     border-radius: var(--rounded);
-    z-index: 1;
+    overflow: hidden;
     &.drag {
       position: absolute;
-      pointer-events: none;
       border-left: solid var(--px-border) var(--color-border);
+      pointer-events: none;
     }
     &.add {
-      min-width: var(--px-3);
-      border-right: none;
       flex-shrink: 0;
+      border-right: none;
+      min-width: var(--px-3);
       > e-label-wrapper e-label {
         padding: 0px var(--px-2);
       }
     }
     &:not(.selected):not(:hover) + e-tab:not(.selected):not(:hover) {
       &::after {
-        content: "";
         display: block;
         position: absolute;
-        width: 0px;
-        border-left: solid 1px var(--color-border);
         // height: 100%;
         top: var(--rounded);
         bottom: var(--rounded);
         left: 0px;
-        background-color: var(--color-border);
+        border-left: solid 1px var(--color-border);
         border-radius: 1px;
+        background-color: var(--color-border);
+        width: 0px;
+        content: "";
       }
     }
     &.selected {
-      z-index: 2;
-      border-radius: var(--rounded) var(--rounded) 0px 0px;
-      overflow: visible;
-      background-color: var(--color-0);
       flex-shrink: 0;
+      z-index: 2;
       border: none;
+      border-radius: var(--rounded) var(--rounded) 0px 0px;
+      background-color: var(--color-0);
+      overflow: visible;
       &:hover {
         background-color: var(--color-0);
       }
       &::before,
       &::after {
-        content: "";
         display: inline-block;
         position: absolute;
         bottom: 0;
         left: calc(var(--rounded) * -1);
-        width: var(--rounded);
-        height: var(--rounded);
-        border-radius: 0 0 100% 0;
         box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2)
           var(--color-0);
+        border-radius: 0 0 100% 0;
+        width: var(--rounded);
+        height: var(--rounded);
+        content: "";
       }
       &::after {
-        left: unset;
         right: calc(var(--rounded) * -1);
+        left: unset;
         transform: scaleX(-1);
       }
     }
     &:hover:not(.selected) {
+      flex-shrink: 0;
       background-color: var(--color-2);
       overflow: visible;
-      flex-shrink: 0;
       &::before,
       &::after {
-        content: "";
         display: inline-block;
         position: absolute;
         bottom: 0;
         left: calc(var(--rounded) * -1);
-        width: var(--rounded);
-        height: var(--rounded);
-        border-radius: 0 0 100% 0;
         box-shadow: calc(var(--rounded) / 2) calc(var(--rounded) / 2) 0px calc(var(--rounded) * 0.2)
           var(--color-2);
+        border-radius: 0 0 100% 0;
+        width: var(--rounded);
+        height: var(--rounded);
+        content: "";
       }
       &::after {
-        left: unset;
         right: calc(var(--rounded) * -1);
+        left: unset;
         transform: scaleX(-1);
       }
     }
@@ -294,8 +294,8 @@ e-tab-root {
       align-items: center;
       height: 100%;
       > e-label {
-        padding: 0px var(--px-2);
         flex-shrink: 1;
+        padding: 0px var(--px-2);
       }
     }
   }

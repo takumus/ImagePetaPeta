@@ -66,19 +66,19 @@ defineExpose({
 
 <style lang="scss" scoped>
 .context-menu-root {
-  padding: 0px;
   margin: 0px;
-  color: var(--color-font);
   border-radius: var(--rounded);
-  overflow: hidden;
+  padding: 0px;
   padding: var(--px-1);
+  overflow: hidden;
+  color: var(--color-font);
   > .item {
-    word-break: break-word;
-    list-style-type: none;
-    min-width: 128px;
-    padding: var(--px-2) 24px;
-    border-radius: calc(var(--rounded) / 2);
     cursor: pointer;
+    border-radius: calc(var(--rounded) / 2);
+    padding: var(--px-2) 24px;
+    min-width: 128px;
+    list-style-type: none;
+    word-break: break-word;
     &:hover {
       background-color: var(--color-accent-1);
     }
@@ -89,8 +89,8 @@ defineExpose({
     }
   }
   > .separate {
-    border-bottom: solid var(--px-border) var(--color-font);
     margin: var(--px-1) var(--px-2);
+    border-bottom: solid var(--px-border) var(--color-font);
     height: 0px;
     overflow: hidden;
   }

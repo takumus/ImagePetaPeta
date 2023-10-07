@@ -126,8 +126,8 @@ defineExpose({
 
 <style lang="scss" scoped>
 e-pixi-root {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
 }
 </style>

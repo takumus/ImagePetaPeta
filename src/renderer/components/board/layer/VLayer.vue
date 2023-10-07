@@ -171,19 +171,19 @@ defineExpose({
 
 <style lang="scss" scoped>
 e-layer-root {
-  background-color: var(--color-0);
-  border-radius: var(--rounded);
-  overflow: hidden;
   display: flex;
-  flex-direction: column;
   position: fixed;
+  top: 50%;
   right: 0px;
   bottom: 0px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  flex-direction: column;
   margin: var(--px-2);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  border-radius: var(--rounded);
+  background-color: var(--color-0);
   padding: var(--px-2);
-  top: 50%;
   width: 128px;
+  overflow: hidden;
   &.hide {
     top: unset;
     width: unset;
@@ -193,60 +193,60 @@ e-layer-root {
   }
   > e-header {
     display: block;
+    flex-shrink: 0;
+    filter: var(--filter-icon);
     cursor: pointer;
-    text-align: center;
+    margin-bottom: var(--px-2);
     background: no-repeat;
+    background-image: url("/images/icons/layer.png");
     background-position: center center;
     background-size: 14px;
-    background-image: url("/images/icons/layer.png");
-    height: 14px;
     min-width: 14px;
-    flex-shrink: 0;
-    margin-bottom: var(--px-2);
-    filter: var(--filter-icon);
+    height: 14px;
+    text-align: center;
   }
   > e-layers-parent {
     display: block;
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100%;
     flex: 1;
     clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0);
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
     > e-layers {
       display: flex;
+      position: relative;
       flex-direction: column;
       margin: 0px;
       padding: 0px;
-      position: relative;
       overflow-anchor: none;
     }
     > e-drag-target-line {
       position: fixed;
-      z-index: 999;
-      width: 0px;
-      height: 0px;
       top: 0px;
       left: 0px;
       transform-origin: top left;
+      z-index: 999;
+      width: 0px;
+      height: 0px;
       &::after {
-        content: "";
         display: block;
-        width: 100%;
-        height: 100%;
+        transform: translate(-50%, -50%);
         border-radius: 99px;
         background-color: var(--color-accent-2);
-        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        content: "";
       }
     }
     > e-drag-floating-tag-cell {
-      z-index: 999;
-      pointer-events: none;
+      position: fixed;
       top: 0px;
       left: 0px;
-      position: fixed;
+      transform-origin: top right;
       visibility: hidden;
       opacity: 0.9;
-      transform-origin: top right;
+      z-index: 999;
+      pointer-events: none;
     }
   }
 }

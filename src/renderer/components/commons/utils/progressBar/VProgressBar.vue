@@ -16,19 +16,19 @@ defineProps<{
 
 <style lang="scss" scoped>
 e-progress-bar-root {
+  display: block;
+  border-radius: var(--rounded);
   background-color: var(--color-font);
+  padding: 2px;
   width: 100%;
   height: var(--px-3);
   overflow: hidden;
-  border-radius: var(--rounded);
-  padding: 2px;
-  display: block;
   > e-bar {
-    width: 50%;
-    height: 100%;
+    display: block;
     border-radius: var(--rounded);
     background-color: var(--color-0);
-    display: block;
+    width: 50%;
+    height: 100%;
   }
 }
 </style>

@@ -56,8 +56,8 @@ e-select-root {
   > button {
     display: flex;
     align-items: center;
-    padding-left: var(--px-2);
     padding-right: var(--px-1);
+    padding-left: var(--px-2);
     > e-label {
       display: block;
       flex: 1;

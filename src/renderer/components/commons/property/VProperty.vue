@@ -360,22 +360,22 @@ petaTagsStore.onUpdate((petaTagIds, petaFileIds) => {
 
 <style lang="scss" scoped>
 e-property-root {
+  display: flex;
+  position: relative;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
   > .content {
-    > .content-child {
-      > p {
-        text-decoration: underline;
-        font-weight: bold;
-        margin: var(--px-2);
-      }
-    }
     display: flex;
     flex-direction: column;
+    > .content-child {
+      > p {
+        margin: var(--px-2);
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    }
   }
   > e-shrinks {
     overflow-y: auto;
@@ -387,12 +387,12 @@ e-property-root {
         flex-direction: column;
         > e-data {
           display: flex;
-          margin: var(--px-1) 0px;
           gap: var(--px-1);
+          margin: var(--px-1) 0px;
           > e-name {
             display: block;
-            width: 35%;
             position: relative;
+            width: 35%;
             text-align: right;
           }
           > e-value {
@@ -405,23 +405,23 @@ e-property-root {
     }
     > e-colors {
       > e-palette {
-        padding: var(--px-2);
         display: block;
+        padding: var(--px-2);
         width: 100%;
         e-color-wrapper {
           display: flex;
-          border-radius: var(--rounded);
-          height: var(--px-2);
-          width: 100%;
-          overflow: hidden;
           margin: var(--px-0) 0px;
           box-shadow: 0px 0px 0px var(--px-border) var(--color-font);
+          border-radius: var(--rounded);
+          width: 100%;
+          height: var(--px-2);
+          overflow: hidden;
           > e-color {
-            height: 100%;
             display: block;
+            height: 100%;
             &:hover {
-              cursor: pointer;
               transform: scaleX(1.5) scaleY(2);
+              cursor: pointer;
             }
           }
         }
@@ -433,17 +433,17 @@ e-property-root {
             margin: var(--px-1) 0px;
             > e-name {
               display: block;
-              width: 30%;
               position: relative;
-              text-align: right;
               padding: 0px var(--px-1);
+              width: 30%;
+              text-align: right;
             }
             > e-value {
-              padding: 0px var(--px-1);
               display: block;
+              padding: 0px var(--px-1);
               width: 70%;
-              word-break: break-word;
               user-select: text;
+              word-break: break-word;
             }
           }
         }
@@ -457,33 +457,33 @@ e-property-root {
   > e-fixed {
     flex: 1;
     > e-tags {
-      flex: 1;
       display: flex;
+      flex: 1;
       flex-direction: column;
       min-height: 128px;
       > e-search-box {
-        outline: none;
-        padding: var(--px-1) var(--px-1) 0px 0px;
-        width: 100%;
-        word-break: break-word;
-        text-align: left;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        outline: none;
+        padding: var(--px-1) var(--px-1) 0px 0px;
+        width: 100%;
         overflow-y: auto;
+        text-align: left;
+        word-break: break-word;
         > e-tag {
           display: inline-block;
           margin: 0px 0px var(--px-1) var(--px-1);
-          border-radius: var(--rounded);
-          padding: var(--px-1);
-          background-color: var(--color-1);
           box-shadow: var(--shadow-small);
+          border-radius: var(--rounded);
+          background-color: var(--color-1);
+          padding: var(--px-1);
           &.last {
-            width: 100%;
-            background-color: unset;
             flex: 1 1 64px;
             box-shadow: unset;
+            background-color: unset;
+            width: 100%;
           }
         }
       }
@@ -493,8 +493,8 @@ e-property-root {
     }
   }
   p {
-    text-align: center;
     margin: var(--px-1) 0px;
+    text-align: center;
   }
 }
 </style>

@@ -304,92 +304,92 @@ e-tile-root {
   display: block;
   position: absolute;
   > e-group {
+    display: block;
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    display: block;
-    text-align: center;
-    line-height: 24px;
     font-weight: bold;
     font-size: var(--size-2);
+    line-height: 24px;
+    text-align: center;
   }
   > e-tile-wrapper {
+    display: block;
     position: relative;
+    border-radius: var(--rounded);
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: var(--rounded);
-    display: block;
     > e-images {
       display: block;
+      position: relative;
+      filter: brightness(0.7);
+      cursor: pointer;
       width: 100%;
       height: 100%;
-      cursor: pointer;
-      filter: brightness(0.7);
-      position: relative;
       &.selected {
         filter: brightness(1);
         border-radius: var(--rounded);
         padding: 2px;
       }
       > img {
-        z-index: 1;
+        display: block;
         position: absolute;
         top: 0px;
         left: 0px;
-        display: block;
+        z-index: 1;
         width: 100%;
         height: 100%;
       }
       > video {
-        z-index: 1;
+        display: block;
         position: absolute;
         top: 0px;
         left: 0px;
-        display: block;
+        z-index: 1;
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
       > e-background {
-        z-index: 0;
+        display: block;
         position: absolute;
         top: 0px;
         left: 0px;
-        display: block;
+        z-index: 0;
+        background-image: url("/images/textures/transparent.png");
+        background-repeat: repeat;
         width: 100%;
         height: 100%;
-        background-repeat: repeat;
-        background-image: url("/images/textures/transparent.png");
       }
       > e-placeholder {
+        display: block;
         position: absolute;
-        z-index: 2;
         top: 0px;
         left: 0px;
-        display: block;
-        width: 100%;
-        height: 100%;
         opacity: 1;
+        z-index: 2;
         // transition: opacity 200ms ease-in-out;
         background-color: unset;
+        width: 100%;
+        height: 100%;
         &.loaded {
           opacity: 0;
         }
       }
       > e-nsfw {
-        z-index: 2;
+        display: block;
         position: absolute;
         top: 0px;
         left: 0px;
+        z-index: 2;
+        background-image: url("/images/textures/nsfw.png");
+        background-position: center;
+        background-size: 32px;
+        background-repeat: repeat;
         width: 100%;
         height: 100%;
-        display: block;
-        background-size: 32px;
-        background-position: center;
-        background-repeat: repeat;
-        background-image: url("/images/textures/nsfw.png");
       }
     }
     &:hover {
@@ -405,8 +405,8 @@ e-tile-root {
       left: 0px;
       margin: var(--px-1);
       border-radius: var(--rounded);
-      padding: var(--px-1);
       background-color: var(--color-1);
+      padding: var(--px-1);
       font-size: var(--size-0);
       line-height: var(--size-0);
       &.selected {
@@ -414,25 +414,25 @@ e-tile-root {
       }
     }
     > e-tags {
-      width: 100%;
+      display: flex;
       position: absolute;
       bottom: 0px;
-      pointer-events: none;
-      outline: none;
-      word-break: break-word;
-      text-align: left;
-      display: flex;
       flex-direction: row-reverse;
       flex-wrap: wrap-reverse;
       justify-content: right;
+      outline: none;
       padding: var(--px-1);
+      width: 100%;
+      pointer-events: none;
+      text-align: left;
+      word-break: break-word;
       > e-tag {
         display: block;
-        margin-left: var(--px-0);
         margin-top: var(--px-0);
+        margin-left: var(--px-0);
         border-radius: var(--rounded);
-        padding: var(--px-1);
         background-color: var(--color-1);
+        padding: var(--px-1);
         font-size: var(--size-0);
       }
       &.selected {
@@ -440,31 +440,31 @@ e-tile-root {
       }
     }
     > e-selected {
+      display: block;
       position: absolute;
-      bottom: 0px;
       right: 0px;
-      pointer-events: none;
+      bottom: 0px;
+      box-shadow: var(--shadow) inset;
       border-radius: var(--rounded);
       width: 100%;
       height: 100%;
-      box-shadow: var(--shadow) inset;
-      display: block;
+      pointer-events: none;
       &:before {
-        content: "";
         position: absolute;
+        box-shadow: 0px 0px 0px calc(var(--px-1) * 0.5 - 0.4px) var(--color-font) inset;
+        border: solid calc(var(--px-1)) var(--color-0);
+        border-radius: var(--rounded);
         width: 100%;
         height: 100%;
-        border-radius: var(--rounded);
-        border: solid calc(var(--px-1)) var(--color-0);
-        box-shadow: 0px 0px 0px calc(var(--px-1) * 0.5 - 0.4px) var(--color-font) inset;
+        content: "";
       }
       &:after {
-        content: "";
         position: absolute;
+        border: solid calc(var(--px-1) * 0.5) var(--color-font);
+        border-radius: var(--rounded);
         width: 100%;
         height: 100%;
-        border-radius: var(--rounded);
-        border: solid calc(var(--px-1) * 0.5) var(--color-font);
+        content: "";
       }
     }
   }

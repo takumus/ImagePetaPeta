@@ -111,14 +111,14 @@ function pointerdown(event: PointerEvent) {
 
 <style lang="scss" scoped>
 .layer-cell-root {
-  cursor: pointer;
-  margin: 0px;
-  padding: var(--px-1);
-  background-color: var(--color-0);
   display: flex;
   align-items: center;
-  height: 64px;
+  cursor: pointer;
+  margin: 0px;
+  background-color: var(--color-0);
+  padding: var(--px-1);
   width: 100%;
+  height: 64px;
   &.selected {
     background-color: var(--color-accent-1) !important;
   }
@@ -134,49 +134,49 @@ function pointerdown(event: PointerEvent) {
     top: 0px;
   }
   > e-icon {
-    padding: 0px var(--px-2);
-    height: 100%;
-    width: 24px;
+    display: block;
+    filter: var(--filter-icon);
     background: no-repeat;
     background-position: center center;
     background-size: 12px;
-    display: block;
-    filter: var(--filter-icon);
+    padding: 0px var(--px-2);
+    width: 24px;
+    height: 100%;
     &.visible {
-      background-size: 14px;
       background-image: url("/images/icons/visible.png");
+      background-size: 14px;
     }
     &.lock {
-      background-size: 11px;
       background-image: url("/images/icons/locked.png");
+      background-size: 11px;
     }
     &.disabled {
       opacity: 0.3;
     }
   }
   > e-thumb {
-    min-width: 32px;
-    height: 100%;
-    margin: 0px var(--px-2);
+    display: block;
     flex: 1;
+    margin: 0px var(--px-2);
     background: no-repeat;
     background-position: center center;
     background-size: contain;
-    display: block;
+    min-width: 32px;
+    height: 100%;
     > e-nsfw {
+      display: block;
+      background-image: url("/images/textures/nsfw.png");
+      background-position: center;
+      background-size: 24px;
+      background-repeat: repeat;
       width: 100%;
       height: 100%;
-      display: block;
-      background-size: 24px;
-      background-position: center;
-      background-repeat: repeat;
-      background-image: url("/images/textures/nsfw.png");
     }
   }
   > .name {
     flex: 1;
-    overflow: hidden;
     max-height: 100%;
+    overflow: hidden;
     word-break: break-word;
   }
 }

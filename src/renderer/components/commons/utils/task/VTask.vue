@@ -85,18 +85,18 @@ function cancel() {
 
 <style lang="scss" scoped>
 e-task-root {
-  text-align: center;
   display: block;
+  text-align: center;
   > pre {
     width: 100%;
-    text-align: left;
-    overflow: hidden;
-    word-break: break-word;
-    white-space: pre-wrap;
     height: 64px;
-    overflow-y: auto;
+    overflow: hidden;
     overflow-x: hidden;
+    overflow-y: auto;
     font-size: var(--size-0);
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
   > p {
     word-break: break-word;

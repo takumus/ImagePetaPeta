@@ -136,40 +136,40 @@ async function send<U extends keyof IpcFunctions>(
 body,
 html,
 #app {
+  margin: 0px;
+  background-color: var(--color-0);
+  padding: 0px;
   width: 100%;
   height: 100%;
-  user-select: none;
-  margin: 0px;
-  padding: 0px;
   font-size: 24px;
   font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
     sans-serif;
-  background-color: var(--color-0);
+  user-select: none;
 }
 e-window-root {
   display: flex;
-  height: 100%;
   flex-direction: column;
   align-items: center;
-  padding: var(--px-3);
-  color: var(--color-font);
   gap: var(--px-3);
+  padding: var(--px-3);
+  height: 100%;
+  color: var(--color-font);
   > img {
     display: block;
+    border-radius: var(--rounded);
     max-width: 60%;
     max-height: 50%;
-    border-radius: var(--rounded);
   }
   > input {
     display: none;
   }
   > e-input {
     display: flex;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
     > e-status {
-      white-space: pre-wrap;
       overflow: hidden;
+      white-space: pre-wrap;
     }
   }
 }

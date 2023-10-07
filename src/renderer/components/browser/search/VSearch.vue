@@ -131,35 +131,35 @@ const selectedPetaTags = computed(() => {
 <style lang="scss" scoped>
 e-search-root {
   display: block;
-  text-align: center;
   width: 100%;
+  text-align: center;
   > e-search-box {
-    border-radius: var(--rounded);
-    border: solid var(--px-border) var(--color-border);
-    outline: none;
-    padding: var(--px-1) var(--px-1) 0px 0px;
-    width: 100%;
-    height: 100%;
-    word-break: break-word;
-    text-align: left;
     // text-align: center;
     // display: block;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    outline: none;
+    border: solid var(--px-border) var(--color-border);
+    border-radius: var(--rounded);
+    padding: var(--px-1) var(--px-1) 0px 0px;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    word-break: break-word;
     > e-tag {
       display: inline-block;
       margin: 0px 0px var(--px-1) var(--px-1);
-      border-radius: var(--rounded);
-      padding: var(--px-1);
-      background-color: var(--color-1);
       box-shadow: var(--shadow-small);
+      border-radius: var(--rounded);
+      background-color: var(--color-1);
+      padding: var(--px-1);
       &.last {
-        width: 100%;
-        background-color: unset;
         flex: 1 1 64px;
         box-shadow: unset;
+        background-color: unset;
+        width: 100%;
       }
     }
   }

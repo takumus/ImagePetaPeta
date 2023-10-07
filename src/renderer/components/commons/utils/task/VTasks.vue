@@ -69,15 +69,15 @@ function close() {
 
 <style lang="scss" scoped>
 e-tasks-root {
-  text-align: center;
   display: block;
+  text-align: center;
   > e-tasks {
+    display: block;
+    padding: var(--px-1);
     width: 100%;
     max-height: 512px;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: var(--px-1);
-    display: block;
   }
 }
 </style>

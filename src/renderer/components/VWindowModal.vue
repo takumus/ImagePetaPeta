@@ -53,18 +53,18 @@ e-window-root {
     flex-direction: column;
     > e-body {
       display: flex;
-      white-space: pre-wrap;
-      user-select: text;
-      align-items: center;
-      justify-content: center;
-      overflow-y: auto;
-      text-align: center;
       flex: 1;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+      user-select: text;
+      text-align: center;
+      white-space: pre-wrap;
     }
     > e-buttons {
       display: block;
-      text-align: center;
       padding-bottom: var(--px-2);
+      text-align: center;
     }
   }
 }

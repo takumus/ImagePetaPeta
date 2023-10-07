@@ -128,30 +128,31 @@ function pressEscape() {
 
 <style lang="scss" scoped>
 e-modal-root {
+  display: block;
   position: absolute;
-  width: 100%;
-  height: 100%;
   top: 0px;
   left: 0px;
   background-color: var(--color-overlay);
-  color: var(--color-font);
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  display: block;
+  color: var(--color-font);
   &.no-background {
     background-color: transparent;
   }
   > e-modal {
-    width: 600px;
-    background-color: var(--color-0);
-    padding: var(--px-3);
-    border-radius: var(--rounded);
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    border-radius: var(--rounded);
+    background-color: var(--color-0);
+    padding: var(--px-3);
+    width: 600px;
+    overflow: hidden;
     > e-buttons {
-      text-align: right;
       display: block;
+      text-align: right;
       > e-button {
+        cursor: pointer;
         font-family:
           Segoe MDL2 Assets,
           "Helvetica Neue",
@@ -160,13 +161,12 @@ e-modal-root {
           "Hiragino Sans",
           Meiryo,
           sans-serif;
-        cursor: pointer;
       }
     }
     > e-content {
+      display: block;
       flex: 1;
       overflow: hidden;
-      display: block;
     }
   }
 }

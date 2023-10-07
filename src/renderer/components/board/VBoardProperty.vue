@@ -65,25 +65,25 @@ const scale = computed({
 
 <style lang="scss" scoped>
 e-board-property-root {
+  display: flex;
   position: absolute;
   top: 0px;
   left: 0px;
-  height: 100%;
-  width: 100%;
-  padding: var(--px-1);
-  align-items: center;
   justify-content: center;
-  display: flex;
+  align-items: center;
+  padding: var(--px-1);
+  width: 100%;
+  height: 100%;
   > button {
-    min-width: 24px;
     padding: 0px;
-    height: 100%;
+    min-width: 24px;
     min-width: 50px;
+    height: 100%;
     &.color {
       border-radius: var(--rounded);
+      aspect-ratio: 1;
       width: auto;
       min-width: 0px;
-      aspect-ratio: 1;
     }
   }
   > * {

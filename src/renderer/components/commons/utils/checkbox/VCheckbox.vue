@@ -21,29 +21,29 @@ function click() {
 <style lang="scss" scoped>
 e-checkbox-root {
   display: inline-block;
-  height: 23px;
-  padding: var(--px-1);
   cursor: pointer;
+  padding: var(--px-1);
+  height: 23px;
   > e-content {
     display: block;
-    height: 100%;
-    aspect-ratio: 2;
-    border-radius: var(--rounded);
     position: relative;
+    border-radius: var(--rounded);
     background-color: var(--color-checkbox-false-background);
+    aspect-ratio: 2;
+    height: 100%;
     overflow: hidden;
     > e-circle {
       display: block;
-      border-radius: var(--rounded-circle);
-      background-color: var(--color-checkbox-false-circle);
-      height: 100%;
-      aspect-ratio: 1;
-      transform: scale(0.7);
       position: relative;
+      left: 0%;
+      transform: scale(0.7);
       transition-duration: 100ms;
       transition-property: left, background-color;
-      left: 0%;
       box-shadow: 0px 0.5px 2px rgba(0, 0, 0, 0.2);
+      border-radius: var(--rounded-circle);
+      background-color: var(--color-checkbox-false-circle);
+      aspect-ratio: 1;
+      height: 100%;
     }
     &.checked {
       background-color: var(--color-checkbox-true-background);

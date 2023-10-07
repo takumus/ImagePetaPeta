@@ -176,17 +176,17 @@ watch(() => props.petaFile, generate, { immediate: true });
 <style lang="scss" scoped>
 e-gamut-map-root {
   display: flex;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   > e-circle {
     display: block;
+    aspect-ratio: 2/1;
     width: 100%;
     overflow: hidden;
-    aspect-ratio: 2/1;
   }
   > input {
     display: block;

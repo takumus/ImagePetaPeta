@@ -67,29 +67,29 @@ const isMac = computed(() => {
 e-titlebar-root {
   --tab-height: 24px;
   --top-draggable-height: 10px;
-  background-color: var(--color-1);
-  min-height: var(--tab-height);
   display: flex;
   position: relative;
+  background-color: var(--color-1);
+  min-height: var(--tab-height);
   > e-title {
-    position: absolute;
-    height: 100%;
-    width: 100%;
     display: flex;
+    position: absolute;
     align-items: center;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     > e-icon {
-      width: 100%;
-      text-align: center;
       display: inline-block;
+      width: 100%;
       font-size: var(--size-0);
+      text-align: center;
     }
   }
   > e-content {
-    flex-grow: 1;
-    overflow: hidden;
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
+    overflow: hidden;
     > e-top {
       flex-grow: 1;
       -webkit-app-region: drag;
@@ -120,8 +120,8 @@ e-titlebar-root {
     display: flex;
     > e-window-button {
       display: flex;
-      padding: 0px 16px;
       align-items: center;
+      padding: 0px 16px;
       > e-icon {
         display: inline-block;
         font-size: 6px;
@@ -130,8 +130,8 @@ e-titlebar-root {
       &:hover {
         background-color: var(--color-2);
         &.close {
-          color: var(--color-window-button);
           background-color: var(--window-buttons-close-hover);
+          color: var(--color-window-button);
         }
       }
     }
