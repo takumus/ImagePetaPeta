@@ -47,7 +47,7 @@ describe("createFileInfo", () => {
     expect(await fileSHA256(info.path)).toBe(correctHash);
   });
   test("fromRemoteURL", async () => {
-    (global.fetch = vi.fn()).mockResolvedValue(new Response(readFileSync(DOG_FILE)));
+    ((global.fetch as any) = vi.fn()).mockResolvedValue(new Response(readFileSync(DOG_FILE)));
     const correctHash = await fileSHA256(DOG_FILE);
     const info = await createFileInfo.fromURL(`https://takumus.io/dog.jpg`); // dummy url
     expect(info).toBeDefined();

@@ -23,7 +23,7 @@ describe("version", () => {
         },
       };
     });
-    (global.fetch = vi.fn()).mockResolvedValue(
+    ((global.fetch as any) = vi.fn()).mockResolvedValue(
       new Response(
         JSON.stringify({
           version: "2.0.0",
