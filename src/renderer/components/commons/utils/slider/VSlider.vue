@@ -1,6 +1,6 @@
 <template>
-  <e-slider-root @click="click" :style="{ width: width ?? '128px' }">
-    <e-content @pointerdown.left="startDrag" ref="bar">
+  <e-slider-root @click="click" @pointerdown.left="startDrag" :style="{ width: width ?? '128px' }">
+    <e-content ref="bar">
       <e-circle :style="{ left: positionX + '%' }"> </e-circle>
       <e-bar>
         <e-bar-inner :style="{ width: positionX + '%' }"></e-bar-inner>
