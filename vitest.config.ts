@@ -4,10 +4,10 @@ import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
-import { defineConfig } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
+import { defineConfig, UserConfigFnPromise } from "vitest/config";
 
-export default defineConfig(async ({ command }) => {
+export default defineConfig((async ({ command }) => {
   rmSync("./_test", { recursive: true, force: true });
   mkdirSync("./_test", { recursive: true });
   const electronPlugin = await createElectronPlugin();
@@ -34,7 +34,7 @@ export default defineConfig(async ({ command }) => {
       alias: viteAlias,
     },
   };
-});
+}) as UserConfigFnPromise);
 
 async function createElectronPlugin() {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));

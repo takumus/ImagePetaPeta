@@ -6,9 +6,9 @@ export function hasPetaFiles(board: PetaBoard, petaFiles: PetaFile[]) {
     return need
       ? true
       : board
-      ? Object.values(board.petaPanels).find(
-          (petaPanel) => petaPanel.petaFileId === petaFile.id,
-        ) !== undefined
-      : false;
+        ? Object.values(board.petaPanels).find(
+            (petaPanel) => petaPanel.petaFileId === petaFile.id,
+          ) !== undefined
+        : false;
   }, false);
 }

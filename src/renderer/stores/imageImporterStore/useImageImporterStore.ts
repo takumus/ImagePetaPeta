@@ -58,13 +58,13 @@ export function useImageImporterStore() {
                 } as const,
               ])
             : buffers !== undefined
-            ? buffers.map((buffer) => [
-                {
-                  type: "buffer",
-                  buffer,
-                } as const,
-              ])
-            : [],
+              ? buffers.map((buffer) => [
+                  {
+                    type: "buffer",
+                    buffer,
+                  } as const,
+                ])
+              : [],
         );
       }
       handler.emit("addPanelByDragAndDrop", ids, vec2FromPointerEvent(event), false);
@@ -83,13 +83,13 @@ export function useImageImporterStore() {
             } as const,
           ])
         : buffers !== undefined
-        ? buffers.map((buffer) => [
-            {
-              type: "buffer",
-              buffer,
-            } as const,
-          ])
-        : [],
+          ? buffers.map((buffer) => [
+              {
+                type: "buffer",
+                buffer,
+              } as const,
+            ])
+          : [],
     );
     handler.emit("addPanelByDragAndDrop", ids, mousePosition, false);
   }

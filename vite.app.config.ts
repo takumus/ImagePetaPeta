@@ -7,13 +7,13 @@ import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
-import { defineConfig } from "vite";
+import { defineConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 import esmodule from "vite-plugin-esmodule";
 
 import vue from "@vitejs/plugin-vue";
 
-export default defineConfig(async ({ command }) => {
+export default defineConfig((async ({ command }) => {
   const isBuild = command === "build";
   if (isBuild) {
     rmSync("_release", { recursive: true, force: true });
@@ -53,7 +53,7 @@ export default defineConfig(async ({ command }) => {
     ],
     clearScreen: false,
   };
-});
+}) as UserConfigFnPromise);
 
 async function createElectronPlugin(isBuild: boolean) {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));

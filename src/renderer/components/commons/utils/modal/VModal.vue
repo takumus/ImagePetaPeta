@@ -17,8 +17,8 @@
               ...(center ? centerStyle : {}),
             }
           : center
-          ? centerStyle
-          : {}
+            ? centerStyle
+            : {}
       ">
       <e-buttons v-if="visibleCloseButton">
         <e-button @click="close" v-html="textsStore.state.value.close"></e-button>

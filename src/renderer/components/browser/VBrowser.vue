@@ -463,8 +463,8 @@ const fetchFilteredPetaFiles = (() => {
         selectedFilterType.value === FilterType.UNTAGGED
           ? { type: "untagged" }
           : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0
-          ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
-          : { type: "all" },
+            ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
+            : { type: "all" },
       );
       results = newResults;
     }
