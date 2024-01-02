@@ -72,8 +72,8 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
   // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
   app.on("will-quit", (e) => {
-    e.preventDefault();
-    useQuit().quit();
+    // e.preventDefault();
+    // useQuit().quit();
   });
   // electron準備OK
   async function appReady() {
