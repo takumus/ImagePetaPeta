@@ -1,5 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { resolve } from "path";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
 import express, { Express } from "express";
 
@@ -41,6 +42,8 @@ export class WebHook extends TypedEventEmitter<{
       res.json({ error: "you are not image-petapeta" });
     });
     this.http.use(express.json({ limit: "100mb" }));
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
     this.http.use(
       "/web",
       express.static(

@@ -6,6 +6,7 @@
   "author": "takumus",
   "license": "BSD 2-Clause License",
   "main": "_electronTemp/dist/main/index.js",
+  "type": "module",
   "scripts": {
     "prepare": "npm run generate-assets",
     "dev": "npm run generate-assets && run-p dev:*",
@@ -74,7 +75,7 @@
     "typed-emitter": "^2.1.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.10",
-    "vite-plugin-electron": "^0.15.5",
+    "vite-plugin-electron": "^0.28.0-beta.2",
     "vite-plugin-esmodule": "^1.5.0",
     "vitest": "^1.1.0",
     "vue-tsc": "^1.8.27",

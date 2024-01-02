@@ -1,4 +1,5 @@
 import * as Path from "path";
+import { fileURLToPath } from "url";
 import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
 
 import {
@@ -102,6 +103,8 @@ export class Windows {
   createWindow(type: WindowName, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
     const logger = useLogger().logMainChunk();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = Path.dirname(__filename);
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -148,8 +151,10 @@ export class Windows {
       const url = process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html";
       logger.debug("url:", url);
       window.loadURL(url);
-      // window.webContents.openDevTools();
+      window.webContents.openDevTools();
     } else {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = Path.dirname(__filename);
       const path = Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html");
       logger.debug("path:", path);
       window.loadFile(path);

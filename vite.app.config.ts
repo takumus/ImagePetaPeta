@@ -7,6 +7,7 @@ import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
+import { throttle } from "throttle-debounce";
 import { defineConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 import esmodule from "vite-plugin-esmodule";
@@ -87,26 +88,37 @@ async function createElectronPlugin(isBuild: boolean) {
     },
   };
   const options: ElectronOptions[] = [];
+  const restart = throttle(2000, (f: () => void) => f());
+  restart(() => undefined);
   options.push(
-    ...wtFiles.map((file) => ({
+    ...wtFiles.map<ElectronOptions>((file) => ({
       ...baseOptions,
       entry: file,
+      onstart(options) {
+        restart(() => options.startup());
+      },
     })),
   );
   options.push({
     ...baseOptions,
-    entry: resolve("./src/main/index.ts"),
     onstart(options) {
-      options.startup();
+      restart(() => options.startup());
     },
     vite: {
       ...baseOptions.vite,
       plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
+      build: {
+        ...baseOptions.vite?.build,
+        lib: {
+          entry: resolve("./src/main/index.ts"),
+          formats: ["es"],
+          fileName: () => "[name].js",
+        },
+      },
     },
   });
   options.push({
     ...baseOptions,
-    entry: resolve("./src/main/preload.ts"),
     onstart(options) {
       options.reload();
     },
@@ -115,6 +127,11 @@ async function createElectronPlugin(isBuild: boolean) {
       build: {
         ...baseOptions.vite?.build,
         sourcemap: !isBuild ? "inline" : undefined, // #332
+        lib: {
+          entry: resolve("./src/main/preload.ts"),
+          formats: ["cjs"],
+          fileName: () => "[name].js",
+        },
       },
     },
   });
