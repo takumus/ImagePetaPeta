@@ -57,6 +57,8 @@ export default defineConfig((async ({ command }) => {
 
 async function createElectronPlugin(isBuild: boolean) {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
+  const mainFile = resolve("./src/main/index.ts");
+  const preloadFile = resolve("./src/main/preload.ts");
   console.log("WorkerThreadsFiles:", wtFiles);
   // const esmodules = (() => {
   //   let packages: string[] = [];
@@ -83,15 +85,23 @@ async function createElectronPlugin(isBuild: boolean) {
     },
   };
   const options: ElectronOptions[] = [];
-  const restart = debounce(2000, (f: () => void) => f(), {
-    atBegin: false,
-  });
-  restart(() => undefined);
+  const restartDebounce = debounce(500, (f: () => void) => f());
+  const tryRestart = (() => {
+    let firstRestartCount = 0;
+    return function tryRestart(name: string, restart: () => void) {
+      if (++firstRestartCount >= options.length) {
+        console.log(`START[OK]: ${name}`);
+        restartDebounce(restart);
+      } else {
+        console.log(`START[SKIP]: ${name}`);
+      }
+    };
+  })();
   options.push(
     ...wtFiles.map<ElectronOptions>((file) =>
       mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
         onstart(options) {
-          restart(() => options.startup());
+          tryRestart(file, options.startup);
         },
         vite: {
           build: {
@@ -108,13 +118,13 @@ async function createElectronPlugin(isBuild: boolean) {
   options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
       onstart(options) {
-        restart(() => options.startup());
+        tryRestart(mainFile, options.startup);
       },
       vite: {
         plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
         build: {
           lib: {
-            entry: resolve("./src/main/index.ts"),
+            entry: mainFile,
             formats: ["es"],
             fileName: () => "[name].mjs",
           },
@@ -126,13 +136,13 @@ async function createElectronPlugin(isBuild: boolean) {
     mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
       onstart(options) {
         // 最初のリロードはなぜかstartが呼ばれる仕様。
-        restart(() => options.reload());
+        tryRestart(preloadFile, options.reload);
       },
       vite: {
         build: {
           sourcemap: !isBuild ? "inline" : undefined, // #332
           lib: {
-            entry: resolve("./src/main/preload.ts"),
+            entry: resolve(preloadFile),
             formats: ["cjs"],
             fileName: () => "[name].js",
           },
