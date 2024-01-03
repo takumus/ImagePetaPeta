@@ -16,21 +16,14 @@ export type TypedWorkerThreadsMessagePort<I, O> = {
   ): TypedWorkerThreadsMessagePort<I, O>;
   on(event: "message", callback: (e: I) => void): TypedWorkerThreadsMessagePort<I, O>;
 } & MessagePort;
-export type WorkerThreadsOutputType<T extends { new (): TypedWorkerThreads<any, any> }> =
-  T extends {
-    new (): TypedWorkerThreads<infer R, any>;
-  }
-    ? R
-    : unknown;
-export type WorkerThreadsInputType<T extends { new (): TypedWorkerThreads<any, any> }> = T extends {
-  new (): TypedWorkerThreads<any, infer R>;
-}
-  ? R
-  : unknown;
+export type WorkerThreadsOutputType<T extends TypedWorkerThreads<any, any>> =
+  T extends TypedWorkerThreads<infer R, any> ? R : unknown;
+export type WorkerThreadsInputType<T extends TypedWorkerThreads<any, any>> =
+  T extends TypedWorkerThreads<any, infer R> ? R : unknown;
 export function initWorkerThreads<ToWorker, ToMain>(
   parentPort: any,
   init: (parentPort: TypedWorkerThreadsMessagePort<ToWorker, ToMain>) => void,
 ) {
   init(parentPort);
-  return {} as { new (): TypedWorkerThreads<ToMain, ToWorker> };
+  return {} as TypedWorkerThreads<ToMain, ToWorker>;
 }

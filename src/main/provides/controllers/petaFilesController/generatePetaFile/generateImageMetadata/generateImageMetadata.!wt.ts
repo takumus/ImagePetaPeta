@@ -12,7 +12,7 @@ import {
 import { initWorkerThreads } from "@/main/libs/initWorkerThreads";
 import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generatePalette";
 
-export default initWorkerThreads<
+export const worker = initWorkerThreads<
   Parameters<typeof generateImageMetaData>[0],
   Awaited<ReturnType<typeof generateImageMetaData> | undefined>
 >(parentPort, (parentPort) => {
