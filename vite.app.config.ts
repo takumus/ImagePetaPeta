@@ -100,7 +100,7 @@ async function createElectronPlugin(isBuild: boolean) {
           lib: {
             entry: file,
             formats: ["es"],
-            fileName: () => "[name].js",
+            fileName: () => "[name].mjs",
           },
         },
       },
@@ -119,7 +119,7 @@ async function createElectronPlugin(isBuild: boolean) {
         lib: {
           entry: resolve("./src/main/index.ts"),
           formats: ["es"],
-          fileName: () => "[name].js",
+          fileName: () => "[name].mjs",
         },
       },
     },

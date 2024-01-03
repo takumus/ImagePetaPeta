@@ -5,7 +5,7 @@
   "description": "image viewer",
   "author": "takumus",
   "license": "BSD 2-Clause License",
-  "main": "_electronTemp/dist/main/index.js",
+  "main": "_electronTemp/dist/main/index.mjs",
   "type": "module",
   "scripts": {
     "prepare": "npm run generate-assets",

@@ -19,7 +19,7 @@ export const electronConfiguration: Configuration = {
   ],
   artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
   extraMetadata: {
-    main: "main/index.js",
+    main: "main/index.mjs",
   },
   extraFiles: [
     {

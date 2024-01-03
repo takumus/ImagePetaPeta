@@ -11,7 +11,7 @@ class W extends Worker {
     super(
       resolve(
         process.env.TEST === "true" ? `./_test/_wt` : getDirname(import.meta.url),
-        "generateImageMetadata.!wt.js",
+        "generateImageMetadata.!wt.mjs",
       ),
     );
   }
