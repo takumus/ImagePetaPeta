@@ -7,10 +7,9 @@ import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
-import { throttle } from "throttle-debounce";
+import { debounce } from "throttle-debounce";
 import { defineConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
-import esmodule from "vite-plugin-esmodule";
 
 import vue from "@vitejs/plugin-vue";
 
@@ -59,26 +58,22 @@ export default defineConfig((async ({ command }) => {
 async function createElectronPlugin(isBuild: boolean) {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
   console.log("WorkerThreadsFiles:", wtFiles);
-  const esmodules = (() => {
-    let packages: string[] = [];
-    const plugin = esmodule((esms) => {
-      packages = esms.filter((esm) => !(esm in pkg.devDependencies));
-      return packages;
-    });
-    return { plugin, packages };
-  })();
+  // const esmodules = (() => {
+  //   let packages: string[] = [];
+  //   const plugin = esmodule((esms) => {
+  //     packages = esms.filter((esm) => !(esm in pkg.devDependencies));
+  //     return packages;
+  //   });
+  //   return { plugin, packages };
+  // })();
   const baseOptions: ElectronOptions = {
     vite: {
-      plugins: [esmodules.plugin],
+      // plugins: [esmodules.plugin],
       build: {
         minify: isBuild,
         outDir: resolve("./_electronTemp/dist/main"),
         rollupOptions: {
-          external: [
-            ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(
-              (pkg) => !esmodules.packages.includes(pkg),
-            ),
-          ],
+          external: [...Object.keys("dependencies" in pkg ? pkg.dependencies : {})],
         },
         sourcemap: !isBuild,
       },
@@ -88,7 +83,9 @@ async function createElectronPlugin(isBuild: boolean) {
     },
   };
   const options: ElectronOptions[] = [];
-  const restart = throttle(2000, (f: () => void) => f());
+  const restart = debounce(2000, (f: () => void) => f(), {
+    atBegin: false,
+  });
   restart(() => undefined);
   options.push(
     ...wtFiles.map<ElectronOptions>((file) => ({
@@ -120,7 +117,8 @@ async function createElectronPlugin(isBuild: boolean) {
   options.push({
     ...baseOptions,
     onstart(options) {
-      options.reload();
+      // 最初のリロードはなぜかstartが呼ばれる仕様。
+      restart(() => options.reload());
     },
     vite: {
       ...baseOptions.vite,
