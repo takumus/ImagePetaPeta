@@ -1,6 +1,5 @@
 import { spawn as _spawn } from "child_process";
 
-console.log(process.cwd());
 spawn(["generate-assets"]).once("exit", () => {
   const web = spawn(["dev:app-web"]);
   spawn(["dev:app"]).once("exit", () => {
@@ -10,5 +9,5 @@ spawn(["generate-assets"]).once("exit", () => {
 });
 
 function spawn(args: string[]) {
-  return _spawn("npm", ["run", ...args], { stdio: "inherit", cwd: process.cwd() });
+  return _spawn("npm", ["run", ...args], { stdio: "inherit" });
 }
