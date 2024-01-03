@@ -8,16 +8,16 @@ import { useWindows } from "@/main/provides/windows";
 
 export class Quit {
   async quit(force = false) {
-    if (force) {
-      app.exit();
-      return;
-    }
-    const windows = useWindows();
-    windows.openWindow("quit");
-    await new Promise((res) => {
-      setTimeout(res, 500);
-    });
-    await useDBS().waitUntilKillable();
+    // if (force) {
+    //   app.exit();
+    //   return;
+    // }
+    // const windows = useWindows();
+    // windows.openWindow("quit");
+    // await new Promise((res) => {
+    //   setTimeout(res, 500);
+    // });
+    // await useDBS().waitUntilKillable();
     app.exit();
   }
   relaunch(force = false) {

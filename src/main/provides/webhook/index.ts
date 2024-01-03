@@ -11,6 +11,7 @@ import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useLogger } from "@/main/provides/utils/logger";
 import { createWebhookAPIKey } from "@/main/provides/webhook/createWebhookAPIKey";
+import { getDirname } from "@/main/utils/dirname";
 
 type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = ["importFiles", "getAppInfo"];
@@ -46,7 +47,7 @@ export class WebHook extends TypedEventEmitter<{
       express.static(
         process.env.NODE_ENV === "development"
           ? resolve("./_electronTemp/dist/web")
-          : resolve(__dirname, "../web"),
+          : resolve(getDirname(import.meta.url), "../web"),
       ),
     );
     this.initAPI();

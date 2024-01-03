@@ -1,8 +1,22 @@
+import { Worker } from "node:worker_threads";
+import { resolve } from "path";
+
 import { WorkerThreadsInputType, WorkerThreadsOutputType } from "@/main/libs/initWorkerThreads";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
 import WorkerThreads from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generateImageMetadata.!wt";
+import { getDirname } from "@/main/utils/dirname";
 
-const wtGroup = createWorkerThreadsGroup(WorkerThreads);
+class W extends Worker {
+  constructor() {
+    super(
+      resolve(
+        process.env.TEST === "true" ? `./_test/_wt` : getDirname(import.meta.url),
+        "generateImageMetadata.!wt.mjs",
+      ),
+    );
+  }
+}
+const wtGroup = createWorkerThreadsGroup(W as any as typeof WorkerThreads);
 export async function generateImageMetadataByWorker(
   params: WorkerThreadsInputType<typeof WorkerThreads>,
 ) {

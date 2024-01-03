@@ -5,7 +5,7 @@ import { viteAlias } from "./vite.alias";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
 import electron, { ElectronOptions } from "vite-plugin-electron";
-import { defineConfig, UserConfigFnPromise } from "vitest/config";
+import { defineConfig, mergeConfig, UserConfigFnPromise } from "vitest/config";
 
 export default defineConfig((async ({ command }) => {
   rmSync("./_test", { recursive: true, force: true });
@@ -53,12 +53,19 @@ async function createElectronPlugin() {
       },
     },
   };
-  const electronConfig: ElectronOptions[] = [
-    ...wtFiles.map((file) => ({
+  const electronConfig: ElectronOptions[] = wtFiles.map<ElectronOptions>((file) =>
+    mergeConfig<ElectronOptions, ElectronOptions>(electronBaseConfig, {
       // worker_threads
-      ...electronBaseConfig,
-      entry: file,
-    })),
-  ];
+      vite: {
+        build: {
+          lib: {
+            entry: file,
+            formats: ["es"],
+            fileName: () => "[name].mjs",
+          },
+        },
+      },
+    }),
+  );
   return electron(electronConfig);
 }

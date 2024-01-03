@@ -1,8 +1,10 @@
-import * as Path from "path";
+import { resolve } from "path";
+
+import { getDirname } from "@/main/utils/dirname";
 
 export function resolveExtraFilesPath(...path: string[]) {
   if (process.platform === "darwin" && process.env.NODE_ENV !== "development") {
-    return Path.resolve(__dirname, "../../../", ...path);
+    return resolve(getDirname(import.meta.url), "../../../", ...path);
   }
-  return Path.resolve(...path);
+  return resolve(...path);
 }

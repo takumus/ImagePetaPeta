@@ -7,9 +7,9 @@ import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
-import { defineConfig, UserConfigFnPromise } from "vite";
+import { debounce } from "throttle-debounce";
+import { defineConfig, mergeConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
-import esmodule from "vite-plugin-esmodule";
 
 import vue from "@vitejs/plugin-vue";
 
@@ -57,27 +57,25 @@ export default defineConfig((async ({ command }) => {
 
 async function createElectronPlugin(isBuild: boolean) {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
+  const mainFile = resolve("./src/main/index.ts");
+  const preloadFile = resolve("./src/main/preload.ts");
   console.log("WorkerThreadsFiles:", wtFiles);
-  const esmodules = (() => {
-    let packages: string[] = [];
-    const plugin = esmodule((esms) => {
-      packages = esms.filter((esm) => !(esm in pkg.devDependencies));
-      return packages;
-    });
-    return { plugin, packages };
-  })();
+  // const esmodules = (() => {
+  //   let packages: string[] = [];
+  //   const plugin = esmodule((esms) => {
+  //     packages = esms.filter((esm) => !(esm in pkg.devDependencies));
+  //     return packages;
+  //   });
+  //   return { plugin, packages };
+  // })();
   const baseOptions: ElectronOptions = {
     vite: {
-      plugins: [esmodules.plugin],
+      // plugins: [esmodules.plugin],
       build: {
         minify: isBuild,
         outDir: resolve("./_electronTemp/dist/main"),
         rollupOptions: {
-          external: [
-            ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}).filter(
-              (pkg) => !esmodules.packages.includes(pkg),
-            ),
-          ],
+          external: [...Object.keys("dependencies" in pkg ? pkg.dependencies : {})],
         },
         sourcemap: !isBuild,
       },
@@ -87,36 +85,70 @@ async function createElectronPlugin(isBuild: boolean) {
     },
   };
   const options: ElectronOptions[] = [];
+  const restartDebounce = debounce(500, (f: () => void) => f());
+  const tryRestart = (() => {
+    let firstRestartCount = 0;
+    return function tryRestart(name: string, restart: () => void) {
+      if (++firstRestartCount >= options.length) {
+        console.log(`START[OK]: ${name}`);
+        restartDebounce(restart);
+      } else {
+        console.log(`START[SKIP]: ${name}`);
+      }
+    };
+  })();
   options.push(
-    ...wtFiles.map((file) => ({
-      ...baseOptions,
-      entry: file,
-    })),
+    ...wtFiles.map<ElectronOptions>((file) =>
+      mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
+        onstart(options) {
+          tryRestart(file, options.startup);
+        },
+        vite: {
+          build: {
+            lib: {
+              entry: file,
+              formats: ["es"],
+              fileName: () => "[name].mjs",
+            },
+          },
+        },
+      }),
+    ),
   );
-  options.push({
-    ...baseOptions,
-    entry: resolve("./src/main/index.ts"),
-    onstart(options) {
-      options.startup();
-    },
-    vite: {
-      ...baseOptions.vite,
-      plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
-    },
-  });
-  options.push({
-    ...baseOptions,
-    entry: resolve("./src/main/preload.ts"),
-    onstart(options) {
-      options.reload();
-    },
-    vite: {
-      ...baseOptions.vite,
-      build: {
-        ...baseOptions.vite?.build,
-        sourcemap: !isBuild ? "inline" : undefined, // #332
+  options.push(
+    mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
+      onstart(options) {
+        tryRestart(mainFile, options.startup);
       },
-    },
-  });
+      vite: {
+        plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
+        build: {
+          lib: {
+            entry: mainFile,
+            formats: ["es"],
+            fileName: () => "[name].mjs",
+          },
+        },
+      },
+    }),
+  );
+  options.push(
+    mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
+      onstart(options) {
+        // 最初のリロードはなぜかstartが呼ばれる仕様。
+        tryRestart(preloadFile, options.reload);
+      },
+      vite: {
+        build: {
+          sourcemap: !isBuild ? "inline" : undefined, // #332
+          lib: {
+            entry: resolve(preloadFile),
+            formats: ["cjs"],
+            fileName: () => "[name].js",
+          },
+        },
+      },
+    }),
+  );
   return electron(options);
 }

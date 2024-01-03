@@ -1,4 +1,5 @@
 import { app, protocol } from "electron";
+import installExtension from "electron-devtools-installer";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
@@ -72,8 +73,8 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
   // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
   app.on("will-quit", (e) => {
-    e.preventDefault();
-    useQuit().quit();
+    // e.preventDefault();
+    // useQuit().quit();
   });
   // electron準備OK
   async function appReady() {
@@ -87,7 +88,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       const log = logger.logMainChunk();
       try {
         log.debug("install vue devtools");
-        await require("electron-devtools-installer").default("nhdogjmejiglipccpnnnanhbledajbpd");
+        await installExtension("nhdogjmejiglipccpnnnanhbledajbpd");
       } catch (error) {
         log.error(error);
       }

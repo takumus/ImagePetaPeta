@@ -1,5 +1,5 @@
 import * as Path from "path";
-import { app, BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
+import { BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
 
 import {
   EULA,
@@ -20,7 +20,7 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { keepAliveWindowNames } from "@/main/provides/windows/keepAliveWindowNames";
 import { windowCustomOptions } from "@/main/provides/windows/windowCustomOptions";
 import { getStyle } from "@/main/utils/darkMode";
-import { defaultStyles } from "@/renderer/styles/styles";
+import { getDirname } from "@/main/utils/dirname";
 
 export class Windows {
   windows: { [key in WindowName]?: BrowserWindow | undefined } = {};
@@ -114,7 +114,7 @@ export class Windows {
         nodeIntegration: false,
         contextIsolation: true,
         backgroundThrottling: false,
-        preload: Path.join(__dirname, "preload.js"),
+        preload: Path.join(getDirname(import.meta.url), "preload.js"),
       },
       backgroundColor: getStyle()["--color-0"],
       trafficLightPosition: {
@@ -150,7 +150,10 @@ export class Windows {
       window.loadURL(url);
       // window.webContents.openDevTools();
     } else {
-      const path = Path.resolve(__dirname, "../renderer/htmls/_" + type + ".html");
+      const path = Path.resolve(
+        getDirname(import.meta.url),
+        "../renderer/htmls/_" + type + ".html",
+      );
       logger.debug("path:", path);
       window.loadFile(path);
     }
