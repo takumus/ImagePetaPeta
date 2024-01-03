@@ -215,7 +215,7 @@ const fetchPetaTags = (() => {
     if (props.tile.petaFile === undefined) {
       return;
     }
-    const result = await IPC.main.getPetaTagIdsByPetaFileIds([props.tile.petaFile.id]);
+    const result = await IPC.getPetaTagIdsByPetaFileIds([props.tile.petaFile.id]);
     if (currentFetchId !== fetchId) {
       return;
     }

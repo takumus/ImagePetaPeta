@@ -166,7 +166,7 @@ onMounted(() => {
   keyboards.keys("KeyA").down(keyA);
   IPC.on("openInBrowser", (_event, petaFileID) => openInBrowser(petaFileID));
   fetchFilteredPetaFiles().then(() => {
-    IPC.main.getOpenInBrowserID().then(openInBrowser);
+    IPC.getOpenInBrowserID().then(openInBrowser);
   });
   petaFilesStore.onUpdate((petaFiles, mode) => {
     if (mode === UpdateMode.INSERT) {
@@ -275,7 +275,7 @@ function drag(petaFile: RPetaFile) {
   }
   const petaFiles = petaFile.renderer.selected ? [] : [petaFile];
   petaFiles.push(...selectedPetaFiles.value);
-  IPC.main.startDrag(petaFiles, actualTileSize.value, "");
+  IPC.startDrag(petaFiles, actualTileSize.value, "");
 }
 function selectTile(thumb: Tile, force = false) {
   if (thumb.petaFile === undefined) {
@@ -370,10 +370,10 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         label: t("browser.petaFileMenu.remove", [selectedPetaFiles.value.length]),
         click: async () => {
           if (
-            (await IPC.main.openModal(
-              t("browser.removeImageDialog", [selectedPetaFiles.value.length]),
-              [t("commons.yes"), t("commons.no")],
-            )) === 0
+            (await IPC.openModal(t("browser.removeImageDialog", [selectedPetaFiles.value.length]), [
+              t("commons.yes"),
+              t("commons.no"),
+            ])) === 0
           ) {
             petaFilesStore.updatePetaFiles(selectedPetaFiles.value, UpdateMode.REMOVE);
           }
@@ -382,21 +382,21 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
       {
         label: t("browser.petaFileMenu.openFile"),
         click: async () => {
-          await IPC.main.openFile(petaFile);
+          await IPC.openFile(petaFile);
         },
       },
       ...realESRGANModelNames.map((modelName) => {
         return {
           label: `${t("browser.petaFileMenu.realESRGAN")}(${modelName})`,
           click: async () => {
-            await IPC.main.realESRGANConvert(selectedPetaFiles.value, modelName);
+            await IPC.realESRGANConvert(selectedPetaFiles.value, modelName);
           },
         };
       }),
       {
         label: t("browser.petaFileMenu.searchImageByGoogle"),
         click: async () => {
-          await IPC.main.searchImageByGoogle(petaFile);
+          await IPC.searchImageByGoogle(petaFile);
         },
       },
     ],
@@ -416,8 +416,8 @@ async function openDetail(petaFile: RPetaFile) {
   ) {
     return;
   }
-  await IPC.main.setDetailsPetaFile(petaFile.id);
-  await IPC.main.openWindow("details");
+  await IPC.setDetailsPetaFile(petaFile.id);
+  await IPC.openWindow("details");
 }
 function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;
@@ -457,7 +457,7 @@ const fetchFilteredPetaFiles = (() => {
     const currentFetchId = ++fetchId;
     console.time("fetch" + currentFetchId);
     if (reload) {
-      const newResults = await IPC.main.getPetaFileIds(
+      const newResults = await IPC.getPetaFileIds(
         selectedFilterType.value === FilterType.UNTAGGED
           ? { type: "untagged" }
           : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0

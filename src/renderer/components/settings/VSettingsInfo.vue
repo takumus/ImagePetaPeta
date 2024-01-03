@@ -50,10 +50,7 @@ const appInfoStore = useAppInfoStore();
 const licenses = ref<{ name: string; text: string; licenses: string }[]>([]);
 const supporters = ref<{ type: string; names: string[] }[]>([]);
 onMounted(async () => {
-  const [_licenses, _supporters] = await Promise.all([
-    IPC.main.getLicenses(),
-    IPC.main.getSupporters(),
-  ]);
+  const [_licenses, _supporters] = await Promise.all([IPC.getLicenses(), IPC.getSupporters()]);
   licenses.value = _licenses;
   Object.keys(_supporters).forEach((type) => {
     supporters.value.push({
@@ -63,26 +60,26 @@ onMounted(async () => {
   });
 });
 function gotoGithub() {
-  IPC.main.openURL("https://github.com/takumus/ImagePetaPeta");
+  IPC.openURL("https://github.com/takumus/ImagePetaPeta");
 }
 function gotoIssues() {
-  IPC.main.openURL(
+  IPC.openURL(
     `${URL_SUPPORT}?usp=pp_url&entry.1709939184=${encodeURIComponent(
       appInfoStore.state.value.version,
     )}`,
   );
 }
 function gotoIcons8() {
-  IPC.main.openURL("https://icons8.com/");
+  IPC.openURL("https://icons8.com/");
 }
 function showDBFolder() {
-  IPC.main.showDBFolder();
+  IPC.showDBFolder();
 }
 function showConfigFolder() {
-  IPC.main.showConfigFolder();
+  IPC.showConfigFolder();
 }
 function showEULA() {
-  IPC.main.openWindow("eula");
+  IPC.openWindow("eula");
 }
 </script>
 

@@ -63,7 +63,7 @@ export async function create(
     initialized = true;
     logChunk().debug(`$Window "${windowName}" init`);
     const app = createApp(component);
-    const platform = await IPC.main.getPlatform();
+    const platform = await IPC.getPlatform();
     app.use(
       createI18n<[typeof languages.ja], "ja">({
         legacy: false,
@@ -92,7 +92,7 @@ export async function create(
   IPC.on("dataInitialized", () => {
     initVue();
   });
-  if (await IPC.main.getIsDataInitialized()) {
+  if (await IPC.getIsDataInitialized()) {
     initVue();
   }
   document.body.addEventListener(
@@ -108,7 +108,7 @@ export async function create(
   const keyboards = new Keyboards();
   keyboards.keys("KeyD").down(() => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      IPC.main.windowToggleDevTools();
+      IPC.windowToggleDevTools();
     }
   });
   keyboards.enabled = true;

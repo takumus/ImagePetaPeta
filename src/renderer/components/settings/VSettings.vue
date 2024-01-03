@@ -72,7 +72,7 @@ onMounted(async () => {
   IPC.on("foundLatestVersion", async () => {
     currentTab.value = "update";
   });
-  const remoteBinaryInfo = await IPC.main.getLatestVersion();
+  const remoteBinaryInfo = await IPC.getLatestVersion();
   if (!remoteBinaryInfo.isLatest) {
     currentTab.value = "update";
   }

@@ -19,12 +19,12 @@ export function useImageImporterStore() {
     event.preventDefault();
     event.stopPropagation();
     if (event.dataTransfer) {
-      IPC.main.windowActivate();
+      IPC.windowActivate();
       const urls = getURLFromHTML(event.dataTransfer.getData("text/html"));
       const { buffers, filePaths } = await getDataFromFileList(event.dataTransfer.files);
       let ids: string[] = [];
       if (urls !== undefined) {
-        ids = await IPC.main.importFiles([
+        ids = await IPC.importFiles([
           [
             ...(urls !== undefined
               ? urls.map(
@@ -48,7 +48,7 @@ export function useImageImporterStore() {
           ],
         ]);
       } else {
-        ids = await IPC.main.importFiles(
+        ids = await IPC.importFiles(
           filePaths !== undefined
             ? filePaths.map((filePath) => [
                 {
@@ -72,7 +72,7 @@ export function useImageImporterStore() {
   async function paste(event: ClipboardEvent) {
     const mousePosition = currentMousePosition.clone();
     const { buffers, filePaths } = await getDataFromFileList(event.clipboardData?.files);
-    const ids = await IPC.main.importFiles(
+    const ids = await IPC.importFiles(
       filePaths !== undefined
         ? filePaths.map((filePath) => [
             {

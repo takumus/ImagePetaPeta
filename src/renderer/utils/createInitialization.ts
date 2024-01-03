@@ -8,8 +8,8 @@ export function createInitialization() {
   const initializationLogDOM = document.body.querySelector("#initialization-log") as HTMLElement;
   return {
     initialize: async () => {
-      const appInfo = await IPC.main.getAppInfo();
-      initializationDOM.style.color = (await IPC.main.getStyle())["--color-font"];
+      const appInfo = await IPC.getAppInfo();
+      initializationDOM.style.color = (await IPC.getStyle())["--color-font"];
       initializationTitleDOM.innerHTML = `${appInfo.name}-${appInfo.version}`;
       IPC.on("initializationProgress", (e, log) => {
         initializationLogDOM.innerHTML = `${log}\n${initializationLogDOM.innerHTML}`

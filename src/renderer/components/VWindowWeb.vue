@@ -10,7 +10,7 @@
           <e-name>
             {{ urlAndQR.name }}
           </e-name>
-          <e-url class="url" @click="IPC.main.openURL(urlAndQR.url)">
+          <e-url class="url" @click="IPC.openURL(urlAndQR.url)">
             {{ urlAndQR.url.replace(/\?.*/g, "***") }}
           </e-url>
         </e-access>
@@ -52,7 +52,7 @@ watch(
   styleStore.style,
   async () => {
     webURLData.value = [];
-    const webURLs = await IPC.main.getWebURL();
+    const webURLs = await IPC.getWebURL();
     await ppa(async (name) => {
       webURLData.value.push(
         ...(await ppa(async (url) => {

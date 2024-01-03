@@ -48,7 +48,7 @@ onMounted(() => {
   });
 });
 function regenerateMetadatas() {
-  IPC.main.regenerateMetadatas();
+  IPC.regenerateMetadatas();
 }
 </script>
 

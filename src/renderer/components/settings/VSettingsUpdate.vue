@@ -40,15 +40,15 @@ onMounted(() => {
   checkUpdate();
 });
 async function checkUpdate() {
-  const remoteBinaryInfo = await IPC.main.getLatestVersion();
+  const remoteBinaryInfo = await IPC.getLatestVersion();
   latestVersion.value = remoteBinaryInfo.version;
   updateAvailable.value = !remoteBinaryInfo.isLatest;
 }
 function downloadUpdate() {
-  IPC.main.openURL(`${URL_DOWNLOAD}${latestVersion.value}`);
+  IPC.openURL(`${URL_DOWNLOAD}${latestVersion.value}`);
 }
 function releaseNote() {
-  IPC.main.openURL(`${URL_DOWNLOAD}${appInfoStore.state.value.version}`);
+  IPC.openURL(`${URL_DOWNLOAD}${appInfoStore.state.value.version}`);
 }
 </script>
 

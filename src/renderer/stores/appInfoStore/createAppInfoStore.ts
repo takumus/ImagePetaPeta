@@ -4,7 +4,7 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createAppInfoStore() {
   return {
-    state: readonly(ref(await IPC.main.getAppInfo())),
+    state: readonly(ref(await IPC.getAppInfo())),
   };
 }
 export type AppInfoStore = Awaited<ReturnType<typeof createAppInfoStore>>;
