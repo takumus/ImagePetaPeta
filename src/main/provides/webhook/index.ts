@@ -1,6 +1,5 @@
 import { IncomingMessage, Server, ServerResponse } from "http";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { resolve } from "path";
 import cors from "cors";
 import express, { Express } from "express";
 
@@ -12,6 +11,7 @@ import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { useLogger } from "@/main/provides/utils/logger";
 import { createWebhookAPIKey } from "@/main/provides/webhook/createWebhookAPIKey";
+import { getDirname } from "@/main/utils/dirname";
 
 type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = ["importFiles", "getAppInfo"];
@@ -42,14 +42,12 @@ export class WebHook extends TypedEventEmitter<{
       res.json({ error: "you are not image-petapeta" });
     });
     this.http.use(express.json({ limit: "100mb" }));
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
     this.http.use(
       "/web",
       express.static(
         process.env.NODE_ENV === "development"
           ? resolve("./_electronTemp/dist/web")
-          : resolve(__dirname, "../web"),
+          : resolve(getDirname(import.meta.url), "../web"),
       ),
     );
     this.initAPI();

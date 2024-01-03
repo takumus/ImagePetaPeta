@@ -1,18 +1,16 @@
 import { Worker } from "node:worker_threads";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { resolve } from "path";
 
 import { WorkerThreadsInputType, WorkerThreadsOutputType } from "@/main/libs/initWorkerThreads";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
 import WorkerThreads from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generateImageMetadata.!wt";
+import { getDirname } from "@/main/utils/dirname";
 
 class W extends Worker {
   constructor() {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
     super(
       resolve(
-        process.env.TEST === "true" ? `./_test/_wt` : __dirname,
+        process.env.TEST === "true" ? `./_test/_wt` : getDirname(import.meta.url),
         "generateImageMetadata.!wt.js",
       ),
     );
