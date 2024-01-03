@@ -54,10 +54,20 @@ async function createElectronPlugin() {
     },
   };
   const electronConfig: ElectronOptions[] = [
-    ...wtFiles.map((file) => ({
+    ...wtFiles.map<ElectronOptions>((file) => ({
       // worker_threads
       ...electronBaseConfig,
-      entry: file,
+      vite: {
+        ...electronBaseConfig.vite,
+        build: {
+          ...electronBaseConfig.vite?.build,
+          lib: {
+            entry: file,
+            formats: ["es"],
+            fileName: () => "[name].mjs",
+          },
+        },
+      },
     })),
   ];
   return electron(electronConfig);
