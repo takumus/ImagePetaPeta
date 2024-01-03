@@ -90,9 +90,19 @@ async function createElectronPlugin(isBuild: boolean) {
   options.push(
     ...wtFiles.map<ElectronOptions>((file) => ({
       ...baseOptions,
-      entry: file,
       onstart(options) {
         restart(() => options.startup());
+      },
+      vite: {
+        ...baseOptions.vite,
+        build: {
+          ...baseOptions.vite?.build,
+          lib: {
+            entry: file,
+            formats: ["es"],
+            fileName: () => "[name].js",
+          },
+        },
       },
     })),
   );
