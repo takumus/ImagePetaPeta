@@ -104,7 +104,7 @@ function animate() {
   console.timeEnd("render");
 }
 function loseContext() {
-  IPC.send("reloadWindow");
+  IPC.main.reloadWindow();
 }
 function resize(rect: PIXIRect) {
   backgroundRawSprite.width =

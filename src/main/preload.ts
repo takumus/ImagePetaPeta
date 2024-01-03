@@ -2,8 +2,6 @@ import { contextBridge, ipcRenderer, webFrame } from "electron";
 
 import { IPC_GLOBAL_NAME } from "@/commons/defines";
 
-import { IPC } from "@/renderer/libs/ipc";
-
 webFrame.setZoomLevel(1);
 contextBridge.exposeInMainWorld(IPC_GLOBAL_NAME, {
   send: (key: string, ...args: unknown[]) => {
@@ -25,4 +23,4 @@ contextBridge.exposeInMainWorld(IPC_GLOBAL_NAME, {
       },
     };
   },
-} as typeof IPC);
+});

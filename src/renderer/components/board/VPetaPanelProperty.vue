@@ -160,7 +160,7 @@ function changeOrder(to: "front" | "back") {
   emit("sortIndex");
 }
 function openInBrowser(petaPanel: RPetaPanel) {
-  IPC.send("openInBrowser", petaPanel.petaFileId);
+  IPC.main.openInBrowser(petaPanel.petaFileId);
 }
 function resetPetaPanel() {
   emit(

@@ -61,7 +61,7 @@ onMounted(async () => {
     //     }
     //     Object.values(board.value.petaPanels).forEach((petaPanel) => {
     //       if (petaPanel.petaFileId === petaFile.id) {
-    //         IPC.send("windowClose");
+    //         IPC.main.windowClose();
     //       }
     //     });
     //   });
@@ -70,10 +70,10 @@ onMounted(async () => {
   IPC.on("detailsPetaFile", (event, petaFile) => {
     petaFileId.value = petaFile.id;
   });
-  petaFileId.value = (await IPC.send("getDetailsPetaFile"))?.id;
+  petaFileId.value = (await IPC.main.getDetailsPetaFile())?.id;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
-    IPC.send("windowClose");
+    IPC.main.windowClose();
   });
 });
 const petaFile = computed(() => {

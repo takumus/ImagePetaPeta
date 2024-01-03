@@ -9,7 +9,7 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaFilesStore() {
   const states = ref<{ [key: string]: RPetaFile }>({});
-  Object.values(await IPC.send("getPetaFiles")).forEach((petaFile) => {
+  Object.values(await IPC.main.getPetaFiles()).forEach((petaFile) => {
     states.value[petaFile.id] = petaFileToRPetaFile(petaFile);
   });
   const eventEmitter = new TypedEventEmitter<{
@@ -47,8 +47,7 @@ export async function createPetaFilesStore() {
       });
     },
     updatePetaFiles(petaFiles: RPetaFile[], mode: UpdateMode) {
-      return IPC.send(
-        "updatePetaFiles",
+      return IPC.main.updatePetaFiles(
         petaFiles.map((rPetaFile) => rPetaFileToPetaFile(rPetaFile)),
         mode,
       );

@@ -8,15 +8,17 @@ import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const WINDOW = window as any;
 export const IPC = {
-  send: <U extends keyof IpcFunctions>(
-    e: U,
-    ...args: Parameters<IpcFunctions[U]>
-  ): ReturnType<IpcFunctions[U]> => {
-    return WINDOW[IPC_GLOBAL_NAME].send(
-      e,
-      ...args.map((arg) => (arg === undefined ? undefined : arg === null ? null : deepcopy(arg))),
-    );
-  },
+  main: new Proxy<IpcFunctions>({} as any, {
+    get(_target, p, _receiver) {
+      return (...args: any) =>
+        WINDOW[IPC_GLOBAL_NAME].send(
+          p,
+          ...args.map((arg: any) =>
+            arg === undefined ? undefined : arg === null ? null : deepcopy(arg),
+          ),
+        );
+    },
+  }),
   on: <U extends keyof IpcEvents>(
     e: U,
     cb: (event: IpcRendererEvent, ...args: Parameters<IpcEvents[U]>) => void,

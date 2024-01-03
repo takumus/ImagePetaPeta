@@ -113,7 +113,7 @@ onMounted(async () => {
   await restoreBoard();
 });
 async function restoreBoard() {
-  const states = await IPC.send("getStates");
+  const states = await IPC.main.getStates();
   errorPetaBoardId.value =
     states.selectedPetaBoardId !== states.loadedPetaBoardId ? states.selectedPetaBoardId : "";
   const lastBoard = petaBoardsStore.state.value[states.selectedPetaBoardId];
@@ -164,7 +164,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
   statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {
     if (
-      (await IPC.send("openModal", t("boards.selectErrorBoardDialog", [board.name]), [
+      (await IPC.main.openModal(t("boards.selectErrorBoardDialog", [board.name]), [
         t("commons.yes"),
         t("commons.no"),
       ])) !== 0
@@ -178,7 +178,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
 }
 async function removePetaBoard(board: RPetaBoard) {
   if (
-    (await IPC.send("openModal", t("boards.removeDialog", [board.name]), [
+    (await IPC.main.openModal(t("boards.removeDialog", [board.name]), [
       t("commons.yes"),
       t("commons.no"),
     ])) !== 0

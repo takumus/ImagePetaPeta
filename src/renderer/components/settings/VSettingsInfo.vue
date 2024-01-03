@@ -51,8 +51,8 @@ const licenses = ref<{ name: string; text: string; licenses: string }[]>([]);
 const supporters = ref<{ type: string; names: string[] }[]>([]);
 onMounted(async () => {
   const [_licenses, _supporters] = await Promise.all([
-    IPC.send("getLicenses"),
-    IPC.send("getSupporters"),
+    IPC.main.getLicenses(),
+    IPC.main.getSupporters(),
   ]);
   licenses.value = _licenses;
   Object.keys(_supporters).forEach((type) => {
@@ -63,27 +63,26 @@ onMounted(async () => {
   });
 });
 function gotoGithub() {
-  IPC.send("openURL", "https://github.com/takumus/ImagePetaPeta");
+  IPC.main.openURL("https://github.com/takumus/ImagePetaPeta");
 }
 function gotoIssues() {
-  IPC.send(
-    "openURL",
+  IPC.main.openURL(
     `${URL_SUPPORT}?usp=pp_url&entry.1709939184=${encodeURIComponent(
       appInfoStore.state.value.version,
     )}`,
   );
 }
 function gotoIcons8() {
-  IPC.send("openURL", "https://icons8.com/");
+  IPC.main.openURL("https://icons8.com/");
 }
 function showDBFolder() {
-  IPC.send("showDBFolder");
+  IPC.main.showDBFolder();
 }
 function showConfigFolder() {
-  IPC.send("showConfigFolder");
+  IPC.main.showConfigFolder();
 }
 function showEULA() {
-  IPC.send("openWindow", "eula");
+  IPC.main.openWindow("eula");
 }
 </script>
 
