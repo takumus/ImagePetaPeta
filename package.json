@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "prepare": "npm run generate-assets",
-    "dev": "npm run generate-assets && run-p dev:*",
+    "dev": "tsx ./scripts/dev.ts",
     "dev:app": "vite --config vite.app.config.ts",
     "dev:app-web": "vite build --watch --config vite.app.web.config.ts",
     "build": "npm run generate-assets && npm run tsc && run-s build:*",
