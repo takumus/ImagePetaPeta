@@ -46,7 +46,7 @@ export function showErrorWindow(error: ErrorWindowParameters, quit = true) {
     errorWindow.moveTop();
     errorWindow.on("close", () => {
       if (quit) {
-        app.exit();
+        app.quit();
       }
     });
   }

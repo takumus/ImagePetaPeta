@@ -19,7 +19,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
-    app.exit();
+    app.quit();
     return;
   }
   // DI準備

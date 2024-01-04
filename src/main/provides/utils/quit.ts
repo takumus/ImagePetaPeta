@@ -18,7 +18,7 @@ export class Quit {
     //   setTimeout(res, 500);
     // });
     // await useDBS().waitUntilKillable();
-    app.exit();
+    app.quit();
   }
   relaunch(force = false) {
     app.relaunch();
