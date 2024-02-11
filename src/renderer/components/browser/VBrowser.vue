@@ -207,19 +207,32 @@ function mouseWheel(e: WheelEvent) {
   }
 }
 function saveScrollPosition() {
-  let minDistance = Infinity;
-  tiles.value.forEach((t) => {
-    if (t.petaFile === undefined || thumbnails.value === undefined) {
-      return;
-    }
-    const offset = thumbnails.value.scrollTop - t.position.y;
-    const distance = Math.abs(offset);
-    if (distance < minDistance) {
-      minDistance = distance;
-      currentScrollTileOffset.value = offset;
-      currentScrollTileId.value = t.petaFile.id;
-    }
-  });
+  if (thumbnails.value === undefined) {
+    return;
+  }
+  const st = thumbnails.value.scrollTop;
+  const result = tiles.value.reduce(
+    (p, c) => {
+      if (c.petaFile === undefined) {
+        return p;
+      }
+      const offset = st - c.position.y;
+      const distance = offset * offset;
+      if (distance < p.distance) {
+        return {
+          distance,
+          offset,
+          id: c.petaFile.id,
+        };
+      }
+      return p;
+    },
+    { offset: -1, id: "", distance: Infinity },
+  );
+  if (result.offset >= 0 && result.id !== "") {
+    currentScrollTileOffset.value = result.offset;
+    currentScrollTileId.value = result.id;
+  }
 }
 
 function restoreScrollPosition() {
