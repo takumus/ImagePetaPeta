@@ -89,12 +89,13 @@ async function createElectronPlugin(isBuild: boolean) {
   const tryRestart = (() => {
     let firstRestartCount = 0;
     return function tryRestart(name: string, restart: () => void) {
-      if (++firstRestartCount >= options.length) {
-        console.log(`START[OK]: ${name}`);
-        restartDebounce(restart);
-      } else {
-        console.log(`START[SKIP]: ${name}`);
-      }
+      restartDebounce(restart);
+      // if (++firstRestartCount >= options.length) {
+      //   console.log(`START[OK]: ${name}`);
+      //   restartDebounce(restart);
+      // } else {
+      //   console.log(`START[SKIP]: ${name}`);
+      // }
     };
   })();
   options.push(
