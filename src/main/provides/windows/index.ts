@@ -140,10 +140,10 @@ export class Windows {
       }
       window.moveTop();
     });
-    window.webContents.addListener("crashed", () => {
-      logger.error("Window Crashed:", type);
-      this.reloadWindow(type);
-    });
+    // window.webContents.addListener("crashed", () => {
+    //   logger.error("Window Crashed:", type);
+    //   this.reloadWindow(type);
+    // });
     if (process.env.VITE_DEV_SERVER_URL) {
       const url = process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html";
       logger.debug("url:", url);
