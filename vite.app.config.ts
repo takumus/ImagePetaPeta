@@ -71,6 +71,9 @@ async function createElectronPlugin(isBuild: boolean) {
   const baseOptions: ElectronOptions = {
     vite: {
       // plugins: [esmodules.plugin],
+      optimizeDeps: {
+        exclude: ["sharp"],
+      },
       build: {
         minify: isBuild,
         outDir: resolve("./_electronTemp/dist/main"),

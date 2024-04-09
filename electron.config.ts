@@ -49,4 +49,5 @@ export const electronConfiguration: Configuration = {
     deleteAppDataOnUninstall: true,
     include: "./electron.installer.nsh",
   },
+  asarUnpack: ["**/node_modules/sharp/**/*", "**/node_modules/@img/**/*"],
 };

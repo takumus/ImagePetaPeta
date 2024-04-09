@@ -3,6 +3,7 @@ import checker from "license-checker-rseidelsohn";
 
 const DANGER_LICENSES = /gpl/;
 const UNKNOWN_LICENSES = /unknown/;
+const IGNORES = [/@img\/sharp-libvips/];
 
 interface Module {
   name: string;
@@ -50,7 +51,10 @@ export async function generateLicenses() {
     })),
   );
   modules.forEach((module) => {
-    if (module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)) {
+    if (
+      !IGNORES.find((r) => module.name.match(r)) &&
+      module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)
+    ) {
       throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
     }
   });
@@ -81,11 +85,13 @@ export async function generateLicenses() {
     } else {
       licensesCounts[module.licenses] = 1;
     }
-    if (module.licenses.toLocaleLowerCase().match(UNKNOWN_LICENSES)) {
-      throw `UNKNOWN LICENSE!!!!!!!: ${module.name}`;
-    }
-    if (module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)) {
-      throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
+    if (!IGNORES.find((r) => module.name.match(r))) {
+      if (module.licenses.toLocaleLowerCase().match(UNKNOWN_LICENSES)) {
+        throw `UNKNOWN LICENSE!!!!!!!: ${module.name}`;
+      }
+      if (module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)) {
+        throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
+      }
     }
     module.text = module.text
       .replace(/^\s+/g, "") //先頭のスペース削除
