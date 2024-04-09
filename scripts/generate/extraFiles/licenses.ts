@@ -3,7 +3,7 @@ import checker from "license-checker-rseidelsohn";
 
 const DANGER_LICENSES = /gpl/;
 const UNKNOWN_LICENSES = /unknown/;
-const IGNORES = [/@img\/sharp-libvips/];
+const IGNORES = [/@img\/sharp/];
 
 interface Module {
   name: string;
