@@ -2,9 +2,8 @@ import { mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
 import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
-import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
-import electron, { ElectronOptions } from "vite-plugin-electron";
+import { build, ElectronOptions } from "vite-plugin-electron";
 import { defineConfig, mergeConfig, UserConfigFnPromise } from "vitest/config";
 
 export default defineConfig((async ({ command }) => {
@@ -24,11 +23,12 @@ export default defineConfig((async ({ command }) => {
       {
         name: "wt",
         apply: "serve",
-        configureServer: () => {
-          (electronPlugin[1].closeBundle as any)();
+        configureServer: async () => {
+          electronPlugin.forEach((o) => {
+            build(o);
+          });
         },
       },
-      workerThreads(),
     ],
     resolve: {
       alias: viteAlias,
@@ -67,5 +67,5 @@ async function createElectronPlugin() {
       },
     }),
   );
-  return electron(electronConfig);
+  return electronConfig;
 }
