@@ -12,6 +12,10 @@ import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaF
 export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const anyPetaFile = data as any;
+  if (data.encrypt === undefined) {
+    data.encrypt = false;
+    update();
+  }
   // v3.0.0
   if (data.metadata === undefined) {
     data.metadata = {

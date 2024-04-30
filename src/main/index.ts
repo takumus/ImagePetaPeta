@@ -1,4 +1,6 @@
-import { app, protocol } from "electron";
+import { stat } from "fs/promises";
+import { resolve } from "path";
+import { app, protocol, ProtocolRequest, ProtocolResponse } from "electron";
 import installExtension from "electron-devtools-installer";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
@@ -8,12 +10,15 @@ import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
+import { decryptFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
@@ -94,18 +99,43 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       }
     }
     // プロトコル登録
-    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, (req, res) => {
-      const info = getPetaFileInfoFromURL(req.url);
-      res({
-        path: getPetaFilePath.fromIDAndFilename(info.id, info.filename, "original"),
-      });
-    });
-    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, (req, res) => {
-      const info = getPetaFileInfoFromURL(req.url);
-      res({
-        path: getPetaFilePath.fromIDAndFilename(info.id, info.filename, "thumbnail"),
-      });
-    });
+    function fileProtocolHandler(
+      type: "thumbnail" | "original",
+    ): (
+      request: ProtocolRequest,
+      callback: (response: string | ProtocolResponse) => void,
+    ) => Promise<void> {
+      return async (req, res) => {
+        const info = getPetaFileInfoFromURL(req.url);
+        const pf = await usePetaFilesController().getPetaFile(info.id);
+        if (pf === undefined) {
+          res({ path: "unknown" });
+          return;
+        }
+        const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
+        if (pf.encrypt) {
+          const decPath = resolve(usePaths().DIR_TEMP, info.filename);
+          try {
+            await stat(decPath);
+            res({
+              path: decPath,
+            });
+            return;
+          } catch {
+            await decryptFile(path, decPath, "1234");
+            res({
+              path: decPath,
+            });
+            return;
+          }
+        }
+        res({
+          path,
+        });
+      };
+    }
+    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, fileProtocolHandler("original"));
+    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, fileProtocolHandler("thumbnail"));
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示
