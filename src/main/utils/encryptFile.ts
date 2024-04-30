@@ -24,7 +24,7 @@ export const encryptFile = (inputFilePath: string, outputFilePath: string, key: 
   });
 };
 export const decryptFile = (inputFilePath: string, outputFilePath: string, key: string) => {
-  return new Promise<void>((res) => {
+  return new Promise<void>((res, rej) => {
     const outputWriteSteam = createWriteStream(outputFilePath);
     const inputReadStream = createReadStream(inputFilePath);
 
@@ -35,7 +35,11 @@ export const decryptFile = (inputFilePath: string, outputFilePath: string, key: 
       outputWriteSteam.write(decrypted);
     });
     inputReadStream.on("end", () => {
-      outputWriteSteam.write(decipher.final());
+      try {
+        outputWriteSteam.write(decipher.final());
+      } catch (err) {
+        rej(err);
+      }
       outputWriteSteam.end();
       outputWriteSteam.close(() => {
         res();
