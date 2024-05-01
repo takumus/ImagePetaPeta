@@ -48,6 +48,7 @@ export async function generatePetaFile(param: {
     encrypt: true,
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
+  const encrypt = param.extends.encrypt !== petaFile.encrypt && petaFile.encrypt;
   if (fileInfo.original.transformedBuffer !== undefined) {
     await writeFile(filePath.original, fileInfo.original.transformedBuffer);
   } else {
@@ -60,13 +61,13 @@ export async function generatePetaFile(param: {
     }
   }
   await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
-  if (param.extends.encrypt !== petaFile.encrypt && petaFile.encrypt) {
+  if (encrypt) {
     console.log("enc", petaFile.id);
     const dist = Path.resolve(usePaths().DIR_TEMP, uuid());
-    await secureFile.encrypt.asFile(filePath.original, dist, "1234");
+    await secureFile.encrypt.toFile(filePath.original, dist, "1234");
     await rename(dist, filePath.original);
     const dist2 = Path.resolve(usePaths().DIR_TEMP, uuid());
-    await secureFile.encrypt.asFile(filePath.thumbnail, dist2, "1234");
+    await secureFile.encrypt.toFile(filePath.thumbnail, dist2, "1234");
     await rename(dist2, filePath.thumbnail);
   }
   return petaFile;

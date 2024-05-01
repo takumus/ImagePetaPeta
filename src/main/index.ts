@@ -130,7 +130,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
             });
             return;
           } catch {
-            await secureFile.decrypt.asFile(path, decPath, "1234");
+            await secureFile.decrypt.toFile(path, decPath, "1234");
             res({
               path: decPath,
             });
@@ -158,7 +158,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         }
         const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
         if (pf.encrypt) {
-          res(secureFile.decrypt.asStream(path, "1234"));
+          res(secureFile.decrypt.toStream(path, "1234"));
           return;
         }
         res(createReadStream(path));

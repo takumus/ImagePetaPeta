@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash } from "crypto";
 import { createReadStream, createWriteStream } from "fs";
-import { PassThrough, pipeline } from "stream";
+import { PassThrough, pipeline, Readable } from "stream";
 
 type Mode = "encrypt" | "decrypt";
 type ReadStreamOptions = Parameters<typeof createReadStream>[1];
@@ -10,8 +10,8 @@ export const secureFile = ((iv: Buffer) => {
     // 192bitのキー
     return createHash("sha256").update(key).digest("base64").substring(0, 24);
   }
-  function asFile(
-    inputFilePath: string,
+  function toFile(
+    input: string | Buffer,
     outputFilePath: string,
     key: string,
     mode: Mode,
@@ -19,7 +19,7 @@ export const secureFile = ((iv: Buffer) => {
   ) {
     return new Promise<void>((res, rej) => {
       const output = createWriteStream(outputFilePath);
-      const encoded = asStream(inputFilePath, key, mode, options);
+      const encoded = toStream(input, key, mode, options);
       encoded.pipe(output);
       function error(err: any) {
         rej(err);
@@ -31,17 +31,25 @@ export const secureFile = ((iv: Buffer) => {
       encoded.on("end", res);
     });
   }
-  function asStream(inputFilePath: string, key: string, mode: Mode, options?: ReadStreamOptions) {
+  function toStream(input: string | Buffer, key: string, mode: Mode, options?: ReadStreamOptions) {
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
       ALGORITHM,
       getKey(key),
       iv,
     );
-    const input = createReadStream(inputFilePath, options);
+    const inputStream =
+      typeof input === "string"
+        ? createReadStream(input, options)
+        : new Readable({
+            read() {
+              this.push(input);
+              this.push(null);
+            },
+          });
     const transformed = new PassThrough();
-    pipeline(input, decipher, transformed, (err) => {
+    pipeline(inputStream, decipher, transformed, (err) => {
       if (!err) return;
-      input.destroy();
+      inputStream.destroy();
       transformed.destroy();
       decipher.destroy();
     });
@@ -49,14 +57,14 @@ export const secureFile = ((iv: Buffer) => {
   }
   function createFunctions(mode: Mode) {
     return {
-      asFile: (
-        inputFilePath: string,
+      toFile: (
+        input: string | Buffer,
         outputFilePath: string,
         key: string,
         readStreamOptions?: ReadStreamOptions,
-      ) => asFile(inputFilePath, outputFilePath, key, mode, readStreamOptions),
-      asStream: (inputFilePath: string, key: string, readStreamOptions?: ReadStreamOptions) =>
-        asStream(inputFilePath, key, mode, readStreamOptions),
+      ) => toFile(input, outputFilePath, key, mode, readStreamOptions),
+      toStream: (input: string | Buffer, key: string, readStreamOptions?: ReadStreamOptions) =>
+        toStream(input, key, mode, readStreamOptions),
     };
   }
   return {
