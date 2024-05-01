@@ -1,4 +1,4 @@
-import { copyFile, readFile, rename, writeFile } from "fs/promises";
+import { copyFile, readFile, rename, rm, writeFile } from "fs/promises";
 import * as Path from "path";
 import { fileTypeFromFile } from "file-type";
 import { v4 as uuid } from "uuid";
@@ -50,25 +50,37 @@ export async function generatePetaFile(param: {
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
   const encrypt = param.extends.encrypt !== petaFile.encrypt && petaFile.encrypt;
   if (fileInfo.original.transformedBuffer !== undefined) {
-    await writeFile(filePath.original, fileInfo.original.transformedBuffer);
+    if (encrypt) {
+      await secureFile.encrypt.toFile(
+        fileInfo.original.transformedBuffer,
+        filePath.original,
+        "1234",
+      );
+    } else {
+      await writeFile(filePath.original, fileInfo.original.transformedBuffer);
+    }
   } else {
     if (param.type === "add") {
-      await copyFile(param.path, filePath.original);
+      if (encrypt) {
+        await secureFile.encrypt.toFile(param.path, filePath.original, "1234");
+      } else {
+        await copyFile(param.path, filePath.original);
+      }
     } else if (param.type === "update") {
       if (param.path !== filePath.original) {
-        await rename(param.path, filePath.original);
+        if (encrypt) {
+          await secureFile.encrypt.toFile(param.path, filePath.original, "1234");
+          await rm(param.path);
+        } else {
+          await rename(param.path, filePath.original);
+        }
       }
     }
   }
-  await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   if (encrypt) {
-    console.log("enc", petaFile.id);
-    const dist = Path.resolve(usePaths().DIR_TEMP, uuid());
-    await secureFile.encrypt.toFile(filePath.original, dist, "1234");
-    await rename(dist, filePath.original);
-    const dist2 = Path.resolve(usePaths().DIR_TEMP, uuid());
-    await secureFile.encrypt.toFile(filePath.thumbnail, dist2, "1234");
-    await rename(dist2, filePath.thumbnail);
+    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, "1234");
+  } else {
+    await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   }
   return petaFile;
 }
