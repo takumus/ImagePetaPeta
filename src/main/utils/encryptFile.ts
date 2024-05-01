@@ -12,7 +12,7 @@ export const secureFile = ((iv: Buffer) => {
   function asFile(inputFilePath: string, outputFilePath: string, key: string, mode: Mode) {
     return new Promise<void>((res, rej) => {
       const output = createWriteStream(outputFilePath);
-      const encoded = asFileStream(inputFilePath, key, mode);
+      const encoded = asStream(inputFilePath, key, mode);
       encoded.pipe(output);
       function error(err: any) {
         rej(err);
@@ -24,7 +24,7 @@ export const secureFile = ((iv: Buffer) => {
       encoded.on("end", res);
     });
   }
-  function asFileStream(inputFilePath: string, key: string, mode: Mode) {
+  function asStream(inputFilePath: string, key: string, mode: Mode) {
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
       ALGORITHM,
       getKey(key),
@@ -44,7 +44,7 @@ export const secureFile = ((iv: Buffer) => {
     return {
       asFile: (inputFilePath: string, outputFilePath: string, key: string) =>
         asFile(inputFilePath, outputFilePath, key, mode),
-      asStream: (inputFilePath: string, key: string) => asFileStream(inputFilePath, key, mode),
+      asStream: (inputFilePath: string, key: string) => asStream(inputFilePath, key, mode),
     };
   }
   return {
