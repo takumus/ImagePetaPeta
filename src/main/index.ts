@@ -19,7 +19,7 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
-import { createDecryptFileStream, decryptFile } from "@/main/utils/encryptFile";
+import { secureFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
@@ -130,7 +130,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
             });
             return;
           } catch {
-            await decryptFile(path, decPath, "1234");
+            await secureFile.decrypt.asFile(path, decPath, "1234");
             res({
               path: decPath,
             });
@@ -158,7 +158,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         }
         const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
         if (pf.encrypt) {
-          res(createDecryptFileStream(path, "1234"));
+          res(secureFile.decrypt.asStream(path, "1234"));
           return;
         }
         res(createReadStream(path));

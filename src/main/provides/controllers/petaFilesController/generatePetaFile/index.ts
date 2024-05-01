@@ -11,7 +11,7 @@ import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaF
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { encryptFile } from "@/main/utils/encryptFile";
+import { secureFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
@@ -63,10 +63,10 @@ export async function generatePetaFile(param: {
   if (param.extends.encrypt !== petaFile.encrypt && petaFile.encrypt) {
     console.log("enc", petaFile.id);
     const dist = Path.resolve(usePaths().DIR_TEMP, uuid());
-    await encryptFile(filePath.original, dist, "1234");
+    await secureFile.encrypt.asFile(filePath.original, dist, "1234");
     await rename(dist, filePath.original);
     const dist2 = Path.resolve(usePaths().DIR_TEMP, uuid());
-    await encryptFile(filePath.thumbnail, dist2, "1234");
+    await secureFile.encrypt.asFile(filePath.thumbnail, dist2, "1234");
     await rename(dist2, filePath.thumbnail);
   }
   return petaFile;
