@@ -32,12 +32,12 @@ export const secureFile = ((iv: Buffer) => {
     );
     const input = createReadStream(inputFilePath);
     const transformed = new PassThrough();
-    function error(err: any) {
-      transformed.emit("error", err);
+    pipeline(input, decipher, transformed, (err) => {
+      if (!err) return;
       input.destroy();
-    }
-    pipeline(input, decipher, transformed, (err) => (err ? error(err) : undefined));
-    decipher.on("error", error);
+      transformed.destroy();
+      decipher.destroy();
+    });
     return transformed;
   }
   function createFunctions(mode: Mode) {
