@@ -1,3 +1,4 @@
+import { createReadStream } from "fs";
 import { stat } from "fs/promises";
 import { resolve } from "path";
 import { app, protocol, ProtocolRequest, ProtocolResponse } from "electron";
@@ -18,7 +19,7 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
-import { decryptFile } from "@/main/utils/encryptFile";
+import { createDecryptFileStream, decryptFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
@@ -47,7 +48,13 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       },
     },
     {
-      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
+      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
+      privileges: {
+        supportFetchAPI: true,
+      },
+    },
+    {
+      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL + "-stream",
       privileges: {
         supportFetchAPI: true,
       },
@@ -107,6 +114,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     ) => Promise<void> {
       return async (req, res) => {
         const info = getPetaFileInfoFromURL(req.url);
+        console.log("file", info.filename);
         const pf = await usePetaFilesController().getPetaFile(info.id);
         if (pf === undefined) {
           res({ path: "unknown" });
@@ -134,8 +142,42 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         });
       };
     }
-    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, fileProtocolHandler("original"));
-    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, fileProtocolHandler("thumbnail"));
+    function streamProtocolHandler(
+      type: "thumbnail" | "original",
+    ): (
+      request: ProtocolRequest,
+      callback: (response: Electron.ProtocolResponse | NodeJS.ReadableStream) => void,
+    ) => Promise<void> {
+      return async (req, res) => {
+        const info = getPetaFileInfoFromURL(req.url);
+        console.log("stream", info.filename);
+        const pf = await usePetaFilesController().getPetaFile(info.id);
+        if (pf === undefined) {
+          res({});
+          return;
+        }
+        const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
+        if (pf.encrypt) {
+          res(createDecryptFileStream(path, "1234"));
+          return;
+        }
+        res(createReadStream(path));
+      };
+    }
+    protocol.registerStreamProtocol(
+      PROTOCOLS.FILE.IMAGE_ORIGINAL + "-stream",
+      streamProtocolHandler("original"),
+    );
+    protocol.registerStreamProtocol(
+      PROTOCOLS.FILE.IMAGE_THUMBNAIL + "-stream",
+      streamProtocolHandler("thumbnail"),
+    );
+    protocol.registerFileProtocol(
+      PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
+      fileProtocolHandler("original"),
+    );
+    // protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, fileProtocolHandler("original"));
+    // protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, fileProtocolHandler("thumbnail"));
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示
