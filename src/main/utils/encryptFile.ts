@@ -25,17 +25,19 @@ export const secureFile = {
 function encryptFile(inputFilePath: string, outputFilePath: string, key: string, mode: Mode) {
   return new Promise<void>((res, rej) => {
     const output = createWriteStream(outputFilePath);
-    const input = createEncryptFileStream(inputFilePath, key, mode);
-    input.pipe(output);
-    input.on("error", (err) => {
-      rej();
-      output.destroy(err);
-      output.end();
+    const encoded = createEncryptFileStream(inputFilePath, key, mode);
+    encoded.pipe(output);
+    encoded.on("error", (err) => {
+      rej(err);
+      output.destroy();
+      encoded.destroy();
     });
     output.on("error", (err) => {
       rej(err);
+      output.destroy();
+      encoded.destroy();
     });
-    input.on("end", () => {
+    encoded.on("end", () => {
       res();
     });
   });
@@ -47,14 +49,16 @@ function createEncryptFileStream(inputFilePath: string, key: string, mode: Mode)
     iv,
   );
   const input = createReadStream(inputFilePath);
-  const passThrough = new PassThrough();
-  pipeline(input, decipher, passThrough, (err) => {
+  const encoded = new PassThrough();
+  pipeline(input, decipher, encoded, (err) => {
     if (err) {
-      passThrough.emit("error", err);
+      encoded.emit("error", err);
+      input.destroy();
     }
   });
   decipher.on("error", (err) => {
-    passThrough.emit("error", err);
+    encoded.emit("error", err);
+    input.destroy();
   });
-  return passThrough;
+  return encoded;
 }
