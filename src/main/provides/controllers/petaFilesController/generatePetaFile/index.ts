@@ -62,6 +62,7 @@ export async function generatePetaFile(param: {
   } else {
     if (param.type === "add") {
       if (encrypt) {
+        console.log("ENC");
         await secureFile.encrypt.toFile(param.path, filePath.original, "1234");
       } else {
         await copyFile(param.path, filePath.original);
@@ -69,10 +70,18 @@ export async function generatePetaFile(param: {
     } else if (param.type === "update") {
       if (param.path !== filePath.original) {
         if (encrypt) {
+          console.log("ENC");
           await secureFile.encrypt.toFile(param.path, filePath.original, "1234");
           await rm(param.path);
         } else {
           await rename(param.path, filePath.original);
+        }
+      } else {
+        if (encrypt) {
+          console.log("ENC");
+          const tmp = Path.resolve(usePaths().DIR_TEMP, uuid());
+          await secureFile.encrypt.toFile(param.path, tmp, "1234");
+          await rename(tmp, filePath.original);
         }
       }
     }
