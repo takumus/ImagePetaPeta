@@ -32,7 +32,6 @@ export const secureFile = ((iv: Buffer) => {
       output.on("close", res);
     });
   }
-
   function toStream(input: string | Buffer, key: string, mode: Mode, options?: ReadStreamOptions) {
     const range = {
       start: options?.startBlock !== undefined ? options.startBlock * BLOCK_SIZE : undefined,
