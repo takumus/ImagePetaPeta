@@ -5,8 +5,8 @@ import { PassThrough, pipeline, Readable } from "stream";
 type Mode = "encrypt" | "decrypt";
 type ReadStreamOptions = { startBlock?: number; endBlock?: number };
 const BLOCK_SIZE = 16;
+const ALGORITHM = "aes-256-ctr" as const;
 export const secureFile = ((iv: Buffer) => {
-  const ALGORITHM = "aes-256-ctr" as const;
   function getKey(key: string) {
     // 32byteのキー
     return createHash("sha256").update(key).digest("base64").substring(0, 32);
