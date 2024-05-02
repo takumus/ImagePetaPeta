@@ -7,10 +7,10 @@ type Mode = "encrypt" | "decrypt";
 type ReadStreamOptions = { startBlock: number };
 const BLOCK_SIZE = 16;
 export const secureFile = ((iv: Buffer) => {
-  const ALGORITHM = "aes-192-cbc" as const;
+  const ALGORITHM = "aes-256-ctr" as const;
   function getKey(key: string) {
     // 192bitのキー
-    return createHash("sha256").update(key).digest("base64").substring(0, 24);
+    return createHash("sha256").update(key).digest("base64").substring(0, 32);
   }
   function toFile(
     input: string | Buffer,
@@ -24,58 +24,16 @@ export const secureFile = ((iv: Buffer) => {
       const encoded = toStream(input, key, mode, options);
       encoded.pipe(output);
       function error(err: any) {
-        if (err.code === "ERR_OSSL_WRONG_FINAL_BLOCK_LENGTH") {
-          res();
-        } else {
-          rej(err);
-          output.destroy();
-          encoded.destroy();
-        }
+        rej(err);
+        output.destroy();
+        encoded.destroy();
       }
       encoded.on("error", error);
       output.on("error", error);
       encoded.on("end", res);
     });
   }
-  async function getFileSize(input: string | Buffer, key: string) {
-    const inputSize = typeof input === "string" ? (await stat(input)).size : input.length;
-    const ivIndex = (Math.floor(inputSize / BLOCK_SIZE) - 2) * BLOCK_SIZE;
-    const lastIndex = (Math.floor(inputSize / BLOCK_SIZE) - 1) * BLOCK_SIZE;
-    const res = await (async (): Promise<{ ivBuffer: Buffer; lastBuffer: Buffer }> => {
-      if (typeof input === "string") {
-        const ivBuffer = Buffer.alloc(BLOCK_SIZE);
-        const lastBuffer = Buffer.alloc(BLOCK_SIZE);
-        const fd = openSync(input, "r");
-        readSync(fd, ivBuffer, {
-          position: ivIndex,
-          length: BLOCK_SIZE,
-        });
-        readSync(fd, lastBuffer, {
-          position: lastIndex,
-          length: BLOCK_SIZE,
-        });
-        closeSync(fd);
-        return {
-          ivBuffer,
-          lastBuffer,
-        };
-      } else {
-        const ivBuffer = input.subarray(ivIndex, ivIndex + BLOCK_SIZE);
-        const lastBuffer = input.subarray(lastIndex, lastIndex + BLOCK_SIZE);
-        return {
-          ivBuffer,
-          lastBuffer,
-        };
-      }
-    })();
-    const cipher = createDecipheriv(ALGORITHM, getKey(key), res.ivBuffer);
-    cipher.update(res.lastBuffer);
-    const size = cipher.final().length + inputSize - BLOCK_SIZE;
-    return {
-      enc: inputSize,
-      dec: size,
-    };
-  }
+
   function toStream(input: string | Buffer, key: string, mode: Mode, options?: ReadStreamOptions) {
     let currentIV = iv;
     let range: { start: number; end?: number } | undefined;
@@ -84,12 +42,15 @@ export const secureFile = ((iv: Buffer) => {
         start: options.startBlock * BLOCK_SIZE,
       };
       if (typeof input === "string" && options.startBlock > 0) {
-        const ivBuffer = Buffer.alloc(BLOCK_SIZE);
-        readSync(openSync(input, "r"), ivBuffer, {
-          position: (options.startBlock - 1) * BLOCK_SIZE,
-          length: BLOCK_SIZE,
-        });
-        currentIV = ivBuffer;
+        // const ivBuffer = Buffer.alloc(BLOCK_SIZE);
+        // readSync(openSync(input, "r"), ivBuffer, {
+        //   position: (options.startBlock - 1) * BLOCK_SIZE,
+        //   length: BLOCK_SIZE,
+        // });
+        // currentIV = ivBuffer;
+        const counter = Buffer.from(iv);
+        counter.writeIntBE(options.startBlock, counter.length - 4, 4);
+        currentIV = counter;
       }
     }
     const inputStream =
@@ -131,7 +92,6 @@ export const secureFile = ((iv: Buffer) => {
     encrypt: createFunctions("encrypt"),
     decrypt: {
       ...createFunctions("decrypt"),
-      getFileSize,
     },
   };
 })(Buffer.alloc(BLOCK_SIZE, 0));
