@@ -9,7 +9,7 @@ const BLOCK_SIZE = 16;
 export const secureFile = ((iv: Buffer) => {
   const ALGORITHM = "aes-256-ctr" as const;
   function getKey(key: string) {
-    // 192bitのキー
+    // 32byteのキー
     return createHash("sha256").update(key).digest("base64").substring(0, 32);
   }
   function toFile(
