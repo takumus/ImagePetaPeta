@@ -30,7 +30,7 @@ export const secureFile = ((iv: Buffer) => {
       }
       encoded.on("error", error);
       output.on("error", error);
-      encoded.on("end", res);
+      output.on("close", res);
     });
   }
 
