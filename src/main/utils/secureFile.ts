@@ -4,7 +4,7 @@ import { stat } from "fs/promises";
 import { PassThrough, pipeline, Readable } from "stream";
 
 type Mode = "encrypt" | "decrypt";
-type ReadStreamOptions = { startBlock: number; endBlock?: number };
+type ReadStreamOptions = { startBlock?: number; endBlock?: number };
 const BLOCK_SIZE = 16;
 export const secureFile = ((iv: Buffer) => {
   const ALGORITHM = "aes-256-ctr" as const;
@@ -35,25 +35,12 @@ export const secureFile = ((iv: Buffer) => {
   }
 
   function toStream(input: string | Buffer, key: string, mode: Mode, options?: ReadStreamOptions) {
-    let currentIV = iv;
-    let range: { start: number; end?: number } | undefined;
-    if (options !== undefined) {
-      range = {
-        start: options.startBlock * BLOCK_SIZE,
-        end: options.endBlock !== undefined ? options.endBlock * BLOCK_SIZE - 1 : undefined,
-      };
-      if (typeof input === "string" && options.startBlock > 0) {
-        // const ivBuffer = Buffer.alloc(BLOCK_SIZE);
-        // readSync(openSync(input, "r"), ivBuffer, {
-        //   position: (options.startBlock - 1) * BLOCK_SIZE,
-        //   length: BLOCK_SIZE,
-        // });
-        // currentIV = ivBuffer;
-        const counter = Buffer.from(iv);
-        counter.writeIntBE(options.startBlock, counter.length - 4, 4);
-        currentIV = counter;
-      }
-    }
+    const range = {
+      start: options?.startBlock !== undefined ? options.startBlock * BLOCK_SIZE : undefined,
+      end: options?.endBlock !== undefined ? options.endBlock * BLOCK_SIZE - 1 : undefined,
+    };
+    const currentIV = Buffer.from(iv);
+    currentIV.writeIntBE(options?.startBlock ?? 0, currentIV.length - 4, 4);
     const inputStream =
       typeof input === "string"
         ? createReadStream(input, range)
