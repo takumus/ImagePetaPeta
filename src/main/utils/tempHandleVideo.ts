@@ -23,7 +23,7 @@ export async function tempHandleVideo(request: Request) {
   let stream: Readable;
   if (rangeText) {
     const [start, end] = parseRangeRequests(rangeText, size)[0];
-    const [startBlock, endBlock] = [Math.floor(start / 16), Math.ceil(end / 16)];
+    const [startBlock, endBlock] = [Math.floor(start / 16), Math.ceil(end / 16) + 1];
     const [_start, _end] = [startBlock * 16, endBlock * 16];
     console.log(`リクエスト(${path.slice(-10)}): ${start}byte - ${end}byte (${size})`);
     console.log("サイズ:", size);
@@ -31,7 +31,7 @@ export async function tempHandleVideo(request: Request) {
     headers.set("Content-Range", `bytes ${start}-${end}/${size}`);
     status = 206;
     stream = secureFile.decrypt
-      .toStream(path, "1234", { startBlock })
+      .toStream(path, "1234", { startBlock, endBlock })
       .pipe(createCroppedStream(start - _start, end - start + start - _start));
     // stream = secureFile.decrypt.toStream(path, "1234").pipe(createCroppedStream(start, end));
   } else {
