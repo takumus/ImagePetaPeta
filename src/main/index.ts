@@ -22,6 +22,7 @@ import { observeDarkMode } from "@/main/utils/darkMode";
 import { secureFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
+import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
@@ -51,12 +52,14 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
       privileges: {
         supportFetchAPI: true,
+        stream: true,
       },
     },
     {
       scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL + "-stream",
       privileges: {
         supportFetchAPI: true,
+        stream: true,
       },
     },
   ]);
@@ -172,10 +175,11 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       PROTOCOLS.FILE.IMAGE_THUMBNAIL + "-stream",
       streamProtocolHandler("thumbnail"),
     );
-    protocol.registerFileProtocol(
-      PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
-      fileProtocolHandler("original"),
-    );
+    // protocol.registerFileProtocol(
+    //   PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
+    //   fileProtocolHandler("original"),
+    // );
+    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file", tempHandleVideo);
     // protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, fileProtocolHandler("original"));
     // protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, fileProtocolHandler("thumbnail"));
     // ipcの関数登録
