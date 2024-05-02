@@ -11,8 +11,8 @@ import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaF
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { secureFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { secureFile } from "@/main/utils/secureFile";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
 export async function generatePetaFile(param: {

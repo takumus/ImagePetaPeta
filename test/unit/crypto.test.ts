@@ -6,8 +6,8 @@ import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import { ppa } from "@/commons/utils/pp";
 
-import { secureFile } from "@/main/utils/encryptFile";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
+import { secureFile } from "@/main/utils/secureFile";
 
 describe("crypto", () => {
   const ROOT = "./_test/unit/crypto";

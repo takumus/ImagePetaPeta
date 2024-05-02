@@ -19,8 +19,8 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
-import { secureFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { secureFile } from "@/main/utils/secureFile";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
 

@@ -5,8 +5,8 @@ import { Readable, Transform } from "stream";
 import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
 
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
-import { secureFile } from "@/main/utils/encryptFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { secureFile } from "@/main/utils/secureFile";
 
 export async function tempHandleVideo(request: Request) {
   const info = getPetaFileInfoFromURL(request.url);
