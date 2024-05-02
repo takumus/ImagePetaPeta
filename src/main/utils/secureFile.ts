@@ -1,6 +1,5 @@
 import { createCipheriv, createDecipheriv, createHash } from "crypto";
-import { closeSync, createReadStream, createWriteStream, openSync, readSync } from "fs";
-import { stat } from "fs/promises";
+import { createReadStream, createWriteStream } from "fs";
 import { PassThrough, pipeline, Readable } from "stream";
 
 type Mode = "encrypt" | "decrypt";
