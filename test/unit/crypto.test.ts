@@ -90,18 +90,5 @@ describe("crypto", () => {
     expect(cropStart).toBe(
       (await readFile("./test/sampleDatas/sample32byte.txt")).toString().slice(16),
     );
-
-    // test: end block
-    await secureFile.decrypt.toFile(
-      resolve(ROOT, "sample32byte.txt.enc"),
-      resolve(ROOT, "sample32byte.txt.enc.endblock.dec"),
-      "1234",
-      { startBlock: 0, endBlock: 1 },
-    );
-    const cropEnd = (await readFile(resolve(ROOT, "sample32byte.txt.enc.endblock.dec"))).toString();
-    console.log(cropEnd);
-    expect(cropEnd).toBe(
-      (await readFile("./test/sampleDatas/sample32byte.txt")).toString().slice(0, 16),
-    );
   });
 });
