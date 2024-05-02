@@ -4,7 +4,7 @@ import { stat } from "fs/promises";
 import { PassThrough, pipeline, Readable } from "stream";
 
 type Mode = "encrypt" | "decrypt";
-type ReadStreamOptions = { startBlock: number };
+type ReadStreamOptions = { startBlock: number; endBlock?: number };
 const BLOCK_SIZE = 16;
 export const secureFile = ((iv: Buffer) => {
   const ALGORITHM = "aes-256-ctr" as const;
@@ -40,6 +40,7 @@ export const secureFile = ((iv: Buffer) => {
     if (options !== undefined) {
       range = {
         start: options.startBlock * BLOCK_SIZE,
+        end: options.endBlock !== undefined ? options.endBlock * BLOCK_SIZE - 1 : undefined,
       };
       if (typeof input === "string" && options.startBlock > 0) {
         // const ivBuffer = Buffer.alloc(BLOCK_SIZE);
