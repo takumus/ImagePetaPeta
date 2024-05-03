@@ -28,9 +28,9 @@ describe("crypto", () => {
       const hash1 = await fileSHA256(resolve("./test/sampleDatas", file));
       const encPath = resolve(ROOT, "enc." + file);
       const decPath = resolve(ROOT, "dec." + file);
-      await secureFile.encrypt.toFile(resolve("./test/sampleDatas", file), encPath, KEY);
+      await secureFile.encrypt.toFile(resolve("./test/sampleDatas", file), encPath, KEY, {}, true);
       // 正しく復号する。
-      await secureFile.decrypt.toFile(encPath, decPath, KEY);
+      await secureFile.decrypt.toFile(encPath, decPath, KEY, {}, true);
       const hash2 = await fileSHA256(decPath);
       console.log(file, hash1, hash2);
       expect(hash1).toBe(hash2);
@@ -58,6 +58,7 @@ describe("crypto", () => {
       resolve(ROOT, "sample64byte.txt.enc.1-end.dec"),
       KEY,
       { startBlock: 1 },
+      false,
     );
     const cropStart = (await readFile(resolve(ROOT, "sample64byte.txt.enc.1-end.dec"))).toString();
     console.log(cropStart);
@@ -70,6 +71,7 @@ describe("crypto", () => {
       resolve(ROOT, "sample64byte.txt.enc.2-3.dec"),
       KEY,
       { startBlock: 2, endBlock: 3 },
+      false,
     );
     const cropStartEnd = (await readFile(resolve(ROOT, "sample64byte.txt.enc.2-3.dec"))).toString();
     console.log(cropStartEnd);
