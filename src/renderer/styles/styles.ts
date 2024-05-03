@@ -37,7 +37,7 @@ export type SizeStyle = {
 export type Style = SizeStyle & ColorStyle;
 export type ReadonlyStyle = Readonly<Style>;
 const sizes: SizeStyle = {
-  "--rounded": "8px",
+  "--rounded": "4px",
   "--rounded-circle": "100%",
   "--size-0": "0.8em",
   "--size-1": "1em",
