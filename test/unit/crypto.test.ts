@@ -11,6 +11,7 @@ import { secureFile } from "@/main/utils/secureFile";
 
 describe("crypto", () => {
   const ROOT = "./_test/unit/crypto";
+  const KEY = "1234";
   beforeAll(() => {
     try {
       rmdirSync(resolve(ROOT), { recursive: true });
@@ -27,9 +28,9 @@ describe("crypto", () => {
       const hash1 = await fileSHA256(resolve("./test/sampleDatas", file));
       const encPath = resolve(ROOT, "enc." + file);
       const decPath = resolve(ROOT, "dec." + file);
-      await secureFile.encrypt.toFile(resolve("./test/sampleDatas", file), encPath, "1234");
+      await secureFile.encrypt.toFile(resolve("./test/sampleDatas", file), encPath, KEY);
       // 正しく復号する。
-      await secureFile.decrypt.toFile(encPath, decPath, "1234");
+      await secureFile.decrypt.toFile(encPath, decPath, KEY);
       const hash2 = await fileSHA256(decPath);
       console.log(file, hash1, hash2);
       expect(hash1).toBe(hash2);
@@ -39,39 +40,23 @@ describe("crypto", () => {
     await secureFile.encrypt.toFile(
       "./test/sampleDatas/sample64byte.txt",
       resolve(ROOT, "sample64byte.txt.enc"),
-      "1234",
+      KEY,
     );
     await secureFile.encrypt.toFile(
       "./test/sampleDatas/sample32byte.txt",
       resolve(ROOT, "sample32byte.txt.enc"),
-      "1234",
+      KEY,
     );
     await secureFile.encrypt.toFile(
       "./test/sampleDatas/sample28byte.txt",
       resolve(ROOT, "sample28byte.txt.enc"),
-      "1234",
+      KEY,
     );
-    // const size1 = await secureFile.decrypt.getFileSize(
-    //   resolve(ROOT, "sample32byte.txt.enc"),
-    //   "1234",
-    // );
-    // console.log(size1);
-    // expect((await stat("./test/sampleDatas/sample32byte.txt")).size).toBe(size1.dec);
-    // expect((await stat(resolve(ROOT, "sample32byte.txt.enc"))).size).toBe(size1.enc);
-
-    // const size2 = await secureFile.decrypt.getFileSize(
-    //   resolve(ROOT, "sample28byte.txt.enc"),
-    //   "1234",
-    // );
-    // console.log(size2);
-    // expect((await stat("./test/sampleDatas/sample28byte.txt")).size).toBe(size2.dec);
-    // expect((await stat(resolve(ROOT, "sample28byte.txt.enc"))).size).toBe(size2.enc);
-
     // test: start block
     await secureFile.decrypt.toFile(
       resolve(ROOT, "sample64byte.txt.enc"),
       resolve(ROOT, "sample64byte.txt.enc.1-end.dec"),
-      "1234",
+      KEY,
       { startBlock: 1 },
     );
     const cropStart = (await readFile(resolve(ROOT, "sample64byte.txt.enc.1-end.dec"))).toString();
@@ -83,7 +68,7 @@ describe("crypto", () => {
     await secureFile.decrypt.toFile(
       resolve(ROOT, "sample64byte.txt.enc"),
       resolve(ROOT, "sample64byte.txt.enc.2-3.dec"),
-      "1234",
+      KEY,
       { startBlock: 2, endBlock: 3 },
     );
     const cropStartEnd = (await readFile(resolve(ROOT, "sample64byte.txt.enc.2-3.dec"))).toString();
