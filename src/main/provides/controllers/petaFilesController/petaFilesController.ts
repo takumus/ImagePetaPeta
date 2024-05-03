@@ -1,5 +1,6 @@
 import { rm, stat } from "fs/promises";
 import * as Path from "path";
+import { fileTypeFromStream } from "file-type";
 
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
@@ -15,12 +16,14 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
+import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { secureFile } from "@/main/utils/secureFile";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
@@ -282,6 +285,56 @@ export class PetaFilesController {
     };
     await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
     windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
+  }
+  async verifyFiles() {
+    const petaFiles = Object.values(await this.getAll());
+    usePetaFilesPetaTagsController();
+    let brokenPetaTag = (await usePetaTagsController().getPetaTags()).find(
+      (p) => p.name === "broken",
+    );
+    if (brokenPetaTag === undefined) {
+      await usePetaTagsController().updateMultiple(
+        [
+          {
+            type: "name",
+            name: "broken",
+          },
+        ],
+        UpdateMode.INSERT,
+      );
+      brokenPetaTag = (await usePetaTagsController().getPetaTags()).find(
+        (p) => p.name === "broken",
+      );
+    }
+    if (brokenPetaTag === undefined) {
+      return;
+    }
+    console.log(brokenPetaTag);
+    (await usePetaTagsController().getPetaTags()).find((p) => p.name === "broken");
+    const errorIDs: string[] = [];
+    let count = 0;
+    const verify = async (petaFile: PetaFile) => {
+      try {
+        const paths = getPetaFilePath.fromPetaFile(petaFile);
+        const statOrg = await stat(paths.original);
+        const statThumb = await stat(paths.original);
+        const type = await fileTypeFromStream(secureFile.decrypt.toStream(paths.original, "12341"));
+        if (type?.mime !== petaFile.mimeType) {
+          errorIDs.push(petaFile.id);
+        }
+      } catch (err) {
+        errorIDs.push(petaFile.id);
+      }
+      console.log(++count, "/", petaFiles.length);
+    };
+    await ppa((pf) => verify(pf), petaFiles, CPU_LENGTH).promise;
+    await usePetaFilesPetaTagsController().updatePetaFilesPetaTags(
+      errorIDs,
+      [{ type: "id", id: brokenPetaTag.id }],
+      UpdateMode.INSERT,
+      true,
+    );
+    console.log("error:", errorIDs.length, "/", petaFiles.length);
   }
 }
 export const petaFilesControllerKey = createKey<PetaFilesController>("petaFilesController");
