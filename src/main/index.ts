@@ -36,6 +36,7 @@ import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
   const logger = useLogger();
   const windows = useWindows();
   const configSettings = useConfigSettings();
+  const petaFilesController = usePetaFilesController();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -49,14 +50,7 @@ import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
       },
     },
     {
-      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
-      privileges: {
-        supportFetchAPI: true,
-        stream: true,
-      },
-    },
-    {
-      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL + "-stream",
+      scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
       privileges: {
         supportFetchAPI: true,
         stream: true,
@@ -108,80 +102,29 @@ import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
         log.error(error);
       }
     }
-    // プロトコル登録
-    function fileProtocolHandler(
-      type: "thumbnail" | "original",
-    ): (
-      request: ProtocolRequest,
-      callback: (response: string | ProtocolResponse) => void,
-    ) => Promise<void> {
-      return async (req, res) => {
-        const info = getPetaFileInfoFromURL(req.url);
-        console.log("file", info.filename);
-        const pf = await usePetaFilesController().getPetaFile(info.id);
-        if (pf === undefined) {
-          res({ path: "unknown" });
-          return;
-        }
-        const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
-        if (pf.encrypt) {
-          const decPath = resolve(usePaths().DIR_TEMP, info.filename);
-          try {
-            await stat(decPath);
-            res({
-              path: decPath,
-            });
-            return;
-          } catch {
-            await secureFile.decrypt.toFile(path, decPath, "1234");
-            res({
-              path: decPath,
-            });
-            return;
-          }
-        }
-        res({
-          path,
-        });
-      };
-    }
     function streamProtocolHandler(
       type: "thumbnail" | "original",
-    ): (
-      request: ProtocolRequest,
-      callback: (response: Electron.ProtocolResponse | NodeJS.ReadableStream) => void,
-    ) => Promise<void> {
-      return async (req, res) => {
+    ): (request: Request) => Promise<Response> {
+      return async (req) => {
         const info = getPetaFileInfoFromURL(req.url);
         console.log("stream", info.filename);
-        const pf = await usePetaFilesController().getPetaFile(info.id);
-        if (pf === undefined) {
-          res({});
-          return;
+        const petaFile = await petaFilesController.getPetaFile(info.id);
+        if (petaFile === undefined) {
+          return new Response(undefined, { status: 404 });
         }
-        const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
-        if (pf.encrypt) {
-          res(secureFile.decrypt.toStream(path, "1234"));
-          return;
+        if (petaFile.metadata.type === "video" && type === "original") {
+          return await tempHandleVideo(req, petaFile);
+        } else {
+          const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
+          if (petaFile.encrypt) {
+            return new Response(secureFile.decrypt.toStream(path, "1234") as any);
+          }
+          return new Response(createReadStream(path) as any);
         }
-        res(createReadStream(path));
       };
     }
-    protocol.registerStreamProtocol(
-      PROTOCOLS.FILE.IMAGE_ORIGINAL + "-stream",
-      streamProtocolHandler("original"),
-    );
-    protocol.registerStreamProtocol(
-      PROTOCOLS.FILE.IMAGE_THUMBNAIL + "-stream",
-      streamProtocolHandler("thumbnail"),
-    );
-    // protocol.registerFileProtocol(
-    //   PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file",
-    //   fileProtocolHandler("original"),
-    // );
-    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL + "-file", tempHandleVideo);
-    // protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, fileProtocolHandler("original"));
-    // protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, fileProtocolHandler("thumbnail"));
+    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, streamProtocolHandler("original"));
+    protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, streamProtocolHandler("thumbnail"));
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示

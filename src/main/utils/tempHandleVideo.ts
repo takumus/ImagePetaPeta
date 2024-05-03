@@ -1,42 +1,42 @@
-import { createReadStream, ReadStream } from "fs";
+import { createReadStream } from "fs";
 import { stat } from "fs/promises";
 import { Readable, Transform } from "stream";
 
-import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
+import { PetaFile } from "@/commons/datas/petaFile";
 
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { secureFile } from "@/main/utils/secureFile";
 
-export async function tempHandleVideo(request: Request) {
-  const info = getPetaFileInfoFromURL(request.url);
-  console.log("\nstream", info.filename);
-  const pf = await usePetaFilesController().getPetaFile(info.id);
-  const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, "original");
-  const size = (await stat(path)).size;
+export async function tempHandleVideo(request: Request, petaFile: PetaFile) {
+  const path = getPetaFilePath.fromPetaFile(petaFile).original;
+  const fileSize = (await stat(path)).size;
   const headers = new Headers();
-  headers.set("Accept-Ranges", "bytes");
-  headers.set("Content-Type", pf?.mimeType ?? "video/mp4");
-  let status = 200;
   const rangeText = request.headers.get("range");
-
   let stream: Readable;
+  let status = 200;
+  console.log("\nstream", petaFile.file.original);
+  headers.set("Accept-Ranges", "bytes");
+  headers.set("Content-Type", petaFile?.mimeType ?? "video/mp4");
   if (rangeText) {
-    const [start, end] = parseRangeRequests(rangeText, size)[0];
-    const [startBlock, endBlock] = [Math.floor(start / 16), Math.ceil(end / 16) + 1];
-    const [_start, _end] = [startBlock * 16, endBlock * 16];
-    console.log(`リクエスト(${path.slice(-10)}): ${start}byte - ${end}byte (${size})`);
-    console.log("サイズ:", size);
-    headers.set("Content-Length", `${end - start + 1}`);
-    headers.set("Content-Range", `bytes ${start}-${end}/${size}`);
+    const [start, end] = parseRangeRequests(rangeText, fileSize)[0];
+    const contentLength = end - start;
+    console.log(`リクエスト(${path.slice(-10)}): ${start}byte - ${end}byte (${fileSize})`);
+    console.log("サイズ:", fileSize);
+    headers.set("Content-Length", `${contentLength + 1}`);
+    headers.set("Content-Range", `bytes ${start}-${end}/${fileSize}`);
     status = 206;
-    stream = secureFile.decrypt
-      .toStream(path, "1234", { startBlock, endBlock })
-      .pipe(createCroppedStream(start - _start, end - start + start - _start));
-    // stream = secureFile.decrypt.toStream(path, "1234").pipe(createCroppedStream(start, end));
+    if (petaFile?.encrypt) {
+      const [startAESBlock, endAESBlock] = [Math.floor(start / 16), Math.ceil(end / 16) + 1];
+      const [startAESByte, endAESByte] = [startAESBlock * 16, endAESBlock * 16];
+      const startByteOffset = start - startAESByte;
+      stream = secureFile.decrypt
+        .toStream(path, "1234", { startBlock: startAESBlock, endBlock: endAESBlock })
+        .pipe(createCroppedStream(startByteOffset, contentLength + startByteOffset));
+    } else {
+      stream = createReadStream(path, { start, end });
+    }
   } else {
-    headers.set("Content-Length", `${size}`);
-    // stream = createReadStream(path);
+    headers.set("Content-Length", `${fileSize}`);
     stream = secureFile.decrypt.toStream(path, "1234");
   }
   stream.on("data", (d) => console.log(`復号(${path.slice(-10)}): ${d.length}bytes`));
