@@ -18,11 +18,11 @@ import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
+import { createVideoResponse } from "@/main/utils/createVideoResponse";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { secureFile } from "@/main/utils/secureFile";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
-import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
 
 (() => {
   if (!app.requestSingleInstanceLock()) {
@@ -113,7 +113,7 @@ import { tempHandleVideo } from "@/main/utils/tempHandleVideo";
           return new Response(undefined, { status: 404 });
         }
         if (petaFile.metadata.type === "video" && type === "original") {
-          return await tempHandleVideo(req, petaFile);
+          return await createVideoResponse(req, petaFile);
         } else {
           const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
           if (petaFile.encrypt) {

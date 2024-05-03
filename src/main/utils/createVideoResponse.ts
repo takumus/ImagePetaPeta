@@ -7,7 +7,7 @@ import { PetaFile } from "@/commons/datas/petaFile";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { secureFile } from "@/main/utils/secureFile";
 
-export async function tempHandleVideo(request: Request, petaFile: PetaFile) {
+export async function createVideoResponse(request: Request, petaFile: PetaFile) {
   const path = getPetaFilePath.fromPetaFile(petaFile).original;
   const fileSize = (await stat(path)).size;
   const headers = new Headers();
