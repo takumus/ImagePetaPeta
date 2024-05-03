@@ -2,6 +2,9 @@ import { createCipheriv, createDecipheriv, createHash } from "crypto";
 import { createReadStream, createWriteStream } from "fs";
 import { PassThrough, pipeline, Readable } from "stream";
 
+import { bufferToStream } from "@/main/utils/bufferToStream";
+import { fileSHA256 } from "@/main/utils/fileSHA256";
+
 type Mode = "encrypt" | "decrypt";
 type ReadStreamOptions = { startBlock?: number; endBlock?: number };
 const BLOCK_SIZE = 16;
@@ -16,7 +19,8 @@ export const secureFile = ((iv: Buffer) => {
     outputFilePath: string,
     key: string,
     mode: Mode,
-    options?: ReadStreamOptions,
+    options: ReadStreamOptions,
+    verify: boolean,
   ) {
     return new Promise<void>((res, rej) => {
       const output = createWriteStream(outputFilePath);
@@ -29,7 +33,22 @@ export const secureFile = ((iv: Buffer) => {
       }
       encoded.on("error", error);
       output.on("error", error);
-      output.on("close", res);
+      output.on("close", async () => {
+        if (verify) {
+          if (
+            (await fileSHA256(typeof input === "string" ? input : bufferToStream(input))) ===
+            (await fileSHA256(
+              toStream(outputFilePath, key, mode === "decrypt" ? "encrypt" : "decrypt"),
+            ))
+          ) {
+            res();
+          } else {
+            rej("failed");
+          }
+        } else {
+          res();
+        }
+      });
     });
   }
   function toStream(input: string | Buffer, key: string, mode: Mode, options?: ReadStreamOptions) {
@@ -40,14 +59,7 @@ export const secureFile = ((iv: Buffer) => {
     const currentIV = Buffer.from(iv);
     currentIV.writeIntBE(options?.startBlock ?? 0, currentIV.length - 4, 4);
     const inputStream =
-      typeof input === "string"
-        ? createReadStream(input, range)
-        : new Readable({
-            read() {
-              this.push(input);
-              this.push(null);
-            },
-          });
+      typeof input === "string" ? createReadStream(input, range) : bufferToStream(input);
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
       ALGORITHM,
       getKey(key),
@@ -68,9 +80,10 @@ export const secureFile = ((iv: Buffer) => {
         input: string | Buffer,
         outputFilePath: string,
         key: string,
-        readStreamOptions?: ReadStreamOptions,
-      ) => toFile(input, outputFilePath, key, mode, readStreamOptions),
-      toStream: (input: string | Buffer, key: string, readStreamOptions?: ReadStreamOptions) =>
+        readStreamOptions: ReadStreamOptions = {},
+        verify = true,
+      ) => toFile(input, outputFilePath, key, mode, readStreamOptions, verify),
+      toStream: (input: string | Buffer, key: string, readStreamOptions: ReadStreamOptions = {}) =>
         toStream(input, key, mode, readStreamOptions),
     };
   }
