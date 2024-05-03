@@ -1,3 +1,4 @@
+import { createReadStream } from "fs";
 import { rm, stat } from "fs/promises";
 import * as Path from "path";
 import { fileTypeFromStream } from "file-type";
@@ -318,7 +319,11 @@ export class PetaFilesController {
         const paths = getPetaFilePath.fromPetaFile(petaFile);
         const statOrg = await stat(paths.original);
         const statThumb = await stat(paths.original);
-        const type = await fileTypeFromStream(secureFile.decrypt.toStream(paths.original, "12341"));
+        const type = await fileTypeFromStream(
+          petaFile.encrypt
+            ? secureFile.decrypt.toStream(paths.original, "12341")
+            : createReadStream(paths.original),
+        );
         if (type?.mime !== petaFile.mimeType) {
           errorIDs.push(petaFile.id);
         }
