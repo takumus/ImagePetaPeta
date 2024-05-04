@@ -11,6 +11,7 @@ import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
+import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
@@ -117,7 +118,9 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         } else {
           const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
           if (petaFile.encrypt) {
-            return new Response(secureFile.decrypt.toStream(path, "1234") as any);
+            return new Response(
+              secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue()) as any,
+            );
           }
           return new Response(createReadStream(path) as any);
         }
