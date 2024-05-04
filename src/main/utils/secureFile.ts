@@ -10,10 +10,6 @@ type ReadStreamOptions = { startBlock?: number; endBlock?: number };
 const BLOCK_SIZE = 16;
 const ALGORITHM = "aes-256-ctr" as const;
 export const secureFile = ((iv: Buffer) => {
-  function getKey(key: string) {
-    // 32byteのキー
-    return createHash("sha256").update(key).digest("base64").substring(0, 32);
-  }
   function toFile(
     input: string | Buffer,
     outputFilePath: string,
@@ -62,7 +58,7 @@ export const secureFile = ((iv: Buffer) => {
       typeof input === "string" ? createReadStream(input, range) : bufferToStream(input);
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
       ALGORITHM,
-      getKey(key),
+      key,
       currentIV,
     );
     const transformed = new PassThrough();
@@ -94,3 +90,6 @@ export const secureFile = ((iv: Buffer) => {
     },
   };
 })(Buffer.alloc(BLOCK_SIZE, 0));
+export function passwordToKey(value: string) {
+  return createHash("sha256").update(value).digest("base64").substring(0, 32);
+}

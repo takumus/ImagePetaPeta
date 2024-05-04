@@ -1,18 +1,20 @@
 import { safeStorage } from "electron";
 
 import Config from "@/main/libs/config";
+import { passwordToKey } from "@/main/utils/secureFile";
 
 export class ConfigSecureFilePassword extends Config<string> {
-  private password: string | undefined;
+  private key: string | undefined;
   setValue(value: string) {
-    this.data = safeStorage.encryptString(value).toString("base64");
-    this.password = value;
+    const key = passwordToKey(value);
+    this.data = safeStorage.encryptString(key).toString("base64");
+    this.key = key;
     this.save();
   }
   getValue() {
-    if (this.password === undefined) {
-      this.password = safeStorage.decryptString(Buffer.from(this.data, "base64"));
+    if (this.key === undefined) {
+      this.key = safeStorage.decryptString(Buffer.from(this.data, "base64"));
     }
-    return this.password;
+    return this.key;
   }
 }

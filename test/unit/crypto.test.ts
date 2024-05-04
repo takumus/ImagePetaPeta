@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { mkdirSync, readdirSync, rmdirSync } from "fs";
 import { readFile, stat } from "fs/promises";
 import { beforeEach } from "node:test";
@@ -7,11 +8,11 @@ import { beforeAll, describe, expect, test, vi } from "vitest";
 import { ppa } from "@/commons/utils/pp";
 
 import { fileSHA256 } from "@/main/utils/fileSHA256";
-import { secureFile } from "@/main/utils/secureFile";
+import { passwordToKey, secureFile } from "@/main/utils/secureFile";
 
+const KEY = passwordToKey("1234");
 describe("crypto", () => {
   const ROOT = "./_test/unit/crypto";
-  const KEY = "1234";
   beforeAll(() => {
     try {
       rmdirSync(resolve(ROOT), { recursive: true });
