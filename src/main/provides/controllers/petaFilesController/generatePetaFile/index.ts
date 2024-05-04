@@ -47,40 +47,40 @@ export async function generatePetaFile(param: {
     mimeType: fileInfo.original.mimeType,
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
-    encrypt: true,
+    encrypt: param.extends.encrypt ?? false,
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
-  const encrypt = param.extends.encrypt !== petaFile.encrypt && petaFile.encrypt;
-  if (fileInfo.original.transformedBuffer !== undefined) {
-    if (encrypt) {
-      await secureFile.encrypt.toFile(
-        fileInfo.original.transformedBuffer,
-        filePath.original,
-        sfp.getValue(),
-      );
-    } else {
-      await writeFile(filePath.original, fileInfo.original.transformedBuffer);
-    }
-  } else {
-    if (param.type === "add") {
-      if (encrypt) {
-        console.log("ENC1");
-        await secureFile.encrypt.toFile(param.path, filePath.original, sfp.getValue());
-      } else {
-        await copyFile(param.path, filePath.original);
-      }
-    } else if (param.type === "update") {
-      if (param.path !== filePath.original) {
-        await rename(param.path, filePath.original);
-      }
-    }
-  }
-  if (encrypt) {
+  if (petaFile.encrypt) {
     await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getValue());
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   }
-  return petaFile;
+  switch (param.type) {
+    case "add":
+      if (fileInfo.original.transformedBuffer !== undefined) {
+        if (petaFile.encrypt) {
+          await secureFile.encrypt.toFile(
+            fileInfo.original.transformedBuffer,
+            filePath.original,
+            sfp.getValue(),
+          );
+        } else {
+          await writeFile(filePath.original, fileInfo.original.transformedBuffer);
+        }
+      } else {
+        if (petaFile.encrypt) {
+          await secureFile.encrypt.toFile(param.path, filePath.original, sfp.getValue());
+        } else {
+          await copyFile(param.path, filePath.original);
+        }
+      }
+      return petaFile;
+    case "update":
+      if (param.path !== filePath.original) {
+        await rename(param.path, filePath.original);
+      }
+      return petaFile;
+  }
 }
 export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {
   const fileType = await fileTypeFromFile(path);
