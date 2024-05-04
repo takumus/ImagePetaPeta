@@ -1,7 +1,5 @@
 import { createReadStream } from "fs";
-import { stat } from "fs/promises";
-import { resolve } from "path";
-import { app, protocol, ProtocolRequest, ProtocolResponse } from "electron";
+import { app, protocol } from "electron";
 import installExtension from "electron-devtools-installer";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
@@ -9,13 +7,10 @@ import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
 
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
-import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
-import { useConfigSettings } from "@/main/provides/configs";
+import { registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
-import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
@@ -142,6 +137,9 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     if (configSettings.data.web) {
       await useWebHook().open(WEBHOOK_PORT);
     }
+    // usePetaFilesController().verifyFiles();
+    // useConfigSecureFilePassword().setValue("1234");
+    // console.log(useConfigSecureFilePassword().getValue());
   }
   app.on("ready", appReady);
 })();
