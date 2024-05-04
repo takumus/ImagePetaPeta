@@ -4,10 +4,12 @@ import { Readable, Transform } from "stream";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { secureFile } from "@/main/utils/secureFile";
 
 export async function createVideoResponse(request: Request, petaFile: PetaFile) {
+  const sfp = useConfigSecureFilePassword();
   const path = getPetaFilePath.fromPetaFile(petaFile).original;
   const fileSize = (await stat(path)).size;
   const headers = new Headers();
@@ -30,14 +32,14 @@ export async function createVideoResponse(request: Request, petaFile: PetaFile) 
       const [startAESByte, endAESByte] = [startAESBlock * 16, endAESBlock * 16];
       const startByteOffset = start - startAESByte;
       stream = secureFile.decrypt
-        .toStream(path, "1234", { startBlock: startAESBlock, endBlock: endAESBlock })
+        .toStream(path, sfp.getValue(), { startBlock: startAESBlock, endBlock: endAESBlock })
         .pipe(createCroppedStream(startByteOffset, contentLength + startByteOffset));
     } else {
       stream = createReadStream(path, { start, end });
     }
   } else {
     headers.set("Content-Length", `${fileSize}`);
-    stream = secureFile.decrypt.toStream(path, "1234");
+    stream = secureFile.decrypt.toStream(path, sfp.getValue());
   }
   stream.on("data", (d) => console.log(`復号(${path.slice(-10)}): ${d.length}bytes`));
   stream.on("close", () => console.log(`終了cls(${path.slice(-10)})`));

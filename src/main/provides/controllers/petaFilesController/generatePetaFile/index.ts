@@ -7,6 +7,7 @@ import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
 import { PetaFile } from "@/commons/datas/petaFile";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata";
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -23,6 +24,7 @@ export async function generatePetaFile(param: {
   type: "update" | "add";
 }): Promise<PetaFile> {
   const logger = useLogger().logMainChunk();
+  const sfp = useConfigSecureFilePassword();
   logger.debug("#Generate PetaFile");
   const fileInfo = await generateMetadata(param.path);
   if (fileInfo === undefined) {
@@ -54,7 +56,7 @@ export async function generatePetaFile(param: {
       await secureFile.encrypt.toFile(
         fileInfo.original.transformedBuffer,
         filePath.original,
-        "1234",
+        sfp.getValue(),
       );
     } else {
       await writeFile(filePath.original, fileInfo.original.transformedBuffer);
@@ -63,7 +65,7 @@ export async function generatePetaFile(param: {
     if (param.type === "add") {
       if (encrypt) {
         console.log("ENC1");
-        await secureFile.encrypt.toFile(param.path, filePath.original, "1234");
+        await secureFile.encrypt.toFile(param.path, filePath.original, sfp.getValue());
       } else {
         await copyFile(param.path, filePath.original);
       }
@@ -74,7 +76,7 @@ export async function generatePetaFile(param: {
     }
   }
   if (encrypt) {
-    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, "1234");
+    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getValue());
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   }
