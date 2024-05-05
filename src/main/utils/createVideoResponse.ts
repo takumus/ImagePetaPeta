@@ -16,14 +16,11 @@ export async function createVideoResponse(request: Request, petaFile: PetaFile) 
   const rangeText = request.headers.get("range");
   let stream: Readable;
   let status = 200;
-  console.log("\nstream", petaFile.file.original);
   headers.set("Accept-Ranges", "bytes");
   headers.set("Content-Type", petaFile?.mimeType ?? "video/mp4");
   if (rangeText) {
     const [start, end] = parseRangeRequests(rangeText, fileSize)[0];
     const contentLength = end - start;
-    console.log(`リクエスト(${path.slice(-10)}): ${start}byte - ${end}byte (${fileSize})`);
-    console.log("サイズ:", fileSize);
     headers.set("Content-Length", `${contentLength + 1}`);
     headers.set("Content-Range", `bytes ${start}-${end}/${fileSize}`);
     status = 206;
@@ -41,9 +38,6 @@ export async function createVideoResponse(request: Request, petaFile: PetaFile) 
     headers.set("Content-Length", `${fileSize}`);
     stream = secureFile.decrypt.toStream(path, sfp.getValue());
   }
-  stream.on("data", (d) => console.log(`復号(${path.slice(-10)}): ${d.length}bytes`));
-  stream.on("close", () => console.log(`終了cls(${path.slice(-10)})`));
-  stream.on("end", () => console.log(`終了end(${path.slice(-10)})`));
   return new Response(stream as any, {
     headers,
     status,

@@ -103,7 +103,6 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     ): (request: Request) => Promise<Response> {
       return async (req) => {
         const info = getPetaFileInfoFromURL(req.url);
-        console.log("stream", info.filename);
         const petaFile = await petaFilesController.getPetaFile(info.id);
         if (petaFile === undefined) {
           return new Response(undefined, { status: 404 });
@@ -112,12 +111,11 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
           return await createVideoResponse(req, petaFile);
         } else {
           const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
-          if (petaFile.encrypt) {
-            return new Response(
-              secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue()) as any,
-            );
-          }
-          return new Response(createReadStream(path) as any);
+          return new Response(
+            (petaFile.encrypt
+              ? secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue())
+              : createReadStream(path)) as any,
+          );
         }
       };
     }
