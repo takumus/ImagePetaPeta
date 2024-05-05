@@ -83,7 +83,7 @@ const light: ReadonlyStyle = {
   "--color-border": "#999999",
   "--color-overlay": "#00000070",
   "--color-font": "#1a1a1a",
-  "--filter-icon": "brightness(0.7) invert(100%)",
+  "--filter-icon": "brightness(0.7) invert(100%) contrast(300%)",
   "--shadow": "0px 0px var(--px-1) var(--px-2) rgba(0, 0, 0, 0.3)",
   "--shadow-floating": "1px 1px 5px rgba(0, 0, 0, 0.3)",
   "--shadow-small": "0px 1px 2px 0px rgba(0, 0, 0, 0.3)",
