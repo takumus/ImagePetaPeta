@@ -32,12 +32,7 @@ export const secureFile = ((iv: Buffer) => {
       const hash = verify
         ? await new Promise((res) => {
             const hash = createHash("sha256");
-            const stream =
-              typeof input === "string"
-                ? createReadStream(input)
-                : input instanceof Buffer
-                  ? bufferToStream(input)
-                  : input;
+            const stream = getInputStream(input);
             stream.pipe(hash);
             stream.on("end", () => {
               hash.end();
@@ -80,12 +75,7 @@ export const secureFile = ((iv: Buffer) => {
     };
     const currentIV = Buffer.from(iv);
     currentIV.writeIntBE(options?.startBlock ?? 0, currentIV.length - 4, 4);
-    const inputStream =
-      typeof input === "string"
-        ? createReadStream(input, range)
-        : input instanceof Buffer
-          ? bufferToStream(input)
-          : input;
+    const inputStream = getInputStream(input, range);
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
       ALGORITHM,
       key,
@@ -107,7 +97,7 @@ export const secureFile = ((iv: Buffer) => {
         outputFilePath: string,
         key: string,
         readStreamOptions: ReadStreamOptions = {},
-        verify = false,
+        verify = true,
       ) => toFile(input, outputFilePath, key, mode, readStreamOptions, verify),
       toStream: (
         input: string | Buffer | Readable,
@@ -125,4 +115,15 @@ export const secureFile = ((iv: Buffer) => {
 })(Buffer.alloc(BLOCK_SIZE, 0));
 export function passwordToKey(value: string) {
   return createHash("sha256").update(value).digest("base64").substring(0, 32);
+}
+
+function getInputStream(
+  input: string | Uint8Array | Readable,
+  range?: { start?: number; end?: number },
+) {
+  return typeof input === "string"
+    ? createReadStream(input, range)
+    : input instanceof Buffer || input instanceof Uint8Array
+      ? bufferToStream(input)
+      : input;
 }
