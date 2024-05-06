@@ -209,7 +209,7 @@ export class PetaFilesController {
                   fileDate: fileDate.getTime(),
                   note: fileInfo.note,
                   id,
-                  encrypted: true,
+                  encrypted: false,
                 },
                 type: "add",
               });
