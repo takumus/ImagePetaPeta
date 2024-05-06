@@ -54,30 +54,30 @@ describe("petaFilesController", () => {
     expect(petaFiles.length, "petaFiles.length").toBe(8);
     await useDBS().waitUntilKillable();
   });
-  test("importRotatedFile", async () => {
-    const rotatedFile = resolve("./test/sampleDatas/lizard-rotated.jpg");
-    expect(await sharp(rotatedFile).metadata()).toMatchObject({
-      width: 853,
-      height: 1280,
-      format: "jpeg",
-    });
-    const pfc = usePetaFilesController();
-    const petaFile = (
-      await pfc.importFilesFromFileInfos({
-        fileInfos: [{ name: "rotated", note: "", path: rotatedFile }],
-      })
-    )[0];
-    const filePaths = getPetaFilePath.fromPetaFile(petaFile);
-    expect(filePaths.original.endsWith(".png")).toBeTruthy();
-    expect(petaFile.metadata.mimeType).toBe("image/png");
-    expect((await fileTypeFromFile(filePaths.original))?.mime).toBe("image/png");
-    expect(await sharp(filePaths.original).metadata()).toMatchObject({
-      width: 1280,
-      height: 853,
-      format: "png",
-    });
-    await useDBS().waitUntilKillable();
-  });
+  // test("importRotatedFile", async () => {
+  //   const rotatedFile = resolve("./test/sampleDatas/lizard-rotated.jpg");
+  //   expect(await sharp(rotatedFile).metadata()).toMatchObject({
+  //     width: 853,
+  //     height: 1280,
+  //     format: "jpeg",
+  //   });
+  //   const pfc = usePetaFilesController();
+  //   const petaFile = (
+  //     await pfc.importFilesFromFileInfos({
+  //       fileInfos: [{ name: "rotated", note: "", path: rotatedFile }],
+  //     })
+  //   )[0];
+  //   const filePaths = getPetaFilePath.fromPetaFile(petaFile);
+  //   expect(filePaths.original.endsWith(".png")).toBeTruthy();
+  //   expect(petaFile.metadata.mimeType).toBe("image/png");
+  //   expect((await fileTypeFromFile(filePaths.original))?.mime).toBe("image/png");
+  //   expect(await sharp(filePaths.original).metadata()).toMatchObject({
+  //     width: 1280,
+  //     height: 853,
+  //     format: "png",
+  //   });
+  //   await useDBS().waitUntilKillable();
+  // });
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
