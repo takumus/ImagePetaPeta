@@ -11,14 +11,14 @@ const BLOCK_SIZE = 16;
 const ALGORITHM = "aes-256-ctr" as const;
 export const secureFile = ((iv: Buffer) => {
   function toFile(
-    input: string | Buffer,
+    input: string | Buffer | Readable,
     outputFilePath: string,
     key: string,
     mode: Mode,
     options: ReadStreamOptions,
     verify: boolean,
   ) {
-    return new Promise<void>((res, rej) => {
+    return new Promise<void>(async (res, rej) => {
       const output = createWriteStream(outputFilePath);
       const encoded = toStream(input, key, mode, options);
       encoded.pipe(output);
@@ -29,10 +29,26 @@ export const secureFile = ((iv: Buffer) => {
       }
       encoded.on("error", error);
       output.on("error", error);
-      output.on("close", async () => {
+      const hash = verify
+        ? await new Promise((res) => {
+            const hash = createHash("sha256");
+            const stream =
+              typeof input === "string"
+                ? createReadStream(input)
+                : input instanceof Buffer
+                  ? bufferToStream(input)
+                  : input;
+            stream.pipe(hash);
+            stream.on("end", () => {
+              hash.end();
+              res(hash.digest("hex"));
+            });
+          })
+        : undefined;
+      async function close() {
         if (verify) {
           if (
-            (await fileSHA256(typeof input === "string" ? input : bufferToStream(input))) ===
+            hash ===
             (await fileSHA256(
               toStream(outputFilePath, key, mode === "decrypt" ? "encrypt" : "decrypt"),
             ))
@@ -44,10 +60,20 @@ export const secureFile = ((iv: Buffer) => {
         } else {
           res();
         }
-      });
+      }
+      if (output.closed) {
+        close();
+        return;
+      }
+      output.on("close", close);
     });
   }
-  function toStream(input: string | Buffer, key: string, mode: Mode, options?: ReadStreamOptions) {
+  function toStream(
+    input: string | Buffer | Readable,
+    key: string,
+    mode: Mode,
+    options?: ReadStreamOptions,
+  ) {
     const range = {
       start: options?.startBlock !== undefined ? options.startBlock * BLOCK_SIZE : undefined,
       end: options?.endBlock !== undefined ? options.endBlock * BLOCK_SIZE - 1 : undefined,
@@ -55,7 +81,11 @@ export const secureFile = ((iv: Buffer) => {
     const currentIV = Buffer.from(iv);
     currentIV.writeIntBE(options?.startBlock ?? 0, currentIV.length - 4, 4);
     const inputStream =
-      typeof input === "string" ? createReadStream(input, range) : bufferToStream(input);
+      typeof input === "string"
+        ? createReadStream(input, range)
+        : input instanceof Buffer
+          ? bufferToStream(input)
+          : input;
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
       ALGORITHM,
       key,
@@ -73,14 +103,17 @@ export const secureFile = ((iv: Buffer) => {
   function createFunctions(mode: Mode) {
     return {
       toFile: (
-        input: string | Buffer,
+        input: string | Buffer | Readable,
         outputFilePath: string,
         key: string,
         readStreamOptions: ReadStreamOptions = {},
-        verify = true,
+        verify = false,
       ) => toFile(input, outputFilePath, key, mode, readStreamOptions, verify),
-      toStream: (input: string | Buffer, key: string, readStreamOptions: ReadStreamOptions = {}) =>
-        toStream(input, key, mode, readStreamOptions),
+      toStream: (
+        input: string | Buffer | Readable,
+        key: string,
+        readStreamOptions: ReadStreamOptions = {},
+      ) => toStream(input, key, mode, readStreamOptions),
     };
   }
   return {

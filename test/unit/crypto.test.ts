@@ -37,6 +37,15 @@ describe("crypto", () => {
       expect(hash1).toBe(hash2);
     }, files).promise;
   });
+  test("stream", async () => {
+    // 暗号化してストリームへ
+    const stream = secureFile.encrypt.toStream("./test/sampleDatas/sample64byte.txt", KEY);
+    // 暗号化ストリームを復号して元ファイルと確認。
+    expect(
+      (await fileSHA256("./test/sampleDatas/sample64byte.txt")) ===
+        (await fileSHA256(secureFile.decrypt.toStream(stream, KEY))),
+    );
+  });
   test("advanced", async () => {
     await secureFile.encrypt.toFile(
       "./test/sampleDatas/sample64byte.txt",
