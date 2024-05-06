@@ -69,7 +69,7 @@ describe("petaFilesController", () => {
     )[0];
     const filePaths = getPetaFilePath.fromPetaFile(petaFile);
     expect(filePaths.original.endsWith(".png")).toBeTruthy();
-    expect(petaFile.mimeType).toBe("image/png");
+    expect(petaFile.metadata.mimeType).toBe("image/png");
     expect((await fileTypeFromFile(filePaths.original))?.mime).toBe("image/png");
     expect(await sharp(filePaths.original).metadata()).toMatchObject({
       width: 1280,

@@ -20,7 +20,7 @@ export class PFileObject extends PIXI.Sprite {
       await this.content.load(petaFile);
       this.addChild(this.content);
     } else if (petaFile?.metadata.type === "image") {
-      if (petaFile.mimeType === "image/gif") {
+      if (petaFile.metadata.mimeType === "image/gif") {
         this.content = new PGIFFileObjectContent();
         await this.content.load(petaFile);
         this.addChild(this.content);

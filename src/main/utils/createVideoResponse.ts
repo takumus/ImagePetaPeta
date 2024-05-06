@@ -17,7 +17,7 @@ export async function createVideoResponse(request: Request, petaFile: PetaFile) 
   let stream: Readable;
   let status = 200;
   headers.set("Accept-Ranges", "bytes");
-  headers.set("Content-Type", petaFile?.mimeType ?? "video/mp4");
+  headers.set("Content-Type", petaFile?.metadata.mimeType ?? "video/mp4");
   if (rangeText) {
     const [start, end] = parseRangeRequests(rangeText, fileSize)[0];
     const contentLength = end - start;

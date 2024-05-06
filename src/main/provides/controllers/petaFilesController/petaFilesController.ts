@@ -325,7 +325,7 @@ export class PetaFilesController {
             ? secureFile.decrypt.toStream(paths.original, "12341")
             : createReadStream(paths.original),
         );
-        if (type?.mime !== petaFile.mimeType) {
+        if (type?.mime !== petaFile.metadata.mimeType) {
           errorIDs.push(petaFile.id);
         }
       } catch (err) {

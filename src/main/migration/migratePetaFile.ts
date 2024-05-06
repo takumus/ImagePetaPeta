@@ -26,6 +26,7 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
       gif: false,
       palette: anyPetaFile.palette ?? [],
       version: 0,
+      mimeType: "unknown/unknown",
     };
     delete anyPetaFile.width;
     delete anyPetaFile.height;
@@ -37,8 +38,8 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
     data.metadata.gif = false;
     update();
   }
-  if (data.mimeType === undefined) {
-    data.mimeType = "unknown/unknown";
+  if (data.metadata.mimeType === undefined) {
+    data.metadata.mimeType = anyPetaFile.mimeType ?? "unknown/unknown";
     update();
   }
   if (data.metadata.type === "video" && data.metadata.duration === undefined) {

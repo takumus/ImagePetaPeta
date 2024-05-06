@@ -44,7 +44,7 @@ export async function generatePetaFile(param: {
     note: param.extends.note ?? "",
     fileDate: param.extends.fileDate ?? new Date().getTime(),
     addDate: param.extends.addDate ?? new Date().getTime(),
-    mimeType: fileInfo.original.mimeType,
+    // mimeType: fileInfo.original.mimeType,
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
     encrypted: param.extends.encrypted ?? false,
