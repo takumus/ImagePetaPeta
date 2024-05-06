@@ -3,20 +3,18 @@ import { MimeType } from "file-type";
 import { PetaColor } from "@/commons/datas/petaColor";
 
 interface _PetaFileMetadata {
-  type: string;
   version: number;
+  width: number;
+  height: number;
+  mimeType: MimeType | "unknown/unknown";
 }
 export interface PetaFileImageMetadata extends _PetaFileMetadata {
   type: "image";
   gif: boolean;
-  width: number;
-  height: number;
   palette: PetaColor[];
 }
 export interface PetaFileVideoMetadata extends _PetaFileMetadata {
   type: "video";
-  width: number;
-  height: number;
   duration: number;
   palette: PetaColor[];
 }
@@ -32,7 +30,7 @@ export interface PetaFile {
   addDate: number;
   note: string;
   nsfw: boolean;
-  mimeType: MimeType | "unknown/unknown";
   metadata: PetaFileMetadata;
+  encrypted: boolean;
 }
 export type PetaFiles = { [id: string]: PetaFile };

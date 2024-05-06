@@ -5,7 +5,6 @@ import { PetaFileMetadata } from "@/commons/datas/petaFile";
 export type GeneratedFileInfo = {
   original: {
     extention: string;
-    mimeType: MimeType;
     transformedBuffer?: Buffer;
   };
   thumbnail: {

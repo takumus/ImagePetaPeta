@@ -1,3 +1,4 @@
+import { createReadStream } from "fs";
 import { app, protocol } from "electron";
 import installExtension from "electron-devtools-installer";
 
@@ -6,15 +7,17 @@ import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
 
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
-import { ipcFunctions, registerIpcFunctions } from "@/main/ipcFunctions";
-import { useConfigSettings } from "@/main/provides/configs";
+import { registerIpcFunctions } from "@/main/ipcFunctions";
+import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useLogger } from "@/main/provides/utils/logger";
-import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
+import { createVideoResponse } from "@/main/utils/createVideoResponse";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { secureFile } from "@/main/utils/secureFile";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
 (() => {
@@ -29,6 +32,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
   const logger = useLogger();
   const windows = useWindows();
   const configSettings = useConfigSettings();
+  const petaFilesController = usePetaFilesController();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -45,6 +49,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
       privileges: {
         supportFetchAPI: true,
+        stream: true,
       },
     },
   ]);
@@ -93,19 +98,29 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         log.error(error);
       }
     }
-    // プロトコル登録
-    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_ORIGINAL, (req, res) => {
-      const info = getPetaFileInfoFromURL(req.url);
-      res({
-        path: getPetaFilePath.fromIDAndFilename(info.id, info.filename, "original"),
-      });
-    });
-    protocol.registerFileProtocol(PROTOCOLS.FILE.IMAGE_THUMBNAIL, (req, res) => {
-      const info = getPetaFileInfoFromURL(req.url);
-      res({
-        path: getPetaFilePath.fromIDAndFilename(info.id, info.filename, "thumbnail"),
-      });
-    });
+    function streamProtocolHandler(
+      type: "thumbnail" | "original",
+    ): (request: Request) => Promise<Response> {
+      return async (req) => {
+        const info = getPetaFileInfoFromURL(req.url);
+        const petaFile = await petaFilesController.getPetaFile(info.id);
+        if (petaFile === undefined) {
+          return new Response(undefined, { status: 404 });
+        }
+        if (petaFile.metadata.type === "video" && type === "original") {
+          return await createVideoResponse(req, petaFile);
+        } else {
+          const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
+          return new Response(
+            (petaFile.encrypted
+              ? secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue())
+              : createReadStream(path)) as any,
+          );
+        }
+      };
+    }
+    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, streamProtocolHandler("original"));
+    protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, streamProtocolHandler("thumbnail"));
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示
@@ -120,6 +135,9 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     if (configSettings.data.web) {
       await useWebHook().open(WEBHOOK_PORT);
     }
+    // usePetaFilesController().verifyFiles();
+    // useConfigSecureFilePassword().setValue("1234");
+    // console.log(useConfigSecureFilePassword().getValue());
   }
   app.on("ready", appReady);
 })();

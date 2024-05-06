@@ -1,15 +1,19 @@
-import { copyFile, readFile, rename, writeFile } from "fs/promises";
+import { copyFile, readFile, rename, rm, writeFile } from "fs/promises";
 import * as Path from "path";
 import { fileTypeFromFile } from "file-type";
+import { v4 as uuid } from "uuid";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
 import { PetaFile } from "@/commons/datas/petaFile";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata";
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { secureFile } from "@/main/utils/secureFile";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
 export async function generatePetaFile(param: {
@@ -20,6 +24,7 @@ export async function generatePetaFile(param: {
   type: "update" | "add";
 }): Promise<PetaFile> {
   const logger = useLogger().logMainChunk();
+  const sfp = useConfigSecureFilePassword();
   logger.debug("#Generate PetaFile");
   const fileInfo = await generateMetadata(param.path);
   if (fileInfo === undefined) {
@@ -39,24 +44,43 @@ export async function generatePetaFile(param: {
     note: param.extends.note ?? "",
     fileDate: param.extends.fileDate ?? new Date().getTime(),
     addDate: param.extends.addDate ?? new Date().getTime(),
-    mimeType: fileInfo.original.mimeType,
+    // mimeType: fileInfo.original.mimeType,
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
+    encrypted: param.extends.encrypted ?? false,
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
-  if (fileInfo.original.transformedBuffer !== undefined) {
-    await writeFile(filePath.original, fileInfo.original.transformedBuffer);
+  if (petaFile.encrypted) {
+    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getValue());
   } else {
-    if (param.type === "add") {
-      await copyFile(param.path, filePath.original);
-    } else if (param.type === "update") {
+    await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
+  }
+  switch (param.type) {
+    case "add":
+      if (fileInfo.original.transformedBuffer !== undefined) {
+        if (petaFile.encrypted) {
+          await secureFile.encrypt.toFile(
+            fileInfo.original.transformedBuffer,
+            filePath.original,
+            sfp.getValue(),
+          );
+        } else {
+          await writeFile(filePath.original, fileInfo.original.transformedBuffer);
+        }
+      } else {
+        if (petaFile.encrypted) {
+          await secureFile.encrypt.toFile(param.path, filePath.original, sfp.getValue());
+        } else {
+          await copyFile(param.path, filePath.original);
+        }
+      }
+      return petaFile;
+    case "update":
       if (param.path !== filePath.original) {
         await rename(param.path, filePath.original);
       }
-    }
+      return petaFile;
   }
-  await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
-  return petaFile;
 }
 export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {
   const fileType = await fileTypeFromFile(path);

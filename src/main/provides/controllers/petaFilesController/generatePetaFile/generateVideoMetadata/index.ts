@@ -109,7 +109,6 @@ export async function generateVideoMetadata(
       },
       original: {
         extention: fileType.ext,
-        mimeType: fileType.mime,
       },
       metadata: {
         type: "video",
@@ -118,6 +117,7 @@ export async function generateVideoMetadata(
         palette,
         version: PETAIMAGE_METADATA_VERSION,
         duration: info.duration,
+        mimeType: fileType.mime,
       },
     };
   } catch (error) {

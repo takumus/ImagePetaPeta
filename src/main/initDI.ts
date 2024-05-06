@@ -8,6 +8,7 @@ import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
+import { SecureFilePassword } from "@/commons/datas/secureFilePassword";
 import { getDefaultSettings, Settings } from "@/commons/datas/settings";
 import { defaultStates, States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
@@ -20,6 +21,7 @@ import {
   FILENAME_DB_INFO,
   FILENAME_IMAGES_DB,
   FILENAME_IMAGES_TAGS_DB,
+  FILENAME_SECURE_FILE_PASSWORD,
   FILENAME_SETTINGS,
   FILENAME_STATES,
   FILENAME_TAG_PARTITIONS_DB,
@@ -39,10 +41,12 @@ import { migrateStates } from "@/main/migration/migrateStates";
 import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
 import {
   configDBInfoKey,
+  configSecureFilePasswordKey,
   configSettingsKey,
   configStatesKey,
   configWindowStatesKey,
 } from "@/main/provides/configs";
+import { ConfigSecureFilePassword } from "@/main/provides/configs/secureFilePassword";
 import {
   PetaBoardsController,
   petaBoardsControllerKey,
@@ -144,6 +148,7 @@ export function initDI(
     const FILE_STATES = initFileSync(DIR_APP, FILENAME_STATES);
     const FILE_DBINFO = initFileSync(DIR_ROOT, FILENAME_DB_INFO);
     const FILE_WINDOW_STATES = initFileSync(DIR_APP, FILENAME_WINDOW_STATES);
+    const FILE_SECURE_FILE_PASSWORD = initFileSync(DIR_APP, FILENAME_SECURE_FILE_PASSWORD);
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, getDefaultDBInfo());
     // デフォルト値だったらバージョン付与。
     if (configDBInfo.data.version === getDefaultDBInfo().version) {
@@ -165,6 +170,7 @@ export function initDI(
       {},
       migrateWindowStates,
     );
+    const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, "");
     // データベース
     const dbPetaFiles = new DB<PetaFile>("petaFiles", FILE_IMAGES_DB);
     const dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);
@@ -207,6 +213,7 @@ export function initDI(
     provide(configSettingsKey, configSettings);
     provide(configStatesKey, configStates);
     provide(configWindowStatesKey, configWindowStates);
+    provide(configSecureFilePasswordKey, configSecureFilePassword);
     provide(petaBoardsControllerKey, new PetaBoardsController());
     provide(petaFilesControllerKey, new PetaFilesController());
     provide(petaTagsControllerKey, new PetaTagsController());

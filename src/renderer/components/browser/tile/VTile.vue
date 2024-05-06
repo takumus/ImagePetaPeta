@@ -44,25 +44,25 @@
           :src="getFileURL(props.tile.petaFile, FileType.ORIGINAL)"></video>
         <e-background> </e-background>
       </e-images>
-      <e-tags
-        v-if="settingsStore.state.value.showTagsOnTile"
+      <e-inners
         :class="{
           selected,
         }">
-        <e-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
-          {{ petaTag.name }}
-        </e-tag>
-        <e-tag v-if="myPetaTags.length === 0 && !loadingTags">
-          {{ t("browser.untagged") }}
-        </e-tag>
-      </e-tags>
-      <e-video-duration
-        v-if="props.tile.petaFile?.metadata.type === 'video'"
-        :class="{
-          selected,
-        }">
-        {{ videoDuration }}
-      </e-video-duration>
+        <e-tags v-if="settingsStore.state.value.showTagsOnTile">
+          <e-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
+            {{ petaTag.name }}
+          </e-tag>
+          <e-tag v-if="myPetaTags.length === 0 && !loadingTags">
+            {{ t("browser.untagged") }}
+          </e-tag>
+        </e-tags>
+        <e-video-duration v-if="props.tile.petaFile?.metadata.type === 'video'">
+          {{ videoDuration }}
+        </e-video-duration>
+        <e-secure v-if="props.tile.petaFile?.encrypted">
+          <e-icon></e-icon>
+        </e-secure>
+      </e-inners>
       <e-selected v-show="selected"> </e-selected>
     </e-tile-wrapper>
     <e-group v-else>
@@ -398,45 +398,69 @@ e-tile-root {
         filter: brightness(1);
       }
     }
-    > e-video-duration {
+    > e-inners {
       display: block;
       position: absolute;
       top: 0px;
       left: 0px;
-      margin: var(--px-1);
-      border-radius: var(--rounded);
-      background-color: var(--color-1);
-      padding: var(--px-1);
-      font-size: var(--size-0);
-      line-height: var(--size-0);
-      &.selected {
-        margin: var(--px-2);
-      }
-    }
-    > e-tags {
-      display: flex;
-      position: absolute;
-      bottom: 0px;
-      flex-direction: row-reverse;
-      flex-wrap: wrap-reverse;
-      justify-content: right;
-      outline: none;
-      padding: var(--px-1);
+      border: solid var(--px-1) transparent;
       width: 100%;
+      height: 100%;
       pointer-events: none;
-      text-align: left;
-      word-break: break-word;
-      > e-tag {
+      &.selected {
+        border: solid var(--px-2) transparent;
+      }
+      > e-video-duration {
         display: block;
-        margin-top: var(--px-0);
-        margin-left: var(--px-0);
+        position: absolute;
+        top: 0px;
+        left: 0px;
         border-radius: var(--rounded);
         background-color: var(--color-1);
-        padding: var(--px-1);
+        padding: var(--px-0);
         font-size: var(--size-0);
+        line-height: var(--size-0);
       }
-      &.selected {
-        padding: var(--px-2);
+      > e-secure {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        border-radius: var(--rounded);
+        background-color: var(--color-1);
+        width: var(--px-3);
+        height: var(--px-3);
+        > e-icon {
+          display: block;
+          filter: var(--filter-icon);
+          background-image: url("/images/icons/locked.png");
+          background-position: center;
+          background-size: calc(var(--px-3) * 0.8);
+          background-repeat: no-repeat;
+          width: 100%;
+          height: 100%;
+        }
+      }
+      > e-tags {
+        display: flex;
+        position: absolute;
+        bottom: 0px;
+        flex-direction: row-reverse;
+        flex-wrap: wrap-reverse;
+        justify-content: right;
+        outline: none;
+        width: 100%;
+        pointer-events: none;
+        text-align: left;
+        word-break: break-word;
+        > e-tag {
+          display: block;
+          margin-top: var(--px-0);
+          margin-left: var(--px-0);
+          border-radius: var(--rounded);
+          background-color: var(--color-1);
+          padding: var(--px-0);
+          font-size: var(--size-0);
+        }
       }
     }
     > e-selected {

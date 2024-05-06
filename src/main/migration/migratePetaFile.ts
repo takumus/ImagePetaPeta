@@ -12,6 +12,11 @@ import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaF
 export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const anyPetaFile = data as any;
+  if (data.encrypted === undefined) {
+    data.encrypted = anyPetaFile.encrypt ?? false;
+    delete anyPetaFile.encrypt;
+    update();
+  }
   // v3.0.0
   if (data.metadata === undefined) {
     data.metadata = {
@@ -21,6 +26,7 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
       gif: false,
       palette: anyPetaFile.palette ?? [],
       version: 0,
+      mimeType: "unknown/unknown",
     };
     delete anyPetaFile.width;
     delete anyPetaFile.height;
@@ -32,8 +38,8 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
     data.metadata.gif = false;
     update();
   }
-  if (data.mimeType === undefined) {
-    data.mimeType = "unknown/unknown";
+  if (data.metadata.mimeType === undefined) {
+    data.metadata.mimeType = anyPetaFile.mimeType ?? "unknown/unknown";
     update();
   }
   if (data.metadata.type === "video" && data.metadata.duration === undefined) {

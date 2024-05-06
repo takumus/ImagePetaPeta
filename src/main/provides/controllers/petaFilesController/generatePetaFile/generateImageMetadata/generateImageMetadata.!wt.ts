@@ -68,7 +68,6 @@ async function generateImageMetaData(param: {
     original: {
       transformedBuffer: transformed ? buffer : undefined,
       extention,
-      mimeType,
     },
     metadata: {
       type: "image",
@@ -77,6 +76,7 @@ async function generateImageMetaData(param: {
       height: metadata.height,
       palette: palette,
       version: PETAIMAGE_METADATA_VERSION,
+      mimeType,
     },
   };
 }

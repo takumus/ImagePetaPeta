@@ -40,7 +40,7 @@
           </e-data>
           <e-data>
             <e-name>{{ t("browser.property.infos.mimeType") }}:</e-name>
-            <e-value>{{ singlePetaFileInfo.petaFile.mimeType }}</e-value>
+            <e-value>{{ singlePetaFileInfo.petaFile.metadata.mimeType }}</e-value>
           </e-data>
           <!-- <e-data>
           <e-name>{{ t("browser.property.infos.fileDate") }}</e-name>
