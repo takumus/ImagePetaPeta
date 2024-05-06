@@ -25,7 +25,7 @@ export async function encryptPetaFile(petaFile: PetaFile, updatePetaFile = true)
     await rename(tempPaths.original, paths.original);
     await rename(tempPaths.thumbnail, paths.thumbnail);
     if (updatePetaFile) {
-      petaFile.encrypt = true;
+      petaFile.encrypted = true;
       await usePetaFilesController().updateMultiple([petaFile], UpdateMode.UPDATE);
     }
     return true;

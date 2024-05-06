@@ -59,7 +59,7 @@
         <e-video-duration v-if="props.tile.petaFile?.metadata.type === 'video'">
           {{ videoDuration }}
         </e-video-duration>
-        <e-secure v-if="props.tile.petaFile?.encrypt">
+        <e-secure v-if="props.tile.petaFile?.encrypted">
           <e-icon></e-icon>
         </e-secure>
       </e-inners>

@@ -209,7 +209,7 @@ export class PetaFilesController {
                   fileDate: fileDate.getTime(),
                   note: fileInfo.note,
                   id,
-                  encrypt: true,
+                  encrypted: true,
                 },
                 type: "add",
               });
@@ -321,7 +321,7 @@ export class PetaFilesController {
         const statOrg = await stat(paths.original);
         const statThumb = await stat(paths.original);
         const type = await fileTypeFromStream(
-          petaFile.encrypt
+          petaFile.encrypted
             ? secureFile.decrypt.toStream(paths.original, "12341")
             : createReadStream(paths.original),
         );

@@ -112,7 +112,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         } else {
           const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
           return new Response(
-            (petaFile.encrypt
+            (petaFile.encrypted
               ? secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue())
               : createReadStream(path)) as any,
           );

@@ -34,6 +34,6 @@ export interface PetaFile {
   nsfw: boolean;
   mimeType: MimeType | "unknown/unknown";
   metadata: PetaFileMetadata;
-  encrypt: boolean;
+  encrypted: boolean;
 }
 export type PetaFiles = { [id: string]: PetaFile };

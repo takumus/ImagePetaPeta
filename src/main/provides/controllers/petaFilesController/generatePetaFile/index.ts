@@ -47,10 +47,10 @@ export async function generatePetaFile(param: {
     mimeType: fileInfo.original.mimeType,
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
-    encrypt: param.extends.encrypt ?? false,
+    encrypted: param.extends.encrypted ?? false,
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
-  if (petaFile.encrypt) {
+  if (petaFile.encrypted) {
     await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getValue());
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
@@ -58,7 +58,7 @@ export async function generatePetaFile(param: {
   switch (param.type) {
     case "add":
       if (fileInfo.original.transformedBuffer !== undefined) {
-        if (petaFile.encrypt) {
+        if (petaFile.encrypted) {
           await secureFile.encrypt.toFile(
             fileInfo.original.transformedBuffer,
             filePath.original,
@@ -68,7 +68,7 @@ export async function generatePetaFile(param: {
           await writeFile(filePath.original, fileInfo.original.transformedBuffer);
         }
       } else {
-        if (petaFile.encrypt) {
+        if (petaFile.encrypted) {
           await secureFile.encrypt.toFile(param.path, filePath.original, sfp.getValue());
         } else {
           await copyFile(param.path, filePath.original);

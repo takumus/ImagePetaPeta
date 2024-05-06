@@ -24,7 +24,7 @@ export async function createVideoResponse(request: Request, petaFile: PetaFile) 
     headers.set("Content-Length", `${contentLength + 1}`);
     headers.set("Content-Range", `bytes ${start}-${end}/${fileSize}`);
     status = 206;
-    if (petaFile?.encrypt) {
+    if (petaFile?.encrypted) {
       const [startAESBlock, endAESBlock] = [Math.floor(start / 16), Math.ceil(end / 16) + 1];
       const [startAESByte, endAESByte] = [startAESBlock * 16, endAESBlock * 16];
       const startByteOffset = start - startAESByte;
