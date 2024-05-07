@@ -1,9 +1,9 @@
 import { createReadStream } from "fs";
-import { rm, stat } from "fs/promises";
+import { rename, rm, stat } from "fs/promises";
 import * as Path from "path";
 import { fileTypeFromStream } from "file-type";
+import { v4 as uuid } from "uuid";
 
-import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
@@ -15,12 +15,14 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
+import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
@@ -322,7 +324,7 @@ export class PetaFilesController {
         const statThumb = await stat(paths.original);
         const type = await fileTypeFromStream(
           petaFile.encrypted
-            ? secureFile.decrypt.toStream(paths.original, "12341")
+            ? secureFile.decrypt.toStream(paths.original, useConfigSecureFilePassword().getValue())
             : createReadStream(paths.original),
         );
         if (type?.mime !== petaFile.metadata.mimeType) {
@@ -341,6 +343,34 @@ export class PetaFilesController {
       true,
     );
     console.log("error:", errorIDs.length, "/", petaFiles.length);
+  }
+  async encryptAll(mode: keyof typeof secureFile) {
+    const petaFiles = Object.values(await this.getAll());
+    const key = useConfigSecureFilePassword().getValue();
+    await ppa(
+      async (pf, i) => {
+        const pathOrg = getPetaFilePath.fromPetaFile(pf);
+        const pathTemp = {
+          original: Path.resolve(usePaths().DIR_TEMP, uuid()),
+          thumbnail: Path.resolve(usePaths().DIR_TEMP, uuid()),
+        };
+        try {
+          let k: keyof typeof pathOrg;
+          for (k in pathOrg) {
+            await secureFile[mode].toFile(pathOrg[k], pathTemp[k], key);
+            await rename(pathTemp[k], pathOrg[k]);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+        console.log(pf.id, i);
+      },
+      petaFiles.filter(
+        (pf) => (mode === "encrypt" && !pf.encrypted) || (mode === "decrypt" && pf.encrypted),
+      ),
+      CPU_LENGTH,
+    ).promise;
+    console.log("complete");
   }
 }
 export const petaFilesControllerKey = createKey<PetaFilesController>("petaFilesController");
