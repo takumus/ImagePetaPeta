@@ -360,6 +360,8 @@ export class PetaFilesController {
             await secureFile[mode].toFile(pathOrg[k], pathTemp[k], key);
             await rename(pathTemp[k], pathOrg[k]);
           }
+          pf.encrypted = mode === "encrypt";
+          this.update(pf, UpdateMode.UPDATE);
         } catch (e) {
           console.log(e);
         }
