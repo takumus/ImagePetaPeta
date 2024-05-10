@@ -1,23 +1,18 @@
-import { createReadStream } from "fs";
 import { app, protocol } from "electron";
 import installExtension from "electron-devtools-installer";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
-import { getPetaFileInfoFromURL } from "@/commons/utils/getPetaFileInfoFromURL";
 
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
-import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { useConfigSettings } from "@/main/provides/configs";
+import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
 import { useLogger } from "@/main/provides/utils/logger";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
-import { createVideoResponse } from "@/main/utils/createVideoResponse";
 import { observeDarkMode } from "@/main/utils/darkMode";
-import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { secureFile } from "@/main/utils/secureFile";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
 (() => {
@@ -32,7 +27,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
   const logger = useLogger();
   const windows = useWindows();
   const configSettings = useConfigSettings();
-  const petaFilesController = usePetaFilesController();
+  const handleFileResponse = useHandleFileResponse();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -98,29 +93,8 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
         log.error(error);
       }
     }
-    function streamProtocolHandler(
-      type: "thumbnail" | "original",
-    ): (request: Request) => Promise<Response> {
-      return async (req) => {
-        const info = getPetaFileInfoFromURL(req.url);
-        const petaFile = await petaFilesController.getPetaFile(info.id);
-        if (petaFile === undefined) {
-          return new Response(undefined, { status: 404 });
-        }
-        if (petaFile.metadata.type === "video" && type === "original") {
-          return await createVideoResponse(req, petaFile);
-        } else {
-          const path = getPetaFilePath.fromIDAndFilename(info.id, info.filename, type);
-          return new Response(
-            (petaFile.encrypted
-              ? secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue())
-              : createReadStream(path)) as any,
-          );
-        }
-      };
-    }
-    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, streamProtocolHandler("original"));
-    protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, streamProtocolHandler("thumbnail"));
+    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
+    protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示

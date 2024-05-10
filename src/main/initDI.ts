@@ -76,6 +76,7 @@ import {
   dbsKey,
   dbStatusKey,
 } from "@/main/provides/databases";
+import { HandleFileResponse, handleFileResponseKey } from "@/main/provides/handleFileResponse";
 import { Modals, modalsKey } from "@/main/provides/modals";
 import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { i18nKey } from "@/main/provides/utils/i18n";
@@ -249,6 +250,7 @@ export function initDI(
     provide(tasksKey, tasks);
     provide(webhookKey, new WebHook(ipcFunctions));
     provide(modalsKey, new Modals());
+    provide(handleFileResponseKey, new HandleFileResponse());
   } catch (err) {
     // どこかで失敗したら強制終了
     console.log(err, app);
