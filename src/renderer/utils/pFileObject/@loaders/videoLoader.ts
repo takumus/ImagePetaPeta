@@ -40,14 +40,7 @@ export class VideoLoader extends TypedEventEmitter<{
     if (!this.play) {
       this.element.pause();
     }
-    this.texture = new PIXI.Texture(
-      new PIXI.BaseTexture(
-        new PIXI.VideoResource(this.element, {
-          autoPlay: false,
-          autoLoad: true,
-        }),
-      ),
-    );
+    this.texture = PIXI.Texture.from(this.element);
     this.updateVideo();
     return this.texture;
   }
