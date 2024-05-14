@@ -66,6 +66,7 @@ export class AnimatedGIF extends Sprite {
     Object.assign(this, rest);
     this.currentFrame = 0;
     this.updateFrame(true);
+    this.onRender = () => this.updateFrame();
   }
   public stop(): void {
     if (!this._playing) {
@@ -73,7 +74,7 @@ export class AnimatedGIF extends Sprite {
     }
     this._playing = false;
     if (this._autoUpdate && this._isConnectedToTicker) {
-      // Ticker.shared.remove(this.update);
+      Ticker.shared.remove(this.update, this);
       this._isConnectedToTicker = false;
     }
   }
@@ -83,7 +84,7 @@ export class AnimatedGIF extends Sprite {
     }
     this._playing = true;
     if (this._autoUpdate && !this._isConnectedToTicker) {
-      // Ticker.shared.add(this.update);
+      Ticker.shared.add(this.update, this);
       this._isConnectedToTicker = true;
     }
     if (!this.loop && this.currentFrame === this._frames.length - 1) {
@@ -96,11 +97,12 @@ export class AnimatedGIF extends Sprite {
   public get playing(): boolean {
     return this._playing;
   }
-  update = (deltaTime: number) => {
+  update = (t: Ticker) => {
     if (!this._playing) {
       return;
     }
-    const elapsed = (this.animationSpeed * deltaTime) / 60;
+    const deltaTime = t.deltaTime;
+    const elapsed = (this.animationSpeed * deltaTime) / Ticker.targetFPMS;
     const currentTime = this._currentTime + elapsed;
     const localTime = currentTime % this.duration;
     const localFrame = this._frames.findIndex(
@@ -131,20 +133,21 @@ export class AnimatedGIF extends Sprite {
       this._context.putImageData(imageData, 0, 0);
       this._context.fillStyle = "transparent";
       this._context.fillRect(0, 0, 0, 1);
+      this.texture.source.update();
     }
     this.texture.update();
     this.dirty = false;
   }
-  _render(renderer: Renderer): void {
-    this.updateFrame();
-    // super._render(renderer);
-  }
-  _renderCanvas(renderer: any): void {
-    this.updateFrame();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    super._renderCanvas(renderer);
-  }
+  // _render(renderer: Renderer): void {
+  //   this.updateFrame();
+  //   super._render(renderer);
+  // }
+  // _renderCanvas(renderer: any): void {
+  //   this.updateFrame();
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  //   super._renderCanvas(renderer);
+  // }
   get autoUpdate(): boolean {
     return this._autoUpdate;
   }
