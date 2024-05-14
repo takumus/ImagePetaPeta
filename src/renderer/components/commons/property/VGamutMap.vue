@@ -50,12 +50,19 @@ const resultNormalizedPixels = new Uint8Array(
 const resultAlphas = Array.from(Array(size.width * size.height)).map(() => 0);
 const backgroundRawSprite = new PIXI.Sprite();
 const backgroundNormalizedSprite = new PIXI.Sprite();
+const resultRawCanvas = document.createElement("canvas");
+resultRawCanvas.width = size.width;
+resultRawCanvas.height = size.height;
+const resultRawCtx = resultRawCanvas.getContext("2d")!;
 const resultRawSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultRawPixels, size))),
+  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultRawCanvas })),
 );
-PIXI.RenderTexture.create(size);
+const resultNormalizedCanvas = document.createElement("canvas");
+resultNormalizedCanvas.width = size.width;
+resultNormalizedCanvas.height = size.height;
+const resultNormalizedCtx = resultNormalizedCanvas.getContext("2d")!;
 const resultNormalizedSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultNormalizedPixels, size))),
+  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultRawCanvas })),
 );
 const settings = useSettingsStore();
 backgroundRawSprite.alpha = 0.3;
@@ -100,6 +107,16 @@ function animate() {
       0xff,
     );
   }
+  resultRawCtx.putImageData(
+    new ImageData(new Uint8ClampedArray(resultRawPixels.buffer), size.width, size.height),
+    0,
+    0,
+  );
+  resultNormalizedCtx.putImageData(
+    new ImageData(new Uint8ClampedArray(resultNormalizedPixels.buffer), size.width, size.height),
+    0,
+    0,
+  );
   resultRawSprite.texture.source.update();
   resultNormalizedSprite.texture.source.update();
   console.timeEnd("render");
