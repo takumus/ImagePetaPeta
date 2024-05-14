@@ -41,7 +41,7 @@ export class PTransformerDashedLine extends PIXI.Container {
     if (!this.dirty) return;
     if (this.corners.length < 5) return;
     this.graphics.clear();
-    this.graphics.drawPolygon(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
+    this.graphics.poly(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
     this.graphics.stroke({
       width: 2,
       color: 0x00ff00,

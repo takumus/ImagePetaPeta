@@ -82,8 +82,8 @@ export class PBoardGrid extends PIXI.Container {
       //------------------------------------------------------
       // 中心線
       //------------------------------------------------------
-      this.center.drawPolygon([position.x + width / 2, -height, position.x + width / 2, height]);
-      this.center.drawPolygon([-width, position.y + height / 2, width, position.y + height / 2]);
+      this.center.poly([position.x + width / 2, -height, position.x + width / 2, height]);
+      this.center.poly([-width, position.y + height / 2, width, position.y + height / 2]);
       this.center.stroke({
         width: 1,
         color: numColor,
@@ -98,8 +98,8 @@ export class PBoardGrid extends PIXI.Container {
     );
     // デバッグ中心線
     // this.grid.lineStyle(4, 0xff0000);
-    // this.grid.drawPolygon(0, -16, 0, 16);
-    // this.grid.drawPolygon(-16, 0, 16, 0);
+    // this.grid.poly(0, -16, 0, 16);
+    // this.grid.poly(-16, 0, 16, 0);
   }
   setScale(scale: number) {
     this.__scale = scale;
@@ -114,15 +114,15 @@ export class PBoardGrid extends PIXI.Container {
     for (let i = 0; i < cx; i++) {
       if (useSkipIndex && i % skipIndex === 0) continue;
       const x = size * i;
-      this.grid.drawPolygon([x, -height, x, height]);
-      if (i > 0) this.grid.drawPolygon([-x, -height, -x, height]);
+      this.grid.poly([x, -height, x, height]);
+      if (i > 0) this.grid.poly([-x, -height, -x, height]);
     }
     // 縦軸
     for (let i = 0; i < cy; i++) {
       if (useSkipIndex && i % skipIndex === 0) continue;
       const y = size * i;
-      this.grid.drawPolygon([-width, y, width, y]);
-      if (i > 0) this.grid.drawPolygon([-width, -y, width, -y]);
+      this.grid.poly([-width, y, width, y]);
+      if (i > 0) this.grid.poly([-width, -y, width, -y]);
     }
   }
 }
