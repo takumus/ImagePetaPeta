@@ -43,30 +43,38 @@ export class PBoardGrid extends PIXI.Container {
       //------------------------------------------------------
       // 主線(maxGridSizeごと)
       //------------------------------------------------------
-      this.grid.lineStyle(1, numColor, MAX_ALPHA * (1 - maximumZoomAlpha), undefined, true);
       this.renderGrid(maxGridSize, width, height);
+      this.grid.stroke({
+        width: 1,
+        color: numColor,
+        alpha: MAX_ALPHA * (1 - maximumZoomAlpha),
+      });
       //------------------------------------------------------
       // 複線(maxGridSizeのDIVISONごと)
       //------------------------------------------------------
-      this.grid.lineStyle(
-        1,
-        numColor,
-        // 透明度はグリッドサイズとの距離 0.05が最小、最大が1
-        Math.max(
-          Math.min((maxGridSize - GRID_SIZE) / (GRID_SIZE * DIVISION - GRID_SIZE), MAX_ALPHA),
-          MIN_ALPHA,
-        ) *
-          (1 - maximumZoomAlpha),
-        undefined,
-        true,
-      );
       this.renderGrid(maxGridSize / DIVISION, width, height, DIVISION);
+      this.grid.stroke({
+        width: 1,
+        color: numColor,
+        // 透明度はグリッドサイズとの距離 0.05が最小、最大が1
+        alpha:
+          Math.max(
+            Math.min((maxGridSize - GRID_SIZE) / (GRID_SIZE * DIVISION - GRID_SIZE), MAX_ALPHA),
+            MIN_ALPHA,
+          ) *
+          (1 - maximumZoomAlpha),
+      });
       //------------------------------------------------------
       // 最大ズーム時の線 (複線のDIVISION倍の細かさ)
       //------------------------------------------------------
       if (maximumZoomAlpha > 0) {
-        this.grid.lineStyle(1, numColor, maximumZoomAlpha * MAX_ALPHA, undefined, true);
         this.renderGrid(maxGridSize / (DIVISION * DIVISION), width, height);
+        this.grid.stroke({
+          width: 1,
+          color: numColor,
+          // 透明度はグリッドサイズとの距離 0.05が最小、最大が1
+          alpha: maximumZoomAlpha * MAX_ALPHA,
+        });
       }
     }
     if (!this.ignoreRenderCenter(width, height, this.__scale, numColor, position.x, position.y)) {
@@ -74,9 +82,12 @@ export class PBoardGrid extends PIXI.Container {
       //------------------------------------------------------
       // 中心線
       //------------------------------------------------------
-      this.center.lineStyle(1, numColor, 1, undefined, true);
-      this.center.drawPolygon(position.x + width / 2, -height, position.x + width / 2, height);
-      this.center.drawPolygon(-width, position.y + height / 2, width, position.y + height / 2);
+      this.center.drawPolygon([position.x + width / 2, -height, position.x + width / 2, height]);
+      this.center.drawPolygon([-width, position.y + height / 2, width, position.y + height / 2]);
+      this.center.stroke({
+        width: 1,
+        color: numColor,
+      });
     }
     //------------------------------------------------------
     // 基準座標
@@ -103,15 +114,15 @@ export class PBoardGrid extends PIXI.Container {
     for (let i = 0; i < cx; i++) {
       if (useSkipIndex && i % skipIndex === 0) continue;
       const x = size * i;
-      this.grid.drawPolygon(x, -height, x, height);
-      if (i > 0) this.grid.drawPolygon(-x, -height, -x, height);
+      this.grid.drawPolygon([x, -height, x, height]);
+      if (i > 0) this.grid.drawPolygon([-x, -height, -x, height]);
     }
     // 縦軸
     for (let i = 0; i < cy; i++) {
       if (useSkipIndex && i % skipIndex === 0) continue;
       const y = size * i;
-      this.grid.drawPolygon(-width, y, width, y);
-      if (i > 0) this.grid.drawPolygon(-width, -y, width, -y);
+      this.grid.drawPolygon([-width, y, width, y]);
+      if (i > 0) this.grid.drawPolygon([-width, -y, width, -y]);
     }
   }
 }

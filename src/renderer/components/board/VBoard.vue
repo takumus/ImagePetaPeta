@@ -171,6 +171,7 @@ function pointerdown(e: PIXI.FederatedPointerEvent) {
   if (!currentBoard.value) {
     return;
   }
+  console.log("pd");
   const mouse = new Vec2(e.global);
   click.down();
   if (e.button === MouseButton.RIGHT || e.button === MouseButton.MIDDLE) {
@@ -302,7 +303,7 @@ function animate() {
         position.set(rootContainer.toLocal(pPanel.toGlobal(position)));
       });
       const newSelected =
-        hitTest(pSelection.rect, pPanelRect) &&
+        hitTest(pSelection.getRect(), pPanelRect) &&
         pPanel.petaPanel.visible &&
         !pPanel.petaPanel.locked;
       if (pPanel.petaPanel.renderer.selected !== newSelected) {

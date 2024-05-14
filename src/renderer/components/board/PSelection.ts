@@ -6,15 +6,21 @@ export class PSelection extends PIXI.Graphics {
   public topLeft = new Vec2();
   public bottomRight = new Vec2();
   public draw(scale: number) {
-    this.lineStyle(1 / scale, 0x000000, 1, undefined, true);
-    this.beginFill(0xffffff, 0.1);
     const rect = this.getRect();
-    this.drawRect(
+    this.rect(
       rect.leftTop.x,
       rect.leftTop.y,
       rect.rightBottom.x - rect.leftTop.x,
       rect.rightBottom.y - rect.leftTop.y,
     );
+    this.stroke({
+      width: 1 / scale,
+      color: 0x000000,
+    });
+    this.fill({
+      color: 0xffffff,
+      alpha: 0.1,
+    });
   }
   public getRect() {
     return {
