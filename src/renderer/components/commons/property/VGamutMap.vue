@@ -35,7 +35,7 @@ const props = defineProps<{
 }>();
 const vPixi = ref<InstanceType<typeof VPIXI>>();
 const amountFilterValue = ref(100);
-const size: PIXI.ISize = {
+const size: PIXI.Size = {
   width: 256,
   height: 256,
 };
@@ -53,13 +53,14 @@ const backgroundNormalizedSprite = new PIXI.Sprite();
 const resultRawSprite = new PIXI.Sprite(
   new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultRawPixels, size))),
 );
+PIXI.RenderTexture.create(size);
 const resultNormalizedSprite = new PIXI.Sprite(
   new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultNormalizedPixels, size))),
 );
 const settings = useSettingsStore();
 backgroundRawSprite.alpha = 0.3;
 backgroundNormalizedSprite.alpha = 0.3;
-PIXI.Texture.fromURL(hsvCircleImage).then((texture) => {
+PIXI.Assets.load(hsvCircleImage).then((texture) => {
   backgroundRawSprite.texture = backgroundNormalizedSprite.texture = texture;
 });
 let generateGamutMapCancel = () => {
@@ -70,10 +71,10 @@ onMounted(() => {
 });
 onUnmounted(() => {
   generateGamutMapCancel();
-  backgroundNormalizedSprite.destroy({ texture: true, baseTexture: true });
-  backgroundRawSprite.destroy({ texture: true, baseTexture: true });
-  resultNormalizedSprite.destroy({ texture: true, baseTexture: true });
-  resultRawSprite.destroy({ texture: true, baseTexture: true });
+  backgroundNormalizedSprite.destroy({ texture: true });
+  backgroundRawSprite.destroy({ texture: true });
+  resultNormalizedSprite.destroy({ texture: true });
+  resultRawSprite.destroy({ texture: true });
   console.log("destroy");
 });
 function construct() {
@@ -99,8 +100,8 @@ function animate() {
       0xff,
     );
   }
-  resultRawSprite.texture.baseTexture.update();
-  resultNormalizedSprite.texture.baseTexture.update();
+  resultRawSprite.texture.source.update();
+  resultNormalizedSprite.texture.source.update();
   console.timeEnd("render");
 }
 function loseContext() {
