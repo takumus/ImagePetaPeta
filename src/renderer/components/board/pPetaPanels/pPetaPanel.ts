@@ -162,13 +162,13 @@ export class PPetaPanel extends PIXI.Sprite {
       }
       if (this.imageWrapper.mask) {
         this.masker.clear();
-        this.masker.beginFill(0xff0000);
-        this.masker.drawRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.masker.rect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.masker.fill(0xff0000);
       }
       this.selection.clear();
       if (this.unselected) {
-        this.selection.beginFill(0x000000, 0.5);
-        this.selection.drawRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.selection.rect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.selection.fill({ color: 0x000000, alpha: 0.5 });
       }
       if (this.nsfwTile) {
         this.nsfwTile.x = -panelWidth / 2;
