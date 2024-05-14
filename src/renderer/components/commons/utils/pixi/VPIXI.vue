@@ -45,16 +45,17 @@ function constructIfResolutionChanged() {
     construct(resolution);
   }
 }
-function construct(resolution: number) {
-  PIXI.BaseTexture.defaultOptions.mipmap = PIXI.MIPMAP_MODES.OFF;
-  app = new PIXI.Application({
+async function construct(resolution: number) {
+  // PIXI.BaseTexture.defaultOptions.mipmap = PIXI.MIPMAP_MODES.OFF;
+  app = new PIXI.Application();
+  await app.init({
     resolution,
     antialias: props.antialias,
     backgroundAlpha: 0,
   });
   app.ticker.stop();
-  canvas = app.view as HTMLCanvasElement;
-  canvasWrapper.value?.appendChild(canvas as HTMLCanvasElement);
+  canvas = app.canvas;
+  canvasWrapper.value?.appendChild(canvas);
   canvas.addEventListener("webglcontextlost", () => {
     emit("loseContext");
   });
@@ -94,8 +95,8 @@ function resize(rect: DOMRect) {
   emit("resize", {
     domRect: rect,
     pixiRect: {
-      width: app.renderer.view.width,
-      height: app.renderer.view.height,
+      width: app.renderer.view.canvas.width,
+      height: app.renderer.view.canvas.height,
     },
   });
   renderPIXI(true);

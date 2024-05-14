@@ -9,11 +9,11 @@ const DIVISION = 5;
 const SUB_GRID_SIZE = GRID_SIZE / DIVISION;
 const MAX_ALPHA = 0.2;
 const MIN_ALPHA = 0.04;
-const MAXIMUM_ZOOM_BEGIN_SCALE = 50;
+const MAXIMUM_ZOOM_BEGIN__scale = 50;
 export class PBoardGrid extends PIXI.Container {
   grid: PIXI.Graphics;
   center: PIXI.Graphics;
-  _scale = 1;
+  __scale = 1;
   private ignoreRenderGrids = valueChecker();
   private ignoreRenderCenter = valueChecker();
   constructor() {
@@ -30,14 +30,14 @@ export class PBoardGrid extends PIXI.Container {
         : getMaxVisibleGridSize(size / division, division, min);
     // DIVISIONのN乗で大きめの数字にした。
     const maxGridSize = getMaxVisibleGridSize(
-      SUB_GRID_SIZE * Math.pow(DIVISION, 8) * this._scale,
+      SUB_GRID_SIZE * Math.pow(DIVISION, 8) * this.__scale,
       DIVISION,
       SUB_GRID_SIZE,
     );
-    if (!this.ignoreRenderGrids(width, height, numColor, this._scale)) {
+    if (!this.ignoreRenderGrids(width, height, numColor, this.__scale)) {
       this.grid.clear();
       const maximumZoomAlpha = Math.max(
-        (this._scale - (BOARD_ZOOM_MAX - MAXIMUM_ZOOM_BEGIN_SCALE)) / MAXIMUM_ZOOM_BEGIN_SCALE,
+        (this.__scale - (BOARD_ZOOM_MAX - MAXIMUM_ZOOM_BEGIN__scale)) / MAXIMUM_ZOOM_BEGIN__scale,
         0,
       );
       //------------------------------------------------------
@@ -69,7 +69,7 @@ export class PBoardGrid extends PIXI.Container {
         this.renderGrid(maxGridSize / (DIVISION * DIVISION), width, height);
       }
     }
-    if (!this.ignoreRenderCenter(width, height, this._scale, numColor, position.x, position.y)) {
+    if (!this.ignoreRenderCenter(width, height, this.__scale, numColor, position.x, position.y)) {
       this.center.clear();
       //------------------------------------------------------
       // 中心線
@@ -91,7 +91,7 @@ export class PBoardGrid extends PIXI.Container {
     // this.grid.drawPolygon(-16, 0, 16, 0);
   }
   setScale(scale: number) {
-    this._scale = scale;
+    this.__scale = scale;
   }
   private renderGrid(size: number, width: number, height: number, skipIndex?: number) {
     width += GRID_SIZE * DIVISION;

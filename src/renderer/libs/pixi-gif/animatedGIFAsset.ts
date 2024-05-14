@@ -1,5 +1,5 @@
-import type { AssetExtension } from "@pixi/assets";
-import { extensions, ExtensionType, settings, utils } from "@pixi/core";
+import type { AssetExtension, DOMAdapter } from "pixi.js";
+import { extensions, ExtensionType, path } from "pixi.js";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
 import { AnimatedGIFResource } from "@/renderer/libs/pixi-gif/animatedGIFResource";
@@ -13,10 +13,10 @@ export function injectAnimatedGIFAsset() {
       remove: async (formats) => formats.filter((format) => format !== "gif"),
     },
     loader: {
-      test: (url) => utils.path.extname(url) === ".gif",
+      test: (url) => path.extname(url) === ".gif",
       load: async (url, asset) => {
         asset;
-        const response = await settings.ADAPTER.fetch(url);
+        const response = await fetch(url);
         const buffer = await response.arrayBuffer();
         return new AnimatedGIFResource(buffer);
       },

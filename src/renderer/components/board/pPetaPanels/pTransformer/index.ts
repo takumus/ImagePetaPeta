@@ -44,7 +44,7 @@ export class PTransformer extends PIXI.Container {
   pMultipleSelection: PTransformerDashedLine = new PTransformerDashedLine();
   draggingPanels = false;
   private mousePosition = new Vec2();
-  _scale = 0;
+  __scale = 0;
   fit = false;
   crop = false;
   beginSize = new Vec2();
@@ -71,10 +71,10 @@ export class PTransformer extends PIXI.Container {
     this.addChild(...this.corners);
   }
   setScale(scale: number) {
-    if (scale === this._scale) {
+    if (scale === this.__scale) {
       return;
     }
-    this._scale = scale;
+    this.__scale = scale;
     this.pMultipleSelection.setScale(scale);
     this.corners.forEach((c) => {
       c.setScale(scale);
@@ -225,7 +225,7 @@ export class PTransformer extends PIXI.Container {
         this.sizingCornerIndex === 0 ||
         this.sizingCornerIndex === 1 ||
         this.sizingCornerIndex === 2;
-      const localPosition = pPetaPanel.toLocal(e.global);
+      const localPosition = pPetaPanel._toLocal(e.global);
       const fixedLocalPosition = new Vec2(
         changeWidth
           ? this.updateCrop("horizontal", petaPanel, beginPetaPanel, negativeWidth, localPosition.x)
@@ -237,7 +237,7 @@ export class PTransformer extends PIXI.Container {
       petaPanel.position.set(
         pPetaPanel.parent.toLocal(
           pPetaPanel.toGlobal(
-            fixedLocalPosition.add(pPetaPanel.toLocal(this.toGlobal(this.pairCorner))).div(2),
+            fixedLocalPosition.add(pPetaPanel._toLocal(this.toGlobal(this.pairCorner))).div(2),
           ),
         ),
       );
@@ -389,7 +389,7 @@ export class PTransformer extends PIXI.Container {
     }
     this.pMultipleSelection.update();
     this.corners.forEach((c) => {
-      c.setScale(this._scale);
+      c.setScale(this.__scale);
     });
   }
 }

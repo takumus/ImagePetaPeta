@@ -8,14 +8,15 @@ export class PSelection extends PIXI.Graphics {
   public draw(scale: number) {
     this.lineStyle(1 / scale, 0x000000, 1, undefined, true);
     this.beginFill(0xffffff, 0.1);
+    const rect = this.getRect();
     this.drawRect(
-      this.rect.leftTop.x,
-      this.rect.leftTop.y,
-      this.rect.rightBottom.x - this.rect.leftTop.x,
-      this.rect.rightBottom.y - this.rect.leftTop.y,
+      rect.leftTop.x,
+      rect.leftTop.y,
+      rect.rightBottom.x - rect.leftTop.x,
+      rect.rightBottom.y - rect.leftTop.y,
     );
   }
-  public get rect() {
+  public getRect() {
     return {
       leftTop: new Vec2(
         Math.min(this.topLeft.x, this.bottomRight.x),
