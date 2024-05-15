@@ -23,11 +23,11 @@ import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import hsvCircleImage from "@/_public/images/utils/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { IPC } from "@/renderer/libs/ipc";
+import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const props = defineProps<{
@@ -36,8 +36,8 @@ const props = defineProps<{
 const vPixi = ref<InstanceType<typeof VPIXI>>();
 const amountFilterValue = ref(100);
 const size: PIXI.Size = {
-  width: 256,
-  height: 256,
+  width: 512,
+  height: 512,
 };
 const dotSize = 1;
 const radius = size.width / 2 - Math.sqrt(Math.pow(dotSize * 2 + 1, 2));
@@ -48,8 +48,6 @@ const resultNormalizedPixels = new Uint8Array(
   Array.from(Array(size.width * size.height * 4)).map(() => 0x00),
 );
 const resultAlphas = Array.from(Array(size.width * size.height)).map(() => 0);
-const backgroundRawSprite = new PIXI.Sprite();
-const backgroundNormalizedSprite = new PIXI.Sprite();
 const resultRawCanvas = document.createElement("canvas");
 resultRawCanvas.width = size.width;
 resultRawCanvas.height = size.height;
@@ -62,19 +60,20 @@ resultNormalizedCanvas.width = size.width;
 resultNormalizedCanvas.height = size.height;
 const resultNormalizedCtx = resultNormalizedCanvas.getContext("2d")!;
 const resultNormalizedSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultRawCanvas })),
+  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultNormalizedCanvas })),
 );
 const settings = useSettingsStore();
-backgroundRawSprite.alpha = 0.3;
-backgroundNormalizedSprite.alpha = 0.3;
-PIXI.Assets.load(hsvCircleImage).then((texture) => {
-  backgroundRawSprite.texture = backgroundNormalizedSprite.texture = texture;
-});
+const { HSV_CIRCLE } = useCommonTextureStore();
+const backgroundRawSprite = new PIXI.Sprite();
+const backgroundNormalizedSprite = new PIXI.Sprite();
 let generateGamutMapCancel = () => {
   //
 };
 onMounted(() => {
-  //
+  backgroundRawSprite.alpha = 0.3;
+  backgroundNormalizedSprite.alpha = 0.3;
+  backgroundRawSprite.texture = HSV_CIRCLE;
+  backgroundNormalizedSprite.texture = HSV_CIRCLE;
 });
 onUnmounted(() => {
   generateGamutMapCancel();
@@ -86,15 +85,14 @@ onUnmounted(() => {
 });
 function construct() {
   console.log("construct");
-  const app = vPixi.value?.app();
-  if (app) {
-    app.stage.addChild(
+  vPixi.value
+    ?.app()
+    ?.stage.addChild(
       backgroundRawSprite,
       backgroundNormalizedSprite,
       resultRawSprite,
       resultNormalizedSprite,
     );
-  }
 }
 function destruct() {
   //
