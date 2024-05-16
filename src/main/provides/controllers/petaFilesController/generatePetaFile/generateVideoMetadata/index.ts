@@ -81,11 +81,10 @@ export async function generateVideoMetadata(
             clearInterval(handler);
             rej("could not get size");
           }
-        }, 500);
+        }, 1000);
       },
     );
-    const height = (info.size.height / info.size.width) * BROWSER_THUMBNAIL_SIZE;
-    window.setSize(Math.floor(BROWSER_THUMBNAIL_SIZE), Math.floor(height));
+    window.setSize(Math.floor(info.size.width), Math.floor(info.size.height));
     const buffer = (await window.capturePage()).toPNG();
     const thumbnailsBuffer = await sharp(buffer, { limitInputPixels: false })
       .resize(BROWSER_THUMBNAIL_SIZE)
