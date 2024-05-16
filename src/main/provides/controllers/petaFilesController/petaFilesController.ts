@@ -16,7 +16,10 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
-import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
+import {
+  generatePetaFile,
+  regeneratePetaFile,
+} from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFiles } from "@/main/provides/databases";
@@ -25,7 +28,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
-import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { secureFile } from "@/main/utils/secureFile";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
@@ -201,19 +204,16 @@ export class PetaFilesController {
               result = ImportImageResult.EXISTS;
               petaFiles.push(exists);
             } else {
-              const directory = getPetaFileDirectoryPath.fromID(id);
               const petaFile = await generatePetaFile({
-                path: fileInfo.path,
-                dirOriginals: directory.original,
-                dirThumbnails: directory.thumbnail,
+                filePath: fileInfo.path,
                 extends: {
                   name: fileInfo.name ?? name,
                   fileDate: fileDate.getTime(),
                   note: fileInfo.note,
                   id,
-                  encrypted: true,
                 },
                 type: "add",
+                encrypt: true,
               });
               if (petaFile === undefined) {
                 throw new Error("unsupported file");
@@ -267,14 +267,7 @@ export class PetaFilesController {
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
-      const directory = getPetaFileDirectoryPath.fromPetaFile(petaFile);
-      const newPetaFile = await generatePetaFile({
-        path: getPetaFilePath.fromPetaFile(petaFile).original,
-        type: "update",
-        dirOriginals: directory.original,
-        dirThumbnails: directory.thumbnail,
-        extends: petaFile,
-      });
+      const newPetaFile = await regeneratePetaFile(petaFile);
       if (newPetaFile === undefined) {
         return;
       }
