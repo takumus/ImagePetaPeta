@@ -16,7 +16,7 @@ export class PTransformerDashedLine extends PIXI.Container {
     this.init();
   }
   async init() {
-    this.texture = new PIXI.TilingSprite(await PIXI.Texture.fromURL(Logo), 100, 100);
+    this.texture = new PIXI.TilingSprite(await PIXI.Assets.load(Logo), 100, 100);
     this.texture.mask = this.graphics;
     this.texture.anchor.set(0.5, 0.5);
     this.addChild(this.texture);
@@ -36,13 +36,16 @@ export class PTransformerDashedLine extends PIXI.Container {
   }
   update() {
     if (!this.texture) return;
-    // this.texture.tilePosition.x += 2 * this.renderScale * PIXI.Ticker.shared.maxFPS;
+    this.texture.tilePosition.x += 2 * this.renderScale * PIXI.Ticker.shared.maxFPS;
     this.texture.tileScale.set(0.5 * this.renderScale);
     if (!this.dirty) return;
     if (this.corners.length < 5) return;
     this.graphics.clear();
-    this.graphics.lineStyle(1, 0x00ff00, 1, undefined, true);
-    this.graphics.drawPolygon(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
+    this.graphics.poly(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
+    this.graphics.stroke({
+      width: 2,
+      color: 0x00ff00,
+    });
     this.corners
       .reduce((p, c) => p.clone().add(c), new Vec2())
       .div(this.corners.length)

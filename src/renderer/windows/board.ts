@@ -20,5 +20,4 @@ injectAnimatedGIFAsset();
 create(VWindow, "board", [
   keyStoreCreatorPair(petaFilesStoreKey, createPetaFilesStore),
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),
-  keyStoreCreatorPair(commonTextureStoreKey, createCommonTextureStore),
 ]);

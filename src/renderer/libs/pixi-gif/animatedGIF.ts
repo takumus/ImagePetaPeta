@@ -1,9 +1,13 @@
 /* eslint-disable */
-import { SCALE_MODES } from "@pixi/constants";
-import { Renderer, Texture } from "@pixi/core";
-import { settings } from "@pixi/settings";
-import { Sprite } from "@pixi/sprite";
-import { Ticker, UPDATE_PRIORITY } from "@pixi/ticker";
+// import { settings } from "pixi.js";
+import {
+  DEPRECATED_SCALE_MODES,
+  Renderer,
+  Sprite,
+  Texture,
+  Ticker,
+  UPDATE_PRIORITY,
+} from "pixi.js";
 
 export interface AnimatedGIFFrame {
   imageData: ImageData;
@@ -11,7 +15,7 @@ export interface AnimatedGIFFrame {
   end: number;
 }
 export interface AnimatedGIFOptions {
-  scaleMode: SCALE_MODES;
+  scaleMode: DEPRECATED_SCALE_MODES;
   loop: boolean;
   animationSpeed: number;
   autoUpdate: boolean;
@@ -22,7 +26,7 @@ export interface AnimatedGIFOptions {
 }
 export class AnimatedGIF extends Sprite {
   public static defaultOptions: AnimatedGIFOptions = {
-    scaleMode: SCALE_MODES.LINEAR,
+    scaleMode: DEPRECATED_SCALE_MODES.LINEAR,
     fps: Ticker.shared.FPS,
     loop: true,
     animationSpeed: 1,
@@ -52,7 +56,7 @@ export class AnimatedGIF extends Sprite {
     const context = canvas.getContext("2d");
     canvas.width = frames[0]!.imageData.width;
     canvas.height = frames[0]!.imageData.height;
-    this.texture = Texture.from(canvas as any, { scaleMode });
+    this.texture = Texture.from(canvas as any);
     this.duration = frames[frames.length - 1]!.end;
     this._frames = frames;
     this._context = context!;
@@ -62,6 +66,7 @@ export class AnimatedGIF extends Sprite {
     Object.assign(this, rest);
     this.currentFrame = 0;
     this.updateFrame(true);
+    this.onRender = () => this.updateFrame();
   }
   public stop(): void {
     if (!this._playing) {
@@ -69,7 +74,7 @@ export class AnimatedGIF extends Sprite {
     }
     this._playing = false;
     if (this._autoUpdate && this._isConnectedToTicker) {
-      Ticker.shared.remove(this.update);
+      Ticker.shared.remove(this.update, this);
       this._isConnectedToTicker = false;
     }
   }
@@ -79,7 +84,7 @@ export class AnimatedGIF extends Sprite {
     }
     this._playing = true;
     if (this._autoUpdate && !this._isConnectedToTicker) {
-      Ticker.shared.add(this.update);
+      Ticker.shared.add(this.update, this);
       this._isConnectedToTicker = true;
     }
     if (!this.loop && this.currentFrame === this._frames.length - 1) {
@@ -92,11 +97,12 @@ export class AnimatedGIF extends Sprite {
   public get playing(): boolean {
     return this._playing;
   }
-  update = (deltaTime: number) => {
+  update = (t: Ticker) => {
     if (!this._playing) {
       return;
     }
-    const elapsed = (this.animationSpeed * deltaTime) / settings.TARGET_FPMS!;
+    const deltaTime = t.deltaTime;
+    const elapsed = (this.animationSpeed * deltaTime) / Ticker.targetFPMS;
     const currentTime = this._currentTime + elapsed;
     const localTime = currentTime % this.duration;
     const localFrame = this._frames.findIndex(
@@ -127,20 +133,21 @@ export class AnimatedGIF extends Sprite {
       this._context.putImageData(imageData, 0, 0);
       this._context.fillStyle = "transparent";
       this._context.fillRect(0, 0, 0, 1);
+      this.texture.source.update();
     }
     this.texture.update();
     this.dirty = false;
   }
-  _render(renderer: Renderer): void {
-    this.updateFrame();
-    super._render(renderer);
-  }
-  _renderCanvas(renderer: any): void {
-    this.updateFrame();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    super._renderCanvas(renderer);
-  }
+  // _render(renderer: Renderer): void {
+  //   this.updateFrame();
+  //   super._render(renderer);
+  // }
+  // _renderCanvas(renderer: any): void {
+  //   this.updateFrame();
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  //   super._renderCanvas(renderer);
+  // }
   get autoUpdate(): boolean {
     return this._autoUpdate;
   }
@@ -148,10 +155,10 @@ export class AnimatedGIF extends Sprite {
     if (value !== this._autoUpdate) {
       this._autoUpdate = value;
       if (!this._autoUpdate && this._isConnectedToTicker) {
-        Ticker.shared.remove(this.update, this);
+        // Ticker.shared.remove(this.update, this);
         this._isConnectedToTicker = false;
       } else if (this._autoUpdate && !this._isConnectedToTicker && this._playing) {
-        Ticker.shared.add(this.update, this);
+        // Ticker.shared.add(this.update, this);
         this._isConnectedToTicker = true;
       }
     }
@@ -195,7 +202,7 @@ export class AnimatedGIF extends Sprite {
     return new AnimatedGIF([...this._frames], {
       autoUpdate: this._autoUpdate,
       loop: this.loop,
-      scaleMode: this.texture.baseTexture.scaleMode,
+      scaleMode: DEPRECATED_SCALE_MODES.LINEAR,
       animationSpeed: this.animationSpeed,
       onComplete: this.onComplete,
       onFrameChange: this.onFrameChange,

@@ -87,9 +87,12 @@ export class PTransformerControlPoint extends PIXI.Container {
   }
   setScale(scale: number) {
     this.size.clear();
-    this.size.lineStyle(1 * scale, 0x000000, 1, undefined, true);
-    this.size.beginFill(0xffffff);
-    this.size.drawRect(0, 0, 10 * scale, 10 * scale);
+    this.size.rect(0, 0, 10 * scale, 10 * scale);
+    this.size.stroke({
+      width: 2 * scale,
+      color: 0x000000,
+    });
+    this.size.fill(0xffffff);
     this.size.pivot.x = (10 * scale) / 2;
     this.size.pivot.y = (10 * scale) / 2;
 

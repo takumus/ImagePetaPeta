@@ -162,13 +162,13 @@ export class PPetaPanel extends PIXI.Sprite {
       }
       if (this.imageWrapper.mask) {
         this.masker.clear();
-        this.masker.beginFill(0xff0000);
-        this.masker.drawRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.masker.rect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.masker.fill(0xff0000);
       }
       this.selection.clear();
       if (this.unselected) {
-        this.selection.beginFill(0x000000, 0.5);
-        this.selection.drawRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.selection.rect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight);
+        this.selection.fill({ color: 0x000000, alpha: 0.5 });
       }
       if (this.nsfwTile) {
         this.nsfwTile.x = -panelWidth / 2;
@@ -234,9 +234,9 @@ export class PPetaPanel extends PIXI.Sprite {
   private absPanelHeight() {
     return Math.abs(this.petaPanel.height);
   }
-  public toLocal<P extends PIXI.IPointData = PIXI.Point>(
-    position: PIXI.IPointData,
-    from?: PIXI.DisplayObject | undefined,
+  public _toLocal<P extends PIXI.PointData = PIXI.Point>(
+    position: PIXI.PointData,
+    from?: PIXI.Container | undefined,
     point?: P | undefined,
     skipUpdate?: boolean | undefined,
   ): P {
@@ -250,8 +250,8 @@ export class PPetaPanel extends PIXI.Sprite {
     }
     return super.toLocal(position, from, point, skipUpdate);
   }
-  public toGlobal<P extends PIXI.IPointData = PIXI.Point>(
-    position: PIXI.IPointData,
+  public _toGlobal<P extends PIXI.PointData = PIXI.Point>(
+    position: PIXI.PointData,
     point?: P | undefined,
     skipUpdate?: boolean | undefined,
   ): P {

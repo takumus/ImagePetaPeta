@@ -14,6 +14,10 @@ import {
   createAppInfoStore,
 } from "@/renderer/stores/appInfoStore/createAppInfoStore";
 import {
+  commonTextureStoreKey,
+  createCommonTextureStore,
+} from "@/renderer/stores/commonTextureStore/createCommonTextureStore";
+import {
   componentsStoreKey,
   createComponentsStore,
 } from "@/renderer/stores/componentsStore/createComponentsStore";
@@ -84,6 +88,7 @@ export async function create(
       (async () => app.provide(textsStoreKey, await createTextsStore()))(),
       (async () => app.provide(componentsStoreKey, await createComponentsStore()))(),
       (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
+      (async () => app.provide(commonTextureStoreKey, await createCommonTextureStore()))(),
       ...(stores?.map(async (store) => app.provide(store.key, await store.creator())) || []),
     ]);
     ClickChecker.init();

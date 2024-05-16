@@ -23,11 +23,11 @@ import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
-import hsvCircleImage from "@/_public/images/utils/hsvCircle.png";
 import { generateGamutMap } from "@/renderer/components/commons/property/worker/generateGamutMap";
 import { generateGamutMapWorkerOutputData } from "@/renderer/components/commons/property/worker/generateGamutMapWorkerData";
 import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { IPC } from "@/renderer/libs/ipc";
+import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 
 const props = defineProps<{
@@ -35,9 +35,9 @@ const props = defineProps<{
 }>();
 const vPixi = ref<InstanceType<typeof VPIXI>>();
 const amountFilterValue = ref(100);
-const size: PIXI.ISize = {
-  width: 256,
-  height: 256,
+const size: PIXI.Size = {
+  width: 512,
+  height: 512,
 };
 const dotSize = 1;
 const radius = size.width / 2 - Math.sqrt(Math.pow(dotSize * 2 + 1, 2));
@@ -48,45 +48,51 @@ const resultNormalizedPixels = new Uint8Array(
   Array.from(Array(size.width * size.height * 4)).map(() => 0x00),
 );
 const resultAlphas = Array.from(Array(size.width * size.height)).map(() => 0);
-const backgroundRawSprite = new PIXI.Sprite();
-const backgroundNormalizedSprite = new PIXI.Sprite();
+const resultRawCanvas = document.createElement("canvas");
+resultRawCanvas.width = size.width;
+resultRawCanvas.height = size.height;
+const resultRawCtx = resultRawCanvas.getContext("2d")!;
 const resultRawSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultRawPixels, size))),
+  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultRawCanvas })),
 );
+const resultNormalizedCanvas = document.createElement("canvas");
+resultNormalizedCanvas.width = size.width;
+resultNormalizedCanvas.height = size.height;
+const resultNormalizedCtx = resultNormalizedCanvas.getContext("2d")!;
 const resultNormalizedSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.BaseTexture(new PIXI.BufferResource(resultNormalizedPixels, size))),
+  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultNormalizedCanvas })),
 );
 const settings = useSettingsStore();
-backgroundRawSprite.alpha = 0.3;
-backgroundNormalizedSprite.alpha = 0.3;
-PIXI.Texture.fromURL(hsvCircleImage).then((texture) => {
-  backgroundRawSprite.texture = backgroundNormalizedSprite.texture = texture;
-});
+const { HSV_CIRCLE } = useCommonTextureStore();
+const backgroundRawSprite = new PIXI.Sprite();
+const backgroundNormalizedSprite = new PIXI.Sprite();
 let generateGamutMapCancel = () => {
   //
 };
 onMounted(() => {
-  //
+  backgroundRawSprite.alpha = 0.3;
+  backgroundNormalizedSprite.alpha = 0.3;
+  backgroundRawSprite.texture = HSV_CIRCLE;
+  backgroundNormalizedSprite.texture = HSV_CIRCLE;
 });
 onUnmounted(() => {
   generateGamutMapCancel();
-  backgroundNormalizedSprite.destroy({ texture: true, baseTexture: true });
-  backgroundRawSprite.destroy({ texture: true, baseTexture: true });
-  resultNormalizedSprite.destroy({ texture: true, baseTexture: true });
-  resultRawSprite.destroy({ texture: true, baseTexture: true });
+  backgroundNormalizedSprite.destroy({ texture: true });
+  backgroundRawSprite.destroy({ texture: true });
+  resultNormalizedSprite.destroy({ texture: true });
+  resultRawSprite.destroy({ texture: true });
   console.log("destroy");
 });
 function construct() {
   console.log("construct");
-  const app = vPixi.value?.app();
-  if (app) {
-    app.stage.addChild(
+  vPixi.value
+    ?.app()
+    ?.stage.addChild(
       backgroundRawSprite,
       backgroundNormalizedSprite,
       resultRawSprite,
       resultNormalizedSprite,
     );
-  }
 }
 function destruct() {
   //
@@ -99,8 +105,18 @@ function animate() {
       0xff,
     );
   }
-  resultRawSprite.texture.baseTexture.update();
-  resultNormalizedSprite.texture.baseTexture.update();
+  resultRawCtx.putImageData(
+    new ImageData(new Uint8ClampedArray(resultRawPixels.buffer), size.width, size.height),
+    0,
+    0,
+  );
+  resultNormalizedCtx.putImageData(
+    new ImageData(new Uint8ClampedArray(resultNormalizedPixels.buffer), size.width, size.height),
+    0,
+    0,
+  );
+  resultRawSprite.texture.source.update();
+  resultNormalizedSprite.texture.source.update();
   console.timeEnd("render");
 }
 function loseContext() {
