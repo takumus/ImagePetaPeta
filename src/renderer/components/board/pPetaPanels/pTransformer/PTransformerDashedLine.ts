@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 
 import { Vec2 } from "@/commons/utils/vec2";
 
-import Logo from "@/_public/images/textures/dashedLine.png";
+import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
 
 export class PTransformerDashedLine extends PIXI.Container {
   texture?: PIXI.TilingSprite;
@@ -15,8 +15,8 @@ export class PTransformerDashedLine extends PIXI.Container {
     this.corners = Array.from({ length: 8 }, () => new Vec2()) as typeof this.corners;
     this.init();
   }
-  async init() {
-    this.texture = new PIXI.TilingSprite(await PIXI.Assets.load(Logo), 100, 100);
+  init() {
+    this.texture = new PIXI.TilingSprite(useCommonTextureStore().DASHED_LINE, 100, 100);
     this.texture.mask = this.graphics;
     this.texture.anchor.set(0.5, 0.5);
     this.addChild(this.texture);
