@@ -57,7 +57,7 @@ export interface IpcFunctions {
   windowClose: () => Promise<void>;
   windowActivate: () => Promise<void>;
   getPlatform: () => Promise<NodeJS.Platform>;
-  regenerateMetadatas: () => Promise<void>;
+  regeneratePetaFiles: () => Promise<void>;
   browsePetaFileDirectory: () => Promise<string | undefined>;
   changePetaFileDirectory: (path: string) => Promise<boolean>;
   realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<string[]>;

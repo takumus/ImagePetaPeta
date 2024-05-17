@@ -499,13 +499,13 @@ export const ipcFunctions: IpcFunctionsType = {
     log.debug("return:", process.platform);
     return process.platform;
   },
-  async regenerateMetadatas() {
+  async regeneratePetaFiles() {
     const logger = useLogger();
     const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     try {
       log.debug("#Regenerate Thumbnails");
-      await petaFilesController.regenerateMetadatas();
+      await petaFilesController.regeneratePetaFiles();
       return;
     } catch (err) {
       log.error(err);

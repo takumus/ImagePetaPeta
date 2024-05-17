@@ -1,12 +1,12 @@
 <template>
   <e-settings-content-root>
-    <button v-show="regenerateMetadatasCompleted" @click="regenerateMetadatas">
-      {{ t("settings.regenerateMetadatasButton") }}
+    <button v-show="regeneratePetaFilesCompleted" @click="regeneratePetaFiles">
+      {{ t("settings.regeneratePetaFilesButton") }}
     </button>
-    <label v-show="!regenerateMetadatasCompleted">
-      {{ regenerateMetadatasDone }}/{{ regenerateMetadatasCount }}
+    <label v-show="!regeneratePetaFilesCompleted">
+      {{ regeneratePetaFilesDone }}/{{ regeneratePetaFilesCount }}
     </label>
-    <p>{{ t("settings.regenerateMetadatasDescriptions") }}</p>
+    <p>{{ t("settings.regeneratePetaFilesDescriptions") }}</p>
     <label>
       <VCheckbox v-model:value="settingsStore.state.value.loadTilesInOriginal" />
       {{ t("settings.loadTilesInOriginal") }}
@@ -31,24 +31,24 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsSto
 
 const settingsStore = useSettingsStore();
 const { t } = useI18n();
-const regenerateMetadatasCompleted = ref(true);
-const regenerateMetadatasDone = ref(0);
-const regenerateMetadatasCount = ref(0);
+const regeneratePetaFilesCompleted = ref(true);
+const regeneratePetaFilesDone = ref(0);
+const regeneratePetaFilesCount = ref(0);
 onMounted(() => {
-  IPC.on("regenerateMetadatasProgress", (_, done, count) => {
-    regenerateMetadatasDone.value = done;
-    regenerateMetadatasCount.value = count;
-    regenerateMetadatasCompleted.value = false;
+  IPC.on("regeneratePetaFilesProgress", (_, done, count) => {
+    regeneratePetaFilesDone.value = done;
+    regeneratePetaFilesCount.value = count;
+    regeneratePetaFilesCompleted.value = false;
   });
-  IPC.on("regenerateMetadatasBegin", () => {
-    regenerateMetadatasCompleted.value = false;
+  IPC.on("regeneratePetaFilesBegin", () => {
+    regeneratePetaFilesCompleted.value = false;
   });
-  IPC.on("regenerateMetadatasComplete", () => {
-    regenerateMetadatasCompleted.value = true;
+  IPC.on("regeneratePetaFilesComplete", () => {
+    regeneratePetaFilesCompleted.value = true;
   });
 });
-function regenerateMetadatas() {
-  IPC.regenerateMetadatas();
+function regeneratePetaFiles() {
+  IPC.regeneratePetaFiles();
 }
 </script>
 

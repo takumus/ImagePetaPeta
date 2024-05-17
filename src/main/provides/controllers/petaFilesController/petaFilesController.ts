@@ -259,11 +259,11 @@ export class PetaFilesController {
       silent,
     );
   }
-  async regenerateMetadatas() {
+  async regeneratePetaFiles() {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasBegin");
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regeneratePetaFilesBegin");
     const petaFiles = Object.values(await this.getAll());
     let completed = 0;
     const generate = async (petaFile: PetaFile) => {
@@ -275,13 +275,13 @@ export class PetaFilesController {
       log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
       windows.emitMainEvent(
         { type: EmitMainEventTargetType.ALL },
-        "regenerateMetadatasProgress",
+        "regeneratePetaFilesProgress",
         completed,
         petaFiles.length,
       );
     };
     await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regenerateMetadatasComplete");
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regeneratePetaFilesComplete");
   }
   async verifyFiles() {
     const petaFiles = Object.values(await this.getAll());

@@ -190,9 +190,9 @@ export const ja: I18NBase = {
     zoomSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
     moveSensitivity: "移動感度(Macのみ)",
     moveSensitivityDescriptions: "-100のように、頭にマイナスを付けると反転できます。",
-    regenerateMetadatasButton: "メタデータ再生成",
-    regenerateMetadatasConfirm: "サムネイルの再生成には時間がかかりますが、よろしいですか?",
-    regenerateMetadatasDescriptions:
+    regeneratePetaFilesButton: "メタデータ再生成",
+    regeneratePetaFilesConfirm: "サムネイルの再生成には時間がかかりますが、よろしいですか?",
+    regeneratePetaFilesDescriptions:
       "サムネイルやメタデータを再生成します。バージョンアップなどで仕様が変わった時に再生成する必要があります。",
     loadTilesInOriginal: "ブラウザをズーム時にフルサイズの画像を読み込む。(高スペックPC向け)",
     loadTilesInOriginalDescriptions:

@@ -17,9 +17,9 @@ export interface IpcEvents {
   foundLatestVersion: (remote: RemoteBinaryInfo) => void;
   windowFocused: (focused: boolean, windowName: WindowName) => void;
   mainWindowName: (type: WindowName | undefined) => void;
-  regenerateMetadatasProgress: (done: number, count: number) => void;
-  regenerateMetadatasBegin: () => void;
-  regenerateMetadatasComplete: () => void;
+  regeneratePetaFilesProgress: (done: number, count: number) => void;
+  regeneratePetaFilesBegin: () => void;
+  regeneratePetaFilesComplete: () => void;
   updateSettings: (settings: Settings) => void;
   updateStates: (states: States) => void;
   showNSFW: (value: boolean) => void;
