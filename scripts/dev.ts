@@ -9,18 +9,20 @@ process.stdin.on("keypress", async function (_ch, key) {
     await Promise.all(
       childProcesses.map(
         (cp) =>
-          new Promise<void>((res) => {
-            if (cp.pid) {
-              kill(cp.pid, (e) => {
-                console.log("tree-kill", cp.pid);
-                if (e) {
-                  console.error(e);
-                }
-                res();
-              });
-            } else {
-              res();
+          new Promise<void>((res, rej) => {
+            if (cp.pid === undefined) {
+              rej("pid is undefined");
+              return;
             }
+            kill(cp.pid, (e) => {
+              console.log("tree-kill", cp.pid);
+              if (e) {
+                console.error(e);
+                rej(e);
+                return;
+              }
+              res();
+            });
           }),
       ),
     );
