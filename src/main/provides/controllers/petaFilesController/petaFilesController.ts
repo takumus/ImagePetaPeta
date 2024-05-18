@@ -369,6 +369,24 @@ export class PetaFilesController {
     ).promise;
     console.log("complete");
   }
+  async removeTrashs() {
+    const files = (
+      await Promise.all([
+        file.readDirRecursive(usePaths().DIR_IMAGES).files,
+        file.readDirRecursive(usePaths().DIR_THUMBNAILS).files,
+      ])
+    ).reduce((p, c) => [...p, ...c], []);
+    await ppa(async (path) => {
+      const id = /([^\.]*)/.exec(Path.basename(path))?.[0];
+      const dir1 = Path.basename(Path.dirname(Path.dirname(path)));
+      const dir2 = Path.basename(Path.dirname(path));
+      if (id !== undefined && id.startsWith(dir1 + dir2)) {
+        if ((await this.getPetaFile(id)) === undefined) {
+          console.log("remove");
+        }
+      }
+    }, files).promise;
+  }
 }
 export const petaFilesControllerKey = createKey<PetaFilesController>("petaFilesController");
 export const usePetaFilesController = createUseFunction(petaFilesControllerKey);
