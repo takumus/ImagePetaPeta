@@ -1,14 +1,18 @@
 import { mkdirSync, readFileSync, rmdirSync } from "fs";
+import { rm } from "fs/promises";
 import { resolve } from "path";
 import { initDummyElectron } from "./initDummyElectron";
+import deepcopy from "deepcopy";
 import { fileTypeFromFile } from "file-type";
 import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
+import { ppa } from "@/commons/utils/pp";
 
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
+import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 
@@ -97,6 +101,29 @@ describe("petaFilesController", () => {
     Object.values(await pfc.getAll()).forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });
+    await useDBS().waitUntilKillable();
+  });
+  test("regenerateMetadatas", async () => {
+    const pfc = usePetaFilesController();
+    await pfc.importFilesFromFileInfos({
+      fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
+      extract: true,
+    });
+    const petaFiles = Object.values(await pfc.getAll());
+    expect(petaFiles.length, "petaFiles.length").toBe(8);
+    const prevThumbHashs = await ppa(
+      async (pf) => fileSHA256(getPetaFilePath.fromPetaFile(pf).thumbnail),
+      petaFiles,
+    ).promise;
+    const prevPFs = deepcopy(petaFiles);
+    await ppa(async (pf) => rm(getPetaFilePath.fromPetaFile(pf).thumbnail), petaFiles).promise;
+    await pfc.regeneratePetaFiles();
+    const newThumbHashs = await ppa(
+      async (pf) => fileSHA256(getPetaFilePath.fromPetaFile(pf).thumbnail),
+      petaFiles,
+    ).promise;
+    expect(prevThumbHashs).toEqual(newThumbHashs);
+    expect(prevPFs).toEqual(Object.values(await pfc.getAll()));
     await useDBS().waitUntilKillable();
   });
   // test("realESRGAN", async () => {
