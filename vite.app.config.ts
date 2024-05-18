@@ -7,7 +7,6 @@ import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
-import { debounce } from "throttle-debounce";
 import { defineConfig, mergeConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 
@@ -60,17 +59,8 @@ async function createElectronPlugin(isBuild: boolean) {
   const mainFile = resolve("./src/main/index.ts");
   const preloadFile = resolve("./src/main/preload.ts");
   console.log("WorkerThreadsFiles:", wtFiles);
-  // const esmodules = (() => {
-  //   let packages: string[] = [];
-  //   const plugin = esmodule((esms) => {
-  //     packages = esms.filter((esm) => !(esm in pkg.devDependencies));
-  //     return packages;
-  //   });
-  //   return { plugin, packages };
-  // })();
   const baseOptions: ElectronOptions = {
     vite: {
-      // plugins: [esmodules.plugin],
       optimizeDeps: {
         exclude: ["sharp"],
       },
@@ -88,25 +78,9 @@ async function createElectronPlugin(isBuild: boolean) {
     },
   };
   const options: ElectronOptions[] = [];
-  const restartDebounce = debounce(500, (f: () => void) => f());
-  const tryRestart = (() => {
-    let firstRestartCount = 0;
-    return function tryRestart(name: string, restart: () => void) {
-      restartDebounce(restart);
-      // if (++firstRestartCount >= options.length) {
-      //   console.log(`START[OK]: ${name}`);
-      //   restartDebounce(restart);
-      // } else {
-      //   console.log(`START[SKIP]: ${name}`);
-      // }
-    };
-  })();
   options.push(
     ...wtFiles.map<ElectronOptions>((file) =>
       mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
-        onstart(options) {
-          tryRestart(file, options.startup);
-        },
         vite: {
           build: {
             lib: {
@@ -121,9 +95,6 @@ async function createElectronPlugin(isBuild: boolean) {
   );
   options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
-      onstart(options) {
-        tryRestart(mainFile, options.startup);
-      },
       vite: {
         plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
         build: {
@@ -138,10 +109,6 @@ async function createElectronPlugin(isBuild: boolean) {
   );
   options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
-      onstart(options) {
-        // 最初のリロードはなぜかstartが呼ばれる仕様。
-        tryRestart(preloadFile, options.reload);
-      },
       vite: {
         build: {
           sourcemap: !isBuild ? "inline" : undefined, // #332
