@@ -702,6 +702,7 @@ e-browser-root {
         display: block;
         position: relative;
         flex: 1;
+        will-change: scroll-position;
         width: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
