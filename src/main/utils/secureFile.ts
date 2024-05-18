@@ -1,9 +1,13 @@
 import { createCipheriv, createDecipheriv, createHash } from "crypto";
 import { createReadStream, createWriteStream } from "fs";
-import { PassThrough, pipeline, Readable } from "stream";
+import { PassThrough, pipeline, Readable, Transform } from "stream";
 
+import { PetaFile } from "@/commons/datas/petaFile";
+
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { bufferToStream } from "@/main/utils/bufferToStream";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
+import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
 type Mode = "encrypt" | "decrypt";
 type ReadStreamOptions = { startBlock?: number; endBlock?: number };
@@ -116,7 +120,35 @@ export const secureFile = ((iv: Buffer) => {
 export function passwordToKey(value: string) {
   return createHash("sha256").update(value).digest("base64").substring(0, 32);
 }
-
+export function getStreamFromPetaFile(
+  petaFile: PetaFile,
+  type: "original" | "thumbnail",
+  options?: { start: number; end: number },
+) {
+  const path = getPetaFilePath.fromPetaFile(petaFile)[type];
+  if (petaFile.encrypted) {
+    const sfp = useConfigSecureFilePassword();
+    if (options) {
+      const contentLength = options.end - options.start;
+      const [startAESBlock, endAESBlock] = [
+        Math.floor(options.start / 16),
+        Math.ceil(options.end / 16) + 1,
+      ];
+      const [startAESByte, _endAESByte] = [startAESBlock * 16, endAESBlock * 16];
+      const startByteOffset = options.start - startAESByte;
+      return secureFile.decrypt
+        .toStream(path, sfp.getValue(), {
+          startBlock: startAESBlock,
+          endBlock: endAESBlock,
+        })
+        .pipe(createCroppedStream(startByteOffset, contentLength + startByteOffset));
+    } else {
+      return secureFile.decrypt.toStream(path, sfp.getValue());
+    }
+  } else {
+    return createReadStream(path, options);
+  }
+}
 function getInputStream(
   input: string | Uint8Array | Readable,
   range?: { start?: number; end?: number },
@@ -126,4 +158,20 @@ function getInputStream(
     : input instanceof Buffer || input instanceof Uint8Array
       ? bufferToStream(input)
       : input;
+}
+function createCroppedStream(start: number, end: number) {
+  let currentIndex = 0;
+  const _end = end + 1;
+  return new Transform({
+    transform(chunk, _encoding, callback) {
+      if (currentIndex < _end) {
+        const startOffset = Math.max(start - currentIndex, 0);
+        const endOffset = Math.min(chunk.length, _end - currentIndex);
+        const relevantData = chunk.slice(startOffset, endOffset);
+        currentIndex += chunk.length;
+        this.push(relevantData);
+      }
+      callback();
+    },
+  });
 }

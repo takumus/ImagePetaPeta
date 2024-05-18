@@ -1,4 +1,3 @@
-import { createReadStream } from "fs";
 import { rename, rm, stat } from "fs/promises";
 import * as Path from "path";
 import { fileTypeFromStream } from "file-type";
@@ -29,7 +28,7 @@ import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { secureFile } from "@/main/utils/secureFile";
+import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
@@ -315,11 +314,7 @@ export class PetaFilesController {
         const paths = getPetaFilePath.fromPetaFile(petaFile);
         const statOrg = await stat(paths.original);
         const statThumb = await stat(paths.original);
-        const type = await fileTypeFromStream(
-          petaFile.encrypted
-            ? secureFile.decrypt.toStream(paths.original, useConfigSecureFilePassword().getValue())
-            : createReadStream(paths.original),
-        );
+        const type = await fileTypeFromStream(getStreamFromPetaFile(petaFile, "original"));
         if (type?.mime !== petaFile.metadata.mimeType) {
           errorIDs.push(petaFile.id);
         }

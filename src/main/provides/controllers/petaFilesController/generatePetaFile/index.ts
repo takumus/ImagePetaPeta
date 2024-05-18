@@ -12,7 +12,7 @@ import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaF
 import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { secureFile } from "@/main/utils/secureFile";
+import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 import { getFileURL } from "@/renderer/utils/fileURL";
@@ -115,9 +115,7 @@ export async function generateMetadata(
     const petaFile = source;
     const path = getPetaFilePath.fromPetaFile(petaFile).original;
     function getStream() {
-      return petaFile.encrypted
-        ? secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue())
-        : createReadStream(path);
+      return getStreamFromPetaFile(petaFile, "original");
     }
     const fileType = await fileTypeFromStream(getStream());
     const logger = useLogger().logMainChunk();

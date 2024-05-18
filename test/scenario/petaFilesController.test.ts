@@ -1,22 +1,20 @@
-import { createReadStream, mkdirSync, readFileSync, rmdirSync } from "fs";
+import { mkdirSync, readFileSync, rmdirSync } from "fs";
 import { rm } from "fs/promises";
 import { resolve } from "path";
 import { initDummyElectron } from "./initDummyElectron";
 import deepcopy from "deepcopy";
-import { fileTypeFromFile, fileTypeFromStream } from "file-type";
+import { fileTypeFromStream } from "file-type";
 import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
-import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { realESRGAN } from "@/main/utils/realESRGAN";
-import { secureFile } from "@/main/utils/secureFile";
+import { getStreamFromPetaFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 const ROOT = "./_test/scenario/petaFilesController";
@@ -78,9 +76,7 @@ describe("petaFilesController", () => {
     expect(filePaths.original.endsWith(".png")).toBeTruthy();
     expect(petaFile.metadata.mimeType).toBe("image/png");
     function stream() {
-      return petaFile.encrypted
-        ? secureFile.decrypt.toStream(filePaths.original, useConfigSecureFilePassword().getValue())
-        : createReadStream(filePaths.original);
+      return getStreamFromPetaFile(petaFile, "original");
     }
     expect((await fileTypeFromStream(stream()))?.mime).toBe("image/png");
     expect(await sharp(await streamToBuffer(stream())).metadata()).toMatchObject({
