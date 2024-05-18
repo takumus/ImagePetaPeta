@@ -12,7 +12,7 @@ import {
 import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generatePalette";
 
 export async function generateVideoMetadata(
-  path: string,
+  source: { path: string } | { url: string },
   fileType: FileTypeResult,
 ): Promise<GeneratedFileInfo> {
   if (fileType.mime === "video/quicktime") {
@@ -21,11 +21,12 @@ export async function generateVideoMetadata(
   const debug = false;
   const window = new BrowserWindow({
     show: debug,
-    frame: debug,
+    frame: false,
     titleBarStyle: "hiddenInset",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      backgroundThrottling: false,
       offscreen: !debug,
     },
   });
@@ -34,16 +35,23 @@ export async function generateVideoMetadata(
     await window.loadURL(url);
     window.webContents.debugger.attach("1.1");
     const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
-    // インプット取得
-    const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
-      nodeId: document.root.nodeId,
-      selector: "input",
-    });
-    // ファイル選択
-    await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
-      nodeId: input.nodeId,
-      files: [path],
-    });
+    if ("path" in source) {
+      // インプット取得
+      const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
+        nodeId: document.root.nodeId,
+        selector: "input",
+      });
+      // ファイル選択
+      await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
+        nodeId: input.nodeId,
+        files: [source.path],
+      });
+    } else {
+      await window.webContents.executeJavaScript(`
+        var videoElement = document.querySelector('video');
+        videoElement.src = "${source.url}"
+      `);
+    }
     const info = await new Promise<{ size: { width: number; height: number }; duration: number }>(
       (res, rej) => {
         let result = { size: { width: 0, height: 0 }, duration: 0 };

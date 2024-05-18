@@ -1,7 +1,9 @@
+import { createReadStream } from "fs";
 import { copyFile, readFile, rename, rm, writeFile } from "fs/promises";
-import { fileTypeFromFile } from "file-type";
+import { fileTypeFromFile, fileTypeFromStream } from "file-type";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
+import { FileType } from "@/commons/datas/fileType";
 import { PetaFile } from "@/commons/datas/petaFile";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
@@ -11,7 +13,9 @@ import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesCont
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { secureFile } from "@/main/utils/secureFile";
+import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
+import { getFileURL } from "@/renderer/utils/fileURL";
 
 export async function regeneratePetaFile(petaFile: PetaFile) {
   return await generatePetaFile({
@@ -30,7 +34,9 @@ export async function generatePetaFile(param: {
   const logger = useLogger().logMainChunk();
   const sfp = useConfigSecureFilePassword();
   logger.debug("#Generate PetaFile");
-  const fileInfo = await generateMetadata(param.filePath);
+  const fileInfo = await generateMetadata(
+    param.type === "update" ? (param.extends as PetaFile) : param.filePath,
+  );
   if (fileInfo === undefined) {
     throw new Error("unsupported file");
   }
@@ -87,19 +93,45 @@ export async function generatePetaFile(param: {
       return petaFile;
   }
 }
-export async function generateMetadata(path: string): Promise<GeneratedFileInfo | undefined> {
-  const fileType = await fileTypeFromFile(path);
-  const logger = useLogger().logMainChunk();
-  logger.debug("#Generate Metadata", fileType?.mime);
-  if (fileType !== undefined) {
-    if (supportedFileConditions.image(fileType)) {
-      return generateImageMetadataByWorker({
-        buffer: await readFile(path),
-        fileType: fileType,
-      });
+export async function generateMetadata(
+  source: string | PetaFile,
+): Promise<GeneratedFileInfo | undefined> {
+  if (typeof source === "string") {
+    const fileType = await fileTypeFromFile(source);
+    const logger = useLogger().logMainChunk();
+    logger.debug("#Generate Metadata", fileType?.mime);
+    if (fileType !== undefined) {
+      if (supportedFileConditions.image(fileType)) {
+        return generateImageMetadataByWorker({
+          buffer: await readFile(source),
+          fileType: fileType,
+        });
+      }
+      if (supportedFileConditions.video(fileType)) {
+        return generateVideoMetadata({ path: source }, fileType);
+      }
     }
-    if (supportedFileConditions.video(fileType)) {
-      return generateVideoMetadata(path, fileType);
+  } else {
+    const petaFile = source;
+    const path = getPetaFilePath.fromPetaFile(petaFile).original;
+    function getStream() {
+      return petaFile.encrypted
+        ? secureFile.decrypt.toStream(path, useConfigSecureFilePassword().getValue())
+        : createReadStream(path);
+    }
+    const fileType = await fileTypeFromStream(getStream());
+    const logger = useLogger().logMainChunk();
+    logger.debug("#Generate Metadata", fileType?.mime);
+    if (fileType !== undefined) {
+      if (supportedFileConditions.image(fileType)) {
+        return generateImageMetadataByWorker({
+          buffer: await streamToBuffer(getStream()),
+          fileType: fileType,
+        });
+      }
+      if (supportedFileConditions.video(fileType)) {
+        return generateVideoMetadata({ url: getFileURL(petaFile, FileType.ORIGINAL) }, fileType);
+      }
     }
   }
   return undefined;
