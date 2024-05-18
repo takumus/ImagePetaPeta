@@ -132,7 +132,7 @@ async function _readDirRecursive(
           continue;
         }
         const cPath = Path.resolve(path, fileName);
-        const isDirectory = fs.statSync(cPath).isDirectory();
+        const isDirectory = (await fsp.stat(cPath)).isDirectory();
         if (isDirectory) {
           _files.push(...(await _readDirRecursive(cPath, onFile, canceled)));
         } else {
