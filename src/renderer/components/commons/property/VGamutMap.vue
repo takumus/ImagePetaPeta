@@ -48,19 +48,12 @@ const resultNormalizedPixels = new Uint8Array(
   Array.from(Array(size.width * size.height * 4)).map(() => 0x00),
 );
 const resultAlphas = Array.from(Array(size.width * size.height)).map(() => 0);
-const resultRawCanvas = document.createElement("canvas");
-resultRawCanvas.width = size.width;
-resultRawCanvas.height = size.height;
-const resultRawCtx = resultRawCanvas.getContext("2d")!;
+
 const resultRawSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultRawCanvas })),
+  new PIXI.Texture(new PIXI.BufferImageSource({ resource: resultRawPixels, ...size })),
 );
-const resultNormalizedCanvas = document.createElement("canvas");
-resultNormalizedCanvas.width = size.width;
-resultNormalizedCanvas.height = size.height;
-const resultNormalizedCtx = resultNormalizedCanvas.getContext("2d")!;
 const resultNormalizedSprite = new PIXI.Sprite(
-  new PIXI.Texture(new PIXI.CanvasSource({ resource: resultNormalizedCanvas })),
+  new PIXI.Texture(new PIXI.BufferImageSource({ resource: resultNormalizedPixels, ...size })),
 );
 const settings = useSettingsStore();
 const { HSV_CIRCLE } = useCommonTextureStore();
@@ -105,16 +98,6 @@ function animate() {
       0xff,
     );
   }
-  resultRawCtx.putImageData(
-    new ImageData(new Uint8ClampedArray(resultRawPixels.buffer), size.width, size.height),
-    0,
-    0,
-  );
-  resultNormalizedCtx.putImageData(
-    new ImageData(new Uint8ClampedArray(resultNormalizedPixels.buffer), size.width, size.height),
-    0,
-    0,
-  );
   resultRawSprite.texture.source.update();
   resultNormalizedSprite.texture.source.update();
   console.timeEnd("render");
