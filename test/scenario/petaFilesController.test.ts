@@ -1,20 +1,23 @@
-import { mkdirSync, readFileSync, rmdirSync } from "fs";
+import { createReadStream, mkdirSync, readFileSync, rmdirSync } from "fs";
 import { rm } from "fs/promises";
 import { resolve } from "path";
 import { initDummyElectron } from "./initDummyElectron";
 import deepcopy from "deepcopy";
-import { fileTypeFromFile } from "file-type";
+import { fileTypeFromFile, fileTypeFromStream } from "file-type";
 import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { realESRGAN } from "@/main/utils/realESRGAN";
+import { secureFile } from "@/main/utils/secureFile";
+import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 const ROOT = "./_test/scenario/petaFilesController";
 describe("petaFilesController", () => {
@@ -58,30 +61,35 @@ describe("petaFilesController", () => {
     expect(petaFiles.length, "petaFiles.length").toBe(8);
     await useDBS().waitUntilKillable();
   });
-  // test("importRotatedFile", async () => {
-  //   const rotatedFile = resolve("./test/sampleDatas/lizard-rotated.jpg");
-  //   expect(await sharp(rotatedFile).metadata()).toMatchObject({
-  //     width: 853,
-  //     height: 1280,
-  //     format: "jpeg",
-  //   });
-  //   const pfc = usePetaFilesController();
-  //   const petaFile = (
-  //     await pfc.importFilesFromFileInfos({
-  //       fileInfos: [{ name: "rotated", note: "", path: rotatedFile }],
-  //     })
-  //   )[0];
-  //   const filePaths = getPetaFilePath.fromPetaFile(petaFile);
-  //   expect(filePaths.original.endsWith(".png")).toBeTruthy();
-  //   expect(petaFile.metadata.mimeType).toBe("image/png");
-  //   expect((await fileTypeFromFile(filePaths.original))?.mime).toBe("image/png");
-  //   expect(await sharp(filePaths.original).metadata()).toMatchObject({
-  //     width: 1280,
-  //     height: 853,
-  //     format: "png",
-  //   });
-  //   await useDBS().waitUntilKillable();
-  // });
+  test("importRotatedFile", async () => {
+    const rotatedFile = resolve("./test/sampleDatas/lizard-rotated.jpg");
+    expect(await sharp(rotatedFile).metadata()).toMatchObject({
+      width: 853,
+      height: 1280,
+      format: "jpeg",
+    });
+    const pfc = usePetaFilesController();
+    const petaFile = (
+      await pfc.importFilesFromFileInfos({
+        fileInfos: [{ name: "rotated", note: "", path: rotatedFile }],
+      })
+    )[0];
+    const filePaths = getPetaFilePath.fromPetaFile(petaFile);
+    expect(filePaths.original.endsWith(".png")).toBeTruthy();
+    expect(petaFile.metadata.mimeType).toBe("image/png");
+    function stream() {
+      return petaFile.encrypted
+        ? secureFile.decrypt.toStream(filePaths.original, useConfigSecureFilePassword().getValue())
+        : createReadStream(filePaths.original);
+    }
+    expect((await fileTypeFromStream(stream()))?.mime).toBe("image/png");
+    expect(await sharp(await streamToBuffer(stream())).metadata()).toMatchObject({
+      width: 1280,
+      height: 853,
+      format: "png",
+    });
+    await useDBS().waitUntilKillable();
+  });
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
     const petaFiles = await pfc.importFilesFromFileInfos({
