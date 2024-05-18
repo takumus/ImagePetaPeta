@@ -1,38 +1,36 @@
-import { ChildProcess, exec } from "child_process";
+import { exec } from "child_process";
 import keypress from "keypress";
 import kill from "tree-kill";
 
 keypress(process.stdin);
 process.stdin.setRawMode(true);
-process.stdin.on("keypress", async function (ch, key) {
-  if (key && key.ctrl && key.name == "c") {
-    console.log("ctrl-c");
+process.stdin.on("keypress", async function (_ch, key) {
+  if (key?.ctrl && key?.name === "c") {
     await Promise.all(
-      cps.map((cp) => {
-        new Promise<void>((res) => {
-          if (cp.pid) {
-            kill(cp.pid, (e) => {
-              if (e) {
-                console.error(e);
-              }
+      childProcesses.map(
+        (cp) =>
+          new Promise<void>((res) => {
+            if (cp.pid) {
+              kill(cp.pid, (e) => {
+                console.log("tree-kill", cp.pid);
+                if (e) {
+                  console.error(e);
+                }
+                res();
+              });
+            } else {
               res();
-            });
-          } else {
-            res();
-          }
-        });
-      }),
+            }
+          }),
+      ),
     );
-    setTimeout(() => {
-      process.exit(0);
-    }, 1000);
+    process.exit(0);
   }
 });
-const cps: ChildProcess[] = [];
-cps.push(spawn(["dev:app"]), spawn(["dev:app-web"]));
-cps.forEach((cp) => {
+const childProcesses = [
+  exec(["npm", "run", "dev:app"].join(" ")),
+  exec(["npm", "run", "dev:app-web"].join(" ")),
+];
+childProcesses.forEach((cp) => {
   cp.stdout?.pipe(process.stdout);
 });
-function spawn(args: any[]) {
-  return exec(["npm", "run", ...args].join(" "));
-}
