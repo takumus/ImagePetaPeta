@@ -273,7 +273,7 @@ export function initBoardLoader(
     orderPIXIRender();
     updatePetaBoard();
   }
-  function getPPetaPanelFromObject(object: PIXI.Sprite | PIXI.FederatedEventTarget) {
+  function getPPetaPanelFromObject(object: PIXI.Container) {
     if (!(object instanceof PPetaPanel)) {
       return undefined;
     }
