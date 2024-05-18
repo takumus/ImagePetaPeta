@@ -305,18 +305,25 @@ export class PetaFilesController {
     if (brokenPetaTag === undefined) {
       return;
     }
-    console.log(brokenPetaTag);
     (await usePetaTagsController().getPetaTags()).find((p) => p.name === "broken");
     const errorIDs: string[] = [];
     let count = 0;
     const verify = async (petaFile: PetaFile) => {
       try {
         const paths = getPetaFilePath.fromPetaFile(petaFile);
-        const statOrg = await stat(paths.original);
-        const statThumb = await stat(paths.original);
-        const type = await fileTypeFromStream(getStreamFromPetaFile(petaFile, "original"));
-        if (type?.mime !== petaFile.metadata.mimeType) {
-          errorIDs.push(petaFile.id);
+        await stat(paths.original);
+        await stat(paths.thumbnail);
+        if (
+          (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "original")))?.mime !==
+          petaFile.metadata.mimeType
+        ) {
+          throw "original is broken";
+        }
+        if (
+          (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "thumbnail")))?.mime !==
+          "image/webp"
+        ) {
+          throw "thumb is broken";
         }
       } catch (err) {
         errorIDs.push(petaFile.id);
