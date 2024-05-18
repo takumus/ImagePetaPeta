@@ -8,7 +8,7 @@ import { ciede } from "@/commons/utils/colors";
 import { ppa } from "@/commons/utils/pp";
 
 import { provide } from "@/main/libs/di";
-import { generateMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
+import { generateFileInfo } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 
 const ROOT = "./_test/unit/metadata";
@@ -41,7 +41,7 @@ describe("metadata", () => {
     await ppa(async (file) => {
       try {
         console.time(file);
-        const metadata = await generateMetadata(file);
+        const metadata = await generateFileInfo(file);
         if (metadata !== undefined) {
           palettes.push({
             palette: metadata.metadata.palette,

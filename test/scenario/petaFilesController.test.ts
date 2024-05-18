@@ -107,7 +107,7 @@ describe("petaFilesController", () => {
     });
     await useDBS().waitUntilKillable();
   });
-  test("regenerateMetadatas", async () => {
+  test("regenerateFileInfos", async () => {
     const pfc = usePetaFilesController();
     await pfc.importFilesFromFileInfos({
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],

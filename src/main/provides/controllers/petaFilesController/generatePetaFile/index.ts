@@ -8,8 +8,8 @@ import { PetaFile } from "@/commons/datas/petaFile";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
-import { generateImageMetadataByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata";
-import { generateVideoMetadata } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoMetadata";
+import { generateImageFileInfoByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo";
+import { generateVideoFileInfo } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoFileInfo";
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
@@ -34,7 +34,7 @@ export async function generatePetaFile(param: {
   const logger = useLogger().logMainChunk();
   const sfp = useConfigSecureFilePassword();
   logger.debug("#Generate PetaFile");
-  const fileInfo = await generateMetadata(
+  const fileInfo = await generateFileInfo(
     param.type === "update" ? (param.extends as PetaFile) : param.filePath,
   );
   if (fileInfo === undefined) {
@@ -93,22 +93,22 @@ export async function generatePetaFile(param: {
       return petaFile;
   }
 }
-export async function generateMetadata(
+export async function generateFileInfo(
   source: string | PetaFile,
 ): Promise<GeneratedFileInfo | undefined> {
   if (typeof source === "string") {
     const fileType = await fileTypeFromFile(source);
     const logger = useLogger().logMainChunk();
-    logger.debug("#Generate Metadata", fileType?.mime);
+    logger.debug("#Generate FileInfo", fileType?.mime);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
-        return generateImageMetadataByWorker({
+        return generateImageFileInfoByWorker({
           buffer: await readFile(source),
           fileType: fileType,
         });
       }
       if (supportedFileConditions.video(fileType)) {
-        return generateVideoMetadata({ path: source }, fileType);
+        return generateVideoFileInfo({ path: source }, fileType);
       }
     }
   } else {
@@ -119,16 +119,16 @@ export async function generateMetadata(
     }
     const fileType = await fileTypeFromStream(getStream());
     const logger = useLogger().logMainChunk();
-    logger.debug("#Generate Metadata", fileType?.mime);
+    logger.debug("#Generate FileInfo", fileType?.mime);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
-        return generateImageMetadataByWorker({
+        return generateImageFileInfoByWorker({
           buffer: await streamToBuffer(getStream()),
           fileType: fileType,
         });
       }
       if (supportedFileConditions.video(fileType)) {
-        return generateVideoMetadata({ url: getFileURL(petaFile, FileType.ORIGINAL) }, fileType);
+        return generateVideoFileInfo({ url: getFileURL(petaFile, FileType.ORIGINAL) }, fileType);
       }
     }
   }

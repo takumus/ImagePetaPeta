@@ -1,9 +1,9 @@
 import { WorkerThreadsInputType, WorkerThreadsOutputType } from "@/main/libs/initWorkerThreads";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
-import { worker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generateImageMetadata.!wt";
+import { worker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/generateImageFileInfo.!wt";
 
-const wtGroup = createWorkerThreadsGroup<typeof worker>("generateImageMetadata.!wt.mjs");
-export async function generateImageMetadataByWorker(params: WorkerThreadsInputType<typeof worker>) {
+const wtGroup = createWorkerThreadsGroup<typeof worker>("generateImageFileInfo.!wt.mjs");
+export async function generateImageFileInfoByWorker(params: WorkerThreadsInputType<typeof worker>) {
   return new Promise<WorkerThreadsOutputType<typeof worker>>((res, rej) => {
     const wt = wtGroup.getWT();
     wt.use();

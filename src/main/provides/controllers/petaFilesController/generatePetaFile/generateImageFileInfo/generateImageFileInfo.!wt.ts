@@ -10,15 +10,15 @@ import {
 } from "@/commons/defines";
 
 import { initWorkerThreads } from "@/main/libs/initWorkerThreads";
-import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generatePalette";
+import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/generatePalette";
 
 export const worker = initWorkerThreads<
-  Parameters<typeof generateImageMetaData>[0],
-  Awaited<ReturnType<typeof generateImageMetaData> | undefined>
+  Parameters<typeof generateImageFileInfo>[0],
+  Awaited<ReturnType<typeof generateImageFileInfo> | undefined>
 >(parentPort, (parentPort) => {
   parentPort.on("message", async (params) => {
     try {
-      const petaFile = await generateImageMetaData(params);
+      const petaFile = await generateImageFileInfo(params);
       parentPort.postMessage(petaFile);
     } catch {
       parentPort.postMessage(undefined);
@@ -26,7 +26,7 @@ export const worker = initWorkerThreads<
   });
 });
 
-async function generateImageMetaData(param: {
+async function generateImageFileInfo(param: {
   buffer: Buffer;
   fileType: FileTypeResult;
 }): Promise<GeneratedFileInfo> {

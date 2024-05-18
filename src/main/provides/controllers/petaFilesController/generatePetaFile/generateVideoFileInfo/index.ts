@@ -9,9 +9,9 @@ import {
   PETAIMAGE_METADATA_VERSION,
 } from "@/commons/defines";
 
-import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageMetadata/generatePalette";
+import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/generatePalette";
 
-export async function generateVideoMetadata(
+export async function generateVideoFileInfo(
   source: { path: string } | { url: string },
   fileType: FileTypeResult,
 ): Promise<GeneratedFileInfo> {
