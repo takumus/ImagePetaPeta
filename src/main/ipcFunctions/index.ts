@@ -644,40 +644,26 @@ export const ipcFunctions: IpcFunctionsType = {
       const fileInfos = (
         await ppa(async (data): Promise<ImportFileInfo | undefined> => {
           for (let i = 0; i < data.length; i++) {
+            console.log(data[i]);
             const d = data[i];
-            if (d?.type === "filePath") {
-              return {
-                path: d.filePath,
-                ...d.additionalData,
-              };
-            }
-            if (d?.type === "url") {
-              const result = await createFileInfo.fromURL(d.url, d.referrer, d.ua);
-              if (result !== undefined) {
-                if (d.additionalData) {
-                  result.name = d.additionalData.name ?? result.name;
-                  result.note = d.additionalData.note ?? result.note;
-                }
+            switch (d.type) {
+              case "filePath":
+                return {
+                  path: d.filePath,
+                  ...d.additionalData,
+                };
+              case "url": {
+                const result = await createFileInfo.fromURL(d.url, d.referrer, d.ua);
+                if (result === undefined) return undefined;
+                result.name = d.additionalData?.name ?? result.name;
+                result.note = d.additionalData?.note ?? result.note;
                 return result;
               }
-            }
-            if (d?.type === "url") {
-              const result = await createFileInfo.fromURL(d.url);
-              if (result !== undefined) {
-                if (d.additionalData) {
-                  result.name = d.additionalData.name ?? result.name;
-                  result.note = d.additionalData.note ?? result.note;
-                }
-                return result;
-              }
-            }
-            if (d?.type === "buffer") {
-              const result = await createFileInfo.fromBuffer(d.buffer);
-              if (result !== undefined) {
-                if (d.additionalData) {
-                  result.name = d.additionalData.name ?? result.name;
-                  result.note = d.additionalData.note ?? result.note;
-                }
+              case "buffer": {
+                const result = await createFileInfo.fromBuffer(d.buffer);
+                if (result === undefined) return undefined;
+                result.name = d.additionalData?.name ?? result.name;
+                result.note = d.additionalData?.note ?? result.note;
                 return result;
               }
             }
