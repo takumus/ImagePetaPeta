@@ -24,9 +24,10 @@ const modelCacher = (() => {
       mkdirIfNotIxistsSync(dir, { recursive: true });
       global.fetch = async (...args: Parameters<typeof originalFetch>) => {
         const url = args[0];
+        console.log(url);
         if (
           typeof url === "string" &&
-          url.startsWith("https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/classification/1/")
+          url.startsWith("https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/")
         ) {
           const filename = new URL(url).pathname.split("/").pop();
           if (filename === undefined) {
@@ -61,7 +62,7 @@ export class TensorFlow {
   async init() {
     await tf.setBackend("wasm");
     modelCacher.start();
-    this.model = await mobilenet.load();
+    this.model = await mobilenet.load({ version: 2, alpha: 1 });
     modelCacher.end();
   }
   async imageToVector(source: string | Buffer) {
@@ -74,6 +75,7 @@ export class TensorFlow {
       .removeAlpha()
       .toBuffer({ resolveWithObject: true });
     const image = tf.tensor3d(data, [info.width, info.height, 3]);
+    console.log(await this.model.classify(image));
     const result = this.model.infer(image).flatten();
     image.dispose();
     return result;

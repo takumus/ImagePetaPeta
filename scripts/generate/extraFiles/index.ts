@@ -47,11 +47,10 @@ interface ExtraFile {
       name: "mobilenet",
       files: [
         "model.json",
-        "group1-shard1of5.bin",
-        "group1-shard2of5.bin",
-        "group1-shard3of5.bin",
-        "group1-shard4of5.bin",
-        "group1-shard5of5.bin",
+        "group1-shard1of4.bin",
+        "group1-shard2of4.bin",
+        "group1-shard3of4.bin",
+        "group1-shard4of4.bin",
       ],
       prepare: async (extraFile) => {
         try {
@@ -63,7 +62,7 @@ interface ExtraFile {
               console.log("download:", n);
               const data = await (
                 await fetch(
-                  "https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/classification/1/" +
+                  "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/" +
                     n +
                     "?tfjs-format=file",
                 )
