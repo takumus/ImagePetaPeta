@@ -5,14 +5,10 @@ import sharp from "sharp";
 
 import "@tensorflow/tfjs-backend-wasm";
 
-import { basename, resolve } from "path";
-
 import { extraFiles } from "@/_defines/extraFiles";
-import { mkdirIfNotIxistsSync } from "@/main/libs/file";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 
 const modelCacher = (() => {
-  const dir = "./_tfCache";
   const originalFetch = global.fetch;
   let started = false;
   return {
@@ -21,7 +17,6 @@ const modelCacher = (() => {
         return;
       }
       started = true;
-      mkdirIfNotIxistsSync(dir, { recursive: true });
       global.fetch = async (...args: Parameters<typeof originalFetch>) => {
         const url = args[0];
         console.log(url);
