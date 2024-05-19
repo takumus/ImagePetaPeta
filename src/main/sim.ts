@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "fs/promises";
 import * as mobilenet from "@tensorflow-models/mobilenet";
-import * as tf from "@tensorflow/tfjs";
+import * as tf from "@tensorflow/tfjs-node";
 import sharp from "sharp";
 
 import "@tensorflow/tfjs-backend-wasm";
@@ -45,8 +45,8 @@ const loadFeatureVector = async (filePath: string) => {
 export const __main = async (model: mobilenet.MobileNet) => {
   console.time("processing1");
   const vecs = await Promise.all([
-    getFeatureVector("C:\\Users\\takumus\\Desktop\\si\\1.jpg", model),
-    getFeatureVector("C:\\Users\\takumus\\Desktop\\si\\2.jpg", model),
+    getFeatureVector("./test/sampleDatas/dog.jpg", model),
+    getFeatureVector("./test/sampleDatas/dogLowRes.jpg", model),
   ]);
   // console.log(vecs[0]);
   // await saveFeatureVector(vecs[0], "featureVector1.json");
@@ -63,10 +63,10 @@ export const __main = async (model: mobilenet.MobileNet) => {
 
   console.log(`Cosine Similarity: ${similarity}`);
 };
-(async () => {
-  await tf.setBackend("wasm");
-  console.log("MODEL1");
-  const model = await mobilenet.load();
-  console.log("MODEL2");
-  __main(model);
-})();
+// (async () => {
+//   // await tf.setBackend("wasm");
+//   console.log("MODEL1");
+//   const model = await mobilenet.load();
+//   console.log("MODEL2");
+//   __main(model);
+// })();
