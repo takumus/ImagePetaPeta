@@ -383,6 +383,12 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         click: async () => {
           const ids = await IPC.getSimIDs(petaFile.id);
           filteredPetaFiles.value = ids.map((id) => petaFilesStore.state.value[id]);
+          currentScrollTileId.value = "";
+          nextTick(() => {
+            if (thumbnails.value) {
+              thumbnails.value.scrollTo(0, 0);
+            }
+          });
         },
       },
       {
