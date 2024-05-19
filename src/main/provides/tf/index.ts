@@ -6,6 +6,7 @@ import sharp from "sharp";
 import "@tensorflow/tfjs-backend-wasm";
 
 import { extraFiles } from "@/_defines/extraFiles";
+import { mobilenetURLToFilename } from "@/main/utils/mobilenetURLToFileName";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 
 const modelCacher = (() => {
@@ -22,12 +23,9 @@ const modelCacher = (() => {
         console.log(url);
         if (
           typeof url === "string" &&
-          url.startsWith("https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/")
+          url.startsWith("https://tfhub.dev/google/imagenet/mobilenet")
         ) {
-          const filename = new URL(url).pathname.split("/").pop();
-          if (filename === undefined) {
-            throw new Error("unknown url:" + url);
-          }
+          const filename = mobilenetURLToFilename(url);
           const cached = resolveExtraFilesPath(
             extraFiles["mobilenet.universal"][
               filename as keyof (typeof extraFiles)["mobilenet.universal"]

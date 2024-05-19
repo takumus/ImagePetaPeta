@@ -4,6 +4,8 @@ import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
 import { normalizePath } from "vite";
 
+import { mobilenetURLToFilename } from "@/main/utils/mobilenetURLToFileName";
+
 interface ExtraFile {
   name: string;
   platform: NodeJS.Platform | "universal";
@@ -46,11 +48,11 @@ interface ExtraFile {
       platform: "universal",
       name: "mobilenet",
       files: [
-        "model.json",
-        "group1-shard1of4.bin",
-        "group1-shard2of4.bin",
-        "group1-shard3of4.bin",
-        "group1-shard4of4.bin",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/model.json",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard1of4.bin",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard2of4.bin",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard3of4.bin",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard4of4.bin",
       ],
       prepare: async (extraFile) => {
         try {
@@ -58,16 +60,13 @@ interface ExtraFile {
         } catch {
           mkdirSync(extraFile.developmentPath, { recursive: true });
           await Promise.all(
-            extraFile.files.map(async (n) => {
-              console.log("download:", n);
-              const data = await (
-                await fetch(
-                  "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/" +
-                    n +
-                    "?tfjs-format=file",
-                )
-              ).arrayBuffer();
-              writeFileSync(resolve(extraFile.developmentPath, n), Buffer.from(data));
+            extraFile.files.map(async (url, i) => {
+              extraFile.files[i] = mobilenetURLToFilename(url);
+              const data = await (await fetch(url + "?tfjs-format=file")).arrayBuffer();
+              writeFileSync(
+                resolve(extraFile.developmentPath, url.replace(/[:\/]/g, "-")),
+                Buffer.from(data),
+              );
             }),
           );
         }
