@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "fs/promises";
 import * as mobilenet from "@tensorflow-models/mobilenet";
-import * as tf from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs";
 import sharp from "sharp";
 
 import "@tensorflow/tfjs-backend-wasm";
