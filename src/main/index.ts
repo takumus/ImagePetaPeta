@@ -8,7 +8,6 @@ import { initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
-import { TensorFlow } from "@/main/provides/tf";
 import { useLogger } from "@/main/provides/utils/logger";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
@@ -113,24 +112,6 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     // usePetaFilesController().verifyFiles();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());
-    (async () => {
-      try {
-        const tf = new TensorFlow();
-        console.log("loading mobilenet");
-        await tf.init();
-        console.log("loaded mobilenet");
-        console.log("converting to vec");
-        const vecs = await Promise.all([
-          tf.imageToVector("./test/sampleDatas/dog.jpg"),
-          tf.imageToVector("./test/sampleDatas/dogLowRes.jpg"),
-        ]);
-        console.log("converted to vec");
-        console.log("siming");
-        console.log(await tf.similarity(...vecs));
-      } catch (err) {
-        console.log(err);
-      }
-    })();
   }
   app.on("ready", appReady);
 })();
