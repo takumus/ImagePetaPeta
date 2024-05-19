@@ -48,11 +48,11 @@ interface ExtraFile {
       platform: "universal",
       name: "mobilenet",
       files: [
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/model.json",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard1of4.bin",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard2of4.bin",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard3of4.bin",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard4of4.bin",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/model.json?tfjs-format=file",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard1of4.bin?tfjs-format=file",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard2of4.bin?tfjs-format=file",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard3of4.bin?tfjs-format=file",
+        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard4of4.bin?tfjs-format=file",
       ],
       prepare: async (extraFile) => {
         try {
@@ -61,12 +61,10 @@ interface ExtraFile {
           mkdirSync(extraFile.developmentPath, { recursive: true });
           await Promise.all(
             extraFile.files.map(async (url, i) => {
-              extraFile.files[i] = mobilenetURLToFilename(url);
-              const data = await (await fetch(url + "?tfjs-format=file")).arrayBuffer();
-              writeFileSync(
-                resolve(extraFile.developmentPath, url.replace(/[:\/]/g, "-")),
-                Buffer.from(data),
-              );
+              const filename = mobilenetURLToFilename(url);
+              extraFile.files[i] = filename;
+              const data = await (await fetch(url)).arrayBuffer();
+              writeFileSync(resolve(extraFile.developmentPath, filename), Buffer.from(data));
             }),
           );
         }
