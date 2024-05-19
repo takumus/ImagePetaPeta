@@ -75,7 +75,6 @@ export class TensorFlow {
       .removeAlpha()
       .toBuffer({ resolveWithObject: true });
     const image = tf.tensor3d(data, [info.width, info.height, 3]);
-    console.log(await this.model.classify(image));
     const result = this.model.infer(image).flatten();
     image.dispose();
     return result;
@@ -85,8 +84,6 @@ export class TensorFlow {
     const normA = vecA.norm();
     const normB = vecB.norm();
     const similarity = dotProduct.div(normA.mul(normB)).array();
-    vecA.dispose();
-    vecB.dispose();
     return similarity;
   }
   async vectorToBuffer(vec: tf.Tensor, filePath: string) {
