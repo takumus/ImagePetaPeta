@@ -1,8 +1,3 @@
-import * as mobilenet from "@tensorflow-models/mobilenet";
-import * as tf from "@tensorflow/tfjs";
-
-import "@tensorflow/tfjs-backend-wasm";
-
 import { app, protocol } from "electron";
 import installExtension from "electron-devtools-installer";
 
@@ -13,11 +8,11 @@ import { initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
+import { TensorFlow } from "@/main/provides/tf";
 import { useLogger } from "@/main/provides/utils/logger";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
-import { __main } from "@/main/sim";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
@@ -118,13 +113,24 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     // usePetaFilesController().verifyFiles();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());
+    (async () => {
+      try {
+        const tf = new TensorFlow();
+        console.log("loading mobilenet");
+        await tf.init();
+        console.log("loaded mobilenet");
+        console.log("converting to vec");
+        const vecs = await Promise.all([
+          tf.imageToVector("./test/sampleDatas/dog.jpg"),
+          tf.imageToVector("./test/sampleDatas/dogLowRes.jpg"),
+        ]);
+        console.log("converted to vec");
+        console.log("siming");
+        console.log(await tf.similarity(...vecs));
+      } catch (err) {
+        console.log(err);
+      }
+    })();
   }
-  (async () => {
-    await tf.setBackend("wasm");
-    console.log("MODEL1");
-    const model = await mobilenet.load();
-    console.log("MODEL2");
-    __main(model);
-  })();
   app.on("ready", appReady);
 })();

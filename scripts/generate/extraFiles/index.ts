@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readdirSync, writeFileSync } from "fs";
+import { copyFileSync, cpSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
 import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
@@ -38,6 +38,40 @@ interface ExtraFile {
           "./resources/supporters/supporters.json",
           resolve(extraFile.developmentPath, "supporters.json"),
         );
+      },
+    }),
+  );
+  extras.push(
+    await createExtra({
+      platform: "universal",
+      name: "mobilenet",
+      files: [
+        "model.json",
+        "group1-shard1of5.bin",
+        "group1-shard2of5.bin",
+        "group1-shard3of5.bin",
+        "group1-shard4of5.bin",
+        "group1-shard5of5.bin",
+      ],
+      prepare: async (extraFile) => {
+        try {
+          readdirSync(extraFile.developmentPath);
+        } catch {
+          mkdirSync(extraFile.developmentPath, { recursive: true });
+          await Promise.all(
+            extraFile.files.map(async (n) => {
+              console.log("download:", n);
+              const data = await (
+                await fetch(
+                  "https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/classification/1/" +
+                    n +
+                    "?tfjs-format=file",
+                )
+              ).arrayBuffer();
+              writeFileSync(resolve(extraFile.developmentPath, n), Buffer.from(data));
+            }),
+          );
+        }
       },
     }),
   );
