@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "fs/promises";
 import * as mobilenet from "@tensorflow-models/mobilenet";
-import * as tf from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs";
 import sharp from "sharp";
 
 import "@tensorflow/tfjs-backend-wasm";
@@ -63,3 +63,10 @@ export const __main = async (model: mobilenet.MobileNet) => {
 
   console.log(`Cosine Similarity: ${similarity}`);
 };
+(async () => {
+  await tf.setBackend("wasm");
+  console.log("MODEL1");
+  const model = await mobilenet.load();
+  console.log("MODEL2");
+  __main(model);
+})();
