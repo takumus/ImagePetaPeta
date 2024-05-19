@@ -85,6 +85,9 @@
   },
   "dependencies": {
     "@seald-io/nedb": "^4.0.4",
+    "@tensorflow-models/mobilenet": "^2.1.1",
+    "@tensorflow/tfjs-backend-wasm": "^4.19.0",
+    "@tensorflow/tfjs-node": "^4.19.0",
     "color-convert": "^2.0.1",
     "color-diff": "^1.4.0",
     "compare-versions": "^6.1.0",

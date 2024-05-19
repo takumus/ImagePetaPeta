@@ -1,3 +1,8 @@
+import * as mobilenet from "@tensorflow-models/mobilenet";
+import * as tf from "@tensorflow/tfjs-node";
+
+import "@tensorflow/tfjs-backend-wasm";
+
 import { app, protocol } from "electron";
 import installExtension from "electron-devtools-installer";
 
@@ -12,6 +17,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
+import { __main } from "@/main/sim";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
@@ -113,5 +119,12 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());
   }
+  (async () => {
+    await tf.setBackend("wasm");
+    console.log("MODEL1");
+    const model = await mobilenet.load();
+    console.log("MODEL2");
+    __main(model);
+  })();
   app.on("ready", appReady);
 })();
