@@ -48,11 +48,11 @@ interface ExtraFile {
       platform: "universal",
       name: "mobilenet",
       files: [
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/model.json?tfjs-format=file",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard1of4.bin?tfjs-format=file",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard2of4.bin?tfjs-format=file",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard3of4.bin?tfjs-format=file",
-        "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard4of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/model.json?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard1of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard2of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard3of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard4of4.bin?tfjs-format=file",
       ],
       prepare: async (extraFile) => {
         mkdirSync(extraFile.developmentPath, { recursive: true });
