@@ -28,7 +28,6 @@ const modelCacher = (() => {
           typeof url === "string" &&
           url.startsWith("https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/classification/1/")
         ) {
-          console.log(url);
           const filename = new URL(url).pathname.split("/").pop();
           if (filename === undefined) {
             throw new Error("unknown url:" + url);
@@ -38,6 +37,9 @@ const modelCacher = (() => {
               filename as keyof (typeof extraFiles)["mobilenet.universal"]
             ],
           );
+          console.log("override fetch");
+          console.log(url);
+          console.log(cached);
           await stat(cached);
           return new Response(await readFile(cached));
         }
