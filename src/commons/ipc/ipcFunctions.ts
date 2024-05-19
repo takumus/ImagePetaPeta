@@ -83,4 +83,5 @@ export interface IpcFunctions {
   getModalDatas: () => Promise<{ id: string; label: string; items: string[] }[]>;
   selectModal: (id: string, index: number) => Promise<void>;
   getWebURL: () => Promise<{ [key: string]: string[] }>;
+  getSimIDs: (id: string) => Promise<string[]>;
 }

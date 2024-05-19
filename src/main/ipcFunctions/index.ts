@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
 import * as Path from "path";
+import { Tensor, Tensor1D } from "@tensorflow/tfjs";
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 
 import { AppInfo } from "@/commons/datas/appInfo";
@@ -15,6 +16,7 @@ import {
   WEBHOOK_PORT,
 } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
+import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
 import { ppa } from "@/commons/utils/pp";
 import { WindowName } from "@/commons/windows";
@@ -33,6 +35,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBStatus } from "@/main/provides/databases";
 import { useModals } from "@/main/provides/modals";
 import { useTasks } from "@/main/provides/tasks";
+import { TensorFlow } from "@/main/provides/tf";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
@@ -46,6 +49,8 @@ import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
+import { getStreamFromPetaFile } from "@/main/utils/secureFile";
+import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { getLatestVersion } from "@/main/utils/versions";
 
 let temporaryShowNSFW = false;
@@ -848,7 +853,60 @@ export const ipcFunctions: IpcFunctionsType = {
     });
     return ips;
   },
+  async getSimIDs(_, id) {
+    try {
+      console.time("sim");
+      const pfs = Object.values(await usePetaFilesController().getAll());
+      const bp = await usePetaFilesController().getPetaFile(id);
+      if (bp === undefined) {
+        return [];
+      }
+      if (tf === undefined) {
+        tf = new TensorFlow();
+        await tf.init();
+      }
+      const _tf = tf;
+      const bv = await _tf.imageToVector(
+        await streamToBuffer(getStreamFromPetaFile(bp, "thumbnail")),
+      );
+      const scores: { id: string; score: number }[] = [];
+      await ppa(async (p, i) => {
+        _tf.startScope();
+        const tv = await (async () => {
+          if (vecCaches[p.id]) {
+            return vecCaches[p.id];
+          }
+          if (i % 100 === 0) console.time("v");
+          vecCaches[p.id] = _tf.vectorToBuffer(
+            await _tf.imageToVector(await streamToBuffer(getStreamFromPetaFile(p, "thumbnail"))),
+          );
+          if (i % 100 === 0) console.log(vecCaches[p.id].byteLength);
+          if (i % 100 === 0) console.timeEnd("v");
+          return vecCaches[p.id];
+        })();
+        if (i % 100 === 0) console.time("s");
+        scores.push({
+          id: p.id,
+          score: Number(await _tf.similarity(bv, _tf.bufferToVector(tv))),
+        });
+        if (i % 100 === 0) console.timeEnd("s");
+        if (i % 100 === 0) console.log(i);
+        _tf.endScope();
+        // tv.dispose();
+      }, pfs).promise;
+      bv.dispose();
+      scores.sort((a, b) => a.score - b.score).reverse();
+      // console.log(scores);
+      console.timeEnd("sim");
+      return scores.map((s) => s.id);
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  },
 };
+const vecCaches: { [id: string]: Buffer } = {};
+let tf: TensorFlow | undefined;
 export function registerIpcFunctions() {
   Object.keys(ipcFunctions).forEach((key) => {
     ipcMain.handle(key, ipcFunctions[key as keyof IpcFunctionsType]);

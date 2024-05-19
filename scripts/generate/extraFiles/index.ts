@@ -1,8 +1,10 @@
-import { copyFileSync, mkdirSync, readdirSync, writeFileSync } from "fs";
+import { copyFileSync, cpSync, mkdirSync, readdirSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
 import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
 import { normalizePath } from "vite";
+
+import { mobilenetURLToFilename } from "@/main/utils/mobilenetURLToFileName";
 
 interface ExtraFile {
   name: string;
@@ -37,6 +39,30 @@ interface ExtraFile {
         copyFileSync(
           "./resources/supporters/supporters.json",
           resolve(extraFile.developmentPath, "supporters.json"),
+        );
+      },
+    }),
+  );
+  extras.push(
+    await createExtra({
+      platform: "universal",
+      name: "mobilenet",
+      files: [
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/model.json?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard1of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard2of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard3of4.bin?tfjs-format=file",
+        "https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1/group1-shard4of4.bin?tfjs-format=file",
+      ],
+      prepare: async (extraFile) => {
+        mkdirSync(extraFile.developmentPath, { recursive: true });
+        await Promise.all(
+          extraFile.files.map(async (url, i) => {
+            const filename = mobilenetURLToFilename(url);
+            extraFile.files[i] = filename;
+            const data = await (await fetch(url)).arrayBuffer();
+            writeFileSync(resolve(extraFile.developmentPath, filename), Buffer.from(data));
+          }),
         );
       },
     }),
