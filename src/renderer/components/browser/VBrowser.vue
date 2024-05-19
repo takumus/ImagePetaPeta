@@ -103,7 +103,6 @@ import { Tile } from "@/renderer/components/browser/tile/tile";
 import { setupDragResizer } from "@/renderer/components/commons/utils/dragResizer";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
-import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { useDefinesStore } from "@/renderer/stores/definesStore/useDefinesStore";
 import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
@@ -243,7 +242,7 @@ function restoreScrollPosition() {
   }
 }
 function updateScrollArea(event?: Event, resize = false) {
-  const preVisibleOffset = scrollAreaHeight.value * 0.5;
+  const preVisibleOffset = scrollAreaHeight.value * 0;
   const visibleOffset = scrollAreaHeight.value * 0;
   if (thumbnails.value === undefined) {
     return;
@@ -600,9 +599,6 @@ const original = computed(
   () =>
     settingsStore.state.value.loadTilesInOriginal && actualTileSize.value > BROWSER_THUMBNAIL_SIZE,
 );
-watch(filteredPetaFiles, () => {
-  ImageDecoder.clear();
-});
 watch([selectedPetaTagIds, selectedFilterType, sortMode], () => {
   currentScrollTileId.value = "";
   nextTick(() => {

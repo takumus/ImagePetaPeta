@@ -31,11 +31,13 @@
           draggable="false"
           :src="thumbnailURL"
           @load="loadingThumbnail = false"
-          v-if="loadingOriginal"
+          loading="lazy"
           decoding="async" />
         <img
-          ref="image"
           draggable="false"
+          decoding="async"
+          :src="originalURL"
+          @load="loadingOriginal = false"
           v-show="!loadingOriginal && tile.petaFile.metadata.type === 'image'" />
         <video
           ref="video"
@@ -94,7 +96,6 @@ import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { Tile } from "@/renderer/components/browser/tile/tile";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { IPC } from "@/renderer/libs/ipc";
-import * as ImageDecoder from "@/renderer/libs/serialImageDecoder";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { usePetaTagsStore } from "@/renderer/stores/petaTagsStore/usePetaTagsStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
@@ -117,7 +118,7 @@ const settingsStore = useSettingsStore();
 const petaTagsStore = usePetaTagsStore();
 const { t } = useI18n();
 const thumbnailURL = ref("");
-const image = ref<HTMLImageElement>();
+const originalURL = ref("");
 const video = ref<HTMLVideoElement>();
 const loadingThumbnail = ref(true);
 const loadingOriginal = ref(true);
@@ -249,17 +250,7 @@ function delayedLoadImage() {
           () => {
             if (props.tile.visible) {
               if (props.tile.petaFile?.metadata.type === "image") {
-                const img = image.value;
-                const url = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
-                if (img === undefined) {
-                  return;
-                }
-                if (img.src !== url) {
-                  loadingOriginal.value = true;
-                  ImageDecoder.decode(img, url, (failed) => {
-                    loadingOriginal.value = failed;
-                  });
-                }
+                originalURL.value = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
               } else if (props.tile.petaFile?.metadata.type === "video") {
                 const v = video.value;
                 if (v === undefined) {
