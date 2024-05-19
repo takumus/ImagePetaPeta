@@ -1,5 +1,4 @@
-import { readFile, stat, writeFile } from "fs/promises";
-import * as mobilenet from "@tensorflow-models/mobilenet";
+import { readFile, stat } from "fs/promises";
 import * as tf from "@tensorflow/tfjs";
 import sharp from "sharp";
 
