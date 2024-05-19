@@ -55,19 +55,15 @@ interface ExtraFile {
         "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2/group1-shard4of4.bin?tfjs-format=file",
       ],
       prepare: async (extraFile) => {
-        try {
-          readdirSync(extraFile.developmentPath);
-        } catch {
-          mkdirSync(extraFile.developmentPath, { recursive: true });
-          await Promise.all(
-            extraFile.files.map(async (url, i) => {
-              const filename = mobilenetURLToFilename(url);
-              extraFile.files[i] = filename;
-              const data = await (await fetch(url)).arrayBuffer();
-              writeFileSync(resolve(extraFile.developmentPath, filename), Buffer.from(data));
-            }),
-          );
-        }
+        mkdirSync(extraFile.developmentPath, { recursive: true });
+        await Promise.all(
+          extraFile.files.map(async (url, i) => {
+            const filename = mobilenetURLToFilename(url);
+            extraFile.files[i] = filename;
+            const data = await (await fetch(url)).arrayBuffer();
+            writeFileSync(resolve(extraFile.developmentPath, filename), Buffer.from(data));
+          }),
+        );
       },
     }),
   );
