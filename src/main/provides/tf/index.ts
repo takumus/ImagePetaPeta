@@ -71,8 +71,7 @@ export class TF {
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
   }
-  async getSimilarPetaTags(petaFile: PetaFile) {
-    const baseVector = await this.getOrUpdateImageVector(petaFile);
+  async createTagModel() {
     const allTags = await usePetaTagsController().getPetaTags();
     const allPetaFiles = Object.values(await usePetaFilesController().getAll());
     const tagIndex = allTags.map((t) => t.id);
@@ -102,39 +101,40 @@ export class TF {
         loss: "binaryCrossentropy",
         metrics: ["accuracy"],
       });
-      const prepareData = async () => {
-        const imageVectors: Tensor[] = [];
-        const tagVectors: Tensor[] = [];
-
-        await ppa(async (pf) => {
-          imageVectors.push(await this.getOrUpdateImageVector(pf));
-          const tagVector = allTags.map(() => 0);
-          const tagIDs = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);
-          tagIDs
-            .map((id) => tagIndex.indexOf(id))
-            .filter((index) => index >= 0)
-            .forEach((index) => {
-              tagVector[index] = 1;
-            });
-          tagVectors.push(tensor(tagVector));
-        }, allPetaFiles).promise;
-
-        const xs = stack(imageVectors);
-        const ys = stack(tagVectors);
-        return { xs, ys };
-      };
-      const trainModel = async () => {
-        console.time("prepare");
-        const { xs, ys } = await prepareData();
-        console.timeEnd("prepare");
-        console.time("fit");
-        await this.predictionModel?.fit(xs, ys, {
-          epochs: 1,
-          batchSize: 32,
-        });
-        console.timeEnd("fit");
-      };
-      await trainModel();
+      const imageVectors: Tensor[] = [];
+      const tagVectors: Tensor[] = [];
+      console.log(1.1);
+      await ppa(async (pf) => {
+        imageVectors.push(await this.getOrUpdateImageVector(pf));
+        const tagVector = allTags.map(() => 0);
+        const tagIDs = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);
+        tagIDs
+          .map((id) => tagIndex.indexOf(id))
+          .filter((index) => index >= 0)
+          .forEach((index) => {
+            tagVector[index] = 1;
+          });
+        tagVectors.push(tensor(tagVector));
+      }, allPetaFiles).promise;
+      console.log(1.2);
+      const xs = stack(imageVectors);
+      const ys = stack(tagVectors);
+      console.log(1);
+      console.time("prepare");
+      console.timeEnd("prepare");
+      console.log(2);
+      console.time("fit");
+      await this.predictionModel?.fit(xs, ys, {
+        epochs: 1,
+        batchSize: 32,
+        callbacks: {
+          nextFrameFunc: () => {
+            console.log("nf");
+          },
+        },
+      });
+      console.log(3);
+      console.timeEnd("fit");
       const _fetch = fetch;
       global.fetch = async (...args: Parameters<typeof fetch>) => {
         if (args[0] === "http://save-to-local") {
@@ -167,17 +167,18 @@ export class TF {
       //   },
       // });
     }
-    const predictTags = async () => {
-      const predictions = this.predictionModel!.predict(baseVector.reshape([1, 1280])) as Tensor;
-      const probabilities = ((await predictions.array()) as number[][])[0];
-
-      const predictedTags = probabilities.map((prob: number, index: number) => ({
-        tagId: index,
-        probability: prob,
-      }));
-
-      return predictedTags;
-    };
+  }
+  async getSimilarPetaTags(petaFile: PetaFile) {
+    const baseVector = await this.getOrUpdateImageVector(petaFile);
+    const allTags = await usePetaTagsController().getPetaTags();
+    const tagIndex = allTags.map((t) => t.id);
+    await this.createTagModel();
+    const predictions = this.predictionModel!.predict(baseVector.reshape([1, 1280])) as Tensor;
+    const probabilities = ((await predictions.array()) as number[][])[0];
+    const predictedTags = probabilities.map((prob: number, index: number) => ({
+      tagId: index,
+      probability: prob,
+    }));
     console.log(
       await ppa(
         async (v) => {
@@ -187,7 +188,7 @@ export class TF {
           };
           return ddd;
         },
-        (await predictTags()).sort((a, b) => b.probability - a.probability),
+        predictedTags.sort((a, b) => b.probability - a.probability),
       ).promise,
     );
   }
