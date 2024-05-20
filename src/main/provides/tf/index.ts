@@ -23,7 +23,7 @@ export class TF {
   }
   async updateImageVector(petaFile: PetaFile) {
     const imageBuffer = await streamToBuffer(getStreamFromPetaFile(petaFile, "thumbnail"));
-    const vector = await this.libTF.imageToVector(imageBuffer);
+    const vector = (await this.libTF.imageToVector(imageBuffer)).reshape([1280]);
     const vectorBuffer = this.libTF.vectorToBuffer(vector);
     const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
     const filePath = resolve(dirPath, petaFile.id + ".tv");
