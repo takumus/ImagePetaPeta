@@ -167,19 +167,18 @@ export class TF {
       tagId: index,
       probability: prob,
     }));
-    console.log(
-      (
-        await ppa(
-          async (v) => {
-            const ddd = {
-              tn: allTags.find((ttt) => ttt.id === tagIndex[v.tagId])?.name!,
-              prob: Math.floor(v.probability * 100) + "%",
-            };
-            return ddd;
-          },
-          predictedTags.sort((a, b) => b.probability - a.probability),
-        ).promise
-      ).map((v) => `${v.prob}:${v.tn}`),
-    );
+    return await ppa(
+      async (v) => {
+        const tag = allTags.find((ttt) => ttt.id === tagIndex[v.tagId]);
+        const ddd = {
+          name: tag?.name!,
+          tagId: tag?.id!,
+          prob: v.probability,
+        };
+        console.log(ddd);
+        return ddd;
+      },
+      predictedTags.sort((a, b) => b.probability - a.probability),
+    ).promise;
   }
 }

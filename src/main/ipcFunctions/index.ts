@@ -868,8 +868,28 @@ export const ipcFunctions: IpcFunctionsType = {
       const scores = await _tf.getSimilarPetaFileIDsByPetaFile(petaFile);
       // console.log(scores);
       console.timeEnd("sim");
-      await _tf.getSimilarPetaTags(petaFile);
       return scores.map((s) => s.id);
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  },
+  async getSimTags(_, id) {
+    try {
+      console.time("sim");
+      const petaFile = await usePetaFilesController().getPetaFile(id);
+      if (petaFile === undefined) {
+        return [];
+      }
+      if (tf === undefined) {
+        tf = new TF();
+        await tf.init();
+      }
+      const _tf = tf;
+      const scores = await _tf.getSimilarPetaTags(petaFile);
+      // console.log(scores);
+      console.timeEnd("sim");
+      return scores;
     } catch (err) {
       console.log(err);
       return [];

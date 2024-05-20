@@ -379,7 +379,7 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
   components.contextMenu.open(
     [
       {
-        label: "sim",
+        label: "simImg",
         click: async () => {
           const ids = await IPC.getSimIDs(petaFile.id);
           filteredPetaFiles.value = ids.map((id) => petaFilesStore.state.value[id]);
@@ -389,6 +389,13 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
               thumbnails.value.scrollTo(0, 0);
             }
           });
+        },
+      },
+      {
+        label: "simTag",
+        click: async () => {
+          const ids = await IPC.getSimTags(petaFile.id);
+          alert(JSON.stringify(ids, undefined, 2));
         },
       },
       {
