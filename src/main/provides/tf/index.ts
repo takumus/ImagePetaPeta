@@ -82,9 +82,15 @@ export class TF {
       this.predictionModel = sequential();
       this.predictionModel.add(
         layers.dense({
-          units: 256,
+          units: 512,
           activation: "relu",
           inputShape: [1280],
+        }),
+      );
+      this.predictionModel.add(
+        layers.dense({
+          units: 256,
+          activation: "relu",
         }),
       );
       this.predictionModel.add(
@@ -167,6 +173,7 @@ export class TF {
       tagId: index,
       probability: prob,
     }));
+    console.log("=========================================================");
     return await ppa(
       async (v) => {
         const tag = allTags.find((ttt) => ttt.id === tagIndex[v.tagId]);
@@ -175,7 +182,7 @@ export class TF {
           tagId: tag?.id!,
           prob: v.probability,
         };
-        console.log(ddd);
+        console.log(ddd.prob.toFixed(2), ddd.name);
         return ddd;
       },
       predictedTags.sort((a, b) => b.probability - a.probability),
