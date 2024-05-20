@@ -103,7 +103,6 @@ export class TF {
       });
       const imageVectors: Tensor[] = [];
       const tagVectors: Tensor[] = [];
-      console.log(1.1);
       await ppa(async (pf) => {
         imageVectors.push(await this.getOrUpdateImageVector(pf));
         const tagVector = allTags.map(() => 0);
@@ -116,25 +115,12 @@ export class TF {
           });
         tagVectors.push(tensor(tagVector));
       }, allPetaFiles).promise;
-      console.log(1.2);
       const xs = stack(imageVectors);
       const ys = stack(tagVectors);
-      console.log(1);
-      console.time("prepare");
-      console.timeEnd("prepare");
-      console.log(2);
-      console.time("fit");
       await this.predictionModel?.fit(xs, ys, {
         epochs: 1,
         batchSize: 32,
-        callbacks: {
-          nextFrameFunc: () => {
-            console.log("nf");
-          },
-        },
       });
-      console.log(3);
-      console.timeEnd("fit");
       const _fetch = fetch;
       global.fetch = async (...args: Parameters<typeof fetch>) => {
         if (args[0] === "http://save-to-local") {
