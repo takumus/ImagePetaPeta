@@ -100,6 +100,17 @@ export class PetaFilesPetaTagsController {
     });
     return petaTagIds;
   }
+  async getPetaTagIdsByPetaFileIds2(petaFileIds: string[]) {
+    const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
+    const res: { [pfid: string]: string[] } = {};
+    await ppa(async (pfid, i) => {
+      res[pfid] = (await dbPetaFilesPetaTags.find({ petaFileId: pfid })).map(
+        (pipt) => pipt.petaTagId,
+      );
+      await new Promise(setImmediate);
+    }, petaFileIds).promise;
+    return res;
+  }
   async getPetaFileIds(params: GetPetaFileIdsParams) {
     const dbPetaFiles = useDBPetaFiles();
     const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();

@@ -65,17 +65,20 @@ export class TF {
           score: this.similarity(baseVec, targetVec),
         });
         if (i % 100 === 0) console.timeEnd("s");
-        // tv.dispose();
       },
       Object.values(await usePetaFilesController().getAll()),
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
   }
   async createTagModel() {
-    const allTags = await usePetaTagsController().getPetaTags();
-    const allPetaFiles = Object.values(await usePetaFilesController().getAll());
-    const tagIndex = allTags.map((t) => t.id);
     if (this.predictionModel === undefined) {
+      const allTags = await usePetaTagsController().getPetaTags();
+      const allPetaFiles = Object.values(await usePetaFilesController().getAll());
+      const allPetaFilesPetaTags =
+        await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds2(
+          allPetaFiles.map((p) => p.id),
+        );
+      const tagIndex = allTags.map((t) => t.id);
       this.predictionModel = sequential();
       this.predictionModel.add(
         layers.dense({
@@ -106,9 +109,8 @@ export class TF {
       await ppa(async (pf) => {
         imageVectors.push(await this.getOrUpdateImageVector(pf));
         const tagVector = allTags.map(() => 0);
-        const tagIDs = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);
-        tagIDs
-          .map((id) => tagIndex.indexOf(id))
+        allPetaFilesPetaTags[pf.id]
+          ?.map((id) => tagIndex.indexOf(id))
           .filter((index) => index >= 0)
           .forEach((index) => {
             tagVector[index] = 1;
@@ -117,7 +119,7 @@ export class TF {
       }, allPetaFiles).promise;
       const xs = stack(imageVectors);
       const ys = stack(tagVectors);
-      await this.predictionModel?.fit(xs, ys, {
+      await this.predictionModel.fit(xs, ys, {
         epochs: 1,
         batchSize: 32,
       });
@@ -166,16 +168,18 @@ export class TF {
       probability: prob,
     }));
     console.log(
-      await ppa(
-        async (v) => {
-          const ddd = {
-            tn: allTags.find((ttt) => ttt.id === tagIndex[v.tagId])?.name!,
-            prob: Math.floor(v.probability * 100) + "%",
-          };
-          return ddd;
-        },
-        predictedTags.sort((a, b) => b.probability - a.probability),
-      ).promise,
+      (
+        await ppa(
+          async (v) => {
+            const ddd = {
+              tn: allTags.find((ttt) => ttt.id === tagIndex[v.tagId])?.name!,
+              prob: Math.floor(v.probability * 100) + "%",
+            };
+            return ddd;
+          },
+          predictedTags.sort((a, b) => b.probability - a.probability),
+        ).promise
+      ).map((v) => `${v.prob}:${v.tn}`),
     );
   }
 }
