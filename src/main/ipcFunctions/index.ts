@@ -35,7 +35,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBStatus } from "@/main/provides/databases";
 import { useModals } from "@/main/provides/modals";
 import { useTasks } from "@/main/provides/tasks";
-import { TensorFlow } from "@/main/provides/tf";
+import { TF } from "@/main/provides/tf";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
@@ -856,48 +856,19 @@ export const ipcFunctions: IpcFunctionsType = {
   async getSimIDs(_, id) {
     try {
       console.time("sim");
-      const pfs = Object.values(await usePetaFilesController().getAll());
-      const bp = await usePetaFilesController().getPetaFile(id);
-      if (bp === undefined) {
+      const petaFile = await usePetaFilesController().getPetaFile(id);
+      if (petaFile === undefined) {
         return [];
       }
       if (tf === undefined) {
-        tf = new TensorFlow();
+        tf = new TF();
         await tf.init();
       }
       const _tf = tf;
-      const bv = await _tf.imageToVector(
-        await streamToBuffer(getStreamFromPetaFile(bp, "thumbnail")),
-      );
-      const scores: { id: string; score: number }[] = [];
-      await ppa(async (p, i) => {
-        _tf.startScope();
-        const tv = await (async () => {
-          if (vecCaches[p.id]) {
-            return vecCaches[p.id];
-          }
-          if (i % 100 === 0) console.time("v");
-          vecCaches[p.id] = _tf.vectorToBuffer(
-            await _tf.imageToVector(await streamToBuffer(getStreamFromPetaFile(p, "thumbnail"))),
-          );
-          if (i % 100 === 0) console.log(vecCaches[p.id].byteLength);
-          if (i % 100 === 0) console.timeEnd("v");
-          return vecCaches[p.id];
-        })();
-        if (i % 100 === 0) console.time("s");
-        scores.push({
-          id: p.id,
-          score: Number(await _tf.similarity(bv, _tf.bufferToVector(tv))),
-        });
-        if (i % 100 === 0) console.timeEnd("s");
-        if (i % 100 === 0) console.log(i);
-        _tf.endScope();
-        // tv.dispose();
-      }, pfs).promise;
-      bv.dispose();
-      scores.sort((a, b) => a.score - b.score).reverse();
+      const scores = await _tf.getSimilarPetaFileIDsByPetaFile(petaFile);
       // console.log(scores);
       console.timeEnd("sim");
+      await _tf.getSimilarPetaTags(petaFile);
       return scores.map((s) => s.id);
     } catch (err) {
       console.log(err);
@@ -905,8 +876,8 @@ export const ipcFunctions: IpcFunctionsType = {
     }
   },
 };
-const vecCaches: { [id: string]: Buffer } = {};
-let tf: TensorFlow | undefined;
+// let predictionModel: TF.Sequential | undefined;
+let tf: TF | undefined;
 export function registerIpcFunctions() {
   Object.keys(ipcFunctions).forEach((key) => {
     ipcMain.handle(key, ipcFunctions[key as keyof IpcFunctionsType]);
