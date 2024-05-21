@@ -3,6 +3,7 @@ import { resolve } from "path";
 import { layers, Sequential, sequential, stack, tensor, Tensor } from "@tensorflow/tfjs";
 
 import { PetaFile } from "@/commons/datas/petaFile";
+import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
@@ -58,15 +59,16 @@ export class TF {
     await ppa(
       async (targetPetaFile, i) => {
         if (i % 100 === 0) console.log("id:", i);
-        if (i % 100 === 0) console.time("s");
+        if (i % 100 === 0) console.time("s" + i);
         const targetVec = await this.getOrUpdateImageVector(targetPetaFile);
         scores.push({
           id: targetPetaFile.id,
           score: this.similarity(baseVec, targetVec),
         });
-        if (i % 100 === 0) console.timeEnd("s");
+        if (i % 100 === 0) console.timeEnd("s" + i);
       },
       Object.values(await usePetaFilesController().getAll()),
+      CPU_LENGTH,
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
   }
@@ -112,17 +114,21 @@ export class TF {
       });
       const imageVectors: Tensor[] = [];
       const tagVectors: Tensor[] = [];
-      await ppa(async (pf) => {
-        imageVectors.push(await this.getOrUpdateImageVector(pf));
-        const tagVector = allTags.map(() => 0);
-        allPetaFilesPetaTags[pf.id]
-          ?.map((id) => tagIndex.indexOf(id))
-          .filter((index) => index >= 0)
-          .forEach((index) => {
-            tagVector[index] = 1;
-          });
-        tagVectors.push(tensor(tagVector));
-      }, allPetaFiles).promise;
+      await ppa(
+        async (pf) => {
+          imageVectors.push(await this.getOrUpdateImageVector(pf));
+          const tagVector = allTags.map(() => 0);
+          allPetaFilesPetaTags[pf.id]
+            ?.map((id) => tagIndex.indexOf(id))
+            .filter((index) => index >= 0)
+            .forEach((index) => {
+              tagVector[index] = 1;
+            });
+          tagVectors.push(tensor(tagVector));
+        },
+        allPetaFiles,
+        CPU_LENGTH,
+      ).promise;
       const xs = stack(imageVectors);
       const ys = stack(tagVectors);
       await this.predictionModel.fit(xs, ys, {

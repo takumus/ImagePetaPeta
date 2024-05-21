@@ -58,6 +58,7 @@ export class LibTF {
   }
   async imageToVector(source: string | Buffer) {
     const { data, info } = await sharp(source)
+      // .modulate({ saturation: 0})
       .resize(224, 224)
       .raw()
       .removeAlpha()

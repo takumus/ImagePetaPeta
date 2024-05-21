@@ -4,6 +4,7 @@ import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
 import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
+import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
 
@@ -103,12 +104,16 @@ export class PetaFilesPetaTagsController {
   async getPetaTagIdsByPetaFileIds2(petaFileIds: string[]) {
     const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
     const res: { [pfid: string]: string[] } = {};
-    await ppa(async (pfid, i) => {
-      res[pfid] = (await dbPetaFilesPetaTags.find({ petaFileId: pfid })).map(
-        (pipt) => pipt.petaTagId,
-      );
-      await new Promise(setImmediate);
-    }, petaFileIds).promise;
+    await ppa(
+      async (pfid, i) => {
+        res[pfid] = (await dbPetaFilesPetaTags.find({ petaFileId: pfid })).map(
+          (pipt) => pipt.petaTagId,
+        );
+        await new Promise(setImmediate);
+      },
+      petaFileIds,
+      CPU_LENGTH,
+    ).promise;
     return res;
   }
   async getPetaFileIds(params: GetPetaFileIdsParams) {
