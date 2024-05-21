@@ -24,8 +24,8 @@ export class TF {
   }
   async updateImageVector(petaFile: PetaFile) {
     const imageBuffer = await streamToBuffer(getStreamFromPetaFile(petaFile, "thumbnail"));
-    const vector = (await this.libTF.imageToVector(imageBuffer)).reshape([1280]);
-    const vectorBuffer = this.libTF.vectorToBuffer(vector);
+    const vector = await this.libTF.imageToTensor(imageBuffer);
+    const vectorBuffer = this.libTF.tensorToBuffer(vector);
     const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
     const filePath = resolve(dirPath, petaFile.id + ".tv");
     await mkdirIfNotIxists(dirPath, { recursive: true });
@@ -41,7 +41,7 @@ export class TF {
       const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
       const filePath = resolve(dirPath, petaFile.id + ".tv");
       const vectorBuffer = await readFile(filePath);
-      this.imageVectorCache[petaFile.id] = this.libTF.bufferToVector(vectorBuffer);
+      this.imageVectorCache[petaFile.id] = this.libTF.bufferToTensor(vectorBuffer);
       return this.imageVectorCache[petaFile.id];
     } catch {
       return undefined;
@@ -76,10 +76,6 @@ export class TF {
     if (this.predictionModel === undefined) {
       const allTags = await usePetaTagsController().getPetaTags();
       const allPetaFiles = Object.values(await usePetaFilesController().getAll());
-      const allPetaFilesPetaTags =
-        await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds2(
-          allPetaFiles.map((p) => p.id),
-        );
       const tagIndex = allTags.map((t) => t.id);
       this.predictionModel = sequential();
       this.predictionModel.add(
@@ -115,15 +111,16 @@ export class TF {
       const imageVectors: Tensor[] = [];
       const tagVectors: Tensor[] = [];
       await ppa(
-        async (pf) => {
+        async (pf, i) => {
           imageVectors.push(await this.getOrUpdateImageVector(pf));
           const tagVector = allTags.map(() => 0);
-          allPetaFilesPetaTags[pf.id]
+          (await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]))
             ?.map((id) => tagIndex.indexOf(id))
             .filter((index) => index >= 0)
             .forEach((index) => {
               tagVector[index] = 1;
             });
+          console.log(i);
           tagVectors.push(tensor(tagVector));
         },
         allPetaFiles,

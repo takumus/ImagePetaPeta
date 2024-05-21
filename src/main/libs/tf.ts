@@ -56,7 +56,7 @@ export class LibTF {
     tensor.dispose();
     return expandedTensor.div(255);
   }
-  async imageToVector(source: string | Buffer) {
+  async imageToTensor(source: string | Buffer) {
     const { data, info } = await sharp(source)
       // .modulate({ saturation: 0})
       .resize(224, 224)
@@ -68,7 +68,7 @@ export class LibTF {
         throw "mobilenet is not initialized";
       }
       const preprocessedImage = this.preprocessImage(data, info);
-      return this.model.predict(preprocessedImage) as tf.Tensor;
+      return (this.model.predict(preprocessedImage) as tf.Tensor).reshape([1280]);
     });
   }
   similarity(vecA: tf.Tensor, vecB: tf.Tensor) {
@@ -79,11 +79,11 @@ export class LibTF {
       return dotProduct.div(normA.mul(normB)).dataSync()[0];
     });
   }
-  vectorToBuffer(vec: tf.Tensor) {
+  tensorToBuffer(vec: tf.Tensor) {
     const data = vec.dataSync();
     return Buffer.from(data.buffer);
   }
-  bufferToVector(buffer: Buffer) {
+  bufferToTensor(buffer: Buffer) {
     const data = new Float32Array(buffer.buffer);
     return tf.tensor(data);
   }
