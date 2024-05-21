@@ -10,3 +10,6 @@ _electronTemp
 _test
 src/_public
 src/_defines
+
+scripts/experiments/temp/*
+!.keep
