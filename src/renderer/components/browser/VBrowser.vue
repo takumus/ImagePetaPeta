@@ -395,7 +395,7 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         label: "simTag",
         click: async () => {
           const ids = await IPC.getSimTags(petaFile.id);
-          alert(JSON.stringify(ids, undefined, 2));
+          console.log(JSON.stringify(ids, undefined, 2));
         },
       },
       {

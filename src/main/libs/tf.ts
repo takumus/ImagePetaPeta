@@ -89,15 +89,16 @@ export class LibTF {
     return tf.tensor(data);
   }
 }
-const noise = Buffer.alloc(224 * 224 * 3);
-for (let i = 0; i < noise.length; i++) {
-  noise[i] = Math.round(0xff * Math.random());
-}
 async function createImageForTensor(source: string | Buffer) {
+  const noise = Buffer.alloc(224 * 224 * 3);
+  for (let i = 0; i < noise.length; i++) {
+    noise[i] = Math.round(0xff * Math.random());
+  }
   const img = await sharp(source)
-    .resize(200, 200, {
+    .resize(224, 224, {
       fit: "inside",
     })
+    .removeAlpha()
     .toBuffer();
   return await sharp(noise, { raw: { width: 224, height: 224, channels: 3 } })
     .composite([
