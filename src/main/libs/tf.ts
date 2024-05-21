@@ -57,12 +57,13 @@ export class LibTF {
     return expandedTensor.div(255);
   }
   async imageToTensor(source: string | Buffer) {
-    const { data, info } = await sharp(source)
-      // .modulate({ saturation: 0})
-      .resize(224, 224)
-      .raw()
-      .removeAlpha()
-      .toBuffer({ resolveWithObject: true });
+    const { data, info } = await createImageForTensor(source);
+    // .modulate({ saturation: 0})
+    // .resize(224, 224, { fit: "fill" })
+    // .raw()
+    // .removeAlpha()
+    // .toBuffer({ resolveWithObject: true });
+    // console.log(info);
     return tf.tidy(() => {
       if (this.model === undefined) {
         throw "mobilenet is not initialized";
@@ -87,4 +88,24 @@ export class LibTF {
     const data = new Float32Array(buffer.buffer);
     return tf.tensor(data);
   }
+}
+const noise = Buffer.alloc(224 * 224 * 3);
+for (let i = 0; i < noise.length; i++) {
+  noise[i] = Math.round(0xff * Math.random());
+}
+async function createImageForTensor(source: string | Buffer) {
+  const img = await sharp(source)
+    .resize(200, 200, {
+      fit: "inside",
+    })
+    .toBuffer();
+  return await sharp(noise, { raw: { width: 224, height: 224, channels: 3 } })
+    .composite([
+      {
+        input: img,
+      },
+    ])
+    .raw()
+    .removeAlpha()
+    .toBuffer({ resolveWithObject: true });
 }
