@@ -100,7 +100,7 @@
     "gifuct-js": "^2.1.2",
     "node-html-parser": "^6.1.13",
     "p-limit": "^5.0.0",
-    "pixi.js": "8.1.4",
+    "pixi.js": "8.1.5",
     "qrcode": "^1.5.3",
     "quantize": "^1.0.2",
     "sharp": "^0.33.4",
