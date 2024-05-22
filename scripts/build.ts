@@ -2,7 +2,7 @@ import { writeFileSync } from "fs";
 import { exit } from "process";
 import { electronConfiguration } from "../electron.config";
 import { Arch, build, Platform } from "electron-builder";
-import { createRelease } from "scripts/createRelease";
+import { release } from "scripts/release";
 import yargs from "yargs/yargs";
 
 (async () => {
@@ -59,7 +59,7 @@ import yargs from "yargs/yargs";
     targets: target,
   })
     .then(() => {
-      createRelease()
+      release()
         .then(() => {
           exit(0);
         })
