@@ -7,7 +7,8 @@ import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
-import { LibTF } from "@/main/libs/tf";
+import { tensorBuffer } from "@/main/libs/tf/tensorBuffer";
+import { TFImageClassification } from "@/main/libs/tf/tfImageClassification";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
@@ -16,16 +17,16 @@ import { getStreamFromPetaFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 export class TF {
-  libTF = new LibTF();
+  imageClassification = new TFImageClassification();
   imageVectorCache: { [id: string]: Tensor } = {};
   predictionModel: Sequential | undefined;
   async init() {
-    return await this.libTF.init();
+    return await this.imageClassification.init();
   }
   async updateImageVector(petaFile: PetaFile) {
     const imageBuffer = await streamToBuffer(getStreamFromPetaFile(petaFile, "thumbnail"));
-    const vector = await this.libTF.imageToTensor(imageBuffer);
-    const vectorBuffer = this.libTF.tensorToBuffer(vector);
+    const vector = await this.imageClassification.imageToTensor(imageBuffer);
+    const vectorBuffer = tensorBuffer.toBuffer(vector);
     const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
     const filePath = resolve(dirPath, petaFile.id + ".tv");
     await mkdirIfNotIxists(dirPath, { recursive: true });
@@ -41,7 +42,7 @@ export class TF {
       const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
       const filePath = resolve(dirPath, petaFile.id + ".tv");
       const vectorBuffer = await readFile(filePath);
-      this.imageVectorCache[petaFile.id] = this.libTF.bufferToTensor(vectorBuffer);
+      this.imageVectorCache[petaFile.id] = tensorBuffer.toTensor(vectorBuffer);
       return this.imageVectorCache[petaFile.id];
     } catch {
       return undefined;
@@ -51,7 +52,7 @@ export class TF {
     return (await this.getImageVector(petaFile)) ?? (await this.updateImageVector(petaFile));
   }
   similarity(vecA: Tensor, vecB: Tensor) {
-    return this.libTF.similarity(vecA, vecB);
+    return this.imageClassification.similarity(vecA, vecB);
   }
   async getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile) {
     const baseVec = await this.getOrUpdateImageVector(basePetaFile);

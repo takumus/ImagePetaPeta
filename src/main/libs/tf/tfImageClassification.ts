@@ -16,12 +16,11 @@ function minURL(url: string) {
   }
   return url.slice(0, pad1) + "..." + url.slice(-pad2);
 }
-export class LibTF {
+export class TFImageClassification {
   model: tf.GraphModel<string | tf.io.IOHandler> | undefined;
   constructor() {}
   async init() {
     await tf.setBackend("wasm");
-    // modelCacher.start();
     this.model = await tf.loadGraphModel(
       "+https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1",
       {
@@ -48,22 +47,16 @@ export class LibTF {
         },
       },
     );
-    // modelCacher.end();
   }
   preprocessImage(data: Buffer, info: sharp.OutputInfo) {
-    const tensor = tf.tensor(data, [info.height, info.width, info.channels]).toFloat();
-    const expandedTensor = tensor.expandDims();
-    tensor.dispose();
-    return expandedTensor.div(255);
+    return tf
+      .tensor(data, [info.height, info.width, info.channels])
+      .toFloat()
+      .div(tf.scalar(255))
+      .expandDims();
   }
   async imageToTensor(source: string | Buffer) {
     const { data, info } = await createImageForTensor(source);
-    // .modulate({ saturation: 0})
-    // .resize(224, 224, { fit: "fill" })
-    // .raw()
-    // .removeAlpha()
-    // .toBuffer({ resolveWithObject: true });
-    // console.log(info);
     return tf.tidy(() => {
       if (this.model === undefined) {
         throw "mobilenet is not initialized";
@@ -79,14 +72,6 @@ export class LibTF {
       const normB = tf.sqrt(tf.sum(tf.square(vecB)));
       return dotProduct.div(normA.mul(normB)).dataSync()[0];
     });
-  }
-  tensorToBuffer(vec: tf.Tensor) {
-    const data = vec.dataSync();
-    return Buffer.from(data.buffer);
-  }
-  bufferToTensor(buffer: Buffer) {
-    const data = new Float32Array(buffer.buffer);
-    return tf.tensor(data);
   }
 }
 async function createImageForTensor(source: string | Buffer) {
