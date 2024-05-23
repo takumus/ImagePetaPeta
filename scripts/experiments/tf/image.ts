@@ -8,7 +8,7 @@ process.env.NODE_ENV = "development";
   const tensor1 = await tfic.imageToTensor("./test/sampleDatas/dog.jpg");
   const tensor2 = await tfic.imageToTensor("./test/sampleDatas/bird.png");
   // console.log(tensor1, tensor2);
-  console.log(tfic.similarity(tensor1, tensor2));
+  console.log(tensor1, tensor2, tfic.similarity(tensor1, tensor2));
   // const squeezedTensor = tensor1.squeeze([0]);
 
   // // テンソルの値を0-255の範囲にスケール

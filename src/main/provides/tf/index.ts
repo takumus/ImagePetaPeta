@@ -25,10 +25,12 @@ export class TF {
   }
   async saveImageVector(petaFile: PetaFile) {
     const imageBuffer = await streamToBuffer(getStreamFromPetaFile(petaFile, "thumbnail"));
-    const tensor = stack([
-      await this.imageClassification.imageToTensor(imageBuffer, 0),
-      await this.imageClassification.imageToTensor(imageBuffer, 1),
-    ]); // [2, 1280]
+    const tensor = stack(
+      await Promise.all([
+        this.imageClassification.imageToTensor(imageBuffer, 0),
+        this.imageClassification.imageToTensor(imageBuffer, 1),
+      ]),
+    ); // [2, 1280]
     const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
     await mkdirIfNotIxists(dirPath, { recursive: true });
     await writeFile(resolve(dirPath, petaFile.id + ".tv"), tensorBuffer.toBuffer(tensor));
