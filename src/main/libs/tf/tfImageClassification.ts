@@ -40,8 +40,8 @@ export class TFImageClassification {
       },
     );
   }
-  async imageToTensor(source: string | Buffer) {
-    const { data, info } = await this.createImage(source);
+  async imageToTensor(source: string | Buffer, croppingType: 0 | 1 = 0) {
+    const { data, info } = await this.createImage(source, croppingType);
     return tf.tidy(() => {
       if (this.model === undefined) {
         throw "mobilenet is not initialized";
@@ -63,27 +63,21 @@ export class TFImageClassification {
       return dotProduct.div(normA.mul(normB)).dataSync()[0];
     });
   }
-  private async createImage(source: string | Buffer) {
-    const noise = Buffer.alloc(224 * 224 * 3);
-    for (let i = 0; i < noise.length; i++) {
-      noise[i] = Math.round(0xff * Math.random());
-    }
-    const img = await sharp(source)
-      .resize(224, 224, {
-        fit: "inside",
-      })
-      .removeAlpha()
-      .toBuffer();
-    return await sharp(noise, { raw: { width: 224, height: 224, channels: 3 } })
-      .composite([
-        {
-          input: img,
-        },
-      ])
+  private async createImage(source: string | Buffer, croppingType: 0 | 1) {
+    return await sharp(
+      await sharp(source)
+        .resize(224, 224, {
+          fit: "cover",
+          position: croppingType === 0 ? sharp.strategy.attention : sharp.strategy.entropy,
+        })
+        .ensureAlpha(1)
+        .toBuffer(),
+    )
       .raw()
       .removeAlpha()
       .toBuffer({ resolveWithObject: true });
   }
+
   private minURL(url: string) {
     const pad1 = 20;
     const pad2 = 30;
