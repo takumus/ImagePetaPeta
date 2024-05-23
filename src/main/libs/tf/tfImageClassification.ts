@@ -46,8 +46,13 @@ export class TFImageClassification {
       if (this.model === undefined) {
         throw "mobilenet is not initialized";
       }
-      const preprocessedImage = this.preprocessImage(data, info);
-      return (this.model.predict(preprocessedImage) as tf.Tensor).reshape([1280]);
+      const preprocessedImage = tf
+        .tensor(data, [info.height, info.width, info.channels])
+        .toFloat()
+        .div(tf.scalar(255))
+        .expandDims();
+      const tensor = this.model.predict(preprocessedImage) as tf.Tensor;
+      return tensor.reshape([1280]);
     });
   }
   similarity(vecA: tf.Tensor, vecB: tf.Tensor) {
@@ -57,13 +62,6 @@ export class TFImageClassification {
       const normB = tf.sqrt(tf.sum(tf.square(vecB)));
       return dotProduct.div(normA.mul(normB)).dataSync()[0];
     });
-  }
-  private preprocessImage(data: Buffer, info: sharp.OutputInfo) {
-    return tf
-      .tensor(data, [info.height, info.width, info.channels])
-      .toFloat()
-      .div(tf.scalar(255))
-      .expandDims();
   }
   private async createImage(source: string | Buffer) {
     const noise = Buffer.alloc(224 * 224 * 3);
