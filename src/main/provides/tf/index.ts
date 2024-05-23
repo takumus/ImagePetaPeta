@@ -23,48 +23,49 @@ export class TF {
   async init() {
     return await this.imageClassification.init();
   }
-  async updateImageVector(petaFile: PetaFile) {
+  async saveImageVector(petaFile: PetaFile) {
     const imageBuffer = await streamToBuffer(getStreamFromPetaFile(petaFile, "thumbnail"));
-    const vector = await this.imageClassification.imageToTensor(imageBuffer);
-    const vectorBuffer = tensorBuffer.toBuffer(vector);
+    const tensor = stack([
+      await this.imageClassification.imageToTensor(imageBuffer, 0),
+      await this.imageClassification.imageToTensor(imageBuffer, 1),
+    ]); // [2, 1280]
     const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
-    const filePath = resolve(dirPath, petaFile.id + ".tv");
     await mkdirIfNotIxists(dirPath, { recursive: true });
-    await writeFile(filePath, vectorBuffer);
-    this.imageVectorCache[petaFile.id] = vector;
-    return vector;
+    await writeFile(resolve(dirPath, petaFile.id + ".tv"), tensorBuffer.toBuffer(tensor));
+    this.imageVectorCache[petaFile.id] = tensor;
+    return tensor;
   }
-  async getImageVector(petaFile: PetaFile) {
+  async loadImageVector(petaFile: PetaFile) {
     try {
       if (this.imageVectorCache[petaFile.id] !== undefined) {
         return this.imageVectorCache[petaFile.id];
       }
       const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
-      const filePath = resolve(dirPath, petaFile.id + ".tv");
-      const vectorBuffer = await readFile(filePath);
-      this.imageVectorCache[petaFile.id] = tensorBuffer.toTensor(vectorBuffer);
+      this.imageVectorCache[petaFile.id] = tensorBuffer
+        .toTensor(await readFile(resolve(dirPath, petaFile.id + ".tv")))
+        .reshape([2, 1280]); // [2, 1280]
       return this.imageVectorCache[petaFile.id];
     } catch {
       return undefined;
     }
   }
-  async getOrUpdateImageVector(petaFile: PetaFile) {
-    return (await this.getImageVector(petaFile)) ?? (await this.updateImageVector(petaFile));
+  async loadOrSaveImageVector(petaFile: PetaFile) {
+    return (await this.loadImageVector(petaFile)) ?? (await this.saveImageVector(petaFile));
   }
   similarity(vecA: Tensor, vecB: Tensor) {
     return this.imageClassification.similarity(vecA, vecB);
   }
   async getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile) {
-    const baseVec = await this.getOrUpdateImageVector(basePetaFile);
+    const baseTensor = await this.loadOrSaveImageVector(basePetaFile);
     const scores: { id: string; score: number }[] = [];
     await ppa(
       async (targetPetaFile, i) => {
         if (i % 100 === 0) console.log("id:", i);
         if (i % 100 === 0) console.time("s" + i);
-        const targetVec = await this.getOrUpdateImageVector(targetPetaFile);
+        const targetTensor = await this.loadOrSaveImageVector(targetPetaFile);
         scores.push({
           id: targetPetaFile.id,
-          score: this.similarity(baseVec, targetVec),
+          score: this.similarity(baseTensor, targetTensor),
         });
         if (i % 100 === 0) console.timeEnd("s" + i);
       },
@@ -113,7 +114,7 @@ export class TF {
       const tagVectors: Tensor[] = [];
       await ppa(
         async (pf, i) => {
-          imageVectors.push(await this.getOrUpdateImageVector(pf));
+          imageVectors.push(await this.loadOrSaveImageVector(pf));
           const tagVector = allTags.map(() => 0);
           (await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]))
             ?.map((id) => tagIndex.indexOf(id))
@@ -167,7 +168,7 @@ export class TF {
     }
   }
   async getSimilarPetaTags(petaFile: PetaFile) {
-    const baseVector = await this.getOrUpdateImageVector(petaFile);
+    const baseVector = await this.loadOrSaveImageVector(petaFile);
     const allTags = await usePetaTagsController().getPetaTags();
     const tagIndex = allTags.map((t) => t.id);
     await this.createTagModel();

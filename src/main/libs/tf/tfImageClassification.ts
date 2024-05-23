@@ -40,7 +40,7 @@ export class TFImageClassification {
       },
     );
   }
-  async imageToTensor(source: string | Buffer, croppingType: 0 | 1 = 0) {
+  async imageToTensor(source: string | Buffer, croppingType: 0 | 1 = 1) {
     const { data, info } = await this.createImage(source, croppingType);
     return tf.tidy(() => {
       if (this.model === undefined) {
@@ -55,12 +55,13 @@ export class TFImageClassification {
       return tensor.reshape([1280]);
     });
   }
-  similarity(vecA: tf.Tensor, vecB: tf.Tensor) {
+  similarity(tensorA: tf.Tensor, tensorB: tf.Tensor) {
     return tf.tidy(() => {
-      const dotProduct = tf.sum(tf.mul(vecA, vecB));
-      const normA = tf.sqrt(tf.sum(tf.square(vecA)));
-      const normB = tf.sqrt(tf.sum(tf.square(vecB)));
-      return dotProduct.div(normA.mul(normB)).dataSync()[0];
+      const normA = tf.sqrt(tf.sum(tf.square(tensorA), -1, true));
+      const normB = tf.sqrt(tf.sum(tf.square(tensorB), -1, true));
+      const dotProduct = tf.matMul(tensorA, tensorB, false, true);
+      const similarity = dotProduct.div(tf.matMul(normA, normB, false, true));
+      return Math.max(...similarity.dataSync());
     });
   }
   private async createImage(source: string | Buffer, croppingType: 0 | 1) {
