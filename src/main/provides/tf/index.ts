@@ -18,8 +18,7 @@ import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 export class TF {
   imageClassification = new TFImageClassification();
-  imageVectorCache: { [id: string]: Tensor } = {};
-  predictionModel: Sequential | undefined;
+  imageTensorCache: { [id: string]: Tensor } = {};
   async init() {
     return await this.imageClassification.init();
   }
@@ -34,19 +33,19 @@ export class TF {
     const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
     await mkdirIfNotIxists(dirPath, { recursive: true });
     await writeFile(resolve(dirPath, petaFile.id + ".tv"), tensorBuffer.toBuffer(tensor));
-    this.imageVectorCache[petaFile.id] = tensor;
+    this.imageTensorCache[petaFile.id] = tensor;
     return tensor;
   }
   async loadImageVector(petaFile: PetaFile) {
     try {
-      if (this.imageVectorCache[petaFile.id] !== undefined) {
-        return this.imageVectorCache[petaFile.id];
+      if (this.imageTensorCache[petaFile.id] !== undefined) {
+        return this.imageTensorCache[petaFile.id];
       }
       const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
-      this.imageVectorCache[petaFile.id] = tensorBuffer
-        .toTensor(await readFile(resolve(dirPath, petaFile.id + ".tv")))
-        .reshape([2, 1280]); // [2, 1280]
-      return this.imageVectorCache[petaFile.id];
+      this.imageTensorCache[petaFile.id] = tensorBuffer.toTensor(
+        await readFile(resolve(dirPath, petaFile.id + ".tv")),
+      );
+      return this.imageTensorCache[petaFile.id];
     } catch {
       return undefined;
     }
@@ -79,100 +78,6 @@ export class TF {
       CPU_LENGTH,
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
-  }
-  async createTagModel() {
-    if (this.predictionModel === undefined) {
-      const allTags = await usePetaTagsController().getPetaTags();
-      const allPetaFiles = Object.values(await usePetaFilesController().getAll());
-      const tagIndex = allTags.map((t) => t.id);
-      this.predictionModel = sequential();
-      this.predictionModel.add(
-        layers.dense({
-          units: 512,
-          activation: "relu",
-          inputShape: [1280],
-        }),
-      );
-      this.predictionModel.add(
-        layers.dense({
-          units: 256,
-          activation: "relu",
-        }),
-      );
-      this.predictionModel.add(
-        layers.dense({
-          units: 128,
-          activation: "relu",
-        }),
-      );
-      this.predictionModel.add(
-        layers.dense({
-          units: allTags.length,
-          activation: "sigmoid",
-        }),
-      );
-      this.predictionModel.compile({
-        optimizer: "adam",
-        loss: "binaryCrossentropy",
-        metrics: ["accuracy"],
-      });
-      const imageVectors: Tensor[] = [];
-      const tagVectors: Tensor[] = [];
-      await ppa(
-        async (pf, i) => {
-          const tens = (await this.loadOrSaveImageVector(pf)).slice([1, 0], [1, 1280]);
-          imageVectors.push(tens.reshape([1280]));
-          const tagVector = allTags.map(() => 0);
-          (await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]))
-            ?.map((id) => tagIndex.indexOf(id))
-            .filter((index) => index >= 0)
-            .forEach((index) => {
-              tagVector[index] = 1;
-            });
-          console.log(i);
-          tagVectors.push(tensor(tagVector));
-        },
-        allPetaFiles,
-        CPU_LENGTH,
-      ).promise;
-      const xs = stack(imageVectors);
-      const ys = stack(tagVectors);
-      await this.predictionModel.fit(xs, ys, {
-        epochs: 1,
-        batchSize: 32,
-      });
-      const _fetch = fetch;
-      global.fetch = async (...args: Parameters<typeof fetch>) => {
-        if (args[0] === "http://save-to-local") {
-          const fd = args[1]?.body as FormData;
-          const files: File[] = [];
-          fd.forEach((v) => {
-            files.push(v as File);
-          });
-          await ppa(async (f) => {
-            console.log(f.name, await f.arrayBuffer());
-            if (f.name === "model.json") {
-              console.log(Buffer.from(await f.arrayBuffer()).toString());
-            }
-          }, files).promise;
-          return new Response();
-        } else {
-          return _fetch(...args);
-        }
-      };
-      await this.predictionModel.save("http://save-to-local");
-      // await this.predictionModel.save({
-      //   async save(model): Promise<any> {
-      //     console.log(model.);
-      //     return {
-      //       modelArtifactsInfo: {
-      //         dateSaved: Date.now(),
-      //         modelTopologyType: "JSON",
-      //       },
-      //     };
-      //   },
-      // });
-    }
   }
   async getSimilarPetaTags(petaFile: PetaFile) {
     const petaFiles = (await this.getSimilarPetaFileIDsByPetaFile(petaFile)).splice(1, 10);
