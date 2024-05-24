@@ -52,7 +52,11 @@ export class TF {
     }
   }
   async loadOrSaveImageVector(petaFile: PetaFile) {
-    return (await this.loadImageVector(petaFile)) ?? (await this.saveImageVector(petaFile));
+    const loadedTensor = await this.loadImageVector(petaFile);
+    if (loadedTensor !== undefined && !loadedTensor.isDisposed) {
+      return loadedTensor;
+    }
+    return await this.saveImageVector(petaFile);
   }
   similarity(vecA: Tensor, vecB: Tensor) {
     return this.imageClassification.similarity(vecA, vecB);
@@ -116,7 +120,8 @@ export class TF {
       const tagVectors: Tensor[] = [];
       await ppa(
         async (pf, i) => {
-          imageVectors.push(await this.loadOrSaveImageVector(pf));
+          const tens = (await this.loadOrSaveImageVector(pf)).slice([1, 0], [1, 1280]);
+          imageVectors.push(tens.reshape([1280]));
           const tagVector = allTags.map(() => 0);
           (await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]))
             ?.map((id) => tagIndex.indexOf(id))
@@ -170,29 +175,24 @@ export class TF {
     }
   }
   async getSimilarPetaTags(petaFile: PetaFile) {
-    const baseVector = await this.loadOrSaveImageVector(petaFile);
+    const petaFiles = (await this.getSimilarPetaFileIDsByPetaFile(petaFile)).splice(1, 10);
     const allTags = await usePetaTagsController().getPetaTags();
-    const tagIndex = allTags.map((t) => t.id);
-    await this.createTagModel();
-    const predictions = this.predictionModel!.predict(baseVector.reshape([1, 1280])) as Tensor;
-    const probabilities = ((await predictions.array()) as number[][])[0];
-    const predictedTags = probabilities.map((prob: number, index: number) => ({
-      tagId: index,
-      probability: prob,
-    }));
-    console.log("=========================================================");
-    return await ppa(
-      async (v) => {
-        const tag = allTags.find((ttt) => ttt.id === tagIndex[v.tagId]);
-        const ddd = {
-          name: tag?.name!,
-          tagId: tag?.id!,
-          prob: v.probability,
-        };
-        console.log(ddd.prob.toFixed(2), ddd.name);
-        return ddd;
-      },
-      predictedTags.sort((a, b) => b.probability - a.probability),
-    ).promise;
+    const tagScore: { [id: string]: number } = allTags.reduce((p, c) => ({ ...p, [c.id]: 0 }), {});
+    await ppa(async (pf) => {
+      const ids = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);
+      ids.forEach((id) => {
+        tagScore[id] += pf.score;
+      });
+    }, petaFiles).promise;
+    const scores = Object.keys(tagScore)
+      .filter((id) => tagScore[id] > 0)
+      .map((id) => ({
+        tagId: id,
+        prob: tagScore[id],
+        name: allTags.find((t) => t.id === id)?.name,
+      }))
+      .sort((a, b) => b.prob - a.prob);
+    console.log(scores.map((s) => `${s.name}: ${s.prob}`).join("\n"));
+    return scores;
   }
 }
