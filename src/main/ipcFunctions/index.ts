@@ -636,7 +636,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const log = logger.logMainChunk();
     try {
       log.debug("#importFiles");
-      log.debug(datas.length);
+      log.debug(datas.length, datas);
       const logFromBrowser = logger.logMainChunk();
       const ids = getIdsFromFilePaths(datas);
       logFromBrowser.debug("## From Browser");
@@ -647,33 +647,34 @@ export const ipcFunctions: IpcFunctionsType = {
         logFromBrowser.debug("return:", false);
       }
       const fileInfos = (
-        await ppa(async (data): Promise<ImportFileInfo | undefined> => {
-          for (let i = 0; i < data.length; i++) {
-            console.log(data[i]);
-            const d = data[i];
-            switch (d.type) {
-              case "filePath":
-                return {
-                  path: d.filePath,
-                  ...d.additionalData,
-                };
-              case "url": {
-                const result = await createFileInfo.fromURL(d.url, d.referrer, d.ua);
-                if (result === undefined) return undefined;
-                result.name = d.additionalData?.name ?? result.name;
-                result.note = d.additionalData?.note ?? result.note;
-                return result;
+        await ppa(async (group): Promise<ImportFileInfo | undefined> => {
+          for (let i = 0; i < group.length; i++) {
+            try {
+              const d = group[i];
+              switch (d.type) {
+                case "filePath":
+                  return {
+                    path: d.filePath,
+                    ...d.additionalData,
+                  };
+                case "url":
+                case "buffer": {
+                  const result =
+                    d.type === "url"
+                      ? await createFileInfo.fromURL(d.url, d.referrer, d.ua)
+                      : await createFileInfo.fromBuffer(d.buffer);
+                  if (result !== undefined) {
+                    result.name = d.additionalData?.name ?? result.name;
+                    result.note = d.additionalData?.note ?? result.note;
+                    return result;
+                  }
+                  break;
+                }
               }
-              case "buffer": {
-                const result = await createFileInfo.fromBuffer(d.buffer);
-                if (result === undefined) return undefined;
-                result.name = d.additionalData?.name ?? result.name;
-                result.note = d.additionalData?.note ?? result.note;
-                return result;
-              }
+            } catch {
+              //
             }
           }
-          return undefined;
         }, datas).promise
       ).filter((info) => info !== undefined) as ImportFileInfo[];
       const petaFileIds = (
@@ -855,7 +856,6 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getSimIDs(_, id) {
     try {
-      console.time("sim");
       const petaFile = await usePetaFilesController().getPetaFile(id);
       if (petaFile === undefined) {
         return [];
@@ -866,17 +866,13 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       const _tf = tf;
       const scores = await _tf.getSimilarPetaFileIDsByPetaFile(petaFile);
-      // console.log(scores);
-      console.timeEnd("sim");
       return scores.map((s) => s.id);
     } catch (err) {
-      console.log(err);
       return [];
     }
   },
   async getSimTags(_, id) {
     try {
-      console.time("sim");
       const petaFile = await usePetaFilesController().getPetaFile(id);
       if (petaFile === undefined) {
         return [];
@@ -887,11 +883,8 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       const _tf = tf;
       const scores = await _tf.getSimilarPetaTags(petaFile);
-      // console.log(scores);
-      console.timeEnd("sim");
       return scores;
     } catch (err) {
-      console.log(err);
       return [];
     }
   },
