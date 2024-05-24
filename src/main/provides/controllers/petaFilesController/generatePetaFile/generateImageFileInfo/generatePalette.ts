@@ -5,13 +5,20 @@ import { ciede } from "@/commons/utils/colors";
 
 function createPixels(buffer: Buffer, pixelCount: number) {
   const pixels: [number, number, number][] = [];
+  let avgAlpha = 0;
+  for (let i = 0; i < pixelCount; i += 1) {
+    const offset = i * 4;
+    avgAlpha += buffer[offset + 3] as number;
+  }
+  avgAlpha /= pixelCount;
+  avgAlpha /= 2;
   for (let i = 0; i < pixelCount; i += 1) {
     const offset = i * 4;
     const r = buffer[offset + 0] as number;
     const g = buffer[offset + 1] as number;
     const b = buffer[offset + 2] as number;
     const a = buffer[offset + 3] as number;
-    if (a === undefined || a >= 125) {
+    if (a === undefined || a > avgAlpha) {
       pixels.push([r, g, b]);
     }
   }
