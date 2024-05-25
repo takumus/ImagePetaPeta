@@ -33,11 +33,11 @@ export const createFileInfo = {
         // 普通のurlだったら
         const init: RequestInit = {
           headers: {
-            ...(ua !== undefined
-              ? {
-                  "user-agent": ua,
-                }
-              : {}),
+            // ...(ua !== undefined
+            //   ? {
+            //       "user-agent": ua,
+            //     }
+            //   : {}),
             ...(referrer !== undefined
               ? {
                   Referer: referrer,

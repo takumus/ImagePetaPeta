@@ -202,16 +202,17 @@ export class PetaFilesController {
           try {
             const name = Path.basename(fileInfo.path);
             const fileDate = (await stat(fileInfo.path)).mtime;
-            const readStream = fileInfo.encrypted
-              ? secureFile.decrypt.toStream(
-                  fileInfo.path,
-                  useConfigSecureFilePassword().getTempFileKey(),
-                )
-              : createReadStream(fileInfo.path);
-            if (!(await isSupportedFile(readStream))) {
+            const readStream = () =>
+              fileInfo.encrypted
+                ? secureFile.decrypt.toStream(
+                    fileInfo.path,
+                    useConfigSecureFilePassword().getTempFileKey(),
+                  )
+                : createReadStream(fileInfo.path);
+            if (!(await isSupportedFile(readStream()))) {
               throw new Error("unsupported file");
             }
-            const id = await fileSHA256(readStream);
+            const id = await fileSHA256(readStream());
             const exists = await this.getPetaFile(id);
             if (exists !== undefined) {
               result = ImportImageResult.EXISTS;
