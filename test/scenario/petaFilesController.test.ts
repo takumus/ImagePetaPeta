@@ -5,11 +5,12 @@ import { initDummyElectron } from "./initDummyElectron";
 import deepcopy from "deepcopy";
 import { fileTypeFromStream } from "file-type";
 import sharp from "sharp";
-import { beforeAll, beforeEach, describe, expect, test } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
+import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
@@ -18,6 +19,7 @@ import { getStreamFromPetaFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 const ROOT = "./_test/scenario/petaFilesController";
+const DOG_FILE = resolve("./test/sampleDatas/dogLowRes.jpg");
 describe("petaFilesController", () => {
   beforeAll(async () => {
     try {
@@ -128,6 +130,27 @@ describe("petaFilesController", () => {
     ).promise;
     expect(prevThumbHashs).toEqual(newThumbHashs);
     expect(prevPFs).toEqual(Object.values(await pfc.getAll()));
+    await useDBS().waitUntilKillable();
+  });
+  test("encryptTempFile", async () => {
+    ((global.fetch as any) = vi.fn()).mockResolvedValue(new Response(readFileSync(DOG_FILE)));
+    const correctHash = await fileSHA256(DOG_FILE);
+    const pfc = usePetaFilesController();
+    const info = await createFileInfo.fromURL(
+      `https://takumus.io/dog.jpg`,
+      undefined,
+      undefined,
+      false,
+    ); // dummy url
+    expect(info).toBeDefined();
+    if (info !== undefined) {
+      await pfc.importFilesFromFileInfos({
+        fileInfos: [info],
+        extract: true,
+      });
+    }
+    const petaFile = Object.values(await pfc.getAll())[0];
+    expect(correctHash).toBe(petaFile.id);
     await useDBS().waitUntilKillable();
   });
   // test("realESRGAN", async () => {
