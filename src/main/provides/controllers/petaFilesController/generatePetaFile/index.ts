@@ -83,9 +83,20 @@ export async function generatePetaFile(param: {
         }
       } else {
         if (param.doEncrypt) {
-          await secureFile.encrypt.toFile(param.filePath, filePath.original, sfp.getValue());
+          const from = param.encryptedSource
+            ? secureFile.decrypt.toStream(param.filePath, sfp.getTempFileKey())
+            : param.filePath;
+          await secureFile.encrypt.toFile(from, filePath.original, sfp.getValue());
         } else {
-          await copyFile(param.filePath, filePath.original);
+          if (param.encryptedSource) {
+            await secureFile.decrypt.toFile(
+              param.filePath,
+              filePath.original,
+              sfp.getTempFileKey(),
+            );
+          } else {
+            await copyFile(param.filePath, filePath.original);
+          }
         }
       }
       return petaFile;
