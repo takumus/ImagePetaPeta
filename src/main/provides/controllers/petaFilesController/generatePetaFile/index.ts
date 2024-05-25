@@ -22,20 +22,23 @@ export async function regeneratePetaFile(petaFile: PetaFile) {
     filePath: getPetaFilePath.fromPetaFile(petaFile).original,
     type: "update",
     extends: petaFile,
-    encrypt: petaFile.encrypted,
+    doEncrypt: petaFile.encrypted,
+    encryptedSource: petaFile.encrypted,
   });
 }
 export async function generatePetaFile(param: {
   filePath: string;
   extends: Partial<PetaFile> & { id: string };
   type: "update" | "add";
-  encrypt: boolean;
+  doEncrypt: boolean;
+  encryptedSource?: boolean;
 }): Promise<PetaFile> {
   const logger = useLogger().logMainChunk();
   const sfp = useConfigSecureFilePassword();
   logger.debug("#Generate PetaFile");
   const fileInfo = await generateFileInfo(
     param.type === "update" ? (param.extends as PetaFile) : param.filePath,
+    param.encryptedSource,
   );
   if (fileInfo === undefined) {
     throw new Error("unsupported file");
@@ -58,10 +61,10 @@ export async function generatePetaFile(param: {
     // mimeType: fileInfo.original.mimeType,
     nsfw: param.extends.nsfw ?? false,
     metadata: fileInfo.metadata,
-    encrypted: param.encrypt,
+    encrypted: param.doEncrypt,
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
-  if (param.encrypt) {
+  if (param.doEncrypt) {
     await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getValue());
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
@@ -69,7 +72,7 @@ export async function generatePetaFile(param: {
   switch (param.type) {
     case "add":
       if (fileInfo.original.transformedBuffer !== undefined) {
-        if (param.encrypt) {
+        if (param.doEncrypt) {
           await secureFile.encrypt.toFile(
             fileInfo.original.transformedBuffer,
             filePath.original,
@@ -79,7 +82,7 @@ export async function generatePetaFile(param: {
           await writeFile(filePath.original, fileInfo.original.transformedBuffer);
         }
       } else {
-        if (param.encrypt) {
+        if (param.doEncrypt) {
           await secureFile.encrypt.toFile(param.filePath, filePath.original, sfp.getValue());
         } else {
           await copyFile(param.filePath, filePath.original);
@@ -95,15 +98,24 @@ export async function generatePetaFile(param: {
 }
 export async function generateFileInfo(
   source: string | PetaFile,
+  encryptedSource?: boolean,
 ): Promise<GeneratedFileInfo | undefined> {
   if (typeof source === "string") {
-    const fileType = await fileTypeFromFile(source);
+    const fileType = await fileTypeFromStream(
+      encryptedSource
+        ? secureFile.decrypt.toStream(source, useConfigSecureFilePassword().getTempFileKey())
+        : createReadStream(source),
+    );
     const logger = useLogger().logMainChunk();
-    logger.debug("#Generate FileInfo", fileType?.mime);
+    logger.debug("#Generate FileInfo", fileType?.mime, `encrypted: ${encryptedSource}`);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
         return generateImageFileInfoByWorker({
-          buffer: await readFile(source),
+          buffer: encryptedSource
+            ? await streamToBuffer(
+                secureFile.decrypt.toStream(source, useConfigSecureFilePassword().getTempFileKey()),
+              )
+            : await readFile(source),
           fileType: fileType,
         });
       }

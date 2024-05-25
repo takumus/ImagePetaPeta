@@ -1,7 +1,9 @@
-import { fileTypeFromFile, FileTypeResult } from "file-type";
+import { Readable } from "node:stream";
+import { fileTypeFromFile, fileTypeFromStream, FileTypeResult } from "file-type";
 
-export async function isSupportedFile(path: string) {
-  const fileType = await fileTypeFromFile(path);
+export async function isSupportedFile(source: string | Readable) {
+  const fileType =
+    typeof source === "string" ? await fileTypeFromFile(source) : await fileTypeFromStream(source);
   if (fileType === undefined) {
     return false;
   }

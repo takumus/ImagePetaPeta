@@ -1,3 +1,4 @@
+import { createReadStream } from "fs";
 import { rename, rm, stat } from "fs/promises";
 import * as Path from "path";
 import { fileTypeFromStream } from "file-type";
@@ -164,6 +165,7 @@ export class PetaFilesController {
               handler.onCancel = readDirResult.cancel;
               fileInfos.push(
                 ...(await readDirResult.files).map((path) => ({
+                  ...fileInfo,
                   path,
                   note: fileInfo.note,
                   name: fileInfo.name,
@@ -188,16 +190,28 @@ export class PetaFilesController {
         let error = false;
         const petaFiles: PetaFile[] = [];
         const importImage = async (fileInfo: ImportFileInfo, index: number) => {
-          log.debug("import:", index + 1, "/", fileInfos.length);
+          log.debug(
+            "import:",
+            index + 1,
+            "/",
+            fileInfos.length,
+            `encrypted: ${fileInfo.encrypted}`,
+          );
           let result = ImportImageResult.SUCCESS;
           let errorReason = "";
           try {
             const name = Path.basename(fileInfo.path);
             const fileDate = (await stat(fileInfo.path)).mtime;
-            if (!(await isSupportedFile(fileInfo.path))) {
+            const readStream = fileInfo.encrypted
+              ? secureFile.decrypt.toStream(
+                  fileInfo.path,
+                  useConfigSecureFilePassword().getTempFileKey(),
+                )
+              : createReadStream(fileInfo.path);
+            if (!(await isSupportedFile(readStream))) {
               throw new Error("unsupported file");
             }
-            const id = await fileSHA256(fileInfo.path);
+            const id = await fileSHA256(readStream);
             const exists = await this.getPetaFile(id);
             if (exists !== undefined) {
               result = ImportImageResult.EXISTS;
@@ -212,7 +226,8 @@ export class PetaFilesController {
                   id,
                 },
                 type: "add",
-                encrypt: true,
+                doEncrypt: true,
+                encryptedSource: fileInfo.encrypted,
               });
               if (petaFile === undefined) {
                 throw new Error("unsupported file");
