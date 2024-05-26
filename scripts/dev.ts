@@ -1,7 +1,8 @@
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import keypress from "keypress";
 import kill from "tree-kill";
 
+const childProcesses = [spawn("npm", ["run", "dev:app"]), spawn("npm", ["run", "dev:app-web"])];
 keypress(process.stdin);
 process.stdin.setRawMode(true);
 process.stdin.on("keypress", async function (_ch, key) {
@@ -9,10 +10,6 @@ process.stdin.on("keypress", async function (_ch, key) {
     killAll();
   }
 });
-const childProcesses = [
-  exec(["npm", "run", "dev:app"].join(" ")),
-  exec(["npm", "run", "dev:app-web"].join(" ")),
-];
 childProcesses.forEach((cp) => {
   cp.stdout?.pipe(process.stdout);
   cp.on("close", () => {
