@@ -4,7 +4,12 @@
       <VTitleBar :title="t('titles.details')"> </VTitleBar>
     </e-top>
     <e-content>
-      <img v-for="d in datas" :src="d" loading="lazy" decoding="async" :key="d" />
+      <img
+        v-for="image in images"
+        :src="image.dataURI"
+        loading="lazy"
+        decoding="async"
+        :key="image.data.url" />
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
@@ -18,7 +23,6 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
@@ -34,14 +38,15 @@ import { useComponentsStore } from "@/renderer/stores/componentsStore/useCompone
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
+type Data = Omit<DownloadSelectorData, "urls" | "referer"> & { url: string };
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const keyboards = new Keyboards();
-const datas = ref<string[]>([]);
-const fetchOrder: { [key: string]: Promise<string> } = {};
+const images = ref<{ dataURI: string; data: Data }[]>([]);
+const fetchImagePromises: { [key: string]: Promise<string> } = {};
 onMounted(async () => {
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
@@ -52,10 +57,10 @@ onMounted(async () => {
   });
   order(await IPC.getDownloadSelectorURLs());
 });
-function order(_datas: DownloadSelectorData[]) {
-  _datas.forEach((data) => {
+function order(datas: DownloadSelectorData[]) {
+  datas.forEach((data) => {
     data.urls.forEach((url) => {
-      if (fetchOrder[url] !== undefined) {
+      if (fetchImagePromises[url] !== undefined) {
         return;
       }
       const init: RequestInit = {
@@ -64,10 +69,21 @@ function order(_datas: DownloadSelectorData[]) {
           method: "GET",
         },
       };
-      fetchOrder[url] = (async () => IPC.fetchAndCreateDataURI(url, init))();
-      fetchOrder[url].then((url) => {
-        datas.value.unshift(url);
-      });
+      fetchImagePromises[url] = (async () => IPC.fetchAndCreateDataURI(url, init))();
+      fetchImagePromises[url]
+        .then((url) => {
+          images.value.unshift({
+            dataURI: url,
+            data: {
+              pageTitle: data.pageTitle,
+              pageURL: data.pageURL,
+              url,
+            },
+          });
+        })
+        .catch(() => {
+          //
+        });
     });
   });
 }
