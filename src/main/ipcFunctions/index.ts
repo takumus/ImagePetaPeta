@@ -888,6 +888,10 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     }
   },
+  async openDownloadSelector(_, urls) {
+    const windows = useWindows();
+    windows.openWindow("downloadSelector");
+  },
 };
 // let predictionModel: TF.Sequential | undefined;
 let tf: TF | undefined;

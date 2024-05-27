@@ -85,4 +85,5 @@ export interface IpcFunctions {
   getWebURL: () => Promise<{ [key: string]: string[] }>;
   getSimIDs: (id: string) => Promise<string[]>;
   getSimTags: (id: string) => Promise<{ tagId: string; prob: number }[]>;
+  openDownloadSelector: (urls: { pageURL: string; urls: string[] }[]) => Promise<void>;
 }
