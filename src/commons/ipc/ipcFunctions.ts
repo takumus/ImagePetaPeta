@@ -1,4 +1,5 @@
 import { AppInfo } from "@/commons/datas/appInfo";
+import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileGroup } from "@/commons/datas/importFileGroup";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
@@ -85,5 +86,8 @@ export interface IpcFunctions {
   getWebURL: () => Promise<{ [key: string]: string[] }>;
   getSimIDs: (id: string) => Promise<string[]>;
   getSimTags: (id: string) => Promise<{ tagId: string; prob: number }[]>;
-  openDownloadSelector: (urls: { pageURL: string; urls: string[] }[]) => Promise<void>;
+  openDownloadSelector: (urls: DownloadSelectorData[]) => Promise<void>;
+  addDownloadSelectorURLs: (urls: DownloadSelectorData[]) => Promise<void>;
+  getDownloadSelectorURLs: () => Promise<DownloadSelectorData[]>;
+  fetchAndCreateDataURI: (...args: Parameters<typeof fetch>) => Promise<string>;
 }

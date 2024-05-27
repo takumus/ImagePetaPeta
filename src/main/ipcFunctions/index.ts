@@ -2,8 +2,10 @@ import { readFile } from "fs/promises";
 import * as Path from "path";
 import { Tensor, Tensor1D } from "@tensorflow/tfjs";
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
+import { fileTypeFromBuffer } from "file-type";
 
 import { AppInfo } from "@/commons/datas/appInfo";
+import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
@@ -890,9 +892,32 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async openDownloadSelector(_, urls) {
     const windows = useWindows();
+    _urls = urls;
     windows.openWindow("downloadSelector");
   },
+  async addDownloadSelectorURLs(_, urls) {
+    _urls = [...urls, ..._urls];
+    const windows = useWindows();
+    windows.emitMainEvent(
+      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["downloadSelector"] },
+      "updateDownloadSelectorURLs",
+      _urls,
+    );
+  },
+  async getDownloadSelectorURLs() {
+    return _urls;
+  },
+  async fetchAndCreateDataURI(_, input, init) {
+    return (async () =>
+      await bufferToDataURI(Buffer.from(await (await fetch(input, init)).arrayBuffer())))();
+  },
 };
+async function bufferToDataURI(buffer: Buffer) {
+  const base64 = buffer.toString("base64");
+  const type = await fileTypeFromBuffer(buffer);
+  return `data:${type?.mime};base64,${base64}`;
+}
+let _urls: DownloadSelectorData[] = [];
 // let predictionModel: TF.Sequential | undefined;
 let tf: TF | undefined;
 export function registerIpcFunctions() {

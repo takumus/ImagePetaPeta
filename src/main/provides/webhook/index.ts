@@ -14,7 +14,12 @@ import { createWebhookAPIKey } from "@/main/provides/webhook/createWebhookAPIKey
 import { getDirname } from "@/main/utils/dirname";
 
 type EventNames = keyof IpcFunctions;
-const allowedEvents: EventNames[] = ["importFiles", "getAppInfo"];
+const allowedEvents: EventNames[] = [
+  "importFiles",
+  "getAppInfo",
+  "openDownloadSelector",
+  "addDownloadSelectorURLs",
+];
 export class WebHook extends TypedEventEmitter<{
   open: () => void;
   error: () => void;
