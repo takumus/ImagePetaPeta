@@ -5,71 +5,63 @@
       width: tile.width + 'px',
       height: tile.height + 'px',
     }">
-    <e-tile-wrapper
-      v-if="tile.group === undefined && tile.petaFile !== undefined"
-      @pointermove="seekVideo"
-      @pointerenter="pointerEnter"
-      @pointerleave="pointerLeave">
-      <e-images
-        @pointerdown="pointerdown"
-        @dragstart="dragstart($event)"
-        @dblclick="dblclick"
-        draggable="true"
-        :class="{
-          selected,
-        }">
-        <e-nsfw v-if="nsfwMask"> </e-nsfw>
-        <e-placeholder
-          class="placeholder"
-          :class="{
-            loaded: !loadingThumbnail,
-          }"
-          :style="{
-            backgroundColor: placeholderColor,
-          }"></e-placeholder>
-        <img
-          draggable="false"
-          :src="thumbnailURL"
-          @load="loadingThumbnail = false"
-          loading="lazy"
-          decoding="async" />
-        <img
-          draggable="false"
-          decoding="async"
-          :src="originalURL"
-          @load="loadingOriginal = false"
-          v-show="!loadingOriginal && tile.petaFile.metadata.type === 'image'" />
-        <video
-          ref="video"
-          v-show="tile.petaFile.metadata.type === 'video'"
-          v-if="showVideo"
-          :src="getFileURL(props.tile.petaFile, FileType.ORIGINAL)"></video>
-        <e-background> </e-background>
-      </e-images>
-      <e-inners
-        :class="{
-          selected,
-        }">
-        <e-tags v-if="settingsStore.state.value.showTagsOnTile">
-          <e-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
-            {{ petaTag.name }}
-          </e-tag>
-          <e-tag v-if="myPetaTags.length === 0 && !loadingTags">
-            {{ t("browser.untagged") }}
-          </e-tag>
-        </e-tags>
-        <e-video-duration v-if="props.tile.petaFile?.metadata.type === 'video'">
-          {{ videoDuration }}
-        </e-video-duration>
-        <e-secure v-if="props.tile.petaFile?.encrypted">
-          <e-icon></e-icon>
-        </e-secure>
-      </e-inners>
-      <e-selected v-show="selected"> </e-selected>
-    </e-tile-wrapper>
-    <e-group v-else>
-      {{ tile.group }}
-    </e-group>
+    <VSelectableBox :selected="selected" v-if="tile.petaFile">
+      <template #content>
+        <e-tile-content
+          @pointermove="seekVideo"
+          @pointerenter="pointerEnter"
+          @pointerleave="pointerLeave"
+          @pointerdown="pointerdown"
+          @dragstart="dragstart($event)"
+          @dblclick="dblclick"
+          draggable="true">
+          <e-nsfw v-if="nsfwMask"> </e-nsfw>
+          <e-placeholder
+            class="placeholder"
+            :class="{
+              loaded: !loadingThumbnail,
+            }"
+            :style="{
+              backgroundColor: placeholderColor,
+            }"></e-placeholder>
+          <img
+            draggable="false"
+            :src="thumbnailURL"
+            @load="loadingThumbnail = false"
+            loading="lazy"
+            decoding="async" />
+          <img
+            draggable="false"
+            decoding="async"
+            :src="originalURL"
+            @load="loadingOriginal = false"
+            v-show="!loadingOriginal && tile.petaFile.metadata.type === 'image'" />
+          <video
+            ref="video"
+            v-show="tile.petaFile.metadata.type === 'video'"
+            v-if="showVideo"
+            :src="getFileURL(props.tile.petaFile, FileType.ORIGINAL)"></video>
+        </e-tile-content>
+      </template>
+      <template #inner>
+        <e-tile-inner>
+          <e-tags v-if="settingsStore.state.value.showTagsOnTile">
+            <e-tag v-for="petaTag in myPetaTags" :key="petaTag.id">
+              {{ petaTag.name }}
+            </e-tag>
+            <e-tag v-if="myPetaTags.length === 0 && !loadingTags">
+              {{ t("browser.untagged") }}
+            </e-tag>
+          </e-tags>
+          <e-video-duration v-if="props.tile.petaFile?.metadata.type === 'video'">
+            {{ videoDuration }}
+          </e-video-duration>
+          <e-secure v-if="props.tile.petaFile?.encrypted">
+            <e-icon></e-icon>
+          </e-secure>
+        </e-tile-inner>
+      </template>
+    </VSelectableBox>
   </e-tile-root>
 </template>
 
@@ -77,6 +69,8 @@
 import { debounce } from "throttle-debounce";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+
+import VSelectableBox from "./VSelectableBox.vue";
 
 import { FileType } from "@/commons/datas/fileType";
 import { MouseButton } from "@/commons/datas/mouseButton";
@@ -294,192 +288,101 @@ petaTagsStore.onUpdate((petaTagIds, petaFileIds) => {
 e-tile-root {
   display: block;
   position: absolute;
-  > e-group {
+  e-tile-content {
     display: block;
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    font-weight: bold;
-    font-size: var(--size-2);
-    line-height: 24px;
-    text-align: center;
-  }
-  > e-tile-wrapper {
-    display: block;
-    position: relative;
-    border-radius: var(--rounded);
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    > e-images {
-      display: block;
-      position: relative;
-      filter: brightness(0.7);
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-      &.selected {
-        filter: brightness(1);
-        border-radius: var(--rounded);
-        padding: 2px;
-      }
-      > img {
-        display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        z-index: 1;
-        width: 100%;
-        height: 100%;
-      }
-      > video {
-        display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        z-index: 1;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      > e-background {
-        display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        z-index: 0;
-        background-image: url("/images/textures/transparent.png");
-        background-repeat: repeat;
-        width: 100%;
-        height: 100%;
-      }
-      > e-placeholder {
-        display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        opacity: 1;
-        z-index: 2;
-        // transition: opacity 200ms ease-in-out;
-        background-color: unset;
-        width: 100%;
-        height: 100%;
-        &.loaded {
-          opacity: 0;
-        }
-      }
-      > e-nsfw {
-        display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        z-index: 2;
-        background-image: url("/images/textures/nsfw.png");
-        background-position: center;
-        background-size: 32px;
-        background-repeat: repeat;
-        width: 100%;
-        height: 100%;
-      }
+    &.selected {
+      filter: brightness(1);
+      border-radius: var(--rounded);
+      padding: 2px;
     }
-    &:hover {
-      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-      > e-images {
-        filter: brightness(1);
-      }
-    }
-    > e-inners {
+    > img,
+    video,
+    e-placeholder,
+    e-nsfw {
       display: block;
       position: absolute;
       top: 0px;
       left: 0px;
-      border: solid var(--px-1) transparent;
+      z-index: 1;
       width: 100%;
       height: 100%;
-      pointer-events: none;
-      &.selected {
-        border: solid var(--px-2) transparent;
+      object-fit: cover;
+    }
+    > e-placeholder {
+      opacity: 1;
+      z-index: 2;
+      // transition: opacity 200ms ease-in-out;
+      background-color: unset;
+      &.loaded {
+        opacity: 0;
       }
-      > e-video-duration {
+    }
+    > e-nsfw {
+      z-index: 2;
+      background-image: url("/images/textures/nsfw.png");
+      background-position: center;
+      background-size: 32px;
+      background-repeat: repeat;
+    }
+  }
+  e-tile-inner {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    > e-video-duration,
+    e-secure {
+      display: block;
+      position: absolute;
+      border-radius: var(--rounded);
+      background-color: var(--color-1);
+      padding: var(--px-0);
+      font-size: var(--size-0);
+      line-height: var(--size-0);
+    }
+    > e-video-duration {
+      top: 0px;
+      left: 0px;
+    }
+    > e-secure {
+      top: 0px;
+      right: 0px;
+      width: var(--px-3);
+      height: var(--px-3);
+      > e-icon {
         display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
+        filter: var(--filter-icon);
+        background-image: url("/images/icons/locked.png");
+        background-position: center;
+        background-size: calc(var(--px-3) * 0.8);
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    > e-tags {
+      display: flex;
+      position: absolute;
+      bottom: 0px;
+      flex-direction: row-reverse;
+      flex-wrap: wrap-reverse;
+      justify-content: right;
+      outline: none;
+      width: 100%;
+      pointer-events: none;
+      text-align: left;
+      word-break: break-word;
+      > e-tag {
+        display: block;
+        margin-top: var(--px-0);
+        margin-left: var(--px-0);
         border-radius: var(--rounded);
         background-color: var(--color-1);
         padding: var(--px-0);
         font-size: var(--size-0);
-        line-height: var(--size-0);
-      }
-      > e-secure {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        border-radius: var(--rounded);
-        background-color: var(--color-1);
-        width: var(--px-3);
-        height: var(--px-3);
-        > e-icon {
-          display: block;
-          filter: var(--filter-icon);
-          background-image: url("/images/icons/locked.png");
-          background-position: center;
-          background-size: calc(var(--px-3) * 0.8);
-          background-repeat: no-repeat;
-          width: 100%;
-          height: 100%;
-        }
-      }
-      > e-tags {
-        display: flex;
-        position: absolute;
-        bottom: 0px;
-        flex-direction: row-reverse;
-        flex-wrap: wrap-reverse;
-        justify-content: right;
-        outline: none;
-        width: 100%;
-        pointer-events: none;
-        text-align: left;
-        word-break: break-word;
-        > e-tag {
-          display: block;
-          margin-top: var(--px-0);
-          margin-left: var(--px-0);
-          border-radius: var(--rounded);
-          background-color: var(--color-1);
-          padding: var(--px-0);
-          font-size: var(--size-0);
-        }
-      }
-    }
-    > e-selected {
-      display: block;
-      position: absolute;
-      right: 0px;
-      bottom: 0px;
-      box-shadow: var(--shadow) inset;
-      border-radius: var(--rounded);
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      &:before {
-        position: absolute;
-        box-shadow: 0px 0px 0px calc(var(--px-1) * 0.5 - 0.4px) var(--color-font) inset;
-        border: solid calc(var(--px-1)) var(--color-0);
-        border-radius: var(--rounded);
-        width: 100%;
-        height: 100%;
-        content: "";
-      }
-      &:after {
-        position: absolute;
-        border: solid calc(var(--px-1) * 0.5) var(--color-font);
-        border-radius: var(--rounded);
-        width: 100%;
-        height: 100%;
-        content: "";
       }
     }
   }
