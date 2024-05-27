@@ -73,7 +73,9 @@ export class WebHook extends TypedEventEmitter<{
           | undefined;
         if (event !== undefined) {
           executeLog.debug(`$Webhook(api): execute`, eventName);
-          res.json(await event(undefined, ...(req.body.args ?? [])));
+          res.json({
+            response: await event(undefined, ...(req.body.args ?? [])),
+          });
           executeLog.debug(`$Webhook(api): done`, eventName);
           return;
         }
