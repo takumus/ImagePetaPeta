@@ -1,4 +1,4 @@
-import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
+import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
@@ -30,5 +30,5 @@ export interface IpcEvents {
   initializationProgress: (log: string) => void;
   openInBrowser: (petaFileID: string) => void;
   updateModalDatas: () => void;
-  updateDownloadSelectorURLs: (urls: DownloadSelectorData[]) => void;
+  updateDownloadSelectorURLs: (urls: PageDownloaderData[]) => void;
 }

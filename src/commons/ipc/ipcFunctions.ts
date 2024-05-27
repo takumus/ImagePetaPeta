@@ -1,8 +1,8 @@
 import { AppInfo } from "@/commons/datas/appInfo";
-import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileGroup } from "@/commons/datas/importFileGroup";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
+import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
 import { PetaTag } from "@/commons/datas/petaTag";
@@ -86,8 +86,8 @@ export interface IpcFunctions {
   getWebURL: () => Promise<{ [key: string]: string[] }>;
   getSimIDs: (id: string) => Promise<string[]>;
   getSimTags: (id: string) => Promise<{ tagId: string; prob: number }[]>;
-  openDownloadSelector: (urls: DownloadSelectorData[]) => Promise<void>;
-  addDownloadSelectorURLs: (urls: DownloadSelectorData[]) => Promise<void>;
-  getDownloadSelectorURLs: () => Promise<DownloadSelectorData[]>;
+  openPageDownloader: (urls: PageDownloaderData[]) => Promise<void>;
+  addPageDownloaderDatas: (urls: PageDownloaderData[]) => Promise<void>;
+  getPageDownloaderDatas: () => Promise<PageDownloaderData[]>;
   fetchAndCreateDataURI: (...args: Parameters<typeof fetch>) => Promise<string>;
 }

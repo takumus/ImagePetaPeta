@@ -17,8 +17,8 @@ type EventNames = keyof IpcFunctions;
 const allowedEvents: EventNames[] = [
   "importFiles",
   "getAppInfo",
-  "openDownloadSelector",
-  "addDownloadSelectorURLs",
+  "openPageDownloader",
+  "addPageDownloaderDatas",
 ];
 export class WebHook extends TypedEventEmitter<{
   open: () => void;

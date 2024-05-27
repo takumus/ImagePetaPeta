@@ -5,8 +5,8 @@ import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } fro
 import { fileTypeFromBuffer } from "file-type";
 
 import { AppInfo } from "@/commons/datas/appInfo";
-import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
+import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
@@ -890,12 +890,12 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     }
   },
-  async openDownloadSelector(_, urls) {
+  async openPageDownloader(_, urls) {
     const windows = useWindows();
     _urls = urls;
     windows.openWindow("downloadSelector");
   },
-  async addDownloadSelectorURLs(_, urls) {
+  async addPageDownloaderDatas(_, urls) {
     _urls = [...urls, ..._urls];
     const windows = useWindows();
     windows.emitMainEvent(
@@ -904,7 +904,7 @@ export const ipcFunctions: IpcFunctionsType = {
       _urls,
     );
   },
-  async getDownloadSelectorURLs() {
+  async getPageDownloaderDatas() {
     return _urls;
   },
   async fetchAndCreateDataURI(_, input, init) {
@@ -917,7 +917,7 @@ export const ipcFunctions: IpcFunctionsType = {
     return `data:${mime};base64,${base64}`;
   },
 };
-let _urls: DownloadSelectorData[] = [];
+let _urls: PageDownloaderData[] = [];
 // let predictionModel: TF.Sequential | undefined;
 let tf: TF | undefined;
 export function registerIpcFunctions() {

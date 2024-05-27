@@ -17,20 +17,20 @@ import { computed, onMounted, ref, watch } from "vue";
 
 import VSelectableBox from "../commons/utils/selectableBox/VSelectableBox.vue";
 
-import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
+import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 
 import { IPC } from "@/renderer/libs/ipc";
 
-type Data = Omit<DownloadSelectorData, "urls" | "referer"> & { url: string };
+type Data = Omit<PageDownloaderData, "urls" | "referer"> & { url: string };
 const images = ref<{ dataURI: string; data: Data }[]>([]);
 const fetchImagePromises: { [key: string]: Promise<string> } = {};
 onMounted(async () => {
   IPC.on("updateDownloadSelectorURLs", (_, urls) => {
     order(urls);
   });
-  order(await IPC.getDownloadSelectorURLs());
+  order(await IPC.getPageDownloaderDatas());
 });
-function order(datas: DownloadSelectorData[]) {
+function order(datas: PageDownloaderData[]) {
   datas.forEach((data) => {
     data.urls.forEach((url) => {
       if (fetchImagePromises[url] !== undefined) {
