@@ -69,8 +69,8 @@ function order(datas: DownloadSelectorData[]) {
           method: "GET",
         },
       };
-      fetchImagePromises[url] = (async () => IPC.fetchAndCreateDataURI(url, init))();
-      fetchImagePromises[url]
+      const promise = (fetchImagePromises[url] = IPC.fetchAndCreateDataURI(url, init));
+      promise
         .then((url) => {
           images.value.unshift({
             dataURI: url,
