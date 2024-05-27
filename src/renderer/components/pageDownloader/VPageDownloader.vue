@@ -1,5 +1,5 @@
 <template>
-  <e-download-selector-root>
+  <e-page-downloader-root>
     <e-image v-for="image in images" :key="image.data.url">
       <VSelectableBox :selected="false">
         <template #content>
@@ -9,7 +9,7 @@
         </template>
       </VSelectableBox>
     </e-image>
-  </e-download-selector-root>
+  </e-page-downloader-root>
 </template>
 
 <script setup lang="ts">
@@ -63,7 +63,7 @@ function order(datas: PageDownloaderData[]) {
 </script>
 
 <style lang="scss" scoped>
-e-download-selector-root {
+e-page-downloader-root {
   display: flex;
   flex-wrap: wrap;
   gap: var(--px-2);
