@@ -4,7 +4,7 @@
       <VSelectableBox :selected="false">
         <template #content>
           <e-content>
-            <img :src="image.dataURI" loading="lazy" decoding="async" />
+            <img :src="image.cacheURL" loading="lazy" decoding="async" />
           </e-content>
         </template>
       </VSelectableBox>
@@ -18,11 +18,12 @@ import { computed, onMounted, ref, watch } from "vue";
 import VSelectableBox from "../commons/utils/selectableBox/VSelectableBox.vue";
 
 import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
+import { PROTOCOLS } from "@/commons/defines";
 
 import { IPC } from "@/renderer/libs/ipc";
 
 type Data = Omit<PageDownloaderData, "urls" | "referer"> & { url: string };
-const images = ref<{ dataURI: string; data: Data }[]>([]);
+const images = ref<{ cacheURL: string; data: Data }[]>([]);
 const fetchImagePromises: { [key: string]: Promise<string> } = {};
 onMounted(async () => {
   IPC.on("updatePageDownloaderDatas", (_, urls) => {
@@ -36,27 +37,16 @@ function order(datas: PageDownloaderData[]) {
       if (fetchImagePromises[url] !== undefined) {
         return;
       }
-      const init: RequestInit = {
-        headers: {
-          Referer: data.referer,
-          method: "GET",
+      images.value.unshift({
+        cacheURL: url.startsWith("data")
+          ? url
+          : `${PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE}://?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(data.referer)}`,
+        data: {
+          pageTitle: data.pageTitle,
+          pageURL: data.pageURL,
+          url,
         },
-      };
-      const promise = (fetchImagePromises[url] = IPC.fetchAndCreateDataURI(url, init));
-      promise
-        .then((url) => {
-          images.value.unshift({
-            dataURI: url,
-            data: {
-              pageTitle: data.pageTitle,
-              pageURL: data.pageURL,
-              url,
-            },
-          });
-        })
-        .catch(() => {
-          //
-        });
+      });
     });
   });
 }

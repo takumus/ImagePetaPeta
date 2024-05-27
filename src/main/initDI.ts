@@ -79,6 +79,7 @@ import {
 } from "@/main/provides/databases";
 import { HandleFileResponse, handleFileResponseKey } from "@/main/provides/handleFileResponse";
 import { Modals, modalsKey } from "@/main/provides/modals";
+import { PageDownloaderCache, pageDownloaderCacheKey } from "@/main/provides/pageDownloaderCache";
 import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
@@ -253,6 +254,7 @@ export function initDI(
     provide(tasksKey, tasks);
     provide(webhookKey, new WebHook(ipcFunctions));
     provide(modalsKey, new Modals());
+    provide(pageDownloaderCacheKey, new PageDownloaderCache());
     provide(handleFileResponseKey, new HandleFileResponse());
   } catch (err) {
     // どこかで失敗したら強制終了

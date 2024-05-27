@@ -8,6 +8,7 @@ import { initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
+import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
@@ -28,6 +29,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
   const windows = useWindows();
   const configSettings = useConfigSettings();
   const handleFileResponse = useHandleFileResponse();
+  const pageDownloaderCache = usePageDownloaderCache();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -42,6 +44,13 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     },
     {
       scheme: PROTOCOLS.FILE.IMAGE_ORIGINAL,
+      privileges: {
+        supportFetchAPI: true,
+        stream: true,
+      },
+    },
+    {
+      scheme: PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE,
       privileges: {
         supportFetchAPI: true,
         stream: true,
@@ -95,6 +104,10 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     }
     protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
     protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
+    protocol.handle(
+      PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE,
+      pageDownloaderCache.handle.bind(pageDownloaderCache),
+    );
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示

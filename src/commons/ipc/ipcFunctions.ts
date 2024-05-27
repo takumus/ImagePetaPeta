@@ -89,5 +89,4 @@ export interface IpcFunctions {
   openPageDownloader: (urls: PageDownloaderData[]) => Promise<void>;
   addPageDownloaderDatas: (urls: PageDownloaderData[]) => Promise<void>;
   getPageDownloaderDatas: () => Promise<PageDownloaderData[]>;
-  fetchAndCreateDataURI: (...args: Parameters<typeof fetch>) => Promise<string>;
 }

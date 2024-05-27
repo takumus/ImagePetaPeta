@@ -2,6 +2,7 @@ export const PROTOCOLS = {
   FILE: {
     IMAGE_ORIGINAL: "file-image-original",
     IMAGE_THUMBNAIL: "file-image-thumbnail",
+    IMAGE_PAGE_DOWNLOADER_CACHE: "page-downloader-cache",
   },
 } as const;
 export const BOARD_DEFAULT_NAME: string = "noname";

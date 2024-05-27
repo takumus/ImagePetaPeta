@@ -36,6 +36,7 @@ import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/peta
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
 import { useModals } from "@/main/provides/modals";
+import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useTasks } from "@/main/provides/tasks";
 import { TF } from "@/main/provides/tf";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
@@ -897,6 +898,7 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async addPageDownloaderDatas(_, urls) {
     _urls = [...urls, ..._urls];
+    usePageDownloaderCache().clear();
     const windows = useWindows();
     windows.emitMainEvent(
       { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["pageDownloader"] },
@@ -906,15 +908,6 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getPageDownloaderDatas() {
     return _urls;
-  },
-  async fetchAndCreateDataURI(_, input, init) {
-    const buffer = Buffer.from(await (await fetch(input, init)).arrayBuffer());
-    const mime = (await fileTypeFromBuffer(buffer))?.mime;
-    if (mime === undefined) {
-      throw "invalid file";
-    }
-    const base64 = buffer.toString("base64");
-    return `data:${mime};base64,${base64}`;
   },
 };
 let _urls: PageDownloaderData[] = [];
