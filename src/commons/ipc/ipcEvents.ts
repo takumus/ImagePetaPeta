@@ -30,5 +30,5 @@ export interface IpcEvents {
   initializationProgress: (log: string) => void;
   openInBrowser: (petaFileID: string) => void;
   updateModalDatas: () => void;
-  updateDownloadSelectorURLs: (urls: PageDownloaderData[]) => void;
+  updatePageDownloaderDatas: (urls: PageDownloaderData[]) => void;
 }

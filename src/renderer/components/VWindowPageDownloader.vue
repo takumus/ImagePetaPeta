@@ -4,7 +4,7 @@
       <VTitleBar :title="t('titles.details')"> </VTitleBar>
     </e-top>
     <e-content>
-      <VDownloadSelector />
+      <VPageDownloader />
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
@@ -22,7 +22,7 @@ import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
-import VDownloadSelector from "@/renderer/components/downloadSelector/VDownloadSelector.vue";
+import VPageDownloader from "@/renderer/components/pageDownloader/VPageDownloader.vue";
 
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
 import { IPC } from "@/renderer/libs/ipc";

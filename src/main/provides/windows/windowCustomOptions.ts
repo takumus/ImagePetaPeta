@@ -61,5 +61,5 @@ export const windowCustomOptions: {
     minWidth: WINDOW_SETTINGS_WIDTH,
     minHeight: WINDOW_SETTINGS_HEIGHT,
   },
-  downloadSelector: {},
+  pageDownloader: {},
 };

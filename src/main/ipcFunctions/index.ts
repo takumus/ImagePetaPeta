@@ -893,14 +893,14 @@ export const ipcFunctions: IpcFunctionsType = {
   async openPageDownloader(_, urls) {
     const windows = useWindows();
     _urls = urls;
-    windows.openWindow("downloadSelector");
+    windows.openWindow("pageDownloader");
   },
   async addPageDownloaderDatas(_, urls) {
     _urls = [...urls, ..._urls];
     const windows = useWindows();
     windows.emitMainEvent(
-      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["downloadSelector"] },
-      "updateDownloadSelectorURLs",
+      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["pageDownloader"] },
+      "updatePageDownloaderDatas",
       _urls,
     );
   },

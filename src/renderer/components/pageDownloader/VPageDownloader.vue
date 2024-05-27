@@ -25,7 +25,7 @@ type Data = Omit<PageDownloaderData, "urls" | "referer"> & { url: string };
 const images = ref<{ dataURI: string; data: Data }[]>([]);
 const fetchImagePromises: { [key: string]: Promise<string> } = {};
 onMounted(async () => {
-  IPC.on("updateDownloadSelectorURLs", (_, urls) => {
+  IPC.on("updatePageDownloaderDatas", (_, urls) => {
     order(urls);
   });
   order(await IPC.getPageDownloaderDatas());
