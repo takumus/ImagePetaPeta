@@ -70,7 +70,7 @@ import { debounce } from "throttle-debounce";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VSelectableBox from "./VSelectableBox.vue";
+import VSelectableBox from "@/renderer/components/commons/utils/selectableBox/VSelectableBox.vue";
 
 import { FileType } from "@/commons/datas/fileType";
 import { MouseButton } from "@/commons/datas/mouseButton";

@@ -38,8 +38,10 @@ e-selectable-box-root {
     position: relative;
     filter: brightness(0.7);
     cursor: pointer;
+    border-radius: var(--rounded);
     width: 100%;
     height: 100%;
+    overflow: hidden;
     &.selected {
       filter: brightness(1);
       border-radius: var(--rounded);
