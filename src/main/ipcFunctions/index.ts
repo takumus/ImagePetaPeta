@@ -908,15 +908,15 @@ export const ipcFunctions: IpcFunctionsType = {
     return _urls;
   },
   async fetchAndCreateDataURI(_, input, init) {
-    return (async () =>
-      await bufferToDataURI(Buffer.from(await (await fetch(input, init)).arrayBuffer())))();
+    const buffer = Buffer.from(await (await fetch(input, init)).arrayBuffer());
+    const mime = (await fileTypeFromBuffer(buffer))?.mime;
+    if (mime === undefined) {
+      throw "invalid file";
+    }
+    const base64 = buffer.toString("base64");
+    return `data:${mime};base64,${base64}`;
   },
 };
-async function bufferToDataURI(buffer: Buffer) {
-  const base64 = buffer.toString("base64");
-  const type = await fileTypeFromBuffer(buffer);
-  return `data:${type?.mime};base64,${base64}`;
-}
 let _urls: DownloadSelectorData[] = [];
 // let predictionModel: TF.Sequential | undefined;
 let tf: TF | undefined;
