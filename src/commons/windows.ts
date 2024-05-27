@@ -8,5 +8,6 @@ export const windowNames = [
   "quit",
   "modal",
   "web",
+  "downloadSelector",
 ] as const;
 export type WindowName = (typeof windowNames)[number];
