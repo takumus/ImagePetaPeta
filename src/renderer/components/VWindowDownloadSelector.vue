@@ -4,12 +4,7 @@
       <VTitleBar :title="t('titles.details')"> </VTitleBar>
     </e-top>
     <e-content>
-      <img
-        v-for="image in images"
-        :src="image.dataURI"
-        loading="lazy"
-        decoding="async"
-        :key="image.data.url" />
+      <VDownloadSelector />
     </e-content>
     <e-modals v-show="components.modal.modalIds.length > 0">
       <VTasks />
@@ -27,8 +22,7 @@ import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
 import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
-
-import { DownloadSelectorData } from "@/commons/datas/downloadSelectorData";
+import VDownloadSelector from "@/renderer/components/downloadSelector/VDownloadSelector.vue";
 
 // import { AnimatedGIFLoader } from "@/renderer/libs/pixi-gif";
 import { IPC } from "@/renderer/libs/ipc";
@@ -38,55 +32,18 @@ import { useComponentsStore } from "@/renderer/stores/componentsStore/useCompone
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
-type Data = Omit<DownloadSelectorData, "urls" | "referer"> & { url: string };
 const appInfoStore = useAppInfoStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const keyboards = new Keyboards();
-const images = ref<{ dataURI: string; data: Data }[]>([]);
-const fetchImagePromises: { [key: string]: Promise<string> } = {};
 onMounted(async () => {
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
     IPC.windowClose();
   });
-  IPC.on("updateDownloadSelectorURLs", (_, urls) => {
-    order(urls);
-  });
-  order(await IPC.getDownloadSelectorURLs());
 });
-function order(datas: DownloadSelectorData[]) {
-  datas.forEach((data) => {
-    data.urls.forEach((url) => {
-      if (fetchImagePromises[url] !== undefined) {
-        return;
-      }
-      const init: RequestInit = {
-        headers: {
-          Referer: data.referer,
-          method: "GET",
-        },
-      };
-      const promise = (fetchImagePromises[url] = IPC.fetchAndCreateDataURI(url, init));
-      promise
-        .then((url) => {
-          images.value.unshift({
-            dataURI: url,
-            data: {
-              pageTitle: data.pageTitle,
-              pageURL: data.pageURL,
-              url,
-            },
-          });
-        })
-        .catch(() => {
-          //
-        });
-    });
-  });
-}
 
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
@@ -101,13 +58,10 @@ watch(
 e-window-root {
   > e-content {
     display: block;
-    will-change: scroll-position;
-    padding: 0px;
-    overflow-y: auto;
-    > img {
-      width: 20%;
-      object-fit: contain;
-    }
+    flex: 1;
+    padding: var(--px-2);
+    width: 100%;
+    overflow: hidden;
   }
   > e-modals {
     position: absolute;
