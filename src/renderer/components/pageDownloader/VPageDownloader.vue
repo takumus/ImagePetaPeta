@@ -1,9 +1,9 @@
 <template>
   <e-page-downloader-root>
-    <e-image v-for="image in images" :key="image.data.url">
-      <VSelectableBox :selected="false">
+    <e-image v-for="image in images" :key="image.url">
+      <VSelectableBox :selected="image.selected">
         <template #content>
-          <e-content>
+          <e-content @click="click(image)">
             <img :src="image.cacheURL" loading="lazy" decoding="async" />
           </e-content>
         </template>
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 
 import VSelectableBox from "../commons/utils/selectableBox/VSelectableBox.vue";
 
@@ -22,30 +22,33 @@ import { PROTOCOLS } from "@/commons/defines";
 
 import { IPC } from "@/renderer/libs/ipc";
 
-type Data = Omit<PageDownloaderData, "urls" | "referer"> & { url: string };
-const images = ref<{ cacheURL: string; data: Data }[]>([]);
-const fetchImagePromises: { [key: string]: Promise<string> } = {};
+type Data = Omit<PageDownloaderData, "urls" | "referer"> & {
+  url: string;
+  selected: boolean;
+  cacheURL: string;
+};
+const images = ref<Data[]>([]);
 onMounted(async () => {
   IPC.on("updatePageDownloaderDatas", (_, urls) => {
     order(urls);
   });
   order(await IPC.getPageDownloaderDatas());
 });
+function click(data: Data) {
+  console.log(data);
+  IPC.openURL(data.url);
+}
 function order(datas: PageDownloaderData[]) {
   datas.forEach((data) => {
     data.urls.forEach((url) => {
-      if (fetchImagePromises[url] !== undefined) {
-        return;
-      }
       images.value.unshift({
         cacheURL: url.startsWith("data")
           ? url
           : `${PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE}://?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(data.referer)}`,
-        data: {
-          pageTitle: data.pageTitle,
-          pageURL: data.pageURL,
-          url,
-        },
+        pageTitle: data.pageTitle,
+        pageURL: data.pageURL,
+        url,
+        selected: false,
       });
     });
   });
