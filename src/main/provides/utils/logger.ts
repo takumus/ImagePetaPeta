@@ -7,6 +7,7 @@ import { LogChunk } from "@/commons/datas/logChunk";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 
+const callStack = false;
 export class Logger {
   private logFile: WriteStream | undefined;
   private date = "";
@@ -14,7 +15,7 @@ export class Logger {
   log(from: LogFrom, id: string, ...args: unknown[]) {
     try {
       this.open();
-      const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})`;
+      const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})${callStack ? `[${extractFunctionNames(new Error().stack ?? "")}]` : ""}`;
       if (this.logFile) {
         this.logFile.write(
           date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n",
@@ -80,6 +81,17 @@ export class Logger {
       uid,
     };
   }
+}
+function extractFunctionNames(errorStack: string): string[] {
+  const functionNames: string[] = [];
+  const regex = /at\s+(\S+)\s+\(/g;
+  let match;
+
+  while ((match = regex.exec(errorStack)) !== null) {
+    functionNames.push(match[1]);
+  }
+
+  return functionNames.slice(2).reverse();
 }
 export enum LogFrom {
   MAIN = "MAIN",
