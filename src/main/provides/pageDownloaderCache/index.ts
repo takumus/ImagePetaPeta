@@ -1,6 +1,7 @@
 import { fileTypeFromBuffer } from "file-type";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
+import { isSupportedFile, supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
 export class PageDownloaderCache {
   private cache: { [url: string]: Buffer } = {};
@@ -38,12 +39,15 @@ export class PageDownloaderCache {
     const referer = params.get("referer");
     console.log(url, referer);
     if (url && referer) {
-      const buf = await this.add(url, referer);
-      const headers = new Headers();
-      headers.set("Content-Type", (await fileTypeFromBuffer(buf))?.mime ?? "");
-      return new Response(buf, {
-        headers,
-      });
+      const buffer = await this.add(url, referer);
+      const fileType = await fileTypeFromBuffer(buffer);
+      if (fileType !== undefined && supportedFileConditions.image(fileType)) {
+        return new Response(buffer, {
+          headers: {
+            "Content-Type": fileType.mime,
+          },
+        });
+      }
     }
     return new Response("", { status: 404 });
   }
