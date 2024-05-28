@@ -35,7 +35,6 @@ export class PageDownloaderCache {
   }
   async handle(request: Request) {
     const { url, referer } = this.extractCacheURL(request.url);
-    console.log(url, referer);
     if (url && referer) {
       const buffer = await this.add(url, referer);
       const fileType = await fileTypeFromBuffer(buffer);
@@ -47,7 +46,7 @@ export class PageDownloaderCache {
         });
       }
     }
-    return new Response("", { status: 404 });
+    return new Response(undefined, { status: 404 });
   }
   extractCacheURL(cacheURL: string) {
     const params = new URL(cacheURL).searchParams;
