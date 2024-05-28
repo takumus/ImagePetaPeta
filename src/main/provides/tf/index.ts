@@ -51,9 +51,13 @@ export class TF {
     }
   }
   async loadOrSaveImageVector(petaFile: PetaFile) {
-    const loadedTensor = await this.loadImageVector(petaFile);
-    if (loadedTensor !== undefined && !loadedTensor.isDisposed) {
-      return loadedTensor;
+    try {
+      const loadedTensor = await this.loadImageVector(petaFile);
+      if (loadedTensor !== undefined && !loadedTensor.isDisposed) {
+        return loadedTensor;
+      }
+    } catch {
+      //
     }
     return await this.saveImageVector(petaFile);
   }
@@ -65,17 +69,15 @@ export class TF {
     const scores: { id: string; score: number }[] = [];
     await ppa(
       async (targetPetaFile, i) => {
-        if (i % 100 === 0) console.log("id:", i);
-        if (i % 100 === 0) console.time("s" + i);
+        console.time("simimg:" + i);
         const targetTensor = await this.loadOrSaveImageVector(targetPetaFile);
         scores.push({
           id: targetPetaFile.id,
           score: this.similarity(baseTensor, targetTensor),
         });
-        if (i % 100 === 0) console.timeEnd("s" + i);
+        console.timeEnd("simimg:" + i);
       },
       Object.values(await usePetaFilesController().getAll()),
-      CPU_LENGTH,
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
   }
