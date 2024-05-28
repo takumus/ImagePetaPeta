@@ -1,5 +1,4 @@
 import { DBInfo } from "@/commons/datas/dbInfo";
-import { SecureFilePassword } from "@/commons/datas/secureFilePassword";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
 import { WindowStates } from "@/commons/datas/windowStates";
