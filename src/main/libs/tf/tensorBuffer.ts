@@ -21,10 +21,9 @@ export const tensorBuffer = {
     offset += NUM_BYTE_LENGTH;
     // shape
     shape.forEach((dim, index) => buffer.writeInt32LE(dim, offset + index * NUM_BYTE_LENGTH));
+    offset += NUM_BYTE_LENGTH * shape.length;
     // data
-    data.forEach((value, index) =>
-      buffer.writeFloatLE(value, offset + shape.length * NUM_BYTE_LENGTH + index * NUM_BYTE_LENGTH),
-    );
+    data.forEach((value, index) => buffer.writeFloatLE(value, offset + index * NUM_BYTE_LENGTH));
     return buffer;
   },
   toTensor(buffer: Buffer) {
@@ -42,14 +41,11 @@ export const tensorBuffer = {
     for (let i = 0; i < shapeLength; i++) {
       shape.push(buffer.readInt32LE(offset + i * NUM_BYTE_LENGTH));
     }
+    offset += shapeLength * NUM_BYTE_LENGTH;
     // data
     const data: number[] = [];
-    for (
-      let i = 0;
-      i < (buffer.length - offset - shapeLength * NUM_BYTE_LENGTH) / NUM_BYTE_LENGTH;
-      i++
-    ) {
-      data.push(buffer.readFloatLE(offset + shapeLength * NUM_BYTE_LENGTH + i * NUM_BYTE_LENGTH));
+    for (let i = 0; i < (buffer.length - offset) / NUM_BYTE_LENGTH; i++) {
+      data.push(buffer.readFloatLE(offset + i * NUM_BYTE_LENGTH));
     }
     return _tensor(data, shape);
   },
