@@ -1,8 +1,5 @@
 import { fileTypeFromBuffer } from "file-type";
 
-import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
-import { ppa } from "@/commons/utils/pp";
-
 import { createKey, createUseFunction } from "@/main/libs/di";
 
 export class PageDownloaderCache {
@@ -16,23 +13,21 @@ export class PageDownloaderCache {
     if (this.cache[url] !== undefined) {
       return this.cache[url];
     }
-    const downloading =
-      this.downloadings[url] ??
-      (async () => {
-        const init: RequestInit = {
-          headers: {
-            Referer: referer,
-            method: "GET",
-          },
-        };
-        return Buffer.from(await (await fetch(url, init)).arrayBuffer());
-      })();
-    this.downloadings[url] = downloading;
-    const buffer = await downloading;
-    if (this.cache[url] === undefined) {
-      this.cache[url] = buffer;
+    if (this.downloadings[url] !== undefined) {
+      return this.downloadings[url];
     }
-    return buffer;
+    return (this.downloadings[url] = (async () => {
+      return (this.cache[url] = Buffer.from(
+        await (
+          await fetch(url, {
+            headers: {
+              Referer: referer,
+              method: "GET",
+            },
+          })
+        ).arrayBuffer(),
+      ));
+    })());
   }
   get(url: string): Buffer | undefined {
     return this.cache[url];
