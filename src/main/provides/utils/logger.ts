@@ -86,11 +86,9 @@ function extractFunctionNames(errorStack: string): string[] {
   const functionNames: string[] = [];
   const regex = /at\s+(\S+)\s+\(/g;
   let match;
-
   while ((match = regex.exec(errorStack)) !== null) {
     functionNames.push(match[1]);
   }
-
   return functionNames.slice(2).reverse();
 }
 export enum LogFrom {
