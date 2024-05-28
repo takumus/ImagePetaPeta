@@ -36,7 +36,18 @@ onMounted(async () => {
 });
 function click(data: Data) {
   console.log(data);
-  IPC.openURL(data.url);
+  IPC.importFiles([
+    [
+      {
+        type: "url",
+        additionalData: {
+          name: data.pageTitle,
+          note: data.pageURL,
+        },
+        url: data.cacheURL,
+      },
+    ],
+  ]);
 }
 function order(datas: PageDownloaderData[]) {
   datas.forEach((data) => {
