@@ -12,6 +12,7 @@ process.stdin.on("keypress", async function (_ch, key) {
 });
 childProcesses.forEach((cp) => {
   cp.stdout?.pipe(process.stdout);
+  cp.stderr?.pipe(process.stderr);
   cp.on("close", () => {
     killAll();
   });
