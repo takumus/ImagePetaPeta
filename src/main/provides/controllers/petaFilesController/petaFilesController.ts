@@ -24,6 +24,7 @@ import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/peta
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
+import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
@@ -195,7 +196,7 @@ export class PetaFilesController {
             index + 1,
             "/",
             fileInfos.length,
-            `encrypted: ${fileInfo.encrypted}`,
+            `encrypted: ${fileInfo.encryptedTempFile}`,
           );
           let result = ImportImageResult.SUCCESS;
           let errorReason = "";
@@ -203,11 +204,8 @@ export class PetaFilesController {
             const name = Path.basename(fileInfo.path);
             const fileDate = (await stat(fileInfo.path)).mtime;
             const readStream = () =>
-              fileInfo.encrypted
-                ? secureFile.decrypt.toStream(
-                    fileInfo.path,
-                    useConfigSecureFilePassword().getTempFileKey(),
-                  )
+              fileInfo.encryptedTempFile
+                ? secureFile.decrypt.toStream(fileInfo.path, useSecureTempFileKey())
                 : createReadStream(fileInfo.path);
             if (!(await isSupportedFile(readStream()))) {
               throw new Error("unsupported file");
@@ -228,7 +226,7 @@ export class PetaFilesController {
                 },
                 type: "add",
                 doEncrypt: true,
-                encryptedSource: fileInfo.encrypted,
+                encryptedSource: fileInfo.encryptedTempFile,
               });
               if (petaFile === undefined) {
                 throw new Error("unsupported file");

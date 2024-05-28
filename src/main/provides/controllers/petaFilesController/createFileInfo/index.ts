@@ -1,4 +1,3 @@
-import { createReadStream } from "fs";
 import { writeFile } from "fs/promises";
 import Path from "path";
 import { dataUriToBuffer } from "data-uri-to-buffer";
@@ -7,8 +6,8 @@ import { v4 as uuid } from "uuid";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { PROTOCOLS } from "@/commons/defines";
 
-import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
+import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { secureFile } from "@/main/utils/secureFile";
@@ -71,7 +70,7 @@ export const createFileInfo = {
         path: dist,
         note: remoteURL,
         name: "downloaded",
-        encrypted: encryptTempFile,
+        encryptedTempFile: encryptTempFile,
       };
     } catch (error) {
       log.error(error);
@@ -96,7 +95,7 @@ export const createFileInfo = {
         path: dist,
         note: "",
         name: "noname",
-        encrypted: true,
+        encryptedTempFile: true,
       };
     } catch (error) {
       log.error(error);
@@ -107,12 +106,8 @@ export const createFileInfo = {
 } as const;
 async function exportTempFileAndCheck(buffer: Buffer, dist: string, encryptTempFile: boolean) {
   if (encryptTempFile) {
-    await secureFile.encrypt.toFile(buffer, dist, useConfigSecureFilePassword().getTempFileKey());
-    if (
-      !(await isSupportedFile(
-        secureFile.decrypt.toStream(dist, useConfigSecureFilePassword().getTempFileKey()),
-      ))
-    ) {
+    await secureFile.encrypt.toFile(buffer, dist, useSecureTempFileKey());
+    if (!(await isSupportedFile(secureFile.decrypt.toStream(dist, useSecureTempFileKey())))) {
       throw new Error("unsupported file");
     }
   } else {

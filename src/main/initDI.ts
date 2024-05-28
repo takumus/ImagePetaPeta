@@ -81,6 +81,7 @@ import { HandleFileResponse, handleFileResponseKey } from "@/main/provides/handl
 import { Modals, modalsKey } from "@/main/provides/modals";
 import { PageDownloaderCache, pageDownloaderCacheKey } from "@/main/provides/pageDownloaderCache";
 import { Tasks, tasksKey } from "@/main/provides/tasks";
+import { createSecureTempFileKey, secureTempFileKeyKey } from "@/main/provides/tempFileKey";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import { Paths, pathsKey } from "@/main/provides/utils/paths";
@@ -218,6 +219,7 @@ export function initDI(
     provide(configSettingsKey, configSettings);
     provide(configStatesKey, configStates);
     provide(configWindowStatesKey, configWindowStates);
+    provide(secureTempFileKeyKey, createSecureTempFileKey());
     provide(configSecureFilePasswordKey, configSecureFilePassword);
     provide(petaBoardsControllerKey, new PetaBoardsController());
     provide(petaFilesControllerKey, new PetaFilesController());

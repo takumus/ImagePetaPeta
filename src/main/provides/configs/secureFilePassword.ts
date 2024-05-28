@@ -19,7 +19,4 @@ export class ConfigSecureFilePassword extends Config<string> {
     }
     return this.key;
   }
-  getTempFileKey() {
-    return this.tempFileKey;
-  }
 }

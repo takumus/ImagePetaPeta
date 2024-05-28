@@ -10,6 +10,7 @@ import { mkdirIfNotIxists } from "@/main/libs/file";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { generateImageFileInfoByWorker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo";
 import { generateVideoFileInfo } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateVideoFileInfo";
+import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
@@ -84,7 +85,7 @@ export async function generatePetaFile(param: {
       } else {
         if (param.doEncrypt) {
           const from = param.encryptedSource
-            ? secureFile.decrypt.toStream(param.filePath, sfp.getTempFileKey())
+            ? secureFile.decrypt.toStream(param.filePath, useSecureTempFileKey())
             : param.filePath;
           await secureFile.encrypt.toFile(from, filePath.original, sfp.getValue());
         } else {
@@ -92,7 +93,7 @@ export async function generatePetaFile(param: {
             await secureFile.decrypt.toFile(
               param.filePath,
               filePath.original,
-              sfp.getTempFileKey(),
+              useSecureTempFileKey(),
             );
           } else {
             await copyFile(param.filePath, filePath.original);
@@ -114,7 +115,7 @@ export async function generateFileInfo(
   if (typeof source === "string") {
     const fileType = await fileTypeFromStream(
       encryptedSource
-        ? secureFile.decrypt.toStream(source, useConfigSecureFilePassword().getTempFileKey())
+        ? secureFile.decrypt.toStream(source, useSecureTempFileKey())
         : createReadStream(source),
     );
     const logger = useLogger().logMainChunk();
@@ -123,9 +124,7 @@ export async function generateFileInfo(
       if (supportedFileConditions.image(fileType)) {
         return generateImageFileInfoByWorker({
           buffer: encryptedSource
-            ? await streamToBuffer(
-                secureFile.decrypt.toStream(source, useConfigSecureFilePassword().getTempFileKey()),
-              )
+            ? await streamToBuffer(secureFile.decrypt.toStream(source, useSecureTempFileKey()))
             : await readFile(source),
           fileType: fileType,
         });

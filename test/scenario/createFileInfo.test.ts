@@ -5,6 +5,7 @@ import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
+import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { secureFile } from "@/main/utils/secureFile";
 
@@ -44,11 +45,9 @@ describe("createFileInfo", () => {
     if (info === undefined) {
       return;
     }
-    expect(
-      await fileSHA256(
-        secureFile.decrypt.toStream(info.path, useConfigSecureFilePassword().getTempFileKey()),
-      ),
-    ).toBe(correctHash);
+    expect(await fileSHA256(secureFile.decrypt.toStream(info.path, useSecureTempFileKey()))).toBe(
+      correctHash,
+    );
   });
   test("fromBase64URL", async () => {
     const correctHash = await fileSHA256(DOG_FILE);
@@ -59,11 +58,9 @@ describe("createFileInfo", () => {
     if (info === undefined) {
       return;
     }
-    expect(
-      await fileSHA256(
-        secureFile.decrypt.toStream(info.path, useConfigSecureFilePassword().getTempFileKey()),
-      ),
-    ).toBe(correctHash);
+    expect(await fileSHA256(secureFile.decrypt.toStream(info.path, useSecureTempFileKey()))).toBe(
+      correctHash,
+    );
   });
   test("fromRemoteURL", async () => {
     ((global.fetch as any) = vi.fn()).mockResolvedValue(new Response(readFileSync(DOG_FILE)));
@@ -88,10 +85,8 @@ describe("createFileInfo", () => {
     if (info === undefined) {
       return;
     }
-    expect(
-      await fileSHA256(
-        secureFile.decrypt.toStream(info.path, useConfigSecureFilePassword().getTempFileKey()),
-      ),
-    ).toBe(correctHash);
+    expect(await fileSHA256(secureFile.decrypt.toStream(info.path, useSecureTempFileKey()))).toBe(
+      correctHash,
+    );
   });
 });
