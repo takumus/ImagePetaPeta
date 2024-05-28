@@ -69,13 +69,13 @@ export class TF {
     const scores: { id: string; score: number }[] = [];
     await ppa(
       async (targetPetaFile, i) => {
-        console.time("simimg:" + i);
+        console.time(`simimg[${i}]`);
         const targetTensor = await this.loadOrSaveImageVector(targetPetaFile);
         scores.push({
           id: targetPetaFile.id,
           score: this.similarity(baseTensor, targetTensor),
         });
-        console.timeEnd("simimg:" + i);
+        console.timeEnd(`simimg[${i}]`);
       },
       Object.values(await usePetaFilesController().getAll()),
     ).promise;
