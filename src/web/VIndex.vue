@@ -45,9 +45,11 @@ onMounted(async () => {
   }, 2000);
   setInterval(async () => {
     const info = await send("getAppInfo");
-    if (info.version !== undefined) {
-      alive = true;
-      connected.value = true;
+    if ("response" in info) {
+      if (info.response.version !== undefined) {
+        alive = true;
+        connected.value = true;
+      }
     }
   }, 1000);
 });
@@ -98,7 +100,10 @@ async function upload() {
         },
       ],
     ]);
-    if (result.length > 0) {
+    if ("error" in result) {
+      throw result.error;
+    }
+    if (result.response.length > 0) {
       status.value = "successful";
     } else {
       status.value = "failed";
@@ -111,7 +116,7 @@ async function upload() {
 async function send<U extends keyof IpcFunctions>(
   event: U,
   ...args: Parameters<IpcFunctions[U]>
-): Promise<Awaited<ReturnType<IpcFunctions[U]>>> {
+): Promise<{ response: Awaited<ReturnType<IpcFunctions[U]>> } | { error: string }> {
   const response = await fetch("http://" + location.host.split(":")[0] + `:${WEBHOOK_PORT}/api`, {
     method: "POST",
     headers: {

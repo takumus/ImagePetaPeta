@@ -31,7 +31,7 @@ describe("webhook", () => {
     apiKey: string,
     event: U,
     ...args: Parameters<IpcFunctions[U]>
-  ): Promise<Awaited<ReturnType<IpcFunctions[U]>>> {
+  ): Promise<{ response: Awaited<ReturnType<IpcFunctions[U]>> } | { error: string }> {
     const response = await fetch("http://localhost:51920/api", {
       method: "POST",
       headers: {
@@ -48,28 +48,47 @@ describe("webhook", () => {
   test("importFiles", async () => {
     const webhook = useWebHook();
     await webhook.open(51920);
-    const ids = await post(webhook.getAPIKEY(), "importFiles", [
-      [
-        {
-          type: "filePath",
-          filePath: resolve("./test/sampleDatas/bee.jpg"),
-        },
-      ],
-    ]);
-    expect(ids.length).toBe(1);
-    await webhook?.close();
+    try {
+      const ids = await post(webhook.getAPIKEY(), "importFiles", [
+        [
+          {
+            type: "filePath",
+            filePath: resolve("./test/sampleDatas/bee.jpg"),
+          },
+        ],
+      ]);
+      if ("error" in ids) {
+        throw `${ids}`;
+      }
+      expect(ids.response.length).toBe(1);
+    } catch (error) {
+      await webhook.close();
+      throw error;
+    }
+    await webhook.close();
   });
   test("whitelist", async () => {
     const webhook = useWebHook();
     await webhook.open(51920);
-    const appInfo = (await post(webhook.getAPIKEY(), "getSettings")) as any;
-    expect(appInfo).property("error");
-    await webhook?.close();
+    try {
+      const appInfo = await post(webhook.getAPIKEY(), "getSettings");
+      expect(appInfo).property("error");
+    } catch (error) {
+      await webhook.close();
+      throw error;
+    }
+    await webhook.close();
   });
   test("wrongAPIKey", async () => {
     const webhook = useWebHook();
     await webhook.open(51920);
-    const appInfo = (await post("wawawawawa", "getSettings")) as any;
-    expect(appInfo).property("error");
+    try {
+      const appInfo = await post("wawawawawa", "getSettings");
+      expect(appInfo).property("error");
+    } catch (error) {
+      await webhook.close();
+      throw error;
+    }
+    await webhook.close();
   });
 });
