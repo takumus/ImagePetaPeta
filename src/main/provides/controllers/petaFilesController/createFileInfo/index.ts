@@ -5,8 +5,10 @@ import { dataUriToBuffer } from "data-uri-to-buffer";
 import { v4 as uuid } from "uuid";
 
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
+import { PROTOCOLS } from "@/commons/defines";
 
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
+import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { secureFile } from "@/main/utils/secureFile";
@@ -24,13 +26,22 @@ export const createFileInfo = {
     const log = logger.logMainChunk();
     try {
       log.debug("## Create File Info URL");
-      let buffer: Buffer;
+      let buffer: Buffer | undefined;
       let remoteURL = "";
-      if (url.trim().startsWith("data:")) {
+      if (url.startsWith(PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE)) {
+        // cache URLだったら
+        log.debug("### Cache URL");
+        const pdc = usePageDownloaderCache();
+        const cache = pdc.extractCacheURL(url);
+        buffer = pdc.get(cache.url);
+        remoteURL = cache.url;
+      } else if (url.trim().startsWith("data:")) {
         // dataURIだったら
+        log.debug("### Data URI");
         buffer = Buffer.from(dataUriToBuffer(url).buffer);
       } else {
         // 普通のurlだったら
+        log.debug("### Normal URL");
         const init: RequestInit = {
           headers: {
             // ...(ua !== undefined
@@ -49,6 +60,9 @@ export const createFileInfo = {
         log.debug("RequestInit:", init);
         buffer = Buffer.from(await (await fetch(url, init)).arrayBuffer());
         remoteURL = url;
+      }
+      if (buffer === undefined) {
+        throw `buffer is undefined`;
       }
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
       await exportTempFileAndCheck(buffer, dist, encryptTempFile);
