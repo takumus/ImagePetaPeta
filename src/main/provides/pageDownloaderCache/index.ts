@@ -34,9 +34,7 @@ export class PageDownloaderCache {
     return this.cache[url];
   }
   async handle(request: Request) {
-    const params = new URL(request.url).searchParams;
-    const url = params.get("url");
-    const referer = params.get("referer");
+    const { url, referer } = this.extractCacheURL(request.url);
     console.log(url, referer);
     if (url && referer) {
       const buffer = await this.add(url, referer);
@@ -50,6 +48,19 @@ export class PageDownloaderCache {
       }
     }
     return new Response("", { status: 404 });
+  }
+  extractCacheURL(cacheURL: string) {
+    const params = new URL(cacheURL).searchParams;
+    const url = params.get("url");
+    const referer = params.get("referer");
+    if (url && referer) {
+      return {
+        url,
+        referer,
+      };
+    } else {
+      throw "invalid cache url";
+    }
   }
 }
 
