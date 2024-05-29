@@ -157,6 +157,11 @@ export class Windows {
       logger.debug("path:", path);
       window.loadFile(path);
     }
+    if (import.meta.env.VITE_DEFAULT_WINDOW_POSITION !== undefined) {
+      window.setPosition(
+        ...(JSON.parse(import.meta.env.VITE_DEFAULT_WINDOW_POSITION) as [number, number]),
+      );
+    }
     return window;
   }
   changeMainWindow(type: WindowName) {

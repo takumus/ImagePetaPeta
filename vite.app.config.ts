@@ -19,6 +19,7 @@ export default defineConfig((async ({ command }) => {
   }
   const electronPlugin = await createElectronPlugin(isBuild);
   return {
+    envDir: "../../",
     base: "./",
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
