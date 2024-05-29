@@ -13,3 +13,5 @@ src/_defines
 
 scripts/experiments/temp/*
 !.keep
+.env.*
+!.env.*.sample
