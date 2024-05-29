@@ -17,12 +17,8 @@ export const worker = initWorkerThreads<
   Awaited<ReturnType<typeof generateImageFileInfo> | undefined>
 >(parentPort, (parentPort) => {
   parentPort.on("message", async (params) => {
-    try {
-      const petaFile = await generateImageFileInfo(params);
-      parentPort.postMessage(petaFile);
-    } catch {
-      parentPort.postMessage(undefined);
-    }
+    const petaFile = await generateImageFileInfo(params);
+    parentPort.postMessage(petaFile);
   });
 });
 
