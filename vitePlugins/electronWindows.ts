@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { Plugin } from "vite";
 
 export default (pluginOptions: {
@@ -28,8 +28,7 @@ export default (pluginOptions: {
       }
     },
     load(id) {
-      const path = id.replace(/\\/g, "/");
-      const windowName = extractSubstring(path);
+      const windowName = extractSubstring(id);
       if (windowName !== undefined) {
         return createHTML(windowName);
       }
@@ -55,7 +54,7 @@ export default (pluginOptions: {
           ...pluginOptions.windows.reduce<{ [key: string]: string }>(
             (obj, window) => ({
               ...obj,
-              [window.name]: join(pluginOptions.htmlDir, `_${window.name}.html`),
+              [window.name]: resolve(pluginOptions.htmlDir, `_${window.name}.html`),
             }),
             {},
           ),
