@@ -53,7 +53,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       },
     },
     {
-      scheme: PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE,
+      scheme: PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
       privileges: {
         supportFetchAPI: true,
         stream: true,
@@ -109,7 +109,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
     protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
     protocol.handle(
-      PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE,
+      PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
       pageDownloaderCache.handle.bind(pageDownloaderCache),
     );
     // ipcの関数登録

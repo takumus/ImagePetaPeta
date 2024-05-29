@@ -77,7 +77,7 @@ function order(datas: PageDownloaderData[]) {
       images.value.unshift({
         cacheURL: url.startsWith("data")
           ? url
-          : `${PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE}://?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(data.referer)}`,
+          : `${PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE}://?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(data.referer)}`,
         pageTitle: data.pageTitle,
         pageURL: data.pageURL,
         url,

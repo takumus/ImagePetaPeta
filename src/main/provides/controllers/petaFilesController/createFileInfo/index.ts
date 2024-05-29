@@ -27,7 +27,7 @@ export const createFileInfo = {
       log.debug("## Create File Info URL");
       let buffer: Buffer | undefined;
       let remoteURL = "";
-      if (url.startsWith(PROTOCOLS.FILE.IMAGE_PAGE_DOWNLOADER_CACHE)) {
+      if (url.startsWith(PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE)) {
         // cache URLだったら
         log.debug("### Cache URL");
         const pdc = usePageDownloaderCache();
