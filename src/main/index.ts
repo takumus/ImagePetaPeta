@@ -26,6 +26,9 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     return;
   }
   const logger = useLogger();
+  process.on("uncaughtException", function (error) {
+    logger.logMainChunk().error("Main Process Error", error);
+  });
   const windows = useWindows();
   const configSettings = useConfigSettings();
   const handleFileResponse = useHandleFileResponse();
