@@ -93,11 +93,25 @@ export class Windows {
         parent: window && modal ? window : undefined,
       });
       this.windows[windowName]?.center();
+      this.setEnvParam(this.windows[windowName]);
     } else {
       this.windows[windowName]?.moveTop();
       this.windows[windowName]?.focus();
     }
     return this.windows[windowName] as BrowserWindow;
+  }
+  private setEnvParam(window?: BrowserWindow) {
+    if (window === undefined) {
+      return;
+    }
+    if (import.meta.env.VITE_OPEN_DEVTOOL === "true") {
+      window.webContents.openDevTools({ mode: "detach" });
+    }
+    if (import.meta.env.VITE_DEFAULT_WINDOW_POSITION !== undefined) {
+      window.setPosition(
+        ...(JSON.parse(import.meta.env.VITE_DEFAULT_WINDOW_POSITION) as [number, number]),
+      );
+    }
   }
   createWindow(type: WindowName, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
@@ -155,16 +169,6 @@ export class Windows {
       );
       logger.debug("path:", path);
       window.loadFile(path);
-    }
-    if (import.meta.env.VITE_OPEN_DEVTOOL === "true") {
-      const size = window.getSize();
-      window.setSize(size[0] + 600, size[1]);
-      window.webContents.openDevTools();
-    }
-    if (import.meta.env.VITE_DEFAULT_WINDOW_POSITION !== undefined) {
-      window.setPosition(
-        ...(JSON.parse(import.meta.env.VITE_DEFAULT_WINDOW_POSITION) as [number, number]),
-      );
     }
     return window;
   }
