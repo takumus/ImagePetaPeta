@@ -116,7 +116,7 @@ async function createElectronPlugin(isBuild: boolean) {
           lib: {
             entry: resolve(preloadFile),
             formats: ["cjs"],
-            fileName: () => "[name].js",
+            fileName: () => "[name].cjs",
           },
         },
       },

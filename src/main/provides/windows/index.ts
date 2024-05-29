@@ -114,7 +114,7 @@ export class Windows {
         nodeIntegration: false,
         contextIsolation: true,
         backgroundThrottling: false,
-        preload: Path.join(getDirname(import.meta.url), "preload.js"),
+        preload: Path.join(getDirname(import.meta.url), "preload.cjs"),
       },
       backgroundColor: getStyle()["--color-0"],
       trafficLightPosition: {
