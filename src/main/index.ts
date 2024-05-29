@@ -92,6 +92,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       .debug(
         `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
       );
+    logger.logMainChunk().debug(import.meta.env);
     logger.logMainChunk().debug(`verison: ${app.getVersion()}`);
     if (process.env.NODE_ENV === "development") {
       const log = logger.logMainChunk();
