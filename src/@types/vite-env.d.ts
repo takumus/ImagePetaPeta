@@ -6,5 +6,6 @@ declare module "*.vue" {
   export default component;
 }
 interface ImportMetaEnv {
-  readonly VITE_DEFAULT_WINDOW_POSITION: string | undefined;
+  readonly VITE_DEFAULT_WINDOW_POSITION?: string;
+  readonly VITE_OPEN_DEVTOOL?: string;
 }

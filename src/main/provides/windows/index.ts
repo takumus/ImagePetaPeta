@@ -148,7 +148,6 @@ export class Windows {
       const url = process.env.VITE_DEV_SERVER_URL + "htmls/_" + type + ".html";
       logger.debug("url:", url);
       window.loadURL(url);
-      // window.webContents.openDevTools();
     } else {
       const path = Path.resolve(
         getDirname(import.meta.url),
@@ -156,6 +155,11 @@ export class Windows {
       );
       logger.debug("path:", path);
       window.loadFile(path);
+    }
+    if (import.meta.env.VITE_OPEN_DEVTOOL === "true") {
+      const size = window.getSize();
+      window.setSize(size[0] + 600, size[1]);
+      window.webContents.openDevTools();
     }
     if (import.meta.env.VITE_DEFAULT_WINDOW_POSITION !== undefined) {
       window.setPosition(
