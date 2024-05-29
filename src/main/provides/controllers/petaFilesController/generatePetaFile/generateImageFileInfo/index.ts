@@ -10,6 +10,7 @@ export async function generateImageFileInfoByWorker(params: WorkerThreadsInputTy
     wt.worker.postMessage(params);
     wt.worker.on("error", (err) => {
       rej(err);
+      wt.unuse();
     });
     wt.worker.once("message", async (data) => {
       try {
