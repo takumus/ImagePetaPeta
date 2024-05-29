@@ -1,24 +1,24 @@
 import { fileTypeFromBuffer } from "file-type";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { isSupportedFile, supportedFileConditions } from "@/main/utils/supportedFileTypes";
+import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 
+type Cache = {
+  buffer: Buffer;
+  url: string;
+};
 export class PageDownloaderCache {
-  private cache: { [url: string]: Buffer } = {};
-  private downloadings: { [url: string]: Promise<Buffer> } = {};
+  private cache: { [url: string]: Promise<Cache> } = {};
   clear() {
     this.cache = {};
   }
-  async add(url: string, referer: string) {
-    console.log(url);
-    if (this.cache[url] !== undefined) {
-      return this.cache[url];
+  async load(cacheURL: string) {
+    if (this.cache[cacheURL] !== undefined) {
+      return this.cache[cacheURL];
     }
-    if (this.downloadings[url] !== undefined) {
-      return this.downloadings[url];
-    }
-    return (this.downloadings[url] = (async () => {
-      return (this.cache[url] = Buffer.from(
+    const { url, referer } = this.extractCacheURL(cacheURL);
+    this.cache[cacheURL] = (async () => ({
+      buffer: Buffer.from(
         await (
           await fetch(url, {
             headers: {
@@ -27,24 +27,21 @@ export class PageDownloaderCache {
             },
           })
         ).arrayBuffer(),
-      ));
-    })());
-  }
-  get(url: string): Buffer | undefined {
-    return this.cache[url];
+      ),
+      url,
+    }))();
+    return this.cache[cacheURL];
   }
   async handle(request: Request) {
-    const { url, referer } = this.extractCacheURL(request.url);
-    if (url && referer) {
-      const buffer = await this.add(url, referer);
-      const fileType = await fileTypeFromBuffer(buffer);
-      if (fileType !== undefined && supportedFileConditions.image(fileType)) {
-        return new Response(buffer, {
-          headers: {
-            "Content-Type": fileType.mime,
-          },
-        });
-      }
+    const c = await this.load(request.url);
+    const fileType = await fileTypeFromBuffer(c.buffer);
+    if (fileType !== undefined && supportedFileConditions.image(fileType)) {
+      return new Response(c.buffer, {
+        headers: {
+          "Content-Type": fileType.mime,
+          "Cache-Control": "no-cache",
+        },
+      });
     }
     return new Response(undefined, { status: 404 });
   }

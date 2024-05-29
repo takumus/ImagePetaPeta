@@ -31,9 +31,9 @@ export const createFileInfo = {
         // cache URLだったら
         log.debug("### Cache URL");
         const pdc = usePageDownloaderCache();
-        const cache = pdc.extractCacheURL(url);
-        buffer = pdc.get(cache.url);
+        const cache = await pdc.load(url);
         remoteURL = cache.url;
+        buffer = cache.buffer;
       } else if (url.trim().startsWith("data:")) {
         // dataURIだったら
         log.debug("### Data URI");

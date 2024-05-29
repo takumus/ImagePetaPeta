@@ -895,10 +895,10 @@ export const ipcFunctions: IpcFunctionsType = {
     const windows = useWindows();
     _urls = urls;
     windows.openWindow("pageDownloader");
+    usePageDownloaderCache().clear();
   },
   async addPageDownloaderDatas(_, urls) {
     _urls = [...urls, ..._urls];
-    usePageDownloaderCache().clear();
     const windows = useWindows();
     windows.emitMainEvent(
       { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["pageDownloader"] },
