@@ -8,6 +8,9 @@ export async function generateImageFileInfoByWorker(params: WorkerThreadsInputTy
     const wt = wtGroup.getWT();
     wt.use();
     wt.worker.postMessage(params);
+    wt.worker.on("error", (err) => {
+      rej(err);
+    });
     wt.worker.once("message", async (data) => {
       try {
         res(data);
