@@ -35,11 +35,11 @@ export default defineConfig((async ({ command }) => {
     plugins: [
       webWorker(),
       electronWindows({
+        templateHTMLFile: "./src/renderer/htmls/template.html",
         htmlDir: "./src/renderer/htmls",
         entryTSDirFromHTMLDir: "../windows",
         windows: windowNames.map((name) => ({
           name,
-          templateHTMLFile: "./src/renderer/htmls/template.html",
         })),
       }),
       vue({
