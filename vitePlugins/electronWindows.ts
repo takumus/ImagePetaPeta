@@ -15,27 +15,27 @@ export default (pluginOptions: {
       join(pluginOptions.entryTSDirFromHTMLDir, `${windowName}.ts`),
     );
   }
-  function extractSubstring(url: string) {
-    return url.match(/[\\/]htmls[\\/]_(.*?)\.html$/)?.[1];
+  function getWindowName(url: string) {
+    return url.match(/[\\/]htmls[\\/]page\.(.*?)\.html$/)?.[1];
   }
   return {
     name: "electronWindow",
     enforce: "pre",
     resolveId(source) {
-      const windowName = extractSubstring(source);
+      const windowName = getWindowName(source);
       if (windowName !== undefined) {
         return source;
       }
     },
     load(id) {
-      const windowName = extractSubstring(id);
+      const windowName = getWindowName(id);
       if (windowName !== undefined) {
         return createHTML(windowName);
       }
     },
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        const windowName = extractSubstring(req?.url ?? "");
+        const windowName = getWindowName(req?.url ?? "");
         if (windowName === undefined) {
           next();
           return;
@@ -54,7 +54,7 @@ export default (pluginOptions: {
           ...pluginOptions.windows.reduce<{ [key: string]: string }>(
             (obj, window) => ({
               ...obj,
-              [window.name]: resolve(pluginOptions.htmlDir, `_${window.name}.html`),
+              [window.name]: resolve(pluginOptions.htmlDir, `page.${window.name}.html`),
             }),
             {},
           ),
