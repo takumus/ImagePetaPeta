@@ -109,7 +109,7 @@ async function createElectronPlugin(isBuild: boolean) {
   options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
       vite: {
-        plugins: [workerThreads(), ...(baseOptions.vite?.plugins ?? [])],
+        plugins: [workerThreads()],
         build: {
           lib: {
             entry: mainFile,
