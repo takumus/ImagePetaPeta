@@ -70,7 +70,7 @@ export const createFileInfo = {
         path: dist,
         note: remoteURL,
         name: "downloaded",
-        encryptedTempFile: encryptTempFile,
+        secureTempFile: encryptTempFile,
       };
     } catch (error) {
       log.error(error);
@@ -95,7 +95,7 @@ export const createFileInfo = {
         path: dist,
         note: "",
         name: "noname",
-        encryptedTempFile: true,
+        secureTempFile: true,
       };
     } catch (error) {
       log.error(error);

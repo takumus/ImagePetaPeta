@@ -24,7 +24,6 @@ export async function regeneratePetaFile(petaFile: PetaFile) {
     type: "update",
     extends: petaFile,
     doEncrypt: petaFile.encrypted,
-    encryptedSource: petaFile.encrypted,
   });
 }
 export async function generatePetaFile(param: {
@@ -32,14 +31,14 @@ export async function generatePetaFile(param: {
   extends: Partial<PetaFile> & { id: string };
   type: "update" | "add";
   doEncrypt: boolean;
-  encryptedSource?: boolean;
+  secureTempFile?: boolean;
 }): Promise<PetaFile> {
   const logger = useLogger().logMainChunk();
   const sfp = useConfigSecureFilePassword();
   logger.debug("#Generate PetaFile");
   const fileInfo = await generateFileInfo(
     param.type === "update" ? (param.extends as PetaFile) : param.filePath,
-    param.encryptedSource,
+    param.secureTempFile,
   );
   if (fileInfo === undefined) {
     throw new Error("unsupported file");
@@ -84,12 +83,12 @@ export async function generatePetaFile(param: {
         }
       } else {
         if (param.doEncrypt) {
-          const from = param.encryptedSource
+          const from = param.secureTempFile
             ? secureFile.decrypt.toStream(param.filePath, useSecureTempFileKey())
             : param.filePath;
           await secureFile.encrypt.toFile(from, filePath.original, sfp.getValue());
         } else {
-          if (param.encryptedSource) {
+          if (param.secureTempFile) {
             await secureFile.decrypt.toFile(
               param.filePath,
               filePath.original,
@@ -110,7 +109,7 @@ export async function generatePetaFile(param: {
 }
 export async function generateFileInfo(
   source: string | PetaFile,
-  encryptedSource?: boolean,
+  secureTempFile?: boolean,
 ): Promise<GeneratedFileInfo | undefined> {
   if (typeof source === "string") {
     const filePath = source;
@@ -118,14 +117,14 @@ export async function generateFileInfo(
       return secureFile.decrypt.toStream(filePath, useSecureTempFileKey());
     }
     const fileType = await fileTypeFromStream(
-      encryptedSource ? getStream() : createReadStream(filePath),
+      secureTempFile ? getStream() : createReadStream(filePath),
     );
     const logger = useLogger().logMainChunk();
-    logger.debug("#Generate FileInfo", fileType?.mime, `encrypted: ${encryptedSource}`);
+    logger.debug("#Generate FileInfo", fileType?.mime, `encrypted: ${secureTempFile}`);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
         return generateImageFileInfoByWorker({
-          buffer: encryptedSource ? await streamToBuffer(getStream()) : await readFile(filePath),
+          buffer: secureTempFile ? await streamToBuffer(getStream()) : await readFile(filePath),
           fileType: fileType,
         });
       }

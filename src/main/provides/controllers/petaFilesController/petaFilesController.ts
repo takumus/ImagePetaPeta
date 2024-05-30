@@ -196,7 +196,7 @@ export class PetaFilesController {
             index + 1,
             "/",
             fileInfos.length,
-            `encrypted: ${fileInfo.encryptedTempFile}`,
+            `encrypted: ${fileInfo.secureTempFile}`,
           );
           let result = ImportImageResult.SUCCESS;
           let errorReason = "";
@@ -204,7 +204,7 @@ export class PetaFilesController {
             const name = Path.basename(fileInfo.path);
             const fileDate = (await stat(fileInfo.path)).mtime;
             const readStream = () =>
-              fileInfo.encryptedTempFile
+              fileInfo.secureTempFile
                 ? secureFile.decrypt.toStream(fileInfo.path, useSecureTempFileKey())
                 : createReadStream(fileInfo.path);
             if (!(await isSupportedFile(readStream()))) {
@@ -226,7 +226,7 @@ export class PetaFilesController {
                 },
                 type: "add",
                 doEncrypt: true,
-                encryptedSource: fileInfo.encryptedTempFile,
+                secureTempFile: fileInfo.secureTempFile,
               });
               if (petaFile === undefined) {
                 throw new Error("unsupported file");
