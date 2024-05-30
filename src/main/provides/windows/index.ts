@@ -125,6 +125,7 @@ export class Windows {
       fullscreenable: false,
       fullscreen: false,
       webPreferences: {
+        sandbox: true,
         nodeIntegration: false,
         contextIsolation: true,
         backgroundThrottling: false,
@@ -159,11 +160,11 @@ export class Windows {
     //   this.reloadWindow(type);
     // });
     if (process.env.VITE_DEV_SERVER_URL) {
-      const url = `${process.env.VITE_DEV_SERVER_URL}htmls/page.${type}.html`;
+      const url = new URL(`window.${type}.html`, process.env.VITE_DEV_SERVER_URL).href;
       logger.debug("url:", url);
       window.loadURL(url);
     } else {
-      const path = Path.resolve(getDirname(import.meta.url), `../renderer/htmls/page.${type}.html`);
+      const path = Path.resolve(getDirname(import.meta.url), `../renderer/window.${type}.html`);
       logger.debug("path:", path);
       window.loadFile(path);
     }

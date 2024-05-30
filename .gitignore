@@ -3,8 +3,6 @@ node_modules
 .DS_Store
 _electronBuilderCache
 
-src/renderer/htmls/_*.html
-
 _release
 _electronTemp
 _test

@@ -1,26 +1,37 @@
 import { readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { Plugin } from "vite";
+import { join, relative, resolve } from "node:path";
+import { BuildOptions, mergeConfig, Plugin, UserConfig } from "vite";
 
 export default (pluginOptions: {
   templateHTMLFile: string;
-  htmlDir: string;
-  entryTSDirFromHTMLDir: string;
-  windows: { name: string }[];
+  virtualDirFromRoot: string;
+  windows: { [name: string]: string };
 }): Plugin => {
+  let root = "";
   const templateHTML = readFileSync(pluginOptions.templateHTMLFile, "utf-8");
   function createHTML(windowName: string) {
-    return templateHTML.replace(
-      /___TS_FILE___/,
-      join(pluginOptions.entryTSDirFromHTMLDir, `${windowName}.ts`),
+    const path = relative(
+      join(root, pluginOptions.virtualDirFromRoot),
+      pluginOptions.windows[windowName],
     );
+    return templateHTML.replace(/___TS_FILE___/, path);
   }
   function getWindowName(url: string) {
-    return url.match(/[\\/]htmls[\\/]page\.(.*?)\.html$/)?.[1];
+    return url.match(/[\\/]window\.(.*?)\.html$/)?.[1];
   }
   return {
     name: "electronWindow",
     enforce: "pre",
+    config(config) {
+      root = config.root ?? ".";
+      config.build = mergeConfig<BuildOptions, BuildOptions>(config.build ?? {}, {
+        rollupOptions: {
+          input: Object.keys(pluginOptions.windows).map((windowName) =>
+            join(root, pluginOptions.virtualDirFromRoot, `window.${windowName}.html`),
+          ),
+        },
+      });
+    },
     resolveId(source) {
       const windowName = getWindowName(source);
       if (windowName !== undefined) {
@@ -46,21 +57,6 @@ export default (pluginOptions: {
         });
         res.end(createHTML(windowName));
       });
-    },
-    config(config) {
-      if (config.build?.rollupOptions) {
-        config.build.rollupOptions.input = {
-          ...(config.build.rollupOptions.input as any),
-          ...pluginOptions.windows.reduce<{ [key: string]: string }>(
-            (obj, window) => ({
-              ...obj,
-              [window.name]: resolve(pluginOptions.htmlDir, `page.${window.name}.html`),
-            }),
-            {},
-          ),
-        };
-        console.log(config.build.rollupOptions.input);
-      }
     },
   };
 };

@@ -26,7 +26,16 @@ export default defineConfig((async ({ command }) => {
     build: {
       emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/renderer"),
-      rollupOptions: {},
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              // モジュール名を取得してチャンク名として返す
+              return id.toString().split("node_modules/")[1].split("/")[0];
+            }
+          },
+        },
+      },
       minify: isBuild,
     },
     resolve: {
@@ -35,12 +44,15 @@ export default defineConfig((async ({ command }) => {
     plugins: [
       webWorker(),
       electronWindows({
-        templateHTMLFile: "./src/renderer/htmls/template.html",
-        htmlDir: "./src/renderer/htmls",
-        entryTSDirFromHTMLDir: "../windows",
-        windows: windowNames.map((name) => ({
-          name,
-        })),
+        templateHTMLFile: resolve("./src/renderer/template.html"),
+        virtualDirFromRoot: ".", // 相対じゃないとダメ。
+        windows: windowNames.reduce<{ [name: string]: string }>(
+          (windows, name) => ({
+            ...windows,
+            [name]: resolve("./src/renderer/windows", name + ".ts"),
+          }),
+          {},
+        ),
       }),
       vue({
         template: {
