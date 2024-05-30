@@ -118,6 +118,9 @@ async function createElectronPlugin(isBuild: boolean) {
           },
         },
       },
+      onstart(args) {
+        args.startup([".", "--sourcemap", "--inspect=9229"]);
+      },
     }),
   );
   options.push(
