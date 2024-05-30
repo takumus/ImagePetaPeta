@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import { Readable } from "node:stream";
 import { pipeline } from "stream/promises";
 
 export async function streamToBuffer(stream: Readable): Promise<Buffer> {

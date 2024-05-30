@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve } from "node:path";
 import { Worker } from "worker_threads";
 
 import { getDirname } from "@/main/utils/dirname";

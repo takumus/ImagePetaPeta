@@ -1,5 +1,5 @@
-import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync } from "fs";
-import { dirname, extname, join, resolve } from "path";
+import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import { dirname, extname, join, resolve } from "node:path";
 import sharp from "sharp";
 
 import { ppa } from "@/commons/utils/pp";

@@ -1,5 +1,5 @@
-import { createWriteStream, WriteStream } from "fs";
-import * as Path from "path";
+import { createWriteStream, WriteStream } from "node:fs";
+import * as Path from "node:path";
 import dateFormat from "dateformat";
 import { v4 as uuid } from "uuid";
 

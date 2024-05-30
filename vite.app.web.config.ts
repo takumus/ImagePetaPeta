@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve } from "node:path";
 import { viteAlias } from "./vite.alias";
 import webWorker from "./vitePlugins/webWorker";
 import { defineConfig } from "vite";

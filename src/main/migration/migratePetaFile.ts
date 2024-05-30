@@ -1,5 +1,5 @@
-import { rename } from "fs/promises";
-import Path from "path";
+import { rename } from "node:fs/promises";
+import Path from "node:path";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 import { PETAIMAGE_METADATA_VERSION } from "@/commons/defines";

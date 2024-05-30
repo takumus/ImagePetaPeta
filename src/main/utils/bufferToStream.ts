@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import { Readable } from "node:stream";
 
 export function bufferToStream(buffer: Uint8Array) {
   return new Readable({

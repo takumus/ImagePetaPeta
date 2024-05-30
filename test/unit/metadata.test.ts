@@ -1,6 +1,6 @@
-import { mkdirSync, rmdirSync } from "fs";
-import { readdir, writeFile } from "fs/promises";
-import { basename, resolve } from "path";
+import { mkdirSync, rmdirSync } from "node:fs";
+import { readdir, writeFile } from "node:fs/promises";
+import { basename, resolve } from "node:path";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
 import { PetaColor } from "@/commons/datas/petaColor";

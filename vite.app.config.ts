@@ -1,5 +1,5 @@
 import { rmSync } from "node:fs";
-import { resolve } from "path";
+import { resolve } from "node:path";
 import pkg from "./package.json";
 import { windowNames } from "./src/commons/windows";
 import { viteAlias } from "./vite.alias";

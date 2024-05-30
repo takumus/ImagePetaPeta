@@ -1,5 +1,5 @@
-import { rename } from "fs/promises";
-import path, { resolve } from "path";
+import { rename } from "node:fs/promises";
+import path, { resolve } from "node:path";
 import { v4 as uuid } from "uuid";
 
 import { PetaFile } from "@/commons/datas/petaFile";

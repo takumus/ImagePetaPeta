@@ -1,6 +1,6 @@
-import { mkdirSync, readFileSync, rmdirSync } from "fs";
-import { rm } from "fs/promises";
-import { resolve } from "path";
+import { mkdirSync, readFileSync, rmdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
+import { resolve } from "node:path";
 import { initDummyElectron } from "./initDummyElectron";
 import deepcopy from "deepcopy";
 import { fileTypeFromStream } from "file-type";

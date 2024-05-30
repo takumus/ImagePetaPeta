@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import { createReadStream, ReadStream } from "fs";
-import { Readable } from "stream";
+import { createReadStream, ReadStream } from "node:fs";
+import { Readable } from "node:stream";
 
 export function fileSHA256(filePath: string | Readable) {
   return new Promise<string>((res, rej) => {

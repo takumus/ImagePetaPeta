@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash } from "crypto";
-import { createReadStream, createWriteStream } from "fs";
-import { PassThrough, pipeline, Readable, Transform } from "stream";
+import { createReadStream, createWriteStream } from "node:fs";
+import { PassThrough, pipeline, Readable, Transform } from "node:stream";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 

@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import * as fsp from "fs/promises";
-import * as Path from "path";
+import * as fs from "node:fs";
+import * as fsp from "node:fs/promises";
+import * as Path from "node:path";
 
 export async function mkdirIfNotIxists(path: string, options: fs.MakeDirectoryOptions) {
   try {

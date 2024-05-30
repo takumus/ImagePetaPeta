@@ -1,5 +1,5 @@
-import { mkdirSync, rmdirSync } from "fs";
-import { resolve } from "path";
+import { mkdirSync, rmdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { initDummyElectron } from "./initDummyElectron";
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 

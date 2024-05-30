@@ -1,4 +1,4 @@
-import { readFile, stat } from "fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import * as tf from "@tensorflow/tfjs";
 import sharp from "sharp";
 

@@ -1,4 +1,4 @@
-import * as Path from "path";
+import * as Path from "node:path";
 
 import { ImportFileGroup } from "@/commons/datas/importFileGroup";
 

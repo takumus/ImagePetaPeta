@@ -1,5 +1,5 @@
-import { stat } from "fs/promises";
-import { Readable, Transform } from "stream";
+import { stat } from "node:fs/promises";
+import { Readable, Transform } from "node:stream";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 

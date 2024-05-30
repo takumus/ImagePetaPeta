@@ -1,5 +1,5 @@
-import { readFile, writeFile } from "fs/promises";
-import { resolve } from "path";
+import { readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { layers, Sequential, sequential, stack, tensor, Tensor } from "@tensorflow/tfjs";
 
 import { PetaFile } from "@/commons/datas/petaFile";

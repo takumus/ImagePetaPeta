@@ -1,5 +1,5 @@
-import { mkdirSync, rmSync } from "fs";
-import { resolve } from "path";
+import { mkdirSync, rmSync } from "node:fs";
+import { resolve } from "node:path";
 import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
 import readdirr from "recursive-readdir";

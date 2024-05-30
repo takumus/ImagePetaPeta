@@ -22,7 +22,7 @@ export default (pluginOptions?: {}): Plugin => {
       //   const root = process.env.TEST === "true" ? `"./_test/_wt"` : "__dirname";
       //   const newCode =
       //     `import { Worker as __WT__ } from "worker_threads";\n` +
-      //     `import { resolve as __RESOLVE__ } from "path";\n` +
+      //     `import { resolve as __RESOLVE__ } from "node:path";\n` +
       //     workers
       //       .map(
       //         (worker) =>

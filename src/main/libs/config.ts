@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import deepcopy from "deepcopy";
 
 import { SyncMigrater } from "@/main/libs/createMigrater";

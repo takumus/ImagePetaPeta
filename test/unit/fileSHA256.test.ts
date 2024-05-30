@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { fileSHA256 } from "@/main/utils/fileSHA256";

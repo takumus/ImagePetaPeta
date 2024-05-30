@@ -1,6 +1,6 @@
-import { createReadStream } from "fs";
-import { rename, rm, stat } from "fs/promises";
-import * as Path from "path";
+import { createReadStream } from "node:fs";
+import { rename, rm, stat } from "node:fs/promises";
+import * as Path from "node:path";
 import { fileTypeFromStream } from "file-type";
 import { v4 as uuid } from "uuid";
 

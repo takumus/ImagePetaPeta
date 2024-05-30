@@ -1,5 +1,5 @@
-import { writeFile } from "fs/promises";
-import Path from "path";
+import { writeFile } from "node:fs/promises";
+import Path from "node:path";
 import { dataUriToBuffer } from "data-uri-to-buffer";
 import { v4 as uuid } from "uuid";
 

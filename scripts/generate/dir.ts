@@ -1,4 +1,4 @@
-import { mkdirSync } from "fs";
+import { mkdirSync } from "node:fs";
 
 mkdirSync("./_electronTemp", { recursive: true });
 mkdirSync("./src/_public", { recursive: true });

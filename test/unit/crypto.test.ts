@@ -1,8 +1,8 @@
 import { createHash } from "crypto";
-import { mkdirSync, readdirSync, rmdirSync } from "fs";
-import { readFile, stat } from "fs/promises";
+import { mkdirSync, readdirSync, rmdirSync } from "node:fs";
+import { readFile, stat } from "node:fs/promises";
+import { resolve } from "node:path";
 import { beforeEach } from "node:test";
-import { resolve } from "path";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import { ppa } from "@/commons/utils/pp";

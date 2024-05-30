@@ -1,5 +1,5 @@
-import { readFile } from "fs/promises";
-import * as Path from "path";
+import { readFile } from "node:fs/promises";
+import * as Path from "node:path";
 import { Tensor, Tensor1D } from "@tensorflow/tfjs";
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 import { fileTypeFromBuffer } from "file-type";

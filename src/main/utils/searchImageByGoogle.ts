@@ -1,4 +1,4 @@
-import * as Path from "path";
+import * as Path from "node:path";
 import { BrowserWindow, shell, WebContents } from "electron";
 
 import { PetaFile } from "@/commons/datas/petaFile";

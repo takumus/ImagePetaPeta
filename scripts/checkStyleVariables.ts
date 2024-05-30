@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import recursiveReadDir from "recursive-readdir";
 
 import { defaultStyles } from "@/renderer/styles/styles";

@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { getURLFromHTML } from "@/renderer/utils/getURLFromHTML";

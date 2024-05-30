@@ -1,4 +1,4 @@
-import * as Path from "path";
+import * as Path from "node:path";
 import { BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
 
 import {

@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 import { getDirname } from "@/main/utils/dirname";
 

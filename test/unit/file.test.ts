@@ -1,5 +1,5 @@
-import { mkdirSync, rmdirSync, writeFileSync } from "fs";
-import { resolve } from "path";
+import { mkdirSync, rmdirSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import {

@@ -1,5 +1,5 @@
-import * as fs from "fs/promises";
-import * as Path from "path";
+import * as fs from "node:fs/promises";
+import * as Path from "node:path";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";

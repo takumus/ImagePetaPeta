@@ -1,5 +1,5 @@
-import { mkdirSync, rmdirSync } from "fs";
-import { resolve } from "path";
+import { mkdirSync, rmdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import Config from "@/main/libs/config";

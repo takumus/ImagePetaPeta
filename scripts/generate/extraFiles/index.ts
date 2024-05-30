@@ -1,5 +1,5 @@
-import { copyFileSync, cpSync, mkdirSync, readdirSync, writeFileSync } from "fs";
-import { join, resolve } from "path";
+import { copyFileSync, cpSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
 import { normalizePath } from "vite";

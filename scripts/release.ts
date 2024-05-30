@@ -1,5 +1,5 @@
-import { readdirSync, renameSync } from "fs";
-import { resolve } from "path";
+import { readdirSync, renameSync } from "node:fs";
+import { resolve } from "node:path";
 import AdmZip from "adm-zip";
 
 export const release = async () => {

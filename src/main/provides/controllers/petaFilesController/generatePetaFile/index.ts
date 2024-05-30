@@ -1,5 +1,5 @@
-import { createReadStream } from "fs";
-import { copyFile, readFile, rename, rm, writeFile } from "fs/promises";
+import { createReadStream } from "node:fs";
+import { copyFile, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { fileTypeFromFile, fileTypeFromStream } from "file-type";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
