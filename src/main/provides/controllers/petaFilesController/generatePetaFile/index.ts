@@ -113,29 +113,28 @@ export async function generateFileInfo(
   encryptedSource?: boolean,
 ): Promise<GeneratedFileInfo | undefined> {
   if (typeof source === "string") {
+    const filePath = source;
+    function getStream() {
+      return secureFile.decrypt.toStream(filePath, useSecureTempFileKey());
+    }
     const fileType = await fileTypeFromStream(
-      encryptedSource
-        ? secureFile.decrypt.toStream(source, useSecureTempFileKey())
-        : createReadStream(source),
+      encryptedSource ? getStream() : createReadStream(filePath),
     );
     const logger = useLogger().logMainChunk();
     logger.debug("#Generate FileInfo", fileType?.mime, `encrypted: ${encryptedSource}`);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
         return generateImageFileInfoByWorker({
-          buffer: encryptedSource
-            ? await streamToBuffer(secureFile.decrypt.toStream(source, useSecureTempFileKey()))
-            : await readFile(source),
+          buffer: encryptedSource ? await streamToBuffer(getStream()) : await readFile(filePath),
           fileType: fileType,
         });
       }
       if (supportedFileConditions.video(fileType)) {
-        return generateVideoFileInfo({ path: source }, fileType);
+        return generateVideoFileInfo({ path: filePath }, fileType);
       }
     }
   } else {
     const petaFile = source;
-    const path = getPetaFilePath.fromPetaFile(petaFile).original;
     function getStream() {
       return getStreamFromPetaFile(petaFile, "original");
     }
