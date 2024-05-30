@@ -13,7 +13,8 @@ export class WorkerThreads<T> {
     this._idle = false;
   }
   unuse() {
-    this._idle = true;
+    (this.worker as Worker).terminate();
+    this._idle = false;
   }
   public get idle() {
     return this._idle;
@@ -32,8 +33,8 @@ export function createWorkerThreadsGroup<T>(path?: string) {
           ),
         ) as any,
       );
-      const id = (newWT.worker as any).threadId;
-      (newWT.worker as any).on("exit", () => {
+      const id = (newWT.worker as Worker).threadId;
+      (newWT.worker as Worker).once("exit", () => {
         delete wts[id];
       });
       wts[id] = newWT;
