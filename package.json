@@ -10,6 +10,7 @@
   "scripts": {
     "prepare": "npm run generate-assets",
     "dev": "tsx ./scripts/dev.ts",
+    "dev-pre": "tsx ./scripts/devPrebuild.ts",
     "dev:app": "vite --config vite.app.config.ts",
     "dev:app-web": "vite build --watch --config vite.app.web.config.ts",
     "build": "npm run generate-assets && npm run tsc && run-s build:*",
