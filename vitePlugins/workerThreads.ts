@@ -5,7 +5,7 @@ export default (pluginOptions?: {}): Plugin => {
     name: "worker-threads",
     enforce: "pre",
     transform(code, id, options) {
-      const pattern = /import\(\s*?["'].*(!workerThread\..*)["']\s*?\)/g;
+      const pattern = /import\(\s*?["'].*(!workerThreads\..*)["']\s*?\)/g;
       let match: RegExpExecArray | null;
       let newCode = code;
       let replaced = false;

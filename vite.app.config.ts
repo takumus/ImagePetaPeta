@@ -69,7 +69,7 @@ export default defineConfig((async ({ command }) => {
 
 async function createElectronPlugin(isBuild: boolean) {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) =>
-    file.includes("!workerThread."),
+    file.includes("!workerThreads."),
   );
   const mainFile = resolve("./src/main/index.ts");
   const preloadFile = resolve("./src/main/preload.ts");

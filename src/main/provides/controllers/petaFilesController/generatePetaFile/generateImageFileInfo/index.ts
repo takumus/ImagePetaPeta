@@ -2,7 +2,7 @@ import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
 
 const workerGroup = createWorkerThreadsGroup(
   import(
-    "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/!workerThread.generateImageFileInfo"
+    "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/!workerThreads.generateImageFileInfo"
   ),
 );
 export const generateImageFileInfoByWorker = workerGroup.createUseWorkerThreadFunction((params) => {
