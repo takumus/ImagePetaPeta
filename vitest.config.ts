@@ -40,7 +40,7 @@ export default defineConfig((async ({ command }) => {
 
 async function createElectronPlugin() {
   const wtFiles = (await readdirr(resolve("./src"))).filter((file) =>
-    file.endsWith(".!workerThread.ts"),
+    file.includes("!workerThread."),
   );
   console.log("WorkerThreadsFiles:", wtFiles);
   const electronConfig: ElectronOptions[] = wtFiles.map<ElectronOptions>((file) => ({

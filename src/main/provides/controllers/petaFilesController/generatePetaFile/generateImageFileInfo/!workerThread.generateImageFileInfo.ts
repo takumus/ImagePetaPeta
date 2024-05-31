@@ -1,4 +1,3 @@
-import { parentPort } from "worker_threads";
 import { FileTypeResult } from "file-type";
 import sharp from "sharp";
 
