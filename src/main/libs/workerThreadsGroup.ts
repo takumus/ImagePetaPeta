@@ -38,16 +38,22 @@ export class TypedWorkerThreads<
   }
 }
 export function createWorkerThreadsGroup<
-  T extends Promise<{ default: TypedWorkerThreadsMessage<any, any> }>,
->(source?: T) {
-  const typedWorkerThreads: { [key: number]: TypedWorkerThreads<Awaited<T>["default"]> } = {};
+  WorkerThreadsImportReturnValue extends Promise<{ default: TypedWorkerThreadsMessage<any, any> }>,
+  _TypedWorkerThreadsMessage extends TypedWorkerThreadsMessage<
+    any,
+    any
+  > = Awaited<WorkerThreadsImportReturnValue>["default"],
+>(source?: WorkerThreadsImportReturnValue) {
+  const typedWorkerThreads: {
+    [key: number]: TypedWorkerThreads<_TypedWorkerThreadsMessage>;
+  } = {};
   function get() {
     const idleWT = Object.values(typedWorkerThreads).find((worker) => worker.idle);
     if (idleWT === undefined) {
       if (typeof source !== "string") {
         throw "TypedWorkerThreads plugin error";
       }
-      const newWT = new TypedWorkerThreads<Awaited<T>["default"]>(
+      const newWT = new TypedWorkerThreads<_TypedWorkerThreadsMessage>(
         new Worker(
           resolve(
             process.env.TEST === "true" ? `./_test/_wt` : getDirname(import.meta.url),
@@ -67,7 +73,9 @@ export function createWorkerThreadsGroup<
   return {
     get,
     createUseWorkerThreadFunction: (
-      func: (data: Awaited<T>["default"]["toWorker"]) => Promise<Awaited<T>["default"]["toMain"]>,
+      func: (
+        data: _TypedWorkerThreadsMessage["toWorker"],
+      ) => Promise<_TypedWorkerThreadsMessage["toMain"]>,
     ) => func,
   };
 }
