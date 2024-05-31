@@ -1,29 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MessagePort, Worker as WorkerThreads } from "worker_threads";
+import { MessagePort, parentPort, Worker as WorkerThreads } from "worker_threads";
 
-export type TypedWorkerThreads<I, O> = {
-  postMessage(data: O): void;
-  addListener(event: "message", callback: (e: I) => any): void;
-  once(event: "message", callback: (e: I) => any): TypedWorkerThreads<I, O>;
-  on(event: "message", listener: (e: I) => any): TypedWorkerThreads<I, O>;
-} & WorkerThreads;
-export type TypedWorkerThreadsMessagePort<I, O> = {
-  postMessage(data: O): void;
-  addEventListener(event: "message", callback: (e: MessageEvent<I>) => void): void;
-  once(
-    event: "message",
-    callback: (e: MessageEvent<I>) => void,
-  ): TypedWorkerThreadsMessagePort<I, O>;
-  on(event: "message", callback: (e: I) => void): TypedWorkerThreadsMessagePort<I, O>;
-} & MessagePort;
-export type WorkerThreadsOutputType<T extends TypedWorkerThreads<any, any>> =
-  T extends TypedWorkerThreads<infer R, any> ? R : unknown;
-export type WorkerThreadsInputType<T extends TypedWorkerThreads<any, any>> =
-  T extends TypedWorkerThreads<any, infer R> ? R : unknown;
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
+
+export type TypedWorkerThreadsMessage<I, O> = {
+  toMain: I;
+  toWorker: O;
+};
+export class TypedWorkerThreadsParentPort<ToWorker, ToMain> extends TypedEventEmitter<{
+  message: (param: ToWorker) => void;
+}> {
+  constructor(public port: MessagePort) {
+    super();
+    port.on("message", (data) => {
+      this.emit("message", data);
+    });
+  }
+  postMessage(data: ToMain) {
+    this.port.postMessage(data);
+  }
+}
 export function initWorkerThreads<ToWorker, ToMain>(
-  parentPort: any,
-  init: (parentPort: TypedWorkerThreadsMessagePort<ToWorker, ToMain>) => void,
-) {
-  init(parentPort);
-  return {} as TypedWorkerThreads<ToMain, ToWorker>;
+  init: (parentPort: TypedWorkerThreadsParentPort<ToWorker, ToMain>) => void,
+): TypedWorkerThreadsMessage<ToMain, ToWorker>;
+export function initWorkerThreads<Func extends (arg: any) => any>(
+  init: (
+    parentPort: TypedWorkerThreadsParentPort<Parameters<Func>[0], Awaited<ReturnType<Func>>>,
+  ) => void,
+): TypedWorkerThreadsMessage<Awaited<ReturnType<Func>>, Parameters<Func>[0]>;
+export function initWorkerThreads<ToWorker, ToMain>(
+  init: (parentPort: TypedWorkerThreadsParentPort<ToWorker, ToMain>) => void,
+): TypedWorkerThreadsMessage<ToMain, ToWorker> {
+  init(parentPort as any);
+  return undefined as any;
 }

@@ -68,7 +68,9 @@ export default defineConfig((async ({ command }) => {
 }) as UserConfigFnPromise);
 
 async function createElectronPlugin(isBuild: boolean) {
-  const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
+  const wtFiles = (await readdirr(resolve("./src"))).filter((file) =>
+    file.endsWith(".!workerThread.ts"),
+  );
   const mainFile = resolve("./src/main/index.ts");
   const preloadFile = resolve("./src/main/preload.ts");
   console.log("WorkerThreadsFiles:", wtFiles);

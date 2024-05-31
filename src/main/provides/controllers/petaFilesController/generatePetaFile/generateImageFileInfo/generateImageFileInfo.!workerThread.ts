@@ -12,13 +12,10 @@ import {
 import { initWorkerThreads } from "@/main/libs/initWorkerThreads";
 import { getSimplePalette } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/generatePalette";
 
-export const worker = initWorkerThreads<
-  Parameters<typeof generateImageFileInfo>[0],
-  Awaited<ReturnType<typeof generateImageFileInfo> | undefined>
->(parentPort, (parentPort) => {
-  parentPort.on("message", async (params) => {
+export default initWorkerThreads<typeof generateImageFileInfo>((port) => {
+  port.on("message", async (params) => {
     const petaFile = await generateImageFileInfo(params);
-    parentPort.postMessage(petaFile);
+    port.postMessage(petaFile);
   });
 });
 

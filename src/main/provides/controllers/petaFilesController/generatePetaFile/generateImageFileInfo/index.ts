@@ -1,24 +1,23 @@
-import { WorkerThreadsInputType, WorkerThreadsOutputType } from "@/main/libs/initWorkerThreads";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
-import { worker } from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/generateImageFileInfo.!wt";
+import Worker from "@/main/provides/controllers/petaFilesController/generatePetaFile/generateImageFileInfo/generateImageFileInfo.!workerThread";
 
-const wtGroup = createWorkerThreadsGroup<typeof worker>("generateImageFileInfo.!wt.mjs");
-export async function generateImageFileInfoByWorker(params: WorkerThreadsInputType<typeof worker>) {
-  return new Promise<WorkerThreadsOutputType<typeof worker>>((res, rej) => {
-    const wt = wtGroup.getWT();
-    wt.use();
-    wt.worker.postMessage(params);
-    wt.worker.on("error", (err) => {
+const workerGroup = createWorkerThreadsGroup(Worker);
+export const generateImageFileInfoByWorker = workerGroup.createUseWorkerThreadFunction((params) => {
+  return new Promise((res, rej) => {
+    const worker = workerGroup.get();
+    worker.use();
+    worker.postMessage(params);
+    worker.once("error", (err) => {
       rej(err);
-      wt.unuse();
+      worker.unuse();
     });
-    wt.worker.once("message", async (data) => {
+    worker.once("message", async (data) => {
       try {
         res(data);
       } catch (err) {
         rej(err);
       }
-      wt.unuse();
+      worker.unuse();
     });
   });
-}
+});

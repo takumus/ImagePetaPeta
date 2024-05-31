@@ -2,6 +2,7 @@ import { mkdirSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
+import workerThreads from "./vitePlugins/workerThreads";
 import readdirr from "recursive-readdir";
 import { build, ElectronOptions } from "vite-plugin-electron";
 import { defineConfig, mergeConfig, UserConfigFnPromise } from "vitest/config";
@@ -20,6 +21,7 @@ export default defineConfig((async ({ command }) => {
       isolate: true,
     },
     plugins: [
+      workerThreads(),
       {
         name: "wt",
         apply: "serve",
@@ -37,35 +39,28 @@ export default defineConfig((async ({ command }) => {
 }) as UserConfigFnPromise);
 
 async function createElectronPlugin() {
-  const wtFiles = (await readdirr(resolve("./src"))).filter((file) => file.endsWith(".!wt.ts"));
+  const wtFiles = (await readdirr(resolve("./src"))).filter((file) =>
+    file.endsWith(".!workerThread.ts"),
+  );
   console.log("WorkerThreadsFiles:", wtFiles);
-  const electronBaseConfig: ElectronOptions = {
+  const electronConfig: ElectronOptions[] = wtFiles.map<ElectronOptions>((file) => ({
+    // worker_threads
     vite: {
       build: {
-        minify: false,
         outDir: resolve("./_test/_wt"),
         rollupOptions: {
           external: Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
+        },
+        lib: {
+          entry: file,
+          formats: ["es"],
+          fileName: () => "[name].mjs",
         },
       },
       resolve: {
         alias: viteAlias,
       },
     },
-  };
-  const electronConfig: ElectronOptions[] = wtFiles.map<ElectronOptions>((file) =>
-    mergeConfig<ElectronOptions, ElectronOptions>(electronBaseConfig, {
-      // worker_threads
-      vite: {
-        build: {
-          lib: {
-            entry: file,
-            formats: ["es"],
-            fileName: () => "[name].mjs",
-          },
-        },
-      },
-    }),
-  );
+  }));
   return electronConfig;
 }

@@ -3,38 +3,28 @@ import { Plugin } from "vite";
 export default (pluginOptions?: {}): Plugin => {
   return {
     name: "worker-threads",
+    enforce: "pre",
     transform(code, id, options) {
-      // if (/import.*?from.*?.*?\.!wt["']/g.exec(code)) {
-      //   const regexp = /import(.*?)from.*?(.*?\.!wt)["']/g;
-      //   let result: RegExpExecArray | null;
-      //   const workers: { name: string; file: string }[] = [];
-      //   while ((result = regexp.exec(code))) {
-      //     const name = result[1].trim();
-      //     const file = result[2].trim().split("/").pop();
-      //     if (file === undefined) {
-      //       throw new Error("error");
-      //     }
-      //     workers.push({
-      //       name,
-      //       file,
-      //     });
-      //   }
-      //   const root = process.env.TEST === "true" ? `"./_test/_wt"` : "__dirname";
-      //   const newCode =
-      //     `import { Worker as __WT__ } from "worker_threads";\n` +
-      //     `import { resolve as __RESOLVE__ } from "node:path";\n` +
-      //     workers
-      //       .map(
-      //         (worker) =>
-      //           `class ${worker.name} extends __WT__ { constructor() { super(__RESOLVE__(${root}, "${worker.file}.js")); } }\n`,
-      //       )
-      //       .join() +
-      //     code.replace(/(import.*?from.*?.*?\.!wt["'])/g, "//$1");
-      //   // console.log(newCode);
-      //   return {
-      //     code: newCode,
-      //   };
-      // }
+      const normalizedCodeString = code.replace(/\s+/g, " ");
+      const pattern = /import\s+(\w+)\s+from\s+["'][^"']+\/(\w+\.!workerThread)["']/g;
+      let match;
+      const results: { file: string; variable: string }[] = [];
+      while ((match = pattern.exec(normalizedCodeString)) !== null) {
+        results.push({ file: match[2], variable: match[1] });
+      }
+      if (results.length > 0) {
+        results.forEach((res) => {
+          code = replaceWorkerThreadGroup(code, res.variable, `"${res.file}.mjs"`);
+        });
+        console.log("\nWT TRANSFORM!\n", code, "\n");
+        return {
+          code,
+        };
+      }
     },
   };
 };
+function replaceWorkerThreadGroup(code: string, name1: string, name2: string): string {
+  const pattern = new RegExp(`createWorkerThreadsGroup\\(\\s*?(${name1})\\s*?\\)`, "g");
+  return code.replace(pattern, `createWorkerThreadsGroup(${name2})`);
+}
