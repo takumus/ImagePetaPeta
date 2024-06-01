@@ -1,28 +1,45 @@
 import { v4 as uuid } from "uuid";
 
-import { TaskStatus } from "@/commons/datas/task";
+import { TaskStatus, TaskStatusWithIndex } from "@/commons/datas/task";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class Tasks {
   tasks: { [id: string]: TaskHandler } = {};
+  emit() {
+    const windows = useWindows();
+    windows.emitMainEvent(
+      { type: EmitMainEventTargetType.ALL },
+      "taskStatus",
+      Object.values(this.tasks)
+        .filter((t) => t.latestStatus && !t.silent)
+        .reduce<{ [id: string]: TaskStatusWithIndex }>(
+          (p, c) => ({ ...p, [c.id]: c.latestStatus! }),
+          {},
+        ),
+    );
+  }
   spawn(name: string, silent: boolean) {
     const id = uuid();
     let done = false;
+    let index = 0;
     const handler: TaskHandler = {
       name,
       isCanceled: false,
       id,
+      latestStatus: undefined,
+      silent,
       emitStatus: (status) => {
-        const windows = useWindows();
+        handler.latestStatus = { ...status, index };
+        index++;
         if (done) {
           return;
         }
         if (!silent) {
-          windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "taskStatus", id, status);
+          this.emit();
         }
-        if (status.status === "failed" || status.status === "complete") {
+        if (status.status === "complete") {
           done = true;
           this.removeTask(handler);
         }
@@ -34,8 +51,13 @@ export class Tasks {
   addTask(task: TaskHandler) {
     this.tasks[task.id] = task;
   }
-  removeTask(task: TaskHandler) {
-    delete this.tasks[task.id];
+  private removeTask(task: TaskHandler) {
+    setTimeout(() => {
+      delete this.tasks[task.id];
+      if (!task.silent) {
+        this.emit();
+      }
+    }, 100);
   }
   cancel(id: string) {
     const task = this.getTask(id);
@@ -48,6 +70,12 @@ export class Tasks {
     }
     return false;
   }
+  confirmFailed(id: string) {
+    const task = this.getTask(id);
+    if (task?.latestStatus?.status === "failed") {
+      this.removeTask(task);
+    }
+  }
   getTask(id: string) {
     return this.tasks[id];
   }
@@ -57,6 +85,8 @@ export interface TaskHandler {
   isCanceled: boolean;
   onCancel?: () => void;
   id: string;
+  latestStatus?: TaskStatusWithIndex;
+  silent: boolean;
   emitStatus: (status: TaskStatus) => void;
 }
 

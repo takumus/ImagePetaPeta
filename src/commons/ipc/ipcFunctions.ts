@@ -21,6 +21,7 @@ export interface IpcFunctions {
   browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
   importFiles: (datas: ImportFileGroup[]) => Promise<string[]>;
   cancelTasks: (ids: string[]) => Promise<void>;
+  confirmFailedTasks: (ids: string[]) => Promise<void>;
   getPetaFiles: () => Promise<PetaFiles>;
   updatePetaFiles: (datas: PetaFile[], mode: UpdateMode) => Promise<boolean>;
   getPetaBoards: () => Promise<{ [petaBoardId: string]: PetaBoard }>;

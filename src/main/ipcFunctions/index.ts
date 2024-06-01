@@ -96,6 +96,23 @@ export const ipcFunctions: IpcFunctionsType = {
     }
     return;
   },
+  async confirmFailedTasks(event, ids) {
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    const tasks = useTasks();
+    try {
+      log.debug("#Confirm Failed Tasks");
+      ids.forEach((id) => {
+        const name = tasks.getTask(id)?.name;
+        log.debug(`task: ${name}-${id}`);
+        tasks.confirmFailed(id);
+      });
+      return;
+    } catch (error) {
+      log.error(error);
+    }
+    return;
+  },
   async getPetaFiles() {
     const logger = useLogger();
     const petaFilesController = usePetaFilesController();

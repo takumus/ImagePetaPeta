@@ -17,19 +17,18 @@ import { useI18n } from "vue-i18n";
 
 import VProgressBar from "@/renderer/components/commons/utils/progressBar/VProgressBar.vue";
 
-import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
+import { TaskStatusCode, TaskStatusWithIndex } from "@/commons/datas/task";
 
 import { IPC } from "@/renderer/libs/ipc";
-import * as Cursor from "@/renderer/utils/cursor";
 
 const props = defineProps<{
-  taskId: string;
-  taskStatus: TaskStatus;
+  taskStatus: TaskStatusWithIndex & { id: string };
 }>();
 const { t } = useI18n();
 const progress = ref(100);
 const status = ref<TaskStatusCode>("complete");
 const currentTaskId = ref("");
+const prevIndex = ref(-1);
 const log = ref("");
 const cancelable = ref(false);
 const name = ref("");
@@ -46,7 +45,16 @@ watch(
 );
 function changeTaskStatus() {
   const task = props.taskStatus;
-  currentTaskId.value = props.taskId;
+  if (currentTaskId.value !== task.id) {
+    log.value = "";
+    progress.value = 100;
+    prevIndex.value = -1;
+  }
+  if (prevIndex.value == task.index) {
+    return;
+  }
+  prevIndex.value = task.index;
+  currentTaskId.value = task.id;
   // window.clearTimeout(closeWindowHandler);
   name.value = task.i18nKey + ".name";
   progress.value = task.progress
@@ -66,12 +74,10 @@ function changeTaskStatus() {
         : ""
     }${localized}`,
   );
-  Cursor.setCursor("wait");
   if (task.status === "complete") {
     progress.value = 100;
   }
   if (task.status === "complete" || task.status === "failed") {
-    Cursor.setDefaultCursor();
     cancelable.value = false;
   }
 }

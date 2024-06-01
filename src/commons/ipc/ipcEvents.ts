@@ -4,7 +4,7 @@ import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
-import { TaskStatus } from "@/commons/datas/task";
+import { TaskStatusWithIndex } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowName } from "@/commons/windows";
 
@@ -14,7 +14,7 @@ export interface IpcEvents {
   updatePetaFiles: (petaFiles: PetaFile[], mode: UpdateMode) => void;
   updatePetaTags: (updates: { petaTagIds: string[]; petaFileIds: string[] }) => void;
   updatePetaTagPartitions: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
-  taskStatus: (id: string, task: TaskStatus) => void;
+  taskStatus: (tasks: { [id: string]: TaskStatusWithIndex }) => void;
   foundLatestVersion: (remote: RemoteBinaryInfo) => void;
   windowFocused: (focused: boolean, windowName: WindowName) => void;
   mainWindowName: (type: WindowName | undefined) => void;
