@@ -1,5 +1,4 @@
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
@@ -21,7 +20,7 @@ export class PetaTagPartitionsController {
     const task = tasks.spawn("UpdatePetaTagPartitions", silent);
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
-      status: TaskStatusCode.BEGIN,
+      status: "begin",
     });
     await ppa(async (tag, index) => {
       await this.updatePetaTagPartition(tag, mode);
@@ -31,12 +30,12 @@ export class PetaTagPartitionsController {
           all: tags.length,
           current: index + 1,
         },
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
       });
     }, tags).promise;
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
-      status: TaskStatusCode.COMPLETE,
+      status: "complete",
     });
     windows.emitMainEvent(
       { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["browser"] },

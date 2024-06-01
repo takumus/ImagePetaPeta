@@ -2,7 +2,6 @@ import * as Path from "node:path";
 import { BrowserWindow, shell, WebContents } from "electron";
 
 import { PetaFile } from "@/commons/datas/petaFile";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { SEARCH_IMAGE_BY_GOOGLE_TIMEOUT } from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
 
@@ -68,7 +67,7 @@ export async function searchImageByGoogle(path: string) {
       all: taskAllCount,
       current: taskCount++,
     },
-    status: TaskStatusCode.BEGIN,
+    status: "begin",
   });
   const window = new BrowserWindow({
     show: false,
@@ -88,7 +87,7 @@ export async function searchImageByGoogle(path: string) {
         current: taskCount++,
       },
       log: [`loaded: ${task.url}`],
-      status: TaskStatusCode.PROGRESS,
+      status: "progress",
     });
     // デバッガ
     window.webContents.debugger.attach("1.1");
@@ -103,7 +102,7 @@ export async function searchImageByGoogle(path: string) {
           current: taskCount++,
         },
         log: [JSON.stringify(step)],
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
       });
     });
     // インプット取得
@@ -125,7 +124,7 @@ export async function searchImageByGoogle(path: string) {
           current: taskCount++,
         },
         log: [JSON.stringify(step)],
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
       });
     });
     handler.emitStatus({
@@ -135,7 +134,7 @@ export async function searchImageByGoogle(path: string) {
         current: taskCount++,
       },
       log: [`uploading`],
-      status: TaskStatusCode.PROGRESS,
+      status: "progress",
     });
     // アップロード完了待ち
     await new Promise((res, rej) => {
@@ -164,7 +163,7 @@ export async function searchImageByGoogle(path: string) {
             current: taskCount++,
           },
           log: [`uploaded`],
-          status: TaskStatusCode.COMPLETE,
+          status: "complete",
         });
         res(true);
       }, 100);
@@ -178,7 +177,7 @@ export async function searchImageByGoogle(path: string) {
         current: taskCount++,
       },
       log: [String(error)],
-      status: TaskStatusCode.FAILED,
+      status: "failed",
     });
     throw error;
   }

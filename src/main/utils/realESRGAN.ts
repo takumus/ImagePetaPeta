@@ -3,7 +3,6 @@ import * as Path from "node:path";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
@@ -32,7 +31,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
   task.emitStatus({
     i18nKey: "tasks.upconverting",
     log: [petaFiles.length.toString()],
-    status: TaskStatusCode.BEGIN,
+    status: "begin",
     cancelable: true,
   });
   const processes = ppa(
@@ -52,7 +51,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
             current: index + percent / 100,
           },
           log: [l],
-          status: TaskStatusCode.PROGRESS,
+          status: "progress",
           cancelable: true,
         });
       });
@@ -67,7 +66,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
           current: index,
         },
         log: [[execFilePath, ...parameters].join(" ")],
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
         cancelable: true,
       });
       const result = await childProcess.promise;
@@ -92,7 +91,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
   task.emitStatus({
     i18nKey: "tasks.upconverting",
     log: [],
-    status: success ? TaskStatusCode.COMPLETE : TaskStatusCode.FAILED,
+    status: success ? "complete" : "failed",
   });
   return newPetaFiles;
 }

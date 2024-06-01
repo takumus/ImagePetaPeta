@@ -18,7 +18,7 @@ import { useI18n } from "vue-i18n";
 import VModal from "@/renderer/components/commons/utils/modal/VModal.vue";
 import VTask from "@/renderer/components/commons/utils/task/VTask.vue";
 
-import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
+import { TaskStatus } from "@/commons/datas/task";
 import { TASK_CLOSE_DELAY } from "@/commons/defines";
 
 import { IPC } from "@/renderer/libs/ipc";
@@ -30,7 +30,7 @@ const taskStatuses = ref<{ [key: string]: TaskStatus }>({});
 onMounted(() => {
   IPC.on("taskStatus", (e, id, task) => {
     taskStatuses.value[id] = task;
-    if (task.status === TaskStatusCode.COMPLETE) {
+    if (task.status === "complete") {
       window.setTimeout(() => {
         delete taskStatuses.value[id];
       }, TASK_CLOSE_DELAY);
@@ -54,13 +54,13 @@ const visible = computed(() => {
 const closable = computed(() => {
   return (
     Object.values(taskStatuses.value).filter((status) => {
-      return status.status === TaskStatusCode.COMPLETE || status.status === TaskStatusCode.FAILED;
+      return status.status === "complete" || status.status === "failed";
     }).length === taskStatusArray.value.length
   );
 });
 function close() {
   Object.keys(taskStatuses.value)
-    .filter((id) => taskStatuses.value[id]?.status === TaskStatusCode.FAILED)
+    .filter((id) => taskStatuses.value[id]?.status === "failed")
     .forEach((key) => {
       delete taskStatuses.value[key];
     });

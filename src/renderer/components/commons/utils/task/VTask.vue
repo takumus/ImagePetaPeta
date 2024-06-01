@@ -28,7 +28,7 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const progress = ref(100);
-const status = ref<TaskStatusCode>(TaskStatusCode.COMPLETE);
+const status = ref<TaskStatusCode>("complete");
 const currentTaskId = ref("");
 const log = ref("");
 const cancelable = ref(false);
@@ -56,21 +56,21 @@ function changeTaskStatus() {
   status.value = task.status;
   const i18nKey = `${task.i18nKey}.logs.${task.status}`;
   const localized = t(i18nKey, task.log ?? []);
-  if (task.status === TaskStatusCode.BEGIN) {
+  if (task.status === "begin") {
     log.value = "";
   }
   addLog(
     `${
-      task.status === TaskStatusCode.PROGRESS && task.progress
+      task.status === "progress" && task.progress
         ? `(${task.progress.current}/${task.progress.all})`
         : ""
     }${localized}`,
   );
   Cursor.setCursor("wait");
-  if (task.status === TaskStatusCode.COMPLETE) {
+  if (task.status === "complete") {
     progress.value = 100;
   }
-  if (task.status === TaskStatusCode.COMPLETE || task.status === TaskStatusCode.FAILED) {
+  if (task.status === "complete" || task.status === "failed") {
     Cursor.setDefaultCursor();
     cancelable.value = false;
   }

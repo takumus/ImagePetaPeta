@@ -2,7 +2,6 @@ import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { createPetaFilePetaTag, PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { createPetaTag, PetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { minimizeID } from "@/commons/utils/minimizeID";
@@ -27,7 +26,7 @@ export class PetaFilesPetaTagsController {
     const task = tasks.spawn("UpdatePetaFilesPetaTags", silent);
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
-      status: TaskStatusCode.BEGIN,
+      status: "begin",
     });
     await ppa(async (petaFileId, iIndex) => {
       await ppa(async (petaTagLike, tIndex) => {
@@ -56,13 +55,13 @@ export class PetaFilesPetaTagsController {
             all: petaFileIds.length * petaTagLikes.length,
             current: iIndex * petaTagLikes.length + tIndex + 1,
           },
-          status: TaskStatusCode.PROGRESS,
+          status: "progress",
         });
       }, petaTagLikes).promise;
     }, petaFileIds).promise;
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
-      status: TaskStatusCode.COMPLETE,
+      status: "complete",
     });
     // Tileの更新対象はPetaFileIdsのみ。
     windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {

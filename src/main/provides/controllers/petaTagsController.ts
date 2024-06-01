@@ -1,6 +1,5 @@
 import { createPetaTag } from "@/commons/datas/petaTag";
 import { PetaTagLike } from "@/commons/datas/petaTagLike";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { minimizeID } from "@/commons/utils/minimizeID";
 import { ppa } from "@/commons/utils/pp";
@@ -19,7 +18,7 @@ export class PetaTagsController {
     const task = tasks.spawn("UpdatePetaTags", silent);
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
-      status: TaskStatusCode.BEGIN,
+      status: "begin",
     });
     const tagIds = await ppa(async (tag, index) => {
       const tagId = await this.updatePetaTag(tag, mode);
@@ -29,13 +28,13 @@ export class PetaTagsController {
           all: tags.length,
           current: index + 1,
         },
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
       });
       return tagId;
     }, tags).promise;
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
-      status: TaskStatusCode.COMPLETE,
+      status: "complete",
     });
     // Tileの更新対象は、PetaTagIdsのみ。
     windows.emitMainEvent(

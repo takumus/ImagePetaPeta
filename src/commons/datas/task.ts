@@ -8,9 +8,4 @@ export interface TaskStatus {
   status: TaskStatusCode;
   cancelable?: boolean;
 }
-export enum TaskStatusCode {
-  COMPLETE = "complete",
-  FAILED = "failed",
-  PROGRESS = "progress",
-  BEGIN = "begin",
-}
+export type TaskStatusCode = "complete" | "failed" | "progress" | "begin";

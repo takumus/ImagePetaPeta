@@ -7,7 +7,6 @@ import { v4 as uuid } from "uuid";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
-import { TaskStatusCode } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { minimizeID } from "@/commons/utils/minimizeID";
@@ -41,7 +40,7 @@ export class PetaFilesController {
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
       log: [],
-      status: TaskStatusCode.BEGIN,
+      status: "begin",
     });
     const update = async (data: PetaFile, index: number) => {
       await this.update(data, mode);
@@ -52,7 +51,7 @@ export class PetaFilesController {
           current: index + 1,
         },
         log: [data.id],
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
       });
     };
     await ppa(update, datas).promise;
@@ -82,7 +81,7 @@ export class PetaFilesController {
     task.emitStatus({
       i18nKey: "tasks.updateDatas",
       log: [],
-      status: TaskStatusCode.COMPLETE,
+      status: "complete",
     });
   }
   async getPetaFile(id: string) {
@@ -147,7 +146,7 @@ export class PetaFilesController {
       log.debug("###List Files", params.fileInfos.length);
       task.emitStatus({
         i18nKey: "tasks.listingFiles",
-        status: TaskStatusCode.BEGIN,
+        status: "begin",
         log: [],
         cancelable: true,
       });
@@ -169,7 +168,7 @@ export class PetaFilesController {
       } catch (error) {
         task.emitStatus({
           i18nKey: "tasks.listingFiles",
-          status: TaskStatusCode.FAILED,
+          status: "failed",
           log: [],
           cancelable: true,
         });
@@ -243,7 +242,7 @@ export class PetaFilesController {
           current: processedFileCount,
         },
         log: [result, `${errorReason !== "" ? `(${errorReason})` : ""}${fileInfo.path}`],
-        status: TaskStatusCode.PROGRESS,
+        status: "progress",
         cancelable: true,
       });
     };
@@ -258,7 +257,7 @@ export class PetaFilesController {
     task.emitStatus({
       i18nKey: "tasks.importingFiles",
       log: [addedFileCount.toString(), fileInfos.length.toString()],
-      status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
+      status: error ? "failed" : "complete",
     });
     return petaFiles;
   }

@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 
-import { TaskStatus, TaskStatusCode } from "@/commons/datas/task";
+import { TaskStatus } from "@/commons/datas/task";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
@@ -22,7 +22,7 @@ export class Tasks {
         if (!silent) {
           windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "taskStatus", id, status);
         }
-        if (status.status === TaskStatusCode.FAILED || status.status === TaskStatusCode.COMPLETE) {
+        if (status.status === "failed" || status.status === "complete") {
           done = true;
           this.removeTask(handler);
         }
