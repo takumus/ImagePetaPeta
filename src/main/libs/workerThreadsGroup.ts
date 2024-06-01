@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { TransferListItem } from "node:worker_threads";
 import { Worker } from "worker_threads";
 
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
@@ -26,8 +27,8 @@ export class TypedWorkerThreads<
   use() {
     this._idle = false;
   }
-  postMessage(data: T["toWorker"]) {
-    this.worker.postMessage(data);
+  postMessage(data: T["toWorker"], transferList?: readonly TransferListItem[]) {
+    this.worker.postMessage(data, transferList);
   }
   unuse() {
     this.worker.terminate();

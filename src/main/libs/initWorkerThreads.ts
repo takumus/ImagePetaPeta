@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MessagePort, parentPort, Worker as WorkerThreads } from "worker_threads";
+import { MessagePort, parentPort, TransferListItem, Worker as WorkerThreads } from "worker_threads";
 
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
@@ -16,8 +16,8 @@ export class TypedWorkerThreadsParentPort<ToWorker, ToMain> extends TypedEventEm
       this.emit("message", data);
     });
   }
-  postMessage(data: ToMain) {
-    this.port.postMessage(data);
+  postMessage(data: ToMain, transferList?: readonly TransferListItem[]) {
+    this.port.postMessage(data, transferList);
   }
 }
 export function initWorkerThreads<ToWorker, ToMain>(
