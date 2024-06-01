@@ -59,134 +59,129 @@ async function steps(
 }
 export async function searchImageByGoogle(path: string) {
   const tasks = useTasks();
-  return tasks.spawn(
-    "Search Image By Google",
-    async (handler) => {
-      const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
-      let taskCount = 0;
+  const handler = tasks.spawn("Search Image By Google", false);
+  const taskAllCount = 3 + task.afterSteps.length + task.beforeSteps.length;
+  let taskCount = 0;
+  handler.emitStatus({
+    i18nKey: "tasks.searchImageByGoogle",
+    progress: {
+      all: taskAllCount,
+      current: taskCount++,
+    },
+    status: TaskStatusCode.BEGIN,
+  });
+  const window = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      offscreen: true,
+    },
+  });
+  try {
+    // ロード
+    await window.loadURL(task.url);
+    handler.emitStatus({
+      i18nKey: "tasks.searchImageByGoogle",
+      progress: {
+        all: taskAllCount,
+        current: taskCount++,
+      },
+      log: [`loaded: ${task.url}`],
+      status: TaskStatusCode.PROGRESS,
+    });
+    // デバッガ
+    window.webContents.debugger.attach("1.1");
+    // ルート取る
+    const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
+    // 前処理
+    await steps(window.webContents, task.beforeSteps, (step) => {
       handler.emitStatus({
         i18nKey: "tasks.searchImageByGoogle",
         progress: {
           all: taskAllCount,
           current: taskCount++,
         },
-        status: TaskStatusCode.BEGIN,
+        log: [JSON.stringify(step)],
+        status: TaskStatusCode.PROGRESS,
       });
-      const window = new BrowserWindow({
-        show: false,
-        webPreferences: {
-          nodeIntegration: false,
-          contextIsolation: true,
-          offscreen: true,
+    });
+    // インプット取得
+    const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
+      nodeId: document.root.nodeId,
+      selector: task.inputElement.selector,
+    });
+    // ファイル選択
+    await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
+      nodeId: input.nodeId,
+      files: [path],
+    });
+    // 後処理
+    await steps(window.webContents, task.afterSteps, (step) => {
+      handler.emitStatus({
+        i18nKey: "tasks.searchImageByGoogle",
+        progress: {
+          all: taskAllCount,
+          current: taskCount++,
         },
+        log: [JSON.stringify(step)],
+        status: TaskStatusCode.PROGRESS,
       });
-      try {
-        // ロード
-        await window.loadURL(task.url);
+    });
+    handler.emitStatus({
+      i18nKey: "tasks.searchImageByGoogle",
+      progress: {
+        all: taskAllCount,
+        current: taskCount++,
+      },
+      log: [`uploading`],
+      status: TaskStatusCode.PROGRESS,
+    });
+    // アップロード完了待ち
+    await new Promise((res, rej) => {
+      // タイムアウト
+      const timeoutHandler = setTimeout(() => {
+        clearInterval(waitForUploadHandler);
+        rej("timeout");
+      }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
+      const waitForUploadHandler = setInterval(() => {
+        // アップロード完了
+        if (
+          !window.webContents
+            .getURL()
+            .match(new RegExp(task.redirectURLRegExp.pattern, task.redirectURLRegExp.flags))
+        ) {
+          return;
+        }
+        clearInterval(waitForUploadHandler);
+        // ブラウザ起動
+        shell.openExternal(window.webContents.getURL());
+        clearTimeout(timeoutHandler);
         handler.emitStatus({
           i18nKey: "tasks.searchImageByGoogle",
           progress: {
             all: taskAllCount,
             current: taskCount++,
           },
-          log: [`loaded: ${task.url}`],
-          status: TaskStatusCode.PROGRESS,
+          log: [`uploaded`],
+          status: TaskStatusCode.COMPLETE,
         });
-        // デバッガ
-        window.webContents.debugger.attach("1.1");
-        // ルート取る
-        const document = await window.webContents.debugger.sendCommand("DOM.getDocument", {});
-        // 前処理
-        await steps(window.webContents, task.beforeSteps, (step) => {
-          handler.emitStatus({
-            i18nKey: "tasks.searchImageByGoogle",
-            progress: {
-              all: taskAllCount,
-              current: taskCount++,
-            },
-            log: [JSON.stringify(step)],
-            status: TaskStatusCode.PROGRESS,
-          });
-        });
-        // インプット取得
-        const input = await window.webContents.debugger.sendCommand("DOM.querySelector", {
-          nodeId: document.root.nodeId,
-          selector: task.inputElement.selector,
-        });
-        // ファイル選択
-        await window.webContents.debugger.sendCommand("DOM.setFileInputFiles", {
-          nodeId: input.nodeId,
-          files: [path],
-        });
-        // 後処理
-        await steps(window.webContents, task.afterSteps, (step) => {
-          handler.emitStatus({
-            i18nKey: "tasks.searchImageByGoogle",
-            progress: {
-              all: taskAllCount,
-              current: taskCount++,
-            },
-            log: [JSON.stringify(step)],
-            status: TaskStatusCode.PROGRESS,
-          });
-        });
-        handler.emitStatus({
-          i18nKey: "tasks.searchImageByGoogle",
-          progress: {
-            all: taskAllCount,
-            current: taskCount++,
-          },
-          log: [`uploading`],
-          status: TaskStatusCode.PROGRESS,
-        });
-        // アップロード完了待ち
-        await new Promise((res, rej) => {
-          // タイムアウト
-          const timeoutHandler = setTimeout(() => {
-            clearInterval(waitForUploadHandler);
-            rej("timeout");
-          }, SEARCH_IMAGE_BY_GOOGLE_TIMEOUT);
-          const waitForUploadHandler = setInterval(() => {
-            // アップロード完了
-            if (
-              !window.webContents
-                .getURL()
-                .match(new RegExp(task.redirectURLRegExp.pattern, task.redirectURLRegExp.flags))
-            ) {
-              return;
-            }
-            clearInterval(waitForUploadHandler);
-            // ブラウザ起動
-            shell.openExternal(window.webContents.getURL());
-            clearTimeout(timeoutHandler);
-            handler.emitStatus({
-              i18nKey: "tasks.searchImageByGoogle",
-              progress: {
-                all: taskAllCount,
-                current: taskCount++,
-              },
-              log: [`uploaded`],
-              status: TaskStatusCode.COMPLETE,
-            });
-            res(true);
-          }, 100);
-        });
-      } catch (error) {
-        window.destroy();
-        handler.emitStatus({
-          i18nKey: "tasks.searchImageByGoogle",
-          progress: {
-            all: taskAllCount,
-            current: taskCount++,
-          },
-          log: [String(error)],
-          status: TaskStatusCode.FAILED,
-        });
-        throw error;
-      }
-      window.destroy();
-      return true;
-    },
-    false,
-  );
+        res(true);
+      }, 100);
+    });
+  } catch (error) {
+    window.destroy();
+    handler.emitStatus({
+      i18nKey: "tasks.searchImageByGoogle",
+      progress: {
+        all: taskAllCount,
+        current: taskCount++,
+      },
+      log: [String(error)],
+      status: TaskStatusCode.FAILED,
+    });
+    throw error;
+  }
+  window.destroy();
+  return true;
 }

@@ -22,93 +22,79 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
   const paths = usePaths();
   const logger = useLogger();
   const tasks = useTasks();
-  return tasks.spawn(
-    "realESRGAN",
-    async (handler) => {
-      const log = logger.logMainChunk();
-      const { execFilePath, modelFilePath } = getFilePath();
-      log.debug("execFilePath:", execFilePath);
-      await setPermisionTo755(execFilePath);
-      let success = true;
-      const newPetaFiles: PetaFile[] = [];
-      handler.emitStatus({
+  const task = tasks.spawn("realESRGAN", false);
+  const log = logger.logMainChunk();
+  const { execFilePath, modelFilePath } = getFilePath();
+  log.debug("execFilePath:", execFilePath);
+  await setPermisionTo755(execFilePath);
+  let success = true;
+  const newPetaFiles: PetaFile[] = [];
+  task.emitStatus({
+    i18nKey: "tasks.upconverting",
+    log: [petaFiles.length.toString()],
+    status: TaskStatusCode.BEGIN,
+    cancelable: true,
+  });
+  const processes = ppa(
+    async (petaFile, index) => {
+      const inputFile = getPetaFilePath.fromPetaFile(petaFile).original;
+      const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.png`;
+      const parameters = ["-i", inputFile, "-o", outputFile, "-m", modelFilePath, "-n", modelName];
+      let percent = 0;
+      const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
+        l = l.trim();
+        percent = /^\d+\.\d+%$/.test(l) ? Number(l.replace(/%/, "")) : percent;
+        log.debug(l);
+        task.emitStatus({
+          i18nKey: "tasks.upconverting",
+          progress: {
+            all: petaFiles.length,
+            current: index + percent / 100,
+          },
+          log: [l],
+          status: TaskStatusCode.PROGRESS,
+          cancelable: true,
+        });
+      });
+      task.onCancel = () => {
+        childProcess.kill();
+        processes.cancel();
+      };
+      task.emitStatus({
         i18nKey: "tasks.upconverting",
-        log: [petaFiles.length.toString()],
-        status: TaskStatusCode.BEGIN,
+        progress: {
+          all: petaFiles.length,
+          current: index,
+        },
+        log: [[execFilePath, ...parameters].join(" ")],
+        status: TaskStatusCode.PROGRESS,
         cancelable: true,
       });
-      const processes = ppa(
-        async (petaFile, index) => {
-          const inputFile = getPetaFilePath.fromPetaFile(petaFile).original;
-          const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.png`;
-          const parameters = [
-            "-i",
-            inputFile,
-            "-o",
-            outputFile,
-            "-m",
-            modelFilePath,
-            "-n",
-            modelName,
-          ];
-          let percent = 0;
-          const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {
-            l = l.trim();
-            percent = /^\d+\.\d+%$/.test(l) ? Number(l.replace(/%/, "")) : percent;
-            log.debug(l);
-            handler.emitStatus({
-              i18nKey: "tasks.upconverting",
-              progress: {
-                all: petaFiles.length,
-                current: index + percent / 100,
-              },
-              log: [l],
-              status: TaskStatusCode.PROGRESS,
-              cancelable: true,
-            });
-          });
-          handler.onCancel = () => {
-            childProcess.kill();
-            processes.cancel();
-          };
-          handler.emitStatus({
-            i18nKey: "tasks.upconverting",
-            progress: {
-              all: petaFiles.length,
-              current: index,
-            },
-            log: [[execFilePath, ...parameters].join(" ")],
-            status: TaskStatusCode.PROGRESS,
-            cancelable: true,
-          });
-          const result = await childProcess.promise;
-          if (result) {
-            const newPetaFile = await importImage(
-              outputFile,
-              petaFile,
-              `${petaFile.name}(RealESRGAN-${modelName})`,
-            );
-            if (newPetaFile !== undefined) {
-              success = true;
-              newPetaFiles.push(newPetaFile);
-            }
-          } else {
-            success = false;
-          }
-        },
-        petaFiles,
-        1,
-      );
-      await processes.promise;
-      handler.emitStatus({
-        i18nKey: "tasks.upconverting",
-        log: [],
-        status: success ? TaskStatusCode.COMPLETE : TaskStatusCode.FAILED,
-      });
-      return newPetaFiles;
+      const result = await childProcess.promise;
+      if (result) {
+        const newPetaFile = await importImage(
+          outputFile,
+          petaFile,
+          `${petaFile.name}(RealESRGAN-${modelName})`,
+        );
+        if (newPetaFile !== undefined) {
+          success = true;
+          newPetaFiles.push(newPetaFile);
+        }
+      } else {
+        success = false;
+      }
     },
-    false,
+    petaFiles,
+    1,
   );
+  await processes.promise;
+  task.emitStatus({
+    i18nKey: "tasks.upconverting",
+    log: [],
+    status: success ? TaskStatusCode.COMPLETE : TaskStatusCode.FAILED,
+  });
+  return newPetaFiles;
 }
 function getFilePath() {
   const isMac = process.platform === "darwin";

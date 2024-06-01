@@ -18,38 +18,33 @@ export class PetaTagPartitionsController {
   async updateMultiple(tags: PetaTagPartition[], mode: UpdateMode, silent = false) {
     const tasks = useTasks();
     const windows = useWindows();
-    return tasks.spawn(
-      "UpdatePetaTagPartitions",
-      async (handler) => {
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          status: TaskStatusCode.BEGIN,
-        });
-        await ppa(async (tag, index) => {
-          await this.updatePetaTagPartition(tag, mode);
-          handler.emitStatus({
-            i18nKey: "tasks.updateDatas",
-            progress: {
-              all: tags.length,
-              current: index + 1,
-            },
-            status: TaskStatusCode.PROGRESS,
-          });
-        }, tags).promise;
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          status: TaskStatusCode.COMPLETE,
-        });
-        windows.emitMainEvent(
-          { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["browser"] },
-          "updatePetaTagPartitions",
-          tags,
-          mode,
-        );
-        return true;
-      },
-      silent,
+    const task = tasks.spawn("UpdatePetaTagPartitions", silent);
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      status: TaskStatusCode.BEGIN,
+    });
+    await ppa(async (tag, index) => {
+      await this.updatePetaTagPartition(tag, mode);
+      task.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        progress: {
+          all: tags.length,
+          current: index + 1,
+        },
+        status: TaskStatusCode.PROGRESS,
+      });
+    }, tags).promise;
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      status: TaskStatusCode.COMPLETE,
+    });
+    windows.emitMainEvent(
+      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["browser"] },
+      "updatePetaTagPartitions",
+      tags,
+      mode,
     );
+    return true;
   }
   async updatePetaTagPartition(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
     const logger = useLogger();

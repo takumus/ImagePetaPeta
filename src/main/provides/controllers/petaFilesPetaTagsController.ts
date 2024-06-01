@@ -24,56 +24,51 @@ export class PetaFilesPetaTagsController {
     const dbPetaTags = useDBPetaTags();
     const tasks = useTasks();
     const windows = useWindows();
-    return tasks.spawn(
-      "UpdatePetaFilesPetaTags",
-      async (handler) => {
-        handler.emitStatus({
+    const task = tasks.spawn("UpdatePetaFilesPetaTags", silent);
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      status: TaskStatusCode.BEGIN,
+    });
+    await ppa(async (petaFileId, iIndex) => {
+      await ppa(async (petaTagLike, tIndex) => {
+        let petaTagId: string | undefined = undefined;
+        if (petaTagLike.type === "id") {
+          petaTagId = petaTagLike.id;
+        } else if (petaTagLike.type === "name") {
+          const petaTag = (await dbPetaTags.find({ name: petaTagLike.name }))[0];
+          if (petaTag) {
+            petaTagId = petaTag.id;
+          } else {
+            const newPetaTag = createPetaTag(petaTagLike.name);
+            await dbPetaTags.insert(newPetaTag);
+            petaTagId = newPetaTag.id;
+          }
+        } else if (petaTagLike.type === "petaTag") {
+          petaTagId = petaTagLike.petaTag.id;
+        }
+        if (petaTagId === undefined) {
+          throw new Error(`PetaTagLike is wrong: ${JSON.stringify(petaTagLike)}`);
+        }
+        await this.updatePetaFilePetaTag(createPetaFilePetaTag(petaFileId, petaTagId), mode);
+        task.emitStatus({
           i18nKey: "tasks.updateDatas",
-          status: TaskStatusCode.BEGIN,
+          progress: {
+            all: petaFileIds.length * petaTagLikes.length,
+            current: iIndex * petaTagLikes.length + tIndex + 1,
+          },
+          status: TaskStatusCode.PROGRESS,
         });
-        await ppa(async (petaFileId, iIndex) => {
-          await ppa(async (petaTagLike, tIndex) => {
-            let petaTagId: string | undefined = undefined;
-            if (petaTagLike.type === "id") {
-              petaTagId = petaTagLike.id;
-            } else if (petaTagLike.type === "name") {
-              const petaTag = (await dbPetaTags.find({ name: petaTagLike.name }))[0];
-              if (petaTag) {
-                petaTagId = petaTag.id;
-              } else {
-                const newPetaTag = createPetaTag(petaTagLike.name);
-                await dbPetaTags.insert(newPetaTag);
-                petaTagId = newPetaTag.id;
-              }
-            } else if (petaTagLike.type === "petaTag") {
-              petaTagId = petaTagLike.petaTag.id;
-            }
-            if (petaTagId === undefined) {
-              throw new Error(`PetaTagLike is wrong: ${JSON.stringify(petaTagLike)}`);
-            }
-            await this.updatePetaFilePetaTag(createPetaFilePetaTag(petaFileId, petaTagId), mode);
-            handler.emitStatus({
-              i18nKey: "tasks.updateDatas",
-              progress: {
-                all: petaFileIds.length * petaTagLikes.length,
-                current: iIndex * petaTagLikes.length + tIndex + 1,
-              },
-              status: TaskStatusCode.PROGRESS,
-            });
-          }, petaTagLikes).promise;
-        }, petaFileIds).promise;
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          status: TaskStatusCode.COMPLETE,
-        });
-        // Tileの更新対象はPetaFileIdsのみ。
-        windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
-          petaTagIds: [],
-          petaFileIds,
-        });
-      },
-      silent,
-    );
+      }, petaTagLikes).promise;
+    }, petaFileIds).promise;
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      status: TaskStatusCode.COMPLETE,
+    });
+    // Tileの更新対象はPetaFileIdsのみ。
+    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
+      petaTagIds: [],
+      petaFileIds,
+    });
   }
   async getPetaTagCount(petaTag: PetaTag) {
     const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();

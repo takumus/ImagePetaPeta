@@ -37,58 +37,53 @@ export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
     const tasks = useTasks();
     const windows = useWindows();
-    return tasks.spawn(
-      "UpdatePetaFiles",
-      async (handler) => {
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          log: [],
-          status: TaskStatusCode.BEGIN,
-        });
-        const update = async (data: PetaFile, index: number) => {
-          await this.update(data, mode);
-          handler.emitStatus({
-            i18nKey: "tasks.updateDatas",
-            progress: {
-              all: datas.length,
-              current: index + 1,
-            },
-            log: [data.id],
-            status: TaskStatusCode.PROGRESS,
-          });
-        };
-        await ppa(update, datas).promise;
-        if (mode === UpdateMode.REMOVE) {
-          // Tileの更新対象なし
-          windows.emitMainEvent(
-            {
-              type: EmitMainEventTargetType.WINDOW_NAMES,
-              windowNames: ["board", "browser", "details"],
-            },
-            "updatePetaTags",
-            {
-              petaFileIds: [],
-              petaTagIds: [],
-            },
-          );
-        }
-        windows.emitMainEvent(
-          {
-            type: EmitMainEventTargetType.WINDOW_NAMES,
-            windowNames: ["board", "browser", "details"],
-          },
-          "updatePetaFiles",
-          datas,
-          mode,
-        );
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          log: [],
-          status: TaskStatusCode.COMPLETE,
-        });
+    const task = tasks.spawn("UpdatePetaFiles", silent);
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      log: [],
+      status: TaskStatusCode.BEGIN,
+    });
+    const update = async (data: PetaFile, index: number) => {
+      await this.update(data, mode);
+      task.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        progress: {
+          all: datas.length,
+          current: index + 1,
+        },
+        log: [data.id],
+        status: TaskStatusCode.PROGRESS,
+      });
+    };
+    await ppa(update, datas).promise;
+    if (mode === UpdateMode.REMOVE) {
+      // Tileの更新対象なし
+      windows.emitMainEvent(
+        {
+          type: EmitMainEventTargetType.WINDOW_NAMES,
+          windowNames: ["board", "browser", "details"],
+        },
+        "updatePetaTags",
+        {
+          petaFileIds: [],
+          petaTagIds: [],
+        },
+      );
+    }
+    windows.emitMainEvent(
+      {
+        type: EmitMainEventTargetType.WINDOW_NAMES,
+        windowNames: ["board", "browser", "details"],
       },
-      silent,
+      "updatePetaFiles",
+      datas,
+      mode,
     );
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      log: [],
+      status: TaskStatusCode.COMPLETE,
+    });
   }
   async getPetaFile(id: string) {
     const dbPetaFiles = useDBPetaFiles();
@@ -144,133 +139,128 @@ export class PetaFilesController {
     if (params.fileInfos.length === 0) {
       return [];
     }
-    return tasks.spawn(
-      "importFilesFromFilePaths",
-      async (handler) => {
-        const log = logger.logMainChunk();
-        log.debug("## Import Images From File Paths");
-        const fileInfos: ImportFileInfo[] = [];
-        if (params.extract) {
-          log.debug("###List Files", params.fileInfos.length);
-          handler.emitStatus({
-            i18nKey: "tasks.listingFiles",
-            status: TaskStatusCode.BEGIN,
-            log: [],
-            cancelable: true,
-          });
-          try {
-            for (let i = 0; i < params.fileInfos.length; i++) {
-              const fileInfo = params.fileInfos[i];
-              if (!fileInfo) continue;
-              const readDirResult = file.readDirRecursive(fileInfo.path);
-              handler.onCancel = readDirResult.cancel;
-              fileInfos.push(
-                ...(await readDirResult.files).map((path) => ({
-                  ...fileInfo,
-                  path,
-                  note: fileInfo.note,
-                  name: fileInfo.name,
-                })),
-              );
-            }
-          } catch (error) {
-            handler.emitStatus({
-              i18nKey: "tasks.listingFiles",
-              status: TaskStatusCode.FAILED,
-              log: [],
-              cancelable: true,
-            });
-            return [];
-          }
-          log.debug("complete", fileInfos.length);
-        } else {
-          fileInfos.push(...params.fileInfos);
-        }
-        let addedFileCount = 0;
-        let processedFileCount = 0;
-        let error = false;
-        const petaFiles: PetaFile[] = [];
-        const importImage = async (fileInfo: ImportFileInfo, index: number) => {
-          log.debug(
-            "import:",
-            index + 1,
-            "/",
-            fileInfos.length,
-            `encrypted: ${fileInfo.secureTempFile}`,
+    const task = tasks.spawn("importFilesFromFilePaths", silent);
+    const log = logger.logMainChunk();
+    log.debug("## Import Images From File Paths");
+    const fileInfos: ImportFileInfo[] = [];
+    if (params.extract) {
+      log.debug("###List Files", params.fileInfos.length);
+      task.emitStatus({
+        i18nKey: "tasks.listingFiles",
+        status: TaskStatusCode.BEGIN,
+        log: [],
+        cancelable: true,
+      });
+      try {
+        for (let i = 0; i < params.fileInfos.length; i++) {
+          const fileInfo = params.fileInfos[i];
+          if (!fileInfo) continue;
+          const readDirResult = file.readDirRecursive(fileInfo.path);
+          task.onCancel = readDirResult.cancel;
+          fileInfos.push(
+            ...(await readDirResult.files).map((path) => ({
+              ...fileInfo,
+              path,
+              note: fileInfo.note,
+              name: fileInfo.name,
+            })),
           );
-          let result = ImportImageResult.SUCCESS;
-          let errorReason = "";
-          try {
-            const name = Path.basename(fileInfo.path);
-            const fileDate = (await stat(fileInfo.path)).mtime;
-            const readStream = () =>
-              fileInfo.secureTempFile
-                ? secureFile.decrypt.toStream(fileInfo.path, useSecureTempFileKey())
-                : createReadStream(fileInfo.path);
-            if (!(await isSupportedFile(readStream()))) {
-              throw new Error("unsupported file");
-            }
-            const id = await fileSHA256(readStream());
-            const exists = await this.getPetaFile(id);
-            if (exists !== undefined) {
-              result = ImportImageResult.EXISTS;
-              petaFiles.push(exists);
-            } else {
-              const petaFile = await generatePetaFile({
-                filePath: fileInfo.path,
-                extends: {
-                  name: fileInfo.name ?? name,
-                  fileDate: fileDate.getTime(),
-                  note: fileInfo.note,
-                  id,
-                },
-                type: "add",
-                doEncrypt: true,
-                secureTempFile: fileInfo.secureTempFile,
-              });
-              if (petaFile === undefined) {
-                throw new Error("unsupported file");
-              }
-              await this.updateMultiple([petaFile], UpdateMode.INSERT, true);
-              addedFileCount++;
-              petaFiles.push(petaFile);
-            }
-            log.debug("imported", result);
-          } catch (err) {
-            log.error(err);
-            errorReason = String(err);
-            result = ImportImageResult.ERROR;
-            error = true;
-          }
-          processedFileCount++;
-          handler.emitStatus({
-            i18nKey: "tasks.importingFiles",
-            progress: {
-              all: fileInfos.length,
-              current: processedFileCount,
-            },
-            log: [result, `${errorReason !== "" ? `(${errorReason})` : ""}${fileInfo.path}`],
-            status: TaskStatusCode.PROGRESS,
-            cancelable: true,
-          });
-        };
-        const result = ppa(importImage, fileInfos, CPU_LENGTH);
-        handler.onCancel = result.cancel;
-        try {
-          await result.promise;
-        } catch (err) {
-          //
         }
-        log.debug("return:", addedFileCount, "/", fileInfos.length);
-        handler.emitStatus({
-          i18nKey: "tasks.importingFiles",
-          log: [addedFileCount.toString(), fileInfos.length.toString()],
-          status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
+      } catch (error) {
+        task.emitStatus({
+          i18nKey: "tasks.listingFiles",
+          status: TaskStatusCode.FAILED,
+          log: [],
+          cancelable: true,
         });
-        return petaFiles;
-      },
-      silent,
-    );
+        return [];
+      }
+      log.debug("complete", fileInfos.length);
+    } else {
+      fileInfos.push(...params.fileInfos);
+    }
+    let addedFileCount = 0;
+    let processedFileCount = 0;
+    let error = false;
+    const petaFiles: PetaFile[] = [];
+    const importImage = async (fileInfo: ImportFileInfo, index: number) => {
+      log.debug(
+        "import:",
+        index + 1,
+        "/",
+        fileInfos.length,
+        `encrypted: ${fileInfo.secureTempFile}`,
+      );
+      let result = ImportImageResult.SUCCESS;
+      let errorReason = "";
+      try {
+        const name = Path.basename(fileInfo.path);
+        const fileDate = (await stat(fileInfo.path)).mtime;
+        const readStream = () =>
+          fileInfo.secureTempFile
+            ? secureFile.decrypt.toStream(fileInfo.path, useSecureTempFileKey())
+            : createReadStream(fileInfo.path);
+        if (!(await isSupportedFile(readStream()))) {
+          throw new Error("unsupported file");
+        }
+        const id = await fileSHA256(readStream());
+        const exists = await this.getPetaFile(id);
+        if (exists !== undefined) {
+          result = ImportImageResult.EXISTS;
+          petaFiles.push(exists);
+        } else {
+          const petaFile = await generatePetaFile({
+            filePath: fileInfo.path,
+            extends: {
+              name: fileInfo.name ?? name,
+              fileDate: fileDate.getTime(),
+              note: fileInfo.note,
+              id,
+            },
+            type: "add",
+            doEncrypt: true,
+            secureTempFile: fileInfo.secureTempFile,
+          });
+          if (petaFile === undefined) {
+            throw new Error("unsupported file");
+          }
+          await this.updateMultiple([petaFile], UpdateMode.INSERT, true);
+          addedFileCount++;
+          petaFiles.push(petaFile);
+        }
+        log.debug("imported", result);
+      } catch (err) {
+        log.error(err);
+        errorReason = String(err);
+        result = ImportImageResult.ERROR;
+        error = true;
+      }
+      processedFileCount++;
+      task.emitStatus({
+        i18nKey: "tasks.importingFiles",
+        progress: {
+          all: fileInfos.length,
+          current: processedFileCount,
+        },
+        log: [result, `${errorReason !== "" ? `(${errorReason})` : ""}${fileInfo.path}`],
+        status: TaskStatusCode.PROGRESS,
+        cancelable: true,
+      });
+    };
+    const result = ppa(importImage, fileInfos, CPU_LENGTH);
+    task.onCancel = result.cancel;
+    try {
+      await result.promise;
+    } catch (err) {
+      //
+    }
+    log.debug("return:", addedFileCount, "/", fileInfos.length);
+    task.emitStatus({
+      i18nKey: "tasks.importingFiles",
+      log: [addedFileCount.toString(), fileInfos.length.toString()],
+      status: error ? TaskStatusCode.FAILED : TaskStatusCode.COMPLETE,
+    });
+    return petaFiles;
   }
   async regeneratePetaFiles() {
     const logger = useLogger();

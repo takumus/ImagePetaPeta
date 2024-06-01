@@ -16,45 +16,40 @@ export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
     const tasks = useTasks();
     const windows = useWindows();
-    return tasks.spawn(
-      "UpdatePetaTags",
-      async (handler) => {
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          status: TaskStatusCode.BEGIN,
-        });
-        const tagIds = await ppa(async (tag, index) => {
-          const tagId = await this.updatePetaTag(tag, mode);
-          handler.emitStatus({
-            i18nKey: "tasks.updateDatas",
-            progress: {
-              all: tags.length,
-              current: index + 1,
-            },
-            status: TaskStatusCode.PROGRESS,
-          });
-          return tagId;
-        }, tags).promise;
-        handler.emitStatus({
-          i18nKey: "tasks.updateDatas",
-          status: TaskStatusCode.COMPLETE,
-        });
-        // Tileの更新対象は、PetaTagIdsのみ。
-        windows.emitMainEvent(
-          {
-            type: EmitMainEventTargetType.WINDOW_NAMES,
-            windowNames: ["board", "browser", "details"],
-          },
-          "updatePetaTags",
-          {
-            petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
-            petaFileIds: [],
-          },
-        );
-        return true;
+    const task = tasks.spawn("UpdatePetaTags", silent);
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      status: TaskStatusCode.BEGIN,
+    });
+    const tagIds = await ppa(async (tag, index) => {
+      const tagId = await this.updatePetaTag(tag, mode);
+      task.emitStatus({
+        i18nKey: "tasks.updateDatas",
+        progress: {
+          all: tags.length,
+          current: index + 1,
+        },
+        status: TaskStatusCode.PROGRESS,
+      });
+      return tagId;
+    }, tags).promise;
+    task.emitStatus({
+      i18nKey: "tasks.updateDatas",
+      status: TaskStatusCode.COMPLETE,
+    });
+    // Tileの更新対象は、PetaTagIdsのみ。
+    windows.emitMainEvent(
+      {
+        type: EmitMainEventTargetType.WINDOW_NAMES,
+        windowNames: ["board", "browser", "details"],
       },
-      silent,
+      "updatePetaTags",
+      {
+        petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
+        petaFileIds: [],
+      },
     );
+    return true;
   }
   async getPetaTags() {
     const dbPetaTags = useDBPetaTags();
