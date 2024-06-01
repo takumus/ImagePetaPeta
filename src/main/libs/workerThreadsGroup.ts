@@ -31,8 +31,8 @@ export class TypedWorkerThreads<
     this.worker.postMessage(data, transferList);
   }
   unuse() {
-    this.worker.terminate();
-    this._idle = false;
+    // this.worker.terminate();
+    this._idle = true;
   }
   public get idle() {
     return this._idle;
