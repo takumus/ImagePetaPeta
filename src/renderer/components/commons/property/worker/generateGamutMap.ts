@@ -32,7 +32,7 @@ export function generateGamutMap(
       context?.drawImage(image, 0, 0);
       const imageData = context?.getImageData(0, 0, canvas.width, canvas.height);
       if (imageData) {
-        wt.worker.postMessage({
+        wt.postMessage({
           pixels: imageData.data,
           resolution,
         });
@@ -41,21 +41,21 @@ export function generateGamutMap(
       }
     };
     cancel = rej;
-    wt.worker.onerror = (e) => {
+    wt.on("error", (e) => {
       wt.terminate();
       rej(e.message);
-    };
-    wt.worker.onmessage = (e) => {
+    });
+    wt.on("message", (e) => {
       if (completed) {
         return;
       }
-      progress(e.data);
-      if (e.data[1]) {
+      progress(e);
+      if (e[1]) {
         wt.unuse();
         completed = true;
         res(true);
       }
-    };
+    });
   });
   return {
     promise,

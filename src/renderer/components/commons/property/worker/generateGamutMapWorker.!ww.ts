@@ -6,7 +6,6 @@ import { initWebWorker } from "@/renderer/libs/initWebWorker";
 
 // import * as convert from "color-convert";
 export default initWebWorker<generateGamutMapWorkerInputData, generateGamutMapWorkerOutputData>(
-  self,
   (worker) => {
     function rgb2hsv(r: number, g: number, b: number) {
       (r = r / 255), (g = g / 255), (b = b / 255);
@@ -66,7 +65,7 @@ export default initWebWorker<generateGamutMapWorkerInputData, generateGamutMapWo
       }
       return [r * 255, g * 255, b * 255] as const;
     }
-    worker.addEventListener("message", async (e) => {
+    worker.on("message", async (e) => {
       const canvas = new OffscreenCanvas(0, 0);
       const context = canvas.getContext("2d");
       const patchCanvas = new OffscreenCanvas(0, 0);
@@ -74,8 +73,8 @@ export default initWebWorker<generateGamutMapWorkerInputData, generateGamutMapWo
       if (patchContext === null || context === null) {
         throw new Error("context is undefined!");
       }
-      const pixels = e.data.pixels;
-      const resolution = e.data.resolution;
+      const pixels = e.pixels;
+      const resolution = e.resolution;
       const length = pixels.length;
       let step = 1;
       if (length / 4 > resolution && resolution > 0) {

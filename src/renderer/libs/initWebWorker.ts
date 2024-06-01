@@ -1,15 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface OnMessage<I> extends Worker {
-  onmessage: (e: MessageEvent<I>) => void;
+
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
+
+export type TypedWebWorkerMessage<I, O> = {
+  toMain: I;
+  toWorker: O;
+};
+export class TypedWebWorkerParentPort<ToWorker, ToMain> extends TypedEventEmitter<{
+  message: (param: ToWorker) => void;
+}> {
+  constructor(public port: Worker) {
+    super();
+    port.addEventListener("message", (event: MessageEvent) => {
+      this.emit("message", event.data);
+    });
+  }
+  postMessage(data: ToMain, transferList?: Transferable[]) {
+    this.port.postMessage(data, transferList ?? []);
+  }
 }
-type TypedWebWorker<I, O> = {
-  postMessage(data: O): void;
-  addEventListener(event: "message", callback: (e: MessageEvent<I>) => void): void;
-} & OnMessage<I>;
 export function initWebWorker<ToWorker, ToMain>(
-  self: any,
-  init: (self: TypedWebWorker<ToWorker, ToMain>) => void,
+  init: (self: TypedWebWorkerParentPort<ToWorker, ToMain>) => void,
 ) {
-  init(self);
-  return {} as { new (): TypedWebWorker<ToMain, ToWorker> };
+  init(new TypedWebWorkerParentPort(self as any));
+  return {} as { new (): TypedWebWorkerMessage<ToMain, ToWorker> };
 }
