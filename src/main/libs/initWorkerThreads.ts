@@ -31,6 +31,6 @@ export function initWorkerThreads<Func extends (arg: any) => any>(
 export function initWorkerThreads<ToWorker, ToMain>(
   init: (parentPort: TypedWorkerThreadsParentPort<ToWorker, ToMain>) => void,
 ): TypedWorkerThreadsMessage<ToMain, ToWorker> {
-  init(parentPort as any);
+  init(new TypedWorkerThreadsParentPort(parentPort as any));
   return undefined as any;
 }
