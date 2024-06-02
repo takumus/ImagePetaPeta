@@ -46,10 +46,6 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
-e-window-root {
-}
-</style>
 <style lang="scss">
 @import "@/renderer/styles/index.scss";
 </style>

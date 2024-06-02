@@ -14,7 +14,7 @@ import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
-import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
+import VTasks from "@/renderer/components/task/VTasks.vue";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";

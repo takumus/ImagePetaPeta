@@ -17,11 +17,9 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import VModal from "@/renderer/components/commons/utils/modal/VModal.vue";
-import VTask from "@/renderer/components/commons/utils/task/VTask.vue";
+import VTask from "@/renderer/components/task/VTask.vue";
 
-import { TaskStatus, TaskStatusWithIndex } from "@/commons/datas/task";
-import { TASK_CLOSE_DELAY } from "@/commons/defines";
+import { TaskStatusWithIndex } from "@/commons/datas/task";
 
 import { IPC } from "@/renderer/libs/ipc";
 import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
