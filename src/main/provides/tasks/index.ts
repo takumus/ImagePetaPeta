@@ -1,3 +1,4 @@
+import { BrowserWindow } from "electron";
 import { throttle } from "throttle-debounce";
 import { v4 as uuid } from "uuid";
 
@@ -13,28 +14,40 @@ export class Tasks {
   constructor() {
     setInterval(() => {
       this.updateWindow();
+      const windows = useWindows();
+      if (
+        windows.windows.task !== undefined &&
+        windowIs.alive(windows.windows.task) &&
+        windows.mainWindowName !== undefined &&
+        windows.windows[windows.mainWindowName] !== undefined &&
+        windows.windows.task.getParentWindow() !== windows.windows[windows.mainWindowName]
+      ) {
+        console.log("update task window parent");
+        windows.windows.task.setParentWindow(windows.windows[windows.mainWindowName]!);
+      }
     }, 10);
   }
   visibleWindow = throttle(100, (visible: boolean) => {
     const windows = useWindows();
-    const task = windows.windows.task;
     if (visible) {
-      if (windowIs.dead(task)) {
-        const t = windows.openWindow("task");
-        t.setSkipTaskbar(true);
-      }
-      if (windowIs.alive(task)) {
-        task?.setIgnoreMouseEvents(false);
-        task?.setOpacity(1);
-        task?.focus();
-      }
-    } else {
-      if (windowIs.dead(task)) {
+      const parent =
+        windows.mainWindowName !== undefined ? windows.windows[windows.mainWindowName] : undefined;
+      if (parent === undefined) {
         return;
       }
-      // task?.close();
-      task?.setIgnoreMouseEvents(true);
-      task?.setOpacity(0);
+      if (windowIs.dead(windows.windows.task)) {
+        windows.openWindow("task", parent).setSkipTaskbar(true);
+      }
+      if (windowIs.alive(windows.windows.task) && windows.windows.task !== undefined) {
+        windows.windows.task.setIgnoreMouseEvents(false);
+        windows.windows.task.setOpacity(1);
+      }
+    } else {
+      if (windows.windows.task === undefined || windowIs.dead(windows.windows.task)) {
+        return;
+      }
+      windows.windows.task.setIgnoreMouseEvents(true);
+      windows.windows.task.setOpacity(0);
     }
   });
   updateWindow() {
