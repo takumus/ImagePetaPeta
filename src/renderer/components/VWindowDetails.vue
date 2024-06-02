@@ -12,9 +12,6 @@
         <VProperty :peta-files="singlePetaFiles" @select-tag="() => {}" />
       </e-property>
     </e-content>
-    <e-modals v-show="components.modal.modalIds.length > 0">
-      <VTasks />
-    </e-modals>
     <VContextMenu :z-index="4" />
     <VTooltip :z-index="3" />
   </e-window-root>
@@ -28,7 +25,6 @@ import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VProperty from "@/renderer/components/commons/property/VProperty.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
 import VDetails from "@/renderer/components/details/VDetails.vue";
 
@@ -42,7 +38,6 @@ import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowN
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
 const appInfoStore = useAppInfoStore();
-const components = useComponentsStore();
 const { t } = useI18n();
 const petaFilesStore = usePetaFilesStore();
 const windowNameStore = useWindowNameStore();
@@ -115,14 +110,6 @@ e-window-root {
       padding: var(--px-2);
       width: 300px;
     }
-  }
-  > e-modals {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 3;
-    width: 100%;
-    height: 100%;
   }
 }
 </style>

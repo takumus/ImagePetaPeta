@@ -24,9 +24,6 @@
         ref="vPetaBoard"
         @update:board="updatePetaBoard" />
     </e-content>
-    <e-modals v-show="components.modal.modalIds.length > 0">
-      <VTasks />
-    </e-modals>
     <VContextMenu :z-index="4" />
     <VTooltip :z-index="3" />
   </e-window-root>
@@ -42,7 +39,6 @@ import VTabBar from "@/renderer/components/board/VTabBar.vue";
 import VHeaderBar from "@/renderer/components/commons/headerBar/VHeaderBar.vue";
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
 import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu.vue";
-import VTasks from "@/renderer/components/commons/utils/task/VTasks.vue";
 import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
 
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
@@ -239,14 +235,6 @@ watch(
 e-window-root {
   > e-content {
     padding: 0px;
-  }
-  > e-modals {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 4;
-    width: 100%;
-    height: 100%;
   }
 }
 </style>
