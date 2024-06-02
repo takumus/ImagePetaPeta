@@ -105,7 +105,8 @@ export class Windows {
       return;
     }
     if (import.meta.env.VITE_OPEN_DEVTOOL === "true") {
-      window.webContents.openDevTools({ mode: "detach" });
+      window.webContents.openDevTools();
+      window.setSize(window.getSize()[0] + 400, window.getSize()[1]);
     }
     if (import.meta.env.VITE_DEFAULT_WINDOW_POSITION !== undefined) {
       window.setPosition(
