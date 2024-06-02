@@ -16,6 +16,7 @@ import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
+const launchTime = performance.now();
 (() => {
   if (!app.requestSingleInstanceLock()) {
     app.quit();
@@ -95,6 +96,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
       .debug(
         `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
       );
+    logger.logMainChunk().debug(`Ready:${performance.now() - launchTime}ms`);
     logger.logMainChunk().debug(import.meta.env);
     logger.logMainChunk().debug(`verison: ${app.getVersion()}`);
     if (process.env.NODE_ENV === "development") {
@@ -116,6 +118,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     registerIpcFunctions();
     // 初期ウインドウ表示
     windows.showWindows();
+    logger.logMainChunk().debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // ダークモード監視開始
     observeDarkMode();
     // アップデート確認と通知
@@ -126,6 +129,7 @@ import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
     if (configSettings.data.web) {
       await useWebHook().open(WEBHOOK_PORT);
     }
+    logger.logMainChunk().debug(`Init DB:${performance.now() - launchTime}ms`);
     // usePetaFilesController().verifyFiles();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());
