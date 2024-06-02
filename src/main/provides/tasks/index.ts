@@ -16,7 +16,6 @@ export class Tasks {
       this.updateWindow();
       const windows = useWindows();
       if (
-        windows.windows.task !== undefined &&
         windowIs.alive(windows.windows.task) &&
         windows.mainWindowName !== undefined &&
         windows.windows[windows.mainWindowName] !== undefined &&
@@ -38,16 +37,14 @@ export class Tasks {
       if (windowIs.dead(windows.windows.task)) {
         windows.openWindow("task", parent).setSkipTaskbar(true);
       }
-      if (windowIs.alive(windows.windows.task) && windows.windows.task !== undefined) {
-        windows.windows.task.setIgnoreMouseEvents(false);
-        windows.windows.task.setOpacity(1);
+      if (windowIs.alive(windows.windows.task)) {
+        windows.windows.task.show();
       }
     } else {
       if (windows.windows.task === undefined || windowIs.dead(windows.windows.task)) {
         return;
       }
-      windows.windows.task.setIgnoreMouseEvents(true);
-      windows.windows.task.setOpacity(0);
+      windows.windows.task.hide();
     }
   });
   updateWindow() {

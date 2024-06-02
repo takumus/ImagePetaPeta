@@ -252,7 +252,7 @@ export class Windows {
       target.windowNames.forEach((type) => {
         const window = this.windows[type];
         if (windowIs.alive(window)) {
-          window?.webContents.send(key, ...args);
+          window.webContents.send(key, ...args);
         }
       });
     }

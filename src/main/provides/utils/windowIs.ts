@@ -5,7 +5,7 @@ import { WindowName } from "@/commons/windows";
 import { useWindows } from "@/main/provides/windows";
 
 export const windowIs = {
-  alive(windowLike?: BrowserWindow | WindowName) {
+  alive(windowLike?: BrowserWindow | WindowName): windowLike is BrowserWindow {
     const window = getWindow(windowLike);
     return window !== undefined && !window.isDestroyed();
   },
