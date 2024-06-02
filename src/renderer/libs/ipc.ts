@@ -1,5 +1,5 @@
-import deepcopy from "deepcopy";
 import { IpcRendererEvent } from "electron/main";
+import deepcopy from "lodash.clonedeep";
 
 import { IPC_GLOBAL_NAME } from "@/commons/defines";
 import { IpcEvents } from "@/commons/ipc/ipcEvents";

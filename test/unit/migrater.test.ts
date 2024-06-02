@@ -1,4 +1,4 @@
-import deepcopy from "deepcopy";
+import deepcopy from "lodash.clonedeep";
 import { describe, expect, test } from "vitest";
 
 import { createMigrater, createSyncMigrater } from "@/main/libs/createMigrater";

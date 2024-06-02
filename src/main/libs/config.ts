@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import deepcopy from "deepcopy";
+import deepcopy from "lodash.clonedeep";
 
 import { SyncMigrater } from "@/main/libs/createMigrater";
 

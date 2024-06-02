@@ -1,4 +1,4 @@
-import deepcopy from "deepcopy";
+import deepcopy from "lodash.clonedeep";
 
 const defaultSettings = {
   darkMode: true,

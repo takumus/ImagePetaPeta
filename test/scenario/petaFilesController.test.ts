@@ -2,8 +2,8 @@ import { mkdirSync, readFileSync, rmdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import { initDummyElectron } from "./initDummyElectron";
-import deepcopy from "deepcopy";
 import { fileTypeFromStream } from "file-type";
+import deepcopy from "lodash.clonedeep";
 import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 

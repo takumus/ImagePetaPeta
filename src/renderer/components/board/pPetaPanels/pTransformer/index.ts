@@ -1,4 +1,4 @@
-import deepcopy from "deepcopy";
+import deepcopy from "lodash.clonedeep";
 import * as PIXI from "pixi.js";
 
 import { PetaPanel } from "@/commons/datas/petaPanel";
