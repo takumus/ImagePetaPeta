@@ -96,6 +96,9 @@ export const ipcFunctions: IpcFunctionsType = {
     }
     return;
   },
+  async getTaskStatus(event) {
+    return useTasks().getStatus();
+  },
   async confirmFailedTasks(event, ids) {
     const logger = useLogger();
     const log = logger.logMainChunk();

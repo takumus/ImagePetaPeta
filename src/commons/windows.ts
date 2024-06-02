@@ -7,6 +7,7 @@ export const windowNames = [
   "capture",
   "quit",
   "modal",
+  "task",
   "web",
   "pageDownloader",
 ] as const;

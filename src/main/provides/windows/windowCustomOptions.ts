@@ -7,6 +7,8 @@ import {
   WINDOW_QUIT_WIDTH,
   WINDOW_SETTINGS_HEIGHT,
   WINDOW_SETTINGS_WIDTH,
+  WINDOW_TASK_HEIGHT,
+  WINDOW_TASK_WIDTH,
 } from "@/commons/defines";
 import { WindowName } from "@/commons/windows";
 
@@ -62,4 +64,14 @@ export const windowCustomOptions: {
     minHeight: WINDOW_SETTINGS_HEIGHT,
   },
   pageDownloader: {},
+  task: {
+    width: WINDOW_TASK_WIDTH,
+    height: WINDOW_TASK_HEIGHT,
+    minWidth: WINDOW_TASK_WIDTH,
+    minHeight: WINDOW_TASK_HEIGHT,
+    titleBarStyle: undefined,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+  },
 };

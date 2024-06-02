@@ -1,24 +1,65 @@
+import { throttle } from "throttle-debounce";
 import { v4 as uuid } from "uuid";
 
 import { TaskStatus, TaskStatusWithIndex } from "@/commons/datas/task";
+import { WINDOW_MODAL_UPDATE_INTERVAL } from "@/commons/defines";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
+import { windowIs } from "@/main/provides/utils/windowIs";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export class Tasks {
   tasks: { [id: string]: TaskHandler } = {};
+  constructor() {
+    setInterval(() => {
+      this.updateWindow();
+    }, 10);
+  }
+  visibleWindow = throttle(100, (visible: boolean) => {
+    const windows = useWindows();
+    const task = windows.windows.task;
+    if (visible) {
+      if (windowIs.dead(task)) {
+        const t = windows.openWindow("task");
+        t.setSkipTaskbar(true);
+      }
+      if (windowIs.alive(task)) {
+        task?.setIgnoreMouseEvents(false);
+        task?.setOpacity(1);
+        task?.focus();
+      }
+    } else {
+      if (windowIs.dead(task)) {
+        return;
+      }
+      // task?.close();
+      task?.setIgnoreMouseEvents(true);
+      task?.setOpacity(0);
+    }
+  });
+  updateWindow() {
+    // console.log(this.getActiveTasks());
+    if (this.getActiveTasks().length < 1) {
+      this.visibleWindow(false);
+      return;
+    }
+    this.visibleWindow(true);
+  }
   emit() {
     const windows = useWindows();
     windows.emitMainEvent(
-      { type: EmitMainEventTargetType.ALL },
+      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["task"] },
       "taskStatus",
-      Object.values(this.tasks)
-        .filter((t) => t.latestStatus && !t.silent)
-        .reduce<{ [id: string]: TaskStatusWithIndex }>(
-          (p, c) => ({ ...p, [c.id]: c.latestStatus! }),
-          {},
-        ),
+      this.getStatus(),
     );
+  }
+  getStatus() {
+    return Object.values(this.tasks)
+      .filter((t) => t.latestStatus && !t.silent)
+      .reduce<{ [id: string]: TaskStatusWithIndex }>(
+        (p, c) => ({ ...p, [c.id]: c.latestStatus! }),
+        {},
+      );
   }
   spawn(name: string, silent: boolean) {
     const id = uuid();
@@ -31,6 +72,7 @@ export class Tasks {
       latestStatus: undefined,
       silent,
       emitStatus: (status) => {
+        console.log(status);
         handler.latestStatus = { ...status, index };
         index++;
         if (done) {
@@ -46,6 +88,7 @@ export class Tasks {
       },
     };
     this.addTask(handler);
+    this.updateWindow();
     return handler;
   }
   addTask(task: TaskHandler) {
@@ -56,6 +99,7 @@ export class Tasks {
       delete this.tasks[task.id];
       if (!task.silent) {
         this.emit();
+        this.updateWindow();
       }
     }, 100);
   }
@@ -78,6 +122,9 @@ export class Tasks {
   }
   getTask(id: string) {
     return this.tasks[id];
+  }
+  getActiveTasks() {
+    return Object.values(this.tasks).filter((t) => !t.silent);
   }
 }
 export interface TaskHandler {

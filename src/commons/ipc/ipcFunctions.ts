@@ -12,6 +12,7 @@ import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
 import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { Settings } from "@/commons/datas/settings";
 import { States } from "@/commons/datas/states";
+import { TaskStatus, TaskStatusWithIndex } from "@/commons/datas/task";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { WindowName } from "@/commons/windows";
 
@@ -90,4 +91,5 @@ export interface IpcFunctions {
   openPageDownloader: (urls: PageDownloaderData[]) => Promise<void>;
   addPageDownloaderDatas: (urls: PageDownloaderData[]) => Promise<void>;
   getPageDownloaderDatas: () => Promise<PageDownloaderData[]>;
+  getTaskStatus: () => Promise<{ [id: string]: TaskStatusWithIndex }>;
 }

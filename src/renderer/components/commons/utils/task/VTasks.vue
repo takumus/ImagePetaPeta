@@ -1,18 +1,16 @@
 <template>
-  <VModal :visible="visible" :center="true" :visible-close-button="false">
-    <e-tasks-root>
-      <e-tasks>
-        <VTask
-          v-for="t in taskStatusArray"
-          :key="t.status.id"
-          :task-id="t.status.id"
-          :task-status="t.status" />
-      </e-tasks>
-      <button tabindex="-1" @click="close" v-if="closable">
-        {{ t("commons.closeButton") }}
-      </button>
-    </e-tasks-root>
-  </VModal>
+  <e-tasks-root>
+    <e-tasks>
+      <VTask
+        v-for="t in taskStatusArray"
+        :key="t.status.id"
+        :task-id="t.status.id"
+        :task-status="t.status" />
+    </e-tasks>
+    <button tabindex="-1" @click="close" v-if="closable">
+      {{ t("commons.closeButton") }}
+    </button>
+  </e-tasks-root>
 </template>
 
 <script setup lang="ts">
@@ -32,7 +30,8 @@ import * as Cursor from "@/renderer/utils/cursor";
 const windowStatus = useWindowStatusStore();
 const { t } = useI18n();
 const taskStatuses = ref<{ [key: string]: TaskStatusWithIndex }>({});
-onMounted(() => {
+onMounted(async () => {
+  taskStatuses.value = await IPC.getTaskStatus();
   IPC.on("taskStatus", (e, tasks) => {
     taskStatuses.value = tasks;
     if (
@@ -72,10 +71,13 @@ function close() {
 
 <style lang="scss" scoped>
 e-tasks-root {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   text-align: center;
   > e-tasks {
     display: block;
+    flex: 1;
     padding: var(--px-1);
     width: 100%;
     max-height: 512px;
