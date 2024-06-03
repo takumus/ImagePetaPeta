@@ -1,12 +1,9 @@
 import { mkdirSync, rmSync } from "node:fs";
-import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
 import workerThreads from "./vitePlugins/workerThreads";
-import readdirr from "recursive-readdir";
-import { build, ElectronOptions } from "vite-plugin-electron";
-import { defineConfig, mergeConfig, UserConfigFnPromise } from "vitest/config";
+import { defineConfig, UserConfigFnPromise } from "vitest/config";
 
 export default defineConfig((async ({ command }) => {
   rmSync("./_test", { recursive: true, force: true });
@@ -26,10 +23,7 @@ export default defineConfig((async ({ command }) => {
           build: {
             outDir: resolve("./_test/_wt"),
             rollupOptions: {
-              external: [
-                ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
-                ...builtinModules,
-              ],
+              external: [...Object.keys("dependencies" in pkg ? pkg.dependencies : {})],
             },
             minify: false,
           },
