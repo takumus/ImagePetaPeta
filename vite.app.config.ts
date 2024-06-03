@@ -106,7 +106,6 @@ async function createElectronPlugin(isBuild: boolean) {
             ),
             config: mergeConfig(cloneDeep(baseOptions.vite ?? {}), {
               build: {
-                watch: isBuild ? undefined : {},
                 rollupOptions: {
                   external: [...builtinModules],
                 },
