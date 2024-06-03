@@ -39,7 +39,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
         },
       ],
     });
-    if (mode === "production") {
+    if (mode === "production" || mode === "test") {
       await build(config);
     } else {
       build(mergeConfig<UserConfig, UserConfig>(config, { build: { watch: {} } }));
@@ -49,7 +49,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
     name: "worker-threads",
     enforce: "pre",
     apply(_config, env) {
-      // console.log("APPLY", env.mode);
+      console.log("APPLY", env.mode);
       mode = env.mode;
       return true;
     },

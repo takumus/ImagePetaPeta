@@ -22,9 +22,6 @@ export default defineConfig((async ({ command }) => {
     },
     plugins: [
       workerThreads({
-        files: (await readdirr(resolve("./src"))).filter((file) =>
-          file.includes("!workerThreads."),
-        ),
         config: {
           build: {
             outDir: resolve("./_test/_wt"),
