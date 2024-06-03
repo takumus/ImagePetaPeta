@@ -12,23 +12,12 @@ import electron, { ElectronOptions } from "vite-plugin-electron";
 
 import vue from "@vitejs/plugin-vue";
 
-function createConfig(config: UserConfig) {
-  return mergeConfig<UserConfig, UserConfig>(
-    {
-      resolve: {
-        alias: viteAlias,
-      },
-      clearScreen: false,
-    },
-    config,
-  );
-}
 export default defineConfig((async ({ command }) => {
   const isBuild = command === "build";
   if (isBuild) {
     rmSync("_release", { recursive: true, force: true });
   }
-  return createConfig({
+  return createViteConfig({
     envDir: "../../",
     base: "./",
     root: resolve("./src/renderer"),
@@ -74,9 +63,7 @@ export default defineConfig((async ({ command }) => {
 }) as UserConfigFnPromise);
 
 function createElectronPlugin(isBuild: boolean) {
-  const mainFile = resolve("./src/main/index.ts");
-  const preloadFile = resolve("./src/main/preload.ts");
-  const viteConfig = createConfig({
+  const viteConfig = createViteConfig({
     optimizeDeps: {
       exclude: ["sharp"],
     },
@@ -94,6 +81,7 @@ function createElectronPlugin(isBuild: boolean) {
     vite: viteConfig,
   };
   const options: ElectronOptions[] = [];
+  /** メインプロセス */
   options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(electronOptions, {
       vite: {
@@ -104,7 +92,7 @@ function createElectronPlugin(isBuild: boolean) {
         ],
         build: {
           lib: {
-            entry: mainFile,
+            entry: resolve("./src/main/index.ts"),
             formats: ["es"],
             fileName: () => "[name].mjs",
           },
@@ -115,13 +103,14 @@ function createElectronPlugin(isBuild: boolean) {
       },
     }),
   );
+  /** プリロード */
   options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(electronOptions, {
       vite: {
         build: {
           sourcemap: !isBuild ? "inline" : undefined, // #332
           lib: {
-            entry: resolve(preloadFile),
+            entry: resolve("./src/main/preload.ts"),
             formats: ["cjs"],
             fileName: () => "[name].cjs",
           },
@@ -130,4 +119,16 @@ function createElectronPlugin(isBuild: boolean) {
     }),
   );
   return electron(options);
+}
+
+function createViteConfig(config: UserConfig) {
+  return mergeConfig<UserConfig, UserConfig>(
+    {
+      resolve: {
+        alias: viteAlias,
+      },
+      clearScreen: false,
+    },
+    config,
+  );
 }
