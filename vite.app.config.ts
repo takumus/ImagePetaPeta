@@ -1,5 +1,4 @@
 import { rmSync } from "node:fs";
-import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import pkg from "./package.json";
 import { windowNames } from "./src/commons/windows";
@@ -8,7 +7,6 @@ import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import cloneDeep from "lodash.clonedeep";
-import readdirr from "recursive-readdir";
 import { defineConfig, mergeConfig, UserConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 
@@ -30,7 +28,6 @@ export default defineConfig((async ({ command }) => {
   if (isBuild) {
     rmSync("_release", { recursive: true, force: true });
   }
-  const electronPlugin = await createElectronPlugin(isBuild);
   return createConfig({
     envDir: "../../",
     base: "./",
@@ -71,46 +68,38 @@ export default defineConfig((async ({ command }) => {
           },
         },
       }),
-      electronPlugin,
+      createElectronPlugin(isBuild),
     ],
   });
 }) as UserConfigFnPromise);
 
-async function createElectronPlugin(isBuild: boolean) {
+function createElectronPlugin(isBuild: boolean) {
   const mainFile = resolve("./src/main/index.ts");
   const preloadFile = resolve("./src/main/preload.ts");
-  const baseOptions: ElectronOptions = {
-    vite: createConfig({
-      optimizeDeps: {
-        exclude: ["sharp"],
+  const viteConfig = createConfig({
+    optimizeDeps: {
+      exclude: ["sharp"],
+    },
+    build: {
+      minify: isBuild,
+      emptyOutDir: false,
+      outDir: resolve("./_electronTemp/dist/main"),
+      rollupOptions: {
+        external: [...Object.keys(pkg.dependencies ?? {})],
       },
-      build: {
-        minify: isBuild,
-        emptyOutDir: false,
-        outDir: resolve("./_electronTemp/dist/main"),
-        rollupOptions: {
-          external: [...Object.keys(pkg.dependencies ?? {})],
-        },
-        sourcemap: !isBuild,
-      },
-    }),
+      sourcemap: !isBuild,
+    },
+  });
+  const electronOptions: ElectronOptions = {
+    vite: viteConfig,
   };
   const options: ElectronOptions[] = [];
   options.push(
-    mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
+    mergeConfig<ElectronOptions, ElectronOptions>(electronOptions, {
       vite: {
         plugins: [
           workerThreads({
-            files: (await readdirr(resolve("./src"))).filter((file) =>
-              file.includes("!workerThreads."),
-            ),
-            config: mergeConfig<UserConfig, UserConfig>(cloneDeep(baseOptions.vite ?? {}), {
-              build: {
-                rollupOptions: {
-                  external: [...builtinModules],
-                },
-              },
-            }),
+            config: cloneDeep(viteConfig),
           }),
         ],
         build: {
@@ -127,7 +116,7 @@ async function createElectronPlugin(isBuild: boolean) {
     }),
   );
   options.push(
-    mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
+    mergeConfig<ElectronOptions, ElectronOptions>(electronOptions, {
       vite: {
         build: {
           sourcemap: !isBuild ? "inline" : undefined, // #332

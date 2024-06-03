@@ -1,8 +1,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import { build, mergeConfig, Plugin, ResolvedConfig, UserConfig } from "vite";
 
-export default (pluginOptions: { files: string[]; config?: UserConfig }): Plugin => {
+export default (pluginOptions: { config?: UserConfig }): Plugin => {
   let baseConfig: ResolvedConfig;
   let mode = "";
   let workerFiles: { [id: string]: boolean } = {};
@@ -19,6 +20,9 @@ export default (pluginOptions: { files: string[]; config?: UserConfig }): Plugin
           entry: workerfile,
           formats: ["es"],
           fileName: () => "[name].mjs",
+        },
+        rollupOptions: {
+          external: [...builtinModules],
         },
       },
       plugins: [
@@ -63,11 +67,9 @@ export default (pluginOptions: { files: string[]; config?: UserConfig }): Plugin
       let newCode = code;
       let replaced = false;
       while ((match = pattern.exec(code))) {
-        if (pluginOptions.files.find((file) => file.includes(match?.[1] ?? "")) !== undefined) {
-          newCode = newCode.replace(match[0], `"${match[1]}.mjs"`);
-          replaced = true;
-          console.log("\nWorkerThreadsTransformed:\n", id, match[1], "\n");
-        }
+        newCode = newCode.replace(match[0], `"${match[1]}.mjs"`);
+        replaced = true;
+        console.log("\nWorkerThreadsTransformed:\n", id, match[1], "\n");
       }
       let match2: RegExpExecArray | null;
       while ((match2 = pattern2.exec(code))) {
