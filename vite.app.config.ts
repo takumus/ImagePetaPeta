@@ -86,6 +86,7 @@ async function createElectronPlugin(isBuild: boolean) {
       },
       build: {
         minify: isBuild,
+        emptyOutDir: false,
         outDir: resolve("./_electronTemp/dist/main"),
         rollupOptions: {
           external: [...Object.keys(pkg.dependencies ?? {})],
