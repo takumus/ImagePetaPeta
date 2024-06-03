@@ -15,7 +15,6 @@ export default (pluginOptions: {
       join(root, pluginOptions.virtualDirFromRoot),
       pluginOptions.windows[windowName],
     );
-    log("createHTML", windowName, path);
     return templateHTML.replace(/___TS_FILE___/, path);
   }
   function getWindowName(url: string) {
@@ -33,6 +32,7 @@ export default (pluginOptions: {
           ),
         },
       });
+      log("virtual htmls", config.build?.rollupOptions?.input);
     },
     resolveId(source) {
       const windowName = getWindowName(source);
@@ -43,12 +43,17 @@ export default (pluginOptions: {
     load(id) {
       const windowName = getWindowName(id);
       if (windowName !== undefined) {
+        log("export", join(id));
         return createHTML(windowName);
       }
     },
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        const windowName = getWindowName(req?.url ?? "");
+        if (req?.url === undefined) {
+          next();
+          return;
+        }
+        const windowName = getWindowName(req.url ?? "");
         if (windowName === undefined) {
           next();
           return;
@@ -57,7 +62,7 @@ export default (pluginOptions: {
           "Content-Type": "text/html, charset=utf-8",
           "Cache-Control": "no-cache",
         });
-        log("serve", join(req?.url ?? ""));
+        log("serve", join(req.url));
         res.end(createHTML(windowName));
       });
     },
