@@ -1,4 +1,5 @@
 import { rmSync } from "node:fs";
+import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import pkg from "./package.json";
 import { windowNames } from "./src/commons/windows";
@@ -6,19 +7,31 @@ import { viteAlias } from "./vite.alias";
 import electronWindows from "./vitePlugins/electronWindows";
 import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
+import cloneDeep from "lodash.clonedeep";
 import readdirr from "recursive-readdir";
-import { defineConfig, mergeConfig, UserConfigFnPromise } from "vite";
+import { defineConfig, InlineConfig, mergeConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 
 import vue from "@vitejs/plugin-vue";
 
+function createConfig(config: InlineConfig) {
+  return mergeConfig<InlineConfig, InlineConfig>(
+    {
+      resolve: {
+        alias: viteAlias,
+      },
+      clearScreen: false,
+    },
+    config,
+  );
+}
 export default defineConfig((async ({ command }) => {
   const isBuild = command === "build";
   if (isBuild) {
     rmSync("_release", { recursive: true, force: true });
   }
   const electronPlugin = await createElectronPlugin(isBuild);
-  return {
+  return createConfig({
     envDir: "../../",
     base: "./",
     root: resolve("./src/renderer"),
@@ -37,9 +50,6 @@ export default defineConfig((async ({ command }) => {
         },
       },
       minify: isBuild,
-    },
-    resolve: {
-      alias: viteAlias,
     },
     plugins: [
       webWorker(),
@@ -63,19 +73,14 @@ export default defineConfig((async ({ command }) => {
       }),
       electronPlugin,
     ],
-    clearScreen: false,
-  };
+  });
 }) as UserConfigFnPromise);
 
 async function createElectronPlugin(isBuild: boolean) {
-  const wtFiles = (await readdirr(resolve("./src"))).filter((file) =>
-    file.includes("!workerThreads."),
-  );
   const mainFile = resolve("./src/main/index.ts");
   const preloadFile = resolve("./src/main/preload.ts");
-  console.log("WorkerThreadsFiles:", wtFiles);
   const baseOptions: ElectronOptions = {
-    vite: {
+    vite: createConfig({
       optimizeDeps: {
         exclude: ["sharp"],
       },
@@ -87,31 +92,27 @@ async function createElectronPlugin(isBuild: boolean) {
         },
         sourcemap: !isBuild,
       },
-      resolve: {
-        alias: viteAlias,
-      },
-    },
+    }),
   };
   const options: ElectronOptions[] = [];
   options.push(
-    ...wtFiles.map<ElectronOptions>((file) =>
-      mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
-        vite: {
-          build: {
-            lib: {
-              entry: file,
-              formats: ["es"],
-              fileName: () => "[name].mjs",
-            },
-          },
-        },
-      }),
-    ),
-  );
-  options.push(
     mergeConfig<ElectronOptions, ElectronOptions>(baseOptions, {
       vite: {
-        plugins: [workerThreads()],
+        plugins: [
+          workerThreads({
+            files: (await readdirr(resolve("./src"))).filter((file) =>
+              file.includes("!workerThreads."),
+            ),
+            config: mergeConfig(cloneDeep(baseOptions.vite ?? {}), {
+              build: {
+                watch: isBuild ? undefined : {},
+                rollupOptions: {
+                  external: [...builtinModules],
+                },
+              },
+            }),
+          }),
+        ],
         build: {
           lib: {
             entry: mainFile,
