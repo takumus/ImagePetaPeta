@@ -9,13 +9,13 @@ import webWorker from "./vitePlugins/webWorker";
 import workerThreads from "./vitePlugins/workerThreads";
 import cloneDeep from "lodash.clonedeep";
 import readdirr from "recursive-readdir";
-import { defineConfig, InlineConfig, mergeConfig, UserConfigFnPromise } from "vite";
+import { defineConfig, mergeConfig, UserConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 
 import vue from "@vitejs/plugin-vue";
 
-function createConfig(config: InlineConfig) {
-  return mergeConfig<InlineConfig, InlineConfig>(
+function createConfig(config: UserConfig) {
+  return mergeConfig<UserConfig, UserConfig>(
     {
       resolve: {
         alias: viteAlias,
@@ -104,7 +104,7 @@ async function createElectronPlugin(isBuild: boolean) {
             files: (await readdirr(resolve("./src"))).filter((file) =>
               file.includes("!workerThreads."),
             ),
-            config: mergeConfig(cloneDeep(baseOptions.vite ?? {}), {
+            config: mergeConfig<UserConfig, UserConfig>(cloneDeep(baseOptions.vite ?? {}), {
               build: {
                 rollupOptions: {
                   external: [...builtinModules],

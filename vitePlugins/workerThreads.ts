@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { build, InlineConfig, mergeConfig, Plugin, ResolvedConfig } from "vite";
+import { build, mergeConfig, Plugin, ResolvedConfig, UserConfig } from "vite";
 
-export default (pluginOptions: { files: string[]; config?: InlineConfig }): Plugin => {
-  let config: ResolvedConfig;
+export default (pluginOptions: { files: string[]; config?: UserConfig }): Plugin => {
+  let baseConfig: ResolvedConfig;
   let mode = "";
   let workerFiles: { [id: string]: boolean } = {};
   async function buildWorkerThreadFile(workerfile: string, onUpdate: () => void) {
@@ -12,7 +12,7 @@ export default (pluginOptions: { files: string[]; config?: InlineConfig }): Plug
     }
     workerFiles[workerfile] = true;
     let init = true;
-    const config = mergeConfig<InlineConfig, InlineConfig>(pluginOptions.config ?? {}, {
+    const config = mergeConfig<UserConfig, UserConfig>(pluginOptions.config ?? {}, {
       build: {
         emptyOutDir: false,
         lib: {
@@ -38,7 +38,7 @@ export default (pluginOptions: { files: string[]; config?: InlineConfig }): Plug
     if (mode === "production") {
       await build(config);
     } else {
-      build(mergeConfig<InlineConfig, InlineConfig>(config, { build: { watch: {} } }));
+      build(mergeConfig<UserConfig, UserConfig>(config, { build: { watch: {} } }));
     }
   }
   return {
@@ -50,7 +50,7 @@ export default (pluginOptions: { files: string[]; config?: InlineConfig }): Plug
       return true;
     },
     configResolved(resolvedConfig) {
-      config = resolvedConfig;
+      baseConfig = resolvedConfig;
     },
     buildStart() {
       console.log("worker-threads buildStart");
@@ -73,7 +73,7 @@ export default (pluginOptions: { files: string[]; config?: InlineConfig }): Plug
       while ((match2 = pattern2.exec(code))) {
         const path = match2?.[1];
         if (path) {
-          for (const { find, replacement } of config.resolve.alias) {
+          for (const { find, replacement } of baseConfig.resolve.alias) {
             const aliasString = typeof find === "string" ? find : find.source;
             if (path.startsWith(aliasString)) {
               const workerfile = resolve(path.replace(aliasString, replacement));
