@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import { styleText } from "node:util";
 import { BuildOptions, mergeConfig, Plugin, UserConfig } from "vite";
 
 export default (pluginOptions: {
@@ -14,6 +15,7 @@ export default (pluginOptions: {
       join(root, pluginOptions.virtualDirFromRoot),
       pluginOptions.windows[windowName],
     );
+    log("createHTML", windowName, path);
     return templateHTML.replace(/___TS_FILE___/, path);
   }
   function getWindowName(url: string) {
@@ -55,8 +57,12 @@ export default (pluginOptions: {
           "Content-Type": "text/html, charset=utf-8",
           "Cache-Control": "no-cache",
         });
+        log("serve", join(req?.url ?? ""));
         res.end(createHTML(windowName));
       });
     },
   };
 };
+function log(...args: any[]) {
+  console.log(styleText("yellowBright", "[vite-plugin:electronWindows]"), ...args);
+}

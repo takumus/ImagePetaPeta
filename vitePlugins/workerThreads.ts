@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { builtinModules } from "node:module";
 import { resolve } from "node:path";
+import { styleText } from "node:util";
 import { build, mergeConfig, Plugin, ResolvedConfig, UserConfig } from "vite";
 
 export default (pluginOptions: { config?: UserConfig }): Plugin => {
@@ -33,7 +34,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
               init = false;
               return;
             }
-            console.log("updated");
+            log("updated", workerfile);
             onUpdate();
           },
         },
@@ -49,7 +50,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
     name: "worker-threads",
     enforce: "pre",
     apply(_config, env) {
-      console.log("APPLY", env.mode);
+      log("apply", env.mode);
       mode = env.mode;
       return true;
     },
@@ -57,7 +58,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
       baseConfig = resolvedConfig;
     },
     buildStart() {
-      console.log("worker-threads buildStart");
+      log("buildStart");
       workerFiles = {};
     },
     async transform(code, id, options) {
@@ -69,7 +70,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
       while ((match = pattern.exec(code))) {
         newCode = newCode.replace(match[0], `"${match[1]}.mjs"`);
         replaced = true;
-        console.log("\nWorkerThreadsTransformed:\n", id, match[1], "\n");
+        log("transformed", id);
       }
       let match2: RegExpExecArray | null;
       while ((match2 = pattern2.exec(code))) {
@@ -98,3 +99,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
     },
   };
 };
+
+function log(...args: any[]) {
+  console.log(styleText("yellow", "[vite-plugin:workerThreads]"), ...args);
+}
