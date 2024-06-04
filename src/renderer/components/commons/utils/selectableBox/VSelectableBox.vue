@@ -3,8 +3,13 @@
     <e-images
       :class="{
         selected,
-      }">
-      <e-content>
+      }"
+      @pointermove="move"
+      @pointerleave="leave">
+      <e-content
+        :style="{
+          transform: `translate(${position.left}%, ${position.top}%) scale(${position.scale}%)`,
+        }">
         <slot name="content"></slot>
       </e-content>
       <e-background> </e-background>
@@ -20,9 +25,63 @@
 </template>
 
 <script setup lang="ts">
+import cloneDeep from "lodash.clonedeep";
+import { onMounted, onUnmounted, ref } from "vue";
+
 const props = defineProps<{
   selected: boolean;
 }>();
+const position = ref({
+  left: 0,
+  top: 0,
+  scale: 100,
+});
+const targetPosition = ref(cloneDeep(position.value));
+const handler = ref(0);
+const ratio = 120;
+let prevTime = 0;
+onMounted(() => {
+  update();
+});
+onUnmounted(() => {
+  cancelAnimationFrame(handler.value);
+});
+function update() {
+  const time = Date.now();
+  const deltaTime = time - prevTime;
+  const speed = deltaTime / 100;
+  prevTime = time;
+  if (
+    Math.abs(position.value.left - targetPosition.value.left) < 0.1 &&
+    Math.abs(position.value.top - targetPosition.value.top) < 0.1 &&
+    Math.abs(position.value.scale - targetPosition.value.scale) < 0.1
+  ) {
+    position.value = cloneDeep(targetPosition.value);
+  } else {
+    position.value = {
+      left: position.value.left + (targetPosition.value.left - position.value.left) * speed,
+      top: position.value.top + (targetPosition.value.top - position.value.top) * speed,
+      scale: position.value.scale + (targetPosition.value.scale - position.value.scale) * speed,
+    };
+  }
+  handler.value = requestAnimationFrame(update);
+}
+function move(event: PointerEvent) {
+  const rect = (event.currentTarget as HTMLElement | undefined)?.getBoundingClientRect();
+  if (rect === undefined) return;
+  targetPosition.value = {
+    left: -((event.clientX - rect.left) / rect.width - 0.5) * (ratio - 100),
+    top: -((event.clientY - rect.top) / rect.height - 0.5) * (ratio - 100),
+    scale: ratio,
+  };
+}
+function leave() {
+  targetPosition.value = {
+    left: 0,
+    top: 0,
+    scale: 100,
+  };
+}
 </script>
 
 <style lang="scss" scoped>
@@ -65,19 +124,21 @@ e-selectable-box-root {
       position: absolute;
       top: 0px;
       left: 0px;
+      transform: translate(0%, 0%);
+      // transform-origin: 0% 0%;
       z-index: 1;
-      transition: transform 0.1s;
+      // transition: transform 0.1s;
       width: 100%;
       height: 100%;
     }
   }
-  &:hover {
-    // box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-    > e-images > e-content {
-      // filter: brightness(1);
-      transform: scale(1.03);
-    }
-  }
+  // &:hover {
+  //   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  //   > e-images > e-content {
+  //     filter: brightness(1);
+  //     transform: scale(1.03) translate(-50%, -50%);
+  //   }
+  // }
   > e-inners {
     display: block;
     position: absolute;
