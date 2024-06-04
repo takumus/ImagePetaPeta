@@ -29,6 +29,7 @@ const props = defineProps<{
 e-selectable-box-root {
   display: block;
   position: relative;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   border-radius: var(--rounded);
   width: 100%;
   height: 100%;
@@ -71,7 +72,7 @@ e-selectable-box-root {
     }
   }
   &:hover {
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    // box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
     > e-images > e-content {
       // filter: brightness(1);
       transform: scale(1.03);
