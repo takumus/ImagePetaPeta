@@ -36,27 +36,28 @@ e-selectable-box-root {
   > e-images {
     display: block;
     position: relative;
-    filter: brightness(0.7);
+    // filter: brightness(0.7);
     cursor: pointer;
     border-radius: var(--rounded);
     width: 100%;
     height: 100%;
     overflow: hidden;
     &.selected {
-      filter: brightness(1);
-      border-radius: var(--rounded);
+      // filter: brightness(1);
       padding: 2px;
     }
     > e-background {
       display: block;
       position: absolute;
-      top: 0px;
-      left: 0px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 0;
+      border-radius: var(--rounded);
       background-image: url("/images/textures/transparent.png");
       background-repeat: repeat;
-      width: 100%;
-      height: 100%;
+      width: calc(100% - 2px);
+      height: calc(100% - 2px);
     }
     > e-content {
       display: block;
@@ -64,14 +65,16 @@ e-selectable-box-root {
       top: 0px;
       left: 0px;
       z-index: 1;
+      transition: transform 0.1s;
       width: 100%;
       height: 100%;
     }
   }
   &:hover {
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-    > e-images {
-      filter: brightness(1);
+    > e-images > e-content {
+      // filter: brightness(1);
+      transform: scale(1.03);
     }
   }
   > e-inners {
@@ -79,6 +82,7 @@ e-selectable-box-root {
     position: absolute;
     top: 0px;
     left: 0px;
+    z-index: 1;
     border: solid var(--px-1) transparent;
     width: 100%;
     height: 100%;
@@ -92,6 +96,7 @@ e-selectable-box-root {
     position: absolute;
     right: 0px;
     bottom: 0px;
+    z-index: 2;
     box-shadow: var(--shadow) inset;
     border-radius: var(--rounded);
     width: 100%;
