@@ -33,9 +33,9 @@ export default defineConfig((async ({ command }) => {
               return id.toString().split("node_modules/")[1].split("/")[0];
             }
           },
-          entryFileNames: `assets/[name][hash].js`,
-          chunkFileNames: `assets/[name][hash].js`,
-          assetFileNames: `assets/[name][hash].[ext]`,
+          entryFileNames: `assets/[name].[hash].js`,
+          chunkFileNames: `assets/[name].[hash].js`,
+          assetFileNames: `assets/[name].[hash].[ext]`,
         },
       },
       minify: isBuild,
@@ -43,7 +43,7 @@ export default defineConfig((async ({ command }) => {
     plugins: [
       webWorker(),
       electronWindows({
-        templateHTMLFile: "./template.html",
+        templateHTMLFile: "./windows/@template.html",
         windows: windowNames.map((name) => ({
           ts: `./windows/${name}.ts`,
           virtualHTML: `./windows/${name}.html`,
