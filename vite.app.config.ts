@@ -33,6 +33,9 @@ export default defineConfig((async ({ command }) => {
               return id.toString().split("node_modules/")[1].split("/")[0];
             }
           },
+          entryFileNames: `assets/[name][hash].js`,
+          chunkFileNames: `assets/[name][hash].js`,
+          assetFileNames: `assets/[name][hash].[ext]`,
         },
       },
       minify: isBuild,
@@ -41,14 +44,10 @@ export default defineConfig((async ({ command }) => {
       webWorker(),
       electronWindows({
         templateHTMLFile: resolve("./src/renderer/template.html"),
-        virtualDirFromRoot: ".", // 相対じゃないとダメ。
-        windows: windowNames.reduce<{ [name: string]: string }>(
-          (windows, name) => ({
-            ...windows,
-            [name]: resolve("./src/renderer/windows", name + ".ts"),
-          }),
-          {},
-        ),
+        windows: windowNames.map((name) => ({
+          ts: resolve("./src/renderer/windows", name + ".ts"),
+          virtualHTML: resolve("./src/renderer/windows/window." + name + ".html"),
+        })),
       }),
       vue({
         template: {
@@ -68,7 +67,7 @@ function createElectronPlugin(isBuild: boolean) {
       exclude: ["sharp"],
     },
     build: {
-      minify: isBuild,
+      minify: isBuild ? "esbuild" : undefined,
       emptyOutDir: false,
       outDir: resolve("./_electronTemp/dist/main"),
       rollupOptions: {

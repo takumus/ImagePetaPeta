@@ -1,24 +1,31 @@
 import { readFileSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { styleText } from "node:util";
 import { BuildOptions, mergeConfig, Plugin, UserConfig } from "vite";
 
 export default (pluginOptions: {
   templateHTMLFile: string;
-  virtualDirFromRoot: string;
-  windows: { [name: string]: string };
+  windows: {
+    ts: string;
+    virtualHTML: string;
+  }[];
 }): Plugin => {
   let root = "";
   const templateHTML = readFileSync(pluginOptions.templateHTMLFile, "utf-8");
-  function createHTML(windowName: string) {
-    const path = relative(
-      join(root, pluginOptions.virtualDirFromRoot),
-      pluginOptions.windows[windowName],
+  function getWindow(path: string) {
+    const window = pluginOptions.windows.find(
+      (window) => resolve(root, window.virtualHTML) === resolve(root, path),
     );
-    return templateHTML.replace(/___TS_FILE___/, path);
+    return window;
   }
-  function getWindowName(url: string) {
-    return url.match(/[\\/]window\.(.*?)\.html$/)?.[1];
+  function createHTML(url: string) {
+    const window = getWindow(url);
+    if (!window) {
+      return;
+    }
+    const path = relative(resolve(root, dirname(window.virtualHTML)), resolve(root, window.ts));
+    // console.log(path);
+    return templateHTML.replace(/___TS_FILE___/, path);
   }
   return {
     name: "electronWindow",
@@ -27,24 +34,21 @@ export default (pluginOptions: {
       root = config.root ?? ".";
       config.build = mergeConfig<BuildOptions, BuildOptions>(config.build ?? {}, {
         rollupOptions: {
-          input: Object.keys(pluginOptions.windows).map((windowName) =>
-            join(root, pluginOptions.virtualDirFromRoot, `window.${windowName}.html`),
-          ),
+          input: pluginOptions.windows.map((window) => window.virtualHTML),
         },
       });
       log("virtual htmls", config.build?.rollupOptions?.input);
     },
     resolveId(source) {
-      const windowName = getWindowName(source);
-      if (windowName !== undefined) {
+      if (getWindow(source) !== undefined) {
         return source;
       }
     },
     load(id) {
-      const windowName = getWindowName(id);
-      if (windowName !== undefined) {
-        log("export", join(id));
-        return createHTML(windowName);
+      const windowHTML = createHTML(id);
+      if (windowHTML !== undefined) {
+        log("export", id);
+        return windowHTML;
       }
     },
     configureServer(server) {
@@ -53,8 +57,9 @@ export default (pluginOptions: {
           next();
           return;
         }
-        const windowName = getWindowName(req.url ?? "");
-        if (windowName === undefined) {
+        const path = req.url.replace(/^[\\/]/, "");
+        const windowHTML = createHTML(path);
+        if (windowHTML === undefined) {
           next();
           return;
         }
@@ -62,8 +67,8 @@ export default (pluginOptions: {
           "Content-Type": "text/html, charset=utf-8",
           "Cache-Control": "no-cache",
         });
-        log("serve", join(req.url));
-        res.end(createHTML(windowName));
+        log("serve", new URL(req.url, process.env.VITE_DEV_SERVER_URL).href, "->", path);
+        res.end(windowHTML);
       });
     },
   };

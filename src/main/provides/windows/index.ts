@@ -161,11 +161,14 @@ export class Windows {
     //   this.reloadWindow(type);
     // });
     if (process.env.VITE_DEV_SERVER_URL) {
-      const url = new URL(`window.${type}.html`, process.env.VITE_DEV_SERVER_URL).href;
+      const url = new URL(`/windows/window.${type}.html`, process.env.VITE_DEV_SERVER_URL).href;
       logger.debug("url:", url);
       window.loadURL(url);
     } else {
-      const path = Path.resolve(getDirname(import.meta.url), `../renderer/window.${type}.html`);
+      const path = Path.resolve(
+        getDirname(import.meta.url),
+        `../renderer/windows/window.${type}.html`,
+      );
       logger.debug("path:", path);
       window.loadFile(path);
     }
