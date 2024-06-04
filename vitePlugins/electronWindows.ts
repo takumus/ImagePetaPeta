@@ -10,8 +10,8 @@ export default (pluginOptions: {
     virtualHTML: string;
   }[];
 }): Plugin => {
-  let root = "";
-  const templateHTML = readFileSync(pluginOptions.templateHTMLFile, "utf-8");
+  let root = ".";
+  let templateHTML = "";
   function getWindow(path: string) {
     const window = pluginOptions.windows.find(
       (window) => resolve(root, window.virtualHTML) === resolve(root, path),
@@ -24,7 +24,6 @@ export default (pluginOptions: {
       return;
     }
     const path = relative(resolve(root, dirname(window.virtualHTML)), resolve(root, window.ts));
-    // console.log(path);
     return templateHTML.replace(/___TS_FILE___/, path);
   }
   return {
@@ -32,9 +31,10 @@ export default (pluginOptions: {
     enforce: "pre",
     config(config) {
       root = config.root ?? ".";
+      templateHTML = readFileSync(resolve(root, pluginOptions.templateHTMLFile), "utf-8");
       config.build = mergeConfig<BuildOptions, BuildOptions>(config.build ?? {}, {
         rollupOptions: {
-          input: pluginOptions.windows.map((window) => window.virtualHTML),
+          input: pluginOptions.windows.map((window) => resolve(root, window.virtualHTML)),
         },
       });
       log("virtual htmls", config.build?.rollupOptions?.input);

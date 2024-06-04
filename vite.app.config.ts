@@ -43,10 +43,10 @@ export default defineConfig((async ({ command }) => {
     plugins: [
       webWorker(),
       electronWindows({
-        templateHTMLFile: resolve("./src/renderer/template.html"),
+        templateHTMLFile: "./template.html",
         windows: windowNames.map((name) => ({
-          ts: resolve("./src/renderer/windows", name + ".ts"),
-          virtualHTML: resolve("./src/renderer/windows/window." + name + ".html"),
+          ts: `./windows/${name}.ts`,
+          virtualHTML: `./windows/window.${name}.html`,
         })),
       }),
       vue({
