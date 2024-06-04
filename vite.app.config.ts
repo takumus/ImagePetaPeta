@@ -46,7 +46,7 @@ export default defineConfig((async ({ command }) => {
         templateHTMLFile: "./template.html",
         windows: windowNames.map((name) => ({
           ts: `./windows/${name}.ts`,
-          virtualHTML: `./windows/window.${name}.html`,
+          virtualHTML: `./windows/${name}.html`,
         })),
       }),
       vue({
