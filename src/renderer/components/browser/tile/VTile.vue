@@ -293,11 +293,6 @@ e-tile-root {
     position: relative;
     width: 100%;
     height: 100%;
-    &.selected {
-      filter: brightness(1);
-      border-radius: var(--rounded);
-      padding: 2px;
-    }
     > img,
     video,
     e-placeholder,
