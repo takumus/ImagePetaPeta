@@ -1,7 +1,7 @@
 <template>
   <e-page-downloader-root>
     <e-image v-for="image in images" :key="image.url">
-      <VSelectableBox :selected="image.selected">
+      <VSelectableBox :selected="image.selected" :zoom="true">
         <template #content>
           <e-content @click="click(image)" v-if="!image.error">
             <img

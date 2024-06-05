@@ -5,7 +5,7 @@
       width: tile.width + 'px',
       height: tile.height + 'px',
     }">
-    <VSelectableBox :selected="selected" v-if="tile.petaFile">
+    <VSelectableBox :selected="selected" :zoom="true" v-if="tile.petaFile">
       <template #content>
         <e-tile-content
           @pointermove="seekVideo"

@@ -1,14 +1,13 @@
 <template>
-  <e-selectable-box-root>
+  <e-selectable-box-root ref="root">
     <e-images
       :class="{
         selected,
       }"
-      @pointermove="move"
       @pointerleave="leave">
       <e-content
         :style="{
-          transform: `translate(${position.left}%, ${position.top}%) scale(${position.scale}%)`,
+          transform: `translate(${position.left * 100}%, ${position.top * 100}%) scale(${position.scale * 100}%)`,
         }">
         <slot name="content"></slot>
       </e-content>
@@ -25,36 +24,30 @@
 </template>
 
 <script setup lang="ts">
+import { useMouseInElement, useRafFn } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
-import { onMounted, onUnmounted, ref } from "vue";
+import { nextTick, ref, watch } from "vue";
 
+const root = ref<HTMLElement>();
+const mouse = useMouseInElement(root, { handleOutside: false });
+const rafHandler = useRafFn(animate);
 const props = defineProps<{
   selected: boolean;
+  zoom?: boolean;
 }>();
 const position = ref({
   left: 0,
   top: 0,
-  scale: 100,
+  scale: 1,
 });
-const targetPosition = ref(cloneDeep(position.value));
-const handler = ref(0);
-const ratio = 120;
-let prevTime = 0;
-onMounted(() => {
-  update();
-});
-onUnmounted(() => {
-  cancelAnimationFrame(handler.value);
-});
-function update() {
-  const time = Date.now();
-  const deltaTime = time - prevTime;
-  const speed = deltaTime / 100;
-  prevTime = time;
+const targetPosition = ref(position.value);
+const zoomRatio = 1.5;
+function animate(param: { delta: number }) {
+  const speed = param.delta / 100;
   if (
-    Math.abs(position.value.left - targetPosition.value.left) < 0.1 &&
-    Math.abs(position.value.top - targetPosition.value.top) < 0.1 &&
-    Math.abs(position.value.scale - targetPosition.value.scale) < 0.1
+    Math.abs(position.value.left - targetPosition.value.left) < 0.01 &&
+    Math.abs(position.value.top - targetPosition.value.top) < 0.01 &&
+    Math.abs(position.value.scale - targetPosition.value.scale) < 0.01
   ) {
     position.value = cloneDeep(targetPosition.value);
   } else {
@@ -64,24 +57,40 @@ function update() {
       scale: position.value.scale + (targetPosition.value.scale - position.value.scale) * speed,
     };
   }
-  handler.value = requestAnimationFrame(update);
-}
-function move(event: PointerEvent) {
-  const rect = (event.currentTarget as HTMLElement | undefined)?.getBoundingClientRect();
-  if (rect === undefined) return;
-  targetPosition.value = {
-    left: -((event.clientX - rect.left) / rect.width - 0.5) * (ratio - 100),
-    top: -((event.clientY - rect.top) / rect.height - 0.5) * (ratio - 100),
-    scale: ratio,
-  };
+  if (mouse.isOutside.value) {
+    targetPosition.value = {
+      left: 0,
+      top: 0,
+      scale: 1,
+    };
+  } else {
+    targetPosition.value = {
+      left: -(mouse.elementX.value / mouse.elementWidth.value - 0.5) * (zoomRatio - 1),
+      top: -(mouse.elementY.value / mouse.elementHeight.value - 0.5) * (zoomRatio - 1),
+      scale: zoomRatio,
+    };
+  }
 }
 function leave() {
-  targetPosition.value = {
-    left: 0,
-    top: 0,
-    scale: 100,
-  };
+  // setTimeout(() => {
+  //   targetPosition.value = {
+  //     left: 0,
+  //     top: 0,
+  //     scale: 100,
+  //   };
+  // }, 1000);
 }
+watch(
+  () => props.zoom,
+  () => {
+    if (props.zoom) {
+      rafHandler.resume();
+    } else {
+      rafHandler.pause();
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>
