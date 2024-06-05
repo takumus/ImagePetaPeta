@@ -16,6 +16,7 @@ export default defineConfig((async ({ command }) => {
   const isBuild = command === "build";
   if (isBuild) {
     rmSync("_release", { recursive: true, force: true });
+    rmSync("_electronTemp/dist", { recursive: true, force: true });
   }
   return createViteConfig({
     envDir: "../../",
@@ -27,12 +28,6 @@ export default defineConfig((async ({ command }) => {
       outDir: resolve("./_electronTemp/dist/renderer"),
       rollupOptions: {
         output: {
-          manualChunks(id) {
-            if (id.includes("node_modules")) {
-              // モジュール名を取得してチャンク名として返す
-              return id.toString().split("node_modules/")[1].split("/")[0];
-            }
-          },
           entryFileNames: `assets/[name].[hash].js`,
           chunkFileNames: `assets/[name].[hash].js`,
           assetFileNames: `assets/[name].[hash].[ext]`,
