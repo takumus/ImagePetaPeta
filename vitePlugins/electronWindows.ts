@@ -6,7 +6,7 @@ import { BuildOptions, mergeConfig, Plugin, UserConfig } from "vite";
 export default (pluginOptions: {
   templateHTMLFile: string;
   windows: {
-    ts: string;
+    templateReplace: { [key: string]: string };
     virtualHTML: string;
   }[];
 }): Plugin => {
@@ -23,8 +23,9 @@ export default (pluginOptions: {
     if (!window) {
       return;
     }
-    const path = relative(resolve(root, dirname(window.virtualHTML)), resolve(root, window.ts));
-    return templateHTML.replace(/___TS_FILE___/, path);
+    return Object.keys(window.templateReplace).reduce((html, key) => {
+      return html.replace(new RegExp(`{{${key}}}`, "g"), window.templateReplace[key]);
+    }, templateHTML);
   }
   return {
     name: "electronWindow",
