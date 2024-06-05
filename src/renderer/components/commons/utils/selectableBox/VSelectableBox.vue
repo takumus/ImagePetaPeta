@@ -3,8 +3,7 @@
     <e-images
       :class="{
         selected,
-      }"
-      @pointerleave="leave">
+      }">
       <e-content
         :style="{
           transform: `translate(${position.left * 100}%, ${position.top * 100}%) scale(${position.scale * 100}%)`,
@@ -25,12 +24,11 @@
 
 <script setup lang="ts">
 import { useMouseInElement, useRafFn } from "@vueuse/core";
-import cloneDeep from "lodash.clonedeep";
-import { nextTick, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 const root = ref<HTMLElement>();
 const mouse = useMouseInElement(root, { handleOutside: false });
-const rafHandler = useRafFn(animate);
+const animateHandler = useRafFn(animate);
 const props = defineProps<{
   selected: boolean;
   zoom?: boolean;
@@ -40,53 +38,42 @@ const position = ref({
   top: 0,
   scale: 1,
 });
-const targetPosition = ref(position.value);
 const zoomRatio = 1.5;
 function animate(param: { delta: number }) {
-  const speed = param.delta / 100;
+  const speed = param.delta / 150;
+  const targetPosition: typeof position.value = {
+    left: 0,
+    top: 0,
+    scale: 1,
+  };
+  if (!mouse.isOutside.value) {
+    targetPosition.left =
+      -(mouse.elementX.value / mouse.elementWidth.value - 0.5) * (zoomRatio - 1);
+    targetPosition.top =
+      -(mouse.elementY.value / mouse.elementHeight.value - 0.5) * (zoomRatio - 1);
+    targetPosition.scale = zoomRatio;
+  }
   if (
-    Math.abs(position.value.left - targetPosition.value.left) < 0.01 &&
-    Math.abs(position.value.top - targetPosition.value.top) < 0.01 &&
-    Math.abs(position.value.scale - targetPosition.value.scale) < 0.01
+    Math.abs(position.value.left - targetPosition.left) < 0.001 &&
+    Math.abs(position.value.top - targetPosition.top) < 0.001 &&
+    Math.abs(position.value.scale - targetPosition.scale) < 0.001
   ) {
-    position.value = cloneDeep(targetPosition.value);
+    position.value = targetPosition;
   } else {
     position.value = {
-      left: position.value.left + (targetPosition.value.left - position.value.left) * speed,
-      top: position.value.top + (targetPosition.value.top - position.value.top) * speed,
-      scale: position.value.scale + (targetPosition.value.scale - position.value.scale) * speed,
+      left: position.value.left + (targetPosition.left - position.value.left) * speed,
+      top: position.value.top + (targetPosition.top - position.value.top) * speed,
+      scale: position.value.scale + (targetPosition.scale - position.value.scale) * speed,
     };
   }
-  if (mouse.isOutside.value) {
-    targetPosition.value = {
-      left: 0,
-      top: 0,
-      scale: 1,
-    };
-  } else {
-    targetPosition.value = {
-      left: -(mouse.elementX.value / mouse.elementWidth.value - 0.5) * (zoomRatio - 1),
-      top: -(mouse.elementY.value / mouse.elementHeight.value - 0.5) * (zoomRatio - 1),
-      scale: zoomRatio,
-    };
-  }
-}
-function leave() {
-  // setTimeout(() => {
-  //   targetPosition.value = {
-  //     left: 0,
-  //     top: 0,
-  //     scale: 100,
-  //   };
-  // }, 1000);
 }
 watch(
   () => props.zoom,
   () => {
     if (props.zoom) {
-      rafHandler.resume();
+      animateHandler.resume();
     } else {
-      rafHandler.pause();
+      animateHandler.pause();
     }
   },
   { immediate: true },
