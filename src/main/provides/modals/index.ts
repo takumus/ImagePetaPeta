@@ -6,6 +6,7 @@ import { WINDOW_MODAL_UPDATE_INTERVAL } from "@/commons/defines";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { PopupWindow } from "@/main/provides/windows/popup";
 
 export class Modals {
   orders: {
@@ -14,35 +15,9 @@ export class Modals {
     items: string[];
     select: (index: number) => void;
   }[] = [];
+  popup: PopupWindow;
   constructor() {
-    setInterval(() => {
-      if (this.orders.length < 1) {
-        return;
-      }
-      const windows = useWindows();
-      const modal = windows.windows.modal;
-      if (windowIs.alive(modal) && modal?.isFocused()) {
-        // モーダルにフォーカスが当たっていたら無視
-        return;
-      }
-      const parent =
-        windows.mainWindowName !== undefined ? windows.windows[windows.mainWindowName] : undefined;
-      if (parent === undefined) {
-        // 親がなかったら無視
-        return;
-      }
-      if (!windowIs.alive(modal)) {
-        // モーダルが死んでたら開く
-        windows.openWindow("modal", parent, true);
-        return;
-      }
-      if (modal === undefined || modal.getParentWindow() === parent) {
-        // モーダルがundefinedか、親が同じなら無視
-        return;
-      }
-      // フォーカス
-      modal.focus();
-    }, WINDOW_MODAL_UPDATE_INTERVAL);
+    this.popup = new PopupWindow("modal");
   }
   async open(event: IpcMainInvokeEvent, label: string, items: string[]) {
     const windows = useWindows();
@@ -66,10 +41,7 @@ export class Modals {
         { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
         "updateModalDatas",
       );
-      windows.openWindow("modal", event, true);
-      windows.windows.modal?.on("closed", () => {
-        // this.select(modalData.id, -1);
-      });
+      this.popup.setVisible(true);
     });
   }
   async select(id: string, index: number) {
@@ -80,8 +52,8 @@ export class Modals {
       { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["modal"] },
       "updateModalDatas",
     );
-    if (this.orders.length === 0 && windowIs.alive("modal")) {
-      windows.windows.modal?.close();
+    if (this.orders.length === 0) {
+      this.popup.setVisible(false);
     }
   }
   async getOrders() {

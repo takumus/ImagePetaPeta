@@ -1,59 +1,27 @@
-import { BrowserWindow } from "electron";
-import { throttle } from "throttle-debounce";
 import { v4 as uuid } from "uuid";
 
 import { TaskStatus, TaskStatusWithIndex } from "@/commons/datas/task";
-import { WINDOW_MODAL_UPDATE_INTERVAL } from "@/commons/defines";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { windowIs } from "@/main/provides/utils/windowIs";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { PopupWindow } from "@/main/provides/windows/popup";
 
 export class Tasks {
   tasks: { [id: string]: TaskHandler } = {};
+  popup: PopupWindow;
   constructor() {
+    this.popup = new PopupWindow("task");
     setInterval(() => {
       this.updateWindow();
-      const windows = useWindows();
-      if (
-        windowIs.alive(windows.windows.task) &&
-        windows.mainWindowName !== undefined &&
-        windows.windows[windows.mainWindowName] !== undefined &&
-        windows.windows.task.getParentWindow() !== windows.windows[windows.mainWindowName]
-      ) {
-        console.log("update task window parent");
-        windows.windows.task.setParentWindow(windows.windows[windows.mainWindowName]!);
-      }
     }, 10);
   }
-  visibleWindow = throttle(100, (visible: boolean) => {
-    const windows = useWindows();
-    if (visible) {
-      const parent =
-        windows.mainWindowName !== undefined ? windows.windows[windows.mainWindowName] : undefined;
-      if (parent === undefined) {
-        return;
-      }
-      if (windowIs.dead(windows.windows.task)) {
-        windows.openWindow("task", parent).setSkipTaskbar(true);
-      }
-      if (windowIs.alive(windows.windows.task)) {
-        windows.windows.task.show();
-      }
-    } else {
-      if (windows.windows.task === undefined || windowIs.dead(windows.windows.task)) {
-        return;
-      }
-      windows.windows.task.hide();
-    }
-  });
   updateWindow() {
     // console.log(this.getActiveTasks());
     if (this.getActiveTasks().length < 1) {
-      this.visibleWindow(false);
+      this.popup.setVisible(false);
       return;
     }
-    this.visibleWindow(true);
+    this.popup.setVisible(true);
   }
   emit() {
     const windows = useWindows();
