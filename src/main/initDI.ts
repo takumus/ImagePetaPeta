@@ -185,7 +185,6 @@ export function initDI(
       FILE_TAG_PARTITIONS_DB,
     );
     const dbPetaFilesPetaTags = new DB<PetaFilePetaTag>("petaFilePetaTag", FILE_IMAGES_TAGS_DB);
-    const tasks = new Tasks();
     // 画面初期化
     const windows = new Windows();
     // パスまとめ
@@ -253,9 +252,9 @@ export function initDI(
         });
       },
     });
-    provide(tasksKey, tasks);
     provide(webhookKey, new WebHook(ipcFunctions));
     provide(modalsKey, new Modals());
+    provide(tasksKey, new Tasks());
     provide(pageDownloaderCacheKey, new PageDownloaderCache());
     provide(handleFileResponseKey, new HandleFileResponse());
   } catch (err) {
