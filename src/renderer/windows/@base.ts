@@ -100,16 +100,16 @@ export async function create(
   if (await IPC.getIsDataInitialized()) {
     initVue();
   }
-  document.body.addEventListener(
-    "touchstart",
-    (e) => {
-      e.preventDefault();
-    },
-    {
-      passive: false,
-      capture: false,
-    },
-  );
+  // document.body.addEventListener(
+  //   "touchstart",
+  //   (e) => {
+  //     e.preventDefault();
+  //   },
+  //   {
+  //     passive: false,
+  //     capture: false,
+  //   },
+  // );
   const keyboards = new Keyboards();
   keyboards.keys("KeyD").down(() => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
