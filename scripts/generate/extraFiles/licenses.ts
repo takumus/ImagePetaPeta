@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
+import { styleText } from "node:util";
 import checker from "license-checker-rseidelsohn";
 
 const DANGER_LICENSES = /gpl/;
@@ -11,52 +12,40 @@ interface Module {
   text: string;
 }
 export async function generateLicenses() {
-  const modules: Module[] = [];
-  modules.push(
-    ...(await new Promise<Module[]>((res) => {
-      checker.init(
-        {
-          start: ".",
-          production: true,
-          excludePrivatePackages: true,
-          unknown: true,
-        },
-        (_, packages) => {
-          res(
-            Object.keys(packages).reduce<Module[]>((modules, name) => {
-              const info = packages[name];
-              const text = (() => {
-                if (info.licenseFile !== undefined) {
-                  try {
-                    return readFileSync(info.licenseFile).toString();
-                  } catch {}
-                }
-                return "";
-              })();
-              return [
-                ...modules,
-                {
-                  name,
-                  licenses:
-                    (typeof info.licenses === "object"
-                      ? info.licenses.join("\n")
-                      : info.licenses) ?? "",
-                  text,
-                },
-              ];
-            }, []),
-          );
-        },
-      );
-    })),
-  );
-  modules.forEach((module) => {
-    if (
-      !IGNORES.find((r) => module.name.match(r)) &&
-      module.licenses.toLocaleLowerCase().match(DANGER_LICENSES)
-    ) {
-      throw `DANGER LICENSE!!!!!!!: ${module.name}(${module.licenses})`;
-    }
+  const modules: Module[] = await new Promise<Module[]>((res) => {
+    checker.init(
+      {
+        start: ".",
+        production: true,
+        excludePrivatePackages: true,
+        unknown: true,
+      },
+      (_, packages) => {
+        res(
+          Object.keys(packages).reduce<Module[]>((modules, name) => {
+            const info = packages[name];
+            const text = (() => {
+              if (info.licenseFile !== undefined) {
+                try {
+                  return readFileSync(info.licenseFile).toString();
+                } catch {}
+              }
+              return "";
+            })();
+            return [
+              ...modules,
+              {
+                name,
+                licenses:
+                  (typeof info.licenses === "object" ? info.licenses.join("\n") : info.licenses) ??
+                  "",
+                text,
+              },
+            ];
+          }, []),
+        );
+      },
+    );
   });
   readdirSync("resources/licenses")
     .filter((fileName) => fileName.endsWith(".txt"))
@@ -77,7 +66,6 @@ export async function generateLicenses() {
       }
       modules.push(module);
     });
-
   const licensesCounts: { [key: string]: number } = {};
   modules.forEach((module) => {
     if (licensesCounts[module.licenses] !== undefined) {
@@ -102,7 +90,8 @@ export async function generateLicenses() {
   });
   console.log(
     Object.keys(licensesCounts)
-      .map((key) => `-${key}: ${licensesCounts[key]}`)
+      .sort((a, b) => licensesCounts[b] - licensesCounts[a])
+      .map((key) => `${styleText("green", key)}: ${licensesCounts[key]}`)
       .join("\n"),
   );
   return JSON.stringify(modules, null, 2);

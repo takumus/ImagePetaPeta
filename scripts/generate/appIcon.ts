@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { styleText } from "node:util";
 import { IconIco } from "@shockpkg/icon-encoder";
 import sharp from "sharp";
 
@@ -28,6 +29,7 @@ async function exportIcon(from: string, to: string, sizes: number[]) {
   writeFileSync(to, ico.encode());
 }
 (async () => {
+  console.log(styleText(["bgCyan", "black"], " [BEGIN] Export icon "));
   await exportIcon(
     "./resources/images/app/icon.png",
     resolve("./_electronTemp/app_icon_win.ico"),
@@ -39,4 +41,5 @@ async function exportIcon(from: string, to: string, sizes: number[]) {
     512,
     50,
   );
+  console.log(styleText(["bgCyan", "black"], " [END] Export icon "));
 })();

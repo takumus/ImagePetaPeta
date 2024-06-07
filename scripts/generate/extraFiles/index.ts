@@ -1,5 +1,6 @@
 import { copyFileSync, cpSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { styleText } from "node:util";
 import { generateLicenses } from "./licenses";
 import AdmZip from "adm-zip";
 import { normalizePath } from "vite";
@@ -15,6 +16,7 @@ interface ExtraFile {
 }
 (async () => {
   const extras = [];
+  console.log(styleText(["bgCyan", "black"], " [BEGIN] Generate extra files "));
   extras.push(
     await createExtra({
       platform: "universal",
@@ -88,6 +90,7 @@ interface ExtraFile {
     }),
   );
   writeExtraFilesTS(extras);
+  console.log(styleText(["bgCyan", "black"], " [END] Generate extra files "));
 })();
 function writeExtraFilesTS(extras: ExtraFile[]) {
   writeFileSync(
@@ -118,6 +121,7 @@ async function createExtra(params: {
   files: string[];
   prepare?: (extra: ExtraFile) => Promise<unknown>;
 }) {
+  console.log(styleText("cyan", `+create: ${params.name}`));
   const developmentPath = normalizePath(
     join("./_electronTemp/extraFiles", params.platform, params.name),
   );
@@ -130,6 +134,7 @@ async function createExtra(params: {
     files: params.files,
   };
   await params.prepare?.(extra);
+  console.log(styleText("cyan", `-create: ${params.name} done`));
   return extra;
 }
 function downloadZIP(url: string) {

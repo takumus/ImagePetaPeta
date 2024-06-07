@@ -1,5 +1,6 @@
 import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
+import { styleText } from "node:util";
 import sharp from "sharp";
 
 import { ppa } from "@/commons/utils/pp";
@@ -35,6 +36,7 @@ const defaultPlugin: Plugin = async (filePath, destFilePath) => {
 };
 
 (async () => {
+  console.log(styleText(["bgCyan", "black"], " [BEGIN] Generate images"));
   const imagesRoot = "./resources/images";
   const destImagesRoot = "./src/_public/images";
   const extetions = ["png"];
@@ -57,7 +59,8 @@ const defaultPlugin: Plugin = async (filePath, destFilePath) => {
           break;
         }
       }
+      console.log(filePath, destFilePath);
     }, readdirSync(dirPath)).promise;
   }, readdirSync(imagesRoot)).promise;
-  console.log("done!");
+  console.log(styleText(["bgCyan", "black"], " [END] Generate images"));
 })();
