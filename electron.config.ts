@@ -16,6 +16,8 @@ export const electronConfiguration: Configuration = {
       to: "./",
     },
     "package.json",
+    "!**/node_modules/**/*.map",
+    "!**/node_modules/**/*.ts",
   ],
   artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
   extraMetadata: {
@@ -49,5 +51,5 @@ export const electronConfiguration: Configuration = {
     deleteAppDataOnUninstall: true,
     include: "./electron.installer.nsh",
   },
-  asarUnpack: ["**/node_modules/sharp/**/*", "**/node_modules/@img/**/*"],
+  asarUnpack: ["**/node_modules/@img/**/*"],
 };
