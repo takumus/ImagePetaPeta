@@ -6,7 +6,7 @@ import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
-import { useConfigSettings } from "@/main/provides/configs";
+import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -117,7 +117,11 @@ const launchTime = performance.now();
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示
-    windows.showWindows();
+    windows.openWindow("password");
+    useConfigSecureFilePassword().events.on("change", () => {
+      windows.showWindows();
+    });
+    // windows.showWindows();
     logger.logMainChunk().debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // ダークモード監視開始
     observeDarkMode();

@@ -10,5 +10,6 @@ export const windowNames = [
   "task",
   "web",
   "pageDownloader",
+  "password",
 ] as const;
 export type WindowName = (typeof windowNames)[number];

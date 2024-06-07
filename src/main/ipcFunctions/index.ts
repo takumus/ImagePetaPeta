@@ -27,7 +27,11 @@ import { extraFiles } from "@/_defines/extraFiles";
 import Transparent from "@/_public/images/utils/transparent.png";
 import { showError } from "@/main/errorWindow";
 import * as file from "@/main/libs/file";
-import { useConfigSettings, useConfigStates } from "@/main/provides/configs";
+import {
+  useConfigSecureFilePassword,
+  useConfigSettings,
+  useConfigStates,
+} from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
@@ -924,6 +928,10 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async getPageDownloaderDatas() {
     return _urls;
+  },
+  async login(event, password) {
+    useConfigSecureFilePassword().setValue(password);
+    return true;
   },
 };
 let _urls: PageDownloaderData[] = [];
