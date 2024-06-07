@@ -7,29 +7,18 @@ import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { PopupWindow } from "@/main/provides/windows/popup";
 
 export class Tasks {
+  taskIndex = 0;
   tasks: { [id: string]: TaskHandler } = {};
   popup: PopupWindow;
   constructor() {
     this.popup = new PopupWindow("task");
-    setInterval(() => {
-      this.updateWindow();
-    }, 10);
   }
   updateWindow() {
-    // console.log(this.getActiveTasks());
-    if (this.getActiveTasks().length < 1) {
+    if (this.getActive().length < 1) {
       this.popup.setVisible(false);
       return;
     }
     this.popup.setVisible(true);
-  }
-  emit() {
-    const windows = useWindows();
-    windows.emitMainEvent(
-      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["task"] },
-      "taskStatus",
-      this.getStatus(),
-    );
   }
   getStatus() {
     return Object.values(this.tasks)
@@ -41,8 +30,8 @@ export class Tasks {
   }
   spawn(name: string, silent: boolean) {
     const id = uuid();
-    let done = false;
-    let index = 0;
+    let completed = false;
+    const index = this.taskIndex++;
     const handler: TaskHandler = {
       name,
       isCanceled: false,
@@ -50,39 +39,21 @@ export class Tasks {
       latestStatus: undefined,
       silent,
       emitStatus: (status) => {
-        console.log(status);
         handler.latestStatus = { ...status, index };
-        index++;
-        if (done) {
-          return;
-        }
-        if (!silent) {
-          this.emit();
-        }
+        if (completed) return;
+        if (!silent) this.emit();
         if (status.status === "complete") {
-          done = true;
-          this.removeTask(handler);
+          completed = true;
+          this.remove(handler);
         }
       },
     };
-    this.addTask(handler);
+    this.tasks[handler.id] = handler;
     this.updateWindow();
     return handler;
   }
-  addTask(task: TaskHandler) {
-    this.tasks[task.id] = task;
-  }
-  private removeTask(task: TaskHandler) {
-    setTimeout(() => {
-      delete this.tasks[task.id];
-      if (!task.silent) {
-        this.emit();
-        this.updateWindow();
-      }
-    }, 100);
-  }
   cancel(id: string) {
-    const task = this.getTask(id);
+    const task = this.get(id);
     if (task) {
       task.isCanceled = true;
       if (task.onCancel) {
@@ -92,16 +63,35 @@ export class Tasks {
     }
     return false;
   }
+
   confirmFailed(id: string) {
-    const task = this.getTask(id);
+    const task = this.get(id);
     if (task?.latestStatus?.status === "failed") {
-      this.removeTask(task);
+      this.remove(task);
     }
   }
-  getTask(id: string) {
+  private emit() {
+    const windows = useWindows();
+    this.updateWindow();
+    windows.emitMainEvent(
+      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["task"] },
+      "taskStatus",
+      this.getStatus(),
+    );
+  }
+  private remove(task: TaskHandler) {
+    setTimeout(() => {
+      delete this.tasks[task.id];
+      if (!task.silent) {
+        this.emit();
+        this.updateWindow();
+      }
+    }, 100);
+  }
+  private get(id: string) {
     return this.tasks[id];
   }
-  getActiveTasks() {
+  private getActive() {
     return Object.values(this.tasks).filter((t) => !t.silent);
   }
 }
