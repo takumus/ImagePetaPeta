@@ -1,10 +1,7 @@
 import { IpcMainInvokeEvent } from "electron";
 import { v4 as uuid } from "uuid";
 
-import { WINDOW_MODAL_UPDATE_INTERVAL } from "@/commons/defines";
-
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { windowIs } from "@/main/provides/utils/windowIs";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 import { PopupWindow } from "@/main/provides/windows/popup";
 
