@@ -38,7 +38,7 @@ const position = ref({
   top: 0,
   scale: 1,
 });
-const zoomRatio = 1.5;
+const zoomRatio = 1.1;
 function animate(param: { delta: number }) {
   const speed = param.delta / 150;
   const targetPosition: typeof position.value = {
