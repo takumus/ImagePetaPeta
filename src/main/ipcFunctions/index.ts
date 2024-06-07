@@ -86,8 +86,6 @@ export const ipcFunctions: IpcFunctionsType = {
     try {
       log.debug("#Cancel Tasks");
       ids.forEach((id) => {
-        const name = tasks.getTask(id)?.name;
-        log.debug(`task: ${name}-${id}`);
         tasks.cancel(id);
       });
       return;
@@ -106,8 +104,6 @@ export const ipcFunctions: IpcFunctionsType = {
     try {
       log.debug("#Confirm Failed Tasks");
       ids.forEach((id) => {
-        const name = tasks.getTask(id)?.name;
-        log.debug(`task: ${name}-${id}`);
         tasks.confirmFailed(id);
       });
       return;
