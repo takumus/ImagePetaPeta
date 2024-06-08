@@ -1,1 +1,3 @@
-export type SecureFilePassword = string;
+export type SecureFilePassword = {
+  [key: string]: string;
+};

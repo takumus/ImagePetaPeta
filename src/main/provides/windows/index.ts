@@ -13,7 +13,11 @@ import { Vec2 } from "@/commons/utils/vec2";
 import { WindowName } from "@/commons/windows";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { useConfigSettings, useConfigWindowStates } from "@/main/provides/configs";
+import {
+  useConfigSecureFilePassword,
+  useConfigSettings,
+  useConfigWindowStates,
+} from "@/main/provides/configs";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
@@ -51,6 +55,14 @@ export class Windows {
       } else {
         this.windows.eula?.moveTop();
       }
+      return;
+    }
+    try {
+      useConfigSecureFilePassword().getKey();
+    } catch (error) {
+      useLogger().logMainChunk().debug("$Open Password:", error);
+      this.openWindow("password");
+      useConfigSecureFilePassword().events.on("change", this.showWindows.bind(this));
       return;
     }
     if (configSettings.data.show === "both") {

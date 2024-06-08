@@ -92,4 +92,5 @@ export interface IpcFunctions {
   addPageDownloaderDatas: (urls: PageDownloaderData[]) => Promise<void>;
   getPageDownloaderDatas: () => Promise<PageDownloaderData[]>;
   getTaskStatus: () => Promise<{ [id: string]: TaskStatusWithIndex }>;
+  login: (password: string, save: boolean) => Promise<boolean>;
 }

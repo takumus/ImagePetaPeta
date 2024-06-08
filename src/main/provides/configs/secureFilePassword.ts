@@ -1,20 +1,49 @@
 import { safeStorage } from "electron";
 
-import Config from "@/main/libs/config";
-import { passwordToKey } from "@/main/utils/secureFile";
+import { SecureFilePassword } from "@/commons/datas/secureFilePassword";
+import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
-export class ConfigSecureFilePassword extends Config<string> {
+import Config from "@/main/libs/config";
+import { usePaths } from "@/main/provides/utils/paths";
+import { passwordToKey } from "@/main/utils/passwordToKey";
+
+// import { passwordToKey } from "@/main/utils/secureFile";
+
+export class ConfigSecureFilePassword extends Config<SecureFilePassword> {
   private key: string | undefined;
-  setValue(value: string) {
-    const key = passwordToKey(value);
-    this.data = safeStorage.encryptString(key).toString("base64");
-    this.key = key;
-    this.save();
+  // private _data: string = "";
+  public readonly events = new TypedEventEmitter<{
+    change: (value: string) => void;
+  }>();
+  async setPassword(password: string, save = false) {
+    this.key = await passwordToKey(password);
+    this.setKey(this.key, save);
   }
-  getValue() {
-    if (this.key === undefined) {
-      this.key = safeStorage.decryptString(Buffer.from(this.data, "base64"));
+  setKey(key: string, save = false) {
+    this.key = key;
+    if (save) {
+      try {
+        this.data[usePaths().DIR_ROOT] = safeStorage.encryptString(this.key).toString("base64");
+        this.save();
+      } catch {
+        //
+      }
     }
-    return this.key;
+    this.events.emit("change", this.key);
+  }
+  getKey() {
+    if (this.key !== undefined) {
+      return this.key;
+    }
+    const encryptedKey = this.data[usePaths().DIR_ROOT];
+    if (encryptedKey !== undefined) {
+      try {
+        this.key = safeStorage.decryptString(Buffer.from(encryptedKey, "base64"));
+        return this.key;
+      } catch {
+        //
+      }
+    }
+    throw new Error("Password is not set");
   }
 }

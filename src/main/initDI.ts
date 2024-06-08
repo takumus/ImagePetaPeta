@@ -175,7 +175,7 @@ export function initDI(
       {},
       migrateWindowStates,
     );
-    const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, "");
+    const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, {});
     // データベース
     const dbPetaFiles = new DB<PetaFile>("petaFiles", FILE_IMAGES_DB);
     const dbPetaBoard = new DB<PetaBoard>("petaBoards", FILE_BOARDS_DB);

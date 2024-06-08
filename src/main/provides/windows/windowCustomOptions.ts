@@ -74,4 +74,14 @@ export const windowCustomOptions: {
     maximizable: false,
     resizable: false,
   },
+  password: {
+    width: WINDOW_MODAL_WIDTH,
+    height: WINDOW_MODAL_HEIGHT,
+    minWidth: WINDOW_MODAL_WIDTH,
+    minHeight: WINDOW_MODAL_HEIGHT,
+    titleBarStyle: undefined,
+    minimizable: false,
+    maximizable: false,
+    resizable: false,
+  },
 };

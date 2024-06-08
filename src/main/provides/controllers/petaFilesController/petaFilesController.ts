@@ -343,8 +343,11 @@ export class PetaFilesController {
     console.log("error:", errorIDs.length, "/", petaFiles.length);
   }
   async encryptAll(mode: keyof typeof secureFile) {
-    const petaFiles = Object.values(await this.getAll());
-    const key = useConfigSecureFilePassword().getValue();
+    const petaFiles = Object.values(await this.getAll()).filter(
+      (pf) => (mode === "encrypt" && !pf.encrypted) || (mode === "decrypt" && pf.encrypted),
+    );
+    const key = useConfigSecureFilePassword().getKey();
+    let completed = 0;
     await ppa(
       async (pf, i) => {
         const pathOrg = getPetaFilePath.fromPetaFile(pf);
@@ -364,10 +367,10 @@ export class PetaFilesController {
           console.log(e);
         }
         console.log(pf.id, i);
+        completed++;
+        console.log(completed, "/", petaFiles.length);
       },
-      petaFiles.filter(
-        (pf) => (mode === "encrypt" && !pf.encrypted) || (mode === "decrypt" && pf.encrypted),
-      ),
+      petaFiles,
       CPU_LENGTH,
     ).promise;
     console.log("complete");

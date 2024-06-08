@@ -19,8 +19,8 @@ export async function encryptPetaFile(petaFile: PetaFile, updatePetaFile = true)
       thumbnail: resolve(usePaths().DIR_TEMP, uuid()),
     };
     const paths = getPetaFilePath.fromPetaFile(petaFile);
-    await secureFile.encrypt.toFile(paths.original, tempPaths.original, sfp.getValue());
-    await secureFile.encrypt.toFile(paths.thumbnail, tempPaths.thumbnail, sfp.getValue());
+    await secureFile.encrypt.toFile(paths.original, tempPaths.original, sfp.getKey());
+    await secureFile.encrypt.toFile(paths.thumbnail, tempPaths.thumbnail, sfp.getKey());
     // 暗号復号OK
     await rename(tempPaths.original, paths.original);
     await rename(tempPaths.thumbnail, paths.thumbnail);

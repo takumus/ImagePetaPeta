@@ -1,14 +1,14 @@
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { vi } from "vitest";
 
 import { initDB } from "@/main/initDB";
 import { clearProvides } from "@/main/libs/di";
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
 
 export async function initDummyElectron(root: string) {
+  const key = createHash("sha512").update("1234").digest("hex").substring(0, 32);
   vi.mock("electron", async () => {
-    const { passwordToKey } =
-      await vi.importActual<typeof import("@/main/utils/secureFile")>("@/main/utils/secureFile");
-    const key = passwordToKey("1234");
     return {
       BrowserWindow: class {
         constructor(...args: any[]) {}
@@ -100,5 +100,7 @@ export async function initDummyElectron(root: string) {
     temp: resolve(root, "temp"),
     default: resolve(root, "petaFiles"),
   });
+
+  useConfigSecureFilePassword().setKey(key);
   await initDB();
 }

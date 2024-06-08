@@ -1,10 +1,10 @@
+import { createHash } from "node:crypto";
 import { v4 } from "uuid";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { passwordToKey } from "@/main/utils/secureFile";
 
 export function createSecureTempFileKey() {
-  return passwordToKey(v4());
+  return createHash("sha512").update(v4()).digest("hex").substring(0, 32);
 }
 export const secureTempFileKeyKey =
   createKey<ReturnType<typeof createSecureTempFileKey>>("secureTempFileKey");
