@@ -1,11 +1,8 @@
-import { createReadStream } from "node:fs";
 import { rename, rm, stat } from "node:fs/promises";
 import * as Path from "node:path";
 import { fileTypeFromStream } from "file-type";
 import { v4 as uuid } from "uuid";
 
-import { ImportFileInfo } from "@/commons/datas/importFileInfo";
-import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { PetaFile, PetaFiles } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
@@ -15,22 +12,16 @@ import { ppa } from "@/commons/utils/pp";
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
-import {
-  generatePetaFile,
-  regeneratePetaFile,
-} from "@/main/provides/controllers/petaFilesController/generatePetaFile";
+import { regeneratePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
-import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
-import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
-import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
