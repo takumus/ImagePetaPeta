@@ -10,6 +10,7 @@ import { extraFiles } from "@/_defines/extraFiles";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { useDBPetaFilesPetaTags } from "@/main/provides/databases";
+import { useFileImporter } from "@/main/provides/fileImporter";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
@@ -120,9 +121,10 @@ async function setPermisionTo755(execFilePath: string) {
 
 async function importImage(outputFile: string, petaFile: PetaFile, newName: string) {
   const petaFilesController = usePetaFilesController();
+  const fileImporter = useFileImporter();
   const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
   const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
-  const newPetaFiles = await petaFilesController.importFilesFromFileInfos({
+  const newPetaFiles = await fileImporter.importFilesFromFileInfos({
     fileInfos: [{ path: outputFile }],
   });
   if (newPetaFiles.length < 1) {

@@ -9,6 +9,7 @@ import { usePetaFilesController } from "@/main/provides/controllers/petaFilesCon
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBS } from "@/main/provides/databases";
+import { useFileImporter } from "@/main/provides/fileImporter";
 
 const ROOT = "./_test/scenario/petaFilesPetaTags";
 describe("petaFilesPetaTags", () => {
@@ -30,9 +31,9 @@ describe("petaFilesPetaTags", () => {
     await initDummyElectron(resolve(ROOT, h.task.name));
   });
   async function addPetaTag() {
-    const pfc = usePetaFilesController();
+    const fi = useFileImporter();
     const pfptc = usePetaFilesPetaTagsController();
-    const petaFiles = await pfc.importFilesFromFileInfos({
+    const petaFiles = await fi.importFilesFromFileInfos({
       fileInfos: [
         { name: "bee", note: "", path: resolve("./test/sampleDatas/bee.jpg") },
         { name: "flower", note: "", path: resolve("./test/sampleDatas/flower.jpg") },

@@ -39,6 +39,7 @@ import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/peta
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
+import { useFileImporter } from "@/main/provides/fileImporter";
 import { useModals } from "@/main/provides/modals";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useTasks } from "@/main/provides/tasks";
@@ -67,7 +68,7 @@ export const ipcFunctions: IpcFunctionsType = {
   async browseAndImportFiles(event, type) {
     const logger = useLogger();
     const windows = useWindows();
-    const petaFilesController = usePetaFilesController();
+    const fileImporter = useFileImporter();
     const log = logger.logMainChunk();
     log.debug("#Browse Image Files");
     const windowInfo = windows.getWindowByEvent(event);
@@ -75,7 +76,7 @@ export const ipcFunctions: IpcFunctionsType = {
       const result = await dialog.showOpenDialog(windowInfo.window, {
         properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
       });
-      petaFilesController.importFilesFromFileInfos({
+      fileImporter.importFilesFromFileInfos({
         fileInfos: result.filePaths.map((path) => ({ path })),
         extract: true,
       });
@@ -655,7 +656,7 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async importFiles(event, datas) {
     const logger = useLogger();
-    const petaFilesController = usePetaFilesController();
+    const fileImporter = useFileImporter();
     const log = logger.logMainChunk();
     try {
       log.debug("#importFiles");
@@ -701,7 +702,7 @@ export const ipcFunctions: IpcFunctionsType = {
         }, datas).promise
       ).filter((info) => info !== undefined) as ImportFileInfo[];
       const petaFileIds = (
-        await petaFilesController.importFilesFromFileInfos({
+        await fileImporter.importFilesFromFileInfos({
           fileInfos,
           extract: true,
         })

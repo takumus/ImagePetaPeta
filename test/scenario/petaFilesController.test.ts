@@ -13,6 +13,7 @@ import { ppa } from "@/commons/utils/pp";
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
+import { useFileImporter } from "@/main/provides/fileImporter";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { getStreamFromPetaFile } from "@/main/utils/secureFile";
@@ -39,8 +40,8 @@ describe("petaFilesController", () => {
     await initDummyElectron(resolve(ROOT, h.task.name));
   });
   test("importFilesFromFileInfos(file)", async () => {
-    const pfc = usePetaFilesController();
-    const petaFiles = await pfc.importFilesFromFileInfos({
+    const fi = useFileImporter();
+    const petaFiles = await fi.importFilesFromFileInfos({
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas/bee.jpg") }],
     });
     expect(petaFiles.length, "petaFiles.length").toBe(1);
@@ -53,8 +54,8 @@ describe("petaFilesController", () => {
     await useDBS().waitUntilKillable();
   });
   test("importFilesFromFileInfos(directory)", async () => {
-    const pfc = usePetaFilesController();
-    const petaFiles = await pfc.importFilesFromFileInfos({
+    const fi = useFileImporter();
+    const petaFiles = await fi.importFilesFromFileInfos({
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
@@ -68,9 +69,9 @@ describe("petaFilesController", () => {
       height: 1280,
       format: "jpeg",
     });
-    const pfc = usePetaFilesController();
+    const fi = useFileImporter();
     const petaFile = (
-      await pfc.importFilesFromFileInfos({
+      await fi.importFilesFromFileInfos({
         fileInfos: [{ name: "rotated", note: "", path: rotatedFile }],
       })
     )[0];
@@ -90,7 +91,8 @@ describe("petaFilesController", () => {
   });
   test("updatePetaFiles", async () => {
     const pfc = usePetaFilesController();
-    const petaFiles = await pfc.importFilesFromFileInfos({
+    const fi = useFileImporter();
+    const petaFiles = await fi.importFilesFromFileInfos({
       fileInfos: [{ name: "image", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
@@ -111,7 +113,8 @@ describe("petaFilesController", () => {
   });
   test("regenerateFileInfos", async () => {
     const pfc = usePetaFilesController();
-    await pfc.importFilesFromFileInfos({
+    const fi = useFileImporter();
+    await fi.importFilesFromFileInfos({
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
@@ -136,6 +139,7 @@ describe("petaFilesController", () => {
     ((global.fetch as any) = vi.fn()).mockResolvedValue(new Response(readFileSync(DOG_FILE)));
     const correctHash = await fileSHA256(DOG_FILE);
     const pfc = usePetaFilesController();
+    const fi = useFileImporter();
     const info = await createFileInfo.fromURL(
       `https://takumus.io/dog.jpg`,
       undefined,
@@ -144,7 +148,7 @@ describe("petaFilesController", () => {
     ); // dummy url
     expect(info).toBeDefined();
     if (info !== undefined) {
-      await pfc.importFilesFromFileInfos({
+      await fi.importFilesFromFileInfos({
         fileInfos: [info],
         extract: true,
       });

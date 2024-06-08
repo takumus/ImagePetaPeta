@@ -77,6 +77,7 @@ import {
   dbsKey,
   dbStatusKey,
 } from "@/main/provides/databases";
+import { FileImporter, fileImporterKey } from "@/main/provides/fileImporter";
 import { HandleFileResponse, handleFileResponseKey } from "@/main/provides/handleFileResponse";
 import { Modals, modalsKey } from "@/main/provides/modals";
 import { PageDownloaderCache, pageDownloaderCacheKey } from "@/main/provides/pageDownloaderCache";
@@ -225,6 +226,7 @@ export function initDI(
     provide(petaTagsControllerKey, new PetaTagsController());
     provide(petaFilesPetaTagsControllerKey, new PetaFilesPetaTagsController());
     provide(petaTagPartitionsControllerKey, new PetaTagPartitionsController());
+    provide(fileImporterKey, new FileImporter());
     provide(dbPetaBoardsKey, dbPetaBoard);
     provide(dbPetaFilesKey, dbPetaFiles);
     provide(dbPetaFilesPetaTagsKey, dbPetaFilesPetaTags);
