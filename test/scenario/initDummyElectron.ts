@@ -7,10 +7,8 @@ import { clearProvides } from "@/main/libs/di";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
 
 export async function initDummyElectron(root: string) {
+  const key = createHash("sha512").update("1234").digest("hex").substring(0, 32);
   vi.mock("electron", async () => {
-    const { passwordToKey } =
-      await vi.importActual<typeof import("@/main/utils/secureFile")>("@/main/utils/secureFile");
-    const key = passwordToKey("1234");
     return {
       BrowserWindow: class {
         constructor(...args: any[]) {}
@@ -103,8 +101,6 @@ export async function initDummyElectron(root: string) {
     default: resolve(root, "petaFiles"),
   });
 
-  useConfigSecureFilePassword().setKey(
-    createHash("sha512").update("1234").digest("hex").substring(0, 32),
-  );
+  useConfigSecureFilePassword().setKey(key);
   await initDB();
 }

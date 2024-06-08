@@ -5,7 +5,9 @@ import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
 import Config from "@/main/libs/config";
 import { usePaths } from "@/main/provides/utils/paths";
-import { passwordToKey } from "@/main/utils/secureFile";
+import { passwordToKey } from "@/main/utils/passwordToKey";
+
+// import { passwordToKey } from "@/main/utils/secureFile";
 
 export class ConfigSecureFilePassword extends Config<SecureFilePassword> {
   private key: string | undefined;
@@ -13,8 +15,8 @@ export class ConfigSecureFilePassword extends Config<SecureFilePassword> {
   public readonly events = new TypedEventEmitter<{
     change: (value: string) => void;
   }>();
-  setPassword(password: string, save = false) {
-    this.key = passwordToKey(password);
+  async setPassword(password: string, save = false) {
+    this.key = await passwordToKey(password);
     this.setKey(this.key, save);
   }
   setKey(key: string, save = false) {

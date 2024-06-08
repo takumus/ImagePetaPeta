@@ -930,7 +930,7 @@ export const ipcFunctions: IpcFunctionsType = {
     return _urls;
   },
   async login(event, password, save) {
-    useConfigSecureFilePassword().setPassword(password, save);
+    await useConfigSecureFilePassword().setPassword(password, save);
     return true;
   },
 };

@@ -8,9 +8,9 @@ import { beforeAll, describe, expect, test, vi } from "vitest";
 import { ppa } from "@/commons/utils/pp";
 
 import { fileSHA256 } from "@/main/utils/fileSHA256";
-import { passwordToKey, secureFile } from "@/main/utils/secureFile";
+import { secureFile } from "@/main/utils/secureFile";
 
-const KEY = passwordToKey("1234");
+const KEY = createHash("sha512").update("1234").digest("hex").substring(0, 32);
 describe("crypto", () => {
   const ROOT = "./_test/unit/crypto";
   beforeAll(() => {
