@@ -27,7 +27,7 @@ onMounted(async () => {
 });
 function login() {
   IPC.login(password.value);
-  IPC.windowClose();
+  // IPC.windowClose();
 }
 </script>
 
