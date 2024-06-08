@@ -1,27 +1,97 @@
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { basename } from "node:path";
+import { dialog } from "electron";
 
+import { ImportFileGroup } from "@/commons/datas/importFileGroup";
 import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { LogChunk } from "@/commons/datas/logChunk";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { UpdateMode } from "@/commons/datas/updateMode";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
+import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
 import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
+import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { TaskHandler, useTasks } from "@/main/provides/tasks";
 import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
+import { useWindows } from "@/main/provides/windows";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { secureFile } from "@/main/utils/secureFile";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
 export class FileImporter {
+  public async browseFiles(event: Electron.IpcMainInvokeEvent, type: "files" | "directories") {
+    const windows = useWindows();
+    const fileImporter = useFileImporter();
+    const windowInfo = windows.getWindowByEvent(event);
+    if (windowInfo) {
+      const result = await dialog.showOpenDialog(windowInfo.window, {
+        properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
+      });
+      fileImporter.importFilesFromFileInfos({
+        fileInfos: result.filePaths.map((path) => ({ path })),
+        extract: true,
+      });
+      return result.filePaths.length;
+    }
+    return 0;
+  }
+  public async importFilesFromImportFileGroup(datas: ImportFileGroup[]) {
+    const logFromBrowser = useLogger().logMainChunk();
+    const ids = getIdsFromFilePaths(datas);
+    logFromBrowser.debug("## From Browser");
+    if (ids.length > 0 && ids.length === datas.length) {
+      logFromBrowser.debug("return:", ids.length);
+      return ids;
+    } else {
+      logFromBrowser.debug("return:", false);
+    }
+    const fileInfos = (
+      await ppa(async (group): Promise<ImportFileInfo | undefined> => {
+        for (let i = 0; i < group.length; i++) {
+          try {
+            const d = group[i];
+            switch (d.type) {
+              case "filePath":
+                return {
+                  path: d.filePath,
+                  ...d.additionalData,
+                };
+              case "url":
+              case "buffer": {
+                const result =
+                  d.type === "url"
+                    ? await createFileInfo.fromURL(d.url, d.referrer, d.ua)
+                    : await createFileInfo.fromBuffer(d.buffer);
+                if (result !== undefined) {
+                  result.name = d.additionalData?.name ?? result.name;
+                  result.note = d.additionalData?.note ?? result.note;
+                  return result;
+                }
+                break;
+              }
+            }
+          } catch {
+            //
+          }
+        }
+      }, datas).promise
+    ).filter((info) => info !== undefined) as ImportFileInfo[];
+    const petaFileIds = (
+      await this.importFilesFromFileInfos({
+        fileInfos,
+        extract: true,
+      })
+    ).map((petaFile) => petaFile.id);
+    return petaFileIds;
+  }
   public async importFilesFromFileInfos(
     params: {
       fileInfos: ImportFileInfo[];

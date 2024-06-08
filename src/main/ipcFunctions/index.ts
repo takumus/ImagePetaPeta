@@ -67,36 +67,17 @@ let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
   async browseAndImportFiles(event, type) {
     const logger = useLogger();
-    const windows = useWindows();
     const fileImporter = useFileImporter();
     const log = logger.logMainChunk();
     log.debug("#Browse Image Files");
-    const windowInfo = windows.getWindowByEvent(event);
-    if (windowInfo) {
-      const result = await dialog.showOpenDialog(windowInfo.window, {
-        properties: type === "files" ? ["openFile", "multiSelections"] : ["openDirectory"],
-      });
-      fileImporter.importFilesFromFileInfos({
-        fileInfos: result.filePaths.map((path) => ({ path })),
-        extract: true,
-      });
-      return result.filePaths.length;
-    }
-    return 0;
+    return await fileImporter.browseFiles(event, type);
   },
   async cancelTasks(event, ids) {
     const logger = useLogger();
     const log = logger.logMainChunk();
     const tasks = useTasks();
-    try {
-      log.debug("#Cancel Tasks");
-      ids.forEach((id) => {
-        tasks.cancel(id);
-      });
-      return;
-    } catch (error) {
-      log.error(error);
-    }
+    log.debug("#Cancel Tasks");
+    tasks.cancel(ids);
     return;
   },
   async getTaskStatus(event) {
@@ -106,15 +87,8 @@ export const ipcFunctions: IpcFunctionsType = {
     const logger = useLogger();
     const log = logger.logMainChunk();
     const tasks = useTasks();
-    try {
-      log.debug("#Confirm Failed Tasks");
-      ids.forEach((id) => {
-        tasks.confirmFailed(id);
-      });
-      return;
-    } catch (error) {
-      log.error(error);
-    }
+    log.debug("#Confirm Failed Tasks");
+    tasks.confirmFailed(ids);
     return;
   },
   async getPetaFiles() {
@@ -316,9 +290,7 @@ export const ipcFunctions: IpcFunctionsType = {
     const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
     const log = logger.logMainChunk();
     try {
-      // log.log("#Get PetaTagIds By PetaFileIds");
       const petaTagIds = await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
-      // log.log("return:", petaTagIds.length);
       return petaTagIds;
     } catch (error) {
       log.error(error);
@@ -386,7 +358,6 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async openFile(event, petaFile) {
     const logger = useLogger();
-    const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.debug("#Open Image File");
     shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
@@ -422,7 +393,6 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async showImageInFolder(event, petaFile) {
     const logger = useLogger();
-    const petaFilesController = usePetaFilesController();
     const log = logger.logMainChunk();
     log.debug("#Show Image In Folder");
     shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
@@ -661,52 +631,7 @@ export const ipcFunctions: IpcFunctionsType = {
     try {
       log.debug("#importFiles");
       log.debug(datas.length, datas);
-      const logFromBrowser = logger.logMainChunk();
-      const ids = getIdsFromFilePaths(datas);
-      logFromBrowser.debug("## From Browser");
-      if (ids.length > 0 && ids.length === datas.length) {
-        logFromBrowser.debug("return:", ids.length);
-        return ids;
-      } else {
-        logFromBrowser.debug("return:", false);
-      }
-      const fileInfos = (
-        await ppa(async (group): Promise<ImportFileInfo | undefined> => {
-          for (let i = 0; i < group.length; i++) {
-            try {
-              const d = group[i];
-              switch (d.type) {
-                case "filePath":
-                  return {
-                    path: d.filePath,
-                    ...d.additionalData,
-                  };
-                case "url":
-                case "buffer": {
-                  const result =
-                    d.type === "url"
-                      ? await createFileInfo.fromURL(d.url, d.referrer, d.ua)
-                      : await createFileInfo.fromBuffer(d.buffer);
-                  if (result !== undefined) {
-                    result.name = d.additionalData?.name ?? result.name;
-                    result.note = d.additionalData?.note ?? result.note;
-                    return result;
-                  }
-                  break;
-                }
-              }
-            } catch {
-              //
-            }
-          }
-        }, datas).promise
-      ).filter((info) => info !== undefined) as ImportFileInfo[];
-      const petaFileIds = (
-        await fileImporter.importFilesFromFileInfos({
-          fileInfos,
-          extract: true,
-        })
-      ).map((petaFile) => petaFile.id);
+      const petaFileIds = await fileImporter.importFilesFromImportFileGroup(datas);
       log.debug("return:", petaFileIds.length);
       return petaFileIds;
     } catch (e) {
@@ -761,7 +686,6 @@ export const ipcFunctions: IpcFunctionsType = {
   },
   async searchImageByGoogle(event, petaFile) {
     const logger = useLogger();
-    const paths = usePaths();
     const log = logger.logMainChunk();
     log.debug("#Search Image By Google");
     try {
@@ -936,7 +860,6 @@ export const ipcFunctions: IpcFunctionsType = {
   },
 };
 let _urls: PageDownloaderData[] = [];
-// let predictionModel: TF.Sequential | undefined;
 let tf: TF | undefined;
 export function registerIpcFunctions() {
   Object.keys(ipcFunctions).forEach((key) => {

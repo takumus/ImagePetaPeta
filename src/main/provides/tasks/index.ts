@@ -52,23 +52,26 @@ export class Tasks {
     this.updateWindow();
     return handler;
   }
-  cancel(id: string) {
-    const task = this.get(id);
-    if (task) {
-      task.isCanceled = true;
-      if (task.onCancel) {
-        task.onCancel();
+  cancel(ids: string[]) {
+    ids.forEach((id) => {
+      const task = this.get(id);
+      if (task !== undefined) {
+        task.isCanceled = true;
+        if (task.onCancel) {
+          task.onCancel();
+        }
       }
-      return true;
-    }
-    return false;
+    });
+    return true;
   }
 
-  confirmFailed(id: string) {
-    const task = this.get(id);
-    if (task?.latestStatus?.status === "failed") {
-      this.remove(task);
-    }
+  confirmFailed(ids: string[]) {
+    ids.forEach((id) => {
+      const task = this.get(id);
+      if (task?.latestStatus?.status === "failed") {
+        this.remove(task);
+      }
+    });
   }
   private emit() {
     const windows = useWindows();
