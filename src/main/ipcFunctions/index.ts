@@ -1,11 +1,8 @@
 import { readFile } from "node:fs/promises";
 import * as Path from "node:path";
-import { Tensor, Tensor1D } from "@tensorflow/tfjs";
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
-import { fileTypeFromBuffer } from "file-type";
 
 import { AppInfo } from "@/commons/datas/appInfo";
-import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
@@ -18,9 +15,6 @@ import {
   WEBHOOK_PORT,
 } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
-import { CPU_LENGTH } from "@/commons/utils/cpu";
-import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
-import { ppa } from "@/commons/utils/pp";
 import { WindowName } from "@/commons/windows";
 
 import { extraFiles } from "@/_defines/extraFiles";
@@ -33,7 +27,6 @@ import {
   useConfigStates,
 } from "@/main/provides/configs";
 import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
-import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
@@ -57,8 +50,6 @@ import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
-import { getStreamFromPetaFile } from "@/main/utils/secureFile";
-import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { getLatestVersion } from "@/main/utils/versions";
 
 let temporaryShowNSFW = false;
