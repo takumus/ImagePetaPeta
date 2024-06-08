@@ -929,8 +929,8 @@ export const ipcFunctions: IpcFunctionsType = {
   async getPageDownloaderDatas() {
     return _urls;
   },
-  async login(event, password) {
-    useConfigSecureFilePassword().setValue(password);
+  async login(event, password, save) {
+    useConfigSecureFilePassword().setPassword(password, save);
     return true;
   },
 };

@@ -143,13 +143,13 @@ export function getStreamFromPetaFile(
       const [startAESByte, _endAESByte] = [startAESBlock * 16, endAESBlock * 16];
       const startByteOffset = options.start - startAESByte;
       return secureFile.decrypt
-        .toStream(path, sfp.getValue(), {
+        .toStream(path, sfp.getKey(), {
           startBlock: startAESBlock,
           endBlock: endAESBlock,
         })
         .pipe(createCroppedStream(startByteOffset, contentLength + startByteOffset));
     } else {
-      return secureFile.decrypt.toStream(path, sfp.getValue());
+      return secureFile.decrypt.toStream(path, sfp.getKey());
     }
   } else {
     return createReadStream(path, options);

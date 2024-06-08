@@ -346,7 +346,7 @@ export class PetaFilesController {
     const petaFiles = Object.values(await this.getAll()).filter(
       (pf) => (mode === "encrypt" && !pf.encrypted) || (mode === "decrypt" && pf.encrypted),
     );
-    const key = useConfigSecureFilePassword().getValue();
+    const key = useConfigSecureFilePassword().getKey();
     let completed = 0;
     await ppa(
       async (pf, i) => {

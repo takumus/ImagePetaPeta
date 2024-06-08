@@ -65,7 +65,7 @@ export async function generatePetaFile(param: {
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
   if (param.doEncrypt) {
-    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getValue());
+    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getKey());
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   }
@@ -76,7 +76,7 @@ export async function generatePetaFile(param: {
           await secureFile.encrypt.toFile(
             fileInfo.original.transformedBuffer,
             filePath.original,
-            sfp.getValue(),
+            sfp.getKey(),
           );
         } else {
           await writeFile(filePath.original, fileInfo.original.transformedBuffer);
@@ -86,7 +86,7 @@ export async function generatePetaFile(param: {
           const from = param.secureTempFile
             ? secureFile.decrypt.toStream(param.filePath, useSecureTempFileKey())
             : param.filePath;
-          await secureFile.encrypt.toFile(from, filePath.original, sfp.getValue());
+          await secureFile.encrypt.toFile(from, filePath.original, sfp.getKey());
         } else {
           if (param.secureTempFile) {
             await secureFile.decrypt.toFile(

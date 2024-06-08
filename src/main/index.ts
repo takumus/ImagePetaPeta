@@ -118,16 +118,7 @@ const launchTime = performance.now();
     // ipcの関数登録
     registerIpcFunctions();
     // 初期ウインドウ表示
-    windows.openWindow("password");
-    useConfigSecureFilePassword().events.on("change", async () => {
-      // try {
-      //   await usePetaFilesController().encryptAll("encrypt");
-      // } catch (err) {
-      //   logger.logMainChunk().error(err);
-      // }
-      windows.showWindows();
-    });
-    // windows.showWindows();
+    windows.showWindows();
     logger.logMainChunk().debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // ダークモード監視開始
     observeDarkMode();
