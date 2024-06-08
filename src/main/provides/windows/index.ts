@@ -18,6 +18,7 @@ import {
   useConfigSettings,
   useConfigWindowStates,
 } from "@/main/provides/configs";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
@@ -62,7 +63,10 @@ export class Windows {
     } catch (error) {
       useLogger().logMainChunk().debug("$Open Password:", error);
       this.openWindow("password");
-      useConfigSecureFilePassword().events.on("change", this.showWindows.bind(this));
+      useConfigSecureFilePassword().events.on("change", () => {
+        // usePetaFilesController().encryptAll("encrypt");
+        this.showWindows();
+      });
       return;
     }
     if (configSettings.data.show === "both") {
