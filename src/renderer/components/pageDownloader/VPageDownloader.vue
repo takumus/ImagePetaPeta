@@ -45,7 +45,7 @@ onMounted(async () => {
   IPC.on("updatePageDownloaderDatas", (_, urls) => {
     order(urls);
   });
-  order(await IPC.getPageDownloaderDatas());
+  order(await IPC.common.getPageDownloaderDatas());
 });
 function loaded(data: Data, img: HTMLImageElement) {
   data.size = {
@@ -58,7 +58,7 @@ function error(data: Data) {
 }
 function click(data: Data) {
   console.log(data);
-  IPC.importFiles([
+  IPC.common.importFiles([
     [
       {
         type: "url",

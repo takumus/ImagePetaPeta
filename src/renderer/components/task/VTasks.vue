@@ -29,7 +29,7 @@ const windowStatus = useWindowStatusStore();
 const { t } = useI18n();
 const taskStatuses = ref<{ [key: string]: TaskStatusWithIndex }>({});
 onMounted(async () => {
-  taskStatuses.value = await IPC.getTaskStatus();
+  taskStatuses.value = await IPC.common.getTaskStatus();
   IPC.on("taskStatus", (e, tasks) => {
     taskStatuses.value = tasks;
     if (
@@ -63,7 +63,7 @@ const closable = computed(() => {
   );
 });
 function close() {
-  IPC.confirmFailedTasks(Object.keys(taskStatuses.value));
+  IPC.common.confirmFailedTasks(Object.keys(taskStatuses.value));
 }
 </script>
 

@@ -154,7 +154,7 @@ function destruct() {
 }
 function loseContext() {
   logChunk().error("WEBGL_lose_context");
-  IPC.reloadWindow();
+  IPC.common.reloadWindow();
 }
 function resize(rect: PIXIRect) {
   stageRect.set(rect.domRect.width, rect.domRect.height);
@@ -206,7 +206,7 @@ function pointerup(e: PIXI.FederatedPointerEvent) {
           [
             {
               label: t("boards.menu.openBrowser"),
-              click: () => IPC.openWindow("browser"),
+              click: () => IPC.common.openWindow("browser"),
             },
             { separate: true },
             { label: t("boards.menu.resetPosition"), click: boardLoader.resetTransform },

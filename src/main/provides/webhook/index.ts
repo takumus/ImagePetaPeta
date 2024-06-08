@@ -13,13 +13,9 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { createWebhookAPIKey } from "@/main/provides/webhook/createWebhookAPIKey";
 import { getDirname } from "@/main/utils/dirname";
 
-type EventNames = keyof IpcFunctions;
-const allowedEvents: EventNames[] = [
-  "importFiles",
-  "getAppInfo",
-  "openPageDownloader",
-  "addPageDownloaderDatas",
-];
+const allowedEvents: { [key in keyof IpcFunctions]: (keyof IpcFunctions[key])[] } = {
+  common: ["importFiles", "getAppInfo", "openPageDownloader", "addPageDownloaderDatas"],
+};
 export class WebHook extends TypedEventEmitter<{
   open: () => void;
   error: () => void;
@@ -62,13 +58,14 @@ export class WebHook extends TypedEventEmitter<{
     this.http.post("/api", async (req, res) => {
       const executeLog = logger.logMainChunk();
       try {
-        const eventName = req.body.event as EventNames;
-        if (!allowedEvents.includes(eventName)) {
+        const eventName = (req.body.event as string).split(".") as [string, string];
+        console.log(eventName);
+        if (!(allowedEvents as any)[eventName[0]].includes(eventName[1])) {
           res.status(400).json({ error: `not allowed event: ${eventName}` });
           executeLog.debug(`$Webhook(api): not allowed event`, eventName);
           return;
         }
-        const event = this.ipcFunctions[eventName] as
+        const event = (this.ipcFunctions as any)[eventName[0]][eventName[1]] as
           | ((...args: any[]) => Promise<any>)
           | undefined;
         if (event !== undefined) {

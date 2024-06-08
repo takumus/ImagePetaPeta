@@ -48,7 +48,7 @@ const sources = ref<MediaSourceInfo[]>([]);
 const currentSource = ref<MediaSourceInfo>();
 const mediaStream = ref<MediaStream>();
 onMounted(async () => {
-  sources.value = await IPC.getMediaSources();
+  sources.value = await IPC.common.getMediaSources();
   currentSource.value = sources.value[0];
 });
 function stopSource() {

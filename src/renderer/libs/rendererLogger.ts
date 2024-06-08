@@ -8,13 +8,13 @@ export function logChunk(): LogChunk {
   const uid = uuid().substring(0, 4);
   return {
     debug: (...args: unknown[]) => {
-      IPC.log(uid, ...args);
+      IPC.common.log(uid, ...args);
     },
     error: (...args: unknown[]) => {
-      IPC.log(uid, "Error:", ...args);
+      IPC.common.log(uid, "Error:", ...args);
     },
     warn: (...args: unknown[]) => {
-      IPC.log(uid, "Warn:", ...args);
+      IPC.common.log(uid, "Warn:", ...args);
     },
     uid,
   };

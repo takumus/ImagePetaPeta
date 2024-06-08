@@ -36,7 +36,7 @@ const keyboards = new Keyboards();
 onMounted(async () => {
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
-    IPC.windowClose();
+    IPC.common.windowClose();
   });
 });
 

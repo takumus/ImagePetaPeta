@@ -34,7 +34,7 @@ const appInfoStore = useAppInfoStore();
 onMounted(() => {
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
-    IPC.windowClose();
+    IPC.common.windowClose();
   });
 });
 watch(

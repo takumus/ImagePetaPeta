@@ -6,9 +6,9 @@ import { UpdateMode } from "@/commons/datas/updateMode";
 import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaTagPartitionsStore() {
-  const petaTagPartitions = ref(await IPC.getPetaTagPartitions());
+  const petaTagPartitions = ref(await IPC.common.getPetaTagPartitions());
   IPC.on("updatePetaTagPartitions", async () => {
-    petaTagPartitions.value = await IPC.getPetaTagPartitions();
+    petaTagPartitions.value = await IPC.common.getPetaTagPartitions();
     // console.log(_petaTagPartitions);
   });
   return {
@@ -16,7 +16,7 @@ export async function createPetaTagPartitionsStore() {
       petaTagPartitions,
     },
     updatePetaTagPartitions(petaTagPartitions: PetaTagPartition[], mode: UpdateMode) {
-      return IPC.updatePetaTagPartitions(petaTagPartitions, mode);
+      return IPC.common.updatePetaTagPartitions(petaTagPartitions, mode);
     },
   };
 }

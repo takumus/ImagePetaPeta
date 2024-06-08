@@ -3,12 +3,12 @@ import { InjectionKey, readonly, ref } from "vue";
 import { IPC } from "@/renderer/libs/ipc";
 
 export async function createNSFWStore() {
-  const state = ref(await IPC.getShowNSFW());
+  const state = ref(await IPC.common.getShowNSFW());
   IPC.on("showNSFW", (_, value) => {
     state.value = value;
   });
   function update(value: boolean) {
-    IPC.setShowNSFW(value);
+    IPC.common.setShowNSFW(value);
   }
   return {
     state: readonly(state),

@@ -37,13 +37,13 @@ onMounted(() => {
   restorePetaFileDirectory();
 });
 async function changePetaFileDirectory() {
-  const result = await IPC.openModal(
+  const result = await IPC.common.openModal(
     t("settings.changePetaFileDirectoryDialog", [tempPetaFileDirectory.value]),
     [t("commons.yes"), t("commons.no")],
   );
   if (result === 0) {
-    if (!(await IPC.changePetaFileDirectory(tempPetaFileDirectory.value))) {
-      await IPC.openModal(
+    if (!(await IPC.common.changePetaFileDirectory(tempPetaFileDirectory.value))) {
+      await IPC.common.openModal(
         t("settings.changePetaFileDirectoryErrorDialog", [tempPetaFileDirectory.value]),
         [t("commons.yes")],
       );
@@ -57,7 +57,7 @@ function restorePetaFileDirectory() {
   tempPetaFileDirectory.value = settingsStore.state.value.petaFileDirectory.path;
 }
 async function browsePetaFileDirectory() {
-  const path = await IPC.browsePetaFileDirectory();
+  const path = await IPC.common.browsePetaFileDirectory();
   if (path) {
     tempPetaFileDirectory.value = path;
   }

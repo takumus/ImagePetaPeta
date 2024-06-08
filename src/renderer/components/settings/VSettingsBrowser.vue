@@ -48,7 +48,7 @@ onMounted(() => {
   });
 });
 function regeneratePetaFiles() {
-  IPC.regeneratePetaFiles();
+  IPC.common.regeneratePetaFiles();
 }
 </script>
 

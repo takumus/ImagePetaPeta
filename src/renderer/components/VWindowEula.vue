@@ -40,13 +40,13 @@ const settings = useSettingsStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 function agree() {
-  IPC.eula(true);
+  IPC.common.eula(true);
 }
 function disagree() {
-  IPC.eula(false);
+  IPC.common.eula(false);
 }
 function close() {
-  IPC.windowClose();
+  IPC.common.windowClose();
 }
 const needToAgree = computed(() => {
   return settings.state.value.eula !== EULA;

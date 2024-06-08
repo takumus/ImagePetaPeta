@@ -83,30 +83,33 @@ const { windowName } = useWindowNameStore();
 const windowStatusStore = useWindowStatusStore();
 const settingsStore = useSettingsStore();
 function openBoard() {
-  IPC.openWindow("board");
+  IPC.common.openWindow("board");
 }
 function openBrowser() {
-  IPC.openWindow("browser");
+  IPC.common.openWindow("browser");
 }
 function openSettings() {
-  IPC.openWindow("settings");
+  IPC.common.openWindow("settings");
 }
 function openCapture() {
-  IPC.openWindow("capture");
+  IPC.common.openWindow("capture");
 }
 function openWeb() {
-  IPC.openWindow("web");
+  IPC.common.openWindow("web");
 }
 function browseAndImportFiles() {
-  IPC.browseAndImportFiles("files");
+  IPC.common.browseAndImportFiles("files");
 }
 function importImageDirectories() {
-  IPC.browseAndImportFiles("directories");
+  IPC.common.browseAndImportFiles("directories");
 }
 async function toggleNSFW() {
   if (!nsfwStore.state.value) {
     if (
-      (await IPC.openModal(t("utilsBar.nsfwConfirm"), [t("commons.yes"), t("commons.no")])) === 0
+      (await IPC.common.openModal(t("utilsBar.nsfwConfirm"), [
+        t("commons.yes"),
+        t("commons.no"),
+      ])) === 0
     ) {
       nsfwStore.update(true);
     }

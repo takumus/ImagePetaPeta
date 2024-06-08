@@ -28,7 +28,7 @@ describe("ipcFunctions", () => {
     await initDummyElectron(resolve(ROOT, h.task.name));
   });
   test("importFiles.filePath", async () => {
-    const result = await ipcFunctions.importFiles({} as any, [
+    const result = await ipcFunctions.common.importFiles({} as any, [
       [
         {
           type: "filePath",
@@ -44,7 +44,7 @@ describe("ipcFunctions", () => {
     await useDBS().waitUntilKillable();
   });
   test("importFiles.withParams", async () => {
-    const result = await ipcFunctions.importFiles({} as any, [
+    const result = await ipcFunctions.common.importFiles({} as any, [
       [
         {
           type: "filePath",
@@ -62,11 +62,11 @@ describe("ipcFunctions", () => {
     await useDBS().waitUntilKillable();
   });
   test("getPetaBoards.empty", async (h) => {
-    const board = Object.values(await ipcFunctions.getPetaBoards({} as any))[0];
+    const board = Object.values(await ipcFunctions.common.getPetaBoards({} as any))[0];
     expect(board).toBeTruthy();
     await useDBS().waitUntilKillable();
     await initDummyElectron(resolve(ROOT, h.task.name));
-    const board2 = Object.values(await ipcFunctions.getPetaBoards({} as any))[0];
+    const board2 = Object.values(await ipcFunctions.common.getPetaBoards({} as any))[0];
     expect(board2.id).toBe(board.id);
     await useDBS().waitUntilKillable();
   });

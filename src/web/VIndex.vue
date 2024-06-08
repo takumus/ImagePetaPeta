@@ -44,7 +44,7 @@ onMounted(async () => {
     }
   }, 2000);
   setInterval(async () => {
-    const info = await send("getAppInfo");
+    const info = await send("common", "getAppInfo");
     if ("response" in info) {
       if (info.response.version !== undefined) {
         alive = true;
@@ -88,7 +88,7 @@ async function upload() {
   status.value = "progress";
   uploading.value = true;
   try {
-    const result = await send("importFiles", [
+    const result = await send("common", "importFiles", [
       [
         {
           type: "url",
@@ -113,10 +113,18 @@ async function upload() {
   }
   uploading.value = false;
 }
-async function send<U extends keyof IpcFunctions>(
+async function send<C extends keyof IpcFunctions, U extends keyof IpcFunctions[C]>(
+  category: C,
   event: U,
-  ...args: Parameters<IpcFunctions[U]>
-): Promise<{ response: Awaited<ReturnType<IpcFunctions[U]>> } | { error: string }> {
+  ...args: Parameters<IpcFunctions[C][U] extends (...args: any) => any ? IpcFunctions[C][U] : never>
+): Promise<
+  | {
+      response: Awaited<
+        ReturnType<IpcFunctions[C][U] extends (...args: any) => any ? IpcFunctions[C][U] : never>
+      >;
+    }
+  | { error: string }
+> {
   const response = await fetch("http://" + location.host.split(":")[0] + `:${WEBHOOK_PORT}/api`, {
     method: "POST",
     headers: {
@@ -124,7 +132,7 @@ async function send<U extends keyof IpcFunctions>(
       "impt-web-api-key": apiKey.value,
     },
     body: JSON.stringify({
-      event,
+      event: `${category}.${event as any}`,
       args,
     }),
   });

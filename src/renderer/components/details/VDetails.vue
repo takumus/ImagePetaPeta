@@ -100,7 +100,7 @@ function update() {
   pFileObject.position.set(position.x + stageRect.value.x / 2, position.y + stageRect.value.y / 2);
 }
 function loseContext() {
-  IPC.reloadWindow();
+  IPC.common.reloadWindow();
 }
 function resize(rect: PIXIRect) {
   mouseOffset.set(0, 0);

@@ -29,8 +29,8 @@ onMounted(async () => {
   windowTitleStore.windowTitle.value = "";
 });
 function login() {
-  IPC.login(password.value, save.value);
-  // IPC.windowClose();
+  IPC.common.login(password.value, save.value);
+  // IPC.common.windowClose();
 }
 </script>
 

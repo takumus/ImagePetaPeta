@@ -27,11 +27,21 @@ describe("webhook", () => {
     mkdirSync(resolve(ROOT, h.task.name), { recursive: true });
     await initDummyElectron(resolve(ROOT, h.task.name));
   });
-  async function post<U extends keyof IpcFunctions>(
+  async function post<C extends keyof IpcFunctions, U extends keyof IpcFunctions[C]>(
     apiKey: string,
+    category: C,
     event: U,
-    ...args: Parameters<IpcFunctions[U]>
-  ): Promise<{ response: Awaited<ReturnType<IpcFunctions[U]>> } | { error: string }> {
+    ...args: Parameters<
+      IpcFunctions[C][U] extends (...args: any) => any ? IpcFunctions[C][U] : never
+    >
+  ): Promise<
+    | {
+        response: Awaited<
+          ReturnType<IpcFunctions[C][U] extends (...args: any) => any ? IpcFunctions[C][U] : never>
+        >;
+      }
+    | { error: string }
+  > {
     const response = await fetch("http://localhost:51920/api", {
       method: "POST",
       headers: {
@@ -39,7 +49,7 @@ describe("webhook", () => {
         "impt-web-api-key": apiKey,
       },
       body: JSON.stringify({
-        event,
+        event: `${category}.${event as any}`,
         args,
       }),
     });
@@ -49,7 +59,7 @@ describe("webhook", () => {
     const webhook = useWebHook();
     await webhook.open(51920);
     try {
-      const ids = await post(webhook.getAPIKEY(), "importFiles", [
+      const ids = await post(webhook.getAPIKEY(), "common", "importFiles", [
         [
           {
             type: "filePath",
@@ -71,7 +81,7 @@ describe("webhook", () => {
     const webhook = useWebHook();
     await webhook.open(51920);
     try {
-      const appInfo = await post(webhook.getAPIKEY(), "getSettings");
+      const appInfo = await post(webhook.getAPIKEY(), "common", "getSettings");
       expect(appInfo).property("error");
     } catch (error) {
       await webhook.close();
@@ -83,7 +93,7 @@ describe("webhook", () => {
     const webhook = useWebHook();
     await webhook.open(51920);
     try {
-      const appInfo = await post("wawawawawa", "getSettings");
+      const appInfo = await post("wawawawawa", "common", "getSettings");
       expect(appInfo).property("error");
     } catch (error) {
       await webhook.close();
