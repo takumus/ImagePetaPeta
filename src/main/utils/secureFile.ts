@@ -117,15 +117,6 @@ export const secureFile = ((iv: Buffer) => {
     },
   };
 })(Buffer.alloc(BLOCK_SIZE, 0));
-// export function passwordToKey(value: string) {
-//   let hash = value;
-//   for (let i = 0; i < 1000000; i++) {
-//     hash = createHash("sha512")
-//       .update(hash + value + hash)
-//       .digest("hex");
-//   }
-//   return hash.substring(0, 32);
-// }
 export function getStreamFromPetaFile(
   petaFile: PetaFile,
   type: "original" | "thumbnail",
