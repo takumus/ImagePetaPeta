@@ -7,6 +7,7 @@ import { initDB } from "@/main/initDB";
 import { initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
+import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -118,7 +119,12 @@ const launchTime = performance.now();
     registerIpcFunctions();
     // 初期ウインドウ表示
     windows.openWindow("password");
-    useConfigSecureFilePassword().events.on("change", () => {
+    useConfigSecureFilePassword().events.on("change", async () => {
+      // try {
+      //   await usePetaFilesController().encryptAll("encrypt");
+      // } catch (err) {
+      //   logger.logMainChunk().error(err);
+      // }
       windows.showWindows();
     });
     // windows.showWindows();
