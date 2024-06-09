@@ -13,10 +13,8 @@ export const detailsIPCFunctions: IpcFunctionsType["details"] = {
     if (detailsPetaFile === undefined) {
       return;
     }
-    windows.emitMainEvent(
+    windows.emit.common.detailsPetaFile(
       { type: "windowNames", windowNames: ["details"] },
-      "common",
-      "detailsPetaFile",
       detailsPetaFile,
     );
     return;

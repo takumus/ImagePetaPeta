@@ -1,7 +1,7 @@
 import { nativeTheme } from "electron";
 
 import { useConfigSettings } from "@/main/provides/configs";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { defaultStyles } from "@/renderer/styles/styles";
 
 export function getStyle() {
@@ -17,6 +17,6 @@ export function getStyle() {
 export function observeDarkMode() {
   nativeTheme.on("updated", () => {
     const windows = useWindows();
-    windows.emitMainEvent({ type: "all" }, "common", "style", getStyle());
+    windows.emit.common.style({ type: "all" }, getStyle());
   });
 }

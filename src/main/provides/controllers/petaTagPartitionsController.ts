@@ -7,7 +7,7 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaTagPartitions } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 
 export class PetaTagPartitionsController {
   async getAll() {
@@ -37,10 +37,8 @@ export class PetaTagPartitionsController {
       i18nKey: "tasks.updateDatas",
       status: "complete",
     });
-    windows.emitMainEvent(
+    windows.emit.common.updatePetaTagPartitions(
       { type: "windowNames", windowNames: ["browser"] },
-      "common",
-      "updatePetaTagPartitions",
       tags,
       mode,
     );

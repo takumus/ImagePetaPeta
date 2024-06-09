@@ -2,7 +2,7 @@ import { IpcMainInvokeEvent } from "electron";
 import { v4 as uuid } from "uuid";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { PopupWindow } from "@/main/provides/windows/popup";
 
 export class Modals {
@@ -34,11 +34,7 @@ export class Modals {
         },
       };
       this.orders.push(modalData);
-      windows.emitMainEvent(
-        { type: "windowNames", windowNames: ["modal"] },
-        "common",
-        "updateModalDatas",
-      );
+      windows.emit.common.updateModalDatas({ type: "windowNames", windowNames: ["modal"] });
       this.popup.setVisible(true);
     });
   }
@@ -46,11 +42,7 @@ export class Modals {
     const windows = useWindows();
     this.orders.find((modal) => modal.id === id)?.select(index);
     this.orders = this.orders.filter((modalData) => modalData.id !== id);
-    windows.emitMainEvent(
-      { type: "windowNames", windowNames: ["modal"] },
-      "common",
-      "updateModalDatas",
-    );
+    windows.emit.common.updateModalDatas({ type: "windowNames", windowNames: ["modal"] });
     if (this.orders.length === 0) {
       this.popup.setVisible(false);
     }

@@ -66,10 +66,8 @@ export const ipcFunctions: IpcFunctionsType = {
       openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
       log.debug(openInBrowserTargetID);
       windows.openWindow("browser");
-      windows.emitMainEvent(
+      windows.emit.common.openInBrowser(
         { windowNames: ["browser"], type: "windowNames" },
-        "common",
-        "openInBrowser",
         openInBrowserTargetID,
       );
     },

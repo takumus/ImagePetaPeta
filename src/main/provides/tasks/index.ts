@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 import { TaskStatus, TaskStatusWithIndex } from "@/commons/datas/task";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { PopupWindow } from "@/main/provides/windows/popup";
 
 export class Tasks {
@@ -76,10 +76,8 @@ export class Tasks {
   private emit() {
     const windows = useWindows();
     this.updateWindow();
-    windows.emitMainEvent(
+    windows.emit.common.taskStatus(
       { type: "windowNames", windowNames: ["task"] },
-      "common",
-      "taskStatus",
       this.getStatus(),
     );
   }

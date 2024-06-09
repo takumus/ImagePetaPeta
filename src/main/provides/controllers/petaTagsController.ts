@@ -9,7 +9,7 @@ import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/peta
 import { useDBPetaTags } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 
 export class PetaTagsController {
   async updateMultiple(tags: PetaTagLike[], mode: UpdateMode, silent = false) {
@@ -37,18 +37,17 @@ export class PetaTagsController {
       status: "complete",
     });
     // Tileの更新対象は、PetaTagIdsのみ。
-    windows.emitMainEvent(
+    windows.emit.common.updatePetaTags(
       {
         type: "windowNames",
         windowNames: ["board", "browser", "details"],
       },
-      "common",
-      "updatePetaTags",
       {
         petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],
         petaFileIds: [],
       },
     );
+
     return true;
   }
   async getAll() {

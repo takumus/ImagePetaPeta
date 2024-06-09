@@ -1,5 +1,6 @@
 import * as Path from "node:path";
 import { BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
+import { string } from "yargs";
 
 import {
   EULA,
@@ -164,11 +165,9 @@ export class Windows {
     logger.debug(type);
     window.setMenuBarVisibility(false);
     window.on("close", () => this.onCloseWindow(type));
-    window.addListener("blur", () =>
-      this.emitMainEvent({ type: "all" }, "common", "windowFocused", false, type),
-    );
+    window.addListener("blur", () => this.emit.common.windowFocused({ type: "all" }, false, type));
     window.addListener("focus", () => {
-      this.emitMainEvent({ type: "all" }, "common", "windowFocused", true, type);
+      this.emit.common.windowFocused({ type: "all" }, true, type);
       if (keepAliveWindowNames.includes(type)) {
         this.changeMainWindow(type);
       }
@@ -191,7 +190,7 @@ export class Windows {
   }
   changeMainWindow(type: WindowName) {
     this.mainWindowName = type;
-    this.emitMainEvent({ type: "all" }, "common", "mainWindowName", type);
+    this.emit.common.mainWindowName({ type: "all" }, type);
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
@@ -248,7 +247,34 @@ export class Windows {
     this.reloadWindow(type);
     return type;
   }
-  emitMainEvent<C extends keyof IpcEvents, U extends keyof IpcEvents[C]>(
+  readonly emit = (() => {
+    const emitMainEvent = this.emitMainEvent.bind(this);
+    const proxies: { [key: string]: any } = {};
+    return new Proxy<{
+      [C in keyof IpcEvents]: {
+        [U in keyof IpcEvents[C]]: (
+          target: EmitMainEventTarget,
+          ...args: Parameters<
+            IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never
+          >
+        ) => void;
+      };
+    }>({} as any, {
+      get(_target, p1: any, _receiver: any) {
+        if (proxies[p1] === undefined) {
+          proxies[p1] = new Proxy<any>({} as any, {
+            get(_target: any, p2: any, _receiver: any) {
+              return (target: EmitMainEventTarget, ...args: any) => {
+                emitMainEvent(target, p1, p2, ...args);
+              };
+            },
+          });
+        }
+        return proxies[p1];
+      },
+    });
+  })();
+  private emitMainEvent<C extends keyof IpcEvents, U extends keyof IpcEvents[C]>(
     target: EmitMainEventTarget,
     cat: C,
     key: U,

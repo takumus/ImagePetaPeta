@@ -2,7 +2,7 @@ import { RemoteBinaryInfo } from "@/commons/datas/remoteBinaryInfo";
 import { UPDATE_CHECK_INTERVAL } from "@/commons/defines";
 
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { getLatestVersion } from "@/main/utils/versions";
 
 let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
@@ -17,7 +17,7 @@ export async function checkAndNotifySoftwareUpdate() {
   if (!remote.isLatest) {
     log.debug("this version is old");
     windows.openWindow("settings");
-    windows.emitMainEvent({ type: "all" }, "common", "foundLatestVersion", remote);
+    windows.emit.common.foundLatestVersion({ type: "all" }, remote);
   } else {
     log.debug("this version is latest");
   }

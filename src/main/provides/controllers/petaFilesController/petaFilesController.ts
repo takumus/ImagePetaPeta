@@ -19,7 +19,7 @@ import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
 
@@ -47,26 +47,22 @@ export class PetaFilesController {
     }, datas).promise;
     if (mode === "remove") {
       // Tileの更新対象なし
-      windows.emitMainEvent(
+      windows.emit.common.updatePetaTags(
         {
           type: "windowNames",
           windowNames: ["board", "browser", "details"],
         },
-        "common",
-        "updatePetaTags",
         {
           petaFileIds: [],
           petaTagIds: [],
         },
       );
     }
-    windows.emitMainEvent(
+    windows.emit.common.updatePetaFiles(
       {
         type: "windowNames",
         windowNames: ["board", "browser", "details"],
       },
-      "common",
-      "updatePetaFiles",
       datas,
       mode,
     );
@@ -100,7 +96,7 @@ export class PetaFilesController {
   public async regenerate() {
     const windows = useWindows();
     const log = useLogger().logMainChunk("PetaFilesController.regenerate");
-    windows.emitMainEvent({ type: "all" }, "common", "regeneratePetaFilesBegin");
+    windows.emit.common.regeneratePetaFilesBegin({ type: "all" });
     const petaFiles = this.getAll();
     let completed = 0;
     await ppa(
@@ -111,10 +107,8 @@ export class PetaFilesController {
         }
         await this.update(newPetaFile, "update");
         log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
-        windows.emitMainEvent(
+        windows.emit.common.regeneratePetaFilesProgress(
           { type: "all" },
-          "common",
-          "regeneratePetaFilesProgress",
           completed,
           petaFiles.length,
         );
@@ -122,7 +116,7 @@ export class PetaFilesController {
       petaFiles,
       CPU_LENGTH,
     ).promise;
-    windows.emitMainEvent({ type: "all" }, "common", "regeneratePetaFilesComplete");
+    windows.emit.common.regeneratePetaFilesComplete({ type: "all" });
   }
   public async verifyFiles() {
     const petaFiles = this.getAll();

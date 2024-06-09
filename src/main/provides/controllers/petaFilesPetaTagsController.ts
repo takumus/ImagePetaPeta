@@ -11,7 +11,7 @@ import { createKey, createUseFunction } from "@/main/libs/di";
 import { useDBPetaFiles, useDBPetaFilesPetaTags, useDBPetaTags } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 
 export class PetaFilesPetaTagsController {
   async updatePetaFilesPetaTags(
@@ -64,10 +64,13 @@ export class PetaFilesPetaTagsController {
       status: "complete",
     });
     // Tileの更新対象はPetaFileIdsのみ。
-    windows.emitMainEvent({ type: "all" }, "common", "updatePetaTags", {
-      petaTagIds: [],
-      petaFileIds,
-    });
+    windows.emit.common.updatePetaTags(
+      { type: "all" },
+      {
+        petaTagIds: [],
+        petaFileIds,
+      },
+    );
   }
   async getPetaTagCount(petaTag: PetaTag) {
     const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();

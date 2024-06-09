@@ -12,7 +12,7 @@ import {
   useDBStatus,
 } from "@/main/provides/databases";
 import { useLogger } from "@/main/provides/utils/logger";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 
 export async function initDB() {
   const initLog = useLogger().logMainChunk("initDB");
@@ -32,7 +32,7 @@ export async function initDB() {
     dbPetaFilesPetaTags,
   ] as const;
   function emitInitialization(l: string) {
-    windows.emitMainEvent({ type: "all" }, "common", "initializationProgress", l);
+    windows.emit.common.initializationProgress({ type: "all" }, l);
     initLog.debug("$Init DB:", l);
   }
   try {
@@ -102,5 +102,5 @@ export async function initDB() {
   });
   // DB初期化完了通知
   dbStatus.initialized = true;
-  windows.emitMainEvent({ type: "all" }, "common", "dataInitialized");
+  windows.emit.common.dataInitialized({ type: "all" });
 }

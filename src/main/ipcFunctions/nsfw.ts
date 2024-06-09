@@ -14,6 +14,6 @@ export const nsfwIPCFunctions: IpcFunctionsType["nsfw"] = {
     log.debug(value);
     const windows = useWindows();
     nsfw.setTemporaryShowNSFW(value);
-    windows.emitMainEvent({ type: "all" }, "common", "showNSFW", nsfw.getShowNSFW());
+    windows.emit.common.showNSFW({ type: "all" }, nsfw.getShowNSFW());
   },
 };
