@@ -129,7 +129,7 @@ export const ipcFunctions: IpcFunctionsType = {
       const log = logger.logMainChunk();
       try {
         log.debug("#Get PetaBoards");
-        const petaBoards = await petaBoardsController.getAll();
+        const petaBoards = await petaBoardsController.getAllAsMap();
         const length = Object.keys(petaBoards).length;
         if (length === 0) {
           log.debug("no boards! create empty board");
@@ -302,7 +302,7 @@ export const ipcFunctions: IpcFunctionsType = {
       const log = logger.logMainChunk();
       try {
         log.debug("#Get PetaTags");
-        const petaTags = await petaTagsController.getPetaTags();
+        const petaTags = await petaTagsController.getAll();
         log.debug("return:", petaTags.length);
         return petaTags;
       } catch (error) {

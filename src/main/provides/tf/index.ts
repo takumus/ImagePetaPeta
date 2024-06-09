@@ -84,7 +84,7 @@ export class TF {
   }
   async getSimilarPetaTags(petaFile: PetaFile) {
     const petaFiles = (await this.getSimilarPetaFileIDsByPetaFile(petaFile)).splice(1, 10);
-    const allTags = await usePetaTagsController().getPetaTags();
+    const allTags = await usePetaTagsController().getAll();
     const tagScore: { [id: string]: number } = allTags.reduce((p, c) => ({ ...p, [c.id]: 0 }), {});
     await ppa(async (pf) => {
       const ids = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);

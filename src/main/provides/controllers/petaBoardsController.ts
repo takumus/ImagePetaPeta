@@ -11,7 +11,7 @@ export class PetaBoardsController {
   async updateMultiple(boards: PetaBoard[], mode: UpdateMode) {
     return await ppa((board) => this.update(board, mode), boards).promise;
   }
-  async getAll() {
+  async getAllAsMap() {
     const dbPetaBoards = useDBPetaBoards();
     const boards: { [id: string]: PetaBoard } = {};
     dbPetaBoards.getAll().forEach((board) => {

@@ -125,9 +125,7 @@ export class PetaFilesController {
   public async verifyFiles() {
     const petaFiles = this.getAll();
     usePetaFilesPetaTagsController();
-    let brokenPetaTag = (await usePetaTagsController().getPetaTags()).find(
-      (p) => p.name === "broken",
-    );
+    let brokenPetaTag = (await usePetaTagsController().getAll()).find((p) => p.name === "broken");
     if (brokenPetaTag === undefined) {
       await usePetaTagsController().updateMultiple(
         [
@@ -138,14 +136,12 @@ export class PetaFilesController {
         ],
         "insert",
       );
-      brokenPetaTag = (await usePetaTagsController().getPetaTags()).find(
-        (p) => p.name === "broken",
-      );
+      brokenPetaTag = (await usePetaTagsController().getAll()).find((p) => p.name === "broken");
     }
     if (brokenPetaTag === undefined) {
       return;
     }
-    (await usePetaTagsController().getPetaTags()).find((p) => p.name === "broken");
+    (await usePetaTagsController().getAll()).find((p) => p.name === "broken");
     const errorIDs: string[] = [];
     let count = 0;
     await ppa(

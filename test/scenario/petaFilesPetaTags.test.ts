@@ -49,7 +49,7 @@ describe("petaFilesPetaTags", () => {
       ],
       "insert",
     );
-    const petaTag = (await petaTagsController.getPetaTags())[0];
+    const petaTag = (await petaTagsController.getAll())[0];
     await pfptc.updatePetaFilesPetaTags(
       [taggedPetaFile.id],
       [

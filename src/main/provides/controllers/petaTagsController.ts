@@ -50,7 +50,7 @@ export class PetaTagsController {
     );
     return true;
   }
-  async getPetaTags() {
+  async getAll() {
     const dbPetaTags = useDBPetaTags();
     return dbPetaTags.getAll();
   }
@@ -103,7 +103,6 @@ export class PetaTagsController {
     } else {
       throw new Error(`PetaTagLike is wrong: ${JSON.stringify(petaTagLike)}`);
     }
-    return undefined;
   }
 }
 export const petaTagsControllerKey = createKey<PetaTagsController>("petaTagsController");

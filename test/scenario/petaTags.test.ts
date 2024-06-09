@@ -36,7 +36,7 @@ describe("petaTags", () => {
       ],
       "insert",
     );
-    const petaTags = await petaTagsController.getPetaTags();
+    const petaTags = await petaTagsController.getAll();
     expect(petaTags[0].name, "addPetaTag").toBe("A");
     await useDBS().waitUntilKillable();
   });
