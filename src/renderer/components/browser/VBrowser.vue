@@ -122,7 +122,7 @@ const { t } = useI18n();
 const thumbnails = ref<HTMLDivElement>();
 const thumbsWrapper = ref<HTMLDivElement>();
 const selectedPetaTagIds = ref<string[]>([]);
-const selectedFilterType = ref<FilterType>(FilterType.ALL);
+const selectedFilterType = ref<FilterType>("all");
 const thumbnailsWidth = ref(0);
 const areaMaxY = ref(0);
 const areaMinY = ref(0);
@@ -169,7 +169,7 @@ onMounted(() => {
   petaFilesStore.onUpdate((petaFiles, mode) => {
     if (mode === "insert") {
       selectedPetaTagIds.value = [];
-      selectedFilterType.value = FilterType.ALL;
+      selectedFilterType.value = "all";
     }
   });
   if (left.value) {
@@ -489,9 +489,9 @@ const fetchFilteredPetaFiles = (() => {
     console.time("fetch" + currentFetchId);
     if (reload) {
       const newResults = await IPC.common.getPetaFileIds(
-        selectedFilterType.value === FilterType.UNTAGGED
+        selectedFilterType.value === "untagged"
           ? { type: "untagged" }
-          : selectedFilterType.value === FilterType.TAGS && selectedPetaTagIds.value.length > 0
+          : selectedFilterType.value === "tags" && selectedPetaTagIds.value.length > 0
             ? { type: "petaTag", petaTagIds: selectedPetaTagIds.value }
             : { type: "all" },
       );
@@ -519,7 +519,7 @@ const fetchFilteredPetaFiles = (() => {
 })();
 function selectTag(tag: RPetaTag) {
   selectedPetaTagIds.value = [tag.id];
-  selectedFilterType.value === FilterType.TAGS;
+  selectedFilterType.value === "tags";
 }
 function updateVisibility(tile: Tile) {
   tile.visible =

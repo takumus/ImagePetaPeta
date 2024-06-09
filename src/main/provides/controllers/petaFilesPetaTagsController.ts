@@ -64,7 +64,7 @@ export class PetaFilesPetaTagsController {
       status: "complete",
     });
     // Tileの更新対象はPetaFileIdsのみ。
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updatePetaTags", {
+    windows.emitMainEvent({ type: "all" }, "updatePetaTags", {
       petaTagIds: [],
       petaFileIds,
     });

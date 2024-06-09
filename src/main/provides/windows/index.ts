@@ -163,10 +163,10 @@ export class Windows {
     window.setMenuBarVisibility(false);
     window.on("close", () => this.onCloseWindow(type));
     window.addListener("blur", () =>
-      this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", false, type),
+      this.emitMainEvent({ type: "all" }, "windowFocused", false, type),
     );
     window.addListener("focus", () => {
-      this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "windowFocused", true, type);
+      this.emitMainEvent({ type: "all" }, "windowFocused", true, type);
       if (keepAliveWindowNames.includes(type)) {
         this.changeMainWindow(type);
       }
@@ -189,7 +189,7 @@ export class Windows {
   }
   changeMainWindow(type: WindowName) {
     this.mainWindowName = type;
-    this.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "mainWindowName", type);
+    this.emitMainEvent({ type: "all" }, "mainWindowName", type);
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
@@ -252,19 +252,19 @@ export class Windows {
     key: U,
     ...args: Parameters<IpcEvents[U]>
   ): void {
-    if (target.type === EmitMainEventTargetType.ALL) {
+    if (target.type === "all") {
       Object.values(this.windows).forEach((window) => {
         if (windowIs.alive(window)) {
           window.webContents.send(key, ...args);
         }
       });
-    } else if (target.type === EmitMainEventTargetType.WINDOWS) {
+    } else if (target.type === "windows") {
       target.windows.forEach((window) => {
         if (windowIs.alive(window)) {
           window.webContents.send(key, ...args);
         }
       });
-    } else if (target.type === EmitMainEventTargetType.WINDOW_NAMES) {
+    } else if (target.type === "windowNames") {
       target.windowNames.forEach((type) => {
         const window = this.windows[type];
         if (windowIs.alive(window)) {
@@ -274,14 +274,10 @@ export class Windows {
     }
   }
 }
-export enum EmitMainEventTargetType {
-  ALL = "all",
-  WINDOWS = "windows",
-  WINDOW_NAMES = "windowNames",
-}
+export type EmitMainEventTargetType = "all" | "windows" | "windowNames";
 export type EmitMainEventTarget =
-  | { type: EmitMainEventTargetType.ALL }
-  | { type: EmitMainEventTargetType.WINDOWS; windows: BrowserWindow[] }
-  | { type: EmitMainEventTargetType.WINDOW_NAMES; windowNames: WindowName[] };
+  | { type: "all" }
+  | { type: "windows"; windows: BrowserWindow[] }
+  | { type: "windowNames"; windowNames: WindowName[] };
 export const windowsKey = createKey<Windows>("windows");
 export const useWindows = createUseFunction(windowsKey);

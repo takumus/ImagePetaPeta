@@ -14,10 +14,10 @@
           @update:value="(value) => editSearchTag(tag, value)"
           @delete-of-empty="editSearchTag(tag, '')" />
       </e-tag>
-      <e-tag v-if="selectedFilterType === FilterType.ALL">
+      <e-tag v-if="selectedFilterType === 'all'">
         <VTextarea :type="'single'" :trim="true" :value="t('browser.all')" :readonly="true" />
       </e-tag>
-      <e-tag v-if="selectedFilterType === FilterType.UNTAGGED">
+      <e-tag v-if="selectedFilterType === 'untagged'">
         <VTextarea :type="'single'" :trim="true" :value="t('browser.untagged')" :readonly="true" />
       </e-tag>
       <e-tag class="last">
@@ -79,8 +79,8 @@ function editSearchTag(tag: RPetaTag, value: string) {
 }
 
 function removeLastPetaTag() {
-  if (props.selectedFilterType !== FilterType.TAGS) {
-    emit("update:selectedFilterType", FilterType.TAGS);
+  if (props.selectedFilterType !== "tags") {
+    emit("update:selectedFilterType", "tags");
   }
   const last = props.selectedPetaTagIds[props.selectedPetaTagIds.length - 1];
   if (last) {
@@ -94,8 +94,8 @@ function removeLastPetaTag() {
 }
 
 function addSelectedTag(tagName: string) {
-  if (props.selectedFilterType !== FilterType.TAGS) {
-    emit("update:selectedFilterType", FilterType.TAGS);
+  if (props.selectedFilterType !== "tags") {
+    emit("update:selectedFilterType", "tags");
   }
   const petaTag = petaTagsStore.state.petaTags.value.find((pti) => pti.name === tagName);
   if (petaTag && !props.selectedPetaTagIds.includes(petaTag.id)) {
@@ -108,7 +108,7 @@ function addSelectedTag(tagName: string) {
 }
 
 const complementItems = computed(() => {
-  if (props.selectedFilterType !== FilterType.TAGS) {
+  if (props.selectedFilterType !== "tags") {
     return petaTagsStore.state.petaTags.value.map((pti) => pti.name);
   }
   return petaTagsStore.state.petaTags.value
@@ -117,7 +117,7 @@ const complementItems = computed(() => {
 });
 
 const selectedPetaTags = computed(() => {
-  if (props.selectedFilterType !== FilterType.TAGS) {
+  if (props.selectedFilterType !== "tags") {
     return [];
   }
   return props.selectedPetaTagIds

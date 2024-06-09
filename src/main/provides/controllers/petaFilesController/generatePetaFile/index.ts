@@ -148,7 +148,7 @@ export async function generateFileInfo(
         });
       }
       if (supportedFileConditions.video(fileType)) {
-        return generateVideoFileInfo({ url: getFileURL(petaFile, FileType.ORIGINAL) }, fileType);
+        return generateVideoFileInfo({ url: getFileURL(petaFile, "original") }, fileType);
       }
     }
   }

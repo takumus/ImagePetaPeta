@@ -28,7 +28,7 @@ const props = defineProps<{
 }>();
 const fileURL = ref<string | undefined>(undefined);
 onMounted(() => {
-  fileURL.value = getFileURL(props.propertyThumbnail.petaFile, FileType.THUMBNAIL);
+  fileURL.value = getFileURL(props.propertyThumbnail.petaFile, "thumbnail");
 });
 const nsfwMask = computed(() => {
   return props.propertyThumbnail.petaFile.nsfw && !nsfwStore.state.value;

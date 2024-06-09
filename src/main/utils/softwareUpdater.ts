@@ -19,7 +19,7 @@ export async function checkAndNotifySoftwareUpdate() {
   if (!remote.isLatest) {
     log.debug("this version is old");
     windows.openWindow("settings");
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "foundLatestVersion", remote);
+    windows.emitMainEvent({ type: "all" }, "foundLatestVersion", remote);
   } else {
     log.debug("this version is latest");
   }

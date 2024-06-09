@@ -29,7 +29,7 @@ export class ImageLoader {
         rej("petaFile is undefined");
         return;
       }
-      const fileURL = getFileURL(this.petaFile, FileType.ORIGINAL);
+      const fileURL = getFileURL(this.petaFile, "original");
       PIXI.Assets.load(fileURL)
         .then(async (resource) => {
           if (this.canceled) {

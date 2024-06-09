@@ -32,7 +32,7 @@ export async function initDB() {
     dbPetaFilesPetaTags,
   ] as const;
   function emitInitialization(log: string) {
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "initializationProgress", log);
+    windows.emitMainEvent({ type: "all" }, "initializationProgress", log);
     logger.logMainChunk().debug("$Init DB:", log);
   }
   try {
@@ -100,5 +100,5 @@ export async function initDB() {
   });
   // DB初期化完了通知
   dbStatus.initialized = true;
-  windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "dataInitialized");
+  windows.emitMainEvent({ type: "all" }, "dataInitialized");
 }

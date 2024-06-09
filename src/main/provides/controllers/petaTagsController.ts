@@ -39,7 +39,7 @@ export class PetaTagsController {
     // Tileの更新対象は、PetaTagIdsのみ。
     windows.emitMainEvent(
       {
-        type: EmitMainEventTargetType.WINDOW_NAMES,
+        type: "windowNames",
         windowNames: ["board", "browser", "details"],
       },
       "updatePetaTags",

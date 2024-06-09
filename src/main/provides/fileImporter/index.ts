@@ -125,7 +125,7 @@ export class FileImporter {
         fileInfos.length,
         `encrypted: ${fileInfo.secureTempFile}`,
       );
-      let result = ImportImageResult.SUCCESS;
+      let result: ImportImageResult = "success";
       let errorReason = "";
       try {
         const name = basename(fileInfo.path);
@@ -140,7 +140,7 @@ export class FileImporter {
         const id = await fileSHA256(readStream());
         const exists = await controller.getPetaFile(id);
         if (exists !== undefined) {
-          result = ImportImageResult.EXISTS;
+          result = "exists";
           petaFiles.push(exists);
         } else {
           const petaFile = await generatePetaFile({
@@ -166,7 +166,7 @@ export class FileImporter {
       } catch (err) {
         log.error(err);
         errorReason = String(err);
-        result = ImportImageResult.ERROR;
+        result = "error";
         error = true;
       }
       processedFileCount++;

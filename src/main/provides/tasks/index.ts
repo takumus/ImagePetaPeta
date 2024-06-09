@@ -77,7 +77,7 @@ export class Tasks {
     const windows = useWindows();
     this.updateWindow();
     windows.emitMainEvent(
-      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["task"] },
+      { type: "windowNames", windowNames: ["task"] },
       "taskStatus",
       this.getStatus(),
     );

@@ -413,9 +413,9 @@ export const ipcFunctions: IpcFunctionsType = {
           }
         });
         configSettings.save();
-        windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateSettings", settings);
-        windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
-        windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "style", getStyle());
+        windows.emitMainEvent({ type: "all" }, "updateSettings", settings);
+        windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
+        windows.emitMainEvent({ type: "all" }, "style", getStyle());
         log.debug("return:", configSettings.data);
         return true;
       } catch (e) {
@@ -609,7 +609,7 @@ export const ipcFunctions: IpcFunctionsType = {
         log.debug("#Update States");
         configStates.data = states;
         configStates.save();
-        windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "updateStates", states);
+        windows.emitMainEvent({ type: "all" }, "updateStates", states);
         log.debug("return:", configStates.data);
         return true;
       } catch (e) {
@@ -649,7 +649,7 @@ export const ipcFunctions: IpcFunctionsType = {
       openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
       windows.openWindow("browser");
       windows.emitMainEvent(
-        { windowNames: ["browser"], type: EmitMainEventTargetType.WINDOW_NAMES },
+        { windowNames: ["browser"], type: "windowNames" },
         "openInBrowser",
         openInBrowserTargetID,
       );
@@ -675,7 +675,7 @@ export const ipcFunctions: IpcFunctionsType = {
     async setShowNSFW(event, value) {
       const windows = useWindows();
       temporaryShowNSFW = value;
-      windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "showNSFW", getShowNSFW());
+      windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, petaFile) {
       const logger = useLogger();
@@ -698,7 +698,7 @@ export const ipcFunctions: IpcFunctionsType = {
         return;
       }
       windows.emitMainEvent(
-        { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["details"] },
+        { type: "windowNames", windowNames: ["details"] },
         "detailsPetaFile",
         detailsPetaFile,
       );
@@ -841,7 +841,7 @@ export const ipcFunctions: IpcFunctionsType = {
       _urls = [...urls, ..._urls];
       const windows = useWindows();
       windows.emitMainEvent(
-        { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["pageDownloader"] },
+        { type: "windowNames", windowNames: ["pageDownloader"] },
         "updatePageDownloaderDatas",
         _urls,
       );

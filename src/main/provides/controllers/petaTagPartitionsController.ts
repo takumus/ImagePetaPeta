@@ -38,7 +38,7 @@ export class PetaTagPartitionsController {
       status: "complete",
     });
     windows.emitMainEvent(
-      { type: EmitMainEventTargetType.WINDOW_NAMES, windowNames: ["browser"] },
+      { type: "windowNames", windowNames: ["browser"] },
       "updatePetaTagPartitions",
       tags,
       mode,

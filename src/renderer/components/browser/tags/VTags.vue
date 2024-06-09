@@ -2,13 +2,13 @@
   <e-tags-root>
     <e-tags-top>
       <VTagCell
-        @click="changeFilterType(FilterType.ALL)"
-        :selected="selectedFilterType === FilterType.ALL"
+        @click="changeFilterType('all')"
+        :selected="selectedFilterType === 'all'"
         :readonly="true"
         :look="`${t('browser.all')}(${petaFilesArray.length})`" />
       <VTagCell
-        @click="changeFilterType(FilterType.UNTAGGED)"
-        :selected="selectedFilterType === FilterType.UNTAGGED"
+        @click="changeFilterType('untagged')"
+        :selected="selectedFilterType === 'untagged'"
         :readonly="true"
         :look="`${t('browser.untagged')}`" />
     </e-tags-top>
@@ -17,7 +17,7 @@
         v-for="c in browserTags"
         :key="c.petaTag.id"
         :selected="
-          (c.selected && selectedFilterType === FilterType.TAGS) ||
+          (c.selected && selectedFilterType === 'tags') ||
           (draggingData !== undefined &&
             'petaTag' in draggingData &&
             draggingData.petaTag === c.petaTag)
@@ -293,7 +293,7 @@ function changeFilterType(filterType: FilterType) {
   emit("update:selectedFilterType", filterType);
 }
 function selectPetaTag(petaTag?: RPetaTag) {
-  changeFilterType(FilterType.TAGS);
+  changeFilterType("tags");
   const newData = [...props.selectedPetaTagIds];
   const prevTags = props.selectedPetaTagIds.join(",");
   let single = false;

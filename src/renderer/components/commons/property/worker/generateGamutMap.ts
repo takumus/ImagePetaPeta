@@ -22,7 +22,7 @@ export function generateGamutMap(
   const wt = wtGroup.getWT();
   wt.use();
   const promise = new Promise<boolean>((res, rej) => {
-    image.src = getFileURL(petaFile, FileType.THUMBNAIL);
+    image.src = getFileURL(petaFile, "thumbnail");
     image.onload = () => {
       if (completed) {
         return;

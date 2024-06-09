@@ -40,7 +40,7 @@
             ref="video"
             v-show="tile.petaFile.metadata.type === 'video'"
             v-if="showVideo"
-            :src="getFileURL(props.tile.petaFile, FileType.ORIGINAL)"></video>
+            :src="getFileURL(props.tile.petaFile, 'original')"></video>
         </e-tile-content>
       </template>
       <template #inner>
@@ -238,19 +238,19 @@ function delayedLoadImage() {
   window.clearTimeout(loadThumbnailTimeoutHandler);
   loadThumbnailTimeoutHandler = window.setTimeout(
     () => {
-      thumbnailURL.value = getFileURL(props.tile.petaFile, FileType.THUMBNAIL);
+      thumbnailURL.value = getFileURL(props.tile.petaFile, "thumbnail");
       if (props.original) {
         loadOriginalTimeoutHandler = window.setTimeout(
           () => {
             if (props.tile.visible) {
               if (props.tile.petaFile?.metadata.type === "image") {
-                originalURL.value = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
+                originalURL.value = getFileURL(props.tile.petaFile, "original");
               } else if (props.tile.petaFile?.metadata.type === "video") {
                 const v = video.value;
                 if (v === undefined) {
                   return;
                 }
-                // v.src = getFileURL(props.tile.petaFile, FileType.ORIGINAL);
+                // v.src = getFileURL(props.tile.petaFile, "original");
               }
             }
           },

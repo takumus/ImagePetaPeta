@@ -1,5 +1,1 @@
-export enum FilterType {
-  TAGS = "tags",
-  ALL = "all",
-  UNTAGGED = "untagged",
-}
+export type FilterType = "tags" | "all" | "untagged";

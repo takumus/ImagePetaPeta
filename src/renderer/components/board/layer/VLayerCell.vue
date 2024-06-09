@@ -68,7 +68,7 @@ onUnmounted(() => {
 });
 const url = computed(() => {
   return props.petaPanel
-    ? getFileURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), FileType.THUMBNAIL)
+    ? getFileURL(petaFilesStore.getPetaFile(props.petaPanel.petaFileId), "thumbnail")
     : undefined;
 });
 const locked = computed(() => {

@@ -26,7 +26,7 @@ export class VideoLoader extends TypedEventEmitter<{
     this.element.style.position = "fixed";
   }
   async load() {
-    this.element.src = getFileURL(this.petaFile, FileType.ORIGINAL);
+    this.element.src = getFileURL(this.petaFile, "original");
     this.element.loop = true;
     this.element.autoplay = false;
     this.element.volume = 0;

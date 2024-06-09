@@ -1,6 +1,1 @@
-export enum ImportImageResult {
-  SUCCESS = "success",
-  EXISTS = "exists",
-  ERROR = "error",
-  LIST = "list",
-}
+export type ImportImageResult = "success" | "exists" | "error" | "list";

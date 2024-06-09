@@ -49,7 +49,7 @@ export class PetaFilesController {
       // Tileの更新対象なし
       windows.emitMainEvent(
         {
-          type: EmitMainEventTargetType.WINDOW_NAMES,
+          type: "windowNames",
           windowNames: ["board", "browser", "details"],
         },
         "updatePetaTags",
@@ -61,7 +61,7 @@ export class PetaFilesController {
     }
     windows.emitMainEvent(
       {
-        type: EmitMainEventTargetType.WINDOW_NAMES,
+        type: "windowNames",
         windowNames: ["board", "browser", "details"],
       },
       "updatePetaFiles",
@@ -99,7 +99,7 @@ export class PetaFilesController {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regeneratePetaFilesBegin");
+    windows.emitMainEvent({ type: "all" }, "regeneratePetaFilesBegin");
     const petaFiles = this.getAll();
     let completed = 0;
     await ppa(
@@ -111,7 +111,7 @@ export class PetaFilesController {
         await this.update(newPetaFile, "update");
         log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
         windows.emitMainEvent(
-          { type: EmitMainEventTargetType.ALL },
+          { type: "all" },
           "regeneratePetaFilesProgress",
           completed,
           petaFiles.length,
@@ -120,7 +120,7 @@ export class PetaFilesController {
       petaFiles,
       CPU_LENGTH,
     ).promise;
-    windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regeneratePetaFilesComplete");
+    windows.emitMainEvent({ type: "all" }, "regeneratePetaFilesComplete");
   }
   public async verifyFiles() {
     const petaFiles = this.getAll();
