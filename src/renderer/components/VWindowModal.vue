@@ -30,9 +30,9 @@ const windowTitleStore = useWindowTitleStore();
 const modalDatas = ref<{ id: string; label: string; items: string[] }[]>([]);
 onMounted(async () => {
   windowTitleStore.windowTitle.value = "";
-  modalDatas.value = await IPC.modals.getModalDatas();
+  modalDatas.value = await IPC.modals.getAll();
   IPC.on("updateModalDatas", async () => {
-    modalDatas.value = await IPC.modals.getModalDatas();
+    modalDatas.value = await IPC.modals.getAll();
   });
 });
 const modalData = computed(() => {
@@ -42,7 +42,7 @@ async function select(index: number) {
   if (modalData.value === undefined) {
     return;
   }
-  await IPC.modals.selectModal(modalData.value.id, index);
+  await IPC.modals.select(modalData.value.id, index);
 }
 </script>
 

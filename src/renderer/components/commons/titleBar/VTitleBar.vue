@@ -47,13 +47,13 @@ defineProps<{
 }>();
 
 function minimizeWindow() {
-  IPC.windows.windowMinimize();
+  IPC.windows.minimize();
 }
 function maximizeWindow() {
-  IPC.windows.windowMaximize();
+  IPC.windows.maximize();
 }
 function closeWindow() {
-  IPC.windows.windowClose();
+  IPC.windows.close();
 }
 const resizable = computed(() => {
   return windowName.value !== "settings";

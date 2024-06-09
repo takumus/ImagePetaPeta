@@ -84,7 +84,7 @@ function showConfigFolder() {
   IPC.common.showConfigFolder();
 }
 function showEULA() {
-  IPC.windows.openWindow("eula");
+  IPC.windows.open("eula");
 }
 </script>
 

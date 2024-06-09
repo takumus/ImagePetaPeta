@@ -76,8 +76,8 @@ function clearSelection() {
 function openDetails() {
   const petaFile = props.petaFiles[0];
   if (petaFile) {
-    IPC.details.setDetailsPetaFile(petaFile.id);
-    IPC.windows.openWindow("details");
+    IPC.details.set(petaFile.id);
+    IPC.windows.open("details");
   }
 }
 const propertyThumbnails = computed<PropertyThumbnail[]>(() => {

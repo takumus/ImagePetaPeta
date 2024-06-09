@@ -245,7 +245,7 @@ async function addPartition(name: string, index: number) {
 }
 async function removeTag(petaTag: RPetaTag) {
   if (
-    (await IPC.modals.openModal(t("browser.removeTagDialog", [petaTag.name]), [
+    (await IPC.modals.open(t("browser.removeTagDialog", [petaTag.name]), [
       t("commons.yes"),
       t("commons.no"),
     ])) === 0
@@ -262,7 +262,7 @@ async function removeTag(petaTag: RPetaTag) {
 }
 async function removeTagPartition(petaTag: PetaTagPartition) {
   if (
-    (await IPC.modals.openModal(t("browser.removeTagPartitionDialog", [petaTag.name]), [
+    (await IPC.modals.open(t("browser.removeTagPartitionDialog", [petaTag.name]), [
       t("commons.yes"),
       t("commons.no"),
     ])) === 0
@@ -275,7 +275,7 @@ async function changeTag(petaTag: RPetaTag, newName: string) {
     return;
   }
   if (browserTags.value.find((c) => c.petaTag.name === newName)) {
-    await IPC.modals.openModal(t("browser.tagAlreadyExistsDialog", [newName]), [t("commons.yes")]);
+    await IPC.modals.open(t("browser.tagAlreadyExistsDialog", [newName]), [t("commons.yes")]);
     return;
   }
   petaTag.name = newName;

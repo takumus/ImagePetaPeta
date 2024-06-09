@@ -29,18 +29,14 @@ describe("ipcFunctions", () => {
     await initDummyElectron(resolve(ROOT, h.task.name));
   });
   test("importFiles.filePath", async () => {
-    const result = await ipcFunctions.importer.importFiles(
-      {} as any,
-      useLogger().logMainChunk(""),
+    const result = await ipcFunctions.importer.import({} as any, useLogger().logMainChunk(""), [
       [
-        [
-          {
-            type: "filePath",
-            filePath: resolve("./test/sampleDatas/bee.jpg"),
-          },
-        ],
+        {
+          type: "filePath",
+          filePath: resolve("./test/sampleDatas/bee.jpg"),
+        },
       ],
-    );
+    ]);
     const petaFile = (await usePetaFilesController().getPetaFile(result[0]))!;
     expect(petaFile).toBeTruthy();
     expect(
@@ -49,22 +45,18 @@ describe("ipcFunctions", () => {
     await useDBS().waitUntilKillable();
   });
   test("importFiles.withParams", async () => {
-    const result = await ipcFunctions.importer.importFiles(
-      {} as any,
-      useLogger().logMainChunk(""),
+    const result = await ipcFunctions.importer.import({} as any, useLogger().logMainChunk(""), [
       [
-        [
-          {
-            type: "filePath",
-            filePath: resolve("./test/sampleDatas/bee.jpg"),
-            additionalData: {
-              name: "bee",
-              note: "cute",
-            },
+        {
+          type: "filePath",
+          filePath: resolve("./test/sampleDatas/bee.jpg"),
+          additionalData: {
+            name: "bee",
+            note: "cute",
           },
-        ],
+        },
       ],
-    );
+    ]);
     const petaFile = (await usePetaFilesController().getPetaFile(result[0]))!;
     expect(petaFile.name).toBe("bee");
     expect(petaFile.note).toBe("cute");
@@ -72,13 +64,13 @@ describe("ipcFunctions", () => {
   });
   test("getPetaBoards.empty", async (h) => {
     const board = Object.values(
-      await ipcFunctions.petaBoards.getPetaBoards({} as any, useLogger().logMainChunk("")),
+      await ipcFunctions.petaBoards.getAll({} as any, useLogger().logMainChunk("")),
     )[0];
     expect(board).toBeTruthy();
     await useDBS().waitUntilKillable();
     await initDummyElectron(resolve(ROOT, h.task.name));
     const board2 = Object.values(
-      await ipcFunctions.petaBoards.getPetaBoards({} as any, useLogger().logMainChunk("")),
+      await ipcFunctions.petaBoards.getAll({} as any, useLogger().logMainChunk("")),
     )[0];
     expect(board2.id).toBe(board.id);
     await useDBS().waitUntilKillable();

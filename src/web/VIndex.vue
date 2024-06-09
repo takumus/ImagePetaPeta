@@ -88,7 +88,7 @@ async function upload() {
   status.value = "progress";
   uploading.value = true;
   try {
-    const result = await send("importer", "importFiles", [
+    const result = await send("importer", "import", [
       [
         {
           type: "url",

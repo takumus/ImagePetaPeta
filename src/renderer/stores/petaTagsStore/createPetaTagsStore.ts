@@ -10,7 +10,7 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaTagsStore() {
   const petaTags = ref(
-    (await IPC.petaTags.getPetaTags())
+    (await IPC.petaTags.getAll())
       .map((petaTag) => petaTagToRPetaTag(petaTag))
       .sort((a, b) => {
         return a.name.localeCompare(b.name);
@@ -20,7 +20,7 @@ export async function createPetaTagsStore() {
     update: (petaFileIds: string[], petaTagIds: string[]) => void;
   }>();
   IPC.on("updatePetaTags", async (event, { petaTagIds, petaFileIds }) => {
-    petaTags.value = (await IPC.petaTags.getPetaTags())
+    petaTags.value = (await IPC.petaTags.getAll())
       .map((petaTag) => petaTagToRPetaTag(petaTag))
       .sort((a, b) => {
         return a.name.localeCompare(b.name);
@@ -41,7 +41,7 @@ export async function createPetaTagsStore() {
         }
         return petaTagLike;
       });
-      return IPC.petaTags.updatePetaTags(petaTagLikes, mode);
+      return IPC.petaTags.update(petaTagLikes, mode);
     },
     onUpdate: (callback: (petaTagIds: string[], petaFileIds: string[]) => void) => {
       eventEmitter.on("update", callback);

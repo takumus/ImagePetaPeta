@@ -401,7 +401,7 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         label: t("browser.petaFileMenu.remove", [selectedPetaFiles.value.length]),
         click: async () => {
           if (
-            (await IPC.modals.openModal(
+            (await IPC.modals.open(
               t("browser.removeImageDialog", [selectedPetaFiles.value.length]),
               [t("commons.yes"), t("commons.no")],
             )) === 0
@@ -447,8 +447,8 @@ async function openDetail(petaFile: RPetaFile) {
   ) {
     return;
   }
-  await IPC.details.setDetailsPetaFile(petaFile.id);
-  await IPC.windows.openWindow("details");
+  await IPC.details.set(petaFile.id);
+  await IPC.windows.open("details");
 }
 function updateTileSize(value: number) {
   statesStore.state.value.browserTileSize = value;
@@ -488,7 +488,7 @@ const fetchFilteredPetaFiles = (() => {
     const currentFetchId = ++fetchId;
     console.time("fetch" + currentFetchId);
     if (reload) {
-      const newResults = await IPC.petaFiles.getPetaFileIds(
+      const newResults = await IPC.petaFiles.getIDs(
         selectedFilterType.value === "untagged"
           ? { type: "untagged" }
           : selectedFilterType.value === "tags" && selectedPetaTagIds.value.length > 0

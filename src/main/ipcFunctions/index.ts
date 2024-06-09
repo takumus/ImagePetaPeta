@@ -58,13 +58,13 @@ let detailsPetaFile: PetaFile | undefined;
 let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
   importer: {
-    async browseAndImportFiles(event, logger, type) {
+    async browse(event, logger, type) {
       const fileImporter = useFileImporter();
       const files = await fileImporter.browseFiles(event, type);
       logger.debug(files);
       return files;
     },
-    async importFiles(event, log, datas) {
+    async import(event, log, datas) {
       const fileImporter = useFileImporter();
       try {
         log.debug(datas.length, datas);
@@ -78,16 +78,16 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   tasks: {
-    async cancelTasks(event, logger, ids) {
+    async cancel(event, logger, ids) {
       const tasks = useTasks();
       logger.debug(ids);
       tasks.cancel(ids);
       return;
     },
-    async getTaskStatus(event) {
+    async getStatus(event) {
       return useTasks().getStatus();
     },
-    async confirmFailedTasks(event, logger, ids) {
+    async confirmFailed(event, logger, ids) {
       const tasks = useTasks();
       logger.debug(ids);
       tasks.confirmFailed(ids);
@@ -95,7 +95,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   petaFiles: {
-    async getPetaFiles(_, logger) {
+    async getAll(_, logger) {
       const petaFilesController = usePetaFilesController();
       try {
         const petaFiles = petaFilesController.getAllAsMap();
@@ -112,7 +112,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return {};
     },
-    async updatePetaFiles(event, logger, datas, mode) {
+    async update(event, logger, datas, mode) {
       const petaFilesController = usePetaFilesController();
       try {
         await petaFilesController.updateMultiple(datas, mode);
@@ -129,7 +129,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async regeneratePetaFiles(_, log) {
+    async regenerate(_, log) {
       const petaFilesController = usePetaFilesController();
       try {
         log.debug("start");
@@ -147,7 +147,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return;
     },
-    async getPetaFileIds(event, log, params) {
+    async getIDs(event, log, params) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
       try {
         log.debug("type:", params.type);
@@ -167,7 +167,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   petaBoards: {
-    async getPetaBoards(_, logger) {
+    async getAll(_, logger) {
       const petaBoardsController = usePetaBoardsController();
       try {
         const petaBoards = await petaBoardsController.getAllAsMap();
@@ -197,7 +197,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return {};
     },
-    async updatePetaBoards(event, logger, boards, mode) {
+    async update(event, logger, boards, mode) {
       const petaBoardsController = usePetaBoardsController();
       try {
         await petaBoardsController.updateMultiple(boards, mode);
@@ -216,7 +216,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   petaTags: {
-    async updatePetaTags(event, log, tags, mode) {
+    async update(event, log, tags, mode) {
       const petaTagsController = usePetaTagsController();
       try {
         await petaTagsController.updateMultiple(tags, mode);
@@ -233,7 +233,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getPetaTags(_, log) {
+    async getAll(_, log) {
       const petaTagsController = usePetaTagsController();
       try {
         const petaTags = await petaTagsController.getAll();
@@ -252,7 +252,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   petaFilePetaTags: {
-    async updatePetaFilesPetaTags(event, log, petaFileIds, petaTagLikes, mode) {
+    async update(event, log, petaFileIds, petaTagLikes, mode) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
       try {
         await petaFilesPetaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
@@ -305,7 +305,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   petaTagPartitions: {
-    async updatePetaTagPartitions(event, log, partitions, mode) {
+    async update(event, log, partitions, mode) {
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
       try {
         await petaTagpartitionsController.updateMultiple(partitions, mode);
@@ -322,7 +322,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getPetaTagPartitions(_, log) {
+    async getAll(_, log) {
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
       try {
         const petaTagPartitions = await petaTagpartitionsController.getAll();
@@ -341,12 +341,12 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   states: {
-    async getStates(_, log) {
+    async get(_, log) {
       const configStates = useConfigStates();
       log.debug(configStates.data);
       return configStates.data;
     },
-    async updateStates(event, log, states) {
+    async update(event, log, states) {
       const configStates = useConfigStates();
       const windows = useWindows();
       try {
@@ -362,7 +362,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   settings: {
-    async updateSettings(event, log, settings) {
+    async update(event, log, settings) {
       const windows = useWindows();
       const configSettings = useConfigSettings();
       try {
@@ -397,26 +397,26 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getSettings(_, log) {
+    async get(_, log) {
       const configSettings = useConfigSettings();
       log.debug("return:", configSettings.data);
       return configSettings.data;
     },
   },
   windows: {
-    async getWindowIsFocused(event, log) {
+    async getIsFocused(event, log) {
       const windows = useWindows();
       const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
       log.debug("return:", isFocued);
       return isFocued;
     },
-    async windowMinimize(event, log) {
+    async minimize(event, log) {
       const windows = useWindows();
       const windowInfo = windows.getWindowByEvent(event);
       windowInfo?.window.minimize();
       log.debug(windowInfo?.type);
     },
-    async windowMaximize(event, log) {
+    async maximize(event, log) {
       const windows = useWindows();
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo?.window.isMaximized()) {
@@ -426,32 +426,32 @@ export const ipcFunctions: IpcFunctionsType = {
       windowInfo?.window.maximize();
       log.debug(windowInfo?.type);
     },
-    async windowClose(event, log) {
+    async close(event, log) {
       const windows = useWindows();
       const windowInfo = windows.getWindowByEvent(event);
       windowInfo?.window.close();
       log.debug(windowInfo?.type);
     },
-    async windowActivate(event, log) {
+    async activate(event, log) {
       const windows = useWindows();
       const windowInfo = windows.getWindowByEvent(event);
       windowInfo?.window.moveTop();
       windowInfo?.window.focus();
       log.debug(windowInfo?.type);
     },
-    async windowToggleDevTools(event, log) {
+    async toggleDevTools(event, log) {
       const windows = useWindows();
       const windowInfo = windows.getWindowByEvent(event);
       windowInfo?.window.webContents.toggleDevTools();
       log.debug(windowInfo?.type);
     },
-    async openWindow(event, log, windowName) {
+    async open(event, log, windowName) {
       const windows = useWindows();
       openInBrowserTargetID = undefined;
       log.debug("type:", windowName);
       windows.openWindow(windowName, event);
     },
-    async reloadWindow(event, log) {
+    async reload(event, log) {
       const windows = useWindows();
       const type = windows.reloadWindowByEvent(event);
       log.debug("type:", type);
@@ -463,29 +463,29 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   modals: {
-    async openModal(event, log, label, items) {
+    async open(event, log, label, items) {
       const index = await useModals().open(event, label, items);
       log.debug("return:", index);
       return index;
     },
-    async selectModal(_, log, id, index) {
+    async select(_, log, id, index) {
       useModals().select(id, index);
       log.debug("return:", index);
     },
-    async getModalDatas(_, log) {
+    async getAll(_, log) {
       const datas = useModals().getOrders();
       log.debug(datas);
       return datas;
     },
   },
   downloader: {
-    async openPageDownloader(_, log, urls) {
+    async open(_, log, urls) {
       const windows = useWindows();
       _urls = urls;
       windows.openWindow("pageDownloader");
       usePageDownloaderCache().clear();
     },
-    async addPageDownloaderDatas(_, log, urls) {
+    async add(_, log, urls) {
       _urls = [...urls, ..._urls];
       const windows = useWindows();
       windows.emitMainEvent(
@@ -494,16 +494,16 @@ export const ipcFunctions: IpcFunctionsType = {
         _urls,
       );
     },
-    async getPageDownloaderDatas() {
+    async getAll() {
       return _urls;
     },
   },
   nsfw: {
-    async getShowNSFW(_, log) {
+    async get(_, log) {
       log.debug(getShowNSFW());
       return getShowNSFW();
     },
-    async setShowNSFW(event, log, value) {
+    async set(event, log, value) {
       log.debug(value);
       const windows = useWindows();
       temporaryShowNSFW = value;
@@ -511,7 +511,7 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
   details: {
-    async setDetailsPetaFile(event, log, petaFileId: string) {
+    async set(event, log, petaFileId: string) {
       const petaFilesController = usePetaFilesController();
       const windows = useWindows();
       log.debug(petaFileId);
@@ -526,7 +526,7 @@ export const ipcFunctions: IpcFunctionsType = {
       );
       return;
     },
-    async getDetailsPetaFile(_, log) {
+    async get(_, log) {
       log.debug(detailsPetaFile);
       return detailsPetaFile;
     },

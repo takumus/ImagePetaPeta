@@ -65,10 +65,10 @@ onMounted(async () => {
   IPC.on("detailsPetaFile", (event, petaFile) => {
     petaFileId.value = petaFile.id;
   });
-  petaFileId.value = (await IPC.details.getDetailsPetaFile())?.id;
+  petaFileId.value = (await IPC.details.get())?.id;
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
-    IPC.windows.windowClose();
+    IPC.windows.close();
   });
 });
 const petaFile = computed(() => {

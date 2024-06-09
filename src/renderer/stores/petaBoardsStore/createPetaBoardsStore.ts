@@ -16,7 +16,7 @@ export async function createPetaBoardsStore() {
   const states = ref<{ [petaBoardId: string]: RPetaBoard }>({});
   const boardUpdaters = ref<{ [key: string]: DelayUpdater<RPetaBoard> }>({});
   async function getPetaBoards() {
-    states.value = Object.values(await IPC.petaBoards.getPetaBoards()).reduce(
+    states.value = Object.values(await IPC.petaBoards.getAll()).reduce(
       (petaBoards, petaBoard) => {
         return {
           ...petaBoards,
@@ -33,7 +33,7 @@ export async function createPetaBoardsStore() {
       updater = boardUpdaters.value[board.id] = new DelayUpdater<RPetaBoard>(BOARD_SAVE_DELAY);
       updater.initData(board);
       updater.onUpdate((board) => {
-        IPC.petaBoards.updatePetaBoards([rPetaBoardToPetaBoard(board)], "update");
+        IPC.petaBoards.update([rPetaBoardToPetaBoard(board)], "update");
       });
     });
   }
@@ -50,7 +50,7 @@ export async function createPetaBoardsStore() {
   async function removePetaBoard(petaBoard: RPetaBoard) {
     boardUpdaters.value[petaBoard.id]?.destroy();
     delete boardUpdaters.value[petaBoard.id];
-    await IPC.petaBoards.updatePetaBoards([rPetaBoardToPetaBoard(petaBoard)], "remove");
+    await IPC.petaBoards.update([rPetaBoardToPetaBoard(petaBoard)], "remove");
     await getPetaBoards();
   }
   async function addPetaBoard(fillColor: string, lineColor: string) {
@@ -64,7 +64,7 @@ export async function createPetaBoardsStore() {
       fillColor,
       lineColor,
     );
-    await IPC.petaBoards.updatePetaBoards([board], "insert");
+    await IPC.petaBoards.update([board], "insert");
     await getPetaBoards();
     const addedBoard = states.value[board.id];
     if (addedBoard === undefined) {

@@ -186,7 +186,7 @@ const mutualPetaTags = ref<RPetaTag[]>([]);
 const tagInput = ref<InstanceType<typeof VTextarea>>();
 const currentColor = ref<PetaColor | undefined>();
 async function addTag(name: string) {
-  await IPC.petaFilePetaTags.updatePetaFilesPetaTags(
+  await IPC.petaFilePetaTags.update(
     props.petaFiles.map((petaFile) => petaFile.id),
     [{ type: "name", name }],
     "insert",
@@ -196,7 +196,7 @@ async function addTag(name: string) {
   }, 100);
 }
 async function removeTag(petaTag: RPetaTag) {
-  await IPC.petaFilePetaTags.updatePetaFilesPetaTags(
+  await IPC.petaFilePetaTags.update(
     props.petaFiles.map((petaFile) => petaFile.id),
     [{ type: "id", id: petaTag.id }],
     "remove",

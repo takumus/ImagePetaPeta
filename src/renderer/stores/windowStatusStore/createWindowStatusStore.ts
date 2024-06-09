@@ -6,7 +6,7 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createWindowStatusStore(myWindowName: WindowName) {
   const state = ref({
-    focused: await IPC.windows.getWindowIsFocused(),
+    focused: await IPC.windows.getIsFocused(),
     isMainWindow: (await IPC.windows.getMainWindowName()) === myWindowName,
   });
   IPC.on("windowFocused", (event, focused, windowName) => {

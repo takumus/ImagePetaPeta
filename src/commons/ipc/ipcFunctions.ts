@@ -20,80 +20,77 @@ import { Style } from "@/renderer/styles/styles";
 
 export interface IpcFunctions {
   importer: {
-    browseAndImportFiles: (type: "files" | "directories") => Promise<number>;
-    importFiles: (datas: ImportFileGroup[]) => Promise<string[]>;
+    browse: (type: "files" | "directories") => Promise<number>;
+    import: (datas: ImportFileGroup[]) => Promise<string[]>;
   };
   tasks: {
-    cancelTasks: (ids: string[]) => Promise<void>;
-    confirmFailedTasks: (ids: string[]) => Promise<void>;
-    getTaskStatus: () => Promise<{ [id: string]: TaskStatusWithIndex }>;
+    cancel: (ids: string[]) => Promise<void>;
+    confirmFailed: (ids: string[]) => Promise<void>;
+    getStatus: () => Promise<{ [id: string]: TaskStatusWithIndex }>;
   };
   petaFiles: {
-    getPetaFiles: () => Promise<PetaFiles>;
-    updatePetaFiles: (datas: PetaFile[], mode: UpdateMode) => Promise<boolean>;
-    getPetaFileIds: (params: GetPetaFileIdsParams) => Promise<string[]>;
-    regeneratePetaFiles: () => Promise<void>;
+    getAll: () => Promise<PetaFiles>;
+    update: (datas: PetaFile[], mode: UpdateMode) => Promise<boolean>;
+    getIDs: (params: GetPetaFileIdsParams) => Promise<string[]>;
+    regenerate: () => Promise<void>;
   };
   petaBoards: {
-    getPetaBoards: () => Promise<{ [petaBoardId: string]: PetaBoard }>;
-    updatePetaBoards: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
+    getAll: () => Promise<{ [petaBoardId: string]: PetaBoard }>;
+    update: (boards: PetaBoard[], mode: UpdateMode) => Promise<boolean>;
   };
   petaTags: {
-    getPetaTags: () => Promise<PetaTag[]>;
-    updatePetaTags: (tags: PetaTagLike[], mode: UpdateMode) => Promise<boolean>;
+    getAll: () => Promise<PetaTag[]>;
+    update: (tags: PetaTagLike[], mode: UpdateMode) => Promise<boolean>;
   };
   petaFilePetaTags: {
     getPetaTagIdsByPetaFileIds: (petaFileIds: string[]) => Promise<string[]>;
     getPetaTagCount: (petaTag: PetaTag) => Promise<number>;
-    updatePetaFilesPetaTags: (
+    update: (
       petaFileIds: string[],
       petaTagLikes: PetaTagLike[],
       mode: UpdateMode,
     ) => Promise<boolean>;
   };
   petaTagPartitions: {
-    getPetaTagPartitions: () => Promise<PetaTagPartition[]>;
-    updatePetaTagPartitions: (
-      petaTagPartitions: PetaTagPartition[],
-      mode: UpdateMode,
-    ) => Promise<boolean>;
+    getAll: () => Promise<PetaTagPartition[]>;
+    update: (petaTagPartitions: PetaTagPartition[], mode: UpdateMode) => Promise<boolean>;
   };
   states: {
-    getStates: () => Promise<States>;
-    updateStates: (states: States) => Promise<boolean>;
+    get: () => Promise<States>;
+    update: (states: States) => Promise<boolean>;
   };
   settings: {
-    updateSettings: (settings: Settings) => Promise<boolean>;
-    getSettings: () => Promise<Settings>;
+    update: (settings: Settings) => Promise<boolean>;
+    get: () => Promise<Settings>;
   };
   windows: {
-    getWindowIsFocused: () => Promise<boolean>;
-    openWindow: (windowName: WindowName) => Promise<void>;
+    getIsFocused: () => Promise<boolean>;
+    open: (windowName: WindowName) => Promise<void>;
     getMainWindowName: () => Promise<WindowName | undefined>;
-    windowMaximize: () => Promise<void>;
-    windowMinimize: () => Promise<void>;
-    windowClose: () => Promise<void>;
-    windowActivate: () => Promise<void>;
-    reloadWindow: () => Promise<void>;
-    windowToggleDevTools: () => Promise<void>;
+    maximize: () => Promise<void>;
+    minimize: () => Promise<void>;
+    close: () => Promise<void>;
+    activate: () => Promise<void>;
+    reload: () => Promise<void>;
+    toggleDevTools: () => Promise<void>;
   };
   modals: {
-    openModal: (label: string, items: string[]) => Promise<number>;
-    getModalDatas: () => Promise<{ id: string; label: string; items: string[] }[]>;
-    selectModal: (id: string, index: number) => Promise<void>;
+    open: (label: string, items: string[]) => Promise<number>;
+    getAll: () => Promise<{ id: string; label: string; items: string[] }[]>;
+    select: (id: string, index: number) => Promise<void>;
   };
   downloader: {
-    openPageDownloader: (urls: PageDownloaderData[]) => Promise<void>;
-    addPageDownloaderDatas: (urls: PageDownloaderData[]) => Promise<void>;
-    getPageDownloaderDatas: () => Promise<PageDownloaderData[]>;
+    open: (urls: PageDownloaderData[]) => Promise<void>;
+    add: (urls: PageDownloaderData[]) => Promise<void>;
+    getAll: () => Promise<PageDownloaderData[]>;
   };
   nsfw: {
-    getShowNSFW: () => Promise<boolean>;
-    setShowNSFW: (value: boolean) => Promise<void>;
+    get: () => Promise<boolean>;
+    set: (value: boolean) => Promise<void>;
   };
   details: {
-    setDetailsPetaFile: (petaFileId: string) => Promise<void>;
-    getDetailsPetaFile: () => Promise<PetaFile | undefined>;
+    set: (petaFileId: string) => Promise<void>;
+    get: () => Promise<PetaFile | undefined>;
   };
   common: {
     log: (id: string, ...args: unknown[]) => Promise<boolean>;

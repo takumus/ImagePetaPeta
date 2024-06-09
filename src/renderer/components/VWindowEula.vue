@@ -46,7 +46,7 @@ function disagree() {
   IPC.common.eula(false);
 }
 function close() {
-  IPC.windows.windowClose();
+  IPC.windows.close();
 }
 const needToAgree = computed(() => {
   return settings.state.value.eula !== EULA;

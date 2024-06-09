@@ -15,8 +15,8 @@ import { getDirname } from "@/main/utils/dirname";
 
 const allowedEvents: { [key in keyof IpcFunctions]: (keyof IpcFunctions[key])[] } = {
   common: ["getAppInfo"],
-  importer: ["importFiles"],
-  downloader: ["openPageDownloader", "addPageDownloaderDatas"],
+  importer: ["import"],
+  downloader: ["open", "add"],
   tasks: [],
   petaFiles: [],
   petaBoards: [],
