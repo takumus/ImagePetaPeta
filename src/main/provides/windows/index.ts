@@ -270,7 +270,7 @@ export class Windows {
     target: EmitMainEventTarget,
     p1: C,
     p2: U,
-    ...args: Parameters<IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never>
+    ...args: Parameters<ExtractFunction<IpcEvents[C][U]>>
   ): void {
     const path = `${p1}.${p2 as string}`;
     if (target.type === "all") {
@@ -302,3 +302,4 @@ export type EmitMainEventTarget =
 export type EmitMainEventTargetType = EmitMainEventTarget["type"];
 export const windowsKey = createKey<Windows>("windows");
 export const useWindows = createUseFunction(windowsKey);
+type ExtractFunction<T> = T extends (...args: any[]) => any ? T : never;
