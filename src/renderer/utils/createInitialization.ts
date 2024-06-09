@@ -11,7 +11,7 @@ export function createInitialization() {
       const appInfo = await IPC.common.getAppInfo();
       initializationDOM.style.color = (await IPC.common.getStyle())["--color-font"];
       initializationTitleDOM.innerHTML = `${appInfo.name}-${appInfo.version}`;
-      IPC.common.on("initializationProgress", (e, log) => {
+      IPC.initialization.on("progress", (e, log) => {
         initializationLogDOM.innerHTML = `${log}\n${initializationLogDOM.innerHTML}`
           .split("\n")
           .slice(0, 100)

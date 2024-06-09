@@ -37,7 +37,7 @@ export class PetaTagPartitionsController {
       i18nKey: "tasks.updateDatas",
       status: "complete",
     });
-    windows.emit.common.updatePetaTagPartitions(
+    windows.emit.petaTagPartitions.update(
       { type: "windowNames", windowNames: ["browser"] },
       tags,
       mode,

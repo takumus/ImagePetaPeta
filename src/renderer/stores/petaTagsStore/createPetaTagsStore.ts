@@ -19,7 +19,7 @@ export async function createPetaTagsStore() {
   const eventEmitter = new TypedEventEmitter<{
     update: (petaFileIds: string[], petaTagIds: string[]) => void;
   }>();
-  IPC.common.on("updatePetaTags", async (event, { petaTagIds, petaFileIds }) => {
+  IPC.petaTags.on("update", async (event, { petaTagIds, petaFileIds }) => {
     petaTags.value = (await IPC.petaTags.getAll())
       .map((petaTag) => petaTagToRPetaTag(petaTag))
       .sort((a, b) => {

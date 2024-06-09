@@ -37,7 +37,7 @@ export class PetaTagsController {
       status: "complete",
     });
     // Tileの更新対象は、PetaTagIdsのみ。
-    windows.emit.common.updatePetaTags(
+    windows.emit.petaTags.update(
       {
         type: "windowNames",
         windowNames: ["board", "browser", "details"],

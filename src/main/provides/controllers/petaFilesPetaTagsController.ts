@@ -64,7 +64,7 @@ export class PetaFilesPetaTagsController {
       status: "complete",
     });
     // Tileの更新対象はPetaFileIdsのみ。
-    windows.emit.common.updatePetaTags(
+    windows.emit.petaTags.update(
       { type: "all" },
       {
         petaTagIds: [],

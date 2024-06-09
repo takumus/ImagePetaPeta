@@ -15,7 +15,7 @@ export const statesIPCFunctions: IpcFunctionsType["states"] = {
     try {
       configStates.data = states;
       configStates.save();
-      windows.emit.common.updateStates({ type: "all" }, states);
+      windows.emit.states.update({ type: "all" }, states);
       log.debug("return:", configStates.data);
       return true;
     } catch (e) {

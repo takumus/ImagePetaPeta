@@ -42,7 +42,7 @@ type Data = Omit<PageDownloaderData, "urls" | "referer"> & {
 };
 const images = ref<Data[]>([]);
 onMounted(async () => {
-  IPC.common.on("updatePageDownloaderDatas", (_, urls) => {
+  IPC.pageDownloader.on("update", (_, urls) => {
     order(urls);
   });
   order(await IPC.downloader.getAll());

@@ -14,7 +14,7 @@ export const downloaderIPCFunctions: IpcFunctionsType["downloader"] = {
   async add(_, log, urls) {
     _urls = [...urls, ..._urls];
     const windows = useWindows();
-    windows.emit.common.updatePageDownloaderDatas(
+    windows.emit.pageDownloader.update(
       { type: "windowNames", windowNames: ["pageDownloader"] },
       _urls,
     );

@@ -1,9 +1,9 @@
 <template>
   <e-settings-content-root>
-    <button v-show="regeneratePetaFilesCompleted" @click="regeneratePetaFiles">
+    <button v-show="regenerateCompleted" @click="regeneratePetaFiles">
       {{ t("settings.regeneratePetaFilesButton") }}
     </button>
-    <label v-show="!regeneratePetaFilesCompleted">
+    <label v-show="!regenerateCompleted">
       {{ regeneratePetaFilesDone }}/{{ regeneratePetaFilesCount }}
     </label>
     <p>{{ t("settings.regeneratePetaFilesDescriptions") }}</p>
@@ -31,20 +31,20 @@ import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsSto
 
 const settingsStore = useSettingsStore();
 const { t } = useI18n();
-const regeneratePetaFilesCompleted = ref(true);
+const regenerateCompleted = ref(true);
 const regeneratePetaFilesDone = ref(0);
 const regeneratePetaFilesCount = ref(0);
 onMounted(() => {
-  IPC.common.on("regeneratePetaFilesProgress", (_, done, count) => {
+  IPC.petaFiles.on("regenerateProgress", (_, done, count) => {
     regeneratePetaFilesDone.value = done;
     regeneratePetaFilesCount.value = count;
-    regeneratePetaFilesCompleted.value = false;
+    regenerateCompleted.value = false;
   });
-  IPC.common.on("regeneratePetaFilesBegin", () => {
-    regeneratePetaFilesCompleted.value = false;
+  IPC.petaFiles.on("regenerateBegin", () => {
+    regenerateCompleted.value = false;
   });
-  IPC.common.on("regeneratePetaFilesComplete", () => {
-    regeneratePetaFilesCompleted.value = true;
+  IPC.petaFiles.on("regenerateComplete", () => {
+    regenerateCompleted.value = true;
   });
 });
 function regeneratePetaFiles() {

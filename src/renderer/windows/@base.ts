@@ -94,7 +94,7 @@ export async function create(
     ClickChecker.init();
     app.mount("#app");
   };
-  IPC.common.on("dataInitialized", () => {
+  IPC.initialization.on("complete", () => {
     initVue();
   });
   if (await IPC.common.getIsDataInitialized()) {

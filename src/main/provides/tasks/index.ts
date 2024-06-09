@@ -76,10 +76,7 @@ export class Tasks {
   private emit() {
     const windows = useWindows();
     this.updateWindow();
-    windows.emit.common.taskStatus(
-      { type: "windowNames", windowNames: ["task"] },
-      this.getStatus(),
-    );
+    windows.emit.tasks.status({ type: "windowNames", windowNames: ["task"] }, this.getStatus());
   }
   private remove(task: TaskHandler) {
     setTimeout(() => {

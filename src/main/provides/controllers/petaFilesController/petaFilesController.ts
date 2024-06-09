@@ -47,7 +47,7 @@ export class PetaFilesController {
     }, datas).promise;
     if (mode === "remove") {
       // Tileの更新対象なし
-      windows.emit.common.updatePetaTags(
+      windows.emit.petaTags.update(
         {
           type: "windowNames",
           windowNames: ["board", "browser", "details"],
@@ -58,7 +58,7 @@ export class PetaFilesController {
         },
       );
     }
-    windows.emit.common.updatePetaFiles(
+    windows.emit.petaFiles.update(
       {
         type: "windowNames",
         windowNames: ["board", "browser", "details"],
@@ -96,7 +96,7 @@ export class PetaFilesController {
   public async regenerate() {
     const windows = useWindows();
     const log = useLogger().logMainChunk("PetaFilesController.regenerate");
-    windows.emit.common.regeneratePetaFilesBegin({ type: "all" });
+    windows.emit.petaFiles.regenerateBegin({ type: "all" });
     const petaFiles = this.getAll();
     let completed = 0;
     await ppa(
@@ -107,16 +107,12 @@ export class PetaFilesController {
         }
         await this.update(newPetaFile, "update");
         log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
-        windows.emit.common.regeneratePetaFilesProgress(
-          { type: "all" },
-          completed,
-          petaFiles.length,
-        );
+        windows.emit.petaFiles.regenerateProgress({ type: "all" }, completed, petaFiles.length);
       },
       petaFiles,
       CPU_LENGTH,
     ).promise;
-    windows.emit.common.regeneratePetaFilesComplete({ type: "all" });
+    windows.emit.petaFiles.regenerateComplete({ type: "all" });
   }
   public async verifyFiles() {
     const petaFiles = this.getAll();

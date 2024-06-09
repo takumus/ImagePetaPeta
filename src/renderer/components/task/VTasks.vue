@@ -30,7 +30,7 @@ const { t } = useI18n();
 const taskStatuses = ref<{ [key: string]: TaskStatusWithIndex }>({});
 onMounted(async () => {
   taskStatuses.value = await IPC.tasks.getStatus();
-  IPC.common.on("taskStatus", (e, tasks) => {
+  IPC.tasks.on("status", (e, tasks) => {
     taskStatuses.value = tasks;
     if (
       Object.values(tasks).find((t) => t.status !== "complete" && t.status !== "failed") !==

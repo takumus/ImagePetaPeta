@@ -11,26 +11,46 @@ import { WindowName } from "@/commons/windows";
 import { Style } from "@/renderer/styles/styles";
 
 export interface IpcEvents {
+  petaFiles: {
+    update: (petaFiles: PetaFile[], mode: UpdateMode) => void;
+    regenerateProgress: (done: number, count: number) => void;
+    regenerateBegin: () => void;
+    regenerateComplete: () => void;
+  };
+  petaTags: {
+    update: (updates: { petaTagIds: string[]; petaFileIds: string[] }) => void;
+  };
+  petaTagPartitions: {
+    update: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
+  };
+  windows: {
+    focused: (focused: boolean, windowName: WindowName) => void;
+    mainName: (type: WindowName | undefined) => void;
+  };
+  settings: {
+    update: (settings: Settings) => void;
+  };
+  initialization: {
+    complete: () => void;
+    progress: (log: string) => void;
+  };
+  states: {
+    update: (states: States) => void;
+  };
+  tasks: {
+    status: (tasks: { [id: string]: TaskStatusWithIndex }) => void;
+  };
+  pageDownloader: {
+    update: (urls: PageDownloaderData[]) => void;
+  };
+  modals: {
+    update: () => void;
+  };
   common: {
-    updatePetaFiles: (petaFiles: PetaFile[], mode: UpdateMode) => void;
-    updatePetaTags: (updates: { petaTagIds: string[]; petaFileIds: string[] }) => void;
-    updatePetaTagPartitions: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
-    taskStatus: (tasks: { [id: string]: TaskStatusWithIndex }) => void;
     foundLatestVersion: (remote: RemoteBinaryInfo) => void;
-    windowFocused: (focused: boolean, windowName: WindowName) => void;
-    mainWindowName: (type: WindowName | undefined) => void;
-    regeneratePetaFilesProgress: (done: number, count: number) => void;
-    regeneratePetaFilesBegin: () => void;
-    regeneratePetaFilesComplete: () => void;
-    updateSettings: (settings: Settings) => void;
-    updateStates: (states: States) => void;
     showNSFW: (value: boolean) => void;
     detailsPetaFile: (petaFile: PetaFile) => void;
     style: (value: Style) => void;
-    dataInitialized: () => void;
-    initializationProgress: (log: string) => void;
     openInBrowser: (petaFileID: string) => void;
-    updateModalDatas: () => void;
-    updatePageDownloaderDatas: (urls: PageDownloaderData[]) => void;
   };
 }

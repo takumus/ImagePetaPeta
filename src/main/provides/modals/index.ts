@@ -34,7 +34,7 @@ export class Modals {
         },
       };
       this.orders.push(modalData);
-      windows.emit.common.updateModalDatas({ type: "windowNames", windowNames: ["modal"] });
+      windows.emit.modals.update({ type: "windowNames", windowNames: ["modal"] });
       this.popup.setVisible(true);
     });
   }
@@ -42,7 +42,7 @@ export class Modals {
     const windows = useWindows();
     this.orders.find((modal) => modal.id === id)?.select(index);
     this.orders = this.orders.filter((modalData) => modalData.id !== id);
-    windows.emit.common.updateModalDatas({ type: "windowNames", windowNames: ["modal"] });
+    windows.emit.modals.update({ type: "windowNames", windowNames: ["modal"] });
     if (this.orders.length === 0) {
       this.popup.setVisible(false);
     }
