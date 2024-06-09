@@ -4,7 +4,7 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createNSFWStore() {
   const state = ref(await IPC.nsfw.get());
-  IPC.on("showNSFW", (_, value) => {
+  IPC.common.on("showNSFW", (_, value) => {
     state.value = value;
   });
   function update(value: boolean) {

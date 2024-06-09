@@ -17,6 +17,6 @@ export function getStyle() {
 export function observeDarkMode() {
   nativeTheme.on("updated", () => {
     const windows = useWindows();
-    windows.emitMainEvent({ type: "all" }, "style", getStyle());
+    windows.emitMainEvent({ type: "all" }, "common", "style", getStyle());
   });
 }

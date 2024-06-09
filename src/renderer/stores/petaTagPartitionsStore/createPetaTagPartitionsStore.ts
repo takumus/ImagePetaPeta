@@ -7,7 +7,7 @@ import { IPC } from "@/renderer/libs/ipc";
 
 export async function createPetaTagPartitionsStore() {
   const petaTagPartitions = ref(await IPC.petaTagPartitions.getAll());
-  IPC.on("updatePetaTagPartitions", async () => {
+  IPC.common.on("updatePetaTagPartitions", async () => {
     petaTagPartitions.value = await IPC.petaTagPartitions.getAll();
     // console.log(_petaTagPartitions);
   });

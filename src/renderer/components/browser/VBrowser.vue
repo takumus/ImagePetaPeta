@@ -162,7 +162,7 @@ onMounted(() => {
   thumbnailsSize.value = statesStore.state.value.browserTileSize;
   keyboards.enabled = true;
   keyboards.keys("KeyA").down(keyA);
-  IPC.on("openInBrowser", (_event, petaFileID) => openInBrowser(petaFileID));
+  IPC.common.on("openInBrowser", (_event, petaFileID) => openInBrowser(petaFileID));
   fetchFilteredPetaFiles().then(() => {
     IPC.common.getOpenInBrowserID().then(openInBrowser);
   });

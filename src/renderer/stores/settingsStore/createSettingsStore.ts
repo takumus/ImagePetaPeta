@@ -17,7 +17,7 @@ export async function createSettingsStore() {
   };
   // watch開始。
   let unwatch = watch();
-  IPC.on("updateSettings", (_event, _states) => {
+  IPC.common.on("updateSettings", (_event, _states) => {
     // メインプロセス側からの変更はunwatch
     unwatch();
     // レンダラに適用

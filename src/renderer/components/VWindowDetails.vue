@@ -62,7 +62,7 @@ onMounted(async () => {
     //   });
     // }
   });
-  IPC.on("detailsPetaFile", (event, petaFile) => {
+  IPC.common.on("detailsPetaFile", (event, petaFile) => {
     petaFileId.value = petaFile.id;
   });
   petaFileId.value = (await IPC.details.get())?.id;

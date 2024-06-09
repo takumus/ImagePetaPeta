@@ -35,15 +35,15 @@ const regeneratePetaFilesCompleted = ref(true);
 const regeneratePetaFilesDone = ref(0);
 const regeneratePetaFilesCount = ref(0);
 onMounted(() => {
-  IPC.on("regeneratePetaFilesProgress", (_, done, count) => {
+  IPC.common.on("regeneratePetaFilesProgress", (_, done, count) => {
     regeneratePetaFilesDone.value = done;
     regeneratePetaFilesCount.value = count;
     regeneratePetaFilesCompleted.value = false;
   });
-  IPC.on("regeneratePetaFilesBegin", () => {
+  IPC.common.on("regeneratePetaFilesBegin", () => {
     regeneratePetaFilesCompleted.value = false;
   });
-  IPC.on("regeneratePetaFilesComplete", () => {
+  IPC.common.on("regeneratePetaFilesComplete", () => {
     regeneratePetaFilesCompleted.value = true;
   });
 });

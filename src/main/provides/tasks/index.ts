@@ -78,6 +78,7 @@ export class Tasks {
     this.updateWindow();
     windows.emitMainEvent(
       { type: "windowNames", windowNames: ["task"] },
+      "common",
       "taskStatus",
       this.getStatus(),
     );

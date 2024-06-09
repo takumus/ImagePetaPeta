@@ -16,6 +16,7 @@ export const downloaderIPCFunctions: IpcFunctionsType["downloader"] = {
     const windows = useWindows();
     windows.emitMainEvent(
       { type: "windowNames", windowNames: ["pageDownloader"] },
+      "common",
       "updatePageDownloaderDatas",
       _urls,
     );

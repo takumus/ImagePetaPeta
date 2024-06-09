@@ -6,7 +6,7 @@ import { applyStyle, Style } from "@/renderer/styles/styles";
 export async function createStyleStore() {
   const state = ref(await IPC.common.getStyle());
   applyStyle(state.value);
-  IPC.on("style", (_, value) => {
+  IPC.common.on("style", (_, value) => {
     state.value = value;
     applyStyle(state.value);
   });

@@ -15,6 +15,7 @@ export const detailsIPCFunctions: IpcFunctionsType["details"] = {
     }
     windows.emitMainEvent(
       { type: "windowNames", windowNames: ["details"] },
+      "common",
       "detailsPetaFile",
       detailsPetaFile,
     );

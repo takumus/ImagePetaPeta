@@ -15,7 +15,7 @@ export async function createPetaFilesStore() {
   const eventEmitter = new TypedEventEmitter<{
     update: (changes: RPetaFile[], mode: UpdateMode) => void;
   }>();
-  IPC.on("updatePetaFiles", async (e, newPetaFiles, mode) => {
+  IPC.common.on("updatePetaFiles", async (e, newPetaFiles, mode) => {
     const newRPetaFiles = newPetaFiles.map((petaFile) => petaFileToRPetaFile(petaFile));
     if (mode === "insert" || mode === "update") {
       newRPetaFiles.forEach((newRPetaFile) => {

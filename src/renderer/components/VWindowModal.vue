@@ -31,7 +31,7 @@ const modalDatas = ref<{ id: string; label: string; items: string[] }[]>([]);
 onMounted(async () => {
   windowTitleStore.windowTitle.value = "";
   modalDatas.value = await IPC.modals.getAll();
-  IPC.on("updateModalDatas", async () => {
+  IPC.common.on("updateModalDatas", async () => {
     modalDatas.value = await IPC.modals.getAll();
   });
 });

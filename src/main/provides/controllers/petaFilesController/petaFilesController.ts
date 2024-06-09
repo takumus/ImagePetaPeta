@@ -52,6 +52,7 @@ export class PetaFilesController {
           type: "windowNames",
           windowNames: ["board", "browser", "details"],
         },
+        "common",
         "updatePetaTags",
         {
           petaFileIds: [],
@@ -64,6 +65,7 @@ export class PetaFilesController {
         type: "windowNames",
         windowNames: ["board", "browser", "details"],
       },
+      "common",
       "updatePetaFiles",
       datas,
       mode,
@@ -98,7 +100,7 @@ export class PetaFilesController {
   public async regenerate() {
     const windows = useWindows();
     const log = useLogger().logMainChunk("PetaFilesController.regenerate");
-    windows.emitMainEvent({ type: "all" }, "regeneratePetaFilesBegin");
+    windows.emitMainEvent({ type: "all" }, "common", "regeneratePetaFilesBegin");
     const petaFiles = this.getAll();
     let completed = 0;
     await ppa(
@@ -111,6 +113,7 @@ export class PetaFilesController {
         log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
         windows.emitMainEvent(
           { type: "all" },
+          "common",
           "regeneratePetaFilesProgress",
           completed,
           petaFiles.length,
@@ -119,7 +122,7 @@ export class PetaFilesController {
       petaFiles,
       CPU_LENGTH,
     ).promise;
-    windows.emitMainEvent({ type: "all" }, "regeneratePetaFilesComplete");
+    windows.emitMainEvent({ type: "all" }, "common", "regeneratePetaFilesComplete");
   }
   public async verifyFiles() {
     const petaFiles = this.getAll();

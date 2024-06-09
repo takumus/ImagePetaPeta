@@ -68,6 +68,7 @@ export const ipcFunctions: IpcFunctionsType = {
       windows.openWindow("browser");
       windows.emitMainEvent(
         { windowNames: ["browser"], type: "windowNames" },
+        "common",
         "openInBrowser",
         openInBrowserTargetID,
       );

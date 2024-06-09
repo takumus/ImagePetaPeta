@@ -69,7 +69,7 @@ const tabNames = [
 const tabs = ref<(typeof tabNames)[number][]>([...tabNames]);
 const currentTab = ref<(typeof tabNames)[number]>("general");
 onMounted(async () => {
-  IPC.on("foundLatestVersion", async () => {
+  IPC.common.on("foundLatestVersion", async () => {
     currentTab.value = "update";
   });
   const remoteBinaryInfo = await IPC.common.getLatestVersion();

@@ -42,6 +42,7 @@ export class PetaTagsController {
         type: "windowNames",
         windowNames: ["board", "browser", "details"],
       },
+      "common",
       "updatePetaTags",
       {
         petaTagIds: tagIds.filter((tagId) => tagId !== undefined) as string[],

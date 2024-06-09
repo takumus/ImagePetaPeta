@@ -165,10 +165,10 @@ export class Windows {
     window.setMenuBarVisibility(false);
     window.on("close", () => this.onCloseWindow(type));
     window.addListener("blur", () =>
-      this.emitMainEvent({ type: "all" }, "windowFocused", false, type),
+      this.emitMainEvent({ type: "all" }, "common", "windowFocused", false, type),
     );
     window.addListener("focus", () => {
-      this.emitMainEvent({ type: "all" }, "windowFocused", true, type);
+      this.emitMainEvent({ type: "all" }, "common", "windowFocused", true, type);
       if (keepAliveWindowNames.includes(type)) {
         this.changeMainWindow(type);
       }
@@ -191,7 +191,7 @@ export class Windows {
   }
   changeMainWindow(type: WindowName) {
     this.mainWindowName = type;
-    this.emitMainEvent({ type: "all" }, "mainWindowName", type);
+    this.emitMainEvent({ type: "all" }, "common", "mainWindowName", type);
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
@@ -248,28 +248,30 @@ export class Windows {
     this.reloadWindow(type);
     return type;
   }
-  emitMainEvent<U extends keyof IpcEvents>(
+  emitMainEvent<C extends keyof IpcEvents, U extends keyof IpcEvents[C]>(
     target: EmitMainEventTarget,
+    cat: C,
     key: U,
-    ...args: Parameters<IpcEvents[U]>
+    ...args: Parameters<IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never>
   ): void {
+    const path = `${cat}.${key as string}`;
     if (target.type === "all") {
       Object.values(this.windows).forEach((window) => {
         if (windowIs.alive(window)) {
-          window.webContents.send(key, ...args);
+          window.webContents.send(path, ...args);
         }
       });
     } else if (target.type === "windows") {
       target.windows.forEach((window) => {
         if (windowIs.alive(window)) {
-          window.webContents.send(key, ...args);
+          window.webContents.send(path, ...args);
         }
       });
     } else if (target.type === "windowNames") {
       target.windowNames.forEach((type) => {
         const window = this.windows[type];
         if (windowIs.alive(window)) {
-          window.webContents.send(key, ...args);
+          window.webContents.send(path, ...args);
         }
       });
     }

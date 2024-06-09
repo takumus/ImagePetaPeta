@@ -30,9 +30,9 @@ export const settingsIPCFunctions: IpcFunctionsType["settings"] = {
         }
       });
       configSettings.save();
-      windows.emitMainEvent({ type: "all" }, "updateSettings", settings);
-      windows.emitMainEvent({ type: "all" }, "showNSFW", useNSFW().getShowNSFW());
-      windows.emitMainEvent({ type: "all" }, "style", getStyle());
+      windows.emitMainEvent({ type: "all" }, "common", "updateSettings", settings);
+      windows.emitMainEvent({ type: "all" }, "common", "showNSFW", useNSFW().getShowNSFW());
+      windows.emitMainEvent({ type: "all" }, "common", "style", getStyle());
       log.debug("return:", configSettings.data);
       return true;
     } catch (e) {

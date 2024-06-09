@@ -17,7 +17,7 @@ export async function createStatesStore() {
   };
   // watch開始。
   let unwatch = watch();
-  IPC.on("updateStates", (_event, _states) => {
+  IPC.common.on("updateStates", (_event, _states) => {
     // メインプロセス側からの変更はunwatch
     unwatch();
     // レンダラに適用

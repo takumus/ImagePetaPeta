@@ -9,12 +9,12 @@ export async function createWindowStatusStore(myWindowName: WindowName) {
     focused: await IPC.windows.getIsFocused(),
     isMainWindow: (await IPC.windows.getMainWindowName()) === myWindowName,
   });
-  IPC.on("windowFocused", (event, focused, windowName) => {
+  IPC.common.on("windowFocused", (event, focused, windowName) => {
     if (myWindowName === windowName) {
       state.value.focused = focused;
     }
   });
-  IPC.on("mainWindowName", (event, type) => {
+  IPC.common.on("mainWindowName", (event, type) => {
     state.value.isMainWindow = type === myWindowName;
   });
   return {
