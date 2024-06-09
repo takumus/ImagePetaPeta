@@ -55,10 +55,9 @@ export class PetaTagsController {
     return dbPetaTags.getAll();
   }
   private async updatePetaTag(petaTagLike: PetaTagLike, mode: UpdateMode) {
-    const logger = useLogger();
     const dbPetaTags = useDBPetaTags();
     const petaFilesPetaTags = usePetaFilesPetaTagsController();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     log.debug("##Update PetaTag");
     if (petaTagLike.type === "petaTag") {
       log.debug("mode:", mode);

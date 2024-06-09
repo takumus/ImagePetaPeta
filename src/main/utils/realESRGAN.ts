@@ -19,10 +19,9 @@ import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
 export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANModelName) {
   const paths = usePaths();
-  const logger = useLogger();
   const tasks = useTasks();
   const task = tasks.spawn("realESRGAN", false);
-  const log = logger.logMainChunk();
+  const log = useLogger().logMainChunk();
   const { execFilePath, modelFilePath } = getFilePath();
   log.debug("execFilePath:", execFilePath);
   await setPermisionTo755(execFilePath);

@@ -46,9 +46,8 @@ export class PetaTagPartitionsController {
     return true;
   }
   async updatePetaTagPartition(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
-    const logger = useLogger();
     const dbPetaTagPartitions = useDBPetaTagPartitions();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     log.debug("##Update PetaTagPartition");
     log.debug("mode:", mode);
     log.debug("tag:", minimizeID(petaPetaTagPartition.id));

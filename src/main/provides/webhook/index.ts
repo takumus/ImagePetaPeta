@@ -26,8 +26,6 @@ export class WebHook extends TypedEventEmitter<{
   private webAPIKey = createWebhookAPIKey();
   constructor(private ipcFunctions: IpcFunctionsType) {
     super();
-    const logger = useLogger();
-    const log = logger.logMainChunk();
     this.http = express();
     this.http.use(cors());
     this.http.use("/api", (req, res, next) => {
@@ -54,9 +52,8 @@ export class WebHook extends TypedEventEmitter<{
     this.initAPI();
   }
   private initAPI() {
-    const logger = useLogger();
     this.http.post("/api", async (req, res) => {
-      const executeLog = logger.logMainChunk();
+      const executeLog = useLogger().logMainChunk();
       try {
         const eventName = (req.body.event as string).split(".") as [string, string];
         console.log(eventName);
@@ -85,8 +82,7 @@ export class WebHook extends TypedEventEmitter<{
     });
   }
   public async open(port: number) {
-    const logger = useLogger();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     log.debug(`$Webhook(open): begin`, port);
     if (this.server !== undefined) {
       log.debug(`$Webhook(open): already opened`);
@@ -107,8 +103,7 @@ export class WebHook extends TypedEventEmitter<{
     });
   }
   public async close() {
-    const logger = useLogger();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     const server = this.server;
     log.debug(`$Webhook(close): begin`);
     if (server === undefined) {

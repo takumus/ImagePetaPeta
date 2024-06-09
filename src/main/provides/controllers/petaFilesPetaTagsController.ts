@@ -167,9 +167,8 @@ export class PetaFilesPetaTagsController {
     await dbPetaFilesPetaTags.remove({ [by]: id });
   }
   private async updatePetaFilePetaTag(petaFilePetaTag: PetaFilePetaTag, mode: UpdateMode) {
-    const logger = useLogger();
     const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     log.debug("##Update PetaFilePetaTag");
     log.debug("mode:", mode);
     log.debug("tag:", minimizeID(petaFilePetaTag.id));

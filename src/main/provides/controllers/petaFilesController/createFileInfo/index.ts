@@ -20,9 +20,8 @@ export const createFileInfo = {
     ua?: string,
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
-    const logger = useLogger();
     const paths = usePaths();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     try {
       log.debug("## Create File Info URL");
       let buffer: Buffer | undefined;
@@ -82,9 +81,8 @@ export const createFileInfo = {
     bufferLike: ArrayBuffer | Buffer,
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
-    const logger = useLogger();
     const paths = usePaths();
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     try {
       log.debug("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());

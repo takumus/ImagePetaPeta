@@ -32,9 +32,8 @@ export class Windows {
   activeWindows: { [key in WindowName]?: boolean } = {};
   mainWindowName: WindowName | undefined;
   onCloseWindow(type: WindowName) {
-    const logger = useLogger();
     const quit = useQuit();
-    logger.logMainChunk().debug("$Close Window:", type);
+    useLogger().logMainChunk().debug("$Close Window:", type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
     const activeMainWindowName = keepAliveWindowNames.reduce<WindowName | undefined>(
@@ -79,8 +78,7 @@ export class Windows {
     }
   }
   openWindow(windowName: WindowName, event?: IpcMainInvokeEvent | BrowserWindow, modal = false) {
-    const logger = useLogger();
-    logger.logMainChunk().debug("$Open Window:", windowName);
+    useLogger().logMainChunk().debug("$Open Window:", windowName);
     const position = new Vec2();
     const window =
       event !== undefined
@@ -193,8 +191,7 @@ export class Windows {
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
-    const logger = useLogger();
-    logger.logMainChunk().debug("$Save Window States:", windowName);
+    useLogger().logMainChunk().debug("$Save Window States:", windowName);
     let state = configWindowStates.data[windowName];
     if (state === undefined) {
       state = configWindowStates.data[windowName] = {

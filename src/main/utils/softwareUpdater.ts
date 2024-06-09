@@ -7,12 +7,11 @@ import { getLatestVersion } from "@/main/utils/versions";
 
 let checkUpdateTimeoutHandler: NodeJS.Timeout | undefined;
 export async function checkAndNotifySoftwareUpdate() {
-  const logger = useLogger();
   const windows = useWindows();
   if (checkUpdateTimeoutHandler) {
     clearTimeout(checkUpdateTimeoutHandler);
   }
-  const log = logger.logMainChunk();
+  const log = useLogger().logMainChunk();
   log.debug("$Check Update");
   const remote: RemoteBinaryInfo = await getLatestVersion();
   log.debug(remote);

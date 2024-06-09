@@ -99,13 +99,12 @@ export class FileImporter {
     silent = false,
   ) {
     const controller = usePetaFilesController();
-    const logger = useLogger();
     const tasks = useTasks();
     if (params.fileInfos.length === 0) {
       return [];
     }
     const task = tasks.spawn("importFilesFromFilePaths", silent);
-    const log = logger.logMainChunk();
+    const log = useLogger().logMainChunk();
     log.debug("## Import Images From File Paths");
     const fileInfos: ImportFileInfo[] = [];
     if (params.extract) {

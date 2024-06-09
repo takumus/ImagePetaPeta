@@ -58,15 +58,13 @@ let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
   common: {
     async browseAndImportFiles(event, type) {
-      const logger = useLogger();
       const fileImporter = useFileImporter();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Browse Image Files");
       return await fileImporter.browseFiles(event, type);
     },
     async cancelTasks(event, ids) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       const tasks = useTasks();
       log.debug("#Cancel Tasks");
       tasks.cancel(ids);
@@ -76,17 +74,15 @@ export const ipcFunctions: IpcFunctionsType = {
       return useTasks().getStatus();
     },
     async confirmFailedTasks(event, ids) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       const tasks = useTasks();
       log.debug("#Confirm Failed Tasks");
       tasks.confirmFailed(ids);
       return;
     },
     async getPetaFiles() {
-      const logger = useLogger();
       const petaFilesController = usePetaFilesController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Get PetaFiles");
         const petaFiles = petaFilesController.getAllAsMap();
@@ -104,9 +100,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return {};
     },
     async updatePetaFiles(event, datas, mode) {
-      const logger = useLogger();
       const petaFilesController = usePetaFilesController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Update PetaFiles");
         await petaFilesController.updateMultiple(datas, mode);
@@ -124,9 +119,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async getPetaBoards() {
-      const logger = useLogger();
       const petaBoardsController = usePetaBoardsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Get PetaBoards");
         const petaBoards = await petaBoardsController.getAllAsMap();
@@ -157,9 +151,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return {};
     },
     async updatePetaBoards(event, boards, mode) {
-      const logger = useLogger();
       const petaBoardsController = usePetaBoardsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Update PetaBoards");
         await petaBoardsController.updateMultiple(boards, mode);
@@ -177,9 +170,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async updatePetaTags(event, tags, mode) {
-      const logger = useLogger();
       const petaTagsController = usePetaTagsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Update PetaTags");
         await petaTagsController.updateMultiple(tags, mode);
@@ -197,9 +189,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async updatePetaFilesPetaTags(event, petaFileIds, petaTagLikes, mode) {
-      const logger = useLogger();
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Update PetaFilesPetaTags");
         await petaFilesPetaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
@@ -217,9 +208,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async updatePetaTagPartitions(event, partitions, mode) {
-      const logger = useLogger();
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Update PetaFilesPetaTags");
         await petaTagpartitionsController.updateMultiple(partitions, mode);
@@ -237,9 +227,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async getPetaTagPartitions() {
-      const logger = useLogger();
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Get PetaTagPartitions");
         const petaTagPartitions = await petaTagpartitionsController.getAll();
@@ -257,9 +246,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     },
     async getPetaFileIds(event, params) {
-      const logger = useLogger();
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Get PetaFileIds");
         log.debug("type:", params.type);
@@ -278,9 +266,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     },
     async getPetaTagIdsByPetaFileIds(event, petaFileIds) {
-      const logger = useLogger();
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         const petaTagIds =
           await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
@@ -297,9 +284,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     },
     async getPetaTags() {
-      const logger = useLogger();
       const petaTagsController = usePetaTagsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Get PetaTags");
         const petaTags = await petaTagsController.getAll();
@@ -317,9 +303,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     },
     async getPetaTagCount(event, petaTag) {
-      const logger = useLogger();
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Get PetaTagCount");
         const petaTagCount = await petaFilesPetaTagsController.getPetaTagCount(petaTag);
@@ -337,27 +322,23 @@ export const ipcFunctions: IpcFunctionsType = {
       return -1;
     },
     async log(event, id, ...args) {
-      const dataLogger = useLogger();
-      dataLogger.log(LogFrom.RENDERER, id, ...args);
+      useLogger().log(LogFrom.RENDERER, id, ...args);
       return true;
     },
     async openURL(event, url) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Open URL");
       log.debug("url:", url);
       shell.openExternal(url);
       return true;
     },
     async openFile(event, petaFile) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Open Image File");
       shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
     },
     async getAppInfo() {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Get App Info");
       const info: AppInfo = {
         name: app.getName(),
@@ -369,33 +350,29 @@ export const ipcFunctions: IpcFunctionsType = {
       return info;
     },
     async showDBFolder() {
-      const logger = useLogger();
       const paths = usePaths();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Show DB Folder");
       shell.showItemInFolder(paths.DIR_ROOT);
       return true;
     },
     async showConfigFolder() {
-      const logger = useLogger();
       const paths = usePaths();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Show Config Folder");
       shell.showItemInFolder(paths.DIR_APP);
       return true;
     },
     async showImageInFolder(event, petaFile) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Show Image In Folder");
       shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
       return true;
     },
     async updateSettings(event, settings) {
-      const logger = useLogger();
       const windows = useWindows();
       const configSettings = useConfigSettings();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Update Settings");
         if (configSettings.data.web !== settings.web) {
@@ -430,33 +407,29 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async getSettings() {
-      const logger = useLogger();
       const configSettings = useConfigSettings();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Get Settings");
       log.debug("return:", configSettings.data);
       return configSettings.data;
     },
     async getWindowIsFocused(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Get Window Is Focused");
       const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
       log.debug("return:", isFocued);
       return isFocued;
     },
     async windowMinimize(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Window Minimize");
       windows.getWindowByEvent(event)?.window.minimize();
     },
     async windowMaximize(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Window Maximize");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo?.window.isMaximized()) {
@@ -466,9 +439,8 @@ export const ipcFunctions: IpcFunctionsType = {
       windowInfo?.window.maximize();
     },
     async windowClose(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Window Close");
       windows.getWindowByEvent(event)?.window.close();
     },
@@ -478,23 +450,20 @@ export const ipcFunctions: IpcFunctionsType = {
       windows.getWindowByEvent(event)?.window.focus();
     },
     async windowToggleDevTools(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Toggle Dev Tools");
       windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
     },
     async getPlatform() {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Get Platform");
       log.debug("return:", process.platform);
       return process.platform;
     },
     async regeneratePetaFiles() {
-      const logger = useLogger();
       const petaFilesController = usePetaFilesController();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Regenerate Thumbnails");
         await petaFilesController.regeneratePetaFiles();
@@ -511,9 +480,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return;
     },
     async browsePetaFileDirectory(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Browse PetaFile Directory");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo) {
@@ -540,10 +508,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return "";
     },
     async changePetaFileDirectory(event, path) {
-      const logger = useLogger();
-      const paths = usePaths();
       const configSettings = useConfigSettings();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Change PetaFile Directory");
         path = Path.resolve(path);
@@ -563,15 +529,13 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async getStates() {
-      const logger = useLogger();
       const configStates = useConfigStates();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Get States");
       return configStates.data;
     },
     async realESRGANConvert(event, petaFiles, modelName) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#Real-ESRGAN Convert");
         const result = (await realESRGAN(petaFiles, modelName)).map((petaFile) => petaFile.id);
@@ -583,7 +547,6 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     },
     async startDrag(event, petaFiles) {
-      const paths = usePaths();
       const windows = useWindows();
       const first = petaFiles[0];
       if (!first) {
@@ -601,9 +564,8 @@ export const ipcFunctions: IpcFunctionsType = {
       });
     },
     async updateStates(event, states) {
-      const logger = useLogger();
       const configStates = useConfigStates();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       const windows = useWindows();
       try {
         log.debug("#Update States");
@@ -618,9 +580,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return false;
     },
     async importFiles(event, datas) {
-      const logger = useLogger();
       const fileImporter = useFileImporter();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       try {
         log.debug("#importFiles");
         log.debug(datas.length, datas);
@@ -633,18 +594,16 @@ export const ipcFunctions: IpcFunctionsType = {
       return [];
     },
     async openWindow(event, windowName) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       openInBrowserTargetID = undefined;
       log.debug("#Open Window");
       log.debug("type:", windowName);
       windows.openWindow(windowName, event);
     },
     async openInBrowser(_event, petaFile) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#OpenBrowserAndOpenInBrowser");
       openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
       windows.openWindow("browser");
@@ -658,9 +617,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return openInBrowserTargetID;
     },
     async reloadWindow(event) {
-      const logger = useLogger();
       const windows = useWindows();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Reload Window");
       const type = windows.reloadWindowByEvent(event);
       log.debug("type:", type);
@@ -678,8 +636,7 @@ export const ipcFunctions: IpcFunctionsType = {
       windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, petaFile) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#Search Image By Google");
       try {
         await searchImageByGoogle(getPetaFilePath.fromPetaFile(petaFile).thumbnail);
@@ -718,9 +675,8 @@ export const ipcFunctions: IpcFunctionsType = {
       return getLatestVersion();
     },
     async eula(event, agree) {
-      const logger = useLogger();
       const configSettings = useConfigSettings();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       const quit = useQuit();
       log.debug("#EULA");
       log.debug(agree ? "agree" : "disagree", EULA);
@@ -771,16 +727,14 @@ export const ipcFunctions: IpcFunctionsType = {
       );
     },
     async openModal(event, label, items) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#OpenModal");
       const index = await useModals().open(event, label, items);
       log.debug("return:", index);
       return index;
     },
     async selectModal(_, id, index) {
-      const logger = useLogger();
-      const log = logger.logMainChunk();
+      const log = useLogger().logMainChunk();
       log.debug("#SelectModal");
       useModals().select(id, index);
       log.debug("return:", index);
