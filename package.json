@@ -8,7 +8,6 @@
   "main": "_electronTemp/dist/main/index.mjs",
   "type": "module",
   "scripts": {
-    "prepare": "npm run generate-assets",
     "dev": "tsx ./scripts/dev.ts",
     "dev-pre": "tsx ./scripts/devPrebuild.ts",
     "dev:app": "vite --config vite.app.config.ts",
