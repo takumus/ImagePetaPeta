@@ -33,7 +33,7 @@ export class PetaFilesController {
       log: [],
       status: "begin",
     });
-    const update = async (data: PetaFile, index: number) => {
+    await ppa(async (data: PetaFile, index: number) => {
       await this.update(data, mode);
       task.emitStatus({
         i18nKey: "tasks.updateDatas",
@@ -44,8 +44,7 @@ export class PetaFilesController {
         log: [data.id],
         status: "progress",
       });
-    };
-    await ppa(update, datas).promise;
+    }, datas).promise;
     if (mode === UpdateMode.REMOVE) {
       // Tileの更新対象なし
       windows.emitMainEvent(
@@ -75,7 +74,7 @@ export class PetaFilesController {
       status: "complete",
     });
   }
-  async getPetaFile(id: string) {
+  public async getPetaFile(id: string) {
     const dbPetaFiles = useDBPetaFiles();
     const petaFile = (await dbPetaFiles.find({ id }))[0];
     if (petaFile === undefined) {
@@ -83,7 +82,7 @@ export class PetaFilesController {
     }
     return petaFile;
   }
-  async getAll() {
+  public getAllAsMap() {
     const dbPetaFiles = useDBPetaFiles();
     const data = dbPetaFiles.getAll();
     const petaFiles: PetaFiles = {};
@@ -92,57 +91,39 @@ export class PetaFilesController {
     });
     return petaFiles;
   }
-  private async update(petaFile: PetaFile, mode: UpdateMode) {
+  public getAll() {
     const dbPetaFiles = useDBPetaFiles();
-    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-    const logger = useLogger();
-    const log = logger.logMainChunk();
-    log.debug("##Update PetaFile");
-    log.debug("mode:", mode);
-    log.debug("image:", minimizeID(petaFile.id));
-    if (mode === UpdateMode.REMOVE) {
-      await petaFilesPetaTagsController.remove(petaFile.id, "petaFileId");
-      await dbPetaFiles.remove({ id: petaFile.id });
-      const path = getPetaFilePath.fromPetaFile(petaFile);
-      await rm(path.original).catch(() => {
-        //
-      });
-      await rm(path.thumbnail).catch(() => {
-        //
-      });
-    } else if (mode === UpdateMode.UPDATE) {
-      await dbPetaFiles.update({ id: petaFile.id }, petaFile);
-    } else {
-      await dbPetaFiles.insert(petaFile);
-    }
-    return true;
+    return dbPetaFiles.getAll();
   }
-  async regeneratePetaFiles() {
+  public async regeneratePetaFiles() {
     const logger = useLogger();
     const windows = useWindows();
     const log = logger.logMainChunk();
     windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regeneratePetaFilesBegin");
-    const petaFiles = Object.values(await this.getAll());
+    const petaFiles = this.getAll();
     let completed = 0;
-    const generate = async (petaFile: PetaFile) => {
-      const newPetaFile = await regeneratePetaFile(petaFile);
-      if (newPetaFile === undefined) {
-        return;
-      }
-      await this.update(newPetaFile, UpdateMode.UPDATE);
-      log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
-      windows.emitMainEvent(
-        { type: EmitMainEventTargetType.ALL },
-        "regeneratePetaFilesProgress",
-        completed,
-        petaFiles.length,
-      );
-    };
-    await ppa((pf) => generate(pf), petaFiles, CPU_LENGTH).promise;
+    await ppa(
+      async (petaFile: PetaFile) => {
+        const newPetaFile = await regeneratePetaFile(petaFile);
+        if (newPetaFile === undefined) {
+          return;
+        }
+        await this.update(newPetaFile, UpdateMode.UPDATE);
+        log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
+        windows.emitMainEvent(
+          { type: EmitMainEventTargetType.ALL },
+          "regeneratePetaFilesProgress",
+          completed,
+          petaFiles.length,
+        );
+      },
+      petaFiles,
+      CPU_LENGTH,
+    ).promise;
     windows.emitMainEvent({ type: EmitMainEventTargetType.ALL }, "regeneratePetaFilesComplete");
   }
-  async verifyFiles() {
-    const petaFiles = Object.values(await this.getAll());
+  public async verifyFiles() {
+    const petaFiles = this.getAll();
     usePetaFilesPetaTagsController();
     let brokenPetaTag = (await usePetaTagsController().getPetaTags()).find(
       (p) => p.name === "broken",
@@ -167,29 +148,32 @@ export class PetaFilesController {
     (await usePetaTagsController().getPetaTags()).find((p) => p.name === "broken");
     const errorIDs: string[] = [];
     let count = 0;
-    const verify = async (petaFile: PetaFile) => {
-      try {
-        const paths = getPetaFilePath.fromPetaFile(petaFile);
-        await stat(paths.original);
-        await stat(paths.thumbnail);
-        if (
-          (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "original")))?.mime !==
-          petaFile.metadata.mimeType
-        ) {
-          throw "original is broken";
+    await ppa(
+      async (petaFile: PetaFile) => {
+        try {
+          const paths = getPetaFilePath.fromPetaFile(petaFile);
+          await stat(paths.original);
+          await stat(paths.thumbnail);
+          if (
+            (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "original")))?.mime !==
+            petaFile.metadata.mimeType
+          ) {
+            throw "original is broken";
+          }
+          if (
+            (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "thumbnail")))?.mime !==
+            "image/webp"
+          ) {
+            throw "thumb is broken";
+          }
+        } catch (err) {
+          errorIDs.push(petaFile.id);
         }
-        if (
-          (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "thumbnail")))?.mime !==
-          "image/webp"
-        ) {
-          throw "thumb is broken";
-        }
-      } catch (err) {
-        errorIDs.push(petaFile.id);
-      }
-      console.log(++count, "/", petaFiles.length);
-    };
-    await ppa((pf) => verify(pf), petaFiles, CPU_LENGTH).promise;
+        console.log(++count, "/", petaFiles.length);
+      },
+      petaFiles,
+      CPU_LENGTH,
+    ).promise;
     await usePetaFilesPetaTagsController().updatePetaFilesPetaTags(
       errorIDs,
       [{ type: "id", id: brokenPetaTag.id }],
@@ -198,8 +182,8 @@ export class PetaFilesController {
     );
     console.log("error:", errorIDs.length, "/", petaFiles.length);
   }
-  async encryptAll(mode: keyof typeof secureFile) {
-    const petaFiles = Object.values(await this.getAll()).filter(
+  public async encryptAll(mode: keyof typeof secureFile) {
+    const petaFiles = this.getAll().filter(
       (pf) => (mode === "encrypt" && !pf.encrypted) || (mode === "decrypt" && pf.encrypted),
     );
     const key = useConfigSecureFilePassword().getKey();
@@ -231,7 +215,7 @@ export class PetaFilesController {
     ).promise;
     console.log("complete");
   }
-  async removeTrashs() {
+  public async removeTrashs() {
     const files = (
       await Promise.all([
         file.readDirRecursive(usePaths().DIR_IMAGES).files,
@@ -248,6 +232,31 @@ export class PetaFilesController {
         }
       }
     }, files).promise;
+  }
+  private async update(petaFile: PetaFile, mode: UpdateMode) {
+    const dbPetaFiles = useDBPetaFiles();
+    const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
+    const logger = useLogger();
+    const log = logger.logMainChunk();
+    log.debug("##Update PetaFile");
+    log.debug("mode:", mode);
+    log.debug("image:", minimizeID(petaFile.id));
+    if (mode === UpdateMode.REMOVE) {
+      await petaFilesPetaTagsController.remove(petaFile.id, "petaFileId");
+      await dbPetaFiles.remove({ id: petaFile.id });
+      const path = getPetaFilePath.fromPetaFile(petaFile);
+      await rm(path.original).catch(() => {
+        //
+      });
+      await rm(path.thumbnail).catch(() => {
+        //
+      });
+    } else if (mode === UpdateMode.UPDATE) {
+      await dbPetaFiles.update({ id: petaFile.id }, petaFile);
+    } else {
+      await dbPetaFiles.insert(petaFile);
+    }
+    return true;
   }
 }
 export const petaFilesControllerKey = createKey<PetaFilesController>("petaFilesController");

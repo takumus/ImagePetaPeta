@@ -106,7 +106,7 @@ describe("petaFilesController", () => {
       UpdateMode.UPDATE,
     );
     expect(petaFiles.length, "petaFiles.length").toBe(8);
-    Object.values(await pfc.getAll()).forEach((petaFile) => {
+    pfc.getAll().forEach((petaFile) => {
       expect(petaFile?.name, "name").toBe("newImage");
     });
     await useDBS().waitUntilKillable();
@@ -118,7 +118,7 @@ describe("petaFilesController", () => {
       fileInfos: [{ name: "test", note: "", path: resolve("./test/sampleDatas") }],
       extract: true,
     });
-    const petaFiles = Object.values(await pfc.getAll());
+    const petaFiles = pfc.getAll();
     expect(petaFiles.length, "petaFiles.length").toBe(8);
     const prevThumbHashs = await ppa(
       async (pf) => fileSHA256(getPetaFilePath.fromPetaFile(pf).thumbnail),
@@ -132,7 +132,7 @@ describe("petaFilesController", () => {
       petaFiles,
     ).promise;
     expect(prevThumbHashs).toEqual(newThumbHashs);
-    expect(prevPFs).toEqual(Object.values(await pfc.getAll()));
+    expect(prevPFs).toEqual(pfc.getAll());
     await useDBS().waitUntilKillable();
   });
   test("encryptTempFile", async () => {
@@ -153,7 +153,7 @@ describe("petaFilesController", () => {
         extract: true,
       });
     }
-    const petaFile = Object.values(await pfc.getAll())[0];
+    const petaFile = Object.values(pfc.getAll())[0];
     expect(correctHash).toBe(petaFile.id);
     await useDBS().waitUntilKillable();
   });

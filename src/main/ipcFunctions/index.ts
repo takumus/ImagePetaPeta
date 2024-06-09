@@ -90,7 +90,7 @@ export const ipcFunctions: IpcFunctionsType = {
       const log = logger.logMainChunk();
       try {
         log.debug("#Get PetaFiles");
-        const petaFiles = await petaFilesController.getAll();
+        const petaFiles = petaFilesController.getAllAsMap();
         log.debug("return:", true);
         return petaFiles;
       } catch (e) {

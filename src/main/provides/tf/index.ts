@@ -77,7 +77,7 @@ export class TF {
         });
         console.timeEnd(`simimg[${i}]`);
       },
-      Object.values(await usePetaFilesController().getAll()),
+      usePetaFilesController().getAll(),
       CPU_LENGTH,
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
