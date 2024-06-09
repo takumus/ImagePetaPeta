@@ -4,46 +4,37 @@ import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } fro
 
 import { AppInfo } from "@/commons/datas/appInfo";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
-import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
-import { createPetaBoard } from "@/commons/datas/petaBoard";
-import { PetaFile } from "@/commons/datas/petaFile";
-import {
-  BOARD_DEFAULT_NAME,
-  CHROME_EXTENSION_VERSION,
-  EULA,
-  FILENAME_DB_INFO,
-  WEBHOOK_PORT,
-} from "@/commons/defines";
+import { CHROME_EXTENSION_VERSION, EULA, FILENAME_DB_INFO, WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { ObjectKeys } from "@/commons/utils/objectKeys";
-import { WindowName } from "@/commons/windows";
 
 import { extraFiles } from "@/_defines/extraFiles";
 import Transparent from "@/_public/images/utils/transparent.png";
-import { showError } from "@/main/errorWindow";
+import { detailsIPCFunctions } from "@/main/ipcFunctions/details";
+import { downloaderIPCFunctions } from "@/main/ipcFunctions/downloader";
+import { importerIPCFunctions } from "@/main/ipcFunctions/importer";
+import { modalsIPCFunctions } from "@/main/ipcFunctions/modals";
+import { nsfwIPCFunctions } from "@/main/ipcFunctions/nsfw";
+import { petaBoardsIPCFunctions } from "@/main/ipcFunctions/petaBoards";
+import { petaFilePetaTagsIPCFunctions } from "@/main/ipcFunctions/petaFilePetaTags";
+import { petaFilesIPCFunctions } from "@/main/ipcFunctions/petaFiles";
+import { petaTagPartitionsIPCFunctions } from "@/main/ipcFunctions/petaTagPartitions";
+import { petaTagsIPCFunctions } from "@/main/ipcFunctions/petaTags";
+import { settingsIPCFunctions } from "@/main/ipcFunctions/settings";
+import { statesIPCFunctions } from "@/main/ipcFunctions/states";
+import { tasksIPCFunctions } from "@/main/ipcFunctions/tasks";
+import { windowsIPCFunctions } from "@/main/ipcFunctions/windows";
 import * as file from "@/main/libs/file";
-import {
-  useConfigSecureFilePassword,
-  useConfigSettings,
-  useConfigStates,
-} from "@/main/provides/configs";
-import { usePetaBoardsController } from "@/main/provides/controllers/petaBoardsController";
+import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
-import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
-import { usePetaTagPartitionsCOntroller } from "@/main/provides/controllers/petaTagPartitionsController";
-import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
-import { useFileImporter } from "@/main/provides/fileImporter";
-import { useModals } from "@/main/provides/modals";
-import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
-import { useTasks } from "@/main/provides/tasks";
 import { TF } from "@/main/provides/tf";
 import { LogFrom, useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
-import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
+import { useWindows } from "@/main/provides/windows";
 import { getStyle } from "@/main/utils/darkMode";
 import { getIPs } from "@/main/utils/getIPs";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
@@ -53,484 +44,22 @@ import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
 import { getLatestVersion } from "@/main/utils/versions";
 
-let temporaryShowNSFW = false;
-let detailsPetaFile: PetaFile | undefined;
 let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
-  importer: {
-    async browse(event, logger, type) {
-      const fileImporter = useFileImporter();
-      const files = await fileImporter.browseFiles(event, type);
-      logger.debug(files);
-      return files;
-    },
-    async import(event, log, datas) {
-      const fileImporter = useFileImporter();
-      try {
-        log.debug(datas.length, datas);
-        const petaFileIds = await fileImporter.importFilesFromImportFileGroup(datas);
-        log.debug("return:", petaFileIds.length);
-        return petaFileIds;
-      } catch (e) {
-        log.error(e);
-      }
-      return [];
-    },
-  },
-  tasks: {
-    async cancel(event, logger, ids) {
-      const tasks = useTasks();
-      logger.debug(ids);
-      tasks.cancel(ids);
-      return;
-    },
-    async getStatus(event) {
-      return useTasks().getStatus();
-    },
-    async confirmFailed(event, logger, ids) {
-      const tasks = useTasks();
-      logger.debug(ids);
-      tasks.confirmFailed(ids);
-      return;
-    },
-  },
-  petaFiles: {
-    async getAll(_, logger) {
-      const petaFilesController = usePetaFilesController();
-      try {
-        const petaFiles = petaFilesController.getAllAsMap();
-        logger.debug("return:", true);
-        return petaFiles;
-      } catch (e) {
-        logger.error(e);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaFiles Error",
-          message: String(e),
-        });
-      }
-      return {};
-    },
-    async update(event, logger, datas, mode) {
-      const petaFilesController = usePetaFilesController();
-      try {
-        await petaFilesController.updateMultiple(datas, mode);
-        logger.debug("return:", true);
-        return true;
-      } catch (err) {
-        logger.error(err);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update PetaFiles Error",
-          message: String(err),
-        });
-      }
-      return false;
-    },
-    async regenerate(_, log) {
-      const petaFilesController = usePetaFilesController();
-      try {
-        log.debug("start");
-        await petaFilesController.regenerate();
-        log.debug("end");
-        return;
-      } catch (err) {
-        log.error(err);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Regenerate Thumbnails Error",
-          message: String(err),
-        });
-      }
-      return;
-    },
-    async getIDs(event, log, params) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      try {
-        log.debug("type:", params.type);
-        const ids = await petaFilesPetaTagsController.getPetaFileIds(params);
-        log.debug("return:", ids.length);
-        return ids;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaFileIds Error",
-          message: String(error),
-        });
-      }
-      return [];
-    },
-  },
-  petaBoards: {
-    async getAll(_, logger) {
-      const petaBoardsController = usePetaBoardsController();
-      try {
-        const petaBoards = await petaBoardsController.getAllAsMap();
-        const length = Object.keys(petaBoards).length;
-        if (length === 0) {
-          logger.debug("no boards! create empty board");
-          const style = getStyle();
-          const board = createPetaBoard(
-            BOARD_DEFAULT_NAME,
-            0,
-            style["--color-0"],
-            style["--color-2"],
-          );
-          await petaBoardsController.updateMultiple([board], "insert");
-          petaBoards[board.id] = board;
-        }
-        logger.debug("return:", length);
-        return petaBoards;
-      } catch (e) {
-        logger.error(e);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaBoards Error",
-          message: String(e),
-        });
-      }
-      return {};
-    },
-    async update(event, logger, boards, mode) {
-      const petaBoardsController = usePetaBoardsController();
-      try {
-        await petaBoardsController.updateMultiple(boards, mode);
-        logger.debug("return:", true);
-        return true;
-      } catch (e) {
-        logger.error(e);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update PetaBoards Error",
-          message: String(e),
-        });
-      }
-      return false;
-    },
-  },
-  petaTags: {
-    async update(event, log, tags, mode) {
-      const petaTagsController = usePetaTagsController();
-      try {
-        await petaTagsController.updateMultiple(tags, mode);
-        log.debug("return:", true);
-        return true;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update PetaTags Error",
-          message: String(error),
-        });
-      }
-      return false;
-    },
-    async getAll(_, log) {
-      const petaTagsController = usePetaTagsController();
-      try {
-        const petaTags = await petaTagsController.getAll();
-        log.debug("return:", petaTags.length);
-        return petaTags;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaTags Error",
-          message: String(error),
-        });
-      }
-      return [];
-    },
-  },
-  petaFilePetaTags: {
-    async update(event, log, petaFileIds, petaTagLikes, mode) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      try {
-        await petaFilesPetaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
-        log.debug("return:", true);
-        return true;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update PetaFilesPetaTags Error",
-          message: String(error),
-        });
-      }
-      return false;
-    },
-    async getPetaTagIdsByPetaFileIds(event, log, petaFileIds) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      try {
-        const petaTagIds =
-          await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
-        return petaTagIds;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaTagIds By PetaFileIds Error",
-          message: String(error),
-        });
-      }
-      return [];
-    },
-    async getPetaTagCount(event, log, petaTag) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      try {
-        const petaTagCount = await petaFilesPetaTagsController.getPetaTagCount(petaTag);
-        log.debug("return:", petaTagCount);
-        return petaTagCount;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaTagCounts Error",
-          message: String(error),
-        });
-      }
-      return -1;
-    },
-  },
-  petaTagPartitions: {
-    async update(event, log, partitions, mode) {
-      const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
-      try {
-        await petaTagpartitionsController.updateMultiple(partitions, mode);
-        log.debug("return:", true);
-        return true;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update PetaFilesPetaTags Error",
-          message: String(error),
-        });
-      }
-      return false;
-    },
-    async getAll(_, log) {
-      const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
-      try {
-        const petaTagPartitions = await petaTagpartitionsController.getAll();
-        log.debug("return:", petaTagPartitions.length);
-        return petaTagPartitions;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaTagPartitions Error",
-          message: String(error),
-        });
-      }
-      return [];
-    },
-  },
-  states: {
-    async get(_, log) {
-      const configStates = useConfigStates();
-      log.debug(configStates.data);
-      return configStates.data;
-    },
-    async update(event, log, states) {
-      const configStates = useConfigStates();
-      const windows = useWindows();
-      try {
-        configStates.data = states;
-        configStates.save();
-        windows.emitMainEvent({ type: "all" }, "updateStates", states);
-        log.debug("return:", configStates.data);
-        return true;
-      } catch (e) {
-        log.error(e);
-      }
-      return false;
-    },
-  },
-  settings: {
-    async update(event, log, settings) {
-      const windows = useWindows();
-      const configSettings = useConfigSettings();
-      try {
-        if (configSettings.data.web !== settings.web) {
-          if (settings.web) {
-            useWebHook().open(WEBHOOK_PORT);
-          } else {
-            useWebHook().close();
-          }
-        }
-        configSettings.data = settings;
-        Object.keys(windows.windows).forEach((key) => {
-          const window = windows.windows[key as WindowName];
-          if (windowIs.dead(window)) {
-            return;
-          }
-        });
-        configSettings.save();
-        windows.emitMainEvent({ type: "all" }, "updateSettings", settings);
-        windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
-        windows.emitMainEvent({ type: "all" }, "style", getStyle());
-        log.debug("return:", configSettings.data);
-        return true;
-      } catch (e) {
-        log.error(e);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update Settings Error",
-          message: String(e),
-        });
-      }
-      return false;
-    },
-    async get(_, log) {
-      const configSettings = useConfigSettings();
-      log.debug("return:", configSettings.data);
-      return configSettings.data;
-    },
-  },
-  windows: {
-    async getIsFocused(event, log) {
-      const windows = useWindows();
-      const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
-      log.debug("return:", isFocued);
-      return isFocued;
-    },
-    async minimize(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.minimize();
-      log.debug(windowInfo?.type);
-    },
-    async maximize(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      if (windowInfo?.window.isMaximized()) {
-        windowInfo?.window.unmaximize();
-        return;
-      }
-      windowInfo?.window.maximize();
-      log.debug(windowInfo?.type);
-    },
-    async close(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.close();
-      log.debug(windowInfo?.type);
-    },
-    async activate(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.moveTop();
-      windowInfo?.window.focus();
-      log.debug(windowInfo?.type);
-    },
-    async toggleDevTools(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.webContents.toggleDevTools();
-      log.debug(windowInfo?.type);
-    },
-    async open(event, log, windowName) {
-      const windows = useWindows();
-      openInBrowserTargetID = undefined;
-      log.debug("type:", windowName);
-      windows.openWindow(windowName, event);
-    },
-    async reload(event, log) {
-      const windows = useWindows();
-      const type = windows.reloadWindowByEvent(event);
-      log.debug("type:", type);
-    },
-    async getMainWindowName(_, log) {
-      const windows = useWindows();
-      log.debug(windows.mainWindowName);
-      return windows.mainWindowName;
-    },
-  },
-  modals: {
-    async open(event, log, label, items) {
-      const index = await useModals().open(event, label, items);
-      log.debug("return:", index);
-      return index;
-    },
-    async select(_, log, id, index) {
-      useModals().select(id, index);
-      log.debug("return:", index);
-    },
-    async getAll(_, log) {
-      const datas = useModals().getOrders();
-      log.debug(datas);
-      return datas;
-    },
-  },
-  downloader: {
-    async open(_, log, urls) {
-      const windows = useWindows();
-      _urls = urls;
-      windows.openWindow("pageDownloader");
-      usePageDownloaderCache().clear();
-    },
-    async add(_, log, urls) {
-      _urls = [...urls, ..._urls];
-      const windows = useWindows();
-      windows.emitMainEvent(
-        { type: "windowNames", windowNames: ["pageDownloader"] },
-        "updatePageDownloaderDatas",
-        _urls,
-      );
-    },
-    async getAll() {
-      return _urls;
-    },
-  },
-  nsfw: {
-    async get(_, log) {
-      log.debug(getShowNSFW());
-      return getShowNSFW();
-    },
-    async set(event, log, value) {
-      log.debug(value);
-      const windows = useWindows();
-      temporaryShowNSFW = value;
-      windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
-    },
-  },
-  details: {
-    async set(event, log, petaFileId: string) {
-      const petaFilesController = usePetaFilesController();
-      const windows = useWindows();
-      log.debug(petaFileId);
-      detailsPetaFile = await petaFilesController.getPetaFile(petaFileId);
-      if (detailsPetaFile === undefined) {
-        return;
-      }
-      windows.emitMainEvent(
-        { type: "windowNames", windowNames: ["details"] },
-        "detailsPetaFile",
-        detailsPetaFile,
-      );
-      return;
-    },
-    async get(_, log) {
-      log.debug(detailsPetaFile);
-      return detailsPetaFile;
-    },
-  },
+  importer: importerIPCFunctions,
+  tasks: tasksIPCFunctions,
+  petaFiles: petaFilesIPCFunctions,
+  petaBoards: petaBoardsIPCFunctions,
+  petaTags: petaTagsIPCFunctions,
+  petaFilePetaTags: petaFilePetaTagsIPCFunctions,
+  petaTagPartitions: petaTagPartitionsIPCFunctions,
+  states: statesIPCFunctions,
+  settings: settingsIPCFunctions,
+  windows: windowsIPCFunctions,
+  modals: modalsIPCFunctions,
+  downloader: downloaderIPCFunctions,
+  nsfw: nsfwIPCFunctions,
+  details: detailsIPCFunctions,
   common: {
     async openInBrowser(_, log, petaFile) {
       const windows = useWindows();
@@ -805,7 +334,6 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
 };
-let _urls: PageDownloaderData[] = [];
 let tf: TF | undefined;
 export function registerIpcFunctions() {
   ObjectKeys(ipcFunctions).forEach((category) => {
@@ -819,8 +347,4 @@ export function registerIpcFunctions() {
       });
     });
   });
-}
-function getShowNSFW() {
-  const configSettings = useConfigSettings();
-  return temporaryShowNSFW || configSettings.data.alwaysShowNSFW;
 }

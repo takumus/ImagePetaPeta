@@ -80,6 +80,7 @@ import {
 import { FileImporter, fileImporterKey } from "@/main/provides/fileImporter";
 import { HandleFileResponse, handleFileResponseKey } from "@/main/provides/handleFileResponse";
 import { Modals, modalsKey } from "@/main/provides/modals";
+import { NSFW, nsfwKey } from "@/main/provides/nsfw";
 import { PageDownloaderCache, pageDownloaderCacheKey } from "@/main/provides/pageDownloaderCache";
 import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { createSecureTempFileKey, secureTempFileKeyKey } from "@/main/provides/tempFileKey";
@@ -219,6 +220,7 @@ export function initDI(
     provide(configSettingsKey, configSettings);
     provide(configStatesKey, configStates);
     provide(configWindowStatesKey, configWindowStates);
+    provide(nsfwKey, new NSFW());
     provide(secureTempFileKeyKey, createSecureTempFileKey());
     provide(configSecureFilePasswordKey, configSecureFilePassword);
     provide(petaBoardsControllerKey, new PetaBoardsController());
