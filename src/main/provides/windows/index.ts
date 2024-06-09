@@ -10,6 +10,7 @@ import {
   WINDOW_MIN_WIDTH,
 } from "@/commons/defines";
 import { IpcEvents } from "@/commons/ipc/ipcEvents";
+import { IpcEventsType } from "@/commons/ipc/ipcEventsType";
 import { Vec2 } from "@/commons/utils/vec2";
 import { WindowName } from "@/commons/windows";
 
@@ -250,16 +251,7 @@ export class Windows {
   readonly emit = (() => {
     const emitMainEvent = this.emitMainEvent.bind(this);
     const proxies: { [key: string]: any } = {};
-    return new Proxy<{
-      [C in keyof IpcEvents]: {
-        [U in keyof IpcEvents[C]]: (
-          target: EmitMainEventTarget,
-          ...args: Parameters<
-            IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never
-          >
-        ) => void;
-      };
-    }>({} as any, {
+    return new Proxy<IpcEventsType>({} as any, {
       get(_target, p1: any, _receiver: any) {
         if (proxies[p1] === undefined) {
           proxies[p1] = new Proxy<any>({} as any, {
@@ -276,11 +268,11 @@ export class Windows {
   })();
   private emitMainEvent<C extends keyof IpcEvents, U extends keyof IpcEvents[C]>(
     target: EmitMainEventTarget,
-    cat: C,
-    key: U,
+    p1: C,
+    p2: U,
     ...args: Parameters<IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never>
   ): void {
-    const path = `${cat}.${key as string}`;
+    const path = `${p1}.${p2 as string}`;
     if (target.type === "all") {
       Object.values(this.windows).forEach((window) => {
         if (windowIs.alive(window)) {
