@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../src/*"],
+      "$/*": ["src/*"]
+    }
+  },
+  "include": [
+    "vite.content.config.ts",
+    "vite.popup.config.ts",
+    "vite.content.config.ts",
+    "package.json",
+    "src",
+    "scripts",
+    "../src/@types"
+  ],
+  "references": []
+}
