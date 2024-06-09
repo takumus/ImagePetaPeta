@@ -274,10 +274,10 @@ export class Windows {
     }
   }
 }
-export type EmitMainEventTargetType = "all" | "windows" | "windowNames";
 export type EmitMainEventTarget =
   | { type: "all" }
   | { type: "windows"; windows: BrowserWindow[] }
   | { type: "windowNames"; windowNames: WindowName[] };
+export type EmitMainEventTargetType = EmitMainEventTarget["type"];
 export const windowsKey = createKey<Windows>("windows");
 export const useWindows = createUseFunction(windowsKey);
