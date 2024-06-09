@@ -30,7 +30,7 @@ onMounted(async () => {
 });
 function login() {
   IPC.common.login(password.value, save.value);
-  // IPC.common.windowClose();
+  // IPC.windows.windowClose();
 }
 </script>
 

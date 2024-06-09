@@ -59,7 +59,7 @@ describe("webhook", () => {
     const webhook = useWebHook();
     await webhook.open(51920);
     try {
-      const ids = await post(webhook.getAPIKEY(), "common", "importFiles", [
+      const ids = await post(webhook.getAPIKEY(), "importer", "importFiles", [
         [
           {
             type: "filePath",
@@ -81,7 +81,7 @@ describe("webhook", () => {
     const webhook = useWebHook();
     await webhook.open(51920);
     try {
-      const appInfo = await post(webhook.getAPIKEY(), "common", "getSettings");
+      const appInfo = await post(webhook.getAPIKEY(), "settings", "getSettings");
       expect(appInfo).property("error");
     } catch (error) {
       await webhook.close();
@@ -93,7 +93,7 @@ describe("webhook", () => {
     const webhook = useWebHook();
     await webhook.open(51920);
     try {
-      const appInfo = await post("wawawawawa", "common", "getSettings");
+      const appInfo = await post("wawawawawa", "settings", "getSettings");
       expect(appInfo).property("error");
     } catch (error) {
       await webhook.close();

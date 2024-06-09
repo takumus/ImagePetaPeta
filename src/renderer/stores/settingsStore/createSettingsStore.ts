@@ -3,12 +3,12 @@ import { watch as _watch, InjectionKey, ref } from "vue";
 import { IPC } from "@/renderer/libs/ipc";
 
 export async function createSettingsStore() {
-  const states = ref(await IPC.common.getSettings());
+  const states = ref(await IPC.settings.getSettings());
   const watch = () => {
     return _watch(
       states,
       (value) => {
-        IPC.common.updateSettings(value);
+        IPC.settings.updateSettings(value);
       },
       {
         deep: true,

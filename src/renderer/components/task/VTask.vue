@@ -85,7 +85,7 @@ function addLog(value: string) {
   log.value = value + "\n" + log.value;
 }
 function cancel() {
-  IPC.common.cancelTasks([currentTaskId.value]);
+  IPC.tasks.cancelTasks([currentTaskId.value]);
 }
 </script>
 

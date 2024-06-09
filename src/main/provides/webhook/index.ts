@@ -14,7 +14,21 @@ import { createWebhookAPIKey } from "@/main/provides/webhook/createWebhookAPIKey
 import { getDirname } from "@/main/utils/dirname";
 
 const allowedEvents: { [key in keyof IpcFunctions]: (keyof IpcFunctions[key])[] } = {
-  common: ["importFiles", "getAppInfo", "openPageDownloader", "addPageDownloaderDatas"],
+  common: ["getAppInfo"],
+  importer: ["importFiles"],
+  downloader: ["openPageDownloader", "addPageDownloaderDatas"],
+  tasks: [],
+  petaFiles: [],
+  petaBoards: [],
+  petaTags: [],
+  petaFilePetaTags: [],
+  petaTagPartitions: [],
+  states: [],
+  settings: [],
+  windows: [],
+  modals: [],
+  nsfw: [],
+  details: [],
 };
 export class WebHook extends TypedEventEmitter<{
   open: () => void;

@@ -57,13 +57,27 @@ let temporaryShowNSFW = false;
 let detailsPetaFile: PetaFile | undefined;
 let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
-  common: {
+  importer: {
     async browseAndImportFiles(event, logger, type) {
       const fileImporter = useFileImporter();
       const files = await fileImporter.browseFiles(event, type);
       logger.debug(files);
       return files;
     },
+    async importFiles(event, log, datas) {
+      const fileImporter = useFileImporter();
+      try {
+        log.debug(datas.length, datas);
+        const petaFileIds = await fileImporter.importFilesFromImportFileGroup(datas);
+        log.debug("return:", petaFileIds.length);
+        return petaFileIds;
+      } catch (e) {
+        log.error(e);
+      }
+      return [];
+    },
+  },
+  tasks: {
     async cancelTasks(event, logger, ids) {
       const tasks = useTasks();
       logger.debug(ids);
@@ -79,6 +93,8 @@ export const ipcFunctions: IpcFunctionsType = {
       tasks.confirmFailed(ids);
       return;
     },
+  },
+  petaFiles: {
     async getPetaFiles(_, logger) {
       const petaFilesController = usePetaFilesController();
       try {
@@ -113,6 +129,44 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
+    async regeneratePetaFiles(_, log) {
+      const petaFilesController = usePetaFilesController();
+      try {
+        log.debug("start");
+        await petaFilesController.regenerate();
+        log.debug("end");
+        return;
+      } catch (err) {
+        log.error(err);
+        showError({
+          category: "M",
+          code: 200,
+          title: "Regenerate Thumbnails Error",
+          message: String(err),
+        });
+      }
+      return;
+    },
+    async getPetaFileIds(event, log, params) {
+      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
+      try {
+        log.debug("type:", params.type);
+        const ids = await petaFilesPetaTagsController.getPetaFileIds(params);
+        log.debug("return:", ids.length);
+        return ids;
+      } catch (error) {
+        log.error(error);
+        showError({
+          category: "M",
+          code: 100,
+          title: "Get PetaFileIds Error",
+          message: String(error),
+        });
+      }
+      return [];
+    },
+  },
+  petaBoards: {
     async getPetaBoards(_, logger) {
       const petaBoardsController = usePetaBoardsController();
       try {
@@ -160,6 +214,8 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
+  },
+  petaTags: {
     async updatePetaTags(event, log, tags, mode) {
       const petaTagsController = usePetaTagsController();
       try {
@@ -177,6 +233,25 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
+    async getPetaTags(_, log) {
+      const petaTagsController = usePetaTagsController();
+      try {
+        const petaTags = await petaTagsController.getAll();
+        log.debug("return:", petaTags.length);
+        return petaTags;
+      } catch (error) {
+        log.error(error);
+        showError({
+          category: "M",
+          code: 100,
+          title: "Get PetaTags Error",
+          message: String(error),
+        });
+      }
+      return [];
+    },
+  },
+  petaFilePetaTags: {
     async updatePetaFilesPetaTags(event, log, petaFileIds, petaTagLikes, mode) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
       try {
@@ -194,6 +269,42 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
+    async getPetaTagIdsByPetaFileIds(event, log, petaFileIds) {
+      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
+      try {
+        const petaTagIds =
+          await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
+        return petaTagIds;
+      } catch (error) {
+        log.error(error);
+        showError({
+          category: "M",
+          code: 100,
+          title: "Get PetaTagIds By PetaFileIds Error",
+          message: String(error),
+        });
+      }
+      return [];
+    },
+    async getPetaTagCount(event, log, petaTag) {
+      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
+      try {
+        const petaTagCount = await petaFilesPetaTagsController.getPetaTagCount(petaTag);
+        log.debug("return:", petaTagCount);
+        return petaTagCount;
+      } catch (error) {
+        log.error(error);
+        showError({
+          category: "M",
+          code: 100,
+          title: "Get PetaTagCounts Error",
+          message: String(error),
+        });
+      }
+      return -1;
+    },
+  },
+  petaTagPartitions: {
     async updatePetaTagPartitions(event, log, partitions, mode) {
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
       try {
@@ -228,74 +339,209 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async getPetaFileIds(event, log, params) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      try {
-        log.debug("type:", params.type);
-        const ids = await petaFilesPetaTagsController.getPetaFileIds(params);
-        log.debug("return:", ids.length);
-        return ids;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaFileIds Error",
-          message: String(error),
-        });
-      }
-      return [];
+  },
+  states: {
+    async getStates(_, log) {
+      const configStates = useConfigStates();
+      log.debug(configStates.data);
+      return configStates.data;
     },
-    async getPetaTagIdsByPetaFileIds(event, log, petaFileIds) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
+    async updateStates(event, log, states) {
+      const configStates = useConfigStates();
+      const windows = useWindows();
       try {
-        const petaTagIds =
-          await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
-        return petaTagIds;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaTagIds By PetaFileIds Error",
-          message: String(error),
-        });
+        configStates.data = states;
+        configStates.save();
+        windows.emitMainEvent({ type: "all" }, "updateStates", states);
+        log.debug("return:", configStates.data);
+        return true;
+      } catch (e) {
+        log.error(e);
       }
-      return [];
+      return false;
     },
-    async getPetaTags(_, log) {
-      const petaTagsController = usePetaTagsController();
+  },
+  settings: {
+    async updateSettings(event, log, settings) {
+      const windows = useWindows();
+      const configSettings = useConfigSettings();
       try {
-        const petaTags = await petaTagsController.getAll();
-        log.debug("return:", petaTags.length);
-        return petaTags;
-      } catch (error) {
-        log.error(error);
+        if (configSettings.data.web !== settings.web) {
+          if (settings.web) {
+            useWebHook().open(WEBHOOK_PORT);
+          } else {
+            useWebHook().close();
+          }
+        }
+        configSettings.data = settings;
+        Object.keys(windows.windows).forEach((key) => {
+          const window = windows.windows[key as WindowName];
+          if (windowIs.dead(window)) {
+            return;
+          }
+        });
+        configSettings.save();
+        windows.emitMainEvent({ type: "all" }, "updateSettings", settings);
+        windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
+        windows.emitMainEvent({ type: "all" }, "style", getStyle());
+        log.debug("return:", configSettings.data);
+        return true;
+      } catch (e) {
+        log.error(e);
         showError({
           category: "M",
-          code: 100,
-          title: "Get PetaTags Error",
-          message: String(error),
+          code: 200,
+          title: "Update Settings Error",
+          message: String(e),
         });
       }
-      return [];
+      return false;
     },
-    async getPetaTagCount(event, log, petaTag) {
-      const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      try {
-        const petaTagCount = await petaFilesPetaTagsController.getPetaTagCount(petaTag);
-        log.debug("return:", petaTagCount);
-        return petaTagCount;
-      } catch (error) {
-        log.error(error);
-        showError({
-          category: "M",
-          code: 100,
-          title: "Get PetaTagCounts Error",
-          message: String(error),
-        });
+    async getSettings(_, log) {
+      const configSettings = useConfigSettings();
+      log.debug("return:", configSettings.data);
+      return configSettings.data;
+    },
+  },
+  windows: {
+    async getWindowIsFocused(event, log) {
+      const windows = useWindows();
+      const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
+      log.debug("return:", isFocued);
+      return isFocued;
+    },
+    async windowMinimize(event, log) {
+      const windows = useWindows();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.minimize();
+      log.debug(windowInfo?.type);
+    },
+    async windowMaximize(event, log) {
+      const windows = useWindows();
+      const windowInfo = windows.getWindowByEvent(event);
+      if (windowInfo?.window.isMaximized()) {
+        windowInfo?.window.unmaximize();
+        return;
       }
-      return -1;
+      windowInfo?.window.maximize();
+      log.debug(windowInfo?.type);
+    },
+    async windowClose(event, log) {
+      const windows = useWindows();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.close();
+      log.debug(windowInfo?.type);
+    },
+    async windowActivate(event, log) {
+      const windows = useWindows();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.moveTop();
+      windowInfo?.window.focus();
+      log.debug(windowInfo?.type);
+    },
+    async windowToggleDevTools(event, log) {
+      const windows = useWindows();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.webContents.toggleDevTools();
+      log.debug(windowInfo?.type);
+    },
+    async openWindow(event, log, windowName) {
+      const windows = useWindows();
+      openInBrowserTargetID = undefined;
+      log.debug("type:", windowName);
+      windows.openWindow(windowName, event);
+    },
+    async reloadWindow(event, log) {
+      const windows = useWindows();
+      const type = windows.reloadWindowByEvent(event);
+      log.debug("type:", type);
+    },
+    async getMainWindowName(_, log) {
+      const windows = useWindows();
+      log.debug(windows.mainWindowName);
+      return windows.mainWindowName;
+    },
+  },
+  modals: {
+    async openModal(event, log, label, items) {
+      const index = await useModals().open(event, label, items);
+      log.debug("return:", index);
+      return index;
+    },
+    async selectModal(_, log, id, index) {
+      useModals().select(id, index);
+      log.debug("return:", index);
+    },
+    async getModalDatas(_, log) {
+      const datas = useModals().getOrders();
+      log.debug(datas);
+      return datas;
+    },
+  },
+  downloader: {
+    async openPageDownloader(_, log, urls) {
+      const windows = useWindows();
+      _urls = urls;
+      windows.openWindow("pageDownloader");
+      usePageDownloaderCache().clear();
+    },
+    async addPageDownloaderDatas(_, log, urls) {
+      _urls = [...urls, ..._urls];
+      const windows = useWindows();
+      windows.emitMainEvent(
+        { type: "windowNames", windowNames: ["pageDownloader"] },
+        "updatePageDownloaderDatas",
+        _urls,
+      );
+    },
+    async getPageDownloaderDatas() {
+      return _urls;
+    },
+  },
+  nsfw: {
+    async getShowNSFW(_, log) {
+      log.debug(getShowNSFW());
+      return getShowNSFW();
+    },
+    async setShowNSFW(event, log, value) {
+      log.debug(value);
+      const windows = useWindows();
+      temporaryShowNSFW = value;
+      windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
+    },
+  },
+  details: {
+    async setDetailsPetaFile(event, log, petaFileId: string) {
+      const petaFilesController = usePetaFilesController();
+      const windows = useWindows();
+      log.debug(petaFileId);
+      detailsPetaFile = await petaFilesController.getPetaFile(petaFileId);
+      if (detailsPetaFile === undefined) {
+        return;
+      }
+      windows.emitMainEvent(
+        { type: "windowNames", windowNames: ["details"] },
+        "detailsPetaFile",
+        detailsPetaFile,
+      );
+      return;
+    },
+    async getDetailsPetaFile(_, log) {
+      log.debug(detailsPetaFile);
+      return detailsPetaFile;
+    },
+  },
+  common: {
+    async openInBrowser(_, log, petaFile) {
+      const windows = useWindows();
+      openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
+      log.debug(openInBrowserTargetID);
+      windows.openWindow("browser");
+      windows.emitMainEvent(
+        { windowNames: ["browser"], type: "windowNames" },
+        "openInBrowser",
+        openInBrowserTargetID,
+      );
     },
     async log(event, logger, id, ...args) {
       useLogger().log(LogFrom.RENDERER, id, ...args);
@@ -338,108 +584,9 @@ export const ipcFunctions: IpcFunctionsType = {
       shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
       return true;
     },
-    async updateSettings(event, log, settings) {
-      const windows = useWindows();
-      const configSettings = useConfigSettings();
-      try {
-        if (configSettings.data.web !== settings.web) {
-          if (settings.web) {
-            useWebHook().open(WEBHOOK_PORT);
-          } else {
-            useWebHook().close();
-          }
-        }
-        configSettings.data = settings;
-        Object.keys(windows.windows).forEach((key) => {
-          const window = windows.windows[key as WindowName];
-          if (windowIs.dead(window)) {
-            return;
-          }
-        });
-        configSettings.save();
-        windows.emitMainEvent({ type: "all" }, "updateSettings", settings);
-        windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
-        windows.emitMainEvent({ type: "all" }, "style", getStyle());
-        log.debug("return:", configSettings.data);
-        return true;
-      } catch (e) {
-        log.error(e);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Update Settings Error",
-          message: String(e),
-        });
-      }
-      return false;
-    },
-    async getSettings(_, log) {
-      const configSettings = useConfigSettings();
-      log.debug("return:", configSettings.data);
-      return configSettings.data;
-    },
-    async getWindowIsFocused(event, log) {
-      const windows = useWindows();
-      const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
-      log.debug("return:", isFocued);
-      return isFocued;
-    },
-    async windowMinimize(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.minimize();
-      log.debug(windowInfo?.type);
-    },
-    async windowMaximize(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      if (windowInfo?.window.isMaximized()) {
-        windowInfo?.window.unmaximize();
-        return;
-      }
-      windowInfo?.window.maximize();
-      log.debug(windowInfo?.type);
-    },
-    async windowClose(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.close();
-      log.debug(windowInfo?.type);
-    },
-    async windowActivate(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.moveTop();
-      windowInfo?.window.focus();
-      log.debug(windowInfo?.type);
-    },
-    async windowToggleDevTools(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      windowInfo?.window.webContents.toggleDevTools();
-      log.debug(windowInfo?.type);
-    },
     async getPlatform(_, log) {
       log.debug("return:", process.platform);
       return process.platform;
-    },
-    async regeneratePetaFiles(_, log) {
-      const petaFilesController = usePetaFilesController();
-      try {
-        log.debug("start");
-        await petaFilesController.regenerate();
-        log.debug("end");
-        return;
-      } catch (err) {
-        log.error(err);
-        showError({
-          category: "M",
-          code: 200,
-          title: "Regenerate Thumbnails Error",
-          message: String(err),
-        });
-      }
-      return;
     },
     async browsePetaFileDirectory(event, log) {
       const windows = useWindows();
@@ -487,11 +634,6 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getStates(_, log) {
-      const configStates = useConfigStates();
-      log.debug(configStates.data);
-      return configStates.data;
-    },
     async realESRGANConvert(event, log, petaFiles, modelName) {
       try {
         log.debug("start");
@@ -522,72 +664,9 @@ export const ipcFunctions: IpcFunctionsType = {
         icon: nativeImage.createFromDataURL(Transparent),
       });
     },
-    async updateStates(event, log, states) {
-      const configStates = useConfigStates();
-      const windows = useWindows();
-      try {
-        configStates.data = states;
-        configStates.save();
-        windows.emitMainEvent({ type: "all" }, "updateStates", states);
-        log.debug("return:", configStates.data);
-        return true;
-      } catch (e) {
-        log.error(e);
-      }
-      return false;
-    },
-    async importFiles(event, log, datas) {
-      const fileImporter = useFileImporter();
-      try {
-        log.debug(datas.length, datas);
-        const petaFileIds = await fileImporter.importFilesFromImportFileGroup(datas);
-        log.debug("return:", petaFileIds.length);
-        return petaFileIds;
-      } catch (e) {
-        log.error(e);
-      }
-      return [];
-    },
-    async openWindow(event, log, windowName) {
-      const windows = useWindows();
-      openInBrowserTargetID = undefined;
-      log.debug("type:", windowName);
-      windows.openWindow(windowName, event);
-    },
-    async openInBrowser(_, log, petaFile) {
-      const windows = useWindows();
-      openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
-      log.debug(openInBrowserTargetID);
-      windows.openWindow("browser");
-      windows.emitMainEvent(
-        { windowNames: ["browser"], type: "windowNames" },
-        "openInBrowser",
-        openInBrowserTargetID,
-      );
-    },
     async getOpenInBrowserID(_, log) {
       log.debug(openInBrowserTargetID);
       return openInBrowserTargetID;
-    },
-    async reloadWindow(event, log) {
-      const windows = useWindows();
-      const type = windows.reloadWindowByEvent(event);
-      log.debug("type:", type);
-    },
-    async getMainWindowName(_, log) {
-      const windows = useWindows();
-      log.debug(windows.mainWindowName);
-      return windows.mainWindowName;
-    },
-    async getShowNSFW(_, log) {
-      log.debug(getShowNSFW());
-      return getShowNSFW();
-    },
-    async setShowNSFW(event, log, value) {
-      log.debug(value);
-      const windows = useWindows();
-      temporaryShowNSFW = value;
-      windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
     },
     async searchImageByGoogle(event, log, petaFile) {
       try {
@@ -598,25 +677,6 @@ export const ipcFunctions: IpcFunctionsType = {
         log.error(error);
       }
       return false;
-    },
-    async setDetailsPetaFile(event, log, petaFileId: string) {
-      const petaFilesController = usePetaFilesController();
-      const windows = useWindows();
-      log.debug(petaFileId);
-      detailsPetaFile = await petaFilesController.getPetaFile(petaFileId);
-      if (detailsPetaFile === undefined) {
-        return;
-      }
-      windows.emitMainEvent(
-        { type: "windowNames", windowNames: ["details"] },
-        "detailsPetaFile",
-        detailsPetaFile,
-      );
-      return;
-    },
-    async getDetailsPetaFile(_, log) {
-      log.debug(detailsPetaFile);
-      return detailsPetaFile;
     },
     async getStyle(_, log) {
       const style = getStyle();
@@ -689,20 +749,6 @@ export const ipcFunctions: IpcFunctionsType = {
         ).toString(),
       );
     },
-    async openModal(event, log, label, items) {
-      const index = await useModals().open(event, label, items);
-      log.debug("return:", index);
-      return index;
-    },
-    async selectModal(_, log, id, index) {
-      useModals().select(id, index);
-      log.debug("return:", index);
-    },
-    async getModalDatas(_, log) {
-      const datas = useModals().getOrders();
-      log.debug(datas);
-      return datas;
-    },
     async getWebURL(_, log) {
       const ips = getIPs();
       Object.keys(ips).forEach((key) => {
@@ -746,24 +792,6 @@ export const ipcFunctions: IpcFunctionsType = {
       } catch (err) {
         return [];
       }
-    },
-    async openPageDownloader(_, log, urls) {
-      const windows = useWindows();
-      _urls = urls;
-      windows.openWindow("pageDownloader");
-      usePageDownloaderCache().clear();
-    },
-    async addPageDownloaderDatas(_, log, urls) {
-      _urls = [...urls, ..._urls];
-      const windows = useWindows();
-      windows.emitMainEvent(
-        { type: "windowNames", windowNames: ["pageDownloader"] },
-        "updatePageDownloaderDatas",
-        _urls,
-      );
-    },
-    async getPageDownloaderDatas() {
-      return _urls;
     },
     async login(event, log, password, save) {
       log.debug(

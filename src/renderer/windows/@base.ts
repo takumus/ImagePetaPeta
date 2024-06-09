@@ -113,7 +113,7 @@ export async function create(
   const keyboards = new Keyboards();
   keyboards.keys("KeyD").down(() => {
     if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      IPC.common.windowToggleDevTools();
+      IPC.windows.windowToggleDevTools();
     }
   });
   keyboards.enabled = true;
