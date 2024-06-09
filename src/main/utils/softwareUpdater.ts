@@ -11,8 +11,7 @@ export async function checkAndNotifySoftwareUpdate() {
   if (checkUpdateTimeoutHandler) {
     clearTimeout(checkUpdateTimeoutHandler);
   }
-  const log = useLogger().logMainChunk();
-  log.debug("$Check Update");
+  const log = useLogger().logMainChunk("checkAndNotifySoftwareUpdate");
   const remote: RemoteBinaryInfo = await getLatestVersion();
   log.debug(remote);
   if (!remote.isLatest) {

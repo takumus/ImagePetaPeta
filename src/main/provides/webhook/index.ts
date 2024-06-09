@@ -53,49 +53,53 @@ export class WebHook extends TypedEventEmitter<{
   }
   private initAPI() {
     this.http.post("/api", async (req, res) => {
-      const executeLog = useLogger().logMainChunk();
+      const executeLog = useLogger().logMainChunk("webhook.execute");
       try {
         const eventName = (req.body.event as string).split(".") as [string, string];
         console.log(eventName);
         if (!(allowedEvents as any)[eventName[0]].includes(eventName[1])) {
           res.status(400).json({ error: `not allowed event: ${eventName}` });
-          executeLog.debug(`$Webhook(api): not allowed event`, eventName);
+          executeLog.debug(`not allowed event`, eventName);
           return;
         }
         const event = (this.ipcFunctions as any)[eventName[0]][eventName[1]] as
           | ((...args: any[]) => Promise<any>)
           | undefined;
         if (event !== undefined) {
-          executeLog.debug(`$Webhook(api): execute`, eventName);
+          executeLog.debug(`execute`, eventName);
           res.json({
-            response: await event(undefined, ...(req.body.args ?? [])),
+            response: await event(
+              undefined,
+              useLogger().logMainChunk(`webhook.${eventName[0]}.${eventName[1]}`),
+              ...(req.body.args ?? []),
+            ),
           });
-          executeLog.debug(`$Webhook(api): done`, eventName);
+          executeLog.debug(`done`, eventName);
           return;
         }
         res.status(400).json({ error: `invalid event: ${eventName}` });
-        executeLog.debug(`$Webhook(api): invalid event`, eventName);
+        executeLog.debug(`invalid event`, eventName);
       } catch (error) {
         res.status(500).json({ error: `event error: ${JSON.stringify(error)}` });
-        executeLog.error(`$Webhook(api): event error`, error);
+        executeLog.error(`event error`, error);
       }
     });
   }
   public async open(port: number) {
-    const log = useLogger().logMainChunk();
-    log.debug(`$Webhook(open): begin`, port);
+    const log = useLogger().logMainChunk("webhook.open");
+    log.debug(`begin`, port);
     if (this.server !== undefined) {
-      log.debug(`$Webhook(open): already opened`);
+      log.debug(`already opened`);
       await this.close();
     }
     return await new Promise<number>((res, rej) => {
       this.server = this.http.listen(port, () => {
-        log.debug(`$Webhook(open): done`);
+        log.debug(`done`);
         this.emit("open");
         res(port);
       });
       this.server.on("error", (error) => {
-        log.debug(`$Webhook(open): error`, WEBHOOK_PORT, error);
+        log.debug(`error`, WEBHOOK_PORT, error);
         this.close().then(() => {
           rej(error);
         });
@@ -103,21 +107,21 @@ export class WebHook extends TypedEventEmitter<{
     });
   }
   public async close() {
-    const log = useLogger().logMainChunk();
+    const log = useLogger().logMainChunk("webhook.close");
     const server = this.server;
-    log.debug(`$Webhook(close): begin`);
+    log.debug(`begin`);
     if (server === undefined) {
-      log.debug(`$Webhook(close): no server`);
+      log.debug(`no server`);
       return;
     }
     return new Promise<void>((res) => {
       server.close((error) => {
         this.server = undefined;
         if (error === undefined) {
-          log.debug(`$Webhook(close): done`);
+          log.debug(`done`);
           this.emit("closed");
         } else {
-          log.debug(`$Webhook(close): done (already closed)`);
+          log.debug(`done (already closed)`);
         }
         res();
       });

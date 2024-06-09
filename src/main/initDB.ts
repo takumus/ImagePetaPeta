@@ -15,7 +15,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { EmitMainEventTargetType, useWindows } from "@/main/provides/windows";
 
 export async function initDB() {
-  const logger = useLogger();
+  const initLog = useLogger().logMainChunk("initDB");
   const dbPetaBoard = useDBPetaBoards();
   const dbPetaFiles = useDBPetaFiles();
   const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
@@ -31,9 +31,9 @@ export async function initDB() {
     dbPetaTagPartitions,
     dbPetaFilesPetaTags,
   ] as const;
-  function emitInitialization(log: string) {
-    windows.emitMainEvent({ type: "all" }, "initializationProgress", log);
-    logger.logMainChunk().debug("$Init DB:", log);
+  function emitInitialization(l: string) {
+    windows.emitMainEvent({ type: "all" }, "initializationProgress", l);
+    initLog.debug("$Init DB:", l);
   }
   try {
     // ロード
@@ -67,10 +67,11 @@ export async function initDB() {
     return;
   }
   try {
+    const migrationLog = useLogger().logMainChunk("migrationDB");
     // 旧バージョンからのマイグレーション
-    await migrate((log: string) => {
-      emitInitialization(`migrate: ${log}`);
-      logger.logMainChunk().debug(log);
+    await migrate((l: string) => {
+      emitInitialization(`migrate: ${l}`);
+      migrationLog.debug(l);
     });
     // バージョンアップ時、バージョン情報更新
     if (configDBInfo.data.version !== app.getVersion()) {
@@ -87,15 +88,16 @@ export async function initDB() {
     return;
   }
   // 自動圧縮登録
+  const compactionLog = useLogger().logMainChunk("compactionDB");
   dbs.forEach((db) => {
     db.on("beginCompaction", () => {
-      logger.logMainChunk().debug(`begin compaction(${db.name})`);
+      compactionLog.debug(`begin compaction(${db.name})`);
     });
     db.on("doneCompaction", () => {
-      logger.logMainChunk().debug(`done compaction(${db.name})`);
+      compactionLog.debug(`done compaction(${db.name})`);
     });
     db.on("compactionError", (error) => {
-      logger.logMainChunk().error(`compaction error(${db.name})`, error);
+      compactionLog.error(`compaction error(${db.name})`, error);
     });
   });
   // DB初期化完了通知

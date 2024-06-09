@@ -23,7 +23,7 @@ export class PetaTagPartitionsController {
       status: "begin",
     });
     await ppa(async (tag, index) => {
-      await this.updatePetaTagPartition(tag, mode);
+      await this.update(tag, mode);
       task.emitStatus({
         i18nKey: "tasks.updateDatas",
         progress: {
@@ -45,10 +45,9 @@ export class PetaTagPartitionsController {
     );
     return true;
   }
-  async updatePetaTagPartition(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
+  async update(petaPetaTagPartition: PetaTagPartition, mode: UpdateMode) {
     const dbPetaTagPartitions = useDBPetaTagPartitions();
-    const log = useLogger().logMainChunk();
-    log.debug("##Update PetaTagPartition");
+    const log = useLogger().logMainChunk("PetaTagPartitionsController.update");
     log.debug("mode:", mode);
     log.debug("tag:", minimizeID(petaPetaTagPartition.id));
     if (mode === "remove") {

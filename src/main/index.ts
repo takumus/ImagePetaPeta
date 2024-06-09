@@ -29,7 +29,7 @@ const launchTime = performance.now();
   }
   const logger = useLogger();
   process.on("uncaughtException", function (error) {
-    logger.logMainChunk().error("Main Process Error", error);
+    logger.logMainChunk("Main Process Error").error(error);
   });
   const windows = useWindows();
   const configSettings = useConfigSettings();
@@ -64,7 +64,7 @@ const launchTime = performance.now();
   ]);
   // Macでドックアイコン押した時。
   app.on("activate", async () => {
-    logger.logMainChunk().debug("$Electron event: activate");
+    logger.logMainChunk("App Event").debug("activate");
     if (windowIs.dead("board") && windowIs.dead("browser")) {
       windows.showWindows();
     }
@@ -92,16 +92,14 @@ const launchTime = performance.now();
   });
   // electron準備OK
   async function appReady() {
-    logger
-      .logMainChunk()
-      .debug(
-        `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
-      );
-    logger.logMainChunk().debug(`Ready:${performance.now() - launchTime}ms`);
-    logger.logMainChunk().debug(import.meta.env);
-    logger.logMainChunk().debug(`verison: ${app.getVersion()}`);
+    const log = logger.logMainChunk("Launch");
+    log.debug(
+      `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
+    );
+    log.debug(`Ready:${performance.now() - launchTime}ms`);
+    log.debug(import.meta.env);
+    log.debug(`verison: ${app.getVersion()}`);
     if (process.env.NODE_ENV === "development") {
-      const log = logger.logMainChunk();
       try {
         log.debug("install vue devtools");
         await installExtension("nhdogjmejiglipccpnnnanhbledajbpd");
@@ -119,7 +117,7 @@ const launchTime = performance.now();
     registerIpcFunctions();
     // 初期ウインドウ表示
     windows.showWindows();
-    logger.logMainChunk().debug(`ShowWindows:${performance.now() - launchTime}ms`);
+    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // ダークモード監視開始
     observeDarkMode();
     // アップデート確認と通知
@@ -130,7 +128,7 @@ const launchTime = performance.now();
     if (configSettings.data.web) {
       await useWebHook().open(WEBHOOK_PORT);
     }
-    logger.logMainChunk().debug(`Init DB:${performance.now() - launchTime}ms`);
+    log.debug(`Init DB:${performance.now() - launchTime}ms`);
     // usePetaFilesController().verifyFiles();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());

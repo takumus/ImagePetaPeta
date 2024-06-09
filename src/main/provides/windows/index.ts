@@ -33,7 +33,7 @@ export class Windows {
   mainWindowName: WindowName | undefined;
   onCloseWindow(type: WindowName) {
     const quit = useQuit();
-    useLogger().logMainChunk().debug("$Close Window:", type);
+    useLogger().logMainChunk("Windows.onCloswWindow").debug(type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
     const activeMainWindowName = keepAliveWindowNames.reduce<WindowName | undefined>(
@@ -49,9 +49,11 @@ export class Windows {
   }
   showWindows() {
     const configSettings = useConfigSettings();
+    const log = useLogger().logMainChunk("Windows.showWindows");
     if (configSettings.data.eula < EULA) {
       if (windowIs.dead("eula")) {
         this.openWindow("eula");
+        log.debug("show eula");
       } else {
         this.windows.eula?.moveTop();
       }
@@ -60,7 +62,7 @@ export class Windows {
     try {
       useConfigSecureFilePassword().getKey();
     } catch (error) {
-      useLogger().logMainChunk().debug("$Open Password:", error);
+      log.debug("show password");
       this.openWindow("password");
       useConfigSecureFilePassword().events.on("change", () => {
         // usePetaFilesController().encryptAll("encrypt");
@@ -68,6 +70,7 @@ export class Windows {
       });
       return;
     }
+    log.debug("show", configSettings.data.show);
     if (configSettings.data.show === "both") {
       this.openWindow("board");
       this.openWindow("browser");
@@ -78,7 +81,8 @@ export class Windows {
     }
   }
   openWindow(windowName: WindowName, event?: IpcMainInvokeEvent | BrowserWindow, modal = false) {
-    useLogger().logMainChunk().debug("$Open Window:", windowName);
+    const log = useLogger().logMainChunk("Windows.openWindow");
+    log.debug(windowName, "modal:", modal);
     const position = new Vec2();
     const window =
       event !== undefined
@@ -130,7 +134,7 @@ export class Windows {
   }
   createWindow(type: WindowName, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
-    const logger = useLogger().logMainChunk();
+    const logger = useLogger().logMainChunk("Windows.createWindow");
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -157,7 +161,7 @@ export class Windows {
     });
     this.activeWindows[type] = true;
     const state = configWindowStates.data[type];
-    logger.debug("$Create Window:", type);
+    logger.debug(type);
     window.setMenuBarVisibility(false);
     window.on("close", () => this.onCloseWindow(type));
     window.addListener("blur", () =>
@@ -191,7 +195,7 @@ export class Windows {
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
-    useLogger().logMainChunk().debug("$Save Window States:", windowName);
+    useLogger().logMainChunk("Windows.saveWindowSize").debug(windowName);
     let state = configWindowStates.data[windowName];
     if (state === undefined) {
       state = configWindowStates.data[windowName] = {

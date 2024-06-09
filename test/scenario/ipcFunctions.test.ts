@@ -6,6 +6,7 @@ import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { ipcFunctions } from "@/main/ipcFunctions";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBS } from "@/main/provides/databases";
+import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
 const ROOT = "./_test/scenario/ipcFunctions";
@@ -28,7 +29,7 @@ describe("ipcFunctions", () => {
     await initDummyElectron(resolve(ROOT, h.task.name));
   });
   test("importFiles.filePath", async () => {
-    const result = await ipcFunctions.common.importFiles({} as any, [
+    const result = await ipcFunctions.common.importFiles({} as any, useLogger().logMainChunk(""), [
       [
         {
           type: "filePath",
@@ -44,7 +45,7 @@ describe("ipcFunctions", () => {
     await useDBS().waitUntilKillable();
   });
   test("importFiles.withParams", async () => {
-    const result = await ipcFunctions.common.importFiles({} as any, [
+    const result = await ipcFunctions.common.importFiles({} as any, useLogger().logMainChunk(""), [
       [
         {
           type: "filePath",
@@ -62,11 +63,15 @@ describe("ipcFunctions", () => {
     await useDBS().waitUntilKillable();
   });
   test("getPetaBoards.empty", async (h) => {
-    const board = Object.values(await ipcFunctions.common.getPetaBoards({} as any))[0];
+    const board = Object.values(
+      await ipcFunctions.common.getPetaBoards({} as any, useLogger().logMainChunk("")),
+    )[0];
     expect(board).toBeTruthy();
     await useDBS().waitUntilKillable();
     await initDummyElectron(resolve(ROOT, h.task.name));
-    const board2 = Object.values(await ipcFunctions.common.getPetaBoards({} as any))[0];
+    const board2 = Object.values(
+      await ipcFunctions.common.getPetaBoards({} as any, useLogger().logMainChunk("")),
+    )[0];
     expect(board2.id).toBe(board.id);
     await useDBS().waitUntilKillable();
   });

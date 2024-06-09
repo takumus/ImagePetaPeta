@@ -33,9 +33,8 @@ export async function generatePetaFile(param: {
   doEncrypt: boolean;
   secureTempFile?: boolean;
 }): Promise<PetaFile> {
-  const logger = useLogger().logMainChunk();
+  const logger = useLogger().logMainChunk("generatePetaFile");
   const sfp = useConfigSecureFilePassword();
-  logger.debug("#Generate PetaFile");
   const fileInfo = await generateFileInfo(
     param.type === "update" ? (param.extends as PetaFile) : param.filePath,
     param.secureTempFile,
@@ -111,6 +110,7 @@ export async function generateFileInfo(
   source: string | PetaFile,
   secureTempFile?: boolean,
 ): Promise<GeneratedFileInfo | undefined> {
+  const logger = useLogger().logMainChunk("generateFileInfo");
   if (typeof source === "string") {
     const filePath = source;
     function getStream() {
@@ -119,8 +119,7 @@ export async function generateFileInfo(
     const fileType = await fileTypeFromStream(
       secureTempFile ? getStream() : createReadStream(filePath),
     );
-    const logger = useLogger().logMainChunk();
-    logger.debug("#Generate FileInfo", fileType?.mime, `encrypted: ${secureTempFile}`);
+    logger.debug(fileType?.mime, `encrypted: ${secureTempFile}`);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
         return generateImageFileInfoByWorker({
@@ -138,8 +137,7 @@ export async function generateFileInfo(
       return getStreamFromPetaFile(petaFile, "original");
     }
     const fileType = await fileTypeFromStream(getStream());
-    const logger = useLogger().logMainChunk();
-    logger.debug("#Generate FileInfo", fileType?.mime);
+    logger.debug(fileType?.mime);
     if (fileType !== undefined) {
       if (supportedFileConditions.image(fileType)) {
         return generateImageFileInfoByWorker({

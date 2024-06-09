@@ -15,7 +15,7 @@ export class Logger {
   log(from: LogFrom, id: string, ...args: unknown[]) {
     try {
       this.open();
-      const date = `[${from}][${id}](${dateFormat(new Date(), "HH:MM:ss.L")})${callStack ? `[${extractFunctionNames(new Error().stack ?? "")}]` : ""}`;
+      const date = `[${from}](${dateFormat(new Date(), "HH:MM:ss.L")})[${id}]${callStack ? `[${extractFunctionNames(new Error().stack ?? "")}]` : ""}`;
       if (this.logFile) {
         this.logFile.write(
           date + " " + args.map((arg) => JSON.stringify(arg)).join(" ") + "\n",
@@ -59,7 +59,7 @@ export class Logger {
   getCurrentLogfilePath() {
     return this.logFile?.path.toString();
   }
-  logMainChunk(label?: string) {
+  logMainChunk(label: string) {
     return this.logChunk(LogFrom.MAIN, label);
   }
   logRendererChunk(label?: string) {
@@ -67,7 +67,7 @@ export class Logger {
   }
   logChunk(logFrom: LogFrom, label?: string): LogChunk {
     const uid = uuid().substring(0, 4);
-    const id = label ? `${label}(${uid})` : uid;
+    const id = label ? `${uid}.${label}` : uid;
     return {
       debug: (...args: unknown[]) => {
         this.log(logFrom, id, ...args);

@@ -2,6 +2,8 @@
   <e-settings-content-root class="info">
     <p>{{ appInfoStore.state.value.name }} {{ appInfoStore.state.value.version }}</p>
     <p>Electron {{ appInfoStore.state.value.electronVersion }}</p>
+    <p>Chromium {{ appInfoStore.state.value.chromiumVersion }}</p>
+    <p>Node.js {{ appInfoStore.state.value.nodeVersion }}</p>
     <button tabindex="-1" @click="gotoGithub">
       {{ t("info.githubButton") }}
     </button>

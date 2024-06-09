@@ -21,7 +21,7 @@ export class PetaTagsController {
       status: "begin",
     });
     const tagIds = await ppa(async (tag, index) => {
-      const tagId = await this.updatePetaTag(tag, mode);
+      const tagId = await this.update(tag, mode);
       task.emitStatus({
         i18nKey: "tasks.updateDatas",
         progress: {
@@ -54,11 +54,10 @@ export class PetaTagsController {
     const dbPetaTags = useDBPetaTags();
     return dbPetaTags.getAll();
   }
-  private async updatePetaTag(petaTagLike: PetaTagLike, mode: UpdateMode) {
+  private async update(petaTagLike: PetaTagLike, mode: UpdateMode) {
     const dbPetaTags = useDBPetaTags();
     const petaFilesPetaTags = usePetaFilesPetaTagsController();
-    const log = useLogger().logMainChunk();
-    log.debug("##Update PetaTag");
+    const log = useLogger().logMainChunk("PetaTagsController.update");
     if (petaTagLike.type === "petaTag") {
       log.debug("mode:", mode);
       log.debug("tag:", minimizeID(petaTagLike.petaTag.id));

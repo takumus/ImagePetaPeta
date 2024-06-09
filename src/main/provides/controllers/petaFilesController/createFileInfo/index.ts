@@ -21,9 +21,8 @@ export const createFileInfo = {
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
     const paths = usePaths();
-    const log = useLogger().logMainChunk();
+    const log = useLogger().logMainChunk("createFileInfo.fromURL");
     try {
-      log.debug("## Create File Info URL");
       let buffer: Buffer | undefined;
       let remoteURL = "";
       if (url.startsWith(PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE)) {
@@ -82,9 +81,8 @@ export const createFileInfo = {
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
     const paths = usePaths();
-    const log = useLogger().logMainChunk();
+    const log = useLogger().logMainChunk("createFileInfo.fromBuffer");
     try {
-      log.debug("## Create File Info From ArrayBuffer");
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
       const buffer = bufferLike instanceof Buffer ? bufferLike : Buffer.from(bufferLike);
       await exportTempFileAndCheck(buffer, dist, encryptTempFile);

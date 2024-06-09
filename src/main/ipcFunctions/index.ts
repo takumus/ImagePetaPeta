@@ -3,6 +3,7 @@ import * as Path from "node:path";
 import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
 
 import { AppInfo } from "@/commons/datas/appInfo";
+import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
@@ -57,39 +58,35 @@ let detailsPetaFile: PetaFile | undefined;
 let openInBrowserTargetID: string | undefined;
 export const ipcFunctions: IpcFunctionsType = {
   common: {
-    async browseAndImportFiles(event, type) {
+    async browseAndImportFiles(event, logger, type) {
       const fileImporter = useFileImporter();
-      const log = useLogger().logMainChunk();
-      log.debug("#Browse Image Files");
-      return await fileImporter.browseFiles(event, type);
+      const files = await fileImporter.browseFiles(event, type);
+      logger.debug(files);
+      return files;
     },
-    async cancelTasks(event, ids) {
-      const log = useLogger().logMainChunk();
+    async cancelTasks(event, logger, ids) {
       const tasks = useTasks();
-      log.debug("#Cancel Tasks");
+      logger.debug(ids);
       tasks.cancel(ids);
       return;
     },
     async getTaskStatus(event) {
       return useTasks().getStatus();
     },
-    async confirmFailedTasks(event, ids) {
-      const log = useLogger().logMainChunk();
+    async confirmFailedTasks(event, logger, ids) {
       const tasks = useTasks();
-      log.debug("#Confirm Failed Tasks");
+      logger.debug(ids);
       tasks.confirmFailed(ids);
       return;
     },
-    async getPetaFiles() {
+    async getPetaFiles(_, logger) {
       const petaFilesController = usePetaFilesController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Get PetaFiles");
         const petaFiles = petaFilesController.getAllAsMap();
-        log.debug("return:", true);
+        logger.debug("return:", true);
         return petaFiles;
       } catch (e) {
-        log.error(e);
+        logger.error(e);
         showError({
           category: "M",
           code: 100,
@@ -99,16 +96,14 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return {};
     },
-    async updatePetaFiles(event, datas, mode) {
+    async updatePetaFiles(event, logger, datas, mode) {
       const petaFilesController = usePetaFilesController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Update PetaFiles");
         await petaFilesController.updateMultiple(datas, mode);
-        log.debug("return:", true);
+        logger.debug("return:", true);
         return true;
       } catch (err) {
-        log.error(err);
+        logger.error(err);
         showError({
           category: "M",
           code: 200,
@@ -118,15 +113,13 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getPetaBoards() {
+    async getPetaBoards(_, logger) {
       const petaBoardsController = usePetaBoardsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Get PetaBoards");
         const petaBoards = await petaBoardsController.getAllAsMap();
         const length = Object.keys(petaBoards).length;
         if (length === 0) {
-          log.debug("no boards! create empty board");
+          logger.debug("no boards! create empty board");
           const style = getStyle();
           const board = createPetaBoard(
             BOARD_DEFAULT_NAME,
@@ -137,10 +130,10 @@ export const ipcFunctions: IpcFunctionsType = {
           await petaBoardsController.updateMultiple([board], "insert");
           petaBoards[board.id] = board;
         }
-        log.debug("return:", length);
+        logger.debug("return:", length);
         return petaBoards;
       } catch (e) {
-        log.error(e);
+        logger.error(e);
         showError({
           category: "M",
           code: 100,
@@ -150,16 +143,14 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return {};
     },
-    async updatePetaBoards(event, boards, mode) {
+    async updatePetaBoards(event, logger, boards, mode) {
       const petaBoardsController = usePetaBoardsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Update PetaBoards");
         await petaBoardsController.updateMultiple(boards, mode);
-        log.debug("return:", true);
+        logger.debug("return:", true);
         return true;
       } catch (e) {
-        log.error(e);
+        logger.error(e);
         showError({
           category: "M",
           code: 200,
@@ -169,11 +160,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async updatePetaTags(event, tags, mode) {
+    async updatePetaTags(event, log, tags, mode) {
       const petaTagsController = usePetaTagsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Update PetaTags");
         await petaTagsController.updateMultiple(tags, mode);
         log.debug("return:", true);
         return true;
@@ -188,11 +177,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async updatePetaFilesPetaTags(event, petaFileIds, petaTagLikes, mode) {
+    async updatePetaFilesPetaTags(event, log, petaFileIds, petaTagLikes, mode) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Update PetaFilesPetaTags");
         await petaFilesPetaTagsController.updatePetaFilesPetaTags(petaFileIds, petaTagLikes, mode);
         log.debug("return:", true);
         return true;
@@ -207,11 +194,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async updatePetaTagPartitions(event, partitions, mode) {
+    async updatePetaTagPartitions(event, log, partitions, mode) {
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Update PetaFilesPetaTags");
         await petaTagpartitionsController.updateMultiple(partitions, mode);
         log.debug("return:", true);
         return true;
@@ -226,11 +211,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getPetaTagPartitions() {
+    async getPetaTagPartitions(_, log) {
       const petaTagpartitionsController = usePetaTagPartitionsCOntroller();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Get PetaTagPartitions");
         const petaTagPartitions = await petaTagpartitionsController.getAll();
         log.debug("return:", petaTagPartitions.length);
         return petaTagPartitions;
@@ -245,11 +228,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async getPetaFileIds(event, params) {
+    async getPetaFileIds(event, log, params) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Get PetaFileIds");
         log.debug("type:", params.type);
         const ids = await petaFilesPetaTagsController.getPetaFileIds(params);
         log.debug("return:", ids.length);
@@ -265,9 +246,8 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async getPetaTagIdsByPetaFileIds(event, petaFileIds) {
+    async getPetaTagIdsByPetaFileIds(event, log, petaFileIds) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = useLogger().logMainChunk();
       try {
         const petaTagIds =
           await petaFilesPetaTagsController.getPetaTagIdsByPetaFileIds(petaFileIds);
@@ -283,11 +263,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async getPetaTags() {
+    async getPetaTags(_, log) {
       const petaTagsController = usePetaTagsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Get PetaTags");
         const petaTags = await petaTagsController.getAll();
         log.debug("return:", petaTags.length);
         return petaTags;
@@ -302,11 +280,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async getPetaTagCount(event, petaTag) {
+    async getPetaTagCount(event, log, petaTag) {
       const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Get PetaTagCount");
         const petaTagCount = await petaFilesPetaTagsController.getPetaTagCount(petaTag);
         log.debug("return:", petaTagCount);
         return petaTagCount;
@@ -321,60 +297,51 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return -1;
     },
-    async log(event, id, ...args) {
+    async log(event, logger, id, ...args) {
       useLogger().log(LogFrom.RENDERER, id, ...args);
       return true;
     },
-    async openURL(event, url) {
-      const log = useLogger().logMainChunk();
-      log.debug("#Open URL");
-      log.debug("url:", url);
+    async openURL(event, log, url) {
       shell.openExternal(url);
       return true;
     },
-    async openFile(event, petaFile) {
-      const log = useLogger().logMainChunk();
-      log.debug("#Open Image File");
+    async openFile(event, log, petaFile) {
+      log.debug(petaFile.id);
       shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
     },
-    async getAppInfo() {
-      const log = useLogger().logMainChunk();
-      log.debug("#Get App Info");
+    async getAppInfo(_, log) {
       const info: AppInfo = {
         name: app.getName(),
         version: app.getVersion(),
         chromeExtensionVersion: CHROME_EXTENSION_VERSION,
-        electronVersion: process.versions.electron ?? "1.0.0",
+        electronVersion: process.versions.electron ?? "0.0.0",
+        chromiumVersion: process.versions.chrome ?? "0.0.0",
+        nodeVersion: process.versions.node ?? "0.0.0",
       };
       log.debug("return:", info);
       return info;
     },
-    async showDBFolder() {
+    async showDBFolder(_, log) {
       const paths = usePaths();
-      const log = useLogger().logMainChunk();
-      log.debug("#Show DB Folder");
+      log.debug(paths.DIR_ROOT);
       shell.showItemInFolder(paths.DIR_ROOT);
       return true;
     },
-    async showConfigFolder() {
+    async showConfigFolder(_, log) {
       const paths = usePaths();
-      const log = useLogger().logMainChunk();
-      log.debug("#Show Config Folder");
+      log.debug(paths.DIR_APP);
       shell.showItemInFolder(paths.DIR_APP);
       return true;
     },
-    async showImageInFolder(event, petaFile) {
-      const log = useLogger().logMainChunk();
-      log.debug("#Show Image In Folder");
+    async showImageInFolder(event, log, petaFile) {
+      log.debug(petaFile.id);
       shell.showItemInFolder(getPetaFilePath.fromPetaFile(petaFile).original);
       return true;
     },
-    async updateSettings(event, settings) {
+    async updateSettings(event, log, settings) {
       const windows = useWindows();
       const configSettings = useConfigSettings();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Update Settings");
         if (configSettings.data.web !== settings.web) {
           if (settings.web) {
             useWebHook().open(WEBHOOK_PORT);
@@ -406,67 +373,62 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getSettings() {
+    async getSettings(_, log) {
       const configSettings = useConfigSettings();
-      const log = useLogger().logMainChunk();
-      log.debug("#Get Settings");
       log.debug("return:", configSettings.data);
       return configSettings.data;
     },
-    async getWindowIsFocused(event) {
+    async getWindowIsFocused(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Get Window Is Focused");
       const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
       log.debug("return:", isFocued);
       return isFocued;
     },
-    async windowMinimize(event) {
+    async windowMinimize(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Window Minimize");
-      windows.getWindowByEvent(event)?.window.minimize();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.minimize();
+      log.debug(windowInfo?.type);
     },
-    async windowMaximize(event) {
+    async windowMaximize(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Window Maximize");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo?.window.isMaximized()) {
         windowInfo?.window.unmaximize();
         return;
       }
       windowInfo?.window.maximize();
+      log.debug(windowInfo?.type);
     },
-    async windowClose(event) {
+    async windowClose(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Window Close");
-      windows.getWindowByEvent(event)?.window.close();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.close();
+      log.debug(windowInfo?.type);
     },
-    async windowActivate(event) {
+    async windowActivate(event, log) {
       const windows = useWindows();
-      windows.getWindowByEvent(event)?.window.moveTop();
-      windows.getWindowByEvent(event)?.window.focus();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.moveTop();
+      windowInfo?.window.focus();
+      log.debug(windowInfo?.type);
     },
-    async windowToggleDevTools(event) {
+    async windowToggleDevTools(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Toggle Dev Tools");
-      windows.getWindowByEvent(event)?.window.webContents.toggleDevTools();
+      const windowInfo = windows.getWindowByEvent(event);
+      windowInfo?.window.webContents.toggleDevTools();
+      log.debug(windowInfo?.type);
     },
-    async getPlatform() {
-      const log = useLogger().logMainChunk();
-      log.debug("#Get Platform");
+    async getPlatform(_, log) {
       log.debug("return:", process.platform);
       return process.platform;
     },
-    async regeneratePetaFiles() {
+    async regeneratePetaFiles(_, log) {
       const petaFilesController = usePetaFilesController();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Regenerate Thumbnails");
-        await petaFilesController.regeneratePetaFiles();
+        log.debug("start");
+        await petaFilesController.regenerate();
+        log.debug("end");
         return;
       } catch (err) {
         log.error(err);
@@ -479,10 +441,8 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return;
     },
-    async browsePetaFileDirectory(event) {
+    async browsePetaFileDirectory(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Browse PetaFile Directory");
       const windowInfo = windows.getWindowByEvent(event);
       if (windowInfo) {
         const filePath = (
@@ -507,11 +467,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return "";
     },
-    async changePetaFileDirectory(event, path) {
+    async changePetaFileDirectory(event, log, path) {
       const configSettings = useConfigSettings();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#Change PetaFile Directory");
         path = Path.resolve(path);
         if (!isValidPetaFilePath(path)) {
           log.error("Invalid file path:", path);
@@ -521,6 +479,7 @@ export const ipcFunctions: IpcFunctionsType = {
         configSettings.data.petaFileDirectory.default = false;
         configSettings.data.petaFileDirectory.path = path;
         configSettings.save();
+        log.debug("true");
         useQuit().relaunch();
         return true;
       } catch (error) {
@@ -528,17 +487,16 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async getStates() {
+    async getStates(_, log) {
       const configStates = useConfigStates();
-      const log = useLogger().logMainChunk();
-      log.debug("#Get States");
+      log.debug(configStates.data);
       return configStates.data;
     },
-    async realESRGANConvert(event, petaFiles, modelName) {
-      const log = useLogger().logMainChunk();
+    async realESRGANConvert(event, log, petaFiles, modelName) {
       try {
-        log.debug("#Real-ESRGAN Convert");
+        log.debug("start");
         const result = (await realESRGAN(petaFiles, modelName)).map((petaFile) => petaFile.id);
+        log.debug("end");
         log.debug("return:", result);
         return result;
       } catch (error) {
@@ -546,7 +504,7 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async startDrag(event, petaFiles) {
+    async startDrag(event, log, petaFiles) {
       const windows = useWindows();
       const first = petaFiles[0];
       if (!first) {
@@ -557,18 +515,17 @@ export const ipcFunctions: IpcFunctionsType = {
       if (windowIs.alive("board")) {
         windows.windows.board?.moveTop();
       }
+      log.debug(files.length);
       event.sender.startDrag({
         file: firstPath,
         files: files,
         icon: nativeImage.createFromDataURL(Transparent),
       });
     },
-    async updateStates(event, states) {
+    async updateStates(event, log, states) {
       const configStates = useConfigStates();
-      const log = useLogger().logMainChunk();
       const windows = useWindows();
       try {
-        log.debug("#Update States");
         configStates.data = states;
         configStates.save();
         windows.emitMainEvent({ type: "all" }, "updateStates", states);
@@ -579,11 +536,9 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async importFiles(event, datas) {
+    async importFiles(event, log, datas) {
       const fileImporter = useFileImporter();
-      const log = useLogger().logMainChunk();
       try {
-        log.debug("#importFiles");
         log.debug(datas.length, datas);
         const petaFileIds = await fileImporter.importFilesFromImportFileGroup(datas);
         log.debug("return:", petaFileIds.length);
@@ -593,19 +548,16 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return [];
     },
-    async openWindow(event, windowName) {
+    async openWindow(event, log, windowName) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
       openInBrowserTargetID = undefined;
-      log.debug("#Open Window");
       log.debug("type:", windowName);
       windows.openWindow(windowName, event);
     },
-    async openInBrowser(_event, petaFile) {
+    async openInBrowser(_, log, petaFile) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#OpenBrowserAndOpenInBrowser");
       openInBrowserTargetID = typeof petaFile === "string" ? petaFile : petaFile.id;
+      log.debug(openInBrowserTargetID);
       windows.openWindow("browser");
       windows.emitMainEvent(
         { windowNames: ["browser"], type: "windowNames" },
@@ -613,31 +565,31 @@ export const ipcFunctions: IpcFunctionsType = {
         openInBrowserTargetID,
       );
     },
-    async getOpenInBrowserID() {
+    async getOpenInBrowserID(_, log) {
+      log.debug(openInBrowserTargetID);
       return openInBrowserTargetID;
     },
-    async reloadWindow(event) {
+    async reloadWindow(event, log) {
       const windows = useWindows();
-      const log = useLogger().logMainChunk();
-      log.debug("#Reload Window");
       const type = windows.reloadWindowByEvent(event);
       log.debug("type:", type);
     },
-    async getMainWindowName() {
+    async getMainWindowName(_, log) {
       const windows = useWindows();
+      log.debug(windows.mainWindowName);
       return windows.mainWindowName;
     },
-    async getShowNSFW() {
+    async getShowNSFW(_, log) {
+      log.debug(getShowNSFW());
       return getShowNSFW();
     },
-    async setShowNSFW(event, value) {
+    async setShowNSFW(event, log, value) {
+      log.debug(value);
       const windows = useWindows();
       temporaryShowNSFW = value;
       windows.emitMainEvent({ type: "all" }, "showNSFW", getShowNSFW());
     },
-    async searchImageByGoogle(event, petaFile) {
-      const log = useLogger().logMainChunk();
-      log.debug("#Search Image By Google");
+    async searchImageByGoogle(event, log, petaFile) {
       try {
         await searchImageByGoogle(getPetaFilePath.fromPetaFile(petaFile).thumbnail);
         log.debug("return:", true);
@@ -647,9 +599,10 @@ export const ipcFunctions: IpcFunctionsType = {
       }
       return false;
     },
-    async setDetailsPetaFile(event, petaFileId: string) {
+    async setDetailsPetaFile(event, log, petaFileId: string) {
       const petaFilesController = usePetaFilesController();
       const windows = useWindows();
+      log.debug(petaFileId);
       detailsPetaFile = await petaFilesController.getPetaFile(petaFileId);
       if (detailsPetaFile === undefined) {
         return;
@@ -661,24 +614,28 @@ export const ipcFunctions: IpcFunctionsType = {
       );
       return;
     },
-    async getDetailsPetaFile() {
+    async getDetailsPetaFile(_, log) {
+      log.debug(detailsPetaFile);
       return detailsPetaFile;
     },
-    async getStyle() {
-      return getStyle();
+    async getStyle(_, log) {
+      const style = getStyle();
+      log.debug(style);
+      return style;
     },
-    async getIsDataInitialized() {
+    async getIsDataInitialized(_, log) {
       const dbStatus = useDBStatus();
+      console.log(dbStatus.initialized);
       return dbStatus.initialized;
     },
-    async getLatestVersion() {
-      return getLatestVersion();
+    async getLatestVersion(_, log) {
+      const version = await getLatestVersion();
+      log.debug(version);
+      return version;
     },
-    async eula(event, agree) {
+    async eula(event, log, agree) {
       const configSettings = useConfigSettings();
-      const log = useLogger().logMainChunk();
       const quit = useQuit();
-      log.debug("#EULA");
       log.debug(agree ? "agree" : "disagree", EULA);
       if (configSettings.data.eula === EULA) {
         return;
@@ -691,7 +648,7 @@ export const ipcFunctions: IpcFunctionsType = {
         quit.quit(true);
       }
     },
-    async getMediaSources() {
+    async getMediaSources(_, log) {
       const displaySizes = screen.getAllDisplays().reduce(
         (displaySizes, display) => ({
           ...displaySizes,
@@ -703,21 +660,27 @@ export const ipcFunctions: IpcFunctionsType = {
         }),
         {} as { [key: string]: { width: number; height: number; scale: number } },
       );
-      return (await desktopCapturer.getSources({ types: ["screen"] })).map((source) => ({
+      const sources: MediaSourceInfo[] = (
+        await desktopCapturer.getSources({ types: ["screen"] })
+      ).map((source) => ({
         name: source.name,
         id: source.id,
         thumbnailDataURL: source.thumbnail.toDataURL(),
         size: displaySizes[source.display_id],
       }));
+      log.debug(sources);
+      return sources;
     },
-    async getLicenses() {
+    async getLicenses(_, log) {
+      log.debug(extraFiles["licenses.universal"]["licenses.json"]);
       return JSON.parse(
         (
           await readFile(resolveExtraFilesPath(extraFiles["licenses.universal"]["licenses.json"]))
         ).toString(),
       );
     },
-    async getSupporters() {
+    async getSupporters(_, log) {
+      log.debug(extraFiles["supporters.universal"]["supporters.json"]);
       return JSON.parse(
         (
           await readFile(
@@ -726,32 +689,31 @@ export const ipcFunctions: IpcFunctionsType = {
         ).toString(),
       );
     },
-    async openModal(event, label, items) {
-      const log = useLogger().logMainChunk();
-      log.debug("#OpenModal");
+    async openModal(event, log, label, items) {
       const index = await useModals().open(event, label, items);
       log.debug("return:", index);
       return index;
     },
-    async selectModal(_, id, index) {
-      const log = useLogger().logMainChunk();
-      log.debug("#SelectModal");
+    async selectModal(_, log, id, index) {
       useModals().select(id, index);
       log.debug("return:", index);
     },
-    async getModalDatas() {
-      return useModals().getOrders();
+    async getModalDatas(_, log) {
+      const datas = useModals().getOrders();
+      log.debug(datas);
+      return datas;
     },
-    async getWebURL() {
+    async getWebURL(_, log) {
       const ips = getIPs();
       Object.keys(ips).forEach((key) => {
         ips[key] = ips[key].map((ip) => {
           return `http://${ip}:${WEBHOOK_PORT}/web/?webAPIKey=${useWebHook().getAPIKEY()}`;
         });
       });
+      log.debug(ips);
       return ips;
     },
-    async getSimIDs(_, id) {
+    async getSimIDs(_, log, id) {
       try {
         const petaFile = await usePetaFilesController().getPetaFile(id);
         if (petaFile === undefined) {
@@ -768,7 +730,7 @@ export const ipcFunctions: IpcFunctionsType = {
         return [];
       }
     },
-    async getSimTags(_, id) {
+    async getSimTags(_, log, id) {
       try {
         const petaFile = await usePetaFilesController().getPetaFile(id);
         if (petaFile === undefined) {
@@ -785,13 +747,13 @@ export const ipcFunctions: IpcFunctionsType = {
         return [];
       }
     },
-    async openPageDownloader(_, urls) {
+    async openPageDownloader(_, log, urls) {
       const windows = useWindows();
       _urls = urls;
       windows.openWindow("pageDownloader");
       usePageDownloaderCache().clear();
     },
-    async addPageDownloaderDatas(_, urls) {
+    async addPageDownloaderDatas(_, log, urls) {
       _urls = [...urls, ..._urls];
       const windows = useWindows();
       windows.emitMainEvent(
@@ -803,7 +765,13 @@ export const ipcFunctions: IpcFunctionsType = {
     async getPageDownloaderDatas() {
       return _urls;
     },
-    async login(event, password, save) {
+    async login(event, log, password, save) {
+      log.debug(
+        Array.from(Array(password.length).keys())
+          .map(() => "*")
+          .join(""),
+        save,
+      );
       await useConfigSecureFilePassword().setPassword(password, save);
       return true;
     },
@@ -814,7 +782,13 @@ let tf: TF | undefined;
 export function registerIpcFunctions() {
   ObjectKeys(ipcFunctions).forEach((category) => {
     ObjectKeys(ipcFunctions[category]).forEach((name) => {
-      ipcMain.handle(`${category}.${name}`, ipcFunctions[category][name]);
+      ipcMain.handle(`${category}.${name}`, (event, ...args) => {
+        return (ipcFunctions[category][name] as any)(
+          event,
+          useLogger().logMainChunk(`${category}.${name}`),
+          ...args,
+        );
+      });
     });
   });
 }

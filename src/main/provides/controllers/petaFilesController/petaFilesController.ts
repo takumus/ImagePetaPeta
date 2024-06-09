@@ -95,9 +95,9 @@ export class PetaFilesController {
     const dbPetaFiles = useDBPetaFiles();
     return dbPetaFiles.getAll();
   }
-  public async regeneratePetaFiles() {
+  public async regenerate() {
     const windows = useWindows();
-    const log = useLogger().logMainChunk();
+    const log = useLogger().logMainChunk("PetaFilesController.regenerate");
     windows.emitMainEvent({ type: "all" }, "regeneratePetaFilesBegin");
     const petaFiles = this.getAll();
     let completed = 0;
@@ -231,8 +231,7 @@ export class PetaFilesController {
   private async update(petaFile: PetaFile, mode: UpdateMode) {
     const dbPetaFiles = useDBPetaFiles();
     const petaFilesPetaTagsController = usePetaFilesPetaTagsController();
-    const log = useLogger().logMainChunk();
-    log.debug("##Update PetaFile");
+    const log = useLogger().logMainChunk("PetaFilesController.update");
     log.debug("mode:", mode);
     log.debug("image:", minimizeID(petaFile.id));
     if (mode === "remove") {

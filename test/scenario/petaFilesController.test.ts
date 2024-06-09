@@ -125,7 +125,7 @@ describe("petaFilesController", () => {
     ).promise;
     const prevPFs = deepcopy(petaFiles);
     await ppa(async (pf) => rm(getPetaFilePath.fromPetaFile(pf).thumbnail), petaFiles).promise;
-    await pfc.regeneratePetaFiles();
+    await pfc.regenerate();
     const newThumbHashs = await ppa(
       async (pf) => fileSHA256(getPetaFilePath.fromPetaFile(pf).thumbnail),
       petaFiles,
