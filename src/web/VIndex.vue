@@ -116,12 +116,10 @@ async function upload() {
 async function send<C extends keyof IpcFunctions, U extends keyof IpcFunctions[C]>(
   category: C,
   event: U,
-  ...args: Parameters<IpcFunctions[C][U] extends (...args: any) => any ? IpcFunctions[C][U] : never>
+  ...args: Parameters<FunctionGuard<IpcFunctions[C][U]>>
 ): Promise<
   | {
-      response: Awaited<
-        ReturnType<IpcFunctions[C][U] extends (...args: any) => any ? IpcFunctions[C][U] : never>
-      >;
+      response: Awaited<ReturnType<FunctionGuard<IpcFunctions[C][U]>>>;
     }
   | { error: string }
 > {

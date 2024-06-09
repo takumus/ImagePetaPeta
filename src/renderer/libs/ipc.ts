@@ -10,17 +10,11 @@ type Funcs = IpcFunctions & {
   [C in keyof IpcEvents]: {
     on: <U extends keyof IpcEvents[C]>(
       e: U,
-      cb: (
-        event: IpcRendererEvent,
-        ...args: Parameters<IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never>
-      ) => void,
+      cb: (event: IpcRendererEvent, ...args: Parameters<FunctionGuard<IpcEvents[C][U]>>) => void,
     ) => { off: () => void };
     once: <U extends keyof IpcEvents[C]>(
       e: U,
-      cb: (
-        event: IpcRendererEvent,
-        ...args: Parameters<IpcEvents[C][U] extends (...args: any) => any ? IpcEvents[C][U] : never>
-      ) => void,
+      cb: (event: IpcRendererEvent, ...args: Parameters<FunctionGuard<IpcEvents[C][U]>>) => void,
     ) => { off: () => void };
   };
 };
