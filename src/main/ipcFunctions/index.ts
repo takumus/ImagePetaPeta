@@ -29,7 +29,7 @@ import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useDBStatus } from "@/main/provides/databases";
 import { TF } from "@/main/provides/tf";
-import { LogFrom, useLogger } from "@/main/provides/utils/logger";
+import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
@@ -72,7 +72,7 @@ export const ipcFunctions: IpcFunctionsType = {
       );
     },
     async log(event, logger, id, ...args) {
-      useLogger().log(LogFrom.RENDERER, id, ...args);
+      useLogger().log("REND", id, ...args);
       return true;
     },
     async openURL(event, log, url) {
@@ -340,7 +340,7 @@ export function registerIpcFunctions() {
       ipcMain.handle(`${category}.${name}`, (event, ...args) => {
         return (ipcFunctions[category][name] as any)(
           event,
-          useLogger().logMainChunk(`${category}.${name}`),
+          useLogger().logChunk(`${category}.${name}`),
           ...args,
         );
       });

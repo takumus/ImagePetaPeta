@@ -65,7 +65,7 @@ export async function create(
     }
     initialization.destroy();
     initialized = true;
-    logChunk().debug(`$Window "${windowName}" init`);
+    logChunk("init").debug(`$Window "${windowName}" init`);
     const app = createApp(component);
     const platform = await IPC.common.getPlatform();
     app.use(
@@ -118,6 +118,6 @@ export async function create(
   });
   keyboards.enabled = true;
   window.onerror = (e) => {
-    logChunk().debug(`window "${windowName}" error:`, e);
+    logChunk("global").debug(`window "${windowName}" error:`, e);
   };
 }

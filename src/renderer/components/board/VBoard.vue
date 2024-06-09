@@ -130,7 +130,7 @@ onMounted(() => {
     .addEventListener("mousewheel", wheel as (e: Event) => void, { passive: true });
 });
 function construct() {
-  logChunk().debug("construct PIXI");
+  logChunk("VBoard").debug("construct PIXI");
   const pixiApp = vPixi.value?.app();
   if (pixiApp === undefined) {
     return;
@@ -153,7 +153,7 @@ function destruct() {
   //
 }
 function loseContext() {
-  logChunk().error("WEBGL_lose_context");
+  logChunk("VBoard").error("WEBGL_lose_context");
   IPC.windows.reload();
 }
 function resize(rect: PIXIRect) {

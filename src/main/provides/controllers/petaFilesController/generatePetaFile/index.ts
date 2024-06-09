@@ -33,7 +33,7 @@ export async function generatePetaFile(param: {
   doEncrypt: boolean;
   secureTempFile?: boolean;
 }): Promise<PetaFile> {
-  const logger = useLogger().logMainChunk("generatePetaFile");
+  const logger = useLogger().logChunk("generatePetaFile");
   const sfp = useConfigSecureFilePassword();
   const fileInfo = await generateFileInfo(
     param.type === "update" ? (param.extends as PetaFile) : param.filePath,
@@ -110,7 +110,7 @@ export async function generateFileInfo(
   source: string | PetaFile,
   secureTempFile?: boolean,
 ): Promise<GeneratedFileInfo | undefined> {
-  const logger = useLogger().logMainChunk("generateFileInfo");
+  const logger = useLogger().logChunk("generateFileInfo");
   if (typeof source === "string") {
     const filePath = source;
     function getStream() {

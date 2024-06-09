@@ -21,7 +21,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
   const paths = usePaths();
   const tasks = useTasks();
   const task = tasks.spawn("realESRGAN", false);
-  const log = useLogger().logMainChunk("realESRGAN");
+  const log = useLogger().logChunk("realESRGAN");
   const { execFilePath, modelFilePath } = getFilePath();
   log.debug("execFilePath:", execFilePath);
   await setPermisionTo755(execFilePath);

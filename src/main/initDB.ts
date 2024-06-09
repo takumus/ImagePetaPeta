@@ -15,7 +15,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { useWindows } from "@/main/provides/windows";
 
 export async function initDB() {
-  const initLog = useLogger().logMainChunk("initDB");
+  const initLog = useLogger().logChunk("initDB");
   const dbPetaBoard = useDBPetaBoards();
   const dbPetaFiles = useDBPetaFiles();
   const dbPetaFilesPetaTags = useDBPetaFilesPetaTags();
@@ -67,7 +67,7 @@ export async function initDB() {
     return;
   }
   try {
-    const migrationLog = useLogger().logMainChunk("migrationDB");
+    const migrationLog = useLogger().logChunk("migrationDB");
     // 旧バージョンからのマイグレーション
     await migrate((l: string) => {
       emitInitialization(`migrate: ${l}`);
@@ -88,7 +88,7 @@ export async function initDB() {
     return;
   }
   // 自動圧縮登録
-  const compactionLog = useLogger().logMainChunk("compactionDB");
+  const compactionLog = useLogger().logChunk("compactionDB");
   dbs.forEach((db) => {
     db.on("beginCompaction", () => {
       compactionLog.debug(`begin compaction(${db.name})`);

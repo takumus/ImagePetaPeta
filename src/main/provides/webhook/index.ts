@@ -67,7 +67,7 @@ export class WebHook extends TypedEventEmitter<{
   }
   private initAPI() {
     this.http.post("/api", async (req, res) => {
-      const executeLog = useLogger().logMainChunk("webhook.execute");
+      const executeLog = useLogger().logChunk("webhook.execute");
       try {
         const eventName = (req.body.event as string).split(".") as [string, string];
         console.log(eventName);
@@ -84,7 +84,7 @@ export class WebHook extends TypedEventEmitter<{
           res.json({
             response: await event(
               undefined,
-              useLogger().logMainChunk(`webhook.${eventName[0]}.${eventName[1]}`),
+              useLogger().logChunk(`webhook.${eventName[0]}.${eventName[1]}`),
               ...(req.body.args ?? []),
             ),
           });
@@ -100,7 +100,7 @@ export class WebHook extends TypedEventEmitter<{
     });
   }
   public async open(port: number) {
-    const log = useLogger().logMainChunk("webhook.open");
+    const log = useLogger().logChunk("webhook.open");
     log.debug(`begin`, port);
     if (this.server !== undefined) {
       log.debug(`already opened`);
@@ -121,7 +121,7 @@ export class WebHook extends TypedEventEmitter<{
     });
   }
   public async close() {
-    const log = useLogger().logMainChunk("webhook.close");
+    const log = useLogger().logChunk("webhook.close");
     const server = this.server;
     log.debug(`begin`);
     if (server === undefined) {

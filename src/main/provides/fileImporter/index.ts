@@ -43,7 +43,7 @@ export class FileImporter {
     return 0;
   }
   public async importFilesFromImportFileGroup(datas: ImportFileGroup[]) {
-    const logFromBrowser = useLogger().logMainChunk("FileImporter.fromBrowser");
+    const logFromBrowser = useLogger().logChunk("FileImporter.fromBrowser");
     const ids = getIdsFromFilePaths(datas);
     if (ids.length > 0 && ids.length === datas.length) {
       logFromBrowser.debug("return:", ids.length);
@@ -103,7 +103,7 @@ export class FileImporter {
       return [];
     }
     const task = tasks.spawn("importFilesFromFilePaths", silent);
-    const log = useLogger().logMainChunk("FileImporter.importFilesFromFileInfos");
+    const log = useLogger().logChunk("FileImporter.importFilesFromFileInfos");
     const fileInfos: ImportFileInfo[] = [];
     if (params.extract) {
       fileInfos.push(...(await this.getFileInfosRecursive(log, task, params.fileInfos)));

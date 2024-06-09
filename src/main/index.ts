@@ -29,7 +29,7 @@ const launchTime = performance.now();
   }
   const logger = useLogger();
   process.on("uncaughtException", function (error) {
-    logger.logMainChunk("Main Process Error").error(error);
+    logger.logChunk("Main Process Error").error(error);
   });
   const windows = useWindows();
   const configSettings = useConfigSettings();
@@ -64,7 +64,7 @@ const launchTime = performance.now();
   ]);
   // Macでドックアイコン押した時。
   app.on("activate", async () => {
-    logger.logMainChunk("App Event").debug("activate");
+    logger.logChunk("App Event").debug("activate");
     if (windowIs.dead("board") && windowIs.dead("browser")) {
       windows.showWindows();
     }
@@ -92,7 +92,7 @@ const launchTime = performance.now();
   });
   // electron準備OK
   async function appReady() {
-    const log = logger.logMainChunk("Launch");
+    const log = logger.logChunk("Launch");
     log.debug(
       `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
     );

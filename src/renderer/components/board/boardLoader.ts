@@ -47,7 +47,7 @@ export function initBoardLoader(
       deletions: string[];
     };
   }): Promise<void> {
-    const log = logChunk().debug;
+    const log = logChunk("boardLoader").debug;
     // endCrop();
     // リロードじゃないならクリア。
     if (params.reload === undefined) {
@@ -77,10 +77,10 @@ export function initBoardLoader(
     loadingStatus.value.loadProgress = 0;
     loadingStatus.value.extractProgress = 0;
     if (cancelExtract !== undefined) {
-      log("vBoard", `canceling loading`);
+      log(`canceling loading`);
       pPanelsArray().forEach((pPanel) => pPanel.destroy());
       await cancelExtract();
-      log("vBoard", `canceled loading`);
+      log(`canceled loading`);
       return load(params);
     }
     if (petaPanels.length === 0) {
@@ -90,7 +90,7 @@ export function initBoardLoader(
       statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;
       return;
     }
-    log("vBoard", `load(${params.reload ? "reload" : "full"})`, minimizeID(currentBoard.value.id));
+    log(`load(${params.reload ? "reload" : "full"})`, minimizeID(currentBoard.value.id));
     let loaded = 0;
     const extract = async (petaPanel: RPetaPanel, index: number) => {
       if (currentBoard.value === undefined) {
@@ -107,11 +107,7 @@ export function initBoardLoader(
             // }
             loadingStatus.value.loadProgress = Math.floor((loaded / petaPanels.length) * 100);
             const progress = `${loaded}/${petaPanels.length}`;
-            log(
-              "vBoard",
-              `loaded[${error ?? "success"}](${minimizeID(petaPanel.petaFileId)}):`,
-              progress,
-            );
+            log(`loaded[${error ?? "success"}](${minimizeID(petaPanel.petaFileId)}):`, progress);
             loadingStatus.value.log =
               `load complete   (${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
               loadingStatus.value.log;
@@ -179,12 +175,12 @@ export function initBoardLoader(
           onLoaded(petaPanel);
           loadResult = "skip";
         }
-        log("vBoard", `extracted[${loadResult}](${minimizeID(petaPanel.petaFileId)}):`, progress);
+        log(`extracted[${loadResult}](${minimizeID(petaPanel.petaFileId)}):`, progress);
         loadingStatus.value.log =
           `extract complete(${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
           loadingStatus.value.log;
       } catch (error) {
-        log("vBoard", `extract error(${minimizeID(petaPanel.petaFileId)}):`, progress, error);
+        log(`extract error(${minimizeID(petaPanel.petaFileId)}):`, progress, error);
         loadingStatus.value.log =
           `extract error   (${minimizeID(petaPanel.petaFileId)}):${progress}\n` +
           loadingStatus.value.log;
@@ -196,12 +192,12 @@ export function initBoardLoader(
     try {
       await extraction.promise;
     } catch (error) {
-      log("vBoard", "load error:", error);
+      log("load error:", error);
     }
     loadingStatus.value.extracting = false;
     loadingStatus.value.log = "";
     cancelExtract = undefined;
-    log("vBoard", "load complete");
+    log("load complete");
     sortIndex();
     Cursor.setDefaultCursor();
     statesStore.state.value.loadedPetaBoardId = currentBoard.value.id;

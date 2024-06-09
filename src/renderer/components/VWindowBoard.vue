@@ -154,7 +154,7 @@ async function selectPetaBoard(board: RPetaBoard | undefined) {
   if (currentPetaBoard.value?.id === board.id) {
     return;
   }
-  logChunk().debug("vIndex", "PetaBoard Selected", minimizeID(board.id));
+  logChunk("VWindowBoard").debug("selected", minimizeID(board.id));
   statesStore.state.value.selectedPetaBoardId = board.id;
   statesStore.state.value.loadedPetaBoardId = "";
   if (errorPetaBoardId.value === board.id) {

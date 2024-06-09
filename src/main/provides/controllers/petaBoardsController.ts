@@ -22,7 +22,7 @@ export class PetaBoardsController {
   }
   private async update(board: PetaBoard, mode: UpdateMode) {
     const dbPetaBoards = useDBPetaBoards();
-    const log = useLogger().logMainChunk("PetaBoardsController.update");
+    const log = useLogger().logChunk("PetaBoardsController.update");
     log.debug("mode:", mode);
     log.debug("board:", minimizeID(board.id));
     if (mode === "remove") {

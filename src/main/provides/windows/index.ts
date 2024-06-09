@@ -34,7 +34,7 @@ export class Windows {
   mainWindowName: WindowName | undefined;
   onCloseWindow(type: WindowName) {
     const quit = useQuit();
-    useLogger().logMainChunk("Windows.onCloswWindow").debug(type);
+    useLogger().logChunk("Windows.onCloswWindow").debug(type);
     this.saveWindowSize(type);
     this.activeWindows[type] = false;
     const activeMainWindowName = keepAliveWindowNames.reduce<WindowName | undefined>(
@@ -50,7 +50,7 @@ export class Windows {
   }
   showWindows() {
     const configSettings = useConfigSettings();
-    const log = useLogger().logMainChunk("Windows.showWindows");
+    const log = useLogger().logChunk("Windows.showWindows");
     if (configSettings.data.eula < EULA) {
       if (windowIs.dead("eula")) {
         this.openWindow("eula");
@@ -82,7 +82,7 @@ export class Windows {
     }
   }
   openWindow(windowName: WindowName, event?: IpcMainInvokeEvent | BrowserWindow, modal = false) {
-    const log = useLogger().logMainChunk("Windows.openWindow");
+    const log = useLogger().logChunk("Windows.openWindow");
     log.debug(windowName, "modal:", modal);
     const position = new Vec2();
     const window =
@@ -135,7 +135,7 @@ export class Windows {
   }
   createWindow(type: WindowName, options: Electron.BrowserWindowConstructorOptions) {
     const configWindowStates = useConfigWindowStates();
-    const logger = useLogger().logMainChunk("Windows.createWindow");
+    const logger = useLogger().logChunk("Windows.createWindow");
     const window = new BrowserWindow({
       minWidth: WINDOW_MIN_WIDTH,
       minHeight: WINDOW_MIN_HEIGHT,
@@ -194,7 +194,7 @@ export class Windows {
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();
-    useLogger().logMainChunk("Windows.saveWindowSize").debug(windowName);
+    useLogger().logChunk("Windows.saveWindowSize").debug(windowName);
     let state = configWindowStates.data[windowName];
     if (state === undefined) {
       state = configWindowStates.data[windowName] = {
