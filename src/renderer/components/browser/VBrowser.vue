@@ -152,6 +152,7 @@ const BROWSER_THUMBNAIL_MARGIN = 8;
 const left = ref<HTMLElement>();
 const right = ref<HTMLElement>();
 const scrollHeight = ref(0);
+const copiedTagIds = ref<string[]>([]);
 onMounted(() => {
   thumbnails.value?.addEventListener("scroll", updateScrollArea);
   thumbnails.value?.addEventListener("wheel", mouseWheel);
@@ -395,6 +396,24 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
         click: async () => {
           const ids = await IPC.common.getSimTags(petaFile.id);
           console.log(JSON.stringify(ids, undefined, 2));
+        },
+      },
+      {
+        label: "copyTag",
+        click: async () => {
+          copiedTagIds.value = await IPC.petaFilePetaTags.getPetaTagIdsByPetaFileIds(
+            selectedPetaFiles.value.map((p) => p.id),
+          );
+        },
+      },
+      {
+        label: "pasteTag",
+        click: async () => {
+          IPC.petaFilePetaTags.update(
+            selectedPetaFiles.value.map((p) => p.id),
+            copiedTagIds.value.map((id) => ({ type: "id", id })),
+            "insert",
+          );
         },
       },
       {
