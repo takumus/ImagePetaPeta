@@ -47,9 +47,9 @@ const keyboards = new Keyboards();
 onMounted(async () => {
   // AnimatedGIFLoader.add?.();
   petaFilesStore.onUpdate(async (newPetaFiles, mode) => {
-    // if (mode === UpdateMode.UPDATE) {
+    // if (mode === "update") {
     //   vPetaBoard.value?.orderPIXIRender();
-    // } else if (mode === UpdateMode.REMOVE) {
+    // } else if (mode === "remove") {
     //   newPetaFiles.forEach((petaFile) => {
     //     if (!board.value) {
     //       return;

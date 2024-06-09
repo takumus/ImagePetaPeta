@@ -3,8 +3,6 @@ import { resolve } from "node:path";
 import { initDummyElectron } from "./initDummyElectron";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { UpdateMode } from "@/commons/datas/updateMode";
-
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
@@ -49,7 +47,7 @@ describe("petaFilesPetaTags", () => {
           name: "A",
         },
       ],
-      UpdateMode.INSERT,
+      "insert",
     );
     const petaTag = (await petaTagsController.getPetaTags())[0];
     await pfptc.updatePetaFilesPetaTags(
@@ -60,7 +58,7 @@ describe("petaFilesPetaTags", () => {
           id: petaTag.id,
         },
       ],
-      UpdateMode.INSERT,
+      "insert",
     );
     const taggedPetaFileIDs = await pfptc.getPetaFileIds({
       type: "petaTag",
@@ -86,7 +84,7 @@ describe("petaFilesPetaTags", () => {
     const result = await addPetaTag();
     const pfc = usePetaFilesController();
     const pfptc = usePetaFilesPetaTagsController();
-    await pfc.updateMultiple([result.taggedPetaFile], UpdateMode.REMOVE);
+    await pfc.updateMultiple([result.taggedPetaFile], "remove");
     expect(
       (
         await pfptc.getPetaFileIds({
@@ -108,7 +106,7 @@ describe("petaFilesPetaTags", () => {
           petaTag: result.petaTag,
         },
       ],
-      UpdateMode.REMOVE,
+      "remove",
     );
     expect(
       (
@@ -132,7 +130,7 @@ describe("petaFilesPetaTags", () => {
           petaTag: result.petaTag,
         },
       ],
-      UpdateMode.REMOVE,
+      "remove",
     );
     expect(
       (

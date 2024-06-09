@@ -45,7 +45,7 @@ export class PetaFilesController {
         status: "progress",
       });
     }, datas).promise;
-    if (mode === UpdateMode.REMOVE) {
+    if (mode === "remove") {
       // Tileの更新対象なし
       windows.emitMainEvent(
         {
@@ -108,7 +108,7 @@ export class PetaFilesController {
         if (newPetaFile === undefined) {
           return;
         }
-        await this.update(newPetaFile, UpdateMode.UPDATE);
+        await this.update(newPetaFile, "update");
         log.debug(`thumbnail (${++completed} / ${petaFiles.length})`);
         windows.emitMainEvent(
           { type: EmitMainEventTargetType.ALL },
@@ -136,7 +136,7 @@ export class PetaFilesController {
             name: "broken",
           },
         ],
-        UpdateMode.INSERT,
+        "insert",
       );
       brokenPetaTag = (await usePetaTagsController().getPetaTags()).find(
         (p) => p.name === "broken",
@@ -177,7 +177,7 @@ export class PetaFilesController {
     await usePetaFilesPetaTagsController().updatePetaFilesPetaTags(
       errorIDs,
       [{ type: "id", id: brokenPetaTag.id }],
-      UpdateMode.INSERT,
+      "insert",
       true,
     );
     console.log("error:", errorIDs.length, "/", petaFiles.length);
@@ -202,7 +202,7 @@ export class PetaFilesController {
             await rename(pathTemp[k], pathOrg[k]);
           }
           pf.encrypted = mode === "encrypt";
-          this.update(pf, UpdateMode.UPDATE);
+          this.update(pf, "update");
         } catch (e) {
           console.log(e);
         }
@@ -241,7 +241,7 @@ export class PetaFilesController {
     log.debug("##Update PetaFile");
     log.debug("mode:", mode);
     log.debug("image:", minimizeID(petaFile.id));
-    if (mode === UpdateMode.REMOVE) {
+    if (mode === "remove") {
       await petaFilesPetaTagsController.remove(petaFile.id, "petaFileId");
       await dbPetaFiles.remove({ id: petaFile.id });
       const path = getPetaFilePath.fromPetaFile(petaFile);
@@ -251,7 +251,7 @@ export class PetaFilesController {
       await rm(path.thumbnail).catch(() => {
         //
       });
-    } else if (mode === UpdateMode.UPDATE) {
+    } else if (mode === "update") {
       await dbPetaFiles.update({ id: petaFile.id }, petaFile);
     } else {
       await dbPetaFiles.insert(petaFile);

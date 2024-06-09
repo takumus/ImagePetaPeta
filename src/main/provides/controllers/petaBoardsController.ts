@@ -27,9 +27,9 @@ export class PetaBoardsController {
     log.debug("##Update PetaBoard");
     log.debug("mode:", mode);
     log.debug("board:", minimizeID(board.id));
-    if (mode === UpdateMode.REMOVE) {
+    if (mode === "remove") {
       await dbPetaBoards.remove({ id: board.id });
-    } else if (mode === UpdateMode.UPDATE) {
+    } else if (mode === "update") {
       await dbPetaBoards.update({ id: board.id }, board);
     } else {
       await dbPetaBoards.insert(board);

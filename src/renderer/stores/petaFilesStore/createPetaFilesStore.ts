@@ -17,7 +17,7 @@ export async function createPetaFilesStore() {
   }>();
   IPC.on("updatePetaFiles", async (e, newPetaFiles, mode) => {
     const newRPetaFiles = newPetaFiles.map((petaFile) => petaFileToRPetaFile(petaFile));
-    if (mode === UpdateMode.INSERT || mode === UpdateMode.UPDATE) {
+    if (mode === "insert" || mode === "update") {
       newRPetaFiles.forEach((newRPetaFile) => {
         const oldPetaFile = states.value[newRPetaFile.id];
         if (oldPetaFile === undefined) {
@@ -26,7 +26,7 @@ export async function createPetaFilesStore() {
           Object.assign(oldPetaFile, { ...newRPetaFile, renderer: oldPetaFile.renderer });
         }
       });
-    } else if (mode === UpdateMode.REMOVE) {
+    } else if (mode === "remove") {
       newPetaFiles.forEach((petaFile) => {
         delete states.value[petaFile.id];
       });

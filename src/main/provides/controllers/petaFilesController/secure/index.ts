@@ -3,7 +3,6 @@ import path, { resolve } from "node:path";
 import { v4 as uuid } from "uuid";
 
 import { PetaFile } from "@/commons/datas/petaFile";
-import { UpdateMode } from "@/commons/datas/updateMode";
 
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
@@ -26,7 +25,7 @@ export async function encryptPetaFile(petaFile: PetaFile, updatePetaFile = true)
     await rename(tempPaths.thumbnail, paths.thumbnail);
     if (updatePetaFile) {
       petaFile.encrypted = true;
-      await usePetaFilesController().updateMultiple([petaFile], UpdateMode.UPDATE);
+      await usePetaFilesController().updateMultiple([petaFile], "update");
     }
     return true;
   } catch {

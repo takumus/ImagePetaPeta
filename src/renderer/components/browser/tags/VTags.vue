@@ -88,7 +88,6 @@ import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vu
 import { createPetaTagPartition, PetaTagPartition } from "@/commons/datas/petaTagPartition";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
 import { BrowserTag } from "@/renderer/components/browser/browserTag";
@@ -165,7 +164,7 @@ const sortHelper = initSortHelper<MergedSortHelperData>(
             index: orders.value[petaTag.id] ?? 0,
           },
         })),
-        UpdateMode.UPDATE,
+        "update",
       );
       petaTagPartitionsStore.updatePetaTagPartitions(
         Object.values(petaTagPartitionsStore.state.petaTagPartitions.value).map(
@@ -174,7 +173,7 @@ const sortHelper = initSortHelper<MergedSortHelperData>(
             index: orders.value[petaTagPartition.id] ?? 0,
           }),
         ),
-        UpdateMode.UPDATE,
+        "update",
       );
     },
     onClick: (_event, data) => {
@@ -237,12 +236,12 @@ function partitionMenu(event: PointerEvent | MouseEvent, ptp: PetaTagPartition) 
   );
 }
 async function addTag(name: string) {
-  await petaTagsStore.updatePetaTags([{ type: "name", name }], UpdateMode.INSERT);
+  await petaTagsStore.updatePetaTags([{ type: "name", name }], "insert");
 }
 async function addPartition(name: string, index: number) {
   const partition = createPetaTagPartition(name);
   partition.index = index;
-  await petaTagPartitionsStore.updatePetaTagPartitions([partition], UpdateMode.INSERT);
+  await petaTagPartitionsStore.updatePetaTagPartitions([partition], "insert");
 }
 async function removeTag(petaTag: RPetaTag) {
   if (
@@ -251,7 +250,7 @@ async function removeTag(petaTag: RPetaTag) {
       t("commons.no"),
     ])) === 0
   ) {
-    await petaTagsStore.updatePetaTags([{ type: "id", id: petaTag.id }], UpdateMode.REMOVE);
+    await petaTagsStore.updatePetaTags([{ type: "id", id: petaTag.id }], "remove");
     const index = props.selectedPetaTagIds.findIndex((pt) => pt === petaTag.id);
     if (index >= 0) {
       // props.selectedPetaTags.splice(index, 1);
@@ -268,7 +267,7 @@ async function removeTagPartition(petaTag: PetaTagPartition) {
       t("commons.no"),
     ])) === 0
   ) {
-    await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], UpdateMode.REMOVE);
+    await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], "remove");
   }
 }
 async function changeTag(petaTag: RPetaTag, newName: string) {
@@ -280,7 +279,7 @@ async function changeTag(petaTag: RPetaTag, newName: string) {
     return;
   }
   petaTag.name = newName;
-  await petaTagsStore.updatePetaTags([{ type: "petaTag", petaTag }], UpdateMode.UPDATE);
+  await petaTagsStore.updatePetaTags([{ type: "petaTag", petaTag }], "update");
   selectPetaTag(petaTag);
 }
 async function changePartition(petaTag: PetaTagPartition, newName: string) {
@@ -288,7 +287,7 @@ async function changePartition(petaTag: PetaTagPartition, newName: string) {
     return;
   }
   petaTag.name = newName;
-  await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], UpdateMode.UPDATE);
+  await petaTagPartitionsStore.updatePetaTagPartitions([petaTag], "update");
 }
 function changeFilterType(filterType: FilterType) {
   emit("update:selectedFilterType", filterType);

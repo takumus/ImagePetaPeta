@@ -1,11 +1,8 @@
 import { mkdirSync, rmdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { initDummyElectron } from "./initDummyElectron";
-import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { UpdateMode } from "@/commons/datas/updateMode";
-
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBS } from "@/main/provides/databases";
 
@@ -37,7 +34,7 @@ describe("petaTags", () => {
           name: "A",
         },
       ],
-      UpdateMode.INSERT,
+      "insert",
     );
     const petaTags = await petaTagsController.getPetaTags();
     expect(petaTags[0].name, "addPetaTag").toBe("A");

@@ -6,7 +6,6 @@ import { AppInfo } from "@/commons/datas/appInfo";
 import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { createPetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BOARD_DEFAULT_NAME,
   CHROME_EXTENSION_VERSION,
@@ -141,7 +140,7 @@ export const ipcFunctions: IpcFunctionsType = {
             style["--color-0"],
             style["--color-2"],
           );
-          await petaBoardsController.updateMultiple([board], UpdateMode.INSERT);
+          await petaBoardsController.updateMultiple([board], "insert");
           petaBoards[board.id] = board;
         }
         log.debug("return:", length);

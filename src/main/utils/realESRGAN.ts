@@ -3,7 +3,6 @@ import * as Path from "node:path";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 import { RealESRGANModelName } from "@/commons/datas/realESRGANModelName";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
 import { extraFiles } from "@/_defines/extraFiles";
@@ -139,7 +138,7 @@ async function importImage(outputFile: string, petaFile: PetaFile, newName: stri
   newPetaFile.name = newName;
   newPetaFile.note = petaFile.note;
   newPetaFile.nsfw = petaFile.nsfw;
-  await petaFilesController.updateMultiple([newPetaFile], UpdateMode.UPDATE);
+  await petaFilesController.updateMultiple([newPetaFile], "update");
   const pipts = await dbPetaFilesPetaTags.find({
     petaFileId: petaFile.id,
   });
@@ -149,7 +148,7 @@ async function importImage(outputFile: string, petaFile: PetaFile, newName: stri
       type: "id",
       id: pipt.petaTagId,
     })),
-    UpdateMode.INSERT,
+    "insert",
   );
   return newPetaFile;
 }

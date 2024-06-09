@@ -43,7 +43,6 @@ import VTooltip from "@/renderer/components/commons/utils/tooltip/VTooltip.vue";
 
 import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { createRPetaPanel } from "@/commons/datas/rPetaPanel";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BOARD_ADD_MULTIPLE_OFFSET_X,
   BOARD_ADD_MULTIPLE_OFFSET_Y,
@@ -90,18 +89,18 @@ onMounted(async () => {
       currentPetaBoard.value === undefined
         ? false
         : hasPetaFiles(currentPetaBoard.value, newPetaFiles);
-    if (mode === UpdateMode.INSERT || mode === UpdateMode.REMOVE) {
+    if (mode === "insert" || mode === "remove") {
       if (needReload) {
         const ids = newPetaFiles.map((petaFile) => petaFile.id);
         vPetaBoard.value?.load({
           reload: {
-            additions: mode === UpdateMode.INSERT ? ids : [],
-            deletions: mode === UpdateMode.REMOVE ? ids : [],
+            additions: mode === "insert" ? ids : [],
+            deletions: mode === "remove" ? ids : [],
           },
         });
       }
       addOrderedPetaPanels();
-    } else if (mode === UpdateMode.UPDATE) {
+    } else if (mode === "update") {
       vPetaBoard.value?.orderPIXIRender();
     }
   });

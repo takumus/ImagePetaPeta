@@ -88,7 +88,6 @@ import { realESRGANModelNames } from "@/commons/datas/realESRGANModelName";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
 import { browserTileViewMode } from "@/commons/datas/states";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import {
   BROWSER_THUMBNAIL_SIZE,
   BROWSER_THUMBNAIL_ZOOM_MAX,
@@ -168,7 +167,7 @@ onMounted(() => {
     IPC.common.getOpenInBrowserID().then(openInBrowser);
   });
   petaFilesStore.onUpdate((petaFiles, mode) => {
-    if (mode === UpdateMode.INSERT) {
+    if (mode === "insert") {
       selectedPetaTagIds.value = [];
       selectedFilterType.value = FilterType.ALL;
     }
@@ -407,7 +406,7 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
               [t("commons.yes"), t("commons.no")],
             )) === 0
           ) {
-            petaFilesStore.updatePetaFiles(selectedPetaFiles.value, UpdateMode.REMOVE);
+            petaFilesStore.updatePetaFiles(selectedPetaFiles.value, "remove");
           }
         },
       },

@@ -173,9 +173,9 @@ export class PetaFilesPetaTagsController {
     log.debug("##Update PetaFilePetaTag");
     log.debug("mode:", mode);
     log.debug("tag:", minimizeID(petaFilePetaTag.id));
-    if (mode === UpdateMode.REMOVE) {
+    if (mode === "remove") {
       await dbPetaFilesPetaTags.remove({ id: petaFilePetaTag.id });
-    } else if (mode === UpdateMode.UPDATE) {
+    } else if (mode === "update") {
       await dbPetaFilesPetaTags.update({ id: petaFilePetaTag.id }, petaFilePetaTag);
     } else {
       await dbPetaFilesPetaTags.insert(petaFilePetaTag);

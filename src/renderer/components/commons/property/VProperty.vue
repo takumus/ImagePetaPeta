@@ -160,7 +160,6 @@ import VTextarea from "@/renderer/components/commons/utils/textarea/VTextarea.vu
 import { PetaColor } from "@/commons/datas/petaColor";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 import { RPetaTag } from "@/commons/datas/rPetaTag";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import { rgb2hex, rgb2hsl } from "@/commons/utils/colors";
 import { vec2FromPointerEvent } from "@/commons/utils/vec2";
 
@@ -190,7 +189,7 @@ async function addTag(name: string) {
   await IPC.common.updatePetaFilesPetaTags(
     props.petaFiles.map((petaFile) => petaFile.id),
     [{ type: "name", name }],
-    UpdateMode.INSERT,
+    "insert",
   );
   setTimeout(() => {
     tagInput.value?.edit();
@@ -200,7 +199,7 @@ async function removeTag(petaTag: RPetaTag) {
   await IPC.common.updatePetaFilesPetaTags(
     props.petaFiles.map((petaFile) => petaFile.id),
     [{ type: "id", id: petaTag.id }],
-    UpdateMode.REMOVE,
+    "remove",
   );
 }
 function changeName(name: string) {
@@ -208,20 +207,20 @@ function changeName(name: string) {
     return;
   }
   singlePetaFileInfo.value.petaFile.name = name;
-  petaFilesStore.updatePetaFiles([singlePetaFileInfo.value.petaFile], UpdateMode.UPDATE);
+  petaFilesStore.updatePetaFiles([singlePetaFileInfo.value.petaFile], "update");
 }
 function changeNote(note: string) {
   if (singlePetaFileInfo.value === undefined) {
     return;
   }
   singlePetaFileInfo.value.petaFile.note = note;
-  petaFilesStore.updatePetaFiles([singlePetaFileInfo.value.petaFile], UpdateMode.UPDATE);
+  petaFilesStore.updatePetaFiles([singlePetaFileInfo.value.petaFile], "update");
 }
 function changeNSFW(value: boolean) {
   props.petaFiles.forEach((pi) => {
     pi.nsfw = value;
   });
-  petaFilesStore.updatePetaFiles(props.petaFiles, UpdateMode.UPDATE);
+  petaFilesStore.updatePetaFiles(props.petaFiles, "update");
 }
 function tagMenu(event: PointerEvent | MouseEvent, tag: RPetaTag) {
   components.contextMenu.open(

@@ -7,7 +7,6 @@ import deepcopy from "lodash.clonedeep";
 import sharp from "sharp";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { UpdateMode } from "@/commons/datas/updateMode";
 import { ppa } from "@/commons/utils/pp";
 
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
@@ -103,7 +102,7 @@ describe("petaFilesController", () => {
           name: "newImage",
         };
       }),
-      UpdateMode.UPDATE,
+      "update",
     );
     expect(petaFiles.length, "petaFiles.length").toBe(8);
     pfc.getAll().forEach((petaFile) => {

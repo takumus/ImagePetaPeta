@@ -52,9 +52,9 @@ export class PetaTagPartitionsController {
     log.debug("##Update PetaTagPartition");
     log.debug("mode:", mode);
     log.debug("tag:", minimizeID(petaPetaTagPartition.id));
-    if (mode === UpdateMode.REMOVE) {
+    if (mode === "remove") {
       await dbPetaTagPartitions.remove({ id: petaPetaTagPartition.id });
-    } else if (mode === UpdateMode.UPDATE) {
+    } else if (mode === "update") {
       await dbPetaTagPartitions.update({ id: petaPetaTagPartition.id }, petaPetaTagPartition);
     } else {
       await dbPetaTagPartitions.insert(petaPetaTagPartition);

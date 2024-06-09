@@ -8,7 +8,6 @@ import { ImportFileInfo } from "@/commons/datas/importFileInfo";
 import { ImportImageResult } from "@/commons/datas/importImageResult";
 import { LogChunk } from "@/commons/datas/logChunk";
 import { PetaFile } from "@/commons/datas/petaFile";
-import { UpdateMode } from "@/commons/datas/updateMode";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { getIdsFromFilePaths } from "@/commons/utils/getIdsFromFilePaths";
 import { ppa } from "@/commons/utils/pp";
@@ -159,7 +158,7 @@ export class FileImporter {
           if (petaFile === undefined) {
             throw new Error("unsupported file");
           }
-          await controller.updateMultiple([petaFile], UpdateMode.INSERT, true);
+          await controller.updateMultiple([petaFile], "insert", true);
           addedFileCount++;
           petaFiles.push(petaFile);
         }
