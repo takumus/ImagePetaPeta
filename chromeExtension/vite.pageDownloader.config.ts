@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     minify: false,
-    outDir: resolve("./dist/contents/pageDownloader"),
+    outDir: resolve("./_release/contents/pageDownloader"),
     emptyOutDir: false,
     rollupOptions: {
       output: {

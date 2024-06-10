@@ -9,7 +9,7 @@ export default defineConfig({
   base: "./",
   build: {
     emptyOutDir: true,
-    outDir: resolve("./dist/popup"),
+    outDir: resolve("./_release/popup"),
     minify: false,
     rollupOptions: {},
   },

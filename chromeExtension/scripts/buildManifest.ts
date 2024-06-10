@@ -3,4 +3,4 @@ import { resolve } from "path";
 import { manifest } from "$/manifest";
 
 console.log("export manifest.json");
-writeFileSync(resolve("./dist/manifest.json"), JSON.stringify(manifest, undefined, 2));
+writeFileSync(resolve("./_release/manifest.json"), JSON.stringify(manifest, undefined, 2));

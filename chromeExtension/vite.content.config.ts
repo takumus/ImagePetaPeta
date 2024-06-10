@@ -9,7 +9,7 @@ export default defineConfig({
   base: "./",
   build: {
     emptyOutDir: !process.argv.includes("--dev"),
-    outDir: resolve("./dist/contents/ui"),
+    outDir: resolve("./_release/contents/ui"),
     minify: false,
     rollupOptions: {
       output: {

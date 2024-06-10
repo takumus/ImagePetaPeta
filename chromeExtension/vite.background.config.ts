@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     minify: false,
-    outDir: resolve("./dist/"),
+    outDir: resolve("./_release/"),
     emptyOutDir: false,
     lib: {
       entry: {

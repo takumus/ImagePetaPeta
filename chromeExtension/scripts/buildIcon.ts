@@ -7,6 +7,6 @@ import sharp from "sharp";
     const size = sizes[i];
     await sharp("../resources/images/app/icon.png")
       .resize(size)
-      .toFile(resolve("./dist", `icon${size}.png`));
+      .toFile(resolve("./_release", `icon${size}.png`));
   }
 })();
