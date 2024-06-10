@@ -16,7 +16,11 @@ export class PTransformerDashedLine extends PIXI.Container {
     this.init();
   }
   init() {
-    this.texture = new PIXI.TilingSprite(useCommonTextureStore().DASHED_LINE, 100, 100);
+    this.texture = new PIXI.TilingSprite({
+      texture: useCommonTextureStore().DASHED_LINE,
+      width: 100,
+      height: 100,
+    });
     this.texture.mask = this.graphics;
     this.texture.anchor.set(0.5, 0.5);
     this.addChild(this.texture);
@@ -43,7 +47,7 @@ export class PTransformerDashedLine extends PIXI.Container {
     this.graphics.clear();
     this.graphics.poly(this.corners.map((p) => new PIXI.Point(p.x, p.y)));
     this.graphics.stroke({
-      width: 2,
+      width: this.renderScale,
       color: 0x00ff00,
     });
     this.corners

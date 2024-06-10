@@ -59,7 +59,11 @@ let scale = 1;
 const position = new Vec2();
 const settingsStore = useSettingsStore();
 const pointerPosition = new Vec2();
-const nsfwMask = new PIXI.TilingSprite(useCommonTextureStore().NSFW, 100, 100);
+const nsfwMask = new PIXI.TilingSprite({
+  texture: useCommonTextureStore().NSFW,
+  width: 100,
+  height: 100,
+});
 const dragging = ref(false);
 let fitToOutside = true;
 onMounted(() => {

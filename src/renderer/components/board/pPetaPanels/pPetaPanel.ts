@@ -10,16 +10,16 @@ import { PFileObject } from "@/renderer/utils/pFileObject";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
-export class PPetaPanel extends PIXI.Sprite {
+export class PPetaPanel extends PIXI.Container {
   public unselected = false;
   public dragging = false;
   public draggingOffset = new Vec2();
-  public imageWrapper = new PIXI.Sprite();
+  public imageWrapper = new PIXI.Container();
   public noImage = true;
   public loading = true;
   private masker = new PIXI.Graphics();
   private selection = new PIXI.Graphics();
-  private cover = new PIXI.Sprite();
+  private cover = new PIXI.Container();
   private nsfwTile?: PIXI.TilingSprite;
   private noImageTile?: PIXI.TilingSprite;
   private loadingTile?: PIXI.TilingSprite;
@@ -37,16 +37,30 @@ export class PPetaPanel extends PIXI.Sprite {
   ) {
     super();
     this.pFileObject = new PFileObject();
-    this.anchor.set(0.5, 0.5);
     this.imageWrapper.mask = this.masker;
     this.imageWrapper.addChild(this.pFileObject);
     this.addChild(this.imageWrapper, this.masker, this.cover, this.selection);
     this.eventMode = "static";
     this.cover.visible = false;
-    this.nsfwTile = new PIXI.TilingSprite(this.commonTextureStore.NSFW, 100, 100);
+    this.nsfwTile = new PIXI.TilingSprite({
+      //this.commonTextureStore.NSFW, 100, 100
+      texture: this.commonTextureStore.NSFW,
+      width: 100,
+      height: 100,
+    });
     this.nsfwTile.visible = false;
-    this.noImageTile = new PIXI.TilingSprite(this.commonTextureStore.NO, 100, 100);
-    this.loadingTile = new PIXI.TilingSprite(this.commonTextureStore.LOADING, 100, 100);
+    this.noImageTile = new PIXI.TilingSprite({
+      //this.commonTextureStore.NO, 100, 100
+      texture: this.commonTextureStore.NO,
+      width: 100,
+      height: 100,
+    });
+    this.loadingTile = new PIXI.TilingSprite({
+      //this.commonTextureStore.LOADING, 100, 100
+      texture: this.commonTextureStore.LOADING,
+      width: 100,
+      height: 100,
+    });
     this.setZoomScale(this.zoomScale);
     this.cover.addChild(this.noImageTile, this.nsfwTile, this.loadingTile);
     this.setPetaPanel(this.petaPanel);
@@ -137,10 +151,10 @@ export class PPetaPanel extends PIXI.Sprite {
         this.petaPanel.flipHorizontal ? -1 : 1,
         this.petaPanel.flipVertical ? -1 : 1,
       );
-      this.imageWrapper.anchor.set(
-        this.petaPanel.flipHorizontal ? 1 : 0,
-        this.petaPanel.flipVertical ? 1 : 0,
-      );
+      // this.imageWrapper.anchor.set(
+      //   this.petaPanel.flipHorizontal ? 1 : 0,
+      //   this.petaPanel.flipVertical ? 1 : 0,
+      // );
       if (this.petaPanel.crop.width !== 1 || this.petaPanel.crop.height !== 1) {
         this.imageWrapper.mask = this.masker;
         this.masker.visible = true;

@@ -7,7 +7,7 @@ import { PImageFileObjectContent } from "@/renderer/utils/pFileObject/image";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
-export class PFileObject extends PIXI.Sprite {
+export class PFileObject extends PIXI.Container {
   public content?: PFileObjectContent<any>;
   private _loaded = false;
   constructor() {
