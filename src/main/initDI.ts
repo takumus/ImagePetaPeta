@@ -122,6 +122,9 @@ export function initDI(
     // ルートディレクトリは試行錯誤して決定する。
     const DIR_ROOT = (() => {
       // デフォルトならピクチャーズ
+      if (import.meta.env.VITE_ROOT_PATH) {
+        return import.meta.env.VITE_ROOT_PATH;
+      }
       if (configSettings.data.petaFileDirectory.default) {
         return (configSettings.data.petaFileDirectory.path = initDirectorySync(
           true,
