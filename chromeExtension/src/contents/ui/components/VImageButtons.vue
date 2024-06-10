@@ -27,8 +27,8 @@
   </e-image-buttons-root>
 </template>
 <script setup lang="ts">
-import { ImageInfo } from "$/@types/imageInfo";
 import { getImageExtension } from "$/contents/ui/getImageExtension";
+import { ImageInfo } from "$/datas/imageInfo";
 import { computed, onMounted, ref } from "vue";
 
 const props = defineProps<{

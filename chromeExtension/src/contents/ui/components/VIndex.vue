@@ -20,12 +20,12 @@
 </template>
 <script setup lang="ts">
 import VImageButtons from "./VImageButtons.vue";
-import { ImageInfo } from "$/@types/imageInfo";
 import { MessagesToContent } from "$/commons/messages";
 import { sendToBackground } from "$/commons/sendToBackground";
 import VBoxes from "$/contents/ui/components/VBoxes.vue";
 import { getData, ImageParserResult } from "$/contents/ui/imageParser";
 import { injectedDataStoreKey } from "$/contents/ui/injectedData";
+import { ImageInfo } from "$/datas/imageInfo";
 import { inject, onMounted, ref } from "vue";
 
 const urls = ref<string[]>([]);
