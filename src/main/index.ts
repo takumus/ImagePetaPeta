@@ -1,4 +1,4 @@
-import { app, protocol } from "electron";
+import { app, protocol, session } from "electron";
 import installExtension from "electron-devtools-installer";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
@@ -92,6 +92,27 @@ const launchTime = performance.now();
   });
   // electron準備OK
   async function appReady() {
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          "Content-Security-Policy": [
+            [
+              "default-src",
+              "'self'",
+              "'unsafe-inline'",
+              "'unsafe-eval'",
+              "data:",
+              "blob:",
+              "file:",
+              PROTOCOLS.FILE.IMAGE_ORIGINAL + ":",
+              PROTOCOLS.FILE.IMAGE_THUMBNAIL + ":",
+              PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE + ":",
+            ].join(" "),
+          ],
+        },
+      });
+    });
     const log = logger.logChunk("Launch");
     log.debug(
       `\n####################################\n#-------APPLICATION LAUNCHED-------#\n####################################`,
