@@ -28,7 +28,6 @@ const { t } = useI18n();
 const progress = ref(100);
 const status = ref<TaskStatusCode>("complete");
 const currentTaskId = ref("");
-const prevIndex = ref(-1);
 const log = ref("");
 const cancelable = ref(false);
 const name = ref("");
@@ -48,12 +47,7 @@ function changeTaskStatus() {
   if (currentTaskId.value !== task.id) {
     log.value = "";
     progress.value = 100;
-    prevIndex.value = -1;
   }
-  if (prevIndex.value == task.index) {
-    return;
-  }
-  prevIndex.value = task.index;
   currentTaskId.value = task.id;
   // window.clearTimeout(closeWindowHandler);
   name.value = task.i18nKey + ".name";
