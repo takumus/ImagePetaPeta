@@ -1,3 +1,4 @@
+import { PetaPanelPlayableLoop } from "@/commons/datas/petaPanel";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { VideoLoader } from "@/renderer/utils/pFileObject/@loaders/videoLoader";
@@ -10,9 +11,13 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   private _canceledLoading = false;
   private setCurrentTimeHandler = -1;
   private orderedCurrentTime = -1;
+  private loop?: PetaPanelPlayableLoop;
   async load(petaFile: RPetaFile) {
     this.video = new VideoLoader(petaFile, false);
     this.video.on("update", () => {
+      if (this.loop?.enabled) {
+        this.doLoop();
+      }
       this.event.emit("time");
       this.event.emit("updateRenderer");
     });
@@ -37,6 +42,23 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
         this.setCurrentTimeFromOrdered.bind(this),
         1000 / 60,
       );
+    }
+  }
+  private doLoop() {
+    if (this.video === undefined) {
+      return;
+    }
+    if (this.loop === undefined) {
+      return;
+    }
+    const loop = this.loop;
+    if (loop.range.end === 0 && loop.range.start === 0) {
+      return;
+    }
+    if (this.video.element.currentTime < loop.range.start) {
+      this.video.element.currentTime = loop.range.start;
+    } else if (this.video.element.currentTime > loop.range.end) {
+      this.video.element.currentTime = loop.range.end;
     }
   }
   destroy() {
@@ -95,5 +117,11 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
       this.video.element.playbackRate = speed;
       this.event.emit("speed");
     }
+  }
+  getLoop() {
+    return this.loop;
+  }
+  setLoop(loop: PetaPanelPlayableLoop) {
+    this.loop = loop;
   }
 }

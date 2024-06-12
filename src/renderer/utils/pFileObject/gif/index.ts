@@ -1,3 +1,4 @@
+import { PetaPanelPlayableLoop } from "@/commons/datas/petaPanel";
 import { RPetaFile } from "@/commons/datas/rPetaFile";
 
 import { AnimatedGIF } from "@/renderer/libs/pixi-gif/animatedGIF";
@@ -89,5 +90,11 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
       this.animatedGIF.animationSpeed = speed;
       this.event.emit("speed");
     }
+  }
+  setLoop(loop: PetaPanelPlayableLoop): void {
+    //
+  }
+  getLoop(): PetaPanelPlayableLoop | undefined {
+    return undefined;
   }
 }

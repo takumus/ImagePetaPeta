@@ -85,6 +85,7 @@ export class PPetaPanel extends PIXI.Container {
             this.pFileObject.content.setCurrentTime(this.petaPanel.status.time);
             this.pFileObject.content.setPaused(this.petaPanel.status.paused);
             this.pFileObject.content.setSpeed(this.petaPanel.status.speed);
+            this.pFileObject.content.setLoop(this.petaPanel.status.loop);
             if (this.pFileObject.content instanceof PVideoFileObjectContent) {
               if (this.petaPanel.status.type === "video") {
                 this.pFileObject.content.setVolume(this.petaPanel.status.volume);

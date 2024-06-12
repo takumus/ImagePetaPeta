@@ -38,6 +38,7 @@ import { useI18n } from "vue-i18n";
 import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
+import { PetaPanelPlayableLoop } from "@/commons/datas/petaPanel";
 import { secondsToHMS } from "@/commons/utils/secondsToHMS";
 
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
@@ -60,11 +61,19 @@ const emit = defineEmits<{
   (e: "volume"): void;
   (e: "seek"): void;
   (e: "speed"): void;
+  (e: "loop"): void;
 }>();
 const duration = ref(0);
 const currentTime = ref(0);
 const currentVolume = ref(0);
 const currentSpeed = ref(1);
+const currentLoop = ref<PetaPanelPlayableLoop>({
+  enabled: true,
+  range: {
+    start: 0,
+    end: 0,
+  },
+});
 const isPlayingBeforeSeek = ref(false);
 const playing = ref(false);
 onUnmounted(() => {
@@ -115,6 +124,15 @@ const currentSpeedModel = computed<number>({
   set(value) {
     props.pFileObjectContent.setSpeed(value / 1000);
     emit("speed");
+  },
+});
+const currentLoopModel = computed<PetaPanelPlayableLoop>({
+  get() {
+    return currentLoop.value;
+  },
+  set(value) {
+    currentLoop.value = value;
+    emit("loop");
   },
 });
 function onPause() {
