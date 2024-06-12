@@ -4,12 +4,14 @@
   box-sizing: border-box;
 }
 ::-webkit-scrollbar {
-  width: 8px;
+  width: var(--px-3);
 }
 ::-webkit-scrollbar-thumb {
-  border-radius: var(--rounded);
+  border-radius: 9999px;
   background-color: var(--color-border);
-  min-height: var(--px-3);
+  min-height: var(--px-4);
+  border: solid var(--px-1) rgba(0,0,0,0);
+  background-clip: padding-box;
 }
 body,
 html {
