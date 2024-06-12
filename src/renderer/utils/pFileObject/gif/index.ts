@@ -93,8 +93,15 @@ export class PGIFFileObjectContent extends PPlayableFileObjectContent<void> {
   }
   setLoop(loop: PetaPanelPlayableLoop): void {
     //
+    this.event.emit("loop");
   }
-  getLoop(): PetaPanelPlayableLoop | undefined {
-    return undefined;
+  getLoop(): PetaPanelPlayableLoop {
+    return {
+      enabled: true,
+      range: {
+        start: 0,
+        end: 0,
+      },
+    };
   }
 }

@@ -17,10 +17,23 @@ export function createRPetaPanel(
 ) {
   const status = ((): PetaPanelStatus => {
     if (petaFile.metadata.type === "image" && petaFile.metadata.gif) {
-      return { type: "gif", paused: true, time: 0, speed: 1 };
+      return {
+        type: "gif",
+        paused: true,
+        time: 0,
+        speed: 1,
+        loop: { enabled: true, range: { start: 0, end: 0 } },
+      };
     }
     if (petaFile.metadata.type === "video") {
-      return { type: "video", paused: true, time: 0, speed: 1, volume: 0 };
+      return {
+        type: "video",
+        paused: true,
+        time: 0,
+        speed: 1,
+        volume: 0,
+        loop: { enabled: true, range: { start: 0, end: 0 } },
+      };
     }
     return { type: "none" };
   })();

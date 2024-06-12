@@ -27,7 +27,8 @@
         @paused="pausePlayback"
         @seek="seekPlayback"
         @volume="volumeVideo"
-        @speed="speedPlayback" />
+        @speed="speedPlayback"
+        @loop="loop" />
     </e-content>
   </VFloating>
 </template>
@@ -126,6 +127,19 @@ function speedPlayback() {
     (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
   ) {
     pPetaPanel.petaPanel.status.speed = pPetaPanel.pFileObject.content.getSpeed();
+    emit("update:petaPanels", [pPetaPanel.petaPanel]);
+  }
+}
+function loop() {
+  const pPetaPanel = singleSelectedPPetaPanel.value;
+  if (pPetaPanel === undefined) {
+    return;
+  }
+  if (
+    pPetaPanel.pFileObject.content instanceof PPlayableFileObjectContent &&
+    (pPetaPanel.petaPanel.status.type === "video" || pPetaPanel.petaPanel.status.type === "gif")
+  ) {
+    pPetaPanel.petaPanel.status.loop = pPetaPanel.pFileObject.content.getLoop();
     emit("update:petaPanels", [pPetaPanel.petaPanel]);
   }
 }

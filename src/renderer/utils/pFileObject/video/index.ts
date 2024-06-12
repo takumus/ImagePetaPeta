@@ -11,7 +11,13 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   private _canceledLoading = false;
   private setCurrentTimeHandler = -1;
   private orderedCurrentTime = -1;
-  private loop?: PetaPanelPlayableLoop;
+  private loop: PetaPanelPlayableLoop = {
+    enabled: true,
+    range: {
+      start: 0,
+      end: 0,
+    },
+  };
   async load(petaFile: RPetaFile) {
     this.video = new VideoLoader(petaFile, false);
     this.video.on("update", () => {
@@ -52,13 +58,14 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
       return;
     }
     const loop = this.loop;
+    console.log("doLoop", this.video.element.currentTime, loop.range.start, loop.range.end);
     if (loop.range.end === 0 && loop.range.start === 0) {
       return;
     }
-    if (this.video.element.currentTime < loop.range.start) {
+    if (this.video.element.currentTime < loop.range.start - 0.1) {
       this.video.element.currentTime = loop.range.start;
     } else if (this.video.element.currentTime > loop.range.end) {
-      this.video.element.currentTime = loop.range.end;
+      this.video.element.currentTime = loop.range.start;
     }
   }
   destroy() {
@@ -123,5 +130,6 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
   }
   setLoop(loop: PetaPanelPlayableLoop) {
     this.loop = loop;
+    this.event.emit("loop");
   }
 }

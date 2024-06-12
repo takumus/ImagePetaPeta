@@ -25,6 +25,6 @@ export abstract class PPlayableFileObjectContent<
   abstract getSpeed(): number;
   abstract setSpeed(speed: number): void;
 
-  abstract getLoop(): PetaPanelPlayableLoop | undefined;
+  abstract getLoop(): PetaPanelPlayableLoop;
   abstract setLoop(loop: PetaPanelPlayableLoop): void;
 }

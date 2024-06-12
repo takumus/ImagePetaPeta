@@ -1,10 +1,10 @@
 import { Vec2 } from "@/commons/utils/vec2";
 
 export interface PetaPanelPlayableLoop {
-  enabled: true;
+  enabled: boolean;
   range: {
-    start: 0;
-    end: 0;
+    start: number;
+    end: number;
   };
 }
 export type PetaPanelPlayableStatus = {
