@@ -56,6 +56,13 @@ export async function create(
   windowName: WindowName,
   stores?: KeyStoreCreatorPair<unknown>[],
 ) {
+  const keyboards = new Keyboards();
+  keyboards.keys("KeyD").down(() => {
+    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
+      IPC.windows.toggleDevTools();
+    }
+  });
+  keyboards.enabled = true;
   const initialization = createInitialization();
   await initialization.initialize();
   let initialized = false;
@@ -110,13 +117,6 @@ export async function create(
   //     capture: false,
   //   },
   // );
-  const keyboards = new Keyboards();
-  keyboards.keys("KeyD").down(() => {
-    if (Keyboards.pressedOR("ControlLeft", "ControlRight", "MetaLeft", "MetaRight")) {
-      IPC.windows.toggleDevTools();
-    }
-  });
-  keyboards.enabled = true;
   window.onerror = (e) => {
     logChunk("global").debug(`window "${windowName}" error:`, e);
   };
