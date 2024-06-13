@@ -10,16 +10,6 @@ export class Keyboards {
     Keyboards.init();
     Keyboards.add(this);
   }
-  private keydown = (key: Keys, event?: KeyboardEvent) => {
-    if (this.enabled) {
-      this.emit(key, true, event);
-    }
-  };
-  private keyup = (key: Keys, event?: KeyboardEvent) => {
-    if (this.enabled) {
-      this.emit(key, false, event);
-    }
-  };
   public lock() {
     Keyboards.locked = this.id;
   }
@@ -33,6 +23,7 @@ export class Keyboards {
     this.upListeners = {};
   }
   public keys(...keys: Keys[]) {
+    keys = parseKeys(...keys);
     const handler = {
       down: (callback: KeyboardsCallback) => {
         keys.forEach((key) => {
@@ -54,21 +45,31 @@ export class Keyboards {
     };
     return handler;
   }
-  private emit(key: Keys, pressed: boolean, event?: KeyboardEvent) {
-    (pressed ? this.downListeners : this.upListeners)[key]?.forEach((callback) => {
-      callback(pressed, event);
-    });
-  }
   public set enabled(value: boolean) {
     this._enabled = value;
     if (!value) {
       this.unlock();
     }
   }
+  private keydown = (key: Keys, event?: KeyboardEvent) => {
+    if (this.enabled) {
+      this.emit(key, true, event);
+    }
+  };
+  private keyup = (key: Keys, event?: KeyboardEvent) => {
+    if (this.enabled) {
+      this.emit(key, false, event);
+    }
+  };
   public get enabled() {
     return (
       this._enabled && (Keyboards.locked < 0 || Keyboards.locked === this.id || !this.lockable)
     );
+  }
+  private emit(key: Keys, pressed: boolean, event?: KeyboardEvent) {
+    (pressed ? this.downListeners : this.upListeners)[key]?.forEach((callback) => {
+      callback(pressed, event);
+    });
   }
 
   // statics
@@ -77,7 +78,7 @@ export class Keyboards {
   static locked = -1;
   static id = 0;
   static pressedKeys: { [key: string]: boolean } = {};
-  static init() {
+  public static init() {
     if (Keyboards.inited) {
       return;
     }
@@ -109,14 +110,6 @@ export class Keyboards {
         });
     });
   }
-  static add(keyboards: Keyboards) {
-    if (!Keyboards.listeners.has(keyboards)) {
-      Keyboards.listeners.add(keyboards);
-    }
-  }
-  static remove(keyboards: Keyboards) {
-    Keyboards.listeners.delete(keyboards);
-  }
   public static pressedOR(...keys: Keys[]) {
     for (let i = 0; i < keys.length; i++) {
       if (Keyboards.pressed(keys[i])) {
@@ -137,8 +130,28 @@ export class Keyboards {
     if (key === undefined) {
       return false;
     }
-    return Keyboards.pressedKeys[key] ? true : false;
+    return parseKeys(key).find((key) => Keyboards.pressedKeys[key]) ? true : false;
   }
+  private static add(keyboards: Keyboards) {
+    if (!Keyboards.listeners.has(keyboards)) {
+      Keyboards.listeners.add(keyboards);
+    }
+  }
+  private static remove(keyboards: Keyboards) {
+    Keyboards.listeners.delete(keyboards);
+  }
+}
+function parseKeys(...keys: Keys[]) {
+  const newKeys: Keys[] = [];
+  keys.forEach((key) => {
+    if (key.endsWith("*")) {
+      const head = key.replace("*", "");
+      newKeys.push((head + "Left") as Keys, (head + "Right") as Keys);
+    } else {
+      newKeys.push(key);
+    }
+  });
+  return newKeys;
 }
 type KeyboardsCallback = (pressed: boolean, event?: KeyboardEvent) => void;
 export type Keys =
@@ -244,4 +257,8 @@ export type Keys =
   | "BracketLeft"
   | "Backslash"
   | "BracketRight"
-  | "Quote";
+  | "Quote"
+  | "Alt*"
+  | "Shift*"
+  | "Control*"
+  | "Meta*";

@@ -23,6 +23,8 @@
         <VSeekBar
           :duration="duration"
           v-model:time="currentTimeModel"
+          v-model:loop-start="currentLoopStartModel"
+          v-model:loop-end="currentLoopEndModel"
           @start-seek="startSeek"
           @stop-seek="stopSeek" />
       </e-seekbar>
@@ -32,12 +34,14 @@
 </template>
 
 <script setup lang="ts">
+import cloneDeep from "lodash.clonedeep";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VSeekBar from "@/renderer/components/commons/playbackController/VSeekBar.vue";
 import VSlider from "@/renderer/components/commons/utils/slider/VSlider.vue";
 
+import { PetaPanelPlayableLoop } from "@/commons/datas/petaPanel";
 import { secondsToHMS } from "@/commons/utils/secondsToHMS";
 
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
@@ -60,11 +64,14 @@ const emit = defineEmits<{
   (e: "volume"): void;
   (e: "seek"): void;
   (e: "speed"): void;
+  (e: "loop"): void;
 }>();
 const duration = ref(0);
 const currentTime = ref(0);
 const currentVolume = ref(0);
 const currentSpeed = ref(1);
+const currentLoopStart = ref(0);
+const currentLoopEnd = ref(0);
 const isPlayingBeforeSeek = ref(false);
 const playing = ref(false);
 onUnmounted(() => {
@@ -117,6 +124,28 @@ const currentSpeedModel = computed<number>({
     emit("speed");
   },
 });
+const currentLoopStartModel = computed<number>({
+  get() {
+    return currentLoopStart.value;
+  },
+  set(value) {
+    const loop = cloneDeep(props.pFileObjectContent.getLoop());
+    loop.range.start = value / 1000;
+    props.pFileObjectContent.setLoop(loop);
+    emit("loop");
+  },
+});
+const currentLoopEndModel = computed<number>({
+  get() {
+    return currentLoopEnd.value;
+  },
+  set(value) {
+    const loop = cloneDeep(props.pFileObjectContent.getLoop());
+    loop.range.end = value / 1000;
+    props.pFileObjectContent.setLoop(loop);
+    emit("loop");
+  },
+});
 function onPause() {
   playing.value = !props.pFileObjectContent.getPaused();
 }
@@ -130,16 +159,22 @@ function onVolume() {
 }
 function onSpeed() {
   currentSpeed.value = props.pFileObjectContent.getSpeed() * 1000;
-  console.log(currentSpeed.value);
+}
+function onLoop() {
+  currentLoopStart.value = props.pFileObjectContent.getLoop().range.start * 1000;
+  currentLoopEnd.value = props.pFileObjectContent.getLoop().range.end * 1000;
 }
 function observe(content: PPlayableFileObjectContent<void>) {
   duration.value = content.getDuration() * 1000;
   playing.value = !content.getPaused();
   currentTime.value = content.getCurrentTime() * 1000;
   currentSpeed.value = content.getSpeed() * 1000;
+  currentLoopStart.value = content.getLoop().range.start * 1000;
+  currentLoopEnd.value = content.getLoop().range.end * 1000;
   content.event.on("paused", onPause);
   content.event.on("time", onTime);
   content.event.on("speed", onSpeed);
+  content.event.on("loop", onLoop);
   if (content instanceof PVideoFileObjectContent) {
     content.event.on("volume", onVolume);
     currentVolume.value = content.getVolume() * 1000;
@@ -149,6 +184,7 @@ function unobserve(content?: PPlayableFileObjectContent<void>) {
   content?.event.off("paused", onPause);
   content?.event.off("time", onTime);
   content?.event.off("speed", onSpeed);
+  content?.event.off("loop", onLoop);
   if (content instanceof PVideoFileObjectContent) {
     content.event.off("volume", onVolume);
   }

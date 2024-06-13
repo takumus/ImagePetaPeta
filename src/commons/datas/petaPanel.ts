@@ -1,9 +1,17 @@
 import { Vec2 } from "@/commons/utils/vec2";
 
+export interface PetaPanelPlayableLoop {
+  enabled: boolean;
+  range: {
+    start: number;
+    end: number;
+  };
+}
 export type PetaPanelPlayableStatus = {
   paused: boolean;
   time: number;
   speed: number;
+  loop: PetaPanelPlayableLoop;
 };
 export type PetaPanelFilters = {
   grayscale?: {
