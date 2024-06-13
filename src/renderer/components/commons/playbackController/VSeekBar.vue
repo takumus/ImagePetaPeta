@@ -127,7 +127,7 @@ e-seekbar-root {
       position: absolute;
       top: 0px;
       left: 0px;
-      opacity: 0.5;
+      // opacity: 0.5;
       z-index: 1;
       width: 100%;
       height: 100%;
@@ -136,6 +136,7 @@ e-seekbar-root {
         position: relative;
         top: 0px;
         left: 0px;
+        opacity: 0.1;
         border-radius: var(--rounded);
         background-color: var(--color-font);
         height: 100%;
@@ -146,7 +147,7 @@ e-seekbar-root {
         top: 0px;
         left: 0px;
         border-radius: var(--rounded);
-        background-color: #ff0000;
+        background-color: var(--color-accent-1);
         width: var(--px-1);
         height: 100%;
         &.left {
