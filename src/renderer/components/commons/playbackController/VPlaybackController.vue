@@ -28,12 +28,6 @@
           @start-seek="startSeek"
           @stop-seek="stopSeek" />
       </e-seekbar>
-      <!-- <e-seekbar>
-        <VSeekBar :duration="duration" v-model:time="currentLoopStartModel" />
-      </e-seekbar>
-      <e-seekbar>
-        <VSeekBar :duration="duration" v-model:time="currentLoopEndModel" />
-      </e-seekbar> -->
       <e-current-time>{{ currentTimeHMS }}</e-current-time>
     </e-general>
   </e-playback-controller-root>
