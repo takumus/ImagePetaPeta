@@ -58,7 +58,6 @@ export class PVideoFileObjectContent extends PPlayableFileObjectContent<{
       return;
     }
     const loop = this.loop;
-    console.log("doLoop", this.video.element.currentTime, loop.range.start, loop.range.end);
     if (loop.range.end === 0 && loop.range.start === 0) {
       return;
     }
