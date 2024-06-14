@@ -33,13 +33,13 @@ export const secureFile = ((iv: Buffer) => {
       }
       encoded.on("error", error);
       output.on("error", error);
-      const hash = verify ? await fileSHA256(getInputStream(input)) : undefined;
+      const hash = verify ? fileSHA256(getInputStream(input)) : undefined;
       async function close() {
         if (verify) {
-          const newHash = await fileSHA256(
+          const newHash = fileSHA256(
             toStream(outputFilePath, key, mode === "decrypt" ? "encrypt" : "decrypt"),
           );
-          if (hash === newHash) {
+          if ((await hash) === (await newHash)) {
             res();
           } else {
             rej("failed");
