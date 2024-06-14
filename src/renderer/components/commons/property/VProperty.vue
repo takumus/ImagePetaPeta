@@ -66,6 +66,12 @@
               @click="changeCurrentColor(color.color)">
             </e-color>
           </e-color-wrapper>
+          <e-test
+            :style="{
+              background: colorGraph ?? ``,
+              transform: `rotate(${colorGraphRotation}deg)`,
+            }">
+          </e-test>
           <e-current-color v-if="currentColor">
             <e-color-label
               ><e-name>RGB:</e-name> <e-value> {{ toRGB(currentColor) }}</e-value></e-color-label
@@ -254,6 +260,29 @@ function toHSL(color: PetaColor) {
   const hsl = rgb2hsl(color);
   return `${Math.floor(hsl[0])}, ${Math.floor(hsl[1])}%, ${Math.floor(hsl[2])}%`;
 }
+const colorGraph = computed(() => {
+  if (singlePetaFileInfo.value === undefined) {
+    return undefined;
+  }
+  const palette = singlePetaFileInfo.value.palette;
+  let p = 0;
+  return `conic-gradient(${palette
+    .map((color) => {
+      const _p1 = p;
+      p += color.population * 100;
+      const _p2 = p;
+      const col1 = `rgb(${color.color.r}, ${color.color.g}, ${color.color.b}) ${Math.floor(_p1)}%`;
+      const col2 = `rgb(${color.color.r}, ${color.color.g}, ${color.color.b}) ${Math.floor(_p2)}%`;
+      return `${col1},${col2}`;
+    })
+    .join(`,`)})`;
+});
+const colorGraphRotation = computed(() => {
+  if (singlePetaFileInfo.value === undefined) {
+    return 0;
+  }
+  return -(singlePetaFileInfo.value.palette[0].population * 360) / 2 + 180;
+});
 const fetchPetaTags = (() => {
   let fetchId = 0;
   return async () => {
@@ -419,6 +448,23 @@ e-property-root {
               transform: scaleX(1.5) scaleY(2);
               cursor: pointer;
             }
+          }
+        }
+        > e-test {
+          display: block;
+          position: relative;
+          box-shadow: 0px 0px 0px var(--px-border) var(--color-font);
+          border-radius: 9999px;
+          background-color: #ff0000;
+          width: 160px;
+          height: 160px;
+          overflow: hidden;
+          > e-color {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
           }
         }
         > e-current-color {
