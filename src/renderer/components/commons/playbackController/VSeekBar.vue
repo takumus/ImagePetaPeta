@@ -19,7 +19,9 @@
         <!-- start -->
         <e-drag
           @pointerdown="pointerMove($event, `loopStart`)"
-          :style="{ left: `${(props.loopStart / props.duration) * 100}%` }"
+          :style="{
+            left: `${(props.loopStart === 0 && props.loopEnd === 0 ? 0 : props.loopStart / props.duration) * 100}%`,
+          }"
           class="left"></e-drag>
         <!-- end -->
         <e-drag
@@ -35,6 +37,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+
+import { setCursor, setDefaultCursor } from "@/renderer/utils/cursor";
 
 const props = defineProps<{
   duration: number;
@@ -61,11 +65,18 @@ function pointerMove(event: PointerEvent, type?: typeof draggingType.value) {
     if (type !== undefined) {
       draggingType.value = type;
     }
+    if (draggingType.value === "loopEnd" || draggingType.value === "loopStart") {
+      // setCursor("col-resize");
+    }
     if (draggingType.value === "seek") {
       emit("startSeek");
     }
+    if (type === "loopStart" && props.loopStart === 0 && props.loopEnd === 0) {
+      emit("update:loopEnd", props.duration);
+    }
   }
   if (draggingType.value === "none") {
+    // setDefaultCursor();
     return;
   }
   if (event.type === "pointerup") {
@@ -89,8 +100,14 @@ function pointerMove(event: PointerEvent, type?: typeof draggingType.value) {
     draggingTime.value = time;
     emit("update:time", draggingTime.value);
   } else if (draggingType.value === "loopStart") {
+    if (time > props.loopEnd) {
+      time = props.loopEnd;
+    }
     emit("update:loopStart", time);
   } else if (draggingType.value === "loopEnd") {
+    if (time < props.loopStart) {
+      time = props.loopStart;
+    }
     emit("update:loopEnd", time);
   }
 }
@@ -110,7 +127,6 @@ const cursorPosition = computed(() => {
 e-seekbar-root {
   display: block;
   position: relative;
-  cursor: pointer;
   border-radius: var(--rounded);
   background-color: var(--color-0);
   padding: var(--px-2) calc(var(--px-2) + calc(var(--px-1) / 2));
@@ -152,9 +168,11 @@ e-seekbar-root {
         height: 100%;
         &.left {
           transform: translateX(-100%);
+          cursor: e-resize;
         }
         &.right {
           transform: translateX(0%);
+          cursor: w-resize;
         }
       }
     }
