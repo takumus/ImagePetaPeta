@@ -13,7 +13,7 @@ type Mode = "encrypt" | "decrypt";
 type ReadStreamOptions = { startBlock?: number; endBlock?: number };
 const BLOCK_SIZE = 16;
 const ALGORITHM = "aes-256-ctr" as const;
-export const secureFile = ((iv: Buffer) => {
+export const secureFile = (() => {
   function toFile(
     input: string | Buffer | Readable,
     outputFilePath: string,
@@ -21,10 +21,11 @@ export const secureFile = ((iv: Buffer) => {
     mode: Mode,
     options: ReadStreamOptions,
     verify: boolean,
+    iv = Buffer.alloc(BLOCK_SIZE, 0),
   ) {
     return new Promise<void>(async (res, rej) => {
       const output = createWriteStream(outputFilePath);
-      const encoded = toStream(input, key, mode, options);
+      const encoded = toStream(input, key, mode, options, iv);
       encoded.pipe(output);
       function error(err: any) {
         rej(err);
@@ -37,7 +38,13 @@ export const secureFile = ((iv: Buffer) => {
       async function close() {
         if (verify) {
           const newHash = fileSHA256(
-            toStream(outputFilePath, key, mode === "decrypt" ? "encrypt" : "decrypt"),
+            toStream(
+              outputFilePath,
+              key,
+              mode === "decrypt" ? "encrypt" : "decrypt",
+              undefined,
+              iv,
+            ),
           );
           if ((await hash) === (await newHash)) {
             res();
@@ -60,12 +67,13 @@ export const secureFile = ((iv: Buffer) => {
     key: string,
     mode: Mode,
     options?: ReadStreamOptions,
+    iv = Buffer.alloc(BLOCK_SIZE, 0),
   ) {
     const range = {
       start: options?.startBlock !== undefined ? options.startBlock * BLOCK_SIZE : undefined,
       end: options?.endBlock !== undefined ? options.endBlock * BLOCK_SIZE - 1 : undefined,
     };
-    const currentIV = Buffer.from(iv);
+    const currentIV = iv;
     currentIV.writeIntBE(options?.startBlock ?? 0, currentIV.length - 4, 4);
     const inputStream = getInputStream(input, range);
     const decipher = (mode === "encrypt" ? createCipheriv : createDecipheriv)(
@@ -90,12 +98,14 @@ export const secureFile = ((iv: Buffer) => {
         key: string,
         readStreamOptions: ReadStreamOptions = {},
         verify = true,
-      ) => toFile(input, outputFilePath, key, mode, readStreamOptions, verify),
+        iv?: Buffer,
+      ) => toFile(input, outputFilePath, key, mode, readStreamOptions, verify, iv),
       toStream: (
         input: string | Buffer | Readable,
         key: string,
         readStreamOptions: ReadStreamOptions = {},
-      ) => toStream(input, key, mode, readStreamOptions),
+        iv?: Buffer,
+      ) => toStream(input, key, mode, readStreamOptions, iv),
     };
   }
   return {
@@ -104,7 +114,7 @@ export const secureFile = ((iv: Buffer) => {
       ...createFunctions("decrypt"),
     },
   };
-})(Buffer.alloc(BLOCK_SIZE, 0));
+})();
 export function getStreamFromPetaFile(
   petaFile: PetaFile,
   type: "original" | "thumbnail",
