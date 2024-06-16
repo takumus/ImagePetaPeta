@@ -149,6 +149,21 @@ export function getStreamFromPetaFile(
     return createReadStream(path, options);
   }
 }
+export function writeSecurePetaFile(
+  petaFile: PetaFile,
+  input: string | Buffer | Readable,
+  outputFilePath: string,
+) {
+  const sfp = useConfigSecureFilePassword();
+  return secureFile.encrypt.toFile(
+    input,
+    outputFilePath,
+    sfp.getKey(),
+    undefined,
+    true,
+    getIVFromID(petaFile.id),
+  );
+}
 function getInputStream(
   input: string | Uint8Array | Readable,
   range?: { start?: number; end?: number },

@@ -1,9 +1,8 @@
 import { createReadStream } from "node:fs";
-import { copyFile, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { fileTypeFromFile, fileTypeFromStream } from "file-type";
+import { copyFile, readFile, rename, writeFile } from "node:fs/promises";
+import { fileTypeFromStream } from "file-type";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
-import { FileType } from "@/commons/datas/fileType";
 import { PetaFile } from "@/commons/datas/petaFile";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
@@ -13,7 +12,7 @@ import { generateVideoFileInfo } from "@/main/provides/controllers/petaFilesCont
 import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getIVFromID, getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
+import { getStreamFromPetaFile, secureFile, writeSecurePetaFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 import { getFileURL } from "@/renderer/utils/fileURL";
@@ -64,14 +63,7 @@ export async function generatePetaFile(param: {
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
   if (param.doEncrypt) {
-    await secureFile.encrypt.toFile(
-      fileInfo.thumbnail.buffer,
-      filePath.thumbnail,
-      sfp.getKey(),
-      undefined,
-      true,
-      getIVFromID(petaFile.id),
-    );
+    await writeSecurePetaFile(petaFile, fileInfo.thumbnail.buffer, filePath.thumbnail);
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   }
@@ -79,13 +71,10 @@ export async function generatePetaFile(param: {
     case "add":
       if (fileInfo.original.transformedBuffer !== undefined) {
         if (param.doEncrypt) {
-          await secureFile.encrypt.toFile(
+          await writeSecurePetaFile(
+            petaFile,
             fileInfo.original.transformedBuffer,
             filePath.original,
-            sfp.getKey(),
-            undefined,
-            true,
-            getIVFromID(petaFile.id),
           );
         } else {
           await writeFile(filePath.original, fileInfo.original.transformedBuffer);
@@ -95,14 +84,7 @@ export async function generatePetaFile(param: {
           const from = param.secureTempFile
             ? secureFile.decrypt.toStream(param.filePath, useSecureTempFileKey())
             : param.filePath;
-          await secureFile.encrypt.toFile(
-            from,
-            filePath.original,
-            sfp.getKey(),
-            undefined,
-            true,
-            getIVFromID(petaFile.id),
-          );
+          await writeSecurePetaFile(petaFile, from, filePath.original);
         } else {
           if (param.secureTempFile) {
             await secureFile.decrypt.toFile(
