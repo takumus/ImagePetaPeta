@@ -115,7 +115,7 @@ export const secureFile = (() => {
     },
   };
 })();
-export function getStreamFromPetaFile(
+export function createPetaFileReadStream(
   petaFile: PetaFile,
   type: "original" | "thumbnail",
   options?: { start: number; end: number },

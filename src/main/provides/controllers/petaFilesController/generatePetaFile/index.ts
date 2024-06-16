@@ -12,7 +12,7 @@ import { generateVideoFileInfo } from "@/main/provides/controllers/petaFilesCont
 import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile, secureFile, writeSecurePetaFile } from "@/main/utils/secureFile";
+import { createPetaFileReadStream, secureFile, writeSecurePetaFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 import { getFileURL } from "@/renderer/utils/fileURL";
@@ -133,7 +133,7 @@ export async function generateFileInfo(
   } else {
     const petaFile = source;
     function getStream() {
-      return getStreamFromPetaFile(petaFile, "original");
+      return createPetaFileReadStream(petaFile, "original");
     }
     const fileType = await fileTypeFromStream(getStream());
     logger.debug(fileType?.mime);

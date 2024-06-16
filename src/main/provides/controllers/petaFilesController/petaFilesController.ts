@@ -21,7 +21,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useWindows } from "@/main/provides/windows";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile, secureFile, writeSecurePetaFile } from "@/main/utils/secureFile";
+import { createPetaFileReadStream, secureFile, writeSecurePetaFile } from "@/main/utils/secureFile";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
@@ -143,13 +143,13 @@ export class PetaFilesController {
           await stat(paths.original);
           await stat(paths.thumbnail);
           if (
-            (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "original")))?.mime !==
+            (await fileTypeFromStream(createPetaFileReadStream(petaFile, "original")))?.mime !==
             petaFile.metadata.mimeType
           ) {
             throw "original is broken";
           }
           if (
-            (await fileTypeFromStream(getStreamFromPetaFile(petaFile, "thumbnail")))?.mime !==
+            (await fileTypeFromStream(createPetaFileReadStream(petaFile, "thumbnail")))?.mime !==
             "image/webp"
           ) {
             throw "thumb is broken";

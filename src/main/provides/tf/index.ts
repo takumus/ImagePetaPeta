@@ -13,7 +13,7 @@ import { usePetaFilesController } from "@/main/provides/controllers/petaFilesCon
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { getPetaFileDirectoryPath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile } from "@/main/utils/secureFile";
+import { createPetaFileReadStream } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 export class TF {
@@ -23,7 +23,7 @@ export class TF {
     return await this.imageClassification.init();
   }
   async saveImageVector(petaFile: PetaFile) {
-    const imageBuffer = await streamToBuffer(getStreamFromPetaFile(petaFile, "thumbnail"));
+    const imageBuffer = await streamToBuffer(createPetaFileReadStream(petaFile, "thumbnail"));
     const tensor = stack(
       await Promise.all([
         this.imageClassification.imageToTensor(imageBuffer, 0),

@@ -4,7 +4,7 @@ import { Readable, Transform } from "node:stream";
 import { PetaFile } from "@/commons/datas/petaFile";
 
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile } from "@/main/utils/secureFile";
+import { createPetaFileReadStream } from "@/main/utils/secureFile";
 
 export async function createVideoResponse(request: Request, petaFile: PetaFile) {
   const path = getPetaFilePath.fromPetaFile(petaFile).original;
@@ -21,10 +21,10 @@ export async function createVideoResponse(request: Request, petaFile: PetaFile) 
     headers.set("Content-Length", `${contentLength + 1}`);
     headers.set("Content-Range", `bytes ${start}-${end}/${fileSize}`);
     status = 206;
-    stream = getStreamFromPetaFile(petaFile, "original", { start, end });
+    stream = createPetaFileReadStream(petaFile, "original", { start, end });
   } else {
     headers.set("Content-Length", `${fileSize}`);
-    stream = getStreamFromPetaFile(petaFile, "original");
+    stream = createPetaFileReadStream(petaFile, "original");
   }
   return new Response(stream as any, {
     headers,

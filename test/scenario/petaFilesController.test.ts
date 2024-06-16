@@ -15,7 +15,7 @@ import { useDBS } from "@/main/provides/databases";
 import { useFileImporter } from "@/main/provides/fileImporter";
 import { fileSHA256 } from "@/main/utils/fileSHA256";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile } from "@/main/utils/secureFile";
+import { createPetaFileReadStream } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 
 const ROOT = "./_test/scenario/petaFilesController";
@@ -78,7 +78,7 @@ describe("petaFilesController", () => {
     expect(filePaths.original.endsWith(".png")).toBeTruthy();
     expect(petaFile.metadata.mimeType).toBe("image/png");
     function stream() {
-      return getStreamFromPetaFile(petaFile, "original");
+      return createPetaFileReadStream(petaFile, "original");
     }
     expect((await fileTypeFromStream(stream()))?.mime).toBe("image/png");
     expect(await sharp(await streamToBuffer(stream())).metadata()).toMatchObject({
