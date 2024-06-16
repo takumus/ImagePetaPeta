@@ -13,7 +13,7 @@ import { generateVideoFileInfo } from "@/main/provides/controllers/petaFilesCont
 import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
+import { getIVFromID, getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { supportedFileConditions } from "@/main/utils/supportedFileTypes";
 import { getFileURL } from "@/renderer/utils/fileURL";
@@ -64,7 +64,14 @@ export async function generatePetaFile(param: {
   };
   const filePath = getPetaFilePath.fromPetaFile(petaFile);
   if (param.doEncrypt) {
-    await secureFile.encrypt.toFile(fileInfo.thumbnail.buffer, filePath.thumbnail, sfp.getKey());
+    await secureFile.encrypt.toFile(
+      fileInfo.thumbnail.buffer,
+      filePath.thumbnail,
+      sfp.getKey(),
+      undefined,
+      true,
+      getIVFromID(petaFile.id),
+    );
   } else {
     await writeFile(filePath.thumbnail, fileInfo.thumbnail.buffer);
   }
@@ -76,6 +83,9 @@ export async function generatePetaFile(param: {
             fileInfo.original.transformedBuffer,
             filePath.original,
             sfp.getKey(),
+            undefined,
+            true,
+            getIVFromID(petaFile.id),
           );
         } else {
           await writeFile(filePath.original, fileInfo.original.transformedBuffer);
@@ -85,7 +95,14 @@ export async function generatePetaFile(param: {
           const from = param.secureTempFile
             ? secureFile.decrypt.toStream(param.filePath, useSecureTempFileKey())
             : param.filePath;
-          await secureFile.encrypt.toFile(from, filePath.original, sfp.getKey());
+          await secureFile.encrypt.toFile(
+            from,
+            filePath.original,
+            sfp.getKey(),
+            undefined,
+            true,
+            getIVFromID(petaFile.id),
+          );
         } else {
           if (param.secureTempFile) {
             await secureFile.decrypt.toFile(

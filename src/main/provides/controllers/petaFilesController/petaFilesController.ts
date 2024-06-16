@@ -21,7 +21,7 @@ import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useWindows } from "@/main/provides/windows";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
-import { getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
+import { getIVFromID, getStreamFromPetaFile, secureFile } from "@/main/utils/secureFile";
 
 export class PetaFilesController {
   public async updateMultiple(datas: PetaFile[], mode: UpdateMode, silent = false) {
@@ -186,7 +186,14 @@ export class PetaFilesController {
         try {
           let k: keyof typeof pathOrg;
           for (k in pathOrg) {
-            await secureFile[mode].toFile(pathOrg[k], pathTemp[k], key);
+            await secureFile[mode].toFile(
+              pathOrg[k],
+              pathTemp[k],
+              key,
+              undefined,
+              true,
+              getIVFromID(pf.id),
+            );
             await rename(pathTemp[k], pathOrg[k]);
           }
           pf.encrypted = mode === "encrypt";

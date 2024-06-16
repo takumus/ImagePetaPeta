@@ -132,13 +132,18 @@ export function getStreamFromPetaFile(
       const [startAESByte, _endAESByte] = [startAESBlock * 16, endAESBlock * 16];
       const startByteOffset = options.start - startAESByte;
       return secureFile.decrypt
-        .toStream(path, sfp.getKey(), {
-          startBlock: startAESBlock,
-          endBlock: endAESBlock,
-        })
+        .toStream(
+          path,
+          sfp.getKey(),
+          {
+            startBlock: startAESBlock,
+            endBlock: endAESBlock,
+          },
+          getIVFromID(petaFile.id),
+        )
         .pipe(createCroppedStream(startByteOffset, contentLength + startByteOffset));
     } else {
-      return secureFile.decrypt.toStream(path, sfp.getKey());
+      return secureFile.decrypt.toStream(path, sfp.getKey(), undefined, getIVFromID(petaFile.id));
     }
   } else {
     return createReadStream(path, options);
@@ -169,4 +174,11 @@ function createCroppedStream(start: number, end: number) {
       callback();
     },
   });
+}
+export function getIVFromID(id: string) {
+  const hash = createHash("sha256");
+  hash.update(id);
+  const iv = hash.digest().subarray(0, BLOCK_SIZE);
+  console.log(iv);
+  return iv;
 }
