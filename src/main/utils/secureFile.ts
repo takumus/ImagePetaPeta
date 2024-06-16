@@ -176,8 +176,5 @@ function createCroppedStream(start: number, end: number) {
   });
 }
 export function getIVFromID(id: string) {
-  const hash = createHash("sha256");
-  hash.update(id);
-  const iv = hash.digest().subarray(0, BLOCK_SIZE);
-  return iv;
+  return createHash("sha256").update(id).digest().subarray(0, BLOCK_SIZE);
 }
