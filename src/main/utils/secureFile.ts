@@ -179,6 +179,5 @@ export function getIVFromID(id: string) {
   const hash = createHash("sha256");
   hash.update(id);
   const iv = hash.digest().subarray(0, BLOCK_SIZE);
-  console.log(iv);
   return iv;
 }
