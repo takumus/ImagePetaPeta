@@ -15,7 +15,7 @@ const BLOCK_SIZE = 16;
 const ALGORITHM = "aes-256-ctr" as const;
 export const secureFile = (() => {
   function toFile(
-    input: string | Buffer | Readable,
+    input: SecureFileInput,
     outputFilePath: string,
     key: string,
     mode: Mode,
@@ -63,7 +63,7 @@ export const secureFile = (() => {
     });
   }
   function toStream(
-    input: string | Buffer | Readable,
+    input: SecureFileInput,
     key: string,
     mode: Mode,
     options?: ReadStreamOptions,
@@ -93,7 +93,7 @@ export const secureFile = (() => {
   function createFunctions(mode: Mode) {
     return {
       toFile: (
-        input: string | Buffer | Readable,
+        input: SecureFileInput,
         outputFilePath: string,
         key: string,
         readStreamOptions: ReadStreamOptions = {},
@@ -101,7 +101,7 @@ export const secureFile = (() => {
         iv?: Buffer,
       ) => toFile(input, outputFilePath, key, mode, readStreamOptions, verify, iv),
       toStream: (
-        input: string | Buffer | Readable,
+        input: SecureFileInput,
         key: string,
         readStreamOptions: ReadStreamOptions = {},
         iv?: Buffer,
@@ -126,10 +126,10 @@ export function createPetaFileReadStream(
     if (options) {
       const contentLength = options.end - options.start;
       const [startAESBlock, endAESBlock] = [
-        Math.floor(options.start / 16),
-        Math.ceil(options.end / 16) + 1,
+        Math.floor(options.start / BLOCK_SIZE),
+        Math.ceil(options.end / BLOCK_SIZE) + 1,
       ];
-      const [startAESByte, _endAESByte] = [startAESBlock * 16, endAESBlock * 16];
+      const [startAESByte, _endAESByte] = [startAESBlock * BLOCK_SIZE, endAESBlock * BLOCK_SIZE];
       const startByteOffset = options.start - startAESByte;
       return secureFile.decrypt
         .toStream(
@@ -151,7 +151,7 @@ export function createPetaFileReadStream(
 }
 export function writeSecurePetaFile(
   petaFile: PetaFile,
-  input: string | Buffer | Readable,
+  input: SecureFileInput,
   outputFilePath: string,
 ) {
   const sfp = useConfigSecureFilePassword();
@@ -164,10 +164,7 @@ export function writeSecurePetaFile(
     getIVFromID(petaFile.id),
   );
 }
-function getInputStream(
-  input: string | Uint8Array | Readable,
-  range?: { start?: number; end?: number },
-) {
+function getInputStream(input: SecureFileInput, range?: { start?: number; end?: number }) {
   return typeof input === "string"
     ? createReadStream(input, range)
     : input instanceof Buffer || input instanceof Uint8Array
@@ -193,3 +190,4 @@ function createCroppedStream(start: number, end: number) {
 export function getIVFromID(id: string) {
   return createHash("sha256").update(id).digest().subarray(0, BLOCK_SIZE);
 }
+export type SecureFileInput = string | Readable | Buffer | Uint8Array;
