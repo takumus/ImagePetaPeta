@@ -70,19 +70,3 @@ function parseRange(text: string, size: number) {
     }
   }
 }
-function createCroppedStream(start: number, end: number) {
-  let currentIndex = 0;
-  const _end = end + 1;
-  return new Transform({
-    transform(chunk, _encoding, callback) {
-      if (currentIndex < _end) {
-        const startOffset = Math.max(start - currentIndex, 0);
-        const endOffset = Math.min(chunk.length, _end - currentIndex);
-        const relevantData = chunk.slice(startOffset, endOffset);
-        currentIndex += chunk.length;
-        this.push(relevantData);
-      }
-      callback();
-    },
-  });
-}
