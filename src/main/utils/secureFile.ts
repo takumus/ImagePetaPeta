@@ -167,9 +167,9 @@ function getInputStream(input: SecureFileInput, range?: { start?: number; end?: 
       : input instanceof Buffer || input instanceof Uint8Array
         ? bufferToStream(input)
         : input;
-  stream.on("close", () => {
-    console.log("CLOSED_ORG");
-  });
+  // stream.on("close", () => {
+  //   console.log("CLOSED_ORG");
+  // });
   return stream;
 }
 function createCroppedStream(start: number, end: number) {
