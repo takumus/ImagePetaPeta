@@ -29,7 +29,7 @@ const launchTime = performance.now();
   }
   const logger = useLogger();
   process.on("uncaughtException", function (error) {
-    logger.logChunk("Main Process Error").error(error);
+    logger.logChunk("Nicht Abgefangene Ausnahme").error(error);
   });
   const windows = useWindows();
   const configSettings = useConfigSettings();
