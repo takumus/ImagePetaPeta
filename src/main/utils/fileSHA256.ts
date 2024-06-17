@@ -11,7 +11,7 @@ export function fileSHA256(filePath: string | Readable) {
       hash.end();
       res(hash.digest("hex"));
       if (stream instanceof ReadStream) {
-        stream.close();
+        stream.destroy();
       }
     });
     stream.on("error", rej);
