@@ -26,7 +26,7 @@ export const secureFile = (() => {
     return new Promise<void>(async (res, rej) => {
       const output = createWriteStream(outputFilePath);
       const encoded = toStream(input, key, mode, options, iv);
-      encoded.pipe(output);
+      pipeline(encoded, output, (_err) => {});
       function error(err: any) {
         rej(err);
         output.destroy();
@@ -81,14 +81,7 @@ export const secureFile = (() => {
       key,
       currentIV,
     );
-    const transformed = new PassThrough();
-    pipeline(inputStream, decipher, transformed, (err) => {
-      if (!err) return;
-      // inputStream.destroy();
-      // transformed.destroy();
-      // decipher.destroy();
-    });
-    return transformed;
+    return pipeline(inputStream, decipher, (_err) => {});
   }
   function createFunctions(mode: Mode) {
     return {
@@ -131,17 +124,20 @@ export function createPetaFileReadStream(
       ];
       const [startAESByte, _endAESByte] = [startAESBlock * BLOCK_SIZE, endAESBlock * BLOCK_SIZE];
       const startByteOffset = options.start - startAESByte;
-      return secureFile.decrypt
-        .toStream(
-          path,
-          sfp.getKey(),
-          {
-            startBlock: startAESBlock,
-            endBlock: endAESBlock,
-          },
-          getIVFromID(petaFile.id),
-        )
-        .pipe(createCroppedStream(startByteOffset, contentLength + startByteOffset));
+      const stream = secureFile.decrypt.toStream(
+        path,
+        sfp.getKey(),
+        {
+          startBlock: startAESBlock,
+          endBlock: endAESBlock,
+        },
+        getIVFromID(petaFile.id),
+      );
+      return pipeline(
+        stream,
+        createCroppedStream(startByteOffset, contentLength + startByteOffset),
+        (_err) => {},
+      );
     } else {
       return secureFile.decrypt.toStream(path, sfp.getKey(), undefined, getIVFromID(petaFile.id));
     }
@@ -165,11 +161,16 @@ export function writeSecurePetaFile(
   );
 }
 function getInputStream(input: SecureFileInput, range?: { start?: number; end?: number }) {
-  return typeof input === "string"
-    ? createReadStream(input, range)
-    : input instanceof Buffer || input instanceof Uint8Array
-      ? bufferToStream(input)
-      : input;
+  const stream =
+    typeof input === "string"
+      ? createReadStream(input, range)
+      : input instanceof Buffer || input instanceof Uint8Array
+        ? bufferToStream(input)
+        : input;
+  stream.on("close", () => {
+    console.log("CLOSED_ORG");
+  });
+  return stream;
 }
 function createCroppedStream(start: number, end: number) {
   let currentIndex = 0;
