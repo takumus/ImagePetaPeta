@@ -49,7 +49,9 @@ export class Tasks {
       },
     };
     this.tasks[handler.id] = handler;
-    this.updateWindow();
+    setTimeout(() => {
+      this.updateWindow();
+    }, 500);
     return handler;
   }
   cancel(ids: string[]) {
@@ -64,7 +66,6 @@ export class Tasks {
     });
     return true;
   }
-
   confirmFailed(ids: string[]) {
     ids.forEach((id) => {
       const task = this.get(id);
@@ -75,17 +76,14 @@ export class Tasks {
   }
   private emit() {
     const windows = useWindows();
-    this.updateWindow();
     windows.emit.tasks.status({ type: "windowNames", windowNames: ["task"] }, this.getStatus());
   }
   private remove(task: TaskHandler) {
-    setTimeout(() => {
-      delete this.tasks[task.id];
-      if (!task.silent) {
-        this.emit();
-        this.updateWindow();
-      }
-    }, 100);
+    delete this.tasks[task.id];
+    if (!task.silent) {
+      this.emit();
+      this.updateWindow();
+    }
   }
   private get(id: string) {
     return this.tasks[id];
