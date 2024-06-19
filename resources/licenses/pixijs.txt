@@ -1,4 +1,4 @@
-pixi.js@8.1.6
+pixi.js@8.1.8
 MIT
 The MIT License
 
