@@ -81,7 +81,7 @@ export class FileImporter {
           }
         }
       }, datas).promise
-    ).filter((info) => info !== undefined) as ImportFileInfo[];
+    ).filter((info) => info !== undefined);
     const petaFileIds = (
       await this.importFilesFromFileInfos({
         fileInfos,
