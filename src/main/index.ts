@@ -150,7 +150,7 @@ const launchTime = performance.now();
       await useWebHook().open(WEBHOOK_PORT);
     }
     log.debug(`Init DB:${performance.now() - launchTime}ms`);
-    // usePetaFilesController().verifyFiles();
+    // usePetaFilesController().removeTrashs();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());
   }

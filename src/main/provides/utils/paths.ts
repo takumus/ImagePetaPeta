@@ -6,7 +6,7 @@ export interface Paths {
   DIR_LOG: string;
   DIR_IMAGES: string;
   DIR_THUMBNAILS: string;
-  DIR_CACHE: string;
+  DIR_FEATURE_VECTORS: string;
   DIR_TEMP: string;
   FILE_IMAGES_DB: string;
   FILE_BOARDS_DB: string;

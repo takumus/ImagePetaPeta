@@ -15,7 +15,7 @@ import { WindowStates } from "@/commons/datas/windowStates";
 import {
   DB_COMPACTION_RETRY_COUNT,
   DB_KILLABLE_CHECK_INTERVAL,
-  DIRNAME_CACHE,
+  DIRNAME_FEATURE_VECTORS,
   DIRNAME_IMAGES,
   DIRNAME_THUMBNAILS,
   FILENAME_BOARDS_DB,
@@ -149,7 +149,7 @@ export function initDI(
     })();
     const DIR_IMAGES = initDirectorySync(true, DIR_ROOT, DIRNAME_IMAGES);
     const DIR_THUMBNAILS = initDirectorySync(true, DIR_ROOT, DIRNAME_THUMBNAILS);
-    const DIR_CACHE = initDirectorySync(true, DIR_ROOT, DIRNAME_CACHE);
+    const DIR_FEATURE_VECTORS = initDirectorySync(true, DIR_ROOT, DIRNAME_FEATURE_VECTORS);
     const FILE_IMAGES_DB = initFileSync(DIR_ROOT, FILENAME_IMAGES_DB);
     const FILE_BOARDS_DB = initFileSync(DIR_ROOT, FILENAME_BOARDS_DB);
     const FILE_TAGS_DB = initFileSync(DIR_ROOT, FILENAME_TAGS_DB);
@@ -199,7 +199,7 @@ export function initDI(
       DIR_LOG,
       DIR_IMAGES,
       DIR_THUMBNAILS,
-      DIR_CACHE,
+      DIR_FEATURE_VECTORS,
       DIR_TEMP,
       FILE_IMAGES_DB,
       FILE_BOARDS_DB,

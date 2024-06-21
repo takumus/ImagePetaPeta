@@ -13,7 +13,7 @@ export const getPetaFileDirectoryPath = {
     return {
       original: Path.resolve(paths.DIR_IMAGES, dir1, dir2),
       thumbnail: Path.resolve(paths.DIR_THUMBNAILS, dir1, dir2),
-      cache: Path.resolve(paths.DIR_CACHE, dir1, dir2),
+      cache: Path.resolve(paths.DIR_FEATURE_VECTORS, dir1, dir2),
     };
   },
 } as const;

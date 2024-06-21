@@ -73,7 +73,7 @@ export const FILENAME_WINDOW_STATES: string = "windowStates.json";
 export const FILENAME_SECURE_FILE_PASSWORD: string = "secureFilePassword.json";
 export const DIRNAME_IMAGES: string = "images";
 export const DIRNAME_THUMBNAILS: string = "thumbnails";
-export const DIRNAME_CACHE: string = "cache";
+export const DIRNAME_FEATURE_VECTORS: string = "featureVectors";
 
 export const PETAIMAGE_METADATA_VERSION: number = 1.8;
 export const CHROME_EXTENSION_VERSION: number = 1;
