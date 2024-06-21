@@ -1,3 +1,4 @@
+import { rmSync } from "node:fs";
 import { rename, rm, stat } from "node:fs/promises";
 import * as Path from "node:path";
 import { fileTypeFromStream } from "file-type";
@@ -204,10 +205,12 @@ export class PetaFilesController {
     console.log("complete");
   }
   public async removeTrashs() {
+    console.log("remove trashes");
     const files = (
       await Promise.all([
         file.readDirRecursive(usePaths().DIR_IMAGES).files,
         file.readDirRecursive(usePaths().DIR_THUMBNAILS).files,
+        file.readDirRecursive(usePaths().DIR_FEATURE_VECTORS).files,
       ])
     ).reduce((p, c) => [...p, ...c], []);
     await ppa(async (path) => {
@@ -216,7 +219,12 @@ export class PetaFilesController {
       const dir2 = Path.basename(Path.dirname(path));
       if (id !== undefined && id.startsWith(dir1 + dir2)) {
         if ((await this.getPetaFile(id)) === undefined) {
-          console.log("remove");
+          console.log("remove", id, path);
+          try {
+            rmSync(path);
+          } catch {
+            ///
+          }
         }
       }
     }, files).promise;
