@@ -380,10 +380,9 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
     [
       {
         label: "copy raw",
+        skip: petaFile.metadata.type !== "image",
         click: async () => {
-          if (petaFile.metadata.type === "image") {
-            await IPC.common.copyRawToClipboard(petaFile);
-          }
+          alert(await IPC.common.copyRawToClipboard(petaFile));
         },
       },
       {
