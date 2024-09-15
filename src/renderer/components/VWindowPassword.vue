@@ -1,14 +1,16 @@
 <template>
-  <e-window-root>
-    <e-top>
-      <VTitleBar :title="''"> </VTitleBar>
-    </e-top>
-    <e-content>
-      <input type="password" v-model="password" />
-      <button @click="login">login</button>
-      <VCheckbox v-model:value="save" />
-    </e-content>
-  </e-window-root>
+  <form>
+    <e-window-root>
+      <e-top>
+        <VTitleBar :title="''"> </VTitleBar>
+      </e-top>
+      <e-content>
+        <input type="password" v-model="password" />
+        <button @click="login">login</button>
+        <VCheckbox v-model:value="save" />
+      </e-content>
+    </e-window-root>
+  </form>
 </template>
 
 <script setup lang="ts">
