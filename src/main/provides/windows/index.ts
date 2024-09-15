@@ -68,6 +68,9 @@ export class Windows {
       this.openWindow("password");
       useConfigSecureFilePassword().events.on("change", async () => {
         // await usePetaFilesController().encryptAll("decrypt");
+        if (windowIs.alive(this.windows.password)) {
+          this.windows.password.close();
+        }
         this.showWindows();
       });
       return;
