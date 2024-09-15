@@ -1,5 +1,5 @@
 import { rmSync } from "node:fs";
-import { rename, rm, stat } from "node:fs/promises";
+import { cp, rm, stat } from "node:fs/promises";
 import * as Path from "node:path";
 import { fileTypeFromStream } from "file-type";
 import { v4 as uuid } from "uuid";
@@ -188,7 +188,8 @@ export class PetaFilesController {
           let k: keyof typeof pathOrg;
           for (k in pathOrg) {
             await writeSecurePetaFile(pf, pathOrg[k], pathTemp[k]);
-            await rename(pathTemp[k], pathOrg[k]);
+            await cp(pathTemp[k], pathOrg[k]);
+            await rm(pathTemp[k]);
           }
           pf.encrypted = mode === "encrypt";
           this.update(pf, "update");

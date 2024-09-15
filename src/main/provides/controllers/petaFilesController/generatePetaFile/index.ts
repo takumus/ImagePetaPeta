@@ -1,5 +1,5 @@
 import { createReadStream } from "node:fs";
-import { copyFile, readFile, rename, writeFile } from "node:fs/promises";
+import { copyFile, cp, readFile, rm, writeFile } from "node:fs/promises";
 import { fileTypeFromStream } from "file-type";
 
 import { GeneratedFileInfo } from "@/commons/datas/fileInfo";
@@ -100,7 +100,8 @@ export async function generatePetaFile(param: {
       return petaFile;
     case "update":
       if (param.filePath !== filePath.original) {
-        await rename(param.filePath, filePath.original);
+        await cp(param.filePath, filePath.original);
+        await rm(param.filePath);
       }
       return petaFile;
   }
