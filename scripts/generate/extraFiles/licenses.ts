@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { styleText } from "node:util";
-import checker from "license-checker-rseidelsohn";
+import * as checker from "license-checker-rseidelsohn";
 
 const DANGER_LICENSES = /gpl/;
 const UNKNOWN_LICENSES = /unknown/;

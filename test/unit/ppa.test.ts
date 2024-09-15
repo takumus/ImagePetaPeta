@@ -70,7 +70,7 @@ describe("ppa", () => {
     }, input);
     setTimeout(async () => {
       await process.cancel();
-      expect(completed, "completed before canceled").toMatchObject(true);
+      expect(completed, "completed before canceled").toBe(true);
     }, 600);
     try {
       await process.promise;
