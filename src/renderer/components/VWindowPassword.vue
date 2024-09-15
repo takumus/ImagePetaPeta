@@ -6,7 +6,7 @@
       </e-top>
       <e-content>
         <input type="password" v-model="password" />
-        <button @click="login">login</button>
+        <button type="submit" @click.prevent="login">login</button>
         <VCheckbox v-model:value="save" />
       </e-content>
     </e-window-root>
@@ -30,7 +30,7 @@ const save = ref<boolean>(false);
 onMounted(async () => {
   windowTitleStore.windowTitle.value = "";
 });
-function login() {
+function login(event: Event) {
   IPC.common.login(password.value, save.value);
   // IPC.windows.windowClose();
 }
