@@ -24,6 +24,8 @@ jobs:
         run: npm ci
       - name: audit
         run: npm audit --audit-level high
+      - name: generate assets
+        run: npm run generate-assets
       - name: test
         run: npm run test
         env:
