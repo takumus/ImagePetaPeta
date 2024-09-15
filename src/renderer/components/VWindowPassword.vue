@@ -30,7 +30,7 @@ const save = ref<boolean>(false);
 onMounted(async () => {
   windowTitleStore.windowTitle.value = "";
 });
-function login(event: Event) {
+function login() {
   IPC.common.login(password.value, save.value);
   // IPC.windows.windowClose();
 }
