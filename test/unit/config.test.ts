@@ -1,4 +1,5 @@
-import { mkdirSync, rmdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -8,9 +9,9 @@ import { createSyncMigrater } from "@/main/libs/createMigrater";
 const ROOT = "./_test/unit/config";
 const CONFIG_FILE_PATH = resolve(ROOT, "config.json");
 describe("config", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     try {
-      rmdirSync(resolve(ROOT), { recursive: true });
+      await rm(resolve(ROOT), { recursive: true });
     } catch {
       //
     }

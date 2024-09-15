@@ -1,4 +1,4 @@
-import { mkdirSync, rmdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { readdir, writeFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";

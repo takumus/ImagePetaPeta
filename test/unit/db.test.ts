@@ -1,4 +1,5 @@
-import { mkdirSync, rmdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -6,9 +7,9 @@ import DB from "@/main/libs/db";
 
 describe("file", () => {
   const ROOT = "./_test/unit/db";
-  beforeEach(() => {
+  beforeEach(async () => {
     try {
-      rmdirSync(resolve(ROOT), { recursive: true });
+      await rm(resolve(ROOT), { recursive: true });
     } catch {
       //
     }

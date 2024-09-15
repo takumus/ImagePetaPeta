@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, rmdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import { initDummyElectron } from "./initDummyElectron";
@@ -23,7 +23,7 @@ const DOG_FILE = resolve("./test/sampleDatas/dogLowRes.jpg");
 describe("petaFilesController", () => {
   beforeAll(async () => {
     try {
-      rmdirSync(resolve(ROOT), { recursive: true });
+      await rm(resolve(ROOT), { recursive: true });
     } catch {
       //
     }
@@ -31,7 +31,7 @@ describe("petaFilesController", () => {
   });
   beforeEach(async (h) => {
     try {
-      rmdirSync(resolve(ROOT, h.task.name), { recursive: true });
+      await rm(resolve(ROOT, h.task.name), { recursive: true });
     } catch {
       //
     }
