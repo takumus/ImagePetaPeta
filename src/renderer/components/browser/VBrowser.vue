@@ -379,6 +379,12 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
   components.contextMenu.open(
     [
       {
+        label: "copy raw",
+        click: async () => {
+          await IPC.common.copyRawToClipboard(petaFile);
+        },
+      },
+      {
         label: "simImg",
         click: async () => {
           const ids = await IPC.common.getSimIDs(petaFile.id);

@@ -1,6 +1,15 @@
 import { readFile } from "node:fs/promises";
 import * as Path from "node:path";
-import { app, desktopCapturer, dialog, ipcMain, nativeImage, screen, shell } from "electron";
+import {
+  app,
+  clipboard,
+  desktopCapturer,
+  dialog,
+  ipcMain,
+  nativeImage,
+  screen,
+  shell,
+} from "electron";
 
 import { AppInfo } from "@/commons/datas/appInfo";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
@@ -42,6 +51,8 @@ import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
 import { realESRGAN } from "@/main/utils/realESRGAN";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { searchImageByGoogle } from "@/main/utils/searchImageByGoogle";
+import { createPetaFileReadStream } from "@/main/utils/secureFile";
+import { streamToBuffer } from "@/main/utils/streamToBuffer";
 import { getLatestVersion } from "@/main/utils/versions";
 
 let openInBrowserTargetID: string | undefined;
@@ -329,6 +340,15 @@ export const ipcFunctions: IpcFunctionsType = {
         save,
       );
       await useConfigSecureFilePassword().setPassword(password, save);
+      return true;
+    },
+    async copyRawToClipboard(event, logger, petaFile) {
+      try {
+        const buf = await streamToBuffer(createPetaFileReadStream(petaFile, "original"));
+        clipboard.writeImage(nativeImage.createFromBuffer(buf));
+      } catch {
+        return false;
+      }
       return true;
     },
   },
