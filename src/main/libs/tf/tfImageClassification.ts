@@ -4,14 +4,15 @@ import sharp from "sharp";
 
 import "@tensorflow/tfjs-backend-wasm";
 
-import { extraFiles } from "@/_defines/extraFiles";
+// import { extraFiles } from "@/_defines/extraFiles";
 import { mobilenetURLToFilename } from "@/main/utils/mobilenetURLToFileName";
-import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
+
+// import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 
 export class TFImageClassification {
   model: tf.GraphModel<string | tf.io.IOHandler> | undefined;
   constructor() {}
-  async init() {
+  async init(mnPaths: { [key: string]: string }) {
     await tf.setBackend("wasm");
     this.model = await tf.loadGraphModel(
       "+https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1",
@@ -24,11 +25,12 @@ export class TFImageClassification {
           if (url.startsWith("+https://")) {
             url = url.substring(1);
             const filename = mobilenetURLToFilename(url);
-            const path = resolveExtraFilesPath(
-              extraFiles["mobilenet.universal"][
-                filename as keyof (typeof extraFiles)["mobilenet.universal"]
-              ],
-            );
+            // const path = resolveExtraFilesPath(
+            //   extraFiles["mobilenet.universal"][
+            //     filename as keyof (typeof extraFiles)["mobilenet.universal"]
+            //   ],
+            // );
+            const path = mnPaths[filename];
             console.log("TF:", "override fetch!", this.minURL(url), "->", this.minURL(path));
             await stat(path);
             return new Response(await readFile(path));
@@ -63,6 +65,9 @@ export class TFImageClassification {
       const similarity = dotProduct.div(tf.matMul(normA, normB, false, true));
       return Math.max(...similarity.dataSync());
     });
+  }
+  isInitialized() {
+    return this.model !== undefined;
   }
   private async createImage(source: string | Buffer, croppingType: 0 | 1) {
     return await sharp(

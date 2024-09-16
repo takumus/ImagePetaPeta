@@ -23,7 +23,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
           fileName: () => "[name].mjs",
         },
         rollupOptions: {
-          external: [...builtinModules],
+          external: [...builtinModules, "node:fs/promises", "node:stream", "node:fs", "node:path"],
         },
       },
       plugins: [

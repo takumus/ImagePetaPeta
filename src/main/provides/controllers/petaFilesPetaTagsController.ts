@@ -183,6 +183,10 @@ export class PetaFilesPetaTagsController {
     }
     return true;
   }
+  public getAll() {
+    const dbPetaFiles = useDBPetaFilesPetaTags();
+    return dbPetaFiles.getAll();
+  }
 }
 export const petaFilesPetaTagsControllerKey = createKey<PetaFilesPetaTagsController>(
   "petaFilesPetaTagsController",

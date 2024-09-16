@@ -36,8 +36,11 @@ import { windowsIPCFunctions } from "@/main/ipcFunctions/windows";
 import * as file from "@/main/libs/file";
 import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
+import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
 import { TF } from "@/main/provides/tf";
+import { tfByWorker } from "@/main/provides/tf/indexWT";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
@@ -304,12 +307,11 @@ export const ipcFunctions: IpcFunctionsType = {
         if (petaFile === undefined) {
           return [];
         }
-        if (tf === undefined) {
-          tf = new TF();
-          await tf.init();
-        }
-        const _tf = tf;
-        const scores = await _tf.getSimilarPetaFileIDsByPetaFile(petaFile);
+        await tfByWorker.init();
+        const scores = await tfByWorker.getSimilarPetaFileIDsByPetaFile(
+          petaFile,
+          usePetaFilesController().getAll(),
+        );
         return scores.map((s) => s.id);
       } catch (err) {
         return [];
@@ -321,12 +323,13 @@ export const ipcFunctions: IpcFunctionsType = {
         if (petaFile === undefined) {
           return [];
         }
-        if (tf === undefined) {
-          tf = new TF();
-          await tf.init();
-        }
-        const _tf = tf;
-        const scores = await _tf.getSimilarPetaTags(petaFile);
+        await tfByWorker.init();
+        const scores = await tfByWorker.getSimilarPetaTags(
+          petaFile,
+          usePetaFilesController().getAll(),
+          await usePetaTagsController().getAll(),
+          usePetaFilesPetaTagsController().getAll(),
+        );
         return scores;
       } catch (err) {
         return [];
@@ -353,7 +356,6 @@ export const ipcFunctions: IpcFunctionsType = {
     },
   },
 };
-let tf: TF | undefined;
 export function registerIpcFunctions() {
   ObjectKeys(ipcFunctions).forEach((category) => {
     ObjectKeys(ipcFunctions[category]).forEach((name) => {

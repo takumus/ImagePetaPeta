@@ -3,15 +3,14 @@ import { resolve } from "node:path";
 import { layers, Sequential, sequential, stack, tensor, Tensor } from "@tensorflow/tfjs";
 
 import { PetaFile } from "@/commons/datas/petaFile";
+import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
+import { PetaTag } from "@/commons/datas/petaTag";
 import { CPU_LENGTH } from "@/commons/utils/cpu";
 import { ppa } from "@/commons/utils/pp";
 
 import { mkdirIfNotIxists } from "@/main/libs/file";
 import { tensorBuffer } from "@/main/libs/tf/tensorBuffer";
 import { TFImageClassification } from "@/main/libs/tf/tfImageClassification";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
-import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
-import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { getPetaFileDirectoryPath } from "@/main/utils/getPetaFileDirectory";
 import { createPetaFileReadStream } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
@@ -19,10 +18,13 @@ import { streamToBuffer } from "@/main/utils/streamToBuffer";
 export class TF {
   imageClassification = new TFImageClassification();
   imageTensorCache: { [id: string]: Tensor } = {};
-  async init() {
-    return await this.imageClassification.init();
+  async init(mnPaths: { [key: string]: string }) {
+    return await this.imageClassification.init(mnPaths);
   }
-  async saveImageVector(petaFile: PetaFile) {
+  isInitialized() {
+    return this.imageClassification.isInitialized();
+  }
+  private async saveImageVector(petaFile: PetaFile) {
     const imageBuffer = await streamToBuffer(createPetaFileReadStream(petaFile, "thumbnail"));
     const tensor = stack(
       await Promise.all([
@@ -36,7 +38,7 @@ export class TF {
     this.imageTensorCache[petaFile.id] = tensor;
     return tensor;
   }
-  async loadImageVector(petaFile: PetaFile) {
+  private async loadImageVector(petaFile: PetaFile) {
     try {
       if (this.imageTensorCache[petaFile.id] !== undefined) {
         return this.imageTensorCache[petaFile.id];
@@ -50,7 +52,7 @@ export class TF {
       return undefined;
     }
   }
-  async loadOrSaveImageVector(petaFile: PetaFile) {
+  private async loadOrSaveImageVector(petaFile: PetaFile) {
     try {
       const loadedTensor = await this.loadImageVector(petaFile);
       if (loadedTensor !== undefined && !loadedTensor.isDisposed) {
@@ -61,10 +63,10 @@ export class TF {
     }
     return await this.saveImageVector(petaFile);
   }
-  similarity(vecA: Tensor, vecB: Tensor) {
+  private similarity(vecA: Tensor, vecB: Tensor) {
     return this.imageClassification.similarity(vecA, vecB);
   }
-  async getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile) {
+  async getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile, allPetaFiles: PetaFile[]) {
     const baseTensor = await this.loadOrSaveImageVector(basePetaFile);
     const scores: { id: string; score: number }[] = [];
     await ppa(
@@ -77,17 +79,27 @@ export class TF {
         });
         console.timeEnd(`simimg[${i}]`);
       },
-      usePetaFilesController().getAll(),
+      allPetaFiles,
       CPU_LENGTH,
     ).promise;
     return scores.sort((a, b) => a.score - b.score).reverse();
   }
-  async getSimilarPetaTags(petaFile: PetaFile) {
-    const petaFiles = (await this.getSimilarPetaFileIDsByPetaFile(petaFile)).splice(1, 10);
-    const allTags = await usePetaTagsController().getAll();
-    const tagScore: { [id: string]: number } = allTags.reduce((p, c) => ({ ...p, [c.id]: 0 }), {});
+  async getSimilarPetaTags(
+    petaFile: PetaFile,
+    allPetaFiles: PetaFile[],
+    allPetaTags: PetaTag[],
+    allPIPTs: PetaFilePetaTag[],
+  ) {
+    const petaFiles = (await this.getSimilarPetaFileIDsByPetaFile(petaFile, allPetaFiles)).splice(
+      1,
+      10,
+    );
+    const tagScore: { [id: string]: number } = allPetaTags.reduce(
+      (p, c) => ({ ...p, [c.id]: 0 }),
+      {},
+    );
     await ppa(async (pf) => {
-      const ids = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);
+      const ids = this.getPetaTagIdsByPetaFileIds([pf.id], allPIPTs);
       ids.forEach((id) => {
         tagScore[id] += pf.score;
       });
@@ -97,10 +109,28 @@ export class TF {
       .map((id) => ({
         tagId: id,
         prob: tagScore[id],
-        name: allTags.find((t) => t.id === id)?.name,
+        name: allPetaTags.find((t) => t.id === id)?.name,
       }))
       .sort((a, b) => b.prob - a.prob);
     console.log(scores.map((s) => `${s.name}: ${s.prob}`).join("\n"));
     return scores;
+  }
+  getPetaTagIdsByPetaFileIds(petaFileIds: string[], allPIPTs: PetaFilePetaTag[]) {
+    const pipts = allPIPTs.filter((pipt) => petaFileIds.includes(pipt.petaFileId));
+    const ids = Array.from(
+      new Set(
+        pipts.map((pipt) => {
+          return pipt.petaTagId;
+        }),
+      ),
+    );
+    const petaTagIds = ids.filter((id) => {
+      return (
+        pipts.filter((pipt) => {
+          return pipt.petaTagId === id;
+        }).length === petaFileIds.length
+      );
+    });
+    return petaTagIds;
   }
 }
