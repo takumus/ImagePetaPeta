@@ -1,14 +1,13 @@
 <template>
   <e-window-root>
     <e-title>{{ t("web.title") }}</e-title>
-    <input ref="fileInput" type="file" accept="image/*" @change="load" />
-    <img :src="connected ? selectedData?.dataURL ?? Icon : Icon" />
+    <input ref="fileInput" type="file" multiple accept="image/*" />
     <e-input v-if="connected">
       <e-status>
         {{ status === "ready" ? "" : t(`web.status.${status}`) }}
       </e-status>
       <button @click="select">{{ t("web.selectButton") }}</button>
-      <button @click="upload" v-if="selectedData">{{ t("web.uploadButton") }}</button>
+      <button @click="upload">{{ t("web.uploadButton") }}</button>
     </e-input>
     <e-input v-else>
       <e-status>{{ t("web.noConnections") }} </e-status>
@@ -22,12 +21,12 @@ import { useI18n } from "vue-i18n";
 
 import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
+import { ppa } from "@/commons/utils/pp";
 
-import Icon from "@/_public/images/app/icon.png";
+// import Icon from "@/_public/images/app/icon.png";
 
 const { t } = useI18n();
 const fileInput = ref<HTMLInputElement>();
-const selectedData = ref<{ dataURL: string; filename: string } | undefined>();
 const uploading = ref(false);
 const status = ref<"successful" | "progress" | "failed" | "ready">("ready");
 const connected = ref(true);
@@ -56,54 +55,58 @@ onMounted(async () => {
 function select() {
   fileInput.value?.click();
 }
-async function load() {
-  const file = fileInput.value?.files?.[0];
-  if (file === undefined) {
-    return;
-  }
-  selectedData.value = undefined;
-  try {
-    const dataURL = await new Promise<string>((res, rej) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        res(reader.result as string);
-      };
-      reader.onerror = () => {
-        rej("error");
-      };
-      reader.readAsDataURL(file);
-    });
-    selectedData.value = {
-      dataURL,
+
+async function loadFile(file: File) {
+  return new Promise<string>((res, rej) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      res(reader.result as string);
+    };
+    reader.onerror = () => {
+      rej("error");
+    };
+    reader.readAsDataURL(file);
+  }).then((dataUrl) => {
+    return {
+      dataURL: dataUrl,
       filename: file.name,
     };
-  } catch {
-    //
-  }
+  });
 }
+
 async function upload() {
-  if (selectedData.value === undefined) {
+  const files = Array.from(fileInput.value?.files || []);
+  if (files === undefined || files.length == 0) {
     return;
   }
+
   status.value = "progress";
   uploading.value = true;
   try {
-    const result = await send("importer", "import", [
-      [
-        {
-          type: "url",
-          url: selectedData.value.dataURL,
-          additionalData: {
-            name: selectedData.value.filename,
-            note: t("web.title"),
+    const results = await ppa(async (file) => {
+      const data = await loadFile(file);
+      return send("importer", "import", [
+        [
+          {
+            type: "url",
+            url: data.dataURL,
+            additionalData: {
+              name: data.filename,
+              note: t("web.title"),
+            },
           },
-        },
-      ],
-    ]);
-    if ("error" in result) {
-      throw result.error;
-    }
-    if (result.response.length > 0) {
+        ],
+      ]);
+    }, files).promise;
+
+    const responseLengthList = results.map((result) => {
+      if ("error" in result) {
+        throw result.error;
+      }
+      return result.response.length;
+    });
+
+    if (!responseLengthList.includes(0)) {
       status.value = "successful";
     } else {
       status.value = "failed";
