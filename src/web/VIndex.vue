@@ -22,6 +22,7 @@ import { useI18n } from "vue-i18n";
 
 import { WEBHOOK_PORT } from "@/commons/defines";
 import { IpcFunctions } from "@/commons/ipc/ipcFunctions";
+import { ppa } from "@/commons/utils/pp";
 
 import Icon from "@/_public/images/app/icon.png";
 
@@ -88,24 +89,29 @@ async function upload() {
   status.value = "progress";
   uploading.value = true;
   try {
-    const selectedResult = selectedData.value.map((data) => {
-      return [
-        {
-          type: "url",
-          url: data.dataURL,
-          additionalData: {
-            name: data.filename,
-            note: t("web.title"),
+    const results = await ppa(async (data) => {
+      return send("importer", "import", [
+        [
+          {
+            type: "url",
+            url: data.dataURL,
+            additionalData: {
+              name: data.filename,
+              note: t("web.title"),
+            },
           },
-        } as const,
-      ];
-    });
-    const result = await send("importer", "import", selectedResult);
+        ],
+      ]);
+    }, selectedData.value).promise;
 
-    if ("error" in result) {
-      throw result.error;
-    }
-    if (result.response.length > 0) {
+    const responseLengthList = results.map((result) => {
+      if ("error" in result) {
+        throw result.error;
+      }
+      return result.response.length;
+    });
+
+    if (!responseLengthList.includes(0)) {
       status.value = "successful";
     } else {
       status.value = "failed";
