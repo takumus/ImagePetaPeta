@@ -1,8 +1,8 @@
 <template>
   <e-window-root>
     <e-title>{{ t("web.title") }}</e-title>
-    <input ref="fileInput" type="file" accept="image/*" @change="load" />
-    <img :src="connected ? selectedData?.dataURL ?? Icon : Icon" />
+    <input ref="fileInput" type="file" multiple accept="image/*" @change="load" />
+    <img :src="connected ? (selectedData[0]?.dataURL ?? Icon) : Icon" />
     <e-input v-if="connected">
       <e-status>
         {{ status === "ready" ? "" : t(`web.status.${status}`) }}
@@ -27,7 +27,7 @@ import Icon from "@/_public/images/app/icon.png";
 
 const { t } = useI18n();
 const fileInput = ref<HTMLInputElement>();
-const selectedData = ref<{ dataURL: string; filename: string } | undefined>();
+const selectedData = ref<{ dataURL: string; filename: string }[]>([]);
 const uploading = ref(false);
 const status = ref<"successful" | "progress" | "failed" | "ready">("ready");
 const connected = ref(true);
@@ -57,26 +57,26 @@ function select() {
   fileInput.value?.click();
 }
 async function load() {
-  const file = fileInput.value?.files?.[0];
-  if (file === undefined) {
-    return;
-  }
-  selectedData.value = undefined;
+  selectedData.value = [];
   try {
-    const dataURL = await new Promise<string>((res, rej) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        res(reader.result as string);
-      };
-      reader.onerror = () => {
-        rej("error");
-      };
-      reader.readAsDataURL(file);
+    const promises = Array.from(fileInput.value?.files || []).map((file) => {
+      return new Promise<string>((res, rej) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          res(reader.result as string);
+        };
+        reader.onerror = () => {
+          rej("error");
+        };
+        reader.readAsDataURL(file);
+      }).then((dataUrl) => {
+        selectedData.value?.push({
+          dataURL: dataUrl,
+          filename: file.name,
+        });
+      });
     });
-    selectedData.value = {
-      dataURL,
-      filename: file.name,
-    };
+    await Promise.all(promises);
   } catch {
     //
   }
@@ -88,18 +88,20 @@ async function upload() {
   status.value = "progress";
   uploading.value = true;
   try {
-    const result = await send("importer", "import", [
-      [
+    const selectedResult = selectedData.value.map((data) => {
+      return [
         {
           type: "url",
-          url: selectedData.value.dataURL,
+          url: data.dataURL,
           additionalData: {
-            name: selectedData.value.filename,
+            name: data.filename,
             note: t("web.title"),
           },
-        },
-      ],
-    ]);
+        } as const,
+      ];
+    });
+    const result = await send("importer", "import", selectedResult);
+
     if ("error" in result) {
       throw result.error;
     }
