@@ -12,7 +12,7 @@ import { mobilenetURLToFilename } from "@/main/utils/mobilenetURLToFileName";
 export class TFImageClassification {
   model: tf.GraphModel<string | tf.io.IOHandler> | undefined;
   constructor() {}
-  async init(mnPaths: { [key: string]: string }) {
+  async init(tfModelPaths: { [key: string]: string }) {
     await tf.setBackend("wasm");
     this.model = await tf.loadGraphModel(
       "+https://www.kaggle.com/models/google/mobilenet-v3/TfJs/large-100-224-feature-vector/1",
@@ -30,7 +30,7 @@ export class TFImageClassification {
             //     filename as keyof (typeof extraFiles)["mobilenet.universal"]
             //   ],
             // );
-            const path = mnPaths[filename];
+            const path = tfModelPaths[filename];
             console.log("TF:", "override fetch!", this.minURL(url), "->", this.minURL(path));
             await stat(path);
             return new Response(await readFile(path));

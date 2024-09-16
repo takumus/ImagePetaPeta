@@ -39,8 +39,7 @@ import { usePetaFilesController } from "@/main/provides/controllers/petaFilesCon
 import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
 import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
 import { useDBStatus } from "@/main/provides/databases";
-import { TF } from "@/main/provides/tf";
-import { tfByWorker } from "@/main/provides/tf/indexWT";
+import { tfByWorker } from "@/main/provides/tf";
 import { useLogger } from "@/main/provides/utils/logger";
 import { usePaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
