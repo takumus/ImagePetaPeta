@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "crypto";
-import { mkdirSync, readdirSync, rmdirSync } from "node:fs";
+import { rm } from "fs/promises";
+import { mkdirSync, readdirSync } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { beforeEach } from "node:test";
@@ -13,9 +14,9 @@ import { secureFile } from "@/main/utils/secureFile";
 const KEY = createHash("sha512").update("1234").digest("hex").substring(0, 32);
 describe("crypto", () => {
   const ROOT = "./_test/unit/crypto";
-  beforeAll(() => {
+  beforeAll(async () => {
     try {
-      rmdirSync(resolve(ROOT), { recursive: true });
+      await rm(resolve(ROOT), { recursive: true });
     } catch {
       //
     }

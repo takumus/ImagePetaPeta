@@ -16,14 +16,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      - name: node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22.x
       - name: npm ci
         run: npm ci
       - name: audit
         run: npm audit --audit-level high
+      - name: generate assets
+        run: npm run generate-assets
       - name: test
         run: npm run test
         env:
