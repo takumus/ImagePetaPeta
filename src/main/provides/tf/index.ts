@@ -13,6 +13,7 @@ const workerGroup = createWorkerThreadsGroup(import("@/main/provides/tf/!workerT
 export const tfByWorker = (() => {
   const callbacks: { [id: number]: Parameters<typeof worker.on<"message">>[1] } = {};
   let _id = 0;
+  let worker = createWorker();
   function createWorker() {
     const w = workerGroup.get();
     w.use();
@@ -49,64 +50,65 @@ export const tfByWorker = (() => {
       };
     });
   }
-  let worker = createWorker();
+  async function getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile, allPetaFiles: PetaFile[]) {
+    await init();
+    return new Promise<
+      {
+        id: string;
+        score: number;
+      }[]
+    >((res, rej) => {
+      const id = _id++;
+      worker.postMessage({
+        method: "getSimilarPetaFileIDsByPetaFile",
+        id,
+        args: {
+          basePetaFile,
+          allPetaFiles,
+        },
+      });
+      callbacks[id] = (data) => {
+        if (data.method === "getSimilarPetaFileIDsByPetaFile") {
+          res(data.result);
+        }
+      };
+    });
+  }
+  async function getSimilarPetaTags(
+    petaFile: PetaFile,
+    allPetaFiles: PetaFile[],
+    allPetaTags: PetaTag[],
+    allPIPTs: PetaFilePetaTag[],
+  ) {
+    await init();
+    return new Promise<
+      {
+        tagId: string;
+        prob: number;
+        name: string | undefined;
+      }[]
+    >((res, rej) => {
+      const id = _id++;
+      worker.postMessage({
+        method: "getSimilarPetaTags",
+        id,
+        args: {
+          petaFile,
+          allPetaFiles,
+          allPetaTags,
+          allPIPTs,
+        },
+      });
+      callbacks[id] = (data) => {
+        if (data.method === "getSimilarPetaTags") {
+          res(data.result);
+        }
+      };
+    });
+  }
   return {
     init,
-    getSimilarPetaFileIDsByPetaFile: async (basePetaFile: PetaFile, allPetaFiles: PetaFile[]) => {
-      await init();
-      return new Promise<
-        {
-          id: string;
-          score: number;
-        }[]
-      >((res, rej) => {
-        const id = _id++;
-        worker.postMessage({
-          method: "getSimilarPetaFileIDsByPetaFile",
-          id,
-          args: {
-            basePetaFile,
-            allPetaFiles,
-          },
-        });
-        callbacks[id] = (data) => {
-          if (data.method === "getSimilarPetaFileIDsByPetaFile") {
-            res(data.result);
-          }
-        };
-      });
-    },
-    getSimilarPetaTags: async (
-      petaFile: PetaFile,
-      allPetaFiles: PetaFile[],
-      allPetaTags: PetaTag[],
-      allPIPTs: PetaFilePetaTag[],
-    ) => {
-      await init();
-      return new Promise<
-        {
-          tagId: string;
-          prob: number;
-          name: string | undefined;
-        }[]
-      >((res, rej) => {
-        const id = _id++;
-        worker.postMessage({
-          method: "getSimilarPetaTags",
-          id,
-          args: {
-            petaFile,
-            allPetaFiles,
-            allPetaTags,
-            allPIPTs,
-          },
-        });
-        callbacks[id] = (data) => {
-          if (data.method === "getSimilarPetaTags") {
-            res(data.result);
-          }
-        };
-      });
-    },
+    getSimilarPetaFileIDsByPetaFile,
+    getSimilarPetaTags,
   };
 })();
