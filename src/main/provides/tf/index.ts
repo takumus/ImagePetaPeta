@@ -1,5 +1,3 @@
-import { get } from "http";
-
 import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
 import { PetaTag } from "@/commons/datas/petaTag";
@@ -14,39 +12,48 @@ import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 const workerGroup = createWorkerThreadsGroup(import("@/main/provides/tf/!workerThreads.tf"));
 export const tfByWorker = (() => {
   const callbacks: { [id: number]: Parameters<typeof worker.on<"message">>[1] } = {};
-  const worker = workerGroup.get();
-  worker.use();
-  worker.on("message", async (data) => {
-    callbacks[data.id](data);
-  });
   let _id = 0;
-  return {
-    init: () => {
-      const tfModelPaths: { [key: string]: string } = ObjectKeys(
-        extraFiles["mobilenet.universal"],
-      ).reduce<{ [key: string]: string }>((acc, key) => {
-        acc[key] = resolveExtraFilesPath(extraFiles["mobilenet.universal"][key]);
-        return acc;
-      }, {});
-      const id = _id++;
-      return new Promise<boolean>((res, rej) => {
-        worker.postMessage({
-          method: "init",
-          id,
-          args: {
-            paths: usePaths(),
-            tfModelPaths,
-            secureKey: useConfigSecureFilePassword().getKey(),
-          },
-        });
-        callbacks[id] = (data) => {
-          if (data.method === "init") {
-            res(data.result);
-          }
-        };
+  function createWorker() {
+    const w = workerGroup.get();
+    w.use();
+    w.on("message", async (data) => {
+      callbacks[data.id](data);
+    });
+    return w;
+  }
+  function init() {
+    const tfModelPaths: { [key: string]: string } = ObjectKeys(
+      extraFiles["mobilenet.universal"],
+    ).reduce<{ [key: string]: string }>((acc, key) => {
+      acc[key] = resolveExtraFilesPath(extraFiles["mobilenet.universal"][key]);
+      return acc;
+    }, {});
+    const id = _id++;
+    if (worker.destroyed) {
+      worker = createWorker();
+    }
+    return new Promise<boolean>((res, rej) => {
+      worker.postMessage({
+        method: "init",
+        id,
+        args: {
+          paths: usePaths(),
+          tfModelPaths,
+          secureKey: useConfigSecureFilePassword().getKey(),
+        },
       });
-    },
-    getSimilarPetaFileIDsByPetaFile: (basePetaFile: PetaFile, allPetaFiles: PetaFile[]) => {
+      callbacks[id] = (data) => {
+        if (data.method === "init") {
+          res(data.result);
+        }
+      };
+    });
+  }
+  let worker = createWorker();
+  return {
+    init,
+    getSimilarPetaFileIDsByPetaFile: async (basePetaFile: PetaFile, allPetaFiles: PetaFile[]) => {
+      await init();
       return new Promise<
         {
           id: string;
@@ -75,6 +82,7 @@ export const tfByWorker = (() => {
       allPetaTags: PetaTag[],
       allPIPTs: PetaFilePetaTag[],
     ) => {
+      await init();
       return new Promise<
         {
           tagId: string;

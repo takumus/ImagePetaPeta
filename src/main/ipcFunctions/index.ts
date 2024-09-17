@@ -306,7 +306,6 @@ export const ipcFunctions: IpcFunctionsType = {
         if (petaFile === undefined) {
           return [];
         }
-        await tfByWorker.init();
         const scores = await tfByWorker.getSimilarPetaFileIDsByPetaFile(
           petaFile,
           usePetaFilesController().getAll(),
@@ -322,7 +321,6 @@ export const ipcFunctions: IpcFunctionsType = {
         if (petaFile === undefined) {
           return [];
         }
-        await tfByWorker.init();
         const scores = await tfByWorker.getSimilarPetaTags(
           petaFile,
           usePetaFilesController().getAll(),
