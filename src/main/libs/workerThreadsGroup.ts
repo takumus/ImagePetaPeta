@@ -15,6 +15,7 @@ export class TypedWorkerThreads<
   error: (error: any) => void;
 }> {
   private _idle = true;
+  private _destroyed = false;
   constructor(public readonly worker: Worker) {
     super();
     worker.on("message", (message) => {
@@ -23,6 +24,14 @@ export class TypedWorkerThreads<
     worker.on("error", (error) => {
       this.emit("error", error);
     });
+  }
+  async destroy() {
+    await this.worker.terminate();
+    this.worker.removeAllListeners();
+    this._destroyed = true;
+  }
+  get destroyed() {
+    return this._destroyed;
   }
   use() {
     this._idle = false;
@@ -64,6 +73,7 @@ export function createWorkerThreadsGroup<
       );
       const id = newWT.worker.threadId;
       newWT.worker.once("exit", () => {
+        typedWorkerThreads[id].destroy();
         delete typedWorkerThreads[id];
       });
       typedWorkerThreads[id] = newWT;

@@ -1,106 +1,114 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { layers, Sequential, sequential, stack, tensor, Tensor } from "@tensorflow/tfjs";
-
 import { PetaFile } from "@/commons/datas/petaFile";
-import { CPU_LENGTH } from "@/commons/utils/cpu";
-import { ppa } from "@/commons/utils/pp";
+import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
+import { PetaTag } from "@/commons/datas/petaTag";
+import { ObjectKeys } from "@/commons/utils/objectKeys";
 
-import { mkdirIfNotIxists } from "@/main/libs/file";
-import { tensorBuffer } from "@/main/libs/tf/tensorBuffer";
-import { TFImageClassification } from "@/main/libs/tf/tfImageClassification";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
-import { usePetaFilesPetaTagsController } from "@/main/provides/controllers/petaFilesPetaTagsController";
-import { usePetaTagsController } from "@/main/provides/controllers/petaTagsController";
-import { getPetaFileDirectoryPath } from "@/main/utils/getPetaFileDirectory";
-import { createPetaFileReadStream } from "@/main/utils/secureFile";
-import { streamToBuffer } from "@/main/utils/streamToBuffer";
+import { extraFiles } from "@/_defines/extraFiles";
+import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
+import { useConfigSecureFilePassword } from "@/main/provides/configs";
+import { usePaths } from "@/main/provides/utils/paths";
+import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 
-export class TF {
-  imageClassification = new TFImageClassification();
-  imageTensorCache: { [id: string]: Tensor } = {};
-  async init() {
-    return await this.imageClassification.init();
+const workerGroup = createWorkerThreadsGroup(import("@/main/provides/tf/!workerThreads.tf"));
+export const tfByWorker = (() => {
+  const callbacks: { [id: number]: Parameters<typeof worker.on<"message">>[1] } = {};
+  let _id = 0;
+  let worker = createWorker();
+  function createWorker() {
+    const w = workerGroup.get();
+    w.use();
+    w.on("message", async (data) => {
+      callbacks[data.id](data);
+    });
+    return w;
   }
-  async saveImageVector(petaFile: PetaFile) {
-    const imageBuffer = await streamToBuffer(createPetaFileReadStream(petaFile, "thumbnail"));
-    const tensor = stack(
-      await Promise.all([
-        this.imageClassification.imageToTensor(imageBuffer, 0),
-        this.imageClassification.imageToTensor(imageBuffer, 1),
-      ]),
-    ); // [2, 1280]
-    const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
-    await mkdirIfNotIxists(dirPath, { recursive: true });
-    await writeFile(resolve(dirPath, petaFile.id + ".tv"), tensorBuffer.toBuffer(tensor));
-    this.imageTensorCache[petaFile.id] = tensor;
-    return tensor;
-  }
-  async loadImageVector(petaFile: PetaFile) {
-    try {
-      if (this.imageTensorCache[petaFile.id] !== undefined) {
-        return this.imageTensorCache[petaFile.id];
-      }
-      const dirPath = getPetaFileDirectoryPath.fromPetaFile(petaFile).cache;
-      this.imageTensorCache[petaFile.id] = tensorBuffer.toTensor(
-        await readFile(resolve(dirPath, petaFile.id + ".tv")),
-      );
-      return this.imageTensorCache[petaFile.id];
-    } catch {
-      return undefined;
+  function init() {
+    const tfModelPaths: { [key: string]: string } = ObjectKeys(
+      extraFiles["mobilenet.universal"],
+    ).reduce<{ [key: string]: string }>((acc, key) => {
+      acc[key] = resolveExtraFilesPath(extraFiles["mobilenet.universal"][key]);
+      return acc;
+    }, {});
+    const id = _id++;
+    if (worker.destroyed) {
+      worker = createWorker();
     }
-  }
-  async loadOrSaveImageVector(petaFile: PetaFile) {
-    try {
-      const loadedTensor = await this.loadImageVector(petaFile);
-      if (loadedTensor !== undefined && !loadedTensor.isDisposed) {
-        return loadedTensor;
-      }
-    } catch {
-      //
-    }
-    return await this.saveImageVector(petaFile);
-  }
-  similarity(vecA: Tensor, vecB: Tensor) {
-    return this.imageClassification.similarity(vecA, vecB);
-  }
-  async getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile) {
-    const baseTensor = await this.loadOrSaveImageVector(basePetaFile);
-    const scores: { id: string; score: number }[] = [];
-    await ppa(
-      async (targetPetaFile, i) => {
-        console.time(`simimg[${i}]`);
-        const targetTensor = await this.loadOrSaveImageVector(targetPetaFile);
-        scores.push({
-          id: targetPetaFile.id,
-          score: this.similarity(baseTensor, targetTensor),
-        });
-        console.timeEnd(`simimg[${i}]`);
-      },
-      usePetaFilesController().getAll(),
-      CPU_LENGTH,
-    ).promise;
-    return scores.sort((a, b) => a.score - b.score).reverse();
-  }
-  async getSimilarPetaTags(petaFile: PetaFile) {
-    const petaFiles = (await this.getSimilarPetaFileIDsByPetaFile(petaFile)).splice(1, 10);
-    const allTags = await usePetaTagsController().getAll();
-    const tagScore: { [id: string]: number } = allTags.reduce((p, c) => ({ ...p, [c.id]: 0 }), {});
-    await ppa(async (pf) => {
-      const ids = await usePetaFilesPetaTagsController().getPetaTagIdsByPetaFileIds([pf.id]);
-      ids.forEach((id) => {
-        tagScore[id] += pf.score;
+    return new Promise<boolean>((res, rej) => {
+      worker.postMessage({
+        method: "init",
+        id,
+        args: {
+          paths: usePaths(),
+          tfModelPaths,
+          secureKey: useConfigSecureFilePassword().getKey(),
+        },
       });
-    }, petaFiles).promise;
-    const scores = Object.keys(tagScore)
-      .filter((id) => tagScore[id] > 0)
-      .map((id) => ({
-        tagId: id,
-        prob: tagScore[id],
-        name: allTags.find((t) => t.id === id)?.name,
-      }))
-      .sort((a, b) => b.prob - a.prob);
-    console.log(scores.map((s) => `${s.name}: ${s.prob}`).join("\n"));
-    return scores;
+      callbacks[id] = (data) => {
+        if (data.method === "init") {
+          res(data.result);
+        }
+      };
+    });
   }
-}
+  async function getSimilarPetaFileIDsByPetaFile(basePetaFile: PetaFile, allPetaFiles: PetaFile[]) {
+    await init();
+    return new Promise<
+      {
+        id: string;
+        score: number;
+      }[]
+    >((res, rej) => {
+      const id = _id++;
+      worker.postMessage({
+        method: "getSimilarPetaFileIDsByPetaFile",
+        id,
+        args: {
+          basePetaFile,
+          allPetaFiles,
+        },
+      });
+      callbacks[id] = (data) => {
+        if (data.method === "getSimilarPetaFileIDsByPetaFile") {
+          res(data.result);
+        }
+      };
+    });
+  }
+  async function getSimilarPetaTags(
+    petaFile: PetaFile,
+    allPetaFiles: PetaFile[],
+    allPetaTags: PetaTag[],
+    allPIPTs: PetaFilePetaTag[],
+  ) {
+    await init();
+    return new Promise<
+      {
+        tagId: string;
+        prob: number;
+        name: string | undefined;
+      }[]
+    >((res, rej) => {
+      const id = _id++;
+      worker.postMessage({
+        method: "getSimilarPetaTags",
+        id,
+        args: {
+          petaFile,
+          allPetaFiles,
+          allPetaTags,
+          allPIPTs,
+        },
+      });
+      callbacks[id] = (data) => {
+        if (data.method === "getSimilarPetaTags") {
+          res(data.result);
+        }
+      };
+    });
+  }
+  return {
+    init,
+    getSimilarPetaFileIDsByPetaFile,
+    getSimilarPetaTags,
+  };
+})();
