@@ -17,11 +17,18 @@ type Funcs = IpcFunctions & {
       cb: (event: IpcRendererEvent, ...args: Parameters<FunctionGuard<IpcEvents[C][U]>>) => void,
     ) => { off: () => void };
   };
+} & {
+  electronWebUtils: {
+    getPathForFile(file: File): string;
+  };
 };
 const cacheFunctions: { [p1: string]: { [p2: string]: any } } = {};
 const cacheProxies: { [p1: string]: any } = {};
 export const IPC = new Proxy<Funcs>({} as any, {
   get(_target: Funcs, p1: any, _receiver: any) {
+    if (p1 === "electronWebUtils") {
+      return WINDOW[IPC_GLOBAL_NAME].electronWebUtils;
+    }
     if (cacheProxies[p1] === undefined) {
       cacheFunctions[p1] = {};
       cacheProxies[p1] = new Proxy<any>({} as any, {

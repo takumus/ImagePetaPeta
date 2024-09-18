@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer, webFrame } from "electron";
+import { contextBridge, ipcRenderer, webFrame, webUtils } from "electron";
 
 import { IPC_GLOBAL_NAME } from "@/commons/defines";
 
@@ -22,5 +22,10 @@ contextBridge.exposeInMainWorld(IPC_GLOBAL_NAME, {
         ipcRenderer.off(key, callback);
       },
     };
+  },
+  electronWebUtils: {
+    getPathForFile(file: File) {
+      return webUtils.getPathForFile(file);
+    },
   },
 });
