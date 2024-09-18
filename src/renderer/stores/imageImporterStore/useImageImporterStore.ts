@@ -108,7 +108,7 @@ export function useImageImporterStore() {
     if (items.length === 0) {
       return {};
     }
-    if (IPC.electronWebUtils.getPathForFile(items[0]) !== undefined) {
+    if (IPC.electronWebUtils.getPathForFile(items[0]) !== "") {
       // パスがあったらファイルパスから読む。
       return {
         filePaths: items
