@@ -3,6 +3,7 @@ import { InjectionKey, onMounted, onUnmounted, readonly, ref } from "vue";
 
 import { inject } from "@/renderer/utils/vue";
 
+import { IPC_GLOBAL_NAME } from "@/commons/defines";
 import { ppa } from "@/commons/utils/pp";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
@@ -48,6 +49,7 @@ export function useImageImporterStore() {
           ],
         ]);
       } else {
+        console.log(filePaths);
         ids = await IPC.importer.import(
           filePaths !== undefined
             ? filePaths.map((filePath) => [
@@ -106,10 +108,12 @@ export function useImageImporterStore() {
     if (items.length === 0) {
       return {};
     }
-    if (items[0]?.path !== "") {
+    if (IPC.electronWebUtils.getPathForFile(items[0]) !== undefined) {
       // パスがあったらファイルパスから読む。
       return {
-        filePaths: items.map((file) => file.path),
+        filePaths: items
+          .map((file) => IPC.electronWebUtils.getPathForFile(file))
+          .filter((path) => path !== undefined) as string[],
       };
     } else {
       // 無かったらバッファーから読む
