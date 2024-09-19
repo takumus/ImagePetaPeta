@@ -1,4 +1,5 @@
 import { rmSync } from "node:fs";
+import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import pkg from "./package.json";
 import { windowNames } from "./src/commons/windows";
@@ -66,7 +67,11 @@ function createElectronPlugin(isBuild: boolean) {
       emptyOutDir: false,
       outDir: resolve("./_electronTemp/dist/main"),
       rollupOptions: {
-        external: [...Object.keys(pkg.dependencies ?? {})],
+        external: [
+          ...Object.keys(pkg.dependencies ?? {}),
+          ...builtinModules,
+          ...builtinModules.map((m) => `node:${m}`),
+        ],
       },
       sourcemap: !isBuild,
     },

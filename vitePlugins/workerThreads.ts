@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import { styleText } from "node:util";
 import { build, mergeConfig, Plugin, ResolvedConfig, UserConfig } from "vite";
@@ -21,9 +20,6 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
           entry: workerfile,
           formats: ["es"],
           fileName: () => "[name].mjs",
-        },
-        rollupOptions: {
-          external: [...builtinModules, ...builtinModules.map((m) => `node:${m}`)],
         },
       },
       plugins: [

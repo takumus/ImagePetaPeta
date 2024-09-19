@@ -1,4 +1,5 @@
 import { mkdirSync, rmSync } from "node:fs";
+import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import pkg from "./package.json";
 import { viteAlias } from "./vite.alias";
@@ -23,7 +24,11 @@ export default defineConfig((async ({ command }) => {
           build: {
             outDir: resolve("./_test/_wt"),
             rollupOptions: {
-              external: [...Object.keys("dependencies" in pkg ? pkg.dependencies : {})],
+              external: [
+                ...Object.keys(pkg.dependencies ?? {}),
+                ...builtinModules,
+                ...builtinModules.map((m) => `node:${m}`),
+              ],
             },
             minify: false,
           },
