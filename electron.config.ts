@@ -16,8 +16,8 @@ export const electronConfiguration: Configuration = {
       to: "./",
     },
     "package.json",
-    "!**/node_modules/**/*.map",
-    "!**/node_modules/**/*.ts",
+    "!**/*.map",
+    "!**/*.ts",
   ],
   artifactName: "${productName}-${version}-${platform}-${arch}.${ext}",
   extraMetadata: {
