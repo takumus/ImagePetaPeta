@@ -65,7 +65,7 @@ export default class DB<T> extends TypedEventEmitter<{
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
     }
-    return this.nedb.findAsync(query).execAsync();
+    return this.nedb.findAsync(query); //.execAsync();
   }
   getAll() {
     if (!this.nedb || !this.loaded) {
@@ -78,7 +78,7 @@ export default class DB<T> extends TypedEventEmitter<{
     if (!this.nedb || !this.loaded) {
       throw new Error("DB is not initialized");
     }
-    return this.nedb.countAsync(query).execAsync();
+    return this.nedb.countAsync(query); //.execAsync();
   }
   async remove(query: Partial<T>): Promise<number> {
     if (!this.nedb || !this.loaded) {
