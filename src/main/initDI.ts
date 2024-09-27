@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import { createI18n } from "vue-i18n";
 
 import { DBInfo, getDefaultDBInfo } from "@/commons/datas/dbInfo";
+import { getDefaultLibrary, Library } from "@/commons/datas/library";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaFilePetaTag } from "@/commons/datas/petaFilesPetaTags";
@@ -22,6 +23,7 @@ import {
   FILENAME_DB_INFO,
   FILENAME_IMAGES_DB,
   FILENAME_IMAGES_TAGS_DB,
+  FILENAME_LIBRARY,
   FILENAME_SECURE_FILE_PASSWORD,
   FILENAME_SETTINGS,
   FILENAME_STATES,
@@ -42,6 +44,7 @@ import { migrateStates } from "@/main/migration/migrateStates";
 import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
 import {
   configDBInfoKey,
+  configLibraryKey,
   configSecureFilePasswordKey,
   configSettingsKey,
   configStatesKey,
@@ -157,9 +160,11 @@ export function initDI(
     const FILE_IMAGES_TAGS_DB = initFileSync(DIR_ROOT, FILENAME_IMAGES_TAGS_DB);
     const FILE_STATES = initFileSync(DIR_APP, FILENAME_STATES);
     const FILE_DBINFO = initFileSync(DIR_ROOT, FILENAME_DB_INFO);
+    const FILE_LIBRARY = initFileSync(DIR_ROOT, FILENAME_LIBRARY);
     const FILE_WINDOW_STATES = initFileSync(DIR_APP, FILENAME_WINDOW_STATES);
     const FILE_SECURE_FILE_PASSWORD = initFileSync(DIR_APP, FILENAME_SECURE_FILE_PASSWORD);
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, getDefaultDBInfo());
+    const configLibrary = new Config<Library>(FILE_LIBRARY, getDefaultLibrary());
     // デフォルト値だったらバージョン付与。
     if (configDBInfo.data.version === getDefaultDBInfo().version) {
       configDBInfo.data.version = app.getVersion();
@@ -220,6 +225,7 @@ export function initDI(
     provide(windowsKey, windows);
     provide(dbStatusKey, { initialized: false });
     provide(configDBInfoKey, configDBInfo);
+    provide(configLibraryKey, configLibrary);
     provide(configSettingsKey, configSettings);
     provide(configStatesKey, configStates);
     provide(configWindowStatesKey, configWindowStates);

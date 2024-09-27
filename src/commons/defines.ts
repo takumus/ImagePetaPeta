@@ -69,6 +69,7 @@ export const FILENAME_IMAGES_TAGS_DB: string = "images_tags.db";
 export const FILENAME_TAG_PARTITIONS_DB: string = "tag_partitions.db";
 export const FILENAME_STATES: string = "states.json";
 export const FILENAME_DB_INFO: string = "dbInfo.json";
+export const FILENAME_LIBRARY: string = "library.json";
 export const FILENAME_WINDOW_STATES: string = "windowStates.json";
 export const FILENAME_SECURE_FILE_PASSWORD: string = "secureFilePassword.json";
 export const DIRNAME_IMAGES: string = "images";
