@@ -68,7 +68,7 @@ export class Keyboards {
   }
   private emit(key: Keys, pressed: boolean, event?: KeyboardEvent) {
     (pressed ? this.downListeners : this.upListeners)[key]?.forEach((callback) => {
-      callback(pressed, event);
+      callback(pressed, event, key);
     });
   }
 
@@ -153,7 +153,7 @@ function parseKeys(...keys: Keys[]) {
   });
   return newKeys;
 }
-type KeyboardsCallback = (pressed: boolean, event?: KeyboardEvent) => void;
+type KeyboardsCallback = (pressed: boolean, event?: KeyboardEvent, key?: Keys) => void;
 export type Keys =
   | "Backspace"
   | "Tab"
