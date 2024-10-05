@@ -14,6 +14,7 @@ import { ppa } from "@/commons/utils/pp";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import * as file from "@/main/libs/file";
+import { useConfigLibrary } from "@/main/provides/configs";
 import { createFileInfo } from "@/main/provides/controllers/petaFilesController/createFileInfo";
 import { generatePetaFile } from "@/main/provides/controllers/petaFilesController/generatePetaFile";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
@@ -149,7 +150,7 @@ export class FileImporter {
               id,
             },
             type: "add",
-            doEncrypt: true,
+            doEncrypt: useConfigLibrary().data.secure,
             secureTempFile: fileInfo.secureTempFile,
           });
           if (petaFile === undefined) {

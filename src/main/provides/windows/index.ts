@@ -16,6 +16,7 @@ import { WindowName } from "@/commons/windows";
 
 import { createKey, createUseFunction } from "@/main/libs/di";
 import {
+  useConfigLibrary,
   useConfigSecureFilePassword,
   useConfigSettings,
   useConfigWindowStates,
@@ -51,6 +52,7 @@ export class Windows {
   }
   showWindows() {
     const configSettings = useConfigSettings();
+    const configLibrary = useConfigLibrary();
     const log = useLogger().logChunk("Windows.showWindows");
     if (configSettings.data.eula < EULA) {
       if (windowIs.dead("eula")) {
@@ -62,7 +64,9 @@ export class Windows {
       return;
     }
     try {
-      useConfigSecureFilePassword().getKey();
+      if (configLibrary.data.secure) {
+        useConfigSecureFilePassword().getKey();
+      }
     } catch (error) {
       log.debug("show password");
       this.openWindow("password");
