@@ -53,9 +53,9 @@
               {{ t("browser.untagged") }}
             </e-tag>
           </e-tags>
-          <e-video-duration v-if="props.tile.petaFile?.metadata.type === 'video'">
-            {{ videoDuration }}
-          </e-video-duration>
+          <e-name>
+            {{ tile.petaFile.name }}
+          </e-name>
           <e-secure v-if="props.tile.petaFile?.encrypted">
             <e-icon></e-icon>
           </e-secure>
@@ -328,7 +328,7 @@ e-tile-root {
     position: relative;
     width: 100%;
     height: 100%;
-    > e-video-duration,
+    > e-name,
     e-secure {
       display: block;
       position: absolute;
@@ -338,7 +338,7 @@ e-tile-root {
       font-size: var(--size-0);
       line-height: var(--size-0);
     }
-    > e-video-duration {
+    > e-name {
       top: 0px;
       left: 0px;
     }
