@@ -36,6 +36,7 @@ import { Vec2, vec2FromPointerEvent } from "@/commons/utils/vec2";
 import { PIXIRect } from "@/renderer/components/commons/utils/pixi/rect";
 import { IPC } from "@/renderer/libs/ipc";
 import { useCommonTextureStore } from "@/renderer/stores/commonTextureStore/useCommonTextureStore";
+import { useKeyboardsStore } from "@/renderer/stores/keyboardsStore/useKeyboardsStore";
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 // import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
@@ -43,6 +44,7 @@ import { useSystemInfoStore } from "@/renderer/stores/systemInfoStore/useSystemI
 import { PFileObject } from "@/renderer/utils/pFileObject";
 import { PFileObjectContent } from "@/renderer/utils/pFileObject/pFileObjectContent";
 import { PPlayableFileObjectContent } from "@/renderer/utils/pFileObject/pPlayableFileObjectContainer";
+import { PVideoFileObjectContent } from "@/renderer/utils/pFileObject/video";
 
 const props = defineProps<{
   petaFile: RPetaFile;
@@ -59,6 +61,7 @@ let scale = 1;
 const position = new Vec2();
 const settingsStore = useSettingsStore();
 const pointerPosition = new Vec2();
+const keyboards = useKeyboardsStore();
 const nsfwMask = new PIXI.TilingSprite({
   texture: useCommonTextureStore().NSFW,
   width: 100,
@@ -67,8 +70,21 @@ const nsfwMask = new PIXI.TilingSprite({
 const dragging = ref(false);
 let fitToOutside = true;
 onMounted(() => {
+  keyboards.enabled = true;
   window.addEventListener("pointerup", pointerup);
   window.addEventListener("pointermove", pointermove);
+  keyboards.keys("ArrowRight", "ArrowLeft").down((_1, _2, key) => {
+    if (pFileObjectContent.value instanceof PPlayableFileObjectContent) {
+      const time = pFileObjectContent.value?.getCurrentTime();
+      let timeOffset = (key === "ArrowRight" ? 5 : -5) + time;
+      if (timeOffset < 0) {
+        timeOffset = 0;
+      } else if (timeOffset > pFileObjectContent.value?.getDuration()) {
+        timeOffset = pFileObjectContent.value?.getDuration();
+      }
+      pFileObjectContent.value?.setCurrentTime(timeOffset);
+    }
+  });
 });
 onUnmounted(() => {
   window.removeEventListener("pointerup", pointerup);
@@ -90,6 +106,9 @@ function construct() {
 }
 async function load() {
   await pFileObject.load(props.petaFile);
+  if (pFileObject.content instanceof PVideoFileObjectContent) {
+    pFileObject.content.setVolume(0.5);
+  }
   pFileObjectContent.value = pFileObject.content;
   if (pFileObject.content instanceof PPlayableFileObjectContent) {
     pFileObject.content.setPaused(false);
