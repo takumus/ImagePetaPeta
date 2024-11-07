@@ -47,6 +47,7 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { getStyle } from "@/main/utils/darkMode";
+import { encodeVideo } from "@/main/utils/encodeVideo";
 import { getIPs } from "@/main/utils/getIPs";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
@@ -349,6 +350,10 @@ export const ipcFunctions: IpcFunctionsType = {
       } catch {
         return false;
       }
+      return true;
+    },
+    async encodeVideo(event, logger, petaFiles) {
+      await encodeVideo(petaFiles, []);
       return true;
     },
   },
