@@ -9,6 +9,13 @@ export default defineConfig(async ({ command }) => {
   return {
     base: "./",
     root: resolve("./src/web"),
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: "modern-compiler",
+        },
+      },
+    },
     build: {
       emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/web"),
