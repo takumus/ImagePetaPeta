@@ -24,13 +24,13 @@ export default defineConfig((async ({ command }) => {
     base: "./",
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: "modern-compiler",
-        },
-      },
-    },
+    // css: {
+    //   preprocessorOptions: {
+    //     scss: {
+    //       api: "modern-compiler",
+    //     },
+    //   },
+    // },
     build: {
       emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/renderer"),

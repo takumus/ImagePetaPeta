@@ -8,13 +8,13 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
   base: "./",
   root: resolve("./src/web"),
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: "modern-compiler",
-      },
-    },
-  },
+  // css: {
+  //   preprocessorOptions: {
+  //     scss: {
+  //       api: "modern-compiler",
+  //     },
+  //   },
+  // },
   build: {
     emptyOutDir: true,
     outDir: resolve("./_electronTemp/dist/web"),
