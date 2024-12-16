@@ -120,5 +120,6 @@ export interface IpcFunctions {
     getSimTags: (id: string) => Promise<{ tagId: string; prob: number }[]>;
     login: (password: string, save: boolean) => Promise<boolean>;
     copyRawToClipboard: (petaFile: PetaFile) => Promise<boolean>;
+    encodeVideo: (petaFiles: PetaFile[]) => Promise<boolean>;
   };
 }

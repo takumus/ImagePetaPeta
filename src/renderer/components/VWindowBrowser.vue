@@ -42,5 +42,5 @@ watch(
 </script>
 
 <style lang="scss">
-@import "@/renderer/styles/index.scss";
+@use "@/renderer/styles/index.scss" as *;
 </style>

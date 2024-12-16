@@ -1,5 +1,5 @@
-@import "./windowRoot.scss";
-@import "./button.scss";
-@import "./color.scss";
-@import "./label.scss";
-@import "./sortHelper.scss";
+@use "./windowRoot.scss" as *;
+@use "./button.scss" as *;
+@use "./color.scss" as *;
+@use "./label.scss" as *;
+@use "./sortHelper.scss" as *;

@@ -54,5 +54,5 @@ function regeneratePetaFiles() {
 
 <style lang="scss" scoped></style>
 <style lang="scss" scoped>
-@import "@/renderer/components/settings/index.scss";
+@use "@/renderer/components/settings/index.scss" as *;
 </style>

@@ -456,6 +456,12 @@ function petaFileMenu(petaFile: RPetaFile, position: Vec2) {
           await IPC.common.searchImageByGoogle(petaFile);
         },
       },
+      {
+        label: t("browser.petaFileMenu.encodeVideo"),
+        click: async () => {
+          await IPC.common.encodeVideo(selectedPetaFiles.value);
+        },
+      },
     ],
     position,
   );
