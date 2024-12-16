@@ -22,10 +22,8 @@ import VTask from "@/renderer/components/task/VTask.vue";
 import { TaskStatusWithIndex } from "@/commons/datas/task";
 
 import { IPC } from "@/renderer/libs/ipc";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import * as Cursor from "@/renderer/utils/cursor";
 
-const windowStatus = useWindowStatusStore();
 const { t } = useI18n();
 const taskStatuses = ref<{ [key: string]: TaskStatusWithIndex }>({});
 onMounted(async () => {
@@ -49,12 +47,7 @@ const taskStatusArray = computed(() => {
       status: { id, ...taskStatuses.value[id] },
     }));
 });
-const visible = computed(() => {
-  return (
-    taskStatusArray.value.length > 0 &&
-    (windowStatus.state.value.isMainWindow || windowStatus.state.value.focused)
-  );
-});
+
 const closable = computed(() => {
   return (
     Object.values(taskStatuses.value).filter((status) => {

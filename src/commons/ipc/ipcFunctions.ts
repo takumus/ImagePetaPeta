@@ -64,7 +64,6 @@ export interface IpcFunctions {
     get: () => Promise<Settings>;
   };
   windows: {
-    getIsFocused: () => Promise<boolean>;
     open: (windowName: WindowName) => Promise<void>;
     getMainWindowName: () => Promise<WindowName | undefined>;
     maximize: () => Promise<void>;

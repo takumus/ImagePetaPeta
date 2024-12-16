@@ -1,6 +1,10 @@
 import VWindow from "@/renderer/components/VWindowBrowser.vue";
 
 import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
+import {
+  commonTextureStoreKey,
+  createCommonTextureStore,
+} from "@/renderer/stores/commonTextureStore/createCommonTextureStore";
 import { keyStoreCreatorPair } from "@/renderer/stores/keyStoreCreatorPair";
 import {
   createPetaBoardsStore,
@@ -26,4 +30,5 @@ create(VWindow, "browser", [
   keyStoreCreatorPair(petaBoardsStoreKey, createPetaBoardsStore),
   keyStoreCreatorPair(petaTagsStoreKey, createPetaTagsStore),
   keyStoreCreatorPair(petaTagPartitionsStoreKey, createPetaTagPartitionsStore),
+  keyStoreCreatorPair(commonTextureStoreKey, createCommonTextureStore),
 ]);

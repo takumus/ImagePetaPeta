@@ -14,10 +14,6 @@ import {
   createAppInfoStore,
 } from "@/renderer/stores/appInfoStore/createAppInfoStore";
 import {
-  commonTextureStoreKey,
-  createCommonTextureStore,
-} from "@/renderer/stores/commonTextureStore/createCommonTextureStore";
-import {
   componentsStoreKey,
   createComponentsStore,
 } from "@/renderer/stores/componentsStore/createComponentsStore";
@@ -41,10 +37,6 @@ import {
   createWindowNameStore,
   windowNameStoreKey,
 } from "@/renderer/stores/windowNameStore/createWindowNameStore";
-import {
-  createWindowStatusStore,
-  windowStatusStoreKey,
-} from "@/renderer/stores/windowStatusStore/createWindowStatusStore";
 import {
   createWindowTitleStore,
   windowTitleStoreKey,
@@ -88,14 +80,12 @@ export async function create(
       (async () => app.provide(windowNameStoreKey, await createWindowNameStore(windowName)))(),
       (async () => app.provide(definesStoreKey, await createDefinesStore()))(),
       (async () => app.provide(systemInfoStoreKey, await createSystemInfoStore(platform)))(),
-      (async () => app.provide(windowStatusStoreKey, await createWindowStatusStore(windowName)))(),
       (async () => app.provide(statesStoreKey, await createStatesStore()))(),
       (async () => app.provide(settingsStoreKey, await createSettingsStore()))(),
       (async () => app.provide(appInfoStoreKey, await createAppInfoStore()))(),
       (async () => app.provide(textsStoreKey, await createTextsStore()))(),
       (async () => app.provide(componentsStoreKey, await createComponentsStore()))(),
       (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
-      (async () => app.provide(commonTextureStoreKey, await createCommonTextureStore()))(),
       ...(stores?.map(async (store) => app.provide(store.key, await store.creator())) || []),
     ]);
     ClickChecker.init();

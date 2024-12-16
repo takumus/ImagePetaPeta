@@ -3,12 +3,6 @@ import { IpcFunctionsType } from "@/commons/ipc/ipcFunctionsType";
 import { useWindows } from "@/main/provides/windows";
 
 export const windowsIPCFunctions: IpcFunctionsType["windows"] = {
-  async getIsFocused(event, log) {
-    const windows = useWindows();
-    const isFocued = windows.getWindowByEvent(event)?.window.isFocused() ? true : false;
-    log.debug("return:", isFocued);
-    return isFocued;
-  },
   async minimize(event, log) {
     const windows = useWindows();
     const windowInfo = windows.getWindowByEvent(event);

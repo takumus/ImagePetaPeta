@@ -74,13 +74,11 @@ import { useComponentsStore } from "@/renderer/stores/componentsStore/useCompone
 import { useNSFWStore } from "@/renderer/stores/nsfwStore/useNSFWStore";
 import { useSettingsStore } from "@/renderer/stores/settingsStore/useSettingsStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 
 const nsfwStore = useNSFWStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const { windowName } = useWindowNameStore();
-const windowStatusStore = useWindowStatusStore();
 const settingsStore = useSettingsStore();
 function openBoard() {
   IPC.windows.open("board");

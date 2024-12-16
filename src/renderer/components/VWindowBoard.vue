@@ -63,14 +63,12 @@ import { usePetaFilesStore } from "@/renderer/stores/petaFilesStore/usePetaFiles
 import { useStateStore } from "@/renderer/stores/statesStore/useStatesStore";
 import { useStyleStore } from "@/renderer/stores/styleStore/useStyleStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
-import { useWindowStatusStore } from "@/renderer/stores/windowStatusStore/useWindowStatusStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
 
 const statesStore = useStateStore();
 const components = useComponentsStore();
 const { t } = useI18n();
 const styleStore = useStyleStore();
-const windowStatusStore = useWindowStatusStore();
 const appInfoStore = useAppInfoStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
@@ -212,15 +210,6 @@ const sortedPetaBoards = computed(() => {
     return a.index - b.index;
   });
 });
-watch(
-  () => windowStatusStore.state.value.focused,
-  () => {
-    if (!windowStatusStore.state.value.focused) {
-      vPetaBoard.value?.clearSelectionAll(true);
-      vPetaBoard.value?.orderPIXIRender();
-    }
-  },
-);
 watch(
   () => `${t(`titles.${windowNameStore.windowName.value}`)} - ${appInfoStore.state.value.name}`,
   (value) => {

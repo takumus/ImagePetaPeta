@@ -173,9 +173,7 @@ export class Windows {
     logger.debug(type);
     window.setMenuBarVisibility(false);
     window.on("close", () => this.onCloseWindow(type));
-    window.addListener("blur", () => this.emit.windows.focused({ type: "all" }, false, type));
     window.addListener("focus", () => {
-      this.emit.windows.focused({ type: "all" }, true, type);
       if (keepAliveWindowNames.includes(type)) {
         this.changeMainWindow(type);
       }
@@ -198,7 +196,6 @@ export class Windows {
   }
   changeMainWindow(type: WindowName) {
     this.mainWindowName = type;
-    this.emit.windows.mainName({ type: "all" }, type);
   }
   saveWindowSize(windowName: WindowName) {
     const configWindowStates = useConfigWindowStates();

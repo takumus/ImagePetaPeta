@@ -23,10 +23,6 @@ export interface IpcEvents {
   petaTagPartitions: {
     update: (petaTagPartition: PetaTagPartition[], mode: UpdateMode) => void;
   };
-  windows: {
-    focused: (focused: boolean, windowName: WindowName) => void;
-    mainName: (type: WindowName | undefined) => void;
-  };
   settings: {
     update: (settings: Settings) => void;
   };
