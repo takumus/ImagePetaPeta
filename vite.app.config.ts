@@ -34,7 +34,7 @@ export default defineConfig((async ({ command }) => {
       electronWindows({
         templateHTMLFile: resolve("./src/renderer/windows/@template.html"),
         windows: windowNames.map((name) => ({
-          templateReplace: { ts: `./${name}.ts` },
+          templateReplace: { ts: resolve(`./src/renderer/windows/${name}.ts`) },
           virtualHTML: resolve(`./src/renderer/windows/${name}.html`),
         })),
       }),

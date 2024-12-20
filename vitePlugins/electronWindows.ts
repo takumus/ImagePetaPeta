@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { styleText } from "node:util";
 import { BuildOptions, mergeConfig, Plugin, UserConfig } from "vite";
 
@@ -24,7 +24,10 @@ export default (pluginOptions: {
       return;
     }
     return Object.keys(window.templateReplace).reduce((html, key) => {
-      return html.replace(new RegExp(`{{${key}}}`, "g"), window.templateReplace[key]);
+      const rp = isAbsolute(window.templateReplace[key])
+        ? relative(dirname(window.virtualHTML), window.templateReplace[key])
+        : window.templateReplace[key];
+      return html.replace(new RegExp(`{{${key}}}`, "g"), rp);
     }, templateHTML);
   }
   return {
