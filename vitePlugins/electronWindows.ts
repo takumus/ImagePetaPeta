@@ -32,7 +32,7 @@ export default (pluginOptions: {
     enforce: "pre",
     config(config) {
       root = config.root ?? ".";
-      templateHTML = readFileSync(resolve(root, pluginOptions.templateHTMLFile), "utf-8");
+      templateHTML = readFileSync(pluginOptions.templateHTMLFile, "utf-8");
       config.build = mergeConfig<BuildOptions, BuildOptions>(config.build ?? {}, {
         rollupOptions: {
           input: pluginOptions.windows.map((window) => resolve(root, window.virtualHTML)),

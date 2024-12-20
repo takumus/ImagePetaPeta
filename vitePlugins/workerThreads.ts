@@ -90,6 +90,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
       if (replaced) {
         return {
           code: newCode,
+          map: null,
         };
       }
     },

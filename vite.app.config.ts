@@ -24,32 +24,18 @@ export default defineConfig((async ({ command }) => {
     base: "./",
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
-    // css: {
-    //   preprocessorOptions: {
-    //     scss: {
-    //       api: "modern-compiler",
-    //     },
-    //   },
-    // },
     build: {
       emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/renderer"),
-      rollupOptions: {
-        output: {
-          entryFileNames: `assets/[name].[hash].js`,
-          chunkFileNames: `assets/[name].[hash].js`,
-          assetFileNames: `assets/[name].[hash].[ext]`,
-        },
-      },
       minify: isBuild,
     },
     plugins: [
       webWorker(),
       electronWindows({
-        templateHTMLFile: "./windows/@template.html",
+        templateHTMLFile: resolve("./src/renderer/windows/@template.html"),
         windows: windowNames.map((name) => ({
-          templateReplace: { ["ts"]: `./${name}.ts` },
-          virtualHTML: `./windows/${name}.html`,
+          templateReplace: { ts: `./${name}.ts` },
+          virtualHTML: resolve(`./src/renderer/windows/${name}.html`),
         })),
       }),
       vue({
