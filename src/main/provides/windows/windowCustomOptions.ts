@@ -30,6 +30,14 @@ export const windowCustomOptions: {
     maximizable: false,
     minimizable: false,
   },
+  libraries: {
+    width: WINDOW_SETTINGS_WIDTH,
+    height: WINDOW_SETTINGS_HEIGHT,
+    minWidth: WINDOW_SETTINGS_WIDTH,
+    minHeight: WINDOW_SETTINGS_HEIGHT,
+    maximizable: false,
+    minimizable: false,
+  },
   details: {},
   capture: {},
   eula: {

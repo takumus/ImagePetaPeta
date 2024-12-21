@@ -2,6 +2,7 @@ export const windowNames = [
   "board",
   "browser",
   "settings",
+  "libraries",
   "details",
   "eula",
   "capture",
