@@ -31,13 +31,6 @@ export default defineConfig((async ({ command }) => {
     },
     plugins: [
       webWorker(),
-      electronWindows({
-        templateHTMLFile: resolve("./src/renderer/windows/@template.html"),
-        windows: windowNames.map((name) => ({
-          templateReplace: { ts: resolve(`./src/renderer/windows/${name}.ts`) },
-          virtualHTML: resolve(`./src/renderer/windows/${name}.html`),
-        })),
-      }),
       vue({
         template: {
           compilerOptions: {
@@ -45,41 +38,46 @@ export default defineConfig((async ({ command }) => {
           },
         },
       }),
-      createElectronPlugin(isBuild),
+      electrons(isBuild),
     ],
   });
 }) as UserConfigFnPromise);
 
-function createElectronPlugin(isBuild: boolean) {
-  const viteConfig = createViteConfig({
-    optimizeDeps: {
-      exclude: ["sharp"],
-    },
-    build: {
-      minify: isBuild ? "esbuild" : undefined,
-      emptyOutDir: false,
-      outDir: resolve("./_electronTemp/dist/main"),
-      rollupOptions: {
-        external: [
-          ...Object.keys(pkg.dependencies ?? {}),
-          ...builtinModules,
-          ...builtinModules.map((m) => `node:${m}`),
-        ],
-      },
-      sourcemap: !isBuild,
-    },
-  });
+function electrons(isBuild: boolean) {
   const electronOptions: ElectronOptions = {
-    vite: viteConfig,
+    vite: createViteConfig({
+      optimizeDeps: {
+        exclude: ["sharp"],
+      },
+      build: {
+        minify: isBuild ? "esbuild" : undefined,
+        emptyOutDir: false,
+        outDir: resolve("./_electronTemp/dist/main"),
+        rollupOptions: {
+          external: [
+            ...Object.keys(pkg.dependencies ?? {}),
+            ...builtinModules,
+            ...builtinModules.map((m) => `node:${m}`),
+          ],
+        },
+        sourcemap: !isBuild,
+      },
+    }),
   };
-  const options: ElectronOptions[] = [];
-  /** メインプロセス */
-  options.push(
+  const windows = electronWindows({
+    templateHTMLFile: resolve("./src/renderer/windows/@template.html"),
+    windows: windowNames.map((name) => ({
+      templateReplace: { ts: resolve(`./src/renderer/windows/${name}.ts`) },
+      virtualHTML: resolve(`./src/renderer/windows/${name}.html`),
+    })),
+  });
+  const builder = electron([
+    // main process
     mergeConfig<ElectronOptions, ElectronOptions>(electronOptions, {
       vite: {
         plugins: [
           workerThreads({
-            config: cloneDeep(viteConfig),
+            config: cloneDeep(electronOptions.vite),
           }),
         ],
         build: {
@@ -94,9 +92,7 @@ function createElectronPlugin(isBuild: boolean) {
         args.startup([".", "--sourcemap", "--inspect=9229"]);
       },
     }),
-  );
-  /** プリロード */
-  options.push(
+    // preload
     mergeConfig<ElectronOptions, ElectronOptions>(electronOptions, {
       vite: {
         build: {
@@ -109,8 +105,9 @@ function createElectronPlugin(isBuild: boolean) {
         },
       },
     }),
-  );
-  return electron(options);
+  ]);
+
+  return [builder, windows];
 }
 
 function createViteConfig(config: UserConfig) {

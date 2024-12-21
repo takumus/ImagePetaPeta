@@ -39,7 +39,7 @@ export default (pluginOptions: { config?: UserConfig }): Plugin => {
     if (mode === "production" || mode === "test") {
       await build(config);
     } else {
-      build(mergeConfig<UserConfig, UserConfig>(config, { build: { watch: {} } }));
+      await build(mergeConfig<UserConfig, UserConfig>(config, { build: { watch: {} } }));
     }
   }
   return {
