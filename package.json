@@ -80,8 +80,7 @@
     "vite-plugin-esmodule": "^1.5.0",
     "vitest": "^2.1.8",
     "vue-tsc": "https://pkg.pr.new/vuejs/language-tools/vue-tsc@b8befb2",
-    "webpack": "^5.97.1",
-    "yargs": "^17.7.2"
+    "webpack": "^5.97.1"
   },
   "dependencies": {
     "@seald-io/nedb": "^4.0.4",
@@ -108,7 +107,8 @@
     "throttle-debounce": "^5.0.2",
     "uuid": "^11.0.3",
     "vue": "^3.5.13",
-    "vue-i18n": "10.0.5"
+    "vue-i18n": "10.0.5",
+    "yargs": "^17.7.2"
   },
   "volta": {
     "node": "23.2.0",

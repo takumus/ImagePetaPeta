@@ -1,6 +1,6 @@
 import * as Path from "node:path";
 import { BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
-import { string } from "yargs";
+import yargs from "yargs";
 
 import {
   EULA,
@@ -22,6 +22,7 @@ import {
   useConfigWindowStates,
 } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { useModals } from "@/main/provides/modals";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
@@ -52,7 +53,6 @@ export class Windows {
   }
   showWindows() {
     const configSettings = useConfigSettings();
-    const configLibrary = useConfigLibrary();
     const log = useLogger().logChunk("Windows.showWindows");
     if (configSettings.data.eula < EULA) {
       if (windowIs.dead("eula")) {
@@ -63,6 +63,22 @@ export class Windows {
       }
       return;
     }
+    // show app args
+    const args = yargs(process.argv).parseSync() as any as { libraryPath?: string };
+    if (args.libraryPath === undefined) {
+      this.openWindow("libraries");
+      useModals()
+        .open({} as any, "test", [`relaunch`])
+        .then((v) => {
+          useQuit().relaunch(["--libraryPath=c:\\hello\\hell"]);
+        });
+      return;
+    } else {
+      this.openWindow("libraries");
+      useModals().open({} as any, "test", [`path: ${args.libraryPath}`]);
+      return;
+    }
+    const configLibrary = useConfigLibrary();
     try {
       if (configLibrary.data.secure) {
         useConfigSecureFilePassword().getKey();
