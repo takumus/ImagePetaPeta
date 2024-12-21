@@ -20,13 +20,12 @@ export default defineConfig((async ({ command }) => {
     rmSync("_electronTemp/dist", { recursive: true, force: true });
   }
   return createViteConfig({
-    envDir: "../../",
-    base: "./",
+    envDir: resolve("./"),
     root: resolve("./src/renderer"),
     publicDir: resolve("./src/_public"),
     build: {
-      emptyOutDir: true,
       outDir: resolve("./_electronTemp/dist/renderer"),
+      emptyOutDir: true,
       minify: isBuild,
     },
     plugins: [
@@ -40,6 +39,7 @@ export default defineConfig((async ({ command }) => {
       }),
       electrons(isBuild),
     ],
+    base: "./", // ビルド後にアセットのurlが/始まりではなく./始まりにする。
   });
 }) as UserConfigFnPromise);
 
