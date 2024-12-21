@@ -62,6 +62,7 @@ export const URL_SUPPORT: string =
   "https://docs.google.com/forms/d/e/1FAIpQLSfMVEzYwdC09SrM6ipTtHyk_wTC1n08pB2eeZIVZifIRW7ojQ/viewform";
 
 export const FILENAME_SETTINGS: string = "settings.json";
+export const FILENAME_LIBRARIES: string = "libraries.json";
 export const FILENAME_IMAGES_DB: string = "images.db";
 export const FILENAME_BOARDS_DB: string = "boards.db";
 export const FILENAME_TAGS_DB: string = "tags.db";

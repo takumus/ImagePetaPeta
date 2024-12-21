@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import { createI18n } from "vue-i18n";
 
 import { DBInfo, getDefaultDBInfo } from "@/commons/datas/dbInfo";
+import { Libraries } from "@/commons/datas/libraries";
 import { getDefaultLibrary, Library } from "@/commons/datas/library";
 import { PetaBoard } from "@/commons/datas/petaBoard";
 import { PetaFile } from "@/commons/datas/petaFile";
@@ -23,6 +24,7 @@ import {
   FILENAME_DB_INFO,
   FILENAME_IMAGES_DB,
   FILENAME_IMAGES_TAGS_DB,
+  FILENAME_LIBRARIES,
   FILENAME_LIBRARY,
   FILENAME_SECURE_FILE_PASSWORD,
   FILENAME_SETTINGS,
@@ -44,6 +46,7 @@ import { migrateStates } from "@/main/migration/migrateStates";
 import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
 import {
   configDBInfoKey,
+  configLibrariesKey,
   configLibraryKey,
   configSecureFilePasswordKey,
   configSettingsKey,
@@ -113,11 +116,13 @@ export function initAppDI(
   const DIR_APP = initDirectorySync(true, dirs.app);
   const DIR_TEMP = initDirectorySync(true, dirs.temp, `imagePetaPeta-beta${uuid()}`);
   const FILE_SETTINGS = initFileSync(DIR_APP, FILENAME_SETTINGS);
+  const FILE_LIBRARIES = initFileSync(DIR_APP, FILENAME_LIBRARIES);
   const FILE_STATES = initFileSync(DIR_APP, FILENAME_STATES);
   const FILE_WINDOW_STATES = initFileSync(DIR_APP, FILENAME_WINDOW_STATES);
   const FILE_SECURE_FILE_PASSWORD = initFileSync(DIR_APP, FILENAME_SECURE_FILE_PASSWORD);
   // 設定ロード
   const configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), migrateSettings);
+  const configLibraries = new Config<Libraries>(FILE_LIBRARIES, {});
   const configStates = new Config<States>(FILE_STATES, defaultStates, migrateStates);
   const configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, {}, migrateWindowStates);
   const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, {});
@@ -162,6 +167,7 @@ export function initAppDI(
   provide(i18nKey, i18n);
   provide(dbStatusKey, { initialized: false });
   provide(configSettingsKey, configSettings);
+  provide(configLibrariesKey, configLibraries);
   provide(configStatesKey, configStates);
   provide(configWindowStatesKey, configWindowStates);
   provide(secureTempFileKeyKey, createSecureTempFileKey());
