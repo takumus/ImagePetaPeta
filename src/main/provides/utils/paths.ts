@@ -19,8 +19,12 @@ export interface AppPaths {
   FILE_STATES: string;
   FILE_SETTINGS: string;
 }
+
 export const libraryPathsKey = createKey<LibraryPaths>("libpaths");
 export const useLibraryPaths = createUseFunction(libraryPathsKey);
 
 export const appPathsKey = createKey<AppPaths>("apppaths");
 export const useAppPaths = createUseFunction(appPathsKey);
+
+export const libraryPathKey = createKey<string>("libpath");
+export const useLibraryPath = createUseFunction(libraryPathKey);

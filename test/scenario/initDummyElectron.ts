@@ -3,8 +3,10 @@ import { resolve } from "node:path";
 import { vi } from "vitest";
 
 import { initDB } from "@/main/initDB";
-import { clearProvides } from "@/main/libs/di";
+import { initAppDI } from "@/main/initDI";
+import { clearProvides, provide } from "@/main/libs/di";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
+import { libraryPathKey } from "@/main/provides/utils/paths";
 
 export async function initDummyElectron(root: string) {
   const key = createHash("sha512").update("1234").digest("hex").substring(0, 32);
@@ -94,12 +96,14 @@ export async function initDummyElectron(root: string) {
   // });
   const { initDI } = await import("@/main/initDI");
   clearProvides();
-  initDI({
+  initAppDI({
     logs: resolve(root, "logs"),
     app: resolve(root, "appData"),
     temp: resolve(root, "temp"),
     default: resolve(root, "petaFiles"),
   });
+  provide(libraryPathKey, resolve(root, "petaFiles"));
+  initDI();
 
   useConfigSecureFilePassword().setKey(key);
   await initDB();

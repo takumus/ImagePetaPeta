@@ -4,13 +4,15 @@ import installExtension from "electron-devtools-installer";
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 
 import { initDB } from "@/main/initDB";
-import { initDI } from "@/main/initDI";
+import { initAppDI, initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
+import { provide } from "@/main/libs/di";
 import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
+import { libraryPathKey } from "@/main/provides/utils/paths";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
@@ -24,7 +26,8 @@ const launchTime = performance.now();
     return;
   }
   // DI準備
-  if (!initDI()) {
+  const diRes = initAppDI();
+  if (!diRes) {
     return;
   }
   const logger = useLogger();
@@ -33,8 +36,6 @@ const launchTime = performance.now();
   });
   const windows = useWindows();
   const configSettings = useConfigSettings();
-  const handleFileResponse = useHandleFileResponse();
-  const pageDownloaderCache = usePageDownloaderCache();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -86,10 +87,10 @@ const launchTime = performance.now();
   });
   // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
-  app.on("will-quit", (e) => {
-    // e.preventDefault();
-    // useQuit().quit();
-  });
+  // app.on("will-quit", (e) => {
+  //   // e.preventDefault();
+  //   // useQuit().quit();
+  // });
   // electron準備OK
   async function appReady() {
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -128,17 +129,22 @@ const launchTime = performance.now();
         log.error(error);
       }
     }
+    // ipcの関数登録
+    registerIpcFunctions();
+    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
+    // その他パス初期化
+    provide(libraryPathKey, diRes.DIR_ROOT);
+    initDI();
+    // 初期ウインドウ表示
+    windows.showWindows();
+    const pageDownloaderCache = usePageDownloaderCache();
+    const handleFileResponse = useHandleFileResponse();
     protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
     protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
     protocol.handle(
       PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
       pageDownloaderCache.handle.bind(pageDownloaderCache),
     );
-    // ipcの関数登録
-    registerIpcFunctions();
-    // 初期ウインドウ表示
-    windows.showWindows();
-    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // ダークモード監視開始
     observeDarkMode();
     // アップデート確認と通知

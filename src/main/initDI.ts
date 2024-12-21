@@ -92,7 +92,13 @@ import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { createSecureTempFileKey, secureTempFileKeyKey } from "@/main/provides/tempFileKey";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
-import { AppPaths, appPathsKey, LibraryPaths, libraryPathsKey } from "@/main/provides/utils/paths";
+import {
+  AppPaths,
+  appPathsKey,
+  LibraryPaths,
+  libraryPathsKey,
+  useLibraryPath,
+} from "@/main/provides/utils/paths";
 import { Quit, quitKey } from "@/main/provides/utils/quit";
 import { WebHook, webhookKey } from "@/main/provides/webhook";
 import { Windows, windowsKey } from "@/main/provides/windows";
@@ -175,21 +181,14 @@ export function initAppDI(
   provide(quitKey, new Quit());
   provide(windowsKey, windows);
   provide(nsfwKey, new NSFW());
+  provide(modalsKey, new Modals());
   return {
     DIR_ROOT,
   };
 }
-export function initDI(
-  dirs = {
-    logs: app.getPath("logs"),
-    app: app.getPath("userData"),
-    temp: app.getPath("temp"),
-    default: app.getPath("pictures"),
-  },
-) {
+export function initDI() {
   try {
-    // その他パス初期化
-    const DIR_ROOT = initAppDI(dirs).DIR_ROOT;
+    const DIR_ROOT = useLibraryPath();
     // 設定ロード
     const DIR_IMAGES = initDirectorySync(true, DIR_ROOT, DIRNAME_IMAGES);
     const DIR_THUMBNAILS = initDirectorySync(true, DIR_ROOT, DIRNAME_THUMBNAILS);
@@ -277,7 +276,6 @@ export function initDI(
       waitUntilKillable: async () => {},
     });
     provide(webhookKey, new WebHook(ipcFunctions));
-    provide(modalsKey, new Modals());
     provide(tasksKey, new Tasks());
     provide(pageDownloaderCacheKey, new PageDownloaderCache());
     provide(handleFileResponseKey, new HandleFileResponse());
