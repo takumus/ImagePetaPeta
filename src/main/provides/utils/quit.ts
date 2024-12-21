@@ -20,9 +20,8 @@ export class Quit {
     // await useDBS().waitUntilKillable();
     app.quit();
   }
-  relaunch(force = false) {
+  relaunch() {
     app.relaunch();
-    this.quit(force);
   }
 }
 export const quitKey = createKey<Quit>("quit");
