@@ -6,7 +6,7 @@ import { PETAIMAGE_METADATA_VERSION } from "@/commons/defines";
 
 import { createMigrater } from "@/main/libs/createMigrater";
 import { mkdirIfNotIxists } from "@/main/libs/file";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useLibraryPaths } from "@/main/provides/utils/paths";
 import { getPetaFileDirectoryPath, getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 
 export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => {
@@ -48,7 +48,7 @@ export const migratePetaFile = createMigrater<PetaFile>(async (data, update) => 
   }
   if (data.metadata.version < 1.8) {
     try {
-      const paths = usePaths();
+      const paths = useLibraryPaths();
       const directory = getPetaFileDirectoryPath.fromPetaFile(data);
       const path = getPetaFilePath.fromPetaFile(data);
       await mkdirIfNotIxists(directory.original, { recursive: true });

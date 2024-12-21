@@ -2,12 +2,12 @@ import Path from "node:path";
 
 import { PetaFile } from "@/commons/datas/petaFile";
 
-import { usePaths } from "@/main/provides/utils/paths";
+import { useLibraryPaths } from "@/main/provides/utils/paths";
 
 export const getPetaFileDirectoryPath = {
   fromPetaFile: (petaFile: PetaFile) => getPetaFileDirectoryPath.fromID(petaFile.id),
   fromID(petaFileID: string) {
-    const paths = usePaths();
+    const paths = useLibraryPaths();
     const dir1 = petaFileID.substring(0, 2);
     const dir2 = petaFileID.substring(2, 4);
     return {

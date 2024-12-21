@@ -9,7 +9,7 @@ import { PROTOCOLS } from "@/commons/defines";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useSecureTempFileKey } from "@/main/provides/tempFileKey";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useAppPaths, useLibraryPaths } from "@/main/provides/utils/paths";
 import { secureFile } from "@/main/utils/secureFile";
 import { isSupportedFile } from "@/main/utils/supportedFileTypes";
 
@@ -20,7 +20,7 @@ export const createFileInfo = {
     ua?: string,
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
-    const paths = usePaths();
+    const appPaths = useAppPaths();
     const log = useLogger().logChunk("createFileInfo.fromURL");
     try {
       let buffer: Buffer | undefined;
@@ -61,7 +61,7 @@ export const createFileInfo = {
       if (buffer === undefined) {
         throw `buffer is undefined`;
       }
-      const dist = Path.resolve(paths.DIR_TEMP, uuid());
+      const dist = Path.resolve(appPaths.DIR_TEMP, uuid());
       await exportTempFileAndCheck(buffer, dist, encryptTempFile);
       log.debug("return:", true);
       return {
@@ -80,10 +80,10 @@ export const createFileInfo = {
     bufferLike: ArrayBufferLike | Buffer,
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
-    const paths = usePaths();
+    const appPaths = useAppPaths();
     const log = useLogger().logChunk("createFileInfo.fromBuffer");
     try {
-      const dist = Path.resolve(paths.DIR_TEMP, uuid());
+      const dist = Path.resolve(appPaths.DIR_TEMP, uuid());
       const buffer =
         bufferLike instanceof Buffer ? bufferLike : Buffer.from(bufferLike as ArrayBufferLike);
       await exportTempFileAndCheck(buffer, dist, encryptTempFile);

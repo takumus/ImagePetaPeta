@@ -41,7 +41,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBStatus } from "@/main/provides/databases";
 import { tfByWorker } from "@/main/provides/tf";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useAppPaths, useLibraryPaths } from "@/main/provides/utils/paths";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
@@ -110,15 +110,15 @@ export const ipcFunctions: IpcFunctionsType = {
       return info;
     },
     async showDBFolder(_, log) {
-      const paths = usePaths();
+      const paths = useLibraryPaths();
       log.debug(paths.DIR_ROOT);
       shell.showItemInFolder(paths.DIR_ROOT);
       return true;
     },
     async showConfigFolder(_, log) {
-      const paths = usePaths();
-      log.debug(paths.DIR_APP);
-      shell.showItemInFolder(paths.DIR_APP);
+      const appPaths = useAppPaths();
+      log.debug(appPaths.DIR_APP);
+      shell.showItemInFolder(appPaths.DIR_APP);
       return true;
     },
     async showImageInFolder(event, log, petaFile) {

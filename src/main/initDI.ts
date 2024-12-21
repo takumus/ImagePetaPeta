@@ -89,7 +89,7 @@ import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { createSecureTempFileKey, secureTempFileKeyKey } from "@/main/provides/tempFileKey";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
-import { Paths, pathsKey } from "@/main/provides/utils/paths";
+import { AppPaths, appPathsKey, LibraryPaths, libraryPathsKey } from "@/main/provides/utils/paths";
 import { Quit, quitKey } from "@/main/provides/utils/quit";
 import { WebHook, webhookKey } from "@/main/provides/webhook";
 import { Windows, windowsKey } from "@/main/provides/windows";
@@ -198,27 +198,30 @@ export function initDI(
     // 画面初期化
     const windows = new Windows();
     // パスまとめ
-    const paths: Paths = {
-      DIR_ROOT,
+    const appPaths: AppPaths = {
       DIR_APP,
       DIR_LOG,
+      DIR_TEMP,
+      FILE_STATES,
+      FILE_SETTINGS,
+    };
+    const libPaths: LibraryPaths = {
+      DIR_ROOT,
       DIR_IMAGES,
       DIR_THUMBNAILS,
       DIR_FEATURE_VECTORS,
-      DIR_TEMP,
       FILE_IMAGES_DB,
       FILE_BOARDS_DB,
       FILE_TAGS_DB,
       FILE_TAG_PARTITIONS_DB,
       FILE_IMAGES_TAGS_DB,
-      FILE_SETTINGS,
-      FILE_STATES,
       FILE_WINDOW_STATES,
       FILE_DBINFO,
     };
     const dbs = [dbPetaBoard, dbPetaFiles, dbPetaFilesPetaTags, dbPetaTags, dbPetaTagPartitions];
     // 注入
-    provide(pathsKey, paths);
+    provide(appPathsKey, appPaths);
+    provide(libraryPathsKey, libPaths);
     provide(loggerKey, dataLogger);
     provide(i18nKey, i18n);
     provide(quitKey, new Quit());

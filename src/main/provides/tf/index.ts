@@ -6,7 +6,7 @@ import { ObjectKeys } from "@/commons/utils/objectKeys";
 import { extraFiles } from "@/_defines/extraFiles";
 import { createWorkerThreadsGroup } from "@/main/libs/workerThreadsGroup";
 import { useConfigSecureFilePassword } from "@/main/provides/configs";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useLibraryPaths } from "@/main/provides/utils/paths";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 
 const workerGroup = createWorkerThreadsGroup(import("@/main/provides/tf/!workerThreads.tf"));
@@ -38,7 +38,7 @@ export const tfByWorker = (() => {
         method: "init",
         id,
         args: {
-          paths: usePaths(),
+          paths: useLibraryPaths(),
           tfModelPaths,
           secureKey: useConfigSecureFilePassword().getKey(),
         },

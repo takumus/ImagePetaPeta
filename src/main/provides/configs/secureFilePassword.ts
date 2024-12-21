@@ -4,7 +4,7 @@ import { SecureFilePassword } from "@/commons/datas/secureFilePassword";
 import { TypedEventEmitter } from "@/commons/utils/typedEventEmitter";
 
 import Config from "@/main/libs/config";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useLibraryPaths } from "@/main/provides/utils/paths";
 import { passwordToKey } from "@/main/utils/passwordToKey";
 
 // import { passwordToKey } from "@/main/utils/secureFile";
@@ -23,7 +23,9 @@ export class ConfigSecureFilePassword extends Config<SecureFilePassword> {
     this.key = key;
     if (save) {
       try {
-        this.data[usePaths().DIR_ROOT] = safeStorage.encryptString(this.key).toString("base64");
+        this.data[useLibraryPaths().DIR_ROOT] = safeStorage
+          .encryptString(this.key)
+          .toString("base64");
         this.save();
       } catch {
         //
@@ -35,7 +37,7 @@ export class ConfigSecureFilePassword extends Config<SecureFilePassword> {
     if (this.key !== undefined) {
       return this.key;
     }
-    const encryptedKey = this.data[usePaths().DIR_ROOT];
+    const encryptedKey = this.data[useLibraryPaths().DIR_ROOT];
     if (encryptedKey !== undefined) {
       try {
         this.key = safeStorage.decryptString(Buffer.from(encryptedKey, "base64"));

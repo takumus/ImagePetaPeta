@@ -2,10 +2,10 @@ import * as Path from "node:path";
 
 import { ImportFileGroup } from "@/commons/datas/importFileGroup";
 
-import { usePaths } from "@/main/provides/utils/paths";
+import { useLibraryPaths } from "@/main/provides/utils/paths";
 
 export function getIdsFromFilePaths(datas: ImportFileGroup[]) {
-  const paths = usePaths();
+  const paths = useLibraryPaths();
   return datas
     .filter(
       (data) =>

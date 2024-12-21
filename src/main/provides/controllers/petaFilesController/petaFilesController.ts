@@ -19,7 +19,7 @@ import { usePetaTagsController } from "@/main/provides/controllers/petaTagsContr
 import { useDBPetaFiles } from "@/main/provides/databases";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useAppPaths, useLibraryPaths } from "@/main/provides/utils/paths";
 import { useWindows } from "@/main/provides/windows";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { createPetaFileReadStream, secureFile, writeSecurePetaFile } from "@/main/utils/secureFile";
@@ -172,6 +172,7 @@ export class PetaFilesController {
     console.log("error:", errorIDs.length, "/", petaFiles.length);
   }
   public async encryptAll(mode: keyof typeof secureFile) {
+    const appPaths = useAppPaths();
     const petaFiles = this.getAll().filter(
       (pf) => (mode === "encrypt" && !pf.encrypted) || (mode === "decrypt" && pf.encrypted),
     );
@@ -181,8 +182,8 @@ export class PetaFilesController {
       async (pf, i) => {
         const pathOrg = getPetaFilePath.fromPetaFile(pf);
         const pathTemp = {
-          original: Path.resolve(usePaths().DIR_TEMP, uuid()),
-          thumbnail: Path.resolve(usePaths().DIR_TEMP, uuid()),
+          original: Path.resolve(appPaths.DIR_TEMP, uuid()),
+          thumbnail: Path.resolve(appPaths.DIR_TEMP, uuid()),
         };
         try {
           let k: keyof typeof pathOrg;
@@ -209,9 +210,9 @@ export class PetaFilesController {
     console.log("remove trashes");
     const files = (
       await Promise.all([
-        file.readDirRecursive(usePaths().DIR_IMAGES).files,
-        file.readDirRecursive(usePaths().DIR_THUMBNAILS).files,
-        file.readDirRecursive(usePaths().DIR_FEATURE_VECTORS).files,
+        file.readDirRecursive(useLibraryPaths().DIR_IMAGES).files,
+        file.readDirRecursive(useLibraryPaths().DIR_THUMBNAILS).files,
+        file.readDirRecursive(useLibraryPaths().DIR_FEATURE_VECTORS).files,
       ])
     ).reduce((p, c) => [...p, ...c], []);
     await ppa(async (path) => {

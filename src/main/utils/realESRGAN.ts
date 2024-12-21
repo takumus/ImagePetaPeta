@@ -12,13 +12,13 @@ import { useDBPetaFilesPetaTags } from "@/main/provides/databases";
 import { useFileImporter } from "@/main/provides/fileImporter";
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useAppPaths, useLibraryPaths } from "@/main/provides/utils/paths";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { resolveExtraFilesPath } from "@/main/utils/resolveExtraFilesPath";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
 export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANModelName) {
-  const paths = usePaths();
+  const appPaths = useAppPaths();
   const tasks = useTasks();
   const task = tasks.spawn("realESRGAN", false);
   const log = useLogger().logChunk("realESRGAN");
@@ -36,7 +36,7 @@ export async function realESRGAN(petaFiles: PetaFile[], modelName: RealESRGANMod
   const processes = ppa(
     async (petaFile, index) => {
       const inputFile = getPetaFilePath.fromPetaFile(petaFile).original;
-      const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.png`;
+      const outputFile = `${Path.resolve(appPaths.DIR_TEMP, petaFile.id)}.png`;
       const parameters = ["-i", inputFile, "-o", outputFile, "-m", modelFilePath, "-n", modelName];
       let percent = 0;
       const childProcess = runExternalApplication(execFilePath, parameters, "utf8", (l) => {

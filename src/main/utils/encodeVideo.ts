@@ -6,12 +6,12 @@ import { ppa } from "@/commons/utils/pp";
 
 import { useTasks } from "@/main/provides/tasks";
 import { useLogger } from "@/main/provides/utils/logger";
-import { usePaths } from "@/main/provides/utils/paths";
+import { useAppPaths, useLibraryPaths } from "@/main/provides/utils/paths";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { runExternalApplication } from "@/main/utils/runExternalApplication";
 
 export async function encodeVideo(petaFiles: PetaFile[], args: string[]) {
-  const paths = usePaths();
+  const appPaths = useAppPaths();
   const tasks = useTasks();
   const task = tasks.spawn("encodeVideo", false);
   const log = useLogger().logChunk("encodeVideo");
@@ -26,7 +26,7 @@ export async function encodeVideo(petaFiles: PetaFile[], args: string[]) {
   const processes = ppa(
     async (petaFile, index) => {
       const inputFile = getPetaFilePath.fromPetaFile(petaFile).original;
-      const outputFile = `${Path.resolve(paths.DIR_TEMP, petaFile.id)}.mp4`;
+      const outputFile = `${Path.resolve(appPaths.DIR_TEMP, petaFile.id)}.mp4`;
       const parameters = [
         "-i",
         inputFile,

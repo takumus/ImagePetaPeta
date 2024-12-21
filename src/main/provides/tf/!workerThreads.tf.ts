@@ -14,7 +14,7 @@ import { initWorkerThreads } from "@/main/libs/initWorkerThreads";
 import { tensorBuffer } from "@/main/libs/tf/tensorBuffer";
 import { TFImageClassification } from "@/main/libs/tf/tfImageClassification";
 import { configSecureFilePasswordKey } from "@/main/provides/configs";
-import { Paths, pathsKey, usePaths } from "@/main/provides/utils/paths";
+import { LibraryPaths, libraryPathsKey, useLibraryPaths } from "@/main/provides/utils/paths";
 import { getPetaFileDirectoryPath } from "@/main/utils/getPetaFileDirectory";
 import { createPetaFileReadStream } from "@/main/utils/secureFile";
 import { streamToBuffer } from "@/main/utils/streamToBuffer";
@@ -23,7 +23,7 @@ type ToWorker =
   | {
       method: "init";
       id: number;
-      args: { paths: Paths; tfModelPaths: { [key: string]: string }; secureKey: string };
+      args: { paths: LibraryPaths; tfModelPaths: { [key: string]: string }; secureKey: string };
     }
   | {
       method: "getSimilarPetaFileIDsByPetaFile";
@@ -67,7 +67,7 @@ export default initWorkerThreads<ToWorker, ToMain>((port) => {
   port.on("message", async (params) => {
     if (params.method === "init") {
       if (tf == undefined) {
-        provide(pathsKey, params.args.paths);
+        provide(libraryPathsKey, params.args.paths);
         provide(configSecureFilePasswordKey, {
           getKey() {
             return params.args.secureKey;
