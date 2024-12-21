@@ -46,9 +46,9 @@ export default defineConfig((async ({ command }) => {
 function electrons(isBuild: boolean) {
   const electronOptions: ElectronOptions = {
     vite: createViteConfig({
-      optimizeDeps: {
-        exclude: ["sharp"],
-      },
+      // optimizeDeps: {
+      //   exclude: ["sharp"],
+      // },
       build: {
         minify: isBuild ? "esbuild" : undefined,
         emptyOutDir: false,
