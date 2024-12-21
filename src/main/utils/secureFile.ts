@@ -21,7 +21,7 @@ export const secureFile = (() => {
     mode: Mode,
     options: ReadStreamOptions,
     verify: boolean,
-    iv = Buffer.alloc(BLOCK_SIZE, 0),
+    iv: Buffer = Buffer.alloc(BLOCK_SIZE, 0),
   ) {
     return new Promise<void>(async (res, rej) => {
       const output = createWriteStream(outputFilePath);
@@ -67,7 +67,7 @@ export const secureFile = (() => {
     key: string,
     mode: Mode,
     options?: ReadStreamOptions,
-    iv = Buffer.alloc(BLOCK_SIZE, 0),
+    iv: Buffer = Buffer.alloc(BLOCK_SIZE, 0),
   ) {
     const range = {
       start: options?.startBlock !== undefined ? options.startBlock * BLOCK_SIZE : undefined,

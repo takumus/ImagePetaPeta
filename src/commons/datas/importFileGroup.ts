@@ -10,6 +10,10 @@ export type ImportFileGroup = (
       referrer?: string;
       additionalData?: ImportFileAdditionalData;
     }
-  | { type: "buffer"; buffer: ArrayBuffer; additionalData?: ImportFileAdditionalData }
+  | {
+      type: "buffer";
+      buffer: Buffer | ArrayBuffer;
+      additionalData?: ImportFileAdditionalData;
+    }
   | { type: "filePath"; filePath: string; additionalData?: ImportFileAdditionalData }
 )[];

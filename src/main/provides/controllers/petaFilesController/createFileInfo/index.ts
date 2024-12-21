@@ -77,14 +77,15 @@ export const createFileInfo = {
     return undefined;
   },
   fromBuffer: async (
-    bufferLike: ArrayBuffer | Buffer,
+    bufferLike: ArrayBufferLike | Buffer,
     encryptTempFile = true,
   ): Promise<ImportFileInfo | undefined> => {
     const paths = usePaths();
     const log = useLogger().logChunk("createFileInfo.fromBuffer");
     try {
       const dist = Path.resolve(paths.DIR_TEMP, uuid());
-      const buffer = bufferLike instanceof Buffer ? bufferLike : Buffer.from(bufferLike);
+      const buffer =
+        bufferLike instanceof Buffer ? bufferLike : Buffer.from(bufferLike as ArrayBufferLike);
       await exportTempFileAndCheck(buffer, dist, encryptTempFile);
       log.debug("return:", true);
       return {

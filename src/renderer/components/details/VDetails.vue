@@ -145,7 +145,7 @@ function reset() {
   update();
   vPixi.value?.orderPIXIRender();
 }
-function pointerdown(event: PointerEvent) {
+function pointerdown(event: PointerEvent | PIXI.FederatedPointerEvent) {
   pointerPosition.set(vec2FromPointerEvent(event));
   dragging.value = true;
 }
