@@ -10,7 +10,6 @@ export interface LibraryPaths {
   FILE_TAGS_DB: string;
   FILE_TAG_PARTITIONS_DB: string;
   FILE_IMAGES_TAGS_DB: string;
-  FILE_WINDOW_STATES: string;
   FILE_DBINFO: string;
 }
 export interface AppPaths {
