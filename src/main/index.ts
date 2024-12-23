@@ -6,13 +6,10 @@ import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 import { initDB } from "@/main/initDB";
 import { initAppDI, initDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
-import { provide } from "@/main/libs/di";
-import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
-import { libraryPathKey } from "@/main/provides/utils/paths";
 import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
@@ -133,8 +130,7 @@ const launchTime = performance.now();
     registerIpcFunctions();
     log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // その他パス初期化
-    provide(libraryPathKey, diRes.DIR_ROOT);
-    initDI();
+    initDI(diRes.DIR_ROOT);
     // 初期ウインドウ表示
     windows.showWindows();
     const pageDownloaderCache = usePageDownloaderCache();

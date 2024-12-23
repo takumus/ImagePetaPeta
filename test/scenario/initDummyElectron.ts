@@ -102,8 +102,7 @@ export async function initDummyElectron(root: string) {
     temp: resolve(root, "temp"),
     default: resolve(root, "petaFiles"),
   });
-  provide(libraryPathKey, resolve(root, "petaFiles"));
-  initDI();
+  initDI(resolve(root, "petaFiles"));
 
   useConfigSecureFilePassword().setKey(key);
   await initDB();

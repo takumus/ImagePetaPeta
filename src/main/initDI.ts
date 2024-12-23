@@ -95,6 +95,7 @@ import { Logger, loggerKey } from "@/main/provides/utils/logger";
 import {
   AppPaths,
   appPathsKey,
+  libraryPathKey,
   LibraryPaths,
   libraryPathsKey,
   useLibraryPath,
@@ -186,7 +187,8 @@ export function initAppDI(
     DIR_ROOT,
   };
 }
-export function initDI() {
+export function initDI(root: string) {
+  provide(libraryPathKey, root);
   try {
     const DIR_ROOT = useLibraryPath();
     // 設定ロード
