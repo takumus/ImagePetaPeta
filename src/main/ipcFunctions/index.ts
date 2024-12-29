@@ -22,6 +22,7 @@ import Transparent from "@/_public/images/utils/transparent.png";
 import { detailsIPCFunctions } from "@/main/ipcFunctions/details";
 import { downloaderIPCFunctions } from "@/main/ipcFunctions/downloader";
 import { importerIPCFunctions } from "@/main/ipcFunctions/importer";
+import { librariesIPCFunctions } from "@/main/ipcFunctions/libraries";
 import { modalsIPCFunctions } from "@/main/ipcFunctions/modals";
 import { nsfwIPCFunctions } from "@/main/ipcFunctions/nsfw";
 import { petaBoardsIPCFunctions } from "@/main/ipcFunctions/petaBoards";
@@ -69,6 +70,7 @@ export const ipcFunctions: IpcFunctionsType = {
   petaTagPartitions: petaTagPartitionsIPCFunctions,
   states: statesIPCFunctions,
   settings: settingsIPCFunctions,
+  libraries: librariesIPCFunctions,
   windows: windowsIPCFunctions,
   modals: modalsIPCFunctions,
   downloader: downloaderIPCFunctions,
@@ -354,6 +356,10 @@ export const ipcFunctions: IpcFunctionsType = {
     },
     async encodeVideo(event, logger, petaFiles) {
       await encodeVideo(petaFiles, []);
+      return true;
+    },
+    async selectLibrary(event, logger, library) {
+      useQuit().relaunch([`--libraryPath="${library.path}"`]);
       return true;
     },
   },

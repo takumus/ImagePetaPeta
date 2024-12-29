@@ -47,6 +47,7 @@ export async function create(
   component: Component,
   windowName: WindowName,
   stores?: KeyStoreCreatorPair<unknown>[],
+  skipDB = false,
 ) {
   const keyboards = new Keyboards();
   keyboards.keys("KeyD").down(() => {
@@ -91,6 +92,9 @@ export async function create(
     ClickChecker.init();
     app.mount("#app");
   };
+  if (skipDB) {
+    initVue();
+  }
   IPC.initialization.on("complete", () => {
     initVue();
   });

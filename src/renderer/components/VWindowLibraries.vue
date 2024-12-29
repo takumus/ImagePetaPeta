@@ -4,8 +4,8 @@
       <VTitleBar :title="t('titles.libraries')"> </VTitleBar>
     </e-top>
     <e-content>
-      <!-- <VSettings /> -->
-      lib!
+      <input type="text" v-model="file" />
+      <button @click="openLib">Open</button>
     </e-content>
     <VContextMenu :z-index="4" />
     <VTooltip :z-index="3" />
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar.vue";
@@ -32,6 +32,7 @@ const keyboards = useKeyboardsStore();
 const windowNameStore = useWindowNameStore();
 const windowTitleStore = useWindowTitleStore();
 const appInfoStore = useAppInfoStore();
+const file = ref("");
 onMounted(() => {
   keyboards.enabled = true;
   keyboards.keys("Escape").up(() => {
@@ -45,6 +46,9 @@ watch(
   },
   { immediate: true },
 );
+function openLib() {
+  IPC.common.selectLibrary({ path: file.value });
+}
 </script>
 
 <style lang="scss">

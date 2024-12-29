@@ -25,6 +25,7 @@ const allowedEvents: { [key in keyof IpcFunctions]: (keyof IpcFunctions[key])[] 
   petaTagPartitions: [],
   states: [],
   settings: [],
+  libraries: [],
   windows: [],
   modals: [],
   nsfw: [],

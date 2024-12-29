@@ -187,7 +187,7 @@ export function initAppDI(
     DIR_ROOT,
   };
 }
-export function initDI(root: string) {
+export function initLibraryDI(root: string) {
   provide(libraryPathKey, root);
   try {
     const DIR_ROOT = useLibraryPath();
@@ -209,6 +209,7 @@ export function initDI(root: string) {
       configDBInfo.data.version = app.getVersion();
       configDBInfo.save();
     }
+    configLibrary.save();
     // データベースバージョンを読んで、アプリのバージョンよりも高かったらダメ
     if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
       throw new Error(

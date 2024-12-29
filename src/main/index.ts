@@ -1,10 +1,11 @@
 import { app, protocol, session } from "electron";
 import installExtension from "electron-devtools-installer";
+import yargs from "yargs";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 
 import { initDB } from "@/main/initDB";
-import { initAppDI, initDI } from "@/main/initDI";
+import { initAppDI, initLibraryDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
 import { useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
@@ -128,30 +129,33 @@ const launchTime = performance.now();
     }
     // ipcの関数登録
     registerIpcFunctions();
-    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
-    // その他パス初期化
-    initDI(diRes.DIR_ROOT);
-    // 初期ウインドウ表示
-    windows.showWindows();
-    const pageDownloaderCache = usePageDownloaderCache();
-    const handleFileResponse = useHandleFileResponse();
-    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
-    protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
-    protocol.handle(
-      PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
-      pageDownloaderCache.handle.bind(pageDownloaderCache),
-    );
     // ダークモード監視開始
     observeDarkMode();
+    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
+    const args = yargs(process.argv).parseSync() as any as { libraryPath?: string };
+    console.log("libraryPath", args.libraryPath);
+    if (args.libraryPath === undefined) {
+      windows.openWindow("libraries");
+    } else {
+      initLibraryDI(args.libraryPath);
+      windows.showWindows();
+      const pageDownloaderCache = usePageDownloaderCache();
+      const handleFileResponse = useHandleFileResponse();
+      protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
+      protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
+      protocol.handle(
+        PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
+        pageDownloaderCache.handle.bind(pageDownloaderCache),
+      );
+      if (configSettings.data.web) {
+        await useWebHook().open(WEBHOOK_PORT);
+      }
+      // dbの初期化
+      await initDB();
+      log.debug(`Init DB:${performance.now() - launchTime}ms`);
+    }
     // アップデート確認と通知
     checkAndNotifySoftwareUpdate();
-    // dbの初期化
-    await initDB();
-    // webhook有効化
-    if (configSettings.data.web) {
-      await useWebHook().open(WEBHOOK_PORT);
-    }
-    log.debug(`Init DB:${performance.now() - launchTime}ms`);
     // usePetaFilesController().removeTrashs();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());

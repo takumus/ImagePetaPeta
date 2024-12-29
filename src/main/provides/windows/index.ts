@@ -63,20 +63,6 @@ export class Windows {
       }
       return;
     }
-    // const args = yargs(process.argv).parseSync() as any as { libraryPath?: string };
-    // if (args.libraryPath === undefined) {
-    //   this.openWindow("libraries");
-    //   useModals()
-    //     .open({} as any, "test", [`relaunch`])
-    //     .then((v) => {
-    //       useQuit().relaunch(["--libraryPath=c:\\hello\\hell"]);
-    //     });
-    //   return;
-    // } else {
-    //   this.openWindow("libraries");
-    //   useModals().open({} as any, "test", [`path: ${args.libraryPath}`]);
-    //   return;
-    // }
     const configLibrary = useConfigLibrary();
     try {
       if (configLibrary.data.secure) {

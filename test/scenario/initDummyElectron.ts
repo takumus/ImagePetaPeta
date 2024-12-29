@@ -94,7 +94,7 @@ export async function initDummyElectron(root: string) {
   //     },
   //   };
   // });
-  const { initDI } = await import("@/main/initDI");
+  const { initLibraryDI: initDI } = await import("@/main/initDI");
   clearProvides();
   initAppDI({
     logs: resolve(root, "logs"),
