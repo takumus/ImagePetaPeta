@@ -49,6 +49,7 @@ import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { getStyle } from "@/main/utils/darkMode";
 import { encodeVideo } from "@/main/utils/encodeVideo";
+import { createAppArgs } from "@/main/utils/getAppArgs";
 import { getIPs } from "@/main/utils/getIPs";
 import { getPetaFilePath } from "@/main/utils/getPetaFileDirectory";
 import { isValidPetaFilePath } from "@/main/utils/isValidFilePath";
@@ -313,7 +314,7 @@ export const ipcFunctions: IpcFunctionsType = {
       return true;
     },
     async selectLibrary(event, logger, library) {
-      useQuit().relaunch([`--libraryPath="${library.path}"`]);
+      useQuit().relaunch(createAppArgs({ libraryPath: library.path }));
       return true;
     },
   },

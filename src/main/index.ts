@@ -1,6 +1,5 @@
 import { app, protocol, session } from "electron";
 import installExtension from "electron-devtools-installer";
-import yargs from "yargs";
 
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 
@@ -15,6 +14,7 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
+import { getAppArgs } from "@/main/utils/getAppArgs";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
 const launchTime = performance.now();
@@ -129,12 +129,13 @@ const launchTime = performance.now();
     // ダークモード監視開始
     observeDarkMode();
     log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
-    const args = yargs(process.argv).parseSync() as any as { libraryPath?: string };
-    console.log("libraryPath", args.libraryPath);
-    if (args.libraryPath === undefined) {
+    const args = getAppArgs();
+    const libraryPath = args.libraryPath ?? import.meta.env.VITE_ROOT_PATH;
+    console.log("libraryPath", libraryPath);
+    if (libraryPath === undefined) {
       windows.openWindow("libraries");
     } else {
-      initLibraryDI(args.libraryPath);
+      initLibraryDI(libraryPath);
       windows.showWindows();
       const pageDownloaderCache = usePageDownloaderCache();
       const handleFileResponse = useHandleFileResponse();
