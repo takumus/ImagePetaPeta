@@ -3,9 +3,8 @@ import App from "$/contents/ui/components/VIndex.vue";
 import { createInjectedDataStore, injectedDataStoreKey } from "$/contents/ui/injectedData";
 import { createApp } from "vue";
 
-import { applyStyle, defaultStyles } from "@/renderer/styles/styles";
+import { defaultStyles } from "@/renderer/styles/styles";
 
-applyStyle(defaultStyles.dark);
 (async () => {
   const styleString = await sendToBackground("getInjectStyle");
   const domRoot = document.createElement("div");
@@ -17,6 +16,9 @@ applyStyle(defaultStyles.dark);
   rootShadow.append(style);
   rootShadow.append(domApp);
   document.body.append(domRoot);
+  Object.keys(defaultStyles.dark).forEach((key) => {
+    domApp.style.setProperty(key, (defaultStyles.dark as { [key: string]: string })[key]);
+  });
   const app = createApp(App);
   const injectedDataStore = await createInjectedDataStore({
     domApp,
