@@ -201,9 +201,6 @@ export const ja: I18NBase = {
     showTagsOnTileDescriptions: "タグが邪魔な場合・ブラウザが重い場合はチェックを外すと良いです。",
     alwaysShowNSFW: "NSFWな画像を常に表示",
     alwaysShowNSFWDescriptions: "NSFWとしてマークした画像を常に表示します。気をつけてくださいね。",
-    browsePetaFileDirectoryButton: "データの保存先を選ぶ",
-    changePetaFileDirectoryButton: "データの保存先を適用",
-    changePetaFileDirectoryDescriptions: "このアプリの画像の保存先を変更できます。",
     updateAvailable: "新しいバージョンがあります。",
     thisIsLatest: "既に最新バージョンです。",
     latestVersion: "最新バージョン",
@@ -221,14 +218,6 @@ export const ja: I18NBase = {
       return `ウェブ機能を有効にすると${ctx.list(
         0,
       )}ポートを使用し、ローカルにAPIサーバーを立てます。拡張機能や、スマホインポート機能に必須です。ファイアウォールの許可が問われますので許可してください。`;
-    },
-    changePetaFileDirectoryDialog: (ctx) => {
-      return `データの保存先を\n"${ctx.list(0)}"\nに変更しますか?\n"はい"を押すと再起動します。`;
-    },
-    changePetaFileDirectoryErrorDialog: (ctx) => {
-      return `データの保存先を\n"${ctx.list(
-        0,
-      )}"\nに変更出来ませんでした。\n他のフォルダを選んでください。`;
     },
   },
   fileImporter: {

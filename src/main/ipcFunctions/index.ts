@@ -132,52 +132,6 @@ export const ipcFunctions: IpcFunctionsType = {
       log.debug("return:", process.platform);
       return process.platform;
     },
-    async browsePetaFileDirectory(event, log) {
-      const windows = useWindows();
-      const windowInfo = windows.getWindowByEvent(event);
-      if (windowInfo) {
-        const filePath = (
-          await dialog.showOpenDialog(windowInfo.window, {
-            properties: ["openDirectory"],
-          })
-        ).filePaths[0];
-        if (filePath === undefined) {
-          return undefined;
-        }
-        let path = Path.resolve(filePath);
-        // if (Path.basename(path) !== "PetaFile") {
-        //   path = Path.resolve(path, "PetaFile");
-        // }
-        try {
-          await readFile(Path.resolve(filePath, FILENAME_DB_INFO));
-        } catch {
-          path = Path.resolve(path, "PetaFile");
-        }
-        log.debug("return:", path);
-        return path;
-      }
-      return "";
-    },
-    async changePetaFileDirectory(event, log, path) {
-      const configSettings = useConfigSettings();
-      try {
-        path = Path.resolve(path);
-        if (!isValidPetaFilePath(path)) {
-          log.error("Invalid file path:", path);
-          return false;
-        }
-        path = await file.initDirectory(true, path);
-        configSettings.data.petaFileDirectory.default = false;
-        configSettings.data.petaFileDirectory.path = path;
-        configSettings.save();
-        log.debug("true");
-        useQuit().relaunch();
-        return true;
-      } catch (error) {
-        log.error(error);
-      }
-      return false;
-    },
     async realESRGANConvert(event, log, petaFiles, modelName) {
       try {
         log.debug("start");

@@ -24,10 +24,7 @@ const launchTime = performance.now();
     return;
   }
   // DI準備
-  const diRes = initAppDI();
-  if (!diRes) {
-    return;
-  }
+  initAppDI();
   const logger = useLogger();
   process.on("uncaughtException", function (error) {
     logger.logChunk("Nicht Abgefangene Ausnahme").error(error);

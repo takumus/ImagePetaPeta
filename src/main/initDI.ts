@@ -134,33 +134,6 @@ export function initAppDI(
   const configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, {}, migrateWindowStates);
   const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, {});
   // ルートディレクトリは試行錯誤して決定する。
-  const DIR_ROOT = (() => {
-    // デフォルトならピクチャーズ
-    if (import.meta.env.VITE_ROOT_PATH) {
-      return import.meta.env.VITE_ROOT_PATH;
-    }
-    if (configSettings.data.petaFileDirectory.default) {
-      return (configSettings.data.petaFileDirectory.path = initDirectorySync(
-        true,
-        dirs.default,
-        "imagePetaPeta",
-      ));
-    } else {
-      // ちがうなら設定ファイルパス
-      try {
-        if (!isValidPetaFilePath(configSettings.data.petaFileDirectory.path)) {
-          throw new Error();
-        }
-        return initDirectorySync(true, configSettings.data.petaFileDirectory.path);
-      } catch (error) {
-        configSettings.data.petaFileDirectory.default = true;
-        configSettings.save();
-        throw new Error(
-          `Cannot access PetaFile directory: "${configSettings.data.petaFileDirectory.path}"\nChanged to default directory. Please restart application.`,
-        );
-      }
-    }
-  })();
   const appPaths: AppPaths = {
     DIR_APP,
     DIR_LOG,
@@ -183,9 +156,6 @@ export function initAppDI(
   provide(windowsKey, windows);
   provide(nsfwKey, new NSFW());
   provide(modalsKey, new Modals());
-  return {
-    DIR_ROOT,
-  };
 }
 export function initLibraryDI(root: string) {
   provide(libraryPathKey, root);

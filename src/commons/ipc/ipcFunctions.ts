@@ -105,8 +105,6 @@ export interface IpcFunctions {
     showConfigFolder: () => Promise<boolean>;
     showImageInFolder: (petaFile: PetaFile) => Promise<boolean>;
     getPlatform: () => Promise<NodeJS.Platform>;
-    browsePetaFileDirectory: () => Promise<string | undefined>;
-    changePetaFileDirectory: (path: string) => Promise<boolean>;
     realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<string[]>;
     startDrag: (petaFiles: PetaFile[], iconSize: number, iconData: string) => Promise<void>;
     openInBrowser: (petaFile: PetaFile | string) => Promise<void>;
