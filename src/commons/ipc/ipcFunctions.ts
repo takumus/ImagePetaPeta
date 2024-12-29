@@ -125,6 +125,6 @@ export interface IpcFunctions {
     login: (password: string, save: boolean) => Promise<boolean>;
     copyRawToClipboard: (petaFile: PetaFile) => Promise<boolean>;
     encodeVideo: (petaFiles: PetaFile[]) => Promise<boolean>;
-    selectLibrary: (library: Libraries[string]) => Promise<boolean>;
+    selectLibrary: (library: Libraries[number]) => Promise<boolean>;
   };
 }

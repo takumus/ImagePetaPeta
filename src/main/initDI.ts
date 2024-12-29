@@ -129,7 +129,7 @@ export function initAppDI(
   const FILE_SECURE_FILE_PASSWORD = initFileSync(DIR_APP, FILENAME_SECURE_FILE_PASSWORD);
   // 設定ロード
   const configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), migrateSettings);
-  const configLibraries = new Config<Libraries>(FILE_LIBRARIES, {});
+  const configLibraries = new Config<Libraries>(FILE_LIBRARIES, []);
   const configStates = new Config<States>(FILE_STATES, defaultStates, migrateStates);
   const configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, {}, migrateWindowStates);
   const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, {});
