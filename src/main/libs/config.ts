@@ -9,6 +9,7 @@ export default class Config<T> {
     private path: string,
     private defaultData: T,
     migrater?: SyncMigrater<T>,
+    private saveDefault = true,
   ) {
     this.data = deepcopy(defaultData);
     this.load();
@@ -26,6 +27,9 @@ export default class Config<T> {
       this.data = JSON.parse(buffer.toString());
     } catch (e) {
       this.data = deepcopy(this.defaultData);
+      if (this.saveDefault) {
+        this.save();
+      }
     }
   }
   save() {
