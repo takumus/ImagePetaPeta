@@ -41,6 +41,7 @@ import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";
 import { initDirectorySync, initFileSync } from "@/main/libs/file";
+import { migrateLibrary } from "@/main/migration/migrateLibrary";
 import { migrateSettings } from "@/main/migration/migrateSettings";
 import { migrateStates } from "@/main/migration/migrateStates";
 import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
@@ -173,13 +174,12 @@ export function initLibraryDI(root: string) {
     const FILE_DBINFO = initFileSync(DIR_ROOT, FILENAME_DB_INFO);
     const FILE_LIBRARY = initFileSync(DIR_ROOT, FILENAME_LIBRARY);
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, getDefaultDBInfo());
-    const configLibrary = new Config<Library>(FILE_LIBRARY, getDefaultLibrary());
+    const configLibrary = new Config<Library>(FILE_LIBRARY, getDefaultLibrary(), migrateLibrary);
     // デフォルト値だったらバージョン付与。
     if (configDBInfo.data.version === getDefaultDBInfo().version) {
       configDBInfo.data.version = app.getVersion();
       configDBInfo.save();
     }
-    configLibrary.save();
     // データベースバージョンを読んで、アプリのバージョンよりも高かったらダメ
     if (!isLatest(app.getVersion(), configDBInfo.data.version)) {
       throw new Error(
