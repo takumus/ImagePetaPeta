@@ -5,7 +5,9 @@ import kill from "tree-kill";
 export function cancelableRun(...commands: string[][]) {
   const childProcesses = commands.map((command) => spawn(command.shift()!, command));
   keypress(process.stdin);
-  process.stdin.setRawMode(true);
+  if (process.stdin.isTTY) {
+    process.stdin.setRawMode(true);
+  }
   process.stdin.on("keypress", async function (_ch, key) {
     if (key?.ctrl && key?.name === "c") {
       killAll();
