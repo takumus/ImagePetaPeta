@@ -59,7 +59,7 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "@vitest/ui": "^3.2.3",
     "adm-zip": "^0.5.16",
-    "electron": "^36.4.0",
+    "electron": "33.4.9",
     "electron-builder": "26.0.12",
     "electron-devtools-installer": "^4.0.0",
     "keypress": "^0.2.1",
