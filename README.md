@@ -1,7 +1,4 @@
 # ImagePetaPeta-beta
-
-<img src="https://user-images.githubusercontent.com/15127636/235609501-165ceda9-d54a-4794-8935-ea31ea14c9b6.png" width="100%">
-
 写真やイラスト資料を閲覧、管理するソフトです！！
 
 ## インストール
