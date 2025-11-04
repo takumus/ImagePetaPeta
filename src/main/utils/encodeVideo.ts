@@ -28,10 +28,16 @@ export async function encodeVideo(petaFiles: PetaFile[], args: string[]) {
       const inputFile = getPetaFilePath.fromPetaFile(petaFile).original;
       const outputFile = `${Path.resolve(appPaths.DIR_TEMP, petaFile.id)}.mp4`;
       const parameters = [
+        "-hwaccel", 
+        "cuda",
         "-i",
         inputFile,
+        "-vf",
+        "scale=-1:720",
         "-b:v",
-        "5000k",
+        "7000k",
+        "-c:v",
+        "h264_nvenc",
         "-c:a",
         "copy",
         outputFile,

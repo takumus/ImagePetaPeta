@@ -174,6 +174,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         requestPageDownloaderDatas(tab.id, false);
       }
       break;
+    case "search":
+      if (tab?.id !== undefined && info.srcUrl !== undefined) {
+        const url = `https://lens.google.com/v3/upload?url=${encodeURIComponent(info.srcUrl)}`;
+        chrome.tabs.create({
+          url,
+          index: tab.index + 1,
+        });
+      } else {
+        _alert("Failed to get image URL.");
+      }
+      break;
   }
 });
 chrome.runtime.onInstalled.addListener(() => {
@@ -191,6 +202,11 @@ chrome.runtime.onInstalled.addListener(() => {
     id: "downloadPageAll",
     contexts: ["all"],
     title: "Download Page (all)",
+  });
+  chrome.contextMenus.create({
+    id: "search",
+    contexts: ["image"],
+    title: "Search Image on Web",
   });
 });
 
