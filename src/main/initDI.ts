@@ -41,6 +41,7 @@ import Config from "@/main/libs/config";
 import DB from "@/main/libs/db";
 import { provide } from "@/main/libs/di";
 import { initDirectorySync, initFileSync } from "@/main/libs/file";
+import { migrateLibrary } from "@/main/migration/migrateLibrary";
 import { migrateSettings } from "@/main/migration/migrateSettings";
 import { migrateStates } from "@/main/migration/migrateStates";
 import { migrateWindowStates } from "@/main/migration/migrateWindowStates";
@@ -92,7 +93,14 @@ import { Tasks, tasksKey } from "@/main/provides/tasks";
 import { createSecureTempFileKey, secureTempFileKeyKey } from "@/main/provides/tempFileKey";
 import { i18nKey } from "@/main/provides/utils/i18n";
 import { Logger, loggerKey } from "@/main/provides/utils/logger";
-import { AppPaths, appPathsKey, LibraryPaths, libraryPathsKey } from "@/main/provides/utils/paths";
+import {
+  AppPaths,
+  appPathsKey,
+  libraryPathKey,
+  LibraryPaths,
+  libraryPathsKey,
+  useLibraryPath,
+} from "@/main/provides/utils/paths";
 import { Quit, quitKey } from "@/main/provides/utils/quit";
 import { WebHook, webhookKey } from "@/main/provides/webhook";
 import { Windows, windowsKey } from "@/main/provides/windows";
@@ -122,38 +130,11 @@ export function initAppDI(
   const FILE_SECURE_FILE_PASSWORD = initFileSync(DIR_APP, FILENAME_SECURE_FILE_PASSWORD);
   // 設定ロード
   const configSettings = new Config<Settings>(FILE_SETTINGS, getDefaultSettings(), migrateSettings);
-  const configLibraries = new Config<Libraries>(FILE_LIBRARIES, {});
+  const configLibraries = new Config<Libraries>(FILE_LIBRARIES, []);
   const configStates = new Config<States>(FILE_STATES, defaultStates, migrateStates);
   const configWindowStates = new Config<WindowStates>(FILE_WINDOW_STATES, {}, migrateWindowStates);
   const configSecureFilePassword = new ConfigSecureFilePassword(FILE_SECURE_FILE_PASSWORD, {});
   // ルートディレクトリは試行錯誤して決定する。
-  const DIR_ROOT = (() => {
-    // デフォルトならピクチャーズ
-    if (import.meta.env.VITE_ROOT_PATH) {
-      return import.meta.env.VITE_ROOT_PATH;
-    }
-    if (configSettings.data.petaFileDirectory.default) {
-      return (configSettings.data.petaFileDirectory.path = initDirectorySync(
-        true,
-        dirs.default,
-        "imagePetaPeta",
-      ));
-    } else {
-      // ちがうなら設定ファイルパス
-      try {
-        if (!isValidPetaFilePath(configSettings.data.petaFileDirectory.path)) {
-          throw new Error();
-        }
-        return initDirectorySync(true, configSettings.data.petaFileDirectory.path);
-      } catch (error) {
-        configSettings.data.petaFileDirectory.default = true;
-        configSettings.save();
-        throw new Error(
-          `Cannot access PetaFile directory: "${configSettings.data.petaFileDirectory.path}"\nChanged to default directory. Please restart application.`,
-        );
-      }
-    }
-  })();
   const appPaths: AppPaths = {
     DIR_APP,
     DIR_LOG,
@@ -175,21 +156,12 @@ export function initAppDI(
   provide(quitKey, new Quit());
   provide(windowsKey, windows);
   provide(nsfwKey, new NSFW());
-  return {
-    DIR_ROOT,
-  };
+  provide(modalsKey, new Modals());
 }
-export function initDI(
-  dirs = {
-    logs: app.getPath("logs"),
-    app: app.getPath("userData"),
-    temp: app.getPath("temp"),
-    default: app.getPath("pictures"),
-  },
-) {
+export function initLibraryDI(root: string) {
+  provide(libraryPathKey, root);
   try {
-    // その他パス初期化
-    const DIR_ROOT = initAppDI(dirs).DIR_ROOT;
+    const DIR_ROOT = useLibraryPath();
     // 設定ロード
     const DIR_IMAGES = initDirectorySync(true, DIR_ROOT, DIRNAME_IMAGES);
     const DIR_THUMBNAILS = initDirectorySync(true, DIR_ROOT, DIRNAME_THUMBNAILS);
@@ -202,7 +174,7 @@ export function initDI(
     const FILE_DBINFO = initFileSync(DIR_ROOT, FILENAME_DB_INFO);
     const FILE_LIBRARY = initFileSync(DIR_ROOT, FILENAME_LIBRARY);
     const configDBInfo = new Config<DBInfo>(FILE_DBINFO, getDefaultDBInfo());
-    const configLibrary = new Config<Library>(FILE_LIBRARY, getDefaultLibrary());
+    const configLibrary = new Config<Library>(FILE_LIBRARY, getDefaultLibrary(), migrateLibrary);
     // デフォルト値だったらバージョン付与。
     if (configDBInfo.data.version === getDefaultDBInfo().version) {
       configDBInfo.data.version = app.getVersion();
@@ -277,7 +249,6 @@ export function initDI(
       waitUntilKillable: async () => {},
     });
     provide(webhookKey, new WebHook(ipcFunctions));
-    provide(modalsKey, new Modals());
     provide(tasksKey, new Tasks());
     provide(pageDownloaderCacheKey, new PageDownloaderCache());
     provide(handleFileResponseKey, new HandleFileResponse());

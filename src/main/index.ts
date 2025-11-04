@@ -4,10 +4,9 @@ import installExtension from "electron-devtools-installer";
 import { PROTOCOLS, WEBHOOK_PORT } from "@/commons/defines";
 
 import { initDB } from "@/main/initDB";
-import { initDI } from "@/main/initDI";
+import { initAppDI, initLibraryDI } from "@/main/initDI";
 import { registerIpcFunctions } from "@/main/ipcFunctions";
-import { useConfigSecureFilePassword, useConfigSettings } from "@/main/provides/configs";
-import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { useConfigSettings } from "@/main/provides/configs";
 import { useHandleFileResponse } from "@/main/provides/handleFileResponse";
 import { usePageDownloaderCache } from "@/main/provides/pageDownloaderCache";
 import { useLogger } from "@/main/provides/utils/logger";
@@ -15,6 +14,7 @@ import { windowIs } from "@/main/provides/utils/windowIs";
 import { useWebHook } from "@/main/provides/webhook";
 import { useWindows } from "@/main/provides/windows";
 import { observeDarkMode } from "@/main/utils/darkMode";
+import { getAppArgs } from "@/main/utils/getAppArgs";
 import { checkAndNotifySoftwareUpdate } from "@/main/utils/softwareUpdater";
 
 const launchTime = performance.now();
@@ -24,17 +24,13 @@ const launchTime = performance.now();
     return;
   }
   // DI準備
-  if (!initDI()) {
-    return;
-  }
+  initAppDI();
   const logger = useLogger();
   process.on("uncaughtException", function (error) {
     logger.logChunk("Nicht Abgefangene Ausnahme").error(error);
   });
   const windows = useWindows();
   const configSettings = useConfigSettings();
-  const handleFileResponse = useHandleFileResponse();
-  const pageDownloaderCache = usePageDownloaderCache();
   // コマンドライン引数
   if (configSettings.data.disableAcceleratedVideoDecode) {
     app.commandLine.appendSwitch("disable-accelerated-video-decode");
@@ -86,10 +82,10 @@ const launchTime = performance.now();
   });
   // XXXX:// でブラウザなどから起動できるように
   app.setAsDefaultProtocolClient("image-petapeta");
-  app.on("will-quit", (e) => {
-    // e.preventDefault();
-    // useQuit().quit();
-  });
+  // app.on("will-quit", (e) => {
+  //   // e.preventDefault();
+  //   // useQuit().quit();
+  // });
   // electron準備OK
   async function appReady() {
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -128,28 +124,36 @@ const launchTime = performance.now();
         log.error(error);
       }
     }
-    protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
-    protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
-    protocol.handle(
-      PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
-      pageDownloaderCache.handle.bind(pageDownloaderCache),
-    );
     // ipcの関数登録
     registerIpcFunctions();
-    // 初期ウインドウ表示
-    windows.showWindows();
-    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
     // ダークモード監視開始
     observeDarkMode();
+    log.debug(`ShowWindows:${performance.now() - launchTime}ms`);
+    const args = getAppArgs();
+    const libraryPath = args.libraryPath ?? import.meta.env.VITE_ROOT_PATH;
+    console.log("libraryPath", libraryPath);
+    if (libraryPath === undefined) {
+      windows.openWindow("libraries");
+    } else {
+      initLibraryDI(libraryPath);
+      windows.showWindows();
+      const pageDownloaderCache = usePageDownloaderCache();
+      const handleFileResponse = useHandleFileResponse();
+      protocol.handle(PROTOCOLS.FILE.IMAGE_ORIGINAL, handleFileResponse.fileResponse("original"));
+      protocol.handle(PROTOCOLS.FILE.IMAGE_THUMBNAIL, handleFileResponse.fileResponse("thumbnail"));
+      protocol.handle(
+        PROTOCOLS.FILE.PAGE_DOWNLOADER_CACHE,
+        pageDownloaderCache.handle.bind(pageDownloaderCache),
+      );
+      if (configSettings.data.web) {
+        await useWebHook().open(WEBHOOK_PORT);
+      }
+      // dbの初期化
+      await initDB();
+      log.debug(`Init DB:${performance.now() - launchTime}ms`);
+    }
     // アップデート確認と通知
     checkAndNotifySoftwareUpdate();
-    // dbの初期化
-    await initDB();
-    // webhook有効化
-    if (configSettings.data.web) {
-      await useWebHook().open(WEBHOOK_PORT);
-    }
-    log.debug(`Init DB:${performance.now() - launchTime}ms`);
     // usePetaFilesController().removeTrashs();
     // useConfigSecureFilePassword().setValue("1234");
     // console.log(useConfigSecureFilePassword().getValue());

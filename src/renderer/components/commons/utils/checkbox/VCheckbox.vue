@@ -40,7 +40,7 @@ e-checkbox-root {
       transition-duration: 100ms;
       transition-property: left, background-color;
       box-shadow: 0px 0.5px 2px rgba(0, 0, 0, 0.2);
-      border-radius: var(--rounded-circle);
+      border-radius: var(--rounded);
       background-color: var(--color-checkbox-false-circle);
       aspect-ratio: 1;
       height: 100%;

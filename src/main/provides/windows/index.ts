@@ -1,6 +1,6 @@
 import * as Path from "node:path";
 import { BrowserWindow, IpcMainInvokeEvent, screen } from "electron";
-import { string } from "yargs";
+import yargs from "yargs";
 
 import {
   EULA,
@@ -22,6 +22,7 @@ import {
   useConfigWindowStates,
 } from "@/main/provides/configs";
 import { usePetaFilesController } from "@/main/provides/controllers/petaFilesController/petaFilesController";
+import { useModals } from "@/main/provides/modals";
 import { useLogger } from "@/main/provides/utils/logger";
 import { useQuit } from "@/main/provides/utils/quit";
 import { windowIs } from "@/main/provides/utils/windowIs";
@@ -52,7 +53,6 @@ export class Windows {
   }
   showWindows() {
     const configSettings = useConfigSettings();
-    const configLibrary = useConfigLibrary();
     const log = useLogger().logChunk("Windows.showWindows");
     if (configSettings.data.eula < EULA) {
       if (windowIs.dead("eula")) {
@@ -63,6 +63,7 @@ export class Windows {
       }
       return;
     }
+    const configLibrary = useConfigLibrary();
     try {
       if (configLibrary.data.secure) {
         useConfigSecureFilePassword().getKey();

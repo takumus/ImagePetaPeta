@@ -32,9 +32,8 @@ export const migrateSettings = createSyncMigrater<Settings>((data, update) => {
     data.gamutMapSampling = defaultSettings.gamutMapSampling;
     update();
   }
-  if (data.petaFileDirectory === undefined) {
-    data.petaFileDirectory = anyData.petaImageDirectory;
-    delete anyData.petaImageDirectory;
+  if (anyData.petaFileDirectory !== undefined) {
+    delete anyData.petaFileDirectory;
     update();
   }
   if (data.disableAcceleratedVideoDecode === undefined) {

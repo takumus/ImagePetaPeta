@@ -186,9 +186,6 @@ export interface I18NBase extends I18N {
     showTagsOnTileDescriptions: I18NProp;
     alwaysShowNSFW: I18NProp;
     alwaysShowNSFWDescriptions: I18NProp;
-    browsePetaFileDirectoryButton: I18NProp;
-    changePetaFileDirectoryButton: I18NProp;
-    changePetaFileDirectoryDescriptions: I18NProp;
     updateAvailable: I18NProp;
     thisIsLatest: I18NProp;
     latestVersion: I18NProp;
@@ -201,8 +198,6 @@ export interface I18NBase extends I18N {
     gamutMapSampling: I18NProp;
     gamutMapSamplingDescriptions: I18NProp;
     webDescriptions: I18NProp;
-    changePetaFileDirectoryDialog: I18NProp;
-    changePetaFileDirectoryErrorDialog: I18NProp;
   };
   fileImporter: {
     cancel: I18NProp;

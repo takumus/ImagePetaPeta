@@ -1,5 +1,4 @@
-export interface Libraries {
-  [key: string]: {
-    path: string;
-  };
-}
+export type Libraries = {
+  path: string;
+  id: string;
+}[];

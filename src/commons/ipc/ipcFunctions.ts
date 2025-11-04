@@ -1,6 +1,7 @@
 import { AppInfo } from "@/commons/datas/appInfo";
 import { GetPetaFileIdsParams } from "@/commons/datas/getPetaFileIdsParams";
 import { ImportFileGroup } from "@/commons/datas/importFileGroup";
+import { Libraries } from "@/commons/datas/libraries";
 import { MediaSourceInfo } from "@/commons/datas/mediaSourceInfo";
 import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { PetaBoard } from "@/commons/datas/petaBoard";
@@ -63,6 +64,10 @@ export interface IpcFunctions {
     update: (settings: Settings) => Promise<boolean>;
     get: () => Promise<Settings>;
   };
+  libraries: {
+    update: (libraries: Libraries) => Promise<boolean>;
+    get: () => Promise<Libraries>;
+  };
   windows: {
     open: (windowName: WindowName) => Promise<void>;
     getMainWindowName: () => Promise<WindowName | undefined>;
@@ -100,8 +105,6 @@ export interface IpcFunctions {
     showConfigFolder: () => Promise<boolean>;
     showImageInFolder: (petaFile: PetaFile) => Promise<boolean>;
     getPlatform: () => Promise<NodeJS.Platform>;
-    browsePetaFileDirectory: () => Promise<string | undefined>;
-    changePetaFileDirectory: (path: string) => Promise<boolean>;
     realESRGANConvert: (petaFiles: PetaFile[], modelName: RealESRGANModelName) => Promise<string[]>;
     startDrag: (petaFiles: PetaFile[], iconSize: number, iconData: string) => Promise<void>;
     openInBrowser: (petaFile: PetaFile | string) => Promise<void>;
@@ -120,5 +123,6 @@ export interface IpcFunctions {
     login: (password: string, save: boolean) => Promise<boolean>;
     copyRawToClipboard: (petaFile: PetaFile) => Promise<boolean>;
     encodeVideo: (petaFiles: PetaFile[]) => Promise<boolean>;
+    selectLibrary: (library: Libraries[number]) => Promise<boolean>;
   };
 }

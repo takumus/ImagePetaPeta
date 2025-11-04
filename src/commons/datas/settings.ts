@@ -9,10 +9,10 @@ const defaultSettings = {
   loadTilesInOriginal: true,
   showTagsOnTile: true,
   alwaysShowNSFW: false,
-  petaFileDirectory: {
-    default: true,
-    path: "",
-  },
+  // petaFileDirectory: {
+  //   default: true,
+  //   path: "",
+  // },
   show: "board" as "board" | "browser" | "both",
   eula: 0,
   web: false,

@@ -6,4 +6,5 @@ export const keepAliveWindowNames: WindowName[] = [
   "capture",
   "details",
   "password",
+  "libraries",
 ];

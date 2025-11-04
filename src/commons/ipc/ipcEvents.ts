@@ -1,3 +1,4 @@
+import { Libraries } from "@/commons/datas/libraries";
 import { PageDownloaderData } from "@/commons/datas/pageDownloaderData";
 import { PetaFile } from "@/commons/datas/petaFile";
 import { PetaTagPartition } from "@/commons/datas/petaTagPartition";
@@ -32,6 +33,9 @@ export interface IpcEvents {
   };
   states: {
     update: (states: States) => void;
+  };
+  libraries: {
+    update: (libraries: Libraries) => void;
   };
   tasks: {
     status: (tasks: { [id: string]: TaskStatusWithIndex }) => void;
