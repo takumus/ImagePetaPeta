@@ -1,19 +1,19 @@
-import { createApp } from "vue";
-import { createI18n } from "vue-i18n";
+import { createElement } from "react";
+import { createRoot } from "react-dom/client";
 
-import VIndex from "./VIndex.vue";
+import App from "./App";
 
-import languages from "@/commons/languages";
-
+import { initializeI18n } from "@/renderer/i18n";
+import "@/renderer/styles/panda.css";
 import { applyStyle, defaultStyles } from "@/renderer/styles/styles";
 
-const app = createApp(VIndex);
 applyStyle(defaultStyles.dark);
-app.use(
-  createI18n<[typeof languages.ja], "ja">({
-    legacy: false,
-    locale: "ja",
-    messages: languages,
-  }),
-);
-app.mount("#app");
+
+const container = document.querySelector("#app");
+if (!(container instanceof HTMLElement)) {
+  throw new Error('Could not find "#app" root element');
+}
+
+void initializeI18n().then(() => {
+  createRoot(container).render(createElement(App));
+});

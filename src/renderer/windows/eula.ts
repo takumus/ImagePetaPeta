@@ -1,4 +1,4 @@
-import VWindow from "@/renderer/components/VWindowEula.vue";
+import VWindow from "@/renderer/components/VWindowEula";
 
 import { create } from "@/renderer/windows/@base";
 

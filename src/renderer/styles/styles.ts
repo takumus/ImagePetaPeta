@@ -36,7 +36,7 @@ export type SizeStyle = {
 };
 export type Style = SizeStyle & ColorStyle;
 export type ReadonlyStyle = Readonly<Style>;
-const sizes: SizeStyle = {
+export const sizeStyles: SizeStyle = {
   "--rounded": "4px",
   "--rounded-circle": "100%",
   "--size-0": "0.8em",
@@ -71,7 +71,7 @@ const dark: ReadonlyStyle = {
   "--color-checkbox-true-circle": "var(--color-font)",
   "--window-buttons-close-hover": "#ff0000",
   "--color-window-button": "#ffffff",
-  ...sizes,
+  ...sizeStyles,
 };
 const light: ReadonlyStyle = {
   "--color-0": "#ffffff",
@@ -93,7 +93,7 @@ const light: ReadonlyStyle = {
   "--color-checkbox-true-circle": "var(--color-0)",
   "--window-buttons-close-hover": "#ff0000",
   "--color-window-button": "#ffffff",
-  ...sizes,
+  ...sizeStyles,
 };
 export const defaultStyles = {
   dark,

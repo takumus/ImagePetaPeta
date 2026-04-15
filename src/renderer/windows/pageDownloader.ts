@@ -1,4 +1,4 @@
-import VWindow from "@/renderer/components/VWindowPageDownloader.vue";
+import VWindow from "@/renderer/components/VWindowPageDownloader";
 
 import { create } from "@/renderer/windows/@base";
 

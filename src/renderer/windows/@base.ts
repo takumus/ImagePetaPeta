@@ -1,14 +1,16 @@
 import { KeyStoreCreatorPair } from "../stores/keyStoreCreatorPair";
-import { Component, createApp } from "vue";
-import { createI18n } from "vue-i18n";
+import { ComponentType, createElement } from "react";
+import { createRoot } from "react-dom/client";
 
-import languages from "@/commons/languages";
 import { WindowName } from "@/commons/windows";
 
+import { StoreProvider } from "@/renderer/contexts/StoreContext";
+import { initializeI18n } from "@/renderer/i18n";
 import { ClickChecker } from "@/renderer/libs/clickChecker";
 import { IPC } from "@/renderer/libs/ipc";
 import { Keyboards } from "@/renderer/libs/keyboards";
 import { logChunk } from "@/renderer/libs/rendererLogger";
+import "@/renderer/styles/panda.css";
 import {
   appInfoStoreKey,
   createAppInfoStore,
@@ -44,7 +46,7 @@ import {
 import { createInitialization } from "@/renderer/utils/createInitialization";
 
 export async function create(
-  component: Component,
+  component: ComponentType,
   windowName: WindowName,
   stores?: KeyStoreCreatorPair<unknown>[],
 ) {
@@ -65,31 +67,36 @@ export async function create(
     initialization.destroy();
     initialized = true;
     logChunk("init").debug(`$Window "${windowName}" init`);
-    const app = createApp(component);
+    await initializeI18n();
     const platform = await IPC.common.getPlatform();
-    app.use(
-      createI18n<[typeof languages.ja], "ja">({
-        legacy: false,
-        locale: "ja",
-        messages: languages,
-      }),
-    );
-    await Promise.all([
-      (async () => app.provide(styleStoreKey, await createStyleStore()))(),
-      (async () => app.provide(nsfwStoreKey, await createNSFWStore()))(),
-      (async () => app.provide(windowNameStoreKey, await createWindowNameStore(windowName)))(),
-      (async () => app.provide(definesStoreKey, await createDefinesStore()))(),
-      (async () => app.provide(systemInfoStoreKey, await createSystemInfoStore(platform)))(),
-      (async () => app.provide(statesStoreKey, await createStatesStore()))(),
-      (async () => app.provide(settingsStoreKey, await createSettingsStore()))(),
-      (async () => app.provide(appInfoStoreKey, await createAppInfoStore()))(),
-      (async () => app.provide(textsStoreKey, await createTextsStore()))(),
-      (async () => app.provide(componentsStoreKey, await createComponentsStore()))(),
-      (async () => app.provide(windowTitleStoreKey, await createWindowTitleStore()))(),
-      ...(stores?.map(async (store) => app.provide(store.key, await store.creator())) || []),
+    const container = document.querySelector("#app");
+    if (!(container instanceof HTMLElement)) {
+      throw new Error('Could not find "#app" root element');
+    }
+    const resolvedStores = await Promise.all([
+      (async () => ({ key: styleStoreKey, value: await createStyleStore() }))(),
+      (async () => ({ key: nsfwStoreKey, value: await createNSFWStore() }))(),
+      (async () => ({ key: windowNameStoreKey, value: await createWindowNameStore(windowName) }))(),
+      (async () => ({ key: definesStoreKey, value: await createDefinesStore() }))(),
+      (async () => ({ key: systemInfoStoreKey, value: await createSystemInfoStore(platform) }))(),
+      (async () => ({ key: statesStoreKey, value: await createStatesStore() }))(),
+      (async () => ({ key: settingsStoreKey, value: await createSettingsStore() }))(),
+      (async () => ({ key: appInfoStoreKey, value: await createAppInfoStore() }))(),
+      (async () => ({ key: textsStoreKey, value: await createTextsStore() }))(),
+      (async () => ({ key: componentsStoreKey, value: await createComponentsStore() }))(),
+      (async () => ({ key: windowTitleStoreKey, value: await createWindowTitleStore() }))(),
+      ...(stores?.map(async (store) => ({ key: store.key, value: await store.creator() })) || []),
     ]);
     ClickChecker.init();
-    app.mount("#app");
+    createRoot(container).render(
+      createElement(
+        StoreProvider,
+        {
+          stores: resolvedStores,
+        },
+        createElement(component),
+      ),
+    );
   };
   IPC.initialization.on("complete", () => {
     initVue();

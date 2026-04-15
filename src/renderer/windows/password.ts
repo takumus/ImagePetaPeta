@@ -1,4 +1,4 @@
-import VWindow from "@/renderer/components/VWindowPassword.vue";
+import VWindow from "@/renderer/components/VWindowPassword";
 
 import { create } from "@/renderer/windows/@base";
 

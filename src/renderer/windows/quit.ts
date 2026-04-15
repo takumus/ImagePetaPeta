@@ -1,4 +1,4 @@
-import VWindow from "@/renderer/components/VWindowQuit.vue";
+import VWindow from "@/renderer/components/VWindowQuit";
 
 import { create } from "@/renderer/windows/@base";
 

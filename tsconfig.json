@@ -3,9 +3,9 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "strict": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -16,6 +16,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "styled-system/*": [
+        "styled-system/*"
       ]
     }
   },
@@ -26,6 +29,7 @@
     "vite.alias.ts",
     "package.json",
     "src",
+    "styled-system",
     "vitePlugins",
     "scripts",
     "test"
