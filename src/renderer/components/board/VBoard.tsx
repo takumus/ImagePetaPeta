@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { css, cx } from "styled-system/css";
 
 import { PetaFile } from "@/commons/datas/petaFile";
@@ -13,8 +14,11 @@ import { RPetaBoard } from "@/commons/datas/rPetaBoard";
 import { RPetaPanel } from "@/commons/datas/rPetaPanel";
 import { Settings, getDefaultSettings } from "@/commons/datas/settings";
 import { BOARD_ZOOM_MAX, BOARD_ZOOM_MIN } from "@/commons/defines";
+import { resizeImage } from "@/commons/utils/resizeImage";
+import { Vec2 } from "@/commons/utils/vec2";
 
 import { IPC } from "@/renderer/libs/ipc";
+import { useComponentsStore } from "@/renderer/stores/componentsStore/useComponentsStore";
 import { getFileURL } from "@/renderer/utils/fileURL";
 
 import NsfwTexture from "@/_public/images/textures/nsfw.png";
@@ -142,11 +146,21 @@ export default function VBoard({
   petaFilesById: Record<string, PetaFile>;
   onUpdateBoard: (board: RPetaBoard) => void;
 }) {
+  const { t } = useTranslation();
+  const components = useComponentsStore();
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragPointerIdRef = useRef<number | null>(null);
   const dragStartRef = useRef<{ x: number; y: number; positionX: number; positionY: number } | null>(
     null,
   );
+  const panelDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    panelId: string;
+    positionX: number;
+    positionY: number;
+  } | null>(null);
   const [selectedPanelId, setSelectedPanelId] = useState("");
   const [showNSFW, setShowNSFW] = useState(false);
   const [settings, setSettings] = useState<Settings>(getDefaultSettings());
@@ -260,7 +274,32 @@ export default function VBoard({
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!board || dragPointerIdRef.current !== event.pointerId || !dragStartRef.current) {
+    if (!board) {
+      return;
+    }
+    if (panelDragRef.current && panelDragRef.current.pointerId === event.pointerId) {
+      const deltaX = (event.clientX - panelDragRef.current.startX) / board.transform.scale;
+      const deltaY = (event.clientY - panelDragRef.current.startY) / board.transform.scale;
+      const currentPanel = board.petaPanels[panelDragRef.current.panelId];
+      if (!currentPanel) {
+        return;
+      }
+      onUpdateBoard({
+        ...board,
+        petaPanels: {
+          ...board.petaPanels,
+          [currentPanel.id]: {
+            ...currentPanel,
+            position: new Vec2(
+              panelDragRef.current.positionX + deltaX,
+              panelDragRef.current.positionY + deltaY,
+            ),
+          },
+        },
+      });
+      return;
+    }
+    if (dragPointerIdRef.current !== event.pointerId || !dragStartRef.current) {
       return;
     }
     const deltaX = event.clientX - dragStartRef.current.x;
@@ -278,6 +317,9 @@ export default function VBoard({
   }
 
   function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (panelDragRef.current?.pointerId === event.pointerId) {
+      panelDragRef.current = null;
+    }
     if (dragPointerIdRef.current !== event.pointerId) {
       return;
     }
@@ -290,6 +332,167 @@ export default function VBoard({
 
   if (!board) {
     return <div className={cx(rootStyle, emptyStyle)}>board</div>;
+  }
+
+  function normalizePanels(nextPanels: RPetaPanel[]) {
+    return nextPanels
+      .sort((a, b) => a.index - b.index)
+      .reduce(
+        (mapped, panel, index) => ({
+          ...mapped,
+          [panel.id]: {
+            ...panel,
+            index,
+          },
+        }),
+        {} as Record<string, RPetaPanel>,
+      );
+  }
+
+  function updatePanel(
+    panelId: string,
+    updater: (panel: RPetaPanel, petaFile?: PetaFile) => RPetaPanel,
+  ) {
+    if (!board) {
+      return;
+    }
+    const targetPanel = board.petaPanels[panelId];
+    if (!targetPanel) {
+      return;
+    }
+    const petaFile = petaFilesById[targetPanel.petaFileId];
+    const nextPanel = updater(targetPanel, petaFile);
+    onUpdateBoard({
+      ...board,
+      petaPanels: {
+        ...board.petaPanels,
+        [targetPanel.id]: nextPanel,
+      },
+    });
+  }
+
+  function openPanelContextMenu(event: React.MouseEvent, panel: RPetaPanel, petaFile?: PetaFile) {
+    event.preventDefault();
+    event.stopPropagation();
+    setSelectedPanelId(panel.id);
+    components.contextMenu.open(
+      [
+        {
+          label: t("boards.panelMenu.toFront"),
+          click: () => {
+            if (!board) {
+              return;
+            }
+            const maxIndex = Math.max(...panels.map((current) => current.index), 0);
+            onUpdateBoard({
+              ...board,
+              petaPanels: normalizePanels(
+                panels.map((current) =>
+                  current.id === panel.id ? { ...current, index: maxIndex + 1 } : current,
+                ),
+              ),
+            });
+          },
+        },
+        {
+          label: t("boards.panelMenu.toBack"),
+          click: () => {
+            if (!board) {
+              return;
+            }
+            const minIndex = Math.min(...panels.map((current) => current.index), 0);
+            onUpdateBoard({
+              ...board,
+              petaPanels: normalizePanels(
+                panels.map((current) =>
+                  current.id === panel.id ? { ...current, index: minIndex - 1 } : current,
+                ),
+              ),
+            });
+          },
+        },
+        {
+          label: t("boards.panelMenu.flipHorizontal"),
+          click: () => {
+            updatePanel(panel.id, (current) => ({
+              ...current,
+              flipHorizontal: !current.flipHorizontal,
+            }));
+          },
+        },
+        {
+          label: t("boards.panelMenu.flipVertical"),
+          click: () => {
+            updatePanel(panel.id, (current) => ({
+              ...current,
+              flipVertical: !current.flipVertical,
+            }));
+          },
+        },
+        {
+          label: t("boards.panelMenu.reset"),
+          click: () => {
+            updatePanel(panel.id, (current, selectedPetaFile) => {
+              if (!selectedPetaFile) {
+                return current;
+              }
+              const maxWidth = current.width;
+              const maxHeight = current.height;
+              const resized =
+                maxWidth > maxHeight
+                  ? resizeImage(selectedPetaFile.metadata.width, selectedPetaFile.metadata.height, maxWidth, "width")
+                  : resizeImage(selectedPetaFile.metadata.width, selectedPetaFile.metadata.height, maxHeight, "height");
+              return {
+                ...current,
+                width: resized.width,
+                height: resized.height,
+                flipHorizontal: false,
+                flipVertical: false,
+                rotation: 0,
+                crop: {
+                  ...current.crop,
+                  position: new Vec2(0, 0),
+                  width: 1,
+                  height: 1,
+                },
+              };
+            });
+          },
+        },
+        {
+          label: t("boards.panelMenu.details"),
+          click: async () => {
+            if (!petaFile) {
+              return;
+            }
+            await IPC.details.set(petaFile.id);
+            await IPC.windows.open("details");
+          },
+        },
+        {
+          label: t("boards.panelMenu.openInBrowser"),
+          click: async () => {
+            await IPC.common.openInBrowser(panel.petaFileId);
+          },
+        },
+        {
+          label: t("boards.panelMenu.remove"),
+          click: () => {
+            if (!board) {
+              return;
+            }
+            const nextPanels = { ...board.petaPanels };
+            delete nextPanels[panel.id];
+            setSelectedPanelId("");
+            onUpdateBoard({
+              ...board,
+              petaPanels: normalizePanels(Object.values(nextPanels)),
+            });
+          },
+        },
+      ],
+      new Vec2(event.clientX, event.clientY),
+    );
   }
 
   return (
@@ -334,11 +537,27 @@ export default function VBoard({
                   event.stopPropagation();
                   setSelectedPanelId(panel.id);
                 }}
+                onContextMenu={(event) => openPanelContextMenu(event, panel, petaFile)}
                 onDoubleClick={(event) => {
                   event.stopPropagation();
                   if (petaFile) {
-                    void IPC.windows.open("details", petaFile.id);
+                    void IPC.details.set(petaFile.id).then(() => IPC.windows.open("details"));
                   }
+                }}
+                onPointerDown={(event) => {
+                  if (event.button !== 0) {
+                    return;
+                  }
+                  event.stopPropagation();
+                  setSelectedPanelId(panel.id);
+                  panelDragRef.current = {
+                    pointerId: event.pointerId,
+                    startX: event.clientX,
+                    startY: event.clientY,
+                    panelId: panel.id,
+                    positionX: panel.position.x,
+                    positionY: panel.position.y,
+                  };
                 }}
                 style={{
                   left: `${panel.position.x}px`,
