@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { css } from "styled-system/css";
 
 import VTitleBar from "@/renderer/components/commons/titleBar/VTitleBar";
+import VContextMenu from "@/renderer/components/commons/utils/contextMenu/VContextMenu";
 import { useAppInfoStore } from "@/renderer/stores/appInfoStore/useAppInfoStore";
 import { useWindowNameStore } from "@/renderer/stores/windowNameStore/useWindowNameStore";
 import { useWindowTitleStore } from "@/renderer/stores/windowTitleStore/useWindowTitleStore";
@@ -56,6 +57,7 @@ export function WindowScaffold({
       <div className={contentStyle}>
         {children ?? <div className={placeholderStyle}>{title}</div>}
       </div>
+      <VContextMenu />
     </div>
   );
 }
