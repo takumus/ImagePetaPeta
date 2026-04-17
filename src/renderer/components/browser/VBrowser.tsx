@@ -11,6 +11,7 @@ import {
   BROWSER_THUMBNAIL_SIZE,
   BROWSER_THUMBNAIL_ZOOM_MAX,
   BROWSER_THUMBNAIL_ZOOM_MIN,
+  INTERNAL_DRAG_PETA_FILE_IDS_MIME,
 } from "@/commons/defines";
 import { ciede, hex2rgb } from "@/commons/utils/colors";
 import { Vec2 } from "@/commons/utils/vec2";
@@ -135,6 +136,7 @@ export default function VBrowser() {
   const components = useComponentsStore();
   const [petaFilesById, setPetaFilesById] = useState<Record<string, PetaFile>>({});
   const [allTags, setAllTags] = useState<PetaTag[]>([]);
+  const [showTagsOnTile, setShowTagsOnTile] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedPetaTagIds, setSelectedPetaTagIds] = useState<string[]>([]);
   const [selectedFilterType, setSelectedFilterType] = useState<FilterType>("all");
@@ -143,6 +145,7 @@ export default function VBrowser() {
   const [showNSFW, setShowNSFW] = useState(false);
   const [states, setStates] = useState<States>(defaultStates);
   const [filteredIds, setFilteredIds] = useState<string[]>([]);
+  const [tileTagsRevision, setTileTagsRevision] = useState(0);
   const filterRequestRef = useRef(0);
 
   useEffect(() => {
@@ -158,14 +161,16 @@ export default function VBrowser() {
     void Promise.all([
       IPC.petaFiles.getAll(),
       IPC.petaTags.getAll(),
+      IPC.settings.get(),
       IPC.states.get(),
       IPC.nsfw.get(),
-    ]).then(([petaFiles, tags, nextStates, nextShowNSFW]) => {
+    ]).then(([petaFiles, tags, settings, nextStates, nextShowNSFW]) => {
       if (!mounted) {
         return;
       }
       setPetaFilesById(petaFiles);
       setAllTags(tags);
+      setShowTagsOnTile(settings.showTagsOnTile);
       setStates(nextStates);
       setShowNSFW(nextShowNSFW);
     });
@@ -182,6 +187,10 @@ export default function VBrowser() {
     });
     const tagsSubscription = IPC.petaTags.on("update", () => {
       void refreshTags();
+      setTileTagsRevision((current) => current + 1);
+    });
+    const settingsSubscription = IPC.settings.on("update", (_event, nextSettings) => {
+      setShowTagsOnTile(nextSettings.showTagsOnTile);
     });
     const statesSubscription = IPC.states.on("update", (_event, nextStates) => {
       setStates(nextStates);
@@ -205,6 +214,7 @@ export default function VBrowser() {
       mounted = false;
       petaFilesSubscription.off();
       tagsSubscription.off();
+      settingsSubscription.off();
       statesSubscription.off();
       nsfwSubscription.off();
       openInBrowserSubscription.off();
@@ -384,6 +394,21 @@ export default function VBrowser() {
     });
   }
 
+  function handleTileDragStart(event: React.DragEvent, petaFile: PetaFile) {
+    const targetFiles = selectedIds.includes(petaFile.id) ? selectedPetaFiles : [petaFile];
+    if (!selectedIds.includes(petaFile.id)) {
+      setSelectedIds([petaFile.id]);
+    }
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "copy";
+      event.dataTransfer.setData(
+        INTERNAL_DRAG_PETA_FILE_IDS_MIME,
+        JSON.stringify(targetFiles.map((file) => file.id)),
+      );
+      event.dataTransfer.setData("text/plain", targetFiles.map((file) => file.name).join(", "));
+    }
+  }
+
   return (
     <div className={rootStyle}>
       <div className={sidebarStyle}>
@@ -437,9 +462,11 @@ export default function VBrowser() {
               style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${states.browserTileSize}px, 1fr))` }}>
               {filteredPetaFiles.map((petaFile) => (
                 <VTile
+                  allTags={allTags}
                   key={petaFile.id}
                   onDoubleClick={(next) => void openDetail(next)}
                   onContextMenu={(event, next) => openContextMenu(event, next)}
+                  onDragStart={(event, next) => handleTileDragStart(event, next)}
                   onSelect={(event, next) => {
                     if (event.metaKey || event.ctrlKey) {
                       setSelectedIds((current) =>
@@ -455,6 +482,8 @@ export default function VBrowser() {
                   petaFile={petaFile}
                   selected={selectedIds.includes(petaFile.id)}
                   showNSFW={showNSFW}
+                  showTagsOnTile={showTagsOnTile}
+                  tagsRevision={tileTagsRevision}
                 />
               ))}
             </div>

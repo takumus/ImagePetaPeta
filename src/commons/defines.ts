@@ -5,6 +5,8 @@ export const PROTOCOLS = {
     PAGE_DOWNLOADER_CACHE: "page-downloader-cache",
   },
 } as const;
+export const INTERNAL_DRAG_PETA_FILE_IDS_MIME: string =
+  "application/x-imagepetapeta-petafileids";
 export const BOARD_DEFAULT_NAME: string = "noname";
 export const BOARD_ADD_MULTIPLE_OFFSET_X: number = 20;
 export const BOARD_ADD_MULTIPLE_OFFSET_Y: number = 20;
