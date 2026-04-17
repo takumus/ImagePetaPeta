@@ -1,4 +1,4 @@
-import VWindow from "@/renderer/components/VWindowBoard.vue";
+import VWindow from "@/renderer/components/VWindowBoard";
 
 import { injectAnimatedGIFAsset } from "@/renderer/libs/pixi-gif/animatedGIFAsset";
 import {

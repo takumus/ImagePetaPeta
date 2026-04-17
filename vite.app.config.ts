@@ -11,7 +11,7 @@ import cloneDeep from "lodash.clonedeep";
 import { defineConfig, mergeConfig, UserConfig, UserConfigFnPromise } from "vite";
 import electron, { ElectronOptions } from "vite-plugin-electron";
 
-import vue from "@vitejs/plugin-vue";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig((async ({ command }) => {
   const isBuild = command === "build";
@@ -30,13 +30,7 @@ export default defineConfig((async ({ command }) => {
     },
     plugins: [
       webWorker(),
-      vue({
-        template: {
-          compilerOptions: {
-            isCustomElement: (tag) => tag.startsWith("e-"),
-          },
-        },
-      }),
+      react(),
       electrons(isBuild),
     ],
     base: "./", // ビルド後にアセットのurlが/始まりではなく./始まりにする。

@@ -1,4 +1,4 @@
-import VWindow from "@/renderer/components/VWindowTask.vue";
+import VWindow from "@/renderer/components/VWindowTask";
 
 import { create } from "@/renderer/windows/@base";
 
